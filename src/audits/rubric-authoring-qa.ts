@@ -100,7 +100,7 @@ export const RUBRIC_AUTHORING_RULES: readonly RuleDefinition[] = Object.freeze([
     id: "cross_locale_structure",
     evidenceClass: "structural_fact",
     description:
-      "Compares cross-locale pair structure by rubric category, behavior, capability, and evaluator type without judging translation equivalence.",
+      "Compares cross-locale pair structure by category, behavior, capability, weight, evaluator type, and critical-failure metadata without judging translation equivalence.",
   },
   {
     id: "known_ambiguity_sentinel",
@@ -284,7 +284,11 @@ function structuralSignature(rubric: TutorEvalRubric): string {
     rubric.category,
     rubricBehavior(rubric),
     rubric.capabilityTag ?? "",
+    rubric.weight,
     rubricEvaluationType(rubric),
+    rubric.critical === true ? "critical" : "ordinary",
+    rubric.criticalFailure?.type ?? "",
+    rubric.criticalFailure?.severity ?? "",
   ].join("|");
 }
 
@@ -406,8 +410,10 @@ export function buildRubricAuthoringAudit(
       }
 
       if (
-        tutorCase.id === "language-word-context-001" &&
-        rubric.id === "language-word-context-001"
+        (tutorCase.id === "language-word-context-001" ||
+          tutorCase.id === "language-word-context-001-zh-CN") &&
+        (rubric.id === "language-word-context-001" ||
+          rubric.id === "language-word-context-001-zh-CN")
       ) {
         findings.push({
           ruleId: "known_ambiguity_sentinel",
@@ -462,7 +468,7 @@ export function buildRubricAuthoringAudit(
     }
   }
 
-  const groups = new Map<string, typeof dataset.cases[number][]>();
+  const groups = new Map<string, Array<(typeof dataset.cases)[number]>>();
   for (const tutorCase of dataset.cases) {
     if (tutorCase.crossLocaleGroupId === undefined) continue;
     const group = groups.get(tutorCase.crossLocaleGroupId) ?? [];
