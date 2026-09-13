@@ -56,6 +56,7 @@
     "benchmark": "npm run build && node dist/src/cli/benchmark.js",
     "judge:openai": "npm run build && node dist/src/cli/judge-openai.js",
     "coverage": "npm run build && node dist/src/cli/dataset-coverage.js",
+    "rubric:audit": "npm run build && node dist/src/cli/rubric-authoring-audit.js",
     "calibration:export": "npm run build && node dist/src/cli/calibration-export.js",
     "calibration:validate": "npm run build && node dist/src/cli/calibration-validate.js",
     "calibration:report": "npm run build && node dist/src/cli/calibration-report.js",
