@@ -32,29 +32,42 @@ Change a scenario or rubric only with independent evidence that the benchmark it
 
 ## Engineering workflow
 
-`re` uses `.agents/skills/tutor-benchmark-engineering/SKILL.md` as the required repo-local engineering Skill for implementation, refactor, maintenance, rules, documentation, tests, and release tasks. Before any repository write, read that Skill and select its workflow mode. Read-only questions do not create a branch.
+This repository uses `.agents/skills/tutor-benchmark-engineering/SKILL.md` as the required repo-local engineering Skill for implementation, refactor, maintenance, rules, documentation, tests, release tasks, and repository/GitHub mutations. Read it before any mutation and select the workflow mode before acting.
 
-The repo-local Skill owns architecture audit, implementation, validation, GitHub delivery, CI/review, merge, cleanup, and final reporting. Keep procedural workflow there; do not duplicate it in this file.
+The Skill owns architecture audit, implementation, validation, GitHub delivery, CI/review, merge eligibility, merge authorization, cleanup, incident recovery, and final reporting. Keep procedural workflow there; do not duplicate it here.
 
 ### Hard invariants and routing
 
-- After bootstrap, new write tasks start from clean `main` synchronized to latest `origin/main` and enter a fresh short-lived `feature/`, `fix/`, `refactor/`, or `chore/` branch before the first edit. Existing PR work continues on the exact verified PR head branch.
+- Pure read-only work does not create a branch and must not mutate GitHub state.
+- GitHub coordination metadata mutations such as creating or editing issues, comments, labels, milestones, or issue state are mutations even though they do not modify repository files. Perform them only when they are within the user's authorized scope; they do not by themselves require a code branch.
+- New repository-content write tasks start from the exact verified latest `origin/main` and enter a fresh short-lived `feature/`, `fix/`, `refactor/`, or `chore/` branch before the first file edit. Existing PR work continues on the exact verified PR head branch.
+- Repository-content writes through a connector/API are subject to the same branch rule as local Git. Any file create/update/delete call must explicitly name the verified task branch. Never omit the branch argument, rely on a default branch, or target `main` for a task write.
 - Preserve unrelated user changes, WIP branches, and worktrees. STOP on unknown dirty changes, detached HEAD, unfinished merge/rebase, ambiguous ownership, or conflicting worktree. Never stash, reset, restore, clean, `git checkout -- .`, delete or prune user work, overwrite WIP, or commit unrelated changes.
-- Unless the user explicitly limits the phase, normal scoped delivery is authorized through commit, push, PR creation, task-related CI fixes, healthy merge, and post-merge cleanup. Safety STOP conditions and unrelated CI blockers remain hard stops.
-- Merge requires green required checks, unblocked review, no conflict, unchanged verified PR HEAD, no sensitive files, and no scope expansion. Do not force-push, direct-push `main`, admin-bypass protections, or merge an unverified PR. Do not configure GitHub branch protection in the Foundation phase.
-- The repo-local Skill directly owns the complete GitHub delivery lifecycle. The available GitHub connector and local `git`/`gh` commands are execution tools, not an additional mandatory workflow layer.
+- Normal scoped delivery may proceed through commit, push, PR creation, task-related CI fixes, and merge-readiness verification unless the user limits the phase. Technical readiness does not itself authorize Merge.
+- Merge requires both technical eligibility and explicit authorization for the current task. Authorization may be given in advance or immediately before Merge, but it must be unambiguous and task-specific. Green CI, mergeability, or prior authorization for a different task is not Merge authorization.
+- Merge eligibility requires green required checks, unblocked review, no conflict, unchanged verified PR HEAD, no sensitive files, and no scope expansion. Do not force-push, direct-push `main`, admin-bypass protections, or merge an unverified PR.
 - Prefer the GitHub connector for structured remote metadata, PRs, issues, patches, comments, reviews, and labels. Use local `git` for checkout and local history operations, and `gh` for authentication, current-PR discovery, Actions checks/logs, and connector gaps.
 
-### Project-specific facts
+### Accidental-mutation safety
 
-- The Foundation phase is synthetic, deterministic, typed, reproducible, and independent of Review Workspace. Keep its product, privacy, benchmark-integrity, and provider-independent contract boundaries intact.
-- Use Node 22 in CI and run the repository's applicable quality gates from the repo-local Skill, normally `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, `npm run benchmark`, and `git diff --check`.
-- Stop at the explicitly requested phase; do not start a later roadmap phase without a new scoped task.
+If an unauthorized or unintended repository mutation occurs:
 
-## Scope and phase boundary
+1. STOP the original task immediately.
+2. Record the pre-mutation SHA, accidental mutation SHA, target branch, and affected paths/state.
+3. Do not force-push, rewrite history, reset shared refs, or hide the incident.
+4. Apply only the minimum safe recovery needed to restore repository content/state, preferably as an ordinary forward recovery commit when shared history has moved.
+5. Verify the recovered tree/state against the pre-mutation baseline.
+6. Report the incident and recovery evidence to the user.
+7. Do not resume the original task until the recovery state is accepted or new explicit scope is provided.
 
-The 0.1 Foundation phase is synthetic, deterministic, typed, testable, and reproducible. It does not include LLM-as-Judge, real model/API calls, Review Workspace integration, real user data, databases, dashboards, large datasets, or complex statistical evaluation.
+## Project and phase routing
 
-An explicitly scoped follow-up may add a versioned judge prompt, provider-independent judge input/output contracts, and pure result validation or score calculations. Real model calls, provider SDKs, calibration claims, and hidden reasoning persistence remain prohibited unless separately authorized.
+TutorBench now spans multiple completed and in-progress roadmap phases. Do not treat the whole repository as if it were still limited to the 0.1 Foundation phase.
 
-Stop when the explicitly requested phase is complete. Do not start the next roadmap phase without a new scoped task.
+- `docs/roadmap.md` is the primary status map for completed, partial, blocked, and not-started phases.
+- The user's explicit task scope determines which phase boundary applies.
+- Historical Foundation restrictions remain binding when work is scoped to Foundation-era contracts or when a later phase has not explicitly authorized the relevant capability.
+- Existing later-phase functionality such as Judge providers, Community Review service components, or other roadmap-approved boundaries is not invalid merely because it exceeds the original 0.1 Foundation scope.
+- Do not start a later roadmap phase, open public intake, make live provider calls, start a real reviewer campaign, or make calibration/validity claims unless the current task explicitly authorizes that boundary.
+- Use Node 22 in CI and run the applicable quality gates from the repo-local Skill, normally `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, `npm run benchmark`, and `git diff --check` for runtime changes; use proportional structural checks for rules-only changes.
+- Stop at the explicitly requested phase.
