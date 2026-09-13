@@ -47,14 +47,23 @@ test("pair identity is input-order independent and blind packets omit candidate 
   assert.equal(second.assignment.aResponseId, "response-z");
   assert.equal(second.assignment.bResponseId, "response-a");
 
-  const serializedFirstPacket = JSON.stringify(first.packet);
-  const serializedSecondPacket = JSON.stringify(second.packet);
-  for (const serialized of [serializedFirstPacket, serializedSecondPacket]) {
+  for (const presentation of [first, second]) {
+    const serialized = JSON.stringify(presentation.packet);
     assert.doesNotMatch(serialized, /response-a|response-z/);
-    assert.doesNotMatch(serialized, /provider|modelVersion|promptVersion|token|latency|cost/i);
-    assert.match(serialized, /comparisonInstruction/);
-    assert.match(serialized, /rubrics/);
-    assert.match(serialized, /disclosurePolicy/);
+    assert.equal("tutor" in presentation.packet, false);
+    assert.equal("provider" in presentation.packet, false);
+    assert.equal("model" in presentation.packet, false);
+    assert.equal("generationSpec" in presentation.packet, false);
+    assert.equal("metrics" in presentation.packet, false);
+    for (const candidate of presentation.packet.candidates) {
+      assert.equal("responseId" in candidate, false);
+      assert.equal("provider" in candidate, false);
+      assert.equal("model" in candidate, false);
+      assert.equal("metrics" in candidate, false);
+    }
+    assert.ok(presentation.packet.comparisonInstruction.length > 0);
+    assert.ok(presentation.packet.evaluatorOnly.rubrics.length > 0);
+    assert.ok(presentation.packet.evaluatorOnly.disclosurePolicy.length > 0);
   }
 
   assert.equal(first.packet.candidates[0].responseText, "Helpful response A");
