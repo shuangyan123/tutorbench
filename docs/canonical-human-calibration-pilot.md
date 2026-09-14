@@ -31,6 +31,13 @@ The fixed Tutor responses are developer-authored synthetic diagnostic stimuli.
 They are not model-performance evidence. Checked-in tests use synthetic fixture
 markers and cannot become human calibration evidence.
 
+For the first real-reviewer operational boundary, reviewer qualification,
+privacy/provenance, blindness, #109 bilingual-review gating, handoff, stop rules,
+and Judge-comparison gating are defined in
+[`r5-human-reference-operations.md`](r5-human-reference-operations.md). That
+operational document does not alter this frozen pilot identity or scoring
+semantics.
+
 ## Frozen pilot design
 
 The pilot contains 9 canonical cases, 27 fixed responses, and 84 rubric-level
