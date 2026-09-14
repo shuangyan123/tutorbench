@@ -81,8 +81,8 @@ five nodes in a horizontally scrollable path. The homepage supports system theme
 an optional locally saved theme choice, and reduced motion. Interface language
 selection remains on the data/methodology pages; homepage editorial copy is English.
 
-`website/src/images/foliage.png` is a generated decorative background, created with
-the built-in image generator from the user-supplied visual reference. It is not a
-brand asset or research evidence. Generation brief: warm off-white empty center,
-soft photographic green foliage at the far edges, a slightly sharper lower-left
-cluster, natural daylight; no text, logo, or UI. CSS masks keep it away from text.
+`website/src/images/foliage.png` is an optimized decorative derivative of the
+user-supplied visual reference and rendered homepage capture. It is not a brand
+asset or research evidence. The asset keeps only the soft edge foliage needed by
+the CSS masks and intentionally excludes page text, logos, controls, and benchmark
+content.
