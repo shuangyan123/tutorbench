@@ -2,6 +2,7 @@ import type {
   PublicBenchmarkArtifact,
   TutorEvalPublicCase,
 } from "../datasets/public.js";
+import { siteIcon } from "./icons.js";
 import {
   TUTOR_EVAL_DATASET_ID,
   TUTOR_EVAL_DATASET_VERSION,
@@ -177,6 +178,18 @@ function renderHeader(
   basePath: string,
   locale: SiteLocale,
 ): string {
+  if (activeRoute === "/") {
+    const links = [
+      ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
+      ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
+    ] as const;
+    return `<header class="site-header home-header"><div class="shell header-inner">
+      <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="TutorBench home"><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">TutorBench</span><span class="wordmark-descriptor">Measurement infrastructure<br>for AI tutoring</span></span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
+      <nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">${links.map(([label, route]) => `<a href="${escapeHtml(sitePath(basePath, route))}"${route === "/" ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav>
+      <div class="home-header-tools"><div class="theme-controls" role="group" aria-label="Color theme"><button type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme">${siteIcon("sun")}</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme">${siteIcon("moon")}</button></div><a class="github-link" href="${SITE_GITHUB_URL}" aria-label="GitHub repository" title="GitHub repository">${siteIcon("github")}</a><a class="button button-primary" href="${escapeHtml(sitePath(basePath, "/run/"))}">Get Started ${siteIcon("arrow")}</a></div>
+    </div></header>`;
+  }
   return `<header class="site-header">
     <div class="shell header-inner">
       <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="TutorBench home">
@@ -250,11 +263,11 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
-  <body>
+  <body${page.route === "/" ? ' class="home-page"' : ""}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     ${renderHeader(page.route, basePath, locale)}
     <main id="main-content">${page.content}</main>
-    ${renderFooter(context.benchmark ?? ({
+    ${page.route === "/" ? "" : renderFooter(context.benchmark ?? ({
       statusLabel: "Developer Preview",
       dataset: { id: TUTOR_EVAL_DATASET_ID, version: TUTOR_EVAL_DATASET_VERSION },
     }), locale)}

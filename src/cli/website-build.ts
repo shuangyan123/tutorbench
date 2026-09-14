@@ -246,6 +246,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await mkdir(join(outputDirectory, "assets"), { recursive: true });
   await writeFile(join(outputDirectory, "assets", "styles.css"), stylesheet, "utf8");
   await writeFile(join(outputDirectory, "assets", "site.js"), clientScript, "utf8");
+  await copyFile(join(websiteRoot, "src", "images", "foliage.png"), join(outputDirectory, "assets", "foliage.png"));
   await copyBrandAssets(outputDirectory);
   await writeJson(outputDirectory, "benchmark.json", artifacts.benchmark);
   await writeJson(outputDirectory, "cases.json", artifacts.cases);
