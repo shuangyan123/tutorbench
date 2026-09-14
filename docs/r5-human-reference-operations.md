@@ -22,6 +22,12 @@ in `docs/canonical-human-calibration-pilot.md` remains authoritative for the
 technical mechanics. This document adds the human qualification, privacy,
 provenance, handoff, and stop rules needed before real annotations are accepted.
 
+An English-only first-run fallback is separately frozen by
+`docs/r5-english-only-human-reference-pilot.md` as
+`english-only-tutoreval-human-reference-pilot-001@0.1.0`. It is a distinct
+pilot identity and must not be produced by manually deleting zh-CN rows from a
+canonical nine-case export.
+
 ## 1. Evidence boundary
 
 A real run may support only a narrow claim after all required steps are complete:
@@ -162,10 +168,10 @@ Therefore:
   independent bilingual qualification/sign-off adequate for #109 or explicitly
   record #109 as an unresolved limitation and prevent any claim that depends on
   bilingual validation;
-- if the project later chooses an English-only first-run subset, that subset
-  must receive its own explicit versioned operational identity and task-set
-  fingerprint. Do not silently remove the zh-CN task from the existing frozen
-  canonical pilot.
+- if the project later chooses an English-only first-run subset, use the
+  separately versioned identity and fingerprint rules in
+  `docs/r5-english-only-human-reference-pilot.md`. Do not silently remove the
+  zh-CN task from the existing frozen canonical pilot.
 
 R5 does not auto-close #109.
 
@@ -178,7 +184,7 @@ steps before sending the task:
 2. decide `eligible`, `not-eligible`, or `limited-scope` and record why;
 3. assign an opaque pseudonym;
 4. export the frozen reviewer package using the existing canonical pilot
-   command;
+   command or a separately versioned, conforming fallback exporter;
 5. verify the pilot/dataset/guide identities and manifest fingerprint;
 6. send only that reviewer's packet, submission template, annotation guide, and
    reviewer instructions;
@@ -233,10 +239,11 @@ The operator must stop rather than repair a real submission by hand when:
 - independence was compromised;
 - the reviewer is later found not to satisfy the documented qualification scope.
 
-Use the existing strict import path. Do not copy labels into a fresh template to
-make an invalid submission pass. If a procedural correction is necessary, send
-the untouched original template/package back to that reviewer and have the
-reviewer produce a corrected submission themselves.
+Use the existing strict import path for the matching pilot identity. Do not copy
+labels into a fresh template to make an invalid submission pass. If a
+procedural correction is necessary, send the untouched original
+template/package back to that reviewer and have the reviewer produce a corrected
+submission themselves.
 
 ## 9. Agreement before adjudication
 
@@ -319,6 +326,7 @@ At this operational-preparation stage:
 
 ```text
 R5-B OPERATIONAL PACKAGE READY FOR REVIEW
+R5-C1 ENGLISH-ONLY FALLBACK SPECIFICATION FROZEN
 REAL HUMAN ANNOTATION NOT STARTED
 HUMAN REFERENCE NOT ESTABLISHED
 JUDGE-VS-HUMAN CALIBRATION NOT STARTED
