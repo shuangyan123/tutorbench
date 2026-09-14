@@ -61,3 +61,28 @@ resolve to `en`. For a local, explicit audit view over an ignored evaluation
 artifact, use `npm run website:build -- -- --evaluation <path> --output
 website/private-dist --locale zh-CN`. The default Pages build never loads that
 path and never emits private evaluation content.
+
+## Reference-led homepage
+
+The homepage uses the supplied September 2026 art direction: an ivory/forest
+palette, serif thesis, case walkthrough, five-dimension path, and compact data
+footer. Its descriptor is “Measurement infrastructure for AI tutoring”; other
+pages retain their existing header. The approved T1 brand mark is unchanged.
+
+`src/site/pages/home.ts` renders public cases only. Tabs expose the learner input,
+authored objective, rubric-method explanation, and public context. There are no
+invented Tutor replies, scores, PASS states, or published runs. Empty score tracks
+mean **not scored**. The dimension progress indicator is the dimension's position
+in the walkthrough, not a quality score. Dataset counts/version come from the
+public artifact; evaluator version comes from the existing contract constant.
+
+Case and dimension navigation support keyboard use; small screens retain all
+five nodes in a horizontally scrollable path. The homepage supports system theme,
+an optional locally saved theme choice, and reduced motion. Interface language
+selection remains on the data/methodology pages; homepage editorial copy is English.
+
+`website/src/images/foliage.png` is a generated decorative background, created with
+the built-in image generator from the user-supplied visual reference. It is not a
+brand asset or research evidence. Generation brief: warm off-white empty center,
+soft photographic green foliage at the far edges, a slightly sharper lower-left
+cluster, natural daylight; no text, logo, or UI. CSS masks keep it away from text.

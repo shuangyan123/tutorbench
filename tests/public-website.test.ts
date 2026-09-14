@@ -13,8 +13,28 @@ import {
   toPublicTutorEvalCase,
   type PublicBenchmarkArtifacts,
 } from "../src/datasets/index.js";
-import { TUTOR_EVAL_DATASET_ID } from "../src/contracts/index.js";
+import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/index.js";
 import { TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
+import { renderHomePage } from "../src/site/pages/home.js";
+
+test("homepage derives facts and escapes case content without inventing model results", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const firstCase = artifacts.cases.cases[0];
+  assert.ok(firstCase);
+  const content = renderHomePage({
+    ...artifacts,
+    benchmark: { ...artifacts.benchmark, dataset: { ...artifacts.benchmark.dataset, version: "test-version", caseCount: 71, rubricCount: 233 } },
+    cases: { ...artifacts.cases, cases: [{ ...firstCase, tutorInput: { ...firstCase.tutorInput, studentMessage: '<img src=x onerror="alert(1)">' } }] },
+  }).content;
+  assert.match(content, /<dd>71<\/dd>/);
+  assert.match(content, /<dd>233<\/dd>/);
+  assert.match(content, /<dd>test-version<\/dd>/);
+  assert.ok(content.includes(`<dd>${TUTOR_EVAL_EVALUATOR_VERSION}</dd>`));
+  assert.match(content, /&lt;img src=x onerror=&quot;alert\(1\)&quot;&gt;/);
+  assert.doesNotMatch(content, /<img src=x/);
+  assert.match(content, /Not scored · no model run/);
+  assert.match(content, /No model response or model score is published here/);
+});
 
 async function loadDataset() {
   return loadTutorEvalDataset(TUTOR_EVAL_DATASET_ID);
@@ -128,30 +148,20 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /No calibrated public model runs yet\./);
     assert.match(homeHtml, /href="\/leaderboard\//);
     assert.match(homeHtml, /href="\/community\//);
-    assert.match(homeHtml, /<a class="button button-primary" href="\/data\/cases\/">Browse cases<\/a>/);
-    assert.match(homeHtml, /<a class="button button-secondary" href="\/run\/">Run TutorBench<\/a>/);
-    assert.match(homeHtml, /<a class="button button-quiet" href="\/methodology\/">Read methodology<\/a>/);
-    assert.doesNotMatch(homeHtml, /Explore leaderboard/);
-    assert.ok(homeHtml.indexOf('href="/data/cases/">Browse cases') < homeHtml.indexOf('href="/run/">Run TutorBench'));
-    assert.ok(homeHtml.indexOf('href="/run/">Run TutorBench') < homeHtml.indexOf('href="/methodology/">Read methodology'));
-    const datasetSnapshotIndex = homeHtml.indexOf('id="dataset-snapshot-heading"');
-    const exampleCaseIndex = homeHtml.indexOf('id="example-case-title"');
-    const measureIndex = homeHtml.indexOf('id="measure-title"');
-    const developerIndex = homeHtml.indexOf('id="developer-title"');
-    const publicResultsIndex = homeHtml.indexOf('id="public-results-title"');
-    const limitsIndex = homeHtml.indexOf('id="limits-title"');
-    assert.ok(datasetSnapshotIndex >= 0);
-    assert.ok(exampleCaseIndex > datasetSnapshotIndex);
-    assert.ok(measureIndex > exampleCaseIndex);
-    assert.ok(developerIndex > measureIndex);
-    assert.ok(publicResultsIndex > developerIndex);
-    assert.ok(limitsIndex > publicResultsIndex);
-    assert.match(homeHtml, /A real synthetic development set/);
-    assert.match(homeHtml, /Example case/);
-    assert.match(homeHtml, /Bring your own Tutor/);
-    assert.match(homeHtml, /freeze responses into a corpus and replay the benchmark offline/);
-    assert.match(homeHtml, /Public results status/);
-    assert.doesNotMatch(homeHtml, /<table[\s\S]*?public model rows/);
+    assert.match(homeHtml, /Before we trust<br>AI tutors, <em>measure<\/em>/);
+    assert.match(homeHtml, /href="\/data\/cases\/">Explore the Benchmark/);
+    assert.match(homeHtml, /href="\/methodology\/">[\s\S]*Read the Methodology/);
+    assert.match(homeHtml, /data-case-walkthrough/);
+    assert.match(homeHtml, /Illustrative case walkthrough/);
+    assert.match(homeHtml, /Not scored · no model run/);
+    assert.match(homeHtml, /No model response or model score is published here/);
+    assert.equal((homeHtml.match(/data-home-case[ >]/g) ?? []).length, 48);
+    assert.equal((homeHtml.match(/data-dimension="[0-4]"/g) ?? []).length, 5);
+    assert.ok(homeHtml.indexOf('class="home-hero"') < homeHtml.indexOf('class="home-dimensions"'));
+    assert.ok(homeHtml.indexOf('class="home-dimensions"') < homeHtml.indexOf('class="home-data"'));
+    assert.match(homeHtml, /Synthetic cases/);
+    assert.match(homeHtml, /Authored rubrics/);
+    assert.doesNotMatch(homeHtml, /Real tutoring cases|Real educational impact|Community-reviewed|4\.6 \/ 5|>PASS<|>PARTIAL</);
     assert.match(homeHtml, /Human calibration \(P5\) has not started/);
     assert.match(homeHtml, /Judge-vs-human and statistical validation are not completed/);
     assert.match(homeHtml, /real Community Review and human calibration have not started/);
@@ -160,9 +170,13 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /src="\/assets\/site\.js"/);
     assert.match(homeHtml, /src="\/assets\/brand\/tutorbench\/web\/tutorbench-mark-small\.svg"/);
     assert.match(homeHtml, /TutorBench/);
-    assert.match(homeHtml, /AI Tutor 评测基准/);
+    assert.match(homeHtml, /Measurement infrastructure/);
     assert.match(homeHtml, /rel="icon" href="\/assets\/brand\/tutorbench\/raster\/favicon\.ico"/);
     assert.match(homeHtml, /rel="icon" type="image\/png" sizes="32x32" href="\/assets\/brand\/tutorbench\/raster\/favicon-32\.png"/);
+    assert.deepEqual(
+      await readFile(join(outputDirectory, "assets", "foliage.png")),
+      await readFile(join(process.cwd(), "website", "src", "images", "foliage.png")),
+    );
     for (const assetPath of TUTORBENCH_BRAND_ASSET_PATHS) {
       assert.deepEqual(
         await readFile(join(outputDirectory, "assets", "brand", "tutorbench", assetPath)),
