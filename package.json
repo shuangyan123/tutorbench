@@ -64,6 +64,8 @@
     "calibration:aggregate": "npm run build && node dist/src/cli/calibration-aggregate.js",
     "calibration:pilot:export": "npm run build && node dist/src/cli/calibration-pilot-export.js",
     "calibration:pilot:import": "npm run build && node dist/src/cli/calibration-pilot-import.js",
+    "calibration:english-only:export": "npm run build && node dist/src/cli/calibration-english-only-pilot-export.js",
+    "calibration:english-only:import": "npm run build && node dist/src/cli/calibration-english-only-pilot-import.js",
     "calibration:critical:export": "npm run build && node dist/src/cli/calibration-critical-export.js",
     "calibration:critical:prepare": "npm run build && node dist/src/cli/calibration-critical-prepare.js",
     "calibration:critical:validate": "npm run build && node dist/src/cli/calibration-critical-validate.js",
