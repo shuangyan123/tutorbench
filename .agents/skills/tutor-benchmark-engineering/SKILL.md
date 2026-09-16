@@ -128,6 +128,22 @@ clean synchronized main worktree
 
 Use a disposable worktree when another task/PR must remain checked out or switching would disturb user work. Before creating/removing one, verify path, branch, HEAD, status, and ownership. Never force-remove or prune an unknown/user-owned worktree.
 
+After an authorized merge, use the repository-owned guard rather than relying
+on prose-only cleanup:
+
+```bash
+npm run worktree:audit
+npm run worktree:cleanup -- --apply
+npm run worktree:audit
+```
+
+The first and last commands are read-only verification. Apply mode rechecks
+each candidate and can remove only `SAFE_TO_REMOVE` registered worktrees. The
+guard fails closed for dirty, detached, current, default-branch, unresolved,
+unknown-ownership, open-PR, dependent-PR, or ambiguous GitHub state. It uses
+`git worktree remove` without `--force`, never deletes branches, and does not
+prune metadata unless a future change provides a separate justified need.
+
 ## 7. Load only relevant context
 
 Read the actual contracts, adapters, evaluator, runner, reports, tests, and directly relevant docs. Do not implement from filenames or assumptions.
@@ -333,7 +349,16 @@ Begin cleanup only after remote evidence confirms:
 - merged PR HEAD equals the exact pre-merge validated HEAD;
 - merge result SHA is known and final main contains it.
 
-Preserve any branch/worktree still referenced by another open/stacked PR or worktree. Remove disposable task worktrees without `--force` only after verifying clean state and ownership.
+From a safe final-main location, run `npm run worktree:audit` and retain its
+stable classification, reason, path, branch, and HEAD output. Only
+when the audit identifies a candidate as `SAFE_TO_REMOVE` may the completed
+task invoke `npm run worktree:cleanup -- --apply`; the command re-audits each
+candidate immediately before calling `git worktree remove <path>` and verifies
+that the registration is gone. Run `npm run worktree:audit` again afterward.
+
+Preserve any branch/worktree still referenced by another open/stacked PR or
+worktree. A failed or ambiguous audit is a hard stop, not permission to use
+`--force`, manually delete a directory, prune metadata, or remove a branch.
 
 Delete task branches only when proven owned by the current completed task and unreferenced. Never delete unknown/user WIP branches.
 
@@ -413,7 +438,9 @@ Understand scope
 -> obtain/verify current-task Merge authorization
 -> Merge
 -> verify merge result/final main
--> safe cleanup
+-> npm run worktree:audit
+-> npm run worktree:cleanup -- --apply when SAFE_TO_REMOVE is proven
+-> npm run worktree:audit again
 -> post-merge verification
 -> STOP
 ```
