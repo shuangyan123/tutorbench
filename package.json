@@ -88,7 +88,10 @@
     "test:community-review-service:postgres": "npm run community-review:portal:build && tsc -p services/community-review-service/tsconfig.json && node scripts/community-review-postgres-tests.mjs",
     "test:package": "npm run build && node scripts/package-consumer-smoke.mjs",
     "test:website": "npm run website:build && node scripts/website-artifact-smoke.mjs",
-    "release:verify": "node scripts/verify-release-candidate.mjs"
+    "release:verify": "node scripts/verify-release-candidate.mjs",
+    "worktree:audit": "node scripts/worktree-cleanup.mjs",
+    "worktree:cleanup": "node scripts/worktree-cleanup.mjs --apply",
+    "test:worktree": "node --test scripts/worktree-cleanup.test.mjs"
   },
   "devDependencies": {
     "@auth0/auth0-spa-js": "2.24.1",
