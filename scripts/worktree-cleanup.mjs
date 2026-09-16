@@ -425,6 +425,37 @@ export function classifyWorktree({
   );
 }
 
+export function validateApplyBoundary({ git, defaultBranch, originMainHead }) {
+  const blockers = [];
+  if (git?.error) {
+    blockers.push(`current Git state is unavailable: ${git.error}`);
+  }
+  if (git?.detached !== false || !git?.branch) {
+    blockers.push("invoking worktree is detached or has no attached branch");
+  }
+  if (git?.status?.dirty !== false) {
+    blockers.push("invoking worktree is not clean");
+  }
+  if (git?.unresolved !== false) {
+    blockers.push("invoking worktree has unfinished merge, rebase, cherry-pick, or revert state");
+  }
+  if (git?.branch !== "main") {
+    blockers.push("invoking worktree is not on local main");
+  }
+  if (defaultBranch !== "main") {
+    blockers.push(`GitHub/default branch is not main: ${defaultBranch ?? "unknown"}`);
+  }
+  if (!originMainHead) {
+    blockers.push("origin/main could not be resolved after fetch");
+  } else if (git?.head !== originMainHead) {
+    blockers.push(`current HEAD ${git?.head ?? "unknown"} is not exact origin/main ${originMainHead}`);
+  }
+  return {
+    allowed: blockers.length === 0,
+    blockers,
+  };
+}
+
 function inspectAllWorktrees(rootPath) {
   const currentWorktreePath = runCommand("git", ["rev-parse", "--show-toplevel"], {
     cwd: rootPath,
@@ -475,12 +506,20 @@ function inspectAllWorktrees(rootPath) {
   };
 }
 
-export function executeCleanup(records, { apply = false, removeWorktree = null } = {}) {
+export function executeCleanup(records, {
+  apply = false,
+  removeWorktree = null,
+  boundary = null,
+} = {}) {
   const candidates = records.filter(
     (record) => record.classification === WORKTREE_CLASSIFICATIONS.SAFE_TO_REMOVE,
   );
   if (!apply) {
     return { candidates, removed: [] };
+  }
+  if (boundary?.allowed !== true) {
+    const reason = boundary?.blockers?.join("; ") ?? "final-main execution boundary was not verified";
+    throw new Error(`Apply mode blocked: ${reason}`);
   }
   if (typeof removeWorktree !== "function") {
     throw new Error("Apply mode requires a worktree removal function.");
@@ -519,6 +558,41 @@ function hasRegisteredPath(rootPath, worktreePath) {
   return registered.some((worktree) => normalizedPath(worktree.path) === normalizedPath(worktreePath));
 }
 
+function inspectApplyBoundary(rootPath) {
+  try {
+    runCommand("git", ["fetch", "origin"], { cwd: rootPath });
+  } catch (error) {
+    return {
+      allowed: false,
+      blockers: [`git fetch origin failed: ${error instanceof Error ? error.message : "unknown error"}`],
+    };
+  }
+
+  const git = inspectGitState(rootPath);
+  const repositoryContext = inspectRepositoryContext(rootPath);
+  let originMainHead = null;
+  try {
+    originMainHead = runCommand("git", ["rev-parse", "origin/main"], { cwd: rootPath });
+  } catch {
+    originMainHead = null;
+  }
+  const boundary = validateApplyBoundary({
+    git,
+    defaultBranch: repositoryContext.defaultBranch,
+    originMainHead,
+  });
+  if (repositoryContext.error) {
+    boundary.allowed = false;
+    boundary.blockers.unshift(`GitHub repository state is unavailable or ambiguous: ${repositoryContext.error}`);
+  }
+  return {
+    ...boundary,
+    git,
+    defaultBranch: repositoryContext.defaultBranch,
+    originMainHead,
+  };
+}
+
 function assertSafeRefresh(snapshot, candidate) {
   const refreshed = snapshot.records.find(
     (record) => normalizedPath(record.path) === normalizedPath(candidate.path),
@@ -539,6 +613,10 @@ export function parseArguments(argv) {
 
 export function main(argv = process.argv.slice(2)) {
   const { apply } = parseArguments(argv);
+  const boundary = apply ? inspectApplyBoundary(repositoryRoot) : null;
+  if (apply && boundary?.allowed !== true) {
+    throw new Error(`Apply mode blocked: ${boundary?.blockers?.join("; ") ?? "final-main execution boundary was not verified"}`);
+  }
   const initialSnapshot = inspectAllWorktrees(repositoryRoot);
   printAudit(initialSnapshot, apply ? "APPLY" : "AUDIT (dry-run; no mutation)");
 
@@ -556,6 +634,7 @@ export function main(argv = process.argv.slice(2)) {
   const removed = [];
   executeCleanup(initialSnapshot.records, {
     apply: true,
+    boundary,
     removeWorktree: (worktreePath) => {
       const candidate = candidates.find(
         (record) => normalizedPath(record.path) === normalizedPath(worktreePath),

@@ -1,14 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   WORKTREE_CLASSIFICATIONS,
   classifyWorktree,
   executeCleanup,
+  validateApplyBoundary,
 } from "./worktree-cleanup.mjs";
 
 const branch = "feature/finished-task";
 const head = "1111111111111111111111111111111111111111";
+const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 function fixture(overrides = {}) {
   const worktree = {
@@ -58,6 +61,40 @@ function fixture(overrides = {}) {
 function classify(overrides = {}) {
   return classifyWorktree(fixture(overrides));
 }
+
+function applyBoundary(overrides = {}) {
+  return validateApplyBoundary({
+    git: {
+      branch: "main",
+      head,
+      detached: false,
+      unresolved: false,
+      error: null,
+      status: { dirty: false },
+      ...overrides.git,
+    },
+    defaultBranch: "main",
+    originMainHead: head,
+    ...overrides,
+  });
+}
+
+function assertApplyBlocked(boundary) {
+  const calls = [];
+  assert.throws(
+    () => executeCleanup(
+      [classify()],
+      { apply: true, boundary, removeWorktree: (path) => calls.push(path) },
+    ),
+    /Apply mode blocked/,
+  );
+  assert.deepEqual(calls, []);
+}
+
+test("npm scripts keep audit read-only and cleanup explicitly in apply mode", () => {
+  assert.equal(packageJson.scripts["worktree:audit"], "node scripts/worktree-cleanup.mjs");
+  assert.equal(packageJson.scripts["worktree:cleanup"], "node scripts/worktree-cleanup.mjs --apply");
+});
 
 test("clean merged task worktree is a safe candidate", () => {
   const result = classify();
@@ -142,6 +179,55 @@ test("current worktree is blocked even when otherwise safe", () => {
   assert.equal(result.safe, false);
 });
 
+test("apply from a feature branch is blocked before any removal", () => {
+  assertApplyBlocked(applyBoundary({ git: { branch: "feature/post-merge-worktree-cleanup" } }));
+});
+
+test("apply from a dirty main worktree is blocked before any removal", () => {
+  assertApplyBlocked(applyBoundary({ git: { status: { dirty: true } } }));
+});
+
+test("apply from a detached HEAD is blocked before any removal", () => {
+  assertApplyBlocked(applyBoundary({ git: { branch: null, detached: true } }));
+});
+
+test("apply from stale main is blocked before any removal", () => {
+  assertApplyBlocked(applyBoundary({ git: { head: "2222222222222222222222222222222222222222" } }));
+});
+
+test("apply is blocked when GitHub default branch is not main", () => {
+  assertApplyBlocked(applyBoundary({ defaultBranch: "trunk" }));
+});
+
+test("apply from clean exact latest main may remove safe candidates", () => {
+  const calls = [];
+  const result = executeCleanup(
+    [classify()],
+    {
+      apply: true,
+      boundary: applyBoundary(),
+      removeWorktree: (path) => calls.push(path),
+    },
+  );
+  assert.deepEqual(calls, ["C:/repo/task-worktree"]);
+  assert.equal(result.removed.length, 1);
+});
+
+test("audit from a feature branch remains read-only", () => {
+  const calls = [];
+  const result = executeCleanup(
+    [classify()],
+    {
+      apply: false,
+      boundary: applyBoundary({ git: { branch: "feature/post-merge-worktree-cleanup" } }),
+      removeWorktree: (path) => calls.push(path),
+    },
+  );
+  assert.equal(result.candidates.length, 1);
+  assert.deepEqual(result.removed, []);
+  assert.deepEqual(calls, []);
+});
+
 test("dry-run performs no mutation", () => {
   const calls = [];
   const result = executeCleanup(
@@ -167,7 +253,7 @@ test("apply removes only safe candidates", () => {
   ];
   const result = executeCleanup(
     records,
-    { apply: true, removeWorktree: (path) => calls.push(path) },
+    { apply: true, boundary: applyBoundary(), removeWorktree: (path) => calls.push(path) },
   );
   assert.deepEqual(calls, ["C:/repo/task-worktree"]);
   assert.deepEqual(result.removed.map((record) => record.path), ["C:/repo/task-worktree"]);

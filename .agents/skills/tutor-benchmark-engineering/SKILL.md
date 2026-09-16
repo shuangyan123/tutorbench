@@ -133,7 +133,7 @@ on prose-only cleanup:
 
 ```bash
 npm run worktree:audit
-npm run worktree:cleanup -- --apply
+npm run worktree:cleanup
 npm run worktree:audit
 ```
 
@@ -352,9 +352,16 @@ Begin cleanup only after remote evidence confirms:
 From a safe final-main location, run `npm run worktree:audit` and retain its
 stable classification, reason, path, branch, and HEAD output. Only
 when the audit identifies a candidate as `SAFE_TO_REMOVE` may the completed
-task invoke `npm run worktree:cleanup -- --apply`; the command re-audits each
-candidate immediately before calling `git worktree remove <path>` and verifies
-that the registration is gone. Run `npm run worktree:audit` again afterward.
+task invoke `npm run worktree:cleanup`; the command itself is the explicit
+apply-mode entry point, re-audits each candidate immediately before calling
+`git worktree remove <path>`, and verifies that the registration is gone. Run
+`npm run worktree:audit` again afterward.
+
+Apply mode is additionally enforced in code: it first fetches `origin`, then
+requires the invoking worktree to be attached, clean, free of unfinished Git
+state, checked out on the GitHub default branch, with GitHub's default branch
+equal to `main`, and with `HEAD` exactly equal to the freshly resolved
+`origin/main`. Audit mode remains read-only and may run from a feature branch.
 
 Preserve any branch/worktree still referenced by another open/stacked PR or
 worktree. A failed or ambiguous audit is a hard stop, not permission to use
@@ -439,7 +446,7 @@ Understand scope
 -> Merge
 -> verify merge result/final main
 -> npm run worktree:audit
--> npm run worktree:cleanup -- --apply when SAFE_TO_REMOVE is proven
+-> npm run worktree:cleanup when SAFE_TO_REMOVE is proven
 -> npm run worktree:audit again
 -> post-merge verification
 -> STOP

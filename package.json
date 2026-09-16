@@ -90,7 +90,7 @@
     "test:website": "npm run website:build && node scripts/website-artifact-smoke.mjs",
     "release:verify": "node scripts/verify-release-candidate.mjs",
     "worktree:audit": "node scripts/worktree-cleanup.mjs",
-    "worktree:cleanup": "node scripts/worktree-cleanup.mjs",
+    "worktree:cleanup": "node scripts/worktree-cleanup.mjs --apply",
     "test:worktree": "node --test scripts/worktree-cleanup.test.mjs"
   },
   "devDependencies": {
