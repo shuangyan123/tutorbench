@@ -53,6 +53,11 @@ import {
   renderRunPage,
 } from "../site/pages/developer.js";
 import { renderCommunityPage } from "../site/pages/community.js";
+import {
+  renderBlogIndexPage,
+  renderTeachingAndSupervisionPage,
+  renderWhyTeachingDoesNotScalePage,
+} from "../site/pages/blog.js";
 
 const websiteRoot = resolve(process.cwd(), "website");
 const defaultOutputDirectory = resolve(websiteRoot, "dist");
@@ -264,6 +269,23 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
       locale,
     );
   }
+
+  const blogPages = [
+    renderBlogIndexPage(),
+    renderWhyTeachingDoesNotScalePage(),
+    renderTeachingAndSupervisionPage(),
+  ];
+  for (const blogPage of blogPages) {
+    await writePage(
+      outputDirectory,
+      blogPage,
+      artifacts,
+      options.siteUrl,
+      options.basePath,
+      locale,
+    );
+  }
+
   await writeFile(
     join(outputDirectory, "404.html"),
     renderPage(
