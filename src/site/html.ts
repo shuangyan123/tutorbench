@@ -181,7 +181,8 @@ function renderHeader(
   if (activeRoute === "/") {
     const links = [
       ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
-      ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
+      ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["Blog", "/blog/"],
+      ["About", "/about/"],
     ] as const;
     return `<header class="site-header home-header"><div class="shell header-inner">
       <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="TutorBench home"><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">TutorBench</span><span class="wordmark-descriptor">Measurement infrastructure<br>for AI tutoring</span></span></a>
@@ -207,6 +208,7 @@ function renderHeader(
         ${navLink("methodology", "/methodology/", activeRoute, basePath, locale)}
         ${navLink("docs", "/docs/", activeRoute, basePath, locale)}
         ${navLink("community", "/community/", activeRoute, basePath, locale)}
+        <a href="${escapeHtml(sitePath(basePath, "/blog/"))}"${activeRoute.startsWith("/blog/") ? ' aria-current="page"' : ""}>Blog</a>
         <a href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">GitHub ↗</a>
         <label class="locale-switcher">
           <span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span>
@@ -235,6 +237,7 @@ function renderFooter(benchmark: SiteFooterBenchmark, locale: SiteLocale): strin
       <div>
         <p class="footer-title">Source</p>
         <a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">Read the repository ↗</a>
+        <p><a class="text-link" href="/blog/">Read the Teachometry blog →</a></p>
         <p class="muted">Dataset ${escapeHtml(benchmark.dataset.id)}@${escapeHtml(benchmark.dataset.version)}</p>
       </div>
     </div>
