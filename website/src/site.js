@@ -82,6 +82,174 @@
     });
   }
 
+  function installHomeMotionPolish() {
+    const heroSection = document.querySelector(".hero-section");
+    if (!(heroSection instanceof HTMLElement)) {
+      return;
+    }
+
+    document.body.dataset.homeMotion = "true";
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finePointer = window.matchMedia("(pointer: fine)");
+    const style = document.createElement("style");
+    style.dataset.tutorbenchMotion = "true";
+    style.textContent = `
+      body[data-home-motion="true"] .site-header {
+        transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+      }
+      body[data-home-motion="true"] .site-header[data-scrolled="true"] {
+        border-bottom-color: color-mix(in srgb, var(--line-strong) 72%, transparent);
+        box-shadow: 0 10px 30px rgba(26, 42, 36, 0.08);
+      }
+      body[data-home-motion="true"] .button {
+        transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+      }
+      body[data-home-motion="true"] .button:hover {
+        transform: translateY(-2px);
+      }
+      body[data-home-motion="true"] .button-primary:hover {
+        box-shadow: 0 9px 20px rgba(30, 90, 84, 0.18);
+      }
+      body[data-home-motion="true"] .metric,
+      body[data-home-motion="true"] .dimension-card,
+      body[data-home-motion="true"] .example-aside,
+      body[data-home-motion="true"] .preview-panel {
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
+      }
+      body[data-home-motion="true"] .metric:hover {
+        position: relative;
+        z-index: 1;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+      }
+      body[data-home-motion="true"] .dimension-card:hover {
+        position: relative;
+        z-index: 1;
+        transform: translateY(-5px);
+        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.16);
+      }
+      body[data-home-motion="true"] .example-aside:hover,
+      body[data-home-motion="true"] .preview-panel:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+      }
+      body[data-home-motion="true"] [data-motion-reveal] {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+        transition-delay: var(--motion-delay, 0ms);
+      }
+      body[data-home-motion="true"] [data-motion-reveal][data-motion-visible="true"] {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      body[data-home-motion="true"] .hero-aside[data-motion-tilt="true"] {
+        transform: perspective(1000px) rotateX(var(--motion-tilt-x, 0deg)) rotateY(var(--motion-tilt-y, 0deg)) translateY(-2px);
+        transition: transform 110ms ease-out, box-shadow 180ms ease;
+        will-change: transform;
+      }
+      body[data-home-motion="true"] .hero-aside[data-motion-tilt="true"]:hover {
+        box-shadow: 0 18px 44px rgba(26, 42, 36, 0.12);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        body[data-home-motion="true"] .site-header,
+        body[data-home-motion="true"] .button,
+        body[data-home-motion="true"] .metric,
+        body[data-home-motion="true"] .dimension-card,
+        body[data-home-motion="true"] .example-aside,
+        body[data-home-motion="true"] .preview-panel,
+        body[data-home-motion="true"] [data-motion-reveal],
+        body[data-home-motion="true"] .hero-aside[data-motion-tilt="true"] {
+          transition: none !important;
+          transform: none !important;
+          opacity: 1 !important;
+        }
+      }
+    `;
+    document.head.append(style);
+
+    const header = document.querySelector(".site-header");
+    let scrollFramePending = false;
+    function syncHeaderState() {
+      scrollFramePending = false;
+      if (header instanceof HTMLElement) {
+        header.dataset.scrolled = String(window.scrollY > 12);
+      }
+    }
+    window.addEventListener("scroll", () => {
+      if (scrollFramePending) {
+        return;
+      }
+      scrollFramePending = true;
+      window.requestAnimationFrame(syncHeaderState);
+    }, { passive: true });
+    syncHeaderState();
+
+    const revealGroups = [
+      [".hero-copy > *", 52],
+      [".metric", 56],
+      [".example-grid > *", 80],
+      [".dimension-card", 62],
+      [".developer-cta > *", 80],
+      [".preview-panel", 0],
+      [".limits-grid > *", 80],
+    ];
+    const revealElements = [];
+    revealGroups.forEach(([selector, delayStep]) => {
+      document.querySelectorAll(selector).forEach((element, index) => {
+        if (!(element instanceof HTMLElement) || element.hasAttribute("data-motion-reveal")) {
+          return;
+        }
+        element.setAttribute("data-motion-reveal", "");
+        element.style.setProperty("--motion-delay", `${index * Number(delayStep)}ms`);
+        revealElements.push(element);
+      });
+    });
+
+    function showAllRevealElements() {
+      revealElements.forEach((element) => {
+        element.dataset.motionVisible = "true";
+      });
+    }
+
+    if (reducedMotion.matches || !("IntersectionObserver" in window)) {
+      showAllRevealElements();
+    } else {
+      const observer = new window.IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) {
+            return;
+          }
+          entry.target.dataset.motionVisible = "true";
+          observer.unobserve(entry.target);
+        });
+      }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+      revealElements.forEach((element) => observer.observe(element));
+    }
+
+    const heroAside = document.querySelector(".hero-aside");
+    if (
+      heroAside instanceof HTMLElement &&
+      !reducedMotion.matches &&
+      finePointer.matches
+    ) {
+      heroAside.dataset.motionTilt = "true";
+      heroAside.addEventListener("pointermove", (event) => {
+        const rect = heroAside.getBoundingClientRect();
+        const normalizedX = (event.clientX - rect.left) / rect.width - 0.5;
+        const normalizedY = (event.clientY - rect.top) / rect.height - 0.5;
+        heroAside.style.setProperty("--motion-tilt-x", `${(-normalizedY * 3).toFixed(2)}deg`);
+        heroAside.style.setProperty("--motion-tilt-y", `${(normalizedX * 3).toFixed(2)}deg`);
+      });
+      heroAside.addEventListener("pointerleave", () => {
+        heroAside.style.setProperty("--motion-tilt-x", "0deg");
+        heroAside.style.setProperty("--motion-tilt-y", "0deg");
+      });
+    }
+  }
+
+  installHomeMotionPolish();
+
   const filterForm = document.querySelector("#case-filters");
   if (!(filterForm instanceof HTMLFormElement)) {
     return;
