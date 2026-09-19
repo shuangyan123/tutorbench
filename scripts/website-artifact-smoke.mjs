@@ -3,6 +3,8 @@ import { extname, resolve, join } from "node:path";
 
 const outputDirectory = resolve(process.cwd(), process.argv[2] ?? "website/dist");
 const requiredFiles = [
+  "assets/home.css",
+  ...["atmosphere", "landscape", "study", "campus", "reading"].map((name) => `assets/home-${name}.jpg`),
   "index.html",
   "404.html",
   "leaderboard/index.html",

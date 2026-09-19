@@ -14,7 +14,7 @@ import {
   type PublicBenchmarkArtifacts,
 } from "../src/datasets/index.js";
 import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/index.js";
-import { TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
+import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
 import { renderHomePage } from "../src/site/pages/home.js";
 
 test("homepage derives facts and escapes case content without inventing model results", async () => {
@@ -34,6 +34,27 @@ test("homepage derives facts and escapes case content without inventing model re
   assert.doesNotMatch(content, /<img src=x/);
   assert.match(content, /Not scored · no model run/);
   assert.match(content, /No model response or model score is published here/);
+});
+
+test("home reconstruction uses real blog routes and isolates its assets from other pages", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const page = renderHomePage(artifacts);
+  const home = renderPage(page, { basePath: "/preview" });
+  assert.match(home, /Teachometry/);
+  assert.match(home, /href="\/preview\/assets\/home\.css"/);
+  assert.match(home, /href="\/preview\/blog\/why-teaching-does-not-scale\/"/);
+  assert.match(home, /href="\/preview\/blog\/teaching-and-supervision-are-different-jobs\/"/);
+  assert.match(home, /Explore the journal · Blog index/);
+  assert.equal((home.match(/<article class="home-blog-card">/g) ?? []).length, 2);
+  assert.match(home, /September 17, 2026/);
+  assert.doesNotMatch(home, /Sep 10, 2024|Why Observable Behavior Matters in AI Tutoring/);
+  for (const image of ["study", "campus", "reading"]) {
+    assert.ok(home.includes(`src="/preview/assets/home-${image}.jpg"`));
+  }
+  assert.ok(home.indexOf('class="home-data"') < home.indexOf('class="home-blog"'));
+  assert.ok(home.indexOf('class="home-blog"') < home.indexOf('class="home-footer"'));
+  const other = renderPage({ title: "Cases", description: "Cases", route: "/data/cases/", content: "Cases" });
+  assert.doesNotMatch(other, /home\.css|home-blog|home-footer|home-page/);
 });
 
 async function loadDataset() {
