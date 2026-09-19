@@ -252,6 +252,10 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await writeFile(join(outputDirectory, "assets", "styles.css"), stylesheet, "utf8");
   await writeFile(join(outputDirectory, "assets", "site.js"), clientScript, "utf8");
   await copyFile(join(websiteRoot, "src", "images", "foliage.png"), join(outputDirectory, "assets", "foliage.png"));
+  await copyFile(join(websiteRoot, "src", "home.css"), join(outputDirectory, "assets", "home.css"));
+  for (const name of ["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
+    await copyFile(join(websiteRoot, "src", "images", `${name}.webp`), join(outputDirectory, "assets", `${name}.webp`));
+  }
   await copyBrandAssets(outputDirectory);
   await writeJson(outputDirectory, "benchmark.json", artifacts.benchmark);
   await writeJson(outputDirectory, "cases.json", artifacts.cases);
