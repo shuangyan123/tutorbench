@@ -48,8 +48,8 @@ test("home reconstruction uses real blog routes and isolates its assets from oth
   assert.equal((home.match(/<article class="home-blog-card">/g) ?? []).length, 2);
   assert.match(home, /September 17, 2026/);
   assert.doesNotMatch(home, /Sep 10, 2024|Why Observable Behavior Matters in AI Tutoring/);
-  for (const image of ["study", "campus", "reading"]) {
-    assert.ok(home.includes(`src="/preview/assets/home-${image}.jpg"`));
+  for (const image of ["home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
+    assert.ok(home.includes(`src="/preview/assets/${image}.webp"`));
   }
   assert.ok(home.indexOf('class="home-data"') < home.indexOf('class="home-blog"'));
   assert.ok(home.indexOf('class="home-blog"') < home.indexOf('class="home-footer"'));
@@ -198,6 +198,13 @@ test("static website build emits the public artifact files and route shell", asy
       await readFile(join(outputDirectory, "assets", "foliage.png")),
       await readFile(join(process.cwd(), "website", "src", "images", "foliage.png")),
     );
+    for (const name of ["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
+      assert.deepEqual(
+        await readFile(join(outputDirectory, "assets", `${name}.webp`)),
+        await readFile(join(process.cwd(), "website", "src", "images", `${name}.webp`)),
+        `Home build must preserve the supplied asset bytes: ${name}`,
+      );
+    }
     for (const assetPath of TUTORBENCH_BRAND_ASSET_PATHS) {
       assert.deepEqual(
         await readFile(join(outputDirectory, "assets", "brand", "tutorbench", assetPath)),

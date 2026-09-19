@@ -12,6 +12,11 @@ const dimensions = [
   ["adaptation", "Adaptation", "Whether it changes its help for the learner’s state and context.", "Adjusts to learner needs and context"],
 ] as const;
 
+// 装饰层不参与内容、读屏或点击；仅 Home 使用随包提供的透明前景。
+function renderFoliage(layers: readonly string[]): string {
+  return `<div class="home-foliage" aria-hidden="true">${layers.map((layer) => `<img class="foliage-layer foliage-${layer}" src="/assets/foliage-${layer}.webp" alt="" width="1536" height="1024" loading="lazy">`).join("")}</div>`;
+}
+
 function renderCase(item: TutorEvalPublicCase, index: number, count: number, selected: boolean): string {
   const key = `walkthrough-${index}`;
   const level = typeof item.metadata.difficulty === "object"
@@ -41,7 +46,7 @@ function renderCase(item: TutorEvalPublicCase, index: number, count: number, sel
 }
 
 function renderDimensions(): string {
-  return `<section class="home-dimensions" id="dimensions" aria-labelledby="measure-title"><div class="shell dimension-layout">
+  return `<section class="home-dimensions" id="dimensions" aria-labelledby="measure-title">${renderFoliage(["right-mid"])}<div class="shell dimension-layout">
     <div class="dimension-intro"><p class="eyebrow">Five dimensions of tutoring</p><h2 id="measure-title">More than<br><em>right or wrong.</em></h2><p>Teachometry examines observable tutoring behavior with structured rubrics and transparent evaluation. Each dimension captures a distinct aspect of a response in an authored scenario.</p><a class="text-link" href="/methodology/">Explore the evaluation method ${icon("arrow")}</a></div>
     <div class="dimension-explorer" data-dimension-explorer>
       <div class="dimension-detail-row"><div class="dimension-details" aria-live="polite">${dimensions.map(([id, label, description], index) => `<article class="dimension-detail" data-dimension-detail="${index}"${index === 0 ? "" : " hidden"}><span class="dimension-disc">${icon(id)}</span><div><h3>${label}</h3><p>${description}</p><div class="dimension-progress"><span aria-hidden="true"><i style="--step:${(index + 1) * 20}%"></i></span><small>Dimension ${index + 1} / ${dimensions.length}</small></div></div></article>`).join("")}</div><p class="handwritten dimension-note">Look beyond<br>the final answer.<svg viewBox="0 0 80 35" aria-hidden="true"><path d="M76 3Q35 1 4 30m3-13L4 30l17-3" fill="none" stroke="currentColor"/></svg></p><div class="dimension-arrows"><button class="round-control" type="button" data-dimension-prev aria-label="Previous dimension">${icon("left")}</button><button class="round-control" type="button" data-dimension-next aria-label="Next dimension">${icon("right")}</button></div></div>
@@ -64,7 +69,7 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts): SitePage {
       <div class="case-walkthrough" data-case-walkthrough data-initial-case="${initialIndex}"><div class="case-controls"><button type="button" aria-label="Previous case" data-case-prev>${icon("left")}</button><button type="button" aria-label="Next case" data-case-next>${icon("right")}</button></div>${cases.cases.map((item, index) => renderCase(item, index, cases.cases.length, index === initialIndex)).join("")}<span class="visually-hidden" aria-live="polite" data-case-announcement></span></div>
     </div><div class="shell hero-foot"><a class="scroll-cue" href="#dimensions"><span>${icon("arrow")}</span>Scroll to explore</a><p class="handwritten hero-note">Evidence for<br>human-centered AI tutoring.</p></div></section>
     ${renderDimensions()}
-    <section class="home-data" aria-labelledby="home-data-title"><div class="shell home-data-grid">
+    <section class="home-data" aria-labelledby="home-data-title">${renderFoliage(["left-near"])}<div class="shell home-data-grid">
       <div class="home-data-statement"><p class="eyebrow">Measurement infrastructure for AI tutoring</p><h2 id="home-data-title">Open data.<br>Transparent evaluation.<br><em>Observable behavior.</em></h2><a class="button data-link" href="/data/">Explore the data ${icon("arrow")}</a></div>
       <dl class="home-facts"><div><dt>Synthetic cases</dt><dd>${benchmark.dataset.caseCount}</dd><dd class="fact-note">Public development scenarios</dd></div><div><dt>Authored rubrics</dt><dd>${benchmark.dataset.rubricCount}</dd><dd class="fact-note">Case-specific evaluation criteria</dd></div><div><dt>Current dataset</dt><dd>${e(benchmark.dataset.version)}</dd><dd class="fact-note">${e(benchmark.dataset.id)}</dd></div><div><dt>Evaluator version</dt><dd>${e(TUTOR_EVAL_EVALUATOR_VERSION)}</dd><dd class="fact-note">Open and reproducible</dd></div></dl>
     </div></section>
@@ -79,17 +84,17 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts): SitePage {
 // 复用已发布页面的编辑内容；第三栏是明确标注的索引，不虚构第三篇文章。
 function renderHomeBlog(): string {
   const posts = [
-    [renderWhyTeachingDoesNotScalePage(), "home-study.jpg"],
-    [renderTeachingAndSupervisionPage(), "home-campus.jpg"],
+    [renderWhyTeachingDoesNotScalePage(), "home-blog-01.webp"],
+    [renderTeachingAndSupervisionPage(), "home-blog-02.webp"],
   ] as const;
-  return `<section class="home-blog" aria-labelledby="home-blog-title"><div class="shell">
+  return `<section class="home-blog" aria-labelledby="home-blog-title">${renderFoliage(["left-mid", "right-near"])}<div class="shell">
     <div class="home-blog-heading"><div><h2 id="home-blog-title">Latest from the Blog</h2><p>Updates, insights, and research perspectives from Teachometry.</p></div><a href="/blog/">View all posts ${icon("arrow")}</a></div>
     <div class="home-blog-grid">${posts.map(([post, image]) => {
       const title = post.content.match(/<h1>(.*?)<\/h1>/)?.[1] ?? e(post.title);
       const metadata = post.content.match(/<p class="eyebrow">(.*?)<\/p>/)?.[1] ?? "Perspective";
       const excerpt = (post.content.match(/<p class="lede">(.*?)<\/p>/)?.[1] ?? e(post.description)).split(/(?<=\.) /)[0];
-      return `<article class="home-blog-card"><a href="${e(post.route)}"><img src="/assets/${image}" width="900" height="600" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">${metadata}</p><h3>${title}</h3><p>${excerpt}</p></div></a></article>`;
+      return `<article class="home-blog-card"><a href="${e(post.route)}"><img src="/assets/${image}" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">${metadata}</p><h3>${title}</h3><p>${excerpt}</p></div></a></article>`;
     }).join("")}
-    <aside class="home-blog-card home-blog-index"><a href="/blog/"><img src="/assets/home-reading.jpg" width="900" height="600" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">Explore the journal · Blog index</p><h3>Ideas that should become testable questions.</h3><p>Long-form notes on AI teaching, measurement, and the future structure of education.</p></div></a></aside></div>
+    <aside class="home-blog-card home-blog-index"><a href="/blog/"><img src="/assets/home-blog-03.webp" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">Explore the journal · Blog index</p><h3>Ideas that should become testable questions.</h3><p>Long-form notes on AI teaching, measurement, and the future structure of education.</p></div></a></aside></div>
   </div></section>`;
 }

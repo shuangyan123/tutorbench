@@ -1,17 +1,33 @@
 # Home photographic assets
 
-These five JPEG assets were generated with the built-in Imagegen tool on 2026-09-19 for the Home reconstruction. They are decorative synthetic illustrations, not photographs of real research activity, learners, institutions, or benchmark evidence. No remote image or font service is required at runtime. Original PNGs were encoded as JPEG for delivery; composition was not edited.
+PR #129 uses the final user-supplied `tutorbench-home-astra-pack.zip`, following
+`ASTRA_HOME_BRIEF.md` and `ASSET_MAP.json`. The nine optimized WebP files are
+copied byte-for-byte from `assets/web/`; no image generation, repainting, or
+re-encoding is part of this polish pass. The package reference is a visual
+composition guide, not benchmark evidence or a source of published articles.
 
-| File | Role | Generation brief |
-| --- | --- | --- |
-| home-atmosphere.jpg | Hero background and outer-edge depth | Follow the supplied Home reference: pale sunlit academic desk, blurred green window, empty left side, leafy plant in ivory pot on muted green books at the right edge. No UI or readable text. |
-| home-landscape.jpg | Full-width data band | Panoramic lush forest valley, misty layered mountain ridges, leafy foreground, soft morning light. No buildings, text, or UI. |
-| home-study.jpg | First published essay cover | Sunlit study desk, notebook and fountain pen, ivory ceramic plant pot and softly blurred books. No people or readable text. |
-| home-campus.jpg | Second published essay cover | Leafy university path, pale stone buildings, soft sunlight and green trees. No people, identifying signs, or text. |
-| home-reading.jpg | Explicit Blog index card | Blank ivory linen book beside an open book, leafy vine and natural window shadows. No typography. |
+| File | Home role |
+| --- | --- |
+| home-hero-bg.webp | Hero photographic base; physical book and pot lettering remains in the photo |
+| home-open-data-bg.webp | Forest data band, with a CSS contrast overlay |
+| home-blog-01.webp | First existing published essay cover |
+| home-blog-02.webp | Second existing published essay cover |
+| home-blog-03.webp | Explicit Blog index card, not an invented third post |
+| foliage-left-near.webp | Transparent foreground at the data band's left edge |
+| foliage-left-mid.webp | Transparent foreground at the Blog's left edge |
+| foliage-right-mid.webp | Transparent foreground at the dimensions' right edge |
+| foliage-right-near.webp | Transparent foreground at the Blog's right edge |
 
-The images are final decorative assets, not placeholders. They reconstruct the reference's photographic roles without claiming to reproduce its exact plants, landscape, lettering, or books. Existing TutorBench vector marks retain their supplied geometry; Teachometry is Home display text only.
+Photography is decorative and is not evidence of real learner outcomes or
+research activity. The Home renderer retains current Teachometry display text,
+real public cases, authored objectives, dataset/evaluator versions, published
+Blog metadata, and existing routes. Unavailable scores stay `N/A`, with the
+explicit no-model-run explanation. All text, navigation, annotations, controls,
+icons, metrics, cards, and footer are HTML/CSS/SVG, not screenshot content.
 
-## Deferred interaction review
-
-PR #125 is not a design baseline or dependency. No commits were cherry-picked. Review its reduced-motion, sticky-header, hover, and reveal changes separately after Home visual approval; existing main-branch accessibility and interactions remain in place.
+`home.css` loads only on Home. Foliage is non-interactive and hidden from assistive
+technology. Each layer has independent 11–16 second CSS breeze timing, at most
+4px translation and 0.7 degree rotation. Reduced motion disables it completely.
+No new reveal, parallax, tilt, count-up, or broader motion system is introduced.
+Existing main-branch interactions and theme/locale behavior remain in place.
+PR #125 is not a dependency and no commits were cherry-picked from it.

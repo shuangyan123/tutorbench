@@ -12,6 +12,7 @@ const contentTypes: Readonly<Record<string, string>> = {
   ".json": "application/json; charset=utf-8",
   ".ico": "image/x-icon",
   ".png": "image/png",
+  ".webp": "image/webp",
   ".svg": "image/svg+xml",
 };
 
