@@ -27,8 +27,8 @@ function validReport(packageVersion = "0.1.0") {
     proposedTag: `v${packageVersion}`,
     releaseStatus: RELEASE_CANDIDATE_STATUS,
     sourceCommit: "0123456789abcdef0123456789abcdef01234567",
-    nodeVersion: "v22.14.0",
-    npmVersion: "11.5.1",
+    nodeVersion: "v24.21.0",
+    npmVersion: "11.19.0",
     packageFilename: `tutor-benchmark-${packageVersion}.tgz`,
     packagePayloadFingerprint: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     packageFileCount: 1,
@@ -169,8 +169,8 @@ test("future npm workflow is explicit, OIDC-only, and stage-only", async () => {
   assert.match(workflow, /^on:\s*\n\s+workflow_dispatch:/m);
   assert.doesNotMatch(workflow, /^\s+(push|pull_request|release|schedule|workflow_run):/m);
   assert.match(workflow, /runs-on:\s*ubuntu-latest/);
-  assert.match(workflow, /node-version:\s*22\.23\.2/);
-  assert.match(workflow, /npm@11\.19\.1/);
+  assert.match(workflow, /node-version:\s*24\.21\.0/);
+  assert.match(workflow, /npm@11\.19\.0/);
   assert.match(workflow, /permissions:\s*\n\s+contents:\s+read\s*\n\s+id-token:\s+write/m);
   assert.doesNotMatch(workflow, /\b(?:contents|packages|actions|pull-requests|issues):\s+write\b/);
   assert.doesNotMatch(workflow, /NPM_TOKEN|NODE_AUTH_TOKEN|secrets\./i);

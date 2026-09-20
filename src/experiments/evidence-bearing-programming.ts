@@ -16,7 +16,7 @@ const FIXTURE_FILES = ["clamp-score.mjs", "clamp-score.test.mjs"] as const;
 
 const EXECUTION_SPEC = {
   runtime: "node",
-  runtimeRange: ">=22 <23",
+  runtimeRange: ">=24 <25",
   arguments: ["--test", "--test-reporter=tap", "clamp-score.test.mjs"],
   expectedExitCode: 1,
   timeoutMs: 5_000,
@@ -134,7 +134,7 @@ function readTapNumber(output: string, field: string): number {
 function assertSupportedNodeRuntime(): void {
   const majorText = process.versions.node.split(".")[0];
   const major = majorText === undefined ? Number.NaN : Number.parseInt(majorText, 10);
-  if (major !== 22) {
+  if (major !== 24) {
     throw new Error(`evidence_runtime_unsupported:${process.versions.node}`);
   }
 }

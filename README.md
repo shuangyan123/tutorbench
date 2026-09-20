@@ -40,7 +40,7 @@ module.
 
 ## Install
 
-Requirements: Node 22 (`>=22 <23`).
+Requirements: Node 24 (`>=24 <25`).
 
 The published `tutor-benchmark@0.1.0` Developer Preview and the repository
 clone are both supported installation paths. The clone path is:
@@ -340,7 +340,7 @@ configured DeepSeek V4-Flash and MiniMax candidates across repeated runs,
 reports stability and sanitized token/latency measurements, and never infers
 an automatic winner. See
 [`docs/judge-candidate-comparison.md`](docs/judge-candidate-comparison.md).
-The repository keeps `openai@7.4.0` as a development dependency and exposes it
+The repository keeps `openai@7.20.0` as a development dependency and exposes it
 as an optional peer so stable package-root and HTTP usage do not install or
 load OpenAI. Consumers explicitly using the OpenAI provider must install that
 optional peer.

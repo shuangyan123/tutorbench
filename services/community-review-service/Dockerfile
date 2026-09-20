@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim AS build
+FROM node:24-bookworm-slim AS build
 
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -13,7 +13,7 @@ RUN npm run build
 RUN npm run community-review:build
 RUN npm run community-review:portal:build
 
-FROM node:22-bookworm-slim
+FROM node:24-bookworm-slim
 
 ENV COMMUNITY_REVIEW_ENV=production
 ENV COMMUNITY_REVIEW_HOST=0.0.0.0

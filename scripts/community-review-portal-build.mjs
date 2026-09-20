@@ -6,7 +6,7 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const sourceDirectory = path.join(repositoryRoot, "services/community-review-service/portal-src");
 const outputDirectory = path.join(repositoryRoot, "services/community-review-service/dist/portal");
 const sdkPackageDirectory = path.join(repositoryRoot, "node_modules/@auth0/auth0-spa-js");
-const sdkVersion = "2.24.1";
+const sdkVersion = "2.27.0";
 
 const sdkPackage = JSON.parse(await readFile(path.join(sdkPackageDirectory, "package.json"), "utf8"));
 if (sdkPackage.version !== sdkVersion || sdkPackage.license !== "MIT") {

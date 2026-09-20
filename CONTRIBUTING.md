@@ -31,7 +31,7 @@ review-evidence boundary.
 1. Read the [product boundary](docs/benchmark-product-boundary.md) and the
    [licensing scope](docs/licensing.md).
 2. Keep the change focused and preserve unrelated work.
-3. Use Node 22 (`>=22 <23`) and run the applicable repository checks.
+3. Use Node 24 (`>=24 <25`) and run the applicable repository checks.
 4. Explain versioning, reproducibility, privacy, and licensing impact.
 5. Never commit secrets, real user data, private provider payloads, hidden
    reasoning, or ignored local artifacts.

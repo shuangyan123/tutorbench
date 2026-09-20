@@ -7,7 +7,7 @@ authorize public application intake, public reviewer intake, or a real campaign.
 ## Boundary and prerequisites
 
 The service is private and isolated under
-`services/community-review-service/`. Use Node 22 and PostgreSQL 16 or a
+`services/community-review-service/`. Use Node 24 and PostgreSQL 16 or a
 compatible supported PostgreSQL service. Keep the database private to the
 service network and mount sealed qualification/review material on a private
 filesystem that is not in the image, repository, web root, logs, or backup
@@ -192,7 +192,7 @@ multi-instance control. External edge abuse protection remains a separate hard
 launch blocker until an approved control is actually configured and tested.
 
 For a container deployment, build
-`services/community-review-service/Dockerfile`. It uses Node 22, excludes
+`services/community-review-service/Dockerfile`. It uses Node 24 bookworm slim, excludes
 repository metadata and private data, creates the material mount, and runs as
 the non-root `node` user. Supply production configuration at runtime; do not
 bake it into the image.
@@ -255,7 +255,7 @@ idle connections, and closes the owned PostgreSQL pool.
 
 ## Verification evidence and phase gate
 
-The repository CI evidence for P4-G must include Node 22 root/service quality
+The repository CI evidence for P4-G must include Node 24 root/service quality
 gates, a real PostgreSQL 16 migration/idempotency/rollback/constraint/concurrency
 run, the backup/restore smoke, a non-root container build, and live/ready
 container probes. Local tests without PostgreSQL are not substituted for the

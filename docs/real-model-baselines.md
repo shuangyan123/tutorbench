@@ -198,9 +198,9 @@ exact configured model ID. Chat Completions JSON mode is object-only, not an
 equivalent claim of strict Structured Outputs. The existing Judge parser and
 rubric-ownership validation remain the final trust boundary.
 
-Use Node 22 in the authoritative CI environment. A local Node 26 development
+Use Node 24 in the authoritative CI environment. A local Node 26 development
 shell may run the commands if the repository currently works, but it is
-outside the declared `>=22 <23` engine range. Configure credentials only in
+outside the declared `>=24 <25` engine range. Configure credentials only in
 the local process environment:
 
 ```powershell
