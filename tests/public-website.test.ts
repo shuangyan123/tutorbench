@@ -212,7 +212,12 @@ test("static website build emits the public artifact files and route shell", asy
         `Generated brand asset differs from its repository source: ${assetPath}`,
       );
     }
-    assert.match(leaderboardHtml, /Leaderboard coming soon/);
+    assert.match(leaderboardHtml, /Results — Teachometry/);
+    assert.match(leaderboardHtml, /Not yet published/);
+    assert.match(leaderboardHtml, /No public model rows are available yet/);
+    assert.match(leaderboardHtml, /results\.css/);
+    assert.match(leaderboardHtml, /Readiness and evidence status/);
+    assert.match(leaderboardHtml, /No ranking without evidence/);
     assert.match(runHtml, /tutor:export-execution/);
     assert.match(runHtml, /TutorExecutionPacket/);
     assert.match(runHtml, /baseline-native-default/);
