@@ -9,7 +9,7 @@ npm ci
 npm run quickstart
 ```
 
-Requirements: Node 22 (`>=22 <23`). Quickstart is provider-free,
+Requirements: Node 24 (`>=24 <25`). Quickstart is provider-free,
 network-free, and Judge-free. It does not read provider credentials, construct
 an HTTP or model adapter, or contact a remote endpoint.
 

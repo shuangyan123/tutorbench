@@ -278,8 +278,7 @@ export function normalizeTutorResponsePairwiseEvidence(
   });
 
   let outcome: TutorResponsePairwiseResult["outcome"] = "INCOMPARABLE";
-  let consistency: TutorResponsePairwiseResult["consistency"] =
-    "incomplete_evidence";
+  let consistency: TutorResponsePairwiseResult["consistency"];
 
   if (normalized.some((presentation) => presentation.status !== "ok")) {
     consistency = "incomplete_evidence";

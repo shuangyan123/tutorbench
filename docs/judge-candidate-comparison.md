@@ -157,7 +157,7 @@ never written to the comparison artifact.
 
 ## Run the comparison
 
-Build with the repository Node 22 runtime, configure one or both candidates,
+Build with the repository Node 24 runtime, configure one or both candidates,
 and inspect the call budget printed before execution:
 
 ```powershell

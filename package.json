@@ -45,7 +45,7 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=22 <23"
+    "node": ">=24 <25"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -94,15 +94,16 @@
     "test:worktree": "node --test scripts/worktree-cleanup.test.mjs"
   },
   "devDependencies": {
-    "@auth0/auth0-spa-js": "2.24.1",
-    "@types/node": "^22.10.5",
-    "eslint": "^9.17.0",
-    "openai": "7.4.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.19.1"
+    "@auth0/auth0-spa-js": "2.27.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.13.6",
+    "eslint": "^10.11.0",
+    "openai": "7.20.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0"
   },
   "peerDependencies": {
-    "openai": "7.4.0"
+    "openai": "7.20.0"
   },
   "peerDependenciesMeta": {
     "openai": {

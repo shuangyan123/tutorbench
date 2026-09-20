@@ -258,7 +258,7 @@ export function parseReviewerQualificationPacket(value: unknown): ReviewerQualif
 export function parseReviewerQualificationSubmission(value: unknown): ReviewerQualificationSubmission {
   const parsed = record(value);
   const envelope = qualificationEnvelope(parsed);
-  let assessments: ReviewerQualificationAtomicAssessment[] | null = null;
+  let assessments: ReviewerQualificationAtomicAssessment[] | null;
   try { assessments = Array.isArray(parsed?.assessments) ? parsed.assessments.map(assessment) : null; } catch { return invalid(); }
   if (envelope === null || assessments === null ||
     !only(parsed as UnknownRecord, ["schemaVersion", "packetKind", "auditProtocolId", "auditProtocolVersion",
@@ -396,7 +396,7 @@ export function parseHumanReferenceQualifiedSemanticAuditSubmission(
 ): HumanReferenceQualifiedSemanticAuditSubmission {
   const parsed = record(value);
   const envelope = auditEnvelope(parsed);
-  let annotations: ReturnType<typeof auditAnnotation>[] | null = null;
+  let annotations: ReturnType<typeof auditAnnotation>[] | null;
   try { annotations = Array.isArray(parsed?.annotations) ? parsed.annotations.map(auditAnnotation) : null; } catch { return invalid(); }
   if (envelope === null || annotations === null ||
     !only(parsed as UnknownRecord, ["schemaVersion", "packetKind", "auditProtocolId", "auditProtocolVersion",
@@ -415,7 +415,7 @@ export function parseHumanReferenceQualifiedSemanticAuditAnnotations(
   const parsed = record(value);
   const envelope = auditEnvelope(parsed);
   const marker = fixture(parsed?.fixture);
-  let annotations: ReturnType<typeof auditAnnotation>[] | null = null;
+  let annotations: ReturnType<typeof auditAnnotation>[] | null;
   try { annotations = Array.isArray(parsed?.annotations) ? parsed.annotations.map(auditAnnotation) : null; } catch { return invalid(); }
   if (envelope === null || marker === null || annotations === null ||
     !only(parsed as UnknownRecord, ["schemaVersion", "dataKind", "fixture", "annotationKind", "auditProtocolId",

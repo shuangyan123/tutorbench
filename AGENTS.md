@@ -69,5 +69,5 @@ TutorBench now spans multiple completed and in-progress roadmap phases. Do not t
 - Historical Foundation restrictions remain binding when work is scoped to Foundation-era contracts or when a later phase has not explicitly authorized the relevant capability.
 - Existing later-phase functionality such as Judge providers, Community Review service components, or other roadmap-approved boundaries is not invalid merely because it exceeds the original 0.1 Foundation scope.
 - Do not start a later roadmap phase, open public intake, make live provider calls, start a real reviewer campaign, or make calibration/validity claims unless the current task explicitly authorizes that boundary.
-- Use Node 22 in CI and run the applicable quality gates from the repo-local Skill, normally `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, `npm run benchmark`, and `git diff --check` for runtime changes; use proportional structural checks for rules-only changes.
+- Use Node 24 in CI and run the applicable quality gates from the repo-local Skill, normally `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, `npm run benchmark`, and `git diff --check` for runtime changes; use proportional structural checks for rules-only changes.
 - Stop at the explicitly requested phase.

@@ -183,7 +183,7 @@ export function parseHumanReferenceSemanticAuditSubmission(
 ): HumanReferenceSemanticAuditSubmission {
   const record = asRecord(value);
   const parsedEnvelope = envelope(record);
-  let annotations: HumanReferenceSemanticAuditAtomicAnnotation[] | null = null;
+  let annotations: HumanReferenceSemanticAuditAtomicAnnotation[] | null;
   try {
     annotations = Array.isArray(record?.annotations) ? record.annotations.map(annotation) : null;
   } catch {
@@ -214,7 +214,7 @@ export function parseHumanReferenceSemanticAuditAnnotations(
   const record = asRecord(value);
   const parsedEnvelope = envelope(record);
   const marker = fixture(record?.fixture);
-  let annotations: HumanReferenceSemanticAuditAtomicAnnotation[] | null = null;
+  let annotations: HumanReferenceSemanticAuditAtomicAnnotation[] | null;
   try {
     annotations = Array.isArray(record?.annotations) ? record.annotations.map(annotation) : null;
   } catch {

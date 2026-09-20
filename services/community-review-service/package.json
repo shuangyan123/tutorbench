@@ -16,8 +16,8 @@
     "serve": "npm run build && node dist/services/community-review-service/src/cli.js serve"
   },
   "devDependencies": {
-    "@types/node": "22.10.5",
-    "@types/pg": "8.15.5",
-    "typescript": "5.7.3"
+    "@types/node": "24.13.6",
+    "@types/pg": "8.23.1",
+    "typescript": "6.0.3"
   }
 }

@@ -107,7 +107,7 @@ No MiniMax, DeepSeek, OpenAI, or other live call is made by these tests.
 
 ## Three-call DeepSeek probe
 
-After building with the repository's Node 22 toolchain, set the local Judge
+After building with the repository's Node 24 toolchain, set the local Judge
 credentials and model selection, then run:
 
 ```powershell

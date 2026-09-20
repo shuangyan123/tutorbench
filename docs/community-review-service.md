@@ -725,7 +725,7 @@ Migration `006_freeze_operational_evidence.sql` keeps the P4-A
 The migration adds insert guards for frozen pools, agreement evidence, and
 disclosures, plus immutable triggers for frozen pools and all P4-F evidence
 records. P4-G executes these migrations through the PostgreSQL adapter in
-Node 22/PostgreSQL 16 CI and keeps the deterministic in-memory adapter for
+Node 24/PostgreSQL 16 CI and keeps the deterministic in-memory adapter for
 synthetic tests. The in-memory adapter mirrors freeze idempotency, rollback,
 exact-set checks, evidence identity, disclosure append/version semantics,
 cloning, and audit metadata.
@@ -853,7 +853,7 @@ URLs, stack traces, or private material. SIGINT/SIGTERM stops accepting work,
 waits for active requests up to the configured bound, closes idle connections,
 and closes the owned PostgreSQL pool.
 
-`services/community-review-service/Dockerfile` builds with Node 22, keeps the
+`services/community-review-service/Dockerfile` builds with Node 24 bookworm slim, keeps the
 service dependency tree isolated, creates the private material mount, runs as
 the non-root `node` user, and includes a live-probe health check. The image
 does not contain private material, credentials, `.env` files, results, or

@@ -12,6 +12,7 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import {
+  dirname,
   isAbsolute,
   join,
   relative,
@@ -20,8 +21,15 @@ import {
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("../", import.meta.url)));
-const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmCommand = process.platform === "win32" ? process.execPath : "npm";
+const npmArguments = process.platform === "win32"
+  ? [join(dirname(process.execPath), "node_modules/npm/bin/npm-cli.js")]
+  : [];
 const expectedPackageName = "tutor-benchmark";
+
+function npmInvocation(args) {
+  return [...npmArguments, ...args];
+}
 
 function run(command, args, cwd, environment = process.env, options = {}) {
   return new Promise((resolveResult, reject) => {
@@ -282,7 +290,7 @@ async function writeConsumerScript(consumerRoot, reportPath) {
 import { createHttpTutor, loadTutorEvalDataset, runTutorBenchmark } from "tutor-benchmark";
 
 const dataset = await loadTutorEvalDataset();
-if (dataset.id !== "tutor-eval-v0.2a" || dataset.version !== "0.2a.5" || dataset.cases.length !== 48) {
+if (dataset.id !== "tutor-eval-v0.2a" || dataset.version !== "0.2a.6" || dataset.cases.length !== 48) {
   throw new Error("Installed package did not load the canonical dataset asset identity.");
 }
 const firstCase = dataset.cases[0];
@@ -317,13 +325,17 @@ console.log("consumer API smoke passed");
   return scriptPath;
 }
 
-function executablePath(consumerRoot) {
-  return join(
-    consumerRoot,
-    "node_modules",
-    ".bin",
-    process.platform === "win32" ? "tutorbench.cmd" : "tutorbench",
-  );
+function executableInvocation(consumerRoot, installedPackageRoot) {
+  if (process.platform === "win32") {
+    return {
+      command: process.execPath,
+      args: [join(installedPackageRoot, "dist/src/cli/tutorbench.js")],
+    };
+  }
+  return {
+    command: join(consumerRoot, "node_modules", ".bin", "tutorbench"),
+    args: [],
+  };
 }
 
 async function verifyInstalledConsumer(
@@ -343,10 +355,9 @@ async function verifyInstalledConsumer(
   );
   await run(
     npmCommand,
-    ["install", "--offline", "--ignore-scripts", "--no-audit", "--no-fund", "--no-package-lock", "--omit=peer", tarballPath],
+    npmInvocation(["install", "--offline", "--ignore-scripts", "--no-audit", "--no-fund", "--no-package-lock", "--omit=peer", tarballPath]),
     consumerRoot,
     environment,
-    { shell: process.platform === "win32" },
   );
 
   const installedPackageRoot = join(consumerRoot, "node_modules", packageJson.name);
@@ -367,14 +378,14 @@ async function verifyInstalledConsumer(
   assertCondition(consumerReport.packageRootImport === true, "Package root import verification failed.");
   assertCondition(consumerReport.optionalOpenAiPeerInstalled === false, "Optional OpenAI peer was installed.");
   assertCondition(consumerReport.canonicalDataset.id === "tutor-eval-v0.2a", "Installed canonical dataset id changed.");
-  assertCondition(consumerReport.canonicalDataset.version === "0.2a.5", "Installed canonical dataset version changed.");
+  assertCondition(consumerReport.canonicalDataset.version === "0.2a.6", "Installed canonical dataset version changed.");
   assertCondition(consumerReport.canonicalDataset.caseCount === 48, "Installed canonical dataset case count changed.");
 
-  const executable = executablePath(consumerRoot);
-  const help = await run(executable, ["--help"], consumerRoot, environment, { shell: process.platform === "win32" });
+  const executable = executableInvocation(consumerRoot, installedPackageRoot);
+  const help = await run(executable.command, [...executable.args, "--help"], consumerRoot, environment);
   assertCondition(/tutorbench quickstart \[options\]/.test(help.stdout), "Installed tutorbench --help omitted Quickstart.");
   const quickstartPath = join(consumerRoot, "quickstart.json");
-  const quickstart = await run(executable, ["quickstart", "--output", quickstartPath], consumerRoot, environment, { shell: process.platform === "win32" });
+  const quickstart = await run(executable.command, [...executable.args, "quickstart", "--output", quickstartPath], consumerRoot, environment);
   assertCondition(/Official benchmark score: no/.test(quickstart.stdout), "Installed Quickstart became official.");
   assertCondition(/Leaderboard eligible: no/.test(quickstart.stdout), "Installed Quickstart became leaderboard eligible.");
   assertCondition(/Errors: 0/.test(quickstart.stdout), "Installed Quickstart reported an error.");
@@ -405,7 +416,7 @@ async function main() {
   const expectedPackageFilename = `${expectedPackageName}-${expectedPackageVersion}.tgz`;
   const expectedTag = `v${expectedPackageVersion}`;
   await run(process.execPath, [join(repositoryRoot, "scripts", "validate-release-version.mjs"), expectedTag], repositoryRoot);
-  assertCondition(packageJson.engines?.node === ">=22 <23", "Package must retain the Node 22 engine range.");
+  assertCondition(packageJson.engines?.node === ">=24 <25", "Package must retain the Node 24 engine range.");
   assertCondition(packageJson.private !== true, "Release candidate package must not be private.");
   assertCondition(packageJson.license === "SEE LICENSE IN LICENSES.md", "Package license metadata is not multi-license aware.");
   assertCondition(packageJson.peerDependenciesMeta?.openai?.optional === true, "OpenAI peer must remain optional.");
@@ -416,13 +427,13 @@ async function main() {
   const environment = packageEnvironment(temporaryRoot);
   await writeFile(join(temporaryRoot, "npmrc"), "audit=false\nfund=false\n", "utf8");
   try {
-    await run(npmCommand, ["run", "build"], repositoryRoot, environment, { shell: process.platform === "win32" });
+    await run(npmCommand, npmInvocation(["run", "build"]), repositoryRoot, environment);
     const identities = await loadBuiltIdentities();
     const packDirectories = [join(temporaryRoot, "pack-a"), join(temporaryRoot, "pack-b")];
     const packResults = [];
     for (const packDirectory of packDirectories) {
       await mkdir(packDirectory, { recursive: true });
-      const result = await run(npmCommand, ["pack", "--pack-destination", packDirectory, "--json", "--ignore-scripts"], repositoryRoot, environment, { shell: process.platform === "win32" });
+      const result = await run(npmCommand, npmInvocation(["pack", "--pack-destination", packDirectory, "--json", "--ignore-scripts"]), repositoryRoot, environment);
       const info = parsePackInfo(result.stdout);
       assertCondition(info.filename === expectedPackageFilename, `Unexpected package filename: ${info.filename ?? ""}`);
       packResults.push({ info, tarballPath: join(packDirectory, info.filename), payload: await buildPackagePayload(info) });
@@ -468,7 +479,7 @@ async function main() {
       releaseStatus: "Developer Preview",
       sourceCommit: commit,
       nodeVersion: process.version,
-      npmVersion: (await run(npmCommand, ["--version"], repositoryRoot, environment, { shell: process.platform === "win32" })).stdout.trim(),
+      npmVersion: (await run(npmCommand, npmInvocation(["--version"]), repositoryRoot, environment)).stdout.trim(),
       packageFilename: expectedPackageFilename,
       packagePayloadFingerprint,
       packageFileCount: firstPack.payload.length,
@@ -489,7 +500,7 @@ async function main() {
         officialBenchmarkScore: quickstartSummary.officialBenchmarkScore,
         publicLeaderboardEligible: quickstartSummary.publicLeaderboardEligible,
       },
-      canonicalDatasetIdentity: { id: "tutor-eval-v0.2a", version: "0.2a.5", caseCount: 48 },
+      canonicalDatasetIdentity: { id: "tutor-eval-v0.2a", version: "0.2a.6", caseCount: 48 },
       evaluatorVersion: identities.contracts.TUTOR_EVAL_EVALUATOR_VERSION,
       productionJudgePromptIdentity: {
         id: identities.judge.TUTOR_EVAL_PEDAGOGY_JUDGE_PROMPT_ID,

@@ -170,7 +170,7 @@ export function parseReviewerQualificationPacketV21(value: unknown): ReviewerQua
 export function parseReviewerQualificationSubmissionV21(value: unknown): ReviewerQualificationSubmissionV21 {
   const parsed = record(value);
   const envelope = qualificationEnvelope(parsed);
-  let assessments: ReviewerQualificationAtomicAssessment[] | null = null;
+  let assessments: ReviewerQualificationAtomicAssessment[] | null;
   try { assessments = Array.isArray(parsed?.assessments) ? parsed.assessments.map(assessment) : null; } catch { return invalid(); }
   if (envelope === null || assessments === null || !only(parsed as UnknownRecord, [...qualificationKeys, "assessments"]) ||
     parsed?.packetKind !== HUMAN_REFERENCE_SEMANTIC_AUDIT_V2_QUALIFICATION_SUBMISSION_KIND) return invalid();
@@ -280,7 +280,7 @@ export function parseHumanReferenceQualifiedSemanticAuditSubmissionV21(
 ): HumanReferenceQualifiedSemanticAuditSubmissionV21 {
   const parsed = record(value);
   const envelope = auditEnvelope(parsed);
-  let annotations: ReturnType<typeof auditAnnotation>[] | null = null;
+  let annotations: ReturnType<typeof auditAnnotation>[] | null;
   try { annotations = Array.isArray(parsed?.annotations) ? parsed.annotations.map(auditAnnotation) : null; } catch { return invalid(); }
   if (envelope === null || annotations === null ||
     !only(parsed as UnknownRecord, [...auditKeys, "reviewLocale", "instructionsClear", "annotations"]) ||
@@ -296,7 +296,7 @@ export function parseHumanReferenceQualifiedSemanticAuditAnnotationsV21(
   const parsed = record(value);
   const envelope = auditEnvelope(parsed);
   const marker = fixture(parsed?.fixture);
-  let annotations: ReturnType<typeof auditAnnotation>[] | null = null;
+  let annotations: ReturnType<typeof auditAnnotation>[] | null;
   try { annotations = Array.isArray(parsed?.annotations) ? parsed.annotations.map(auditAnnotation) : null; } catch { return invalid(); }
   const allowed: readonly string[] = [...auditKeys.filter((key) => key !== "packetKind"), "dataKind", "fixture",
     "annotationKind", "reviewLocale", "instructionsClear", "annotations"];

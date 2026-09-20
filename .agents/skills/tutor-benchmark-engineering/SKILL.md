@@ -234,7 +234,7 @@ npm run benchmark
 git diff --check
 ```
 
-Use Node 22 in CI and keep the repository Node engine requirement intact. Never claim an unrun check passed.
+Use Node 24 in CI and keep the repository Node engine requirement intact. Never claim an unrun check passed.
 
 ## 14. Failure classification
 

@@ -41,7 +41,7 @@ account receives the same coarse `reviewer_access_not_enabled` denial.
 
 ## Browser security contract
 
-The browser uses the bundled `@auth0/auth0-spa-js` `2.24.1` package (MIT
+The browser uses the bundled `@auth0/auth0-spa-js` `2.27.0` package (MIT
 license) with an `Auth0Client`, Authorization Code + PKCE behavior, exact
 callback/logout paths, `cacheLocation: "memory"`, and
 `useRefreshTokens: false`. The access token is held only in a closure during

@@ -2,10 +2,13 @@ import { spawn } from "node:child_process";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("../", import.meta.url)));
-const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmCommand = process.platform === "win32" ? process.execPath : "npm";
+const npmArguments = process.platform === "win32"
+  ? [join(dirname(process.execPath), "node_modules/npm/bin/npm-cli.js")]
+  : [];
 
 function run(command, args, cwd, environment = process.env, options = {}) {
   return new Promise((resolveResult, reject) => {
@@ -105,10 +108,9 @@ async function main() {
     );
     const packResult = await run(
       npmCommand,
-      ["pack", "--pack-destination", packDirectory, "--json", "--ignore-scripts"],
+      [...npmArguments, "pack", "--pack-destination", packDirectory, "--json", "--ignore-scripts"],
       repositoryRoot,
       environment,
-      { shell: process.platform === "win32" },
     );
     const packInfo = JSON.parse(packResult.stdout)[0];
     assertCondition(packInfo !== undefined, "npm pack returned no package metadata.");
@@ -170,6 +172,7 @@ async function main() {
     await run(
       npmCommand,
       [
+        ...npmArguments,
         "install",
         "--offline",
         "--ignore-scripts",
@@ -181,7 +184,6 @@ async function main() {
       ],
       consumerRoot,
       environment,
-      { shell: process.platform === "win32" },
     );
 
     const installedPackageRoot = join(consumerRoot, "node_modules", packageJson.name);
@@ -257,18 +259,17 @@ console.log("consumer API smoke passed");
     );
     await run(process.execPath, ["consumer.mjs"], consumerRoot, environment);
 
-    const executable = join(
-      consumerRoot,
-      "node_modules",
-      ".bin",
-      process.platform === "win32" ? "tutorbench.cmd" : "tutorbench",
-    );
+    const executable = process.platform === "win32"
+      ? process.execPath
+      : join(consumerRoot, "node_modules", ".bin", "tutorbench");
+    const executableArguments = process.platform === "win32"
+      ? [join(installedPackageRoot, "dist/src/cli/tutorbench.js")]
+      : [];
     const help = await run(
       executable,
-      ["--help"],
+      [...executableArguments, "--help"],
       consumerRoot,
       environment,
-      { shell: process.platform === "win32" },
     );
     assertCondition(
       /tutorbench run --http <url>/.test(help.stdout),
@@ -288,10 +289,9 @@ console.log("consumer API smoke passed");
     );
     const quickstart = await run(
       executable,
-      ["quickstart"],
+      [...executableArguments, "quickstart"],
       consumerRoot,
       environment,
-      { shell: process.platform === "win32" },
     );
     assertCondition(
       /Quickstart completed/.test(quickstart.stdout) &&
@@ -306,10 +306,9 @@ console.log("consumer API smoke passed");
     );
     const collectHelp = await run(
       executable,
-      ["collect", "--help"],
+      [...executableArguments, "collect", "--help"],
       consumerRoot,
       environment,
-      { shell: process.platform === "win32" },
     );
     assertCondition(
       /Collects Product Tutor responses sequentially/.test(collectHelp.stdout),
@@ -317,10 +316,9 @@ console.log("consumer API smoke passed");
     );
     const collectModelHelp = await run(
       executable,
-      ["collect-model", "--help"],
+      [...executableArguments, "collect-model", "--help"],
       consumerRoot,
       environment,
-      { shell: process.platform === "win32" },
     );
     assertCondition(
       /Collects canonical foundation-model evidence/.test(collectModelHelp.stdout),
@@ -328,10 +326,9 @@ console.log("consumer API smoke passed");
     );
     const evaluateHelp = await run(
       executable,
-      ["evaluate", "--help"],
+      [...executableArguments, "evaluate", "--help"],
       consumerRoot,
       environment,
-      { shell: process.platform === "win32" },
     );
     assertCondition(
       /Frozen responses are replayed locally/.test(evaluateHelp.stdout),

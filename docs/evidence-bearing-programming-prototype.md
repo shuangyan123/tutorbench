@@ -26,7 +26,7 @@ fixtures/experimental/evidence-bearing-programming/
   clamp-score.test.mjs
 ```
 
-The implementation contains a deliberate synthetic bug in a small `clampScore()` function. A Node 22 `node:test` assertion expects `clampScore(120)` to return `100`; the buggy implementation returns `0`.
+The implementation contains a deliberate synthetic bug in a small `clampScore()` function. A Node 24 `node:test` assertion expects `clampScore(120)` to return `100`; the buggy implementation returns `0`.
 
 The evidence generator runs only the checked-in test file with the repository's current Node executable:
 
@@ -65,7 +65,7 @@ The evidence bundle records SHA-256 fingerprints for:
 - the normalized execution evidence; and
 - a binding fingerprint over the challenge identity and the preceding fingerprints.
 
-The runtime's exact Node version is recorded as diagnostic provenance, while the stable execution-spec fingerprint targets the repository-supported Node 22 range (`>=22 <23`).
+The runtime's exact Node version is recorded as diagnostic provenance, while the stable execution-spec fingerprint targets the repository-supported Node 24 range (`>=24 <25`). A runtime-contract migration intentionally changes this fingerprint; older Node 22 fingerprints are historical evidence and are not accepted as compatible substitutes.
 
 Before a `TutorTurnInput` is built, the current challenge specification, fixture bytes, execution specification, evidence record, and binding fingerprint are recomputed. Any mismatch fails closed with explicit diagnostics.
 

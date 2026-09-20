@@ -14,7 +14,7 @@ import {
   verifyEvidenceBearingProgrammingBundle,
 } from "../src/experiments/evidence-bearing-programming.js";
 
-test("execution-backed programming evidence is deterministic on the supported runtime", () => {
+test("execution-backed programming evidence is deterministic on the supported Node 24 runtime", () => {
   const first = generateEvidenceBearingProgrammingBundle();
   const second = generateEvidenceBearingProgrammingBundle();
 
@@ -26,6 +26,7 @@ test("execution-backed programming evidence is deterministic on the supported ru
   assert.equal(first.evidence.actual, 0);
   assert.equal(first.evidence.operator, "strictEqual");
   assert.equal(first.evidence.errorCode, "ERR_ASSERTION");
+  assert.match(first.provenance.runtimeVersion, /^24\./u);
   assert.match(first.provenance.challengeSpecFingerprint, /^sha256:[0-9a-f]{64}$/u);
   assert.match(first.provenance.fixtureFingerprint, /^sha256:[0-9a-f]{64}$/u);
   assert.match(first.provenance.executionSpecFingerprint, /^sha256:[0-9a-f]{64}$/u);

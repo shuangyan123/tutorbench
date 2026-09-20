@@ -145,7 +145,7 @@ permissions:
   id-token: write
 ```
 
-It pins Node `22.23.2` and npm `11.19.1`. The only registry mutation is:
+It pins Node `24.21.0` and npm `11.19.0`. The only registry mutation is:
 
 ```text
 npm stage publish artifacts/release/tutor-benchmark-${package version}.tgz

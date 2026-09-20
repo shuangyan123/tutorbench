@@ -697,7 +697,7 @@ export function parseCommunityReviewReviewerPacket(value: unknown): CommunityRev
   const parsed = record(value);
   const source = parsed === null ? null : parseDataKindAndFixture(parsed);
   const instrument = parseCommunityReviewInstrumentIdentity(parsed?.instrument);
-  let tasks: CommunityReviewVisibleTask[] | null = null;
+  let tasks: CommunityReviewVisibleTask[] | null;
   try { tasks = parseCommunityReviewVisibleTasks(parsed?.tasks); } catch { tasks = null; }
   const packetFingerprint = parsed === null ? null : optionalFingerprint(parsed, "packetFingerprint");
   const base = parsed === null || tasks === null ? null : {
@@ -773,7 +773,7 @@ export function parseCommunityReviewSubmission(value: unknown): CommunityReviewS
   const parsed = record(value);
   const source = parsed === null ? null : parseDataKindAndFixture(parsed);
   const instrument = parseCommunityReviewInstrumentIdentity(parsed?.instrument);
-  let annotations: CommunityReviewAnnotation[] | null = null;
+  let annotations: CommunityReviewAnnotation[] | null;
   try { annotations = parseAnnotations(parsed?.annotations); } catch { annotations = null; }
   const submissionFingerprint = parsed === null ? null : optionalFingerprint(parsed, "submissionFingerprint");
   const base = parsed === null || annotations === null ? null : {
@@ -1083,7 +1083,7 @@ export function parseFrozenCommunityReviewPool(value: unknown): FrozenCommunityR
   const qualificationEligibility = parseCommunityReviewQualificationEligibility(parsed?.qualificationEligibility);
   const visibleAtomicIds = parseAtomicIdentities(parsed?.visibleAtomicIds);
   const coverage = parseCommunityReviewCoverage(parsed?.coverage);
-  let submissions: CommunityReviewSubmission[] | null = null;
+  let submissions: CommunityReviewSubmission[] | null;
   try {
     submissions = Array.isArray(parsed?.submissions)
       ? parsed.submissions.map((item) => parseCommunityReviewSubmission(item))
@@ -1258,7 +1258,7 @@ function parseDisagreement(value: unknown): CommunityReviewDisagreement | null {
 
 function parsePublicSubmission(value: unknown): CommunityReviewPublicSubmission | null {
   const parsed = record(value);
-  let annotations: CommunityReviewAnnotation[] | null = null;
+  let annotations: CommunityReviewAnnotation[] | null;
   try { annotations = Array.isArray(parsed?.annotations) ? parseAnnotations(parsed.annotations) : null; } catch { annotations = null; }
   const reviewerId = parsed === null || !("reviewerId" in parsed)
     ? undefined
@@ -1280,7 +1280,7 @@ function parsePublicAgreement(value: unknown): CommunityReviewPublicAgreement | 
   const matrix = record(parsed?.confusionMatrix);
   const perRequirement = record(parsed?.perRequirement);
   const perCase = record(parsed?.perCase);
-  let disagreements: CommunityReviewDisagreement[] | null = null;
+  let disagreements: CommunityReviewDisagreement[] | null;
   try { disagreements = Array.isArray(parsed?.disagreements) ? parsed.disagreements.map(parseDisagreement) as CommunityReviewDisagreement[] : null; } catch { disagreements = null; }
   const distributions = (value: UnknownRecord | null): Record<string, CommunityReviewStatusDistribution> | null => {
     if (value === null || Object.keys(value).some((key) => !publicDistributionKeyPattern.test(key))) return null;

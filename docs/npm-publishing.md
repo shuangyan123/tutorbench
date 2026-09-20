@@ -68,8 +68,8 @@ permissions:
   id-token: write
 ```
 
-It pins Node `22.23.2` and npm `11.19.1`. The package engine remains
-`>=22 <23`; npm staged publishing requires npm `11.15.0+` and Node `22.14.0+`.
+It pins Node `24.21.0` and npm `11.19.0`. The package engine remains
+`>=24 <25`; staged publishing verifies those exact Node and npm versions.
 No npm token or secret-based npm authentication is configured.
 
 The only registry mutation in the workflow is staging the retained artifact:

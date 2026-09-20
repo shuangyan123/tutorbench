@@ -570,7 +570,7 @@ function inspectApplyBoundary(rootPath) {
 
   const git = inspectGitState(rootPath);
   const repositoryContext = inspectRepositoryContext(rootPath);
-  let originMainHead = null;
+  let originMainHead;
   try {
     originMainHead = runCommand("git", ["rev-parse", "origin/main"], { cwd: rootPath });
   } catch {
