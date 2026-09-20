@@ -35,6 +35,10 @@
 .benchmark-section-intro>p:not(.eyebrow) { color: var(--muted); font-size: 14px; }
 .benchmark-entry { border-radius: 9px; background: color-mix(in srgb, var(--warm) 42%, var(--surface)); padding: 25px 23px; display: flex; flex-direction: column; align-items: start; }
 .benchmark-entry:nth-child(2) { background: color-mix(in srgb, var(--accent-soft) 65%, var(--surface)); }
+/* 暗色卡片保持深绿色层次，避免全局暖色 token 混出灰面。 */
+.benchmark-page[data-theme=dark] .benchmark-entry:nth-child(2) { background: color-mix(in srgb, var(--accent-soft) 65%, var(--surface)); }
+.benchmark-page[data-theme=dark] .benchmark-entry:nth-child(3) { background: color-mix(in srgb, var(--accent-soft) 52%, var(--surface)); }
+.benchmark-page[data-theme=dark] .benchmark-entry:nth-child(4) { background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface)); }
 .benchmark-entry-icon { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 45%, transparent); color: var(--accent); margin-bottom: 25px; }
 .benchmark-entry-icon .site-icon { width: 29px; height: 29px; }
 .benchmark-entry h3 { font: 24px/1.15 var(--serif); letter-spacing: -.04em; margin: 10px 0; }
