@@ -1,4 +1,4 @@
-/* global HTMLButtonElement, HTMLFormElement, HTMLSelectElement, HTMLElement, URLSearchParams, document, history, window */
+/* global HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLSelectElement, HTMLElement, URLSearchParams, document, history, window */
 
 (() => {
   const navToggle = document.querySelector(".nav-toggle");
@@ -54,7 +54,9 @@
         : "data-case-count-template-en";
       const template = element.getAttribute(templateAttribute) ?? "Showing {count} cases";
       const count = element.getAttribute("data-case-count-value") ?? "0";
-      element.textContent = template.replace("{count}", count);
+      const start = element.getAttribute("data-case-count-start") ?? "0";
+      const end = element.getAttribute("data-case-count-end") ?? count;
+      element.textContent = template.replaceAll("{start}", start).replaceAll("{end}", end).replaceAll("{count}", count);
     });
     if (localeSwitcher instanceof HTMLSelectElement) {
       localeSwitcher.value = locale;
@@ -88,107 +90,219 @@
   }
 
   const filterFields = Array.from(
-    filterForm.querySelectorAll("[data-case-filter]"),
-  ).filter((field) => field instanceof HTMLSelectElement);
-  const cards = Array.from(document.querySelectorAll("[data-case-card]"));
+    filterForm.querySelectorAll("input[data-case-filter]"),
+  ).filter((field) => field instanceof HTMLInputElement);
+  const cards = Array.from(document.querySelectorAll("[data-case-item]"));
+  const searchField = document.querySelector("[data-case-search]");
+  const sortField = document.querySelector("[data-case-sort]");
+  const results = document.querySelector("[data-case-results]");
+  const cardGrid = results?.querySelector(".case-card-grid");
+  const pagination = document.querySelector("[data-case-pagination]");
+  const viewButtons = Array.from(document.querySelectorAll("[data-case-view]"));
+  const filterToggle = document.querySelector("[data-case-filter-toggle]");
+  const filterPanel = document.querySelector("[data-case-filter-panel]");
+  const activeFilterCount = document.querySelector("[data-case-active-filter-count]");
+  const filterSummary = document.querySelector("[data-case-filter-summary]");
   const resultCount = document.querySelector("#case-result-count");
   const emptyState = document.querySelector("#case-filter-empty");
-  const parameterByFilter = {
-    locale: "locale",
-    subject: "subject",
-    learnerLevel: "learnerLevel",
-    taskDifficulty: "taskDifficulty",
-    pedagogicalDifficulty: "pedagogicalDifficulty",
-    capability: "capability",
-    studentState: "studentState",
-    disclosurePolicy: "disclosurePolicy",
-  };
+  const pageSize = Number(results?.getAttribute("data-page-size") ?? "12") || 12;
+  const filterKeys = ["subject", "learnerLevel", "taskDifficulty", "pedagogicalDifficulty", "capability", "studentState", "locale", "disclosurePolicy"];
+  let currentPage = 1;
 
   function readValues() {
-    return Object.fromEntries(
-      filterFields.map((field) => [field.dataset.caseFilter ?? "", field.value]),
-    );
-  }
-
-  function matches(card, values) {
-    const locale = card.dataset.caseLocale ?? "";
-    const subject = card.dataset.caseSubject ?? "";
-    const learnerLevel = card.dataset.caseLearnerLevel ?? "";
-    const taskDifficulty = card.dataset.caseTaskDifficulty ?? "";
-    const pedagogicalDifficulty = card.dataset.casePedagogicalDifficulty ?? "";
-    const capabilities = (card.dataset.caseCapabilities ?? "").split(" ");
-    const studentState = card.dataset.caseStudentState ?? "";
-    const disclosurePolicy = card.dataset.caseDisclosurePolicy ?? "";
-    return (
-      (!values.locale || values.locale === locale) &&
-      (!values.subject || values.subject === subject) &&
-      (!values.learnerLevel || values.learnerLevel === learnerLevel) &&
-      (!values.taskDifficulty || values.taskDifficulty === taskDifficulty) &&
-      (!values.pedagogicalDifficulty || values.pedagogicalDifficulty === pedagogicalDifficulty) &&
-      (!values.capability || capabilities.includes(values.capability)) &&
-      (!values.studentState || values.studentState === studentState) &&
-      (!values.disclosurePolicy || values.disclosurePolicy === disclosurePolicy)
-    );
-  }
-
-  function updateUrl(values) {
-    const params = new URLSearchParams();
-    Object.entries(values).forEach(([key, value]) => {
-      if (value) {
-        params.set(parameterByFilter[key] ?? key, value);
-      }
+    const values = Object.fromEntries(filterKeys.map((key) => [key, []]));
+    filterFields.forEach((field) => {
+      const key = field.dataset.caseFilter;
+      if (key && field.checked && field.value) values[key].push(field.value);
     });
+    return values;
+  }
+
+  function selectedSearch() {
+    return searchField instanceof HTMLInputElement ? searchField.value.trim().toLowerCase() : "";
+  }
+
+  function matches(card, values, search) {
+    const capabilities = (card.dataset.caseCapabilities ?? "").split(" ");
+    const matchesSearch = !search || (card.dataset.caseSearchText ?? "").toLowerCase().includes(search);
+    return matchesSearch &&
+      (!values.locale.length || values.locale.includes(card.dataset.caseLocale ?? "")) &&
+      (!values.subject.length || values.subject.includes(card.dataset.caseSubject ?? "")) &&
+      (!values.learnerLevel.length || values.learnerLevel.includes(card.dataset.caseLearnerLevel ?? "")) &&
+      (!values.taskDifficulty.length || values.taskDifficulty.includes(card.dataset.caseTaskDifficulty ?? "")) &&
+      (!values.pedagogicalDifficulty.length || values.pedagogicalDifficulty.includes(card.dataset.casePedagogicalDifficulty ?? "")) &&
+      (!values.capability.length || values.capability.some((value) => capabilities.includes(value))) &&
+      (!values.studentState.length || values.studentState.includes(card.dataset.caseStudentState ?? "")) &&
+      (!values.disclosurePolicy.length || values.disclosurePolicy.includes(card.dataset.caseDisclosurePolicy ?? ""));
+  }
+
+  function updateUrl(values, search, page) {
+    const params = new URLSearchParams();
+    Object.entries(values).forEach(([key, selected]) => selected.forEach((value) => params.append(key, value)));
+    if (search) params.set("q", search);
+    if (sortField instanceof HTMLSelectElement && sortField.value !== "case-id-asc") params.set("sort", sortField.value);
+    const activeView = viewButtons.find((button) => button.getAttribute("aria-pressed") === "true");
+    if (activeView?.getAttribute("data-case-view") === "compact") params.set("view", "compact");
+    if (page > 1) params.set("page", String(page));
     const query = params.toString();
     history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
   }
 
+  function renderCount(start, end, count) {
+    if (!(resultCount instanceof HTMLElement)) return;
+    const uiLocale = document.documentElement.dataset.uiLocale === "zh-CN" ? "zh-CN" : "en";
+    const template = resultCount.getAttribute(uiLocale === "zh-CN" ? "data-case-count-template-zh-cn" : "data-case-count-template-en") ?? "Showing {count} cases";
+    resultCount.setAttribute("data-case-count-value", String(count));
+    resultCount.setAttribute("data-case-count-start", String(start));
+    resultCount.setAttribute("data-case-count-end", String(end));
+    resultCount.textContent = template.replaceAll("{start}", String(start)).replaceAll("{end}", String(end)).replaceAll("{count}", String(count));
+  }
+
+  function renderPagination(total, page) {
+    if (!(pagination instanceof HTMLElement)) return;
+    pagination.replaceChildren();
+    const pageCount = Math.ceil(total / pageSize);
+    if (pageCount <= 1) return;
+    const addButton = (label, target, disabled = false, current = false) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "case-page-button";
+      button.textContent = label;
+      button.disabled = disabled;
+      if (current) button.setAttribute("aria-current", "page");
+      button.addEventListener("click", () => { currentPage = target; update(); });
+      pagination.append(button);
+    };
+    addButton("Previous", Math.max(1, page - 1), page === 1);
+    const pageNumbers = new Set([1, pageCount, page - 1, page, page + 1].filter((value) => value >= 1 && value <= pageCount));
+    let last = 0;
+    [...pageNumbers].sort((a, b) => a - b).forEach((number) => {
+      if (last && number - last > 1) {
+        const ellipsis = document.createElement("span");
+        ellipsis.className = "case-page-ellipsis";
+        ellipsis.textContent = "…";
+        pagination.append(ellipsis);
+      }
+      addButton(String(number), number, false, number === page);
+      last = number;
+    });
+    addButton("Next", Math.min(pageCount, page + 1), page === pageCount);
+  }
+
+  function sortCards() {
+    if (!(cardGrid instanceof HTMLElement)) return;
+    const sort = sortField instanceof HTMLSelectElement ? sortField.value : "case-id-asc";
+    const ordered = [...cards].sort((left, right) => {
+      let comparison = (left.dataset.caseId ?? "").localeCompare(right.dataset.caseId ?? "", "en", { numeric: true });
+      if (sort === "case-id-desc") comparison *= -1;
+      if (sort === "subject") comparison = (left.dataset.caseSubject ?? "").localeCompare(right.dataset.caseSubject ?? "", "en");
+      if (sort === "learner-level") comparison = Number(left.dataset.caseLearnerLevel ?? 0) - Number(right.dataset.caseLearnerLevel ?? 0);
+      if (sort === "task-difficulty") comparison = Number(left.dataset.caseTaskDifficulty ?? 0) - Number(right.dataset.caseTaskDifficulty ?? 0);
+      return comparison || (left.dataset.caseId ?? "").localeCompare(right.dataset.caseId ?? "", "en", { numeric: true });
+    });
+    ordered.forEach((card) => cardGrid.append(card));
+  }
+
+  function updateFilterSummary(values, search) {
+    const count = Object.values(values).reduce((total, selected) => total + selected.length, 0) + (search ? 1 : 0);
+    if (activeFilterCount instanceof HTMLElement) activeFilterCount.textContent = String(count);
+    if (filterSummary instanceof HTMLElement) filterSummary.textContent = count === 0 ? "All cases" : `${count} active ${count === 1 ? "filter" : "filters"}`;
+  }
+
   function update(syncUrl = true) {
     const values = readValues();
-    let visibleCount = 0;
+    const search = selectedSearch();
+    const matchingCards = cards.filter((card) => matches(card, values, search));
+    const pageCount = Math.max(1, Math.ceil(matchingCards.length / pageSize));
+    currentPage = Math.min(currentPage, pageCount);
+    const first = (currentPage - 1) * pageSize;
+    const visibleCards = new Set(matchingCards.slice(first, first + pageSize));
     cards.forEach((card) => {
-      const visible = matches(card, values);
+      const visible = visibleCards.has(card);
       card.hidden = !visible;
       card.setAttribute("aria-hidden", String(!visible));
-      if (visible) {
-        visibleCount += 1;
-      }
     });
-    if (resultCount instanceof HTMLElement) {
-      const uiLocale = document.documentElement.dataset.uiLocale === "zh-CN"
-        ? "zh-CN"
-        : "en";
-      const templateAttribute = uiLocale === "zh-CN"
-        ? "data-case-count-template-zh-cn"
-        : "data-case-count-template-en";
-      const template = resultCount.getAttribute(templateAttribute) ?? "Showing {count} cases";
-      resultCount.setAttribute("data-case-count-value", String(visibleCount));
-      resultCount.textContent = template.replace("{count}", String(visibleCount));
-    }
-    if (emptyState instanceof HTMLElement) {
-      emptyState.hidden = visibleCount !== 0;
-    }
-    if (syncUrl) {
-      updateUrl(values);
-    }
+    const start = matchingCards.length === 0 ? 0 : first + 1;
+    const end = matchingCards.length === 0 ? 0 : Math.min(first + pageSize, matchingCards.length);
+    renderCount(start, end, matchingCards.length);
+    if (emptyState instanceof HTMLElement) emptyState.hidden = matchingCards.length !== 0;
+    if (cardGrid instanceof HTMLElement) cardGrid.hidden = matchingCards.length === 0;
+    updateFilterSummary(values, search);
+    renderPagination(matchingCards.length, currentPage);
+    if (syncUrl) updateUrl(values, search, currentPage);
+  }
+
+  function clearGroup(key) {
+    filterFields.forEach((field) => {
+      if (field.dataset.caseFilter !== key) return;
+      field.checked = field.dataset.caseFilterAll !== undefined;
+    });
   }
 
   const params = new URLSearchParams(window.location.search);
-  filterFields.forEach((field) => {
-    const value = params.get(field.dataset.caseFilter ?? "");
-    if (value !== null && Array.from(field.options).some((option) => option.value === value)) {
-      field.value = value;
+  filterKeys.forEach((key) => {
+    const values = params.getAll(key);
+    if (values.length === 0) return;
+    filterFields.forEach((field) => {
+      if (field.dataset.caseFilter === key) field.checked = field.dataset.caseFilterAll === undefined && values.includes(field.value);
+    });
+  });
+  if (searchField instanceof HTMLInputElement) searchField.value = params.get("q") ?? "";
+  if (sortField instanceof HTMLSelectElement && params.get("sort") && Array.from(sortField.options).some((option) => option.value === params.get("sort"))) sortField.value = params.get("sort");
+  if (params.get("view") === "compact") {
+    const compactButton = viewButtons.find((button) => button.getAttribute("data-case-view") === "compact");
+    const cardButton = viewButtons.find((button) => button.getAttribute("data-case-view") === "cards");
+    compactButton?.setAttribute("aria-pressed", "true");
+    cardButton?.setAttribute("aria-pressed", "false");
+    if (results instanceof HTMLElement) results.dataset.view = "compact";
+  }
+  currentPage = Math.max(1, Number(params.get("page") ?? "1") || 1);
+
+  filterFields.forEach((field) => field.addEventListener("change", () => {
+    if (field.dataset.caseFilterAll !== undefined && field.checked) clearGroup(field.dataset.caseFilter ?? "");
+    if (field.dataset.caseFilterAll === undefined && field.checked) {
+      filterFields.filter((candidate) => candidate.dataset.caseFilter === field.dataset.caseFilter && candidate.dataset.caseFilterAll !== undefined).forEach((candidate) => { candidate.checked = false; });
     }
+    if (field.dataset.caseFilterAll === undefined && !field.checked && !filterFields.some((candidate) => candidate.dataset.caseFilter === field.dataset.caseFilter && candidate.dataset.caseFilterAll === undefined && candidate.checked)) {
+      filterFields.filter((candidate) => candidate.dataset.caseFilter === field.dataset.caseFilter && candidate.dataset.caseFilterAll !== undefined).forEach((candidate) => { candidate.checked = true; });
+    }
+    currentPage = 1;
+    update();
+  }));
+  filterForm.querySelectorAll("[data-case-filter-clear]").forEach((button) => button.addEventListener("click", () => {
+    clearGroup(button.getAttribute("data-case-filter-clear") ?? "");
+    currentPage = 1;
+    update();
+  }));
+  if (searchField instanceof HTMLInputElement) searchField.addEventListener("input", () => { currentPage = 1; update(); });
+  if (sortField instanceof HTMLSelectElement) sortField.addEventListener("change", () => { sortCards(); currentPage = 1; update(); });
+  filterForm.addEventListener("reset", () => {
+    window.setTimeout(() => {
+      if (searchField instanceof HTMLInputElement) searchField.value = "";
+      if (sortField instanceof HTMLSelectElement) sortField.value = "case-id-asc";
+      currentPage = 1;
+      sortCards();
+      update();
+    }, 0);
+  });
+  viewButtons.forEach((button) => button.addEventListener("click", () => {
+    const view = button.getAttribute("data-case-view") === "compact" ? "compact" : "cards";
+    viewButtons.forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
+    if (results instanceof HTMLElement) results.dataset.view = view;
+    update();
+  }));
+  if (filterToggle instanceof HTMLButtonElement && filterPanel instanceof HTMLElement) filterToggle.addEventListener("click", () => {
+    const open = filterPanel.getAttribute("data-open") === "true";
+    filterPanel.setAttribute("data-open", String(!open));
+    filterToggle.setAttribute("aria-expanded", String(!open));
   });
 
-  filterForm.addEventListener("change", () => update());
-  filterForm.addEventListener("reset", () => {
-    window.setTimeout(() => update(), 0);
-  });
+  sortCards();
   update(false);
 })();
 
 (() => {
-  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page');
+  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.cases-page');
   if (!(themedPage instanceof HTMLElement)) return;
 
   const media = window.matchMedia('(prefers-color-scheme: dark)');

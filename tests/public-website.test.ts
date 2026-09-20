@@ -36,7 +36,7 @@ test("homepage derives facts and escapes case content without inventing model re
   assert.match(content, /No model response or model score is published here/);
 });
 
-test("home reconstruction uses real blog routes and isolates its assets from other pages", async () => {
+test("home reconstruction uses real blog routes and cases reuse the Teachometry shell", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const page = renderHomePage(artifacts);
   const home = renderPage(page, { basePath: "/preview" });
@@ -54,7 +54,10 @@ test("home reconstruction uses real blog routes and isolates its assets from oth
   assert.ok(home.indexOf('class="home-data"') < home.indexOf('class="home-blog"'));
   assert.ok(home.indexOf('class="home-blog"') < home.indexOf('class="home-footer"'));
   const other = renderPage({ title: "Cases", description: "Cases", route: "/data/cases/", content: "Cases" });
-  assert.doesNotMatch(other, /home\.css|home-blog|home-footer|home-page/);
+  assert.match(other, /href="\/assets\/home\.css"/);
+  assert.match(other, /href="\/assets\/cases\.css"/);
+  assert.match(other, /<body class="cases-page">/);
+  assert.doesNotMatch(other, /home-blog|site-footer|home-page/);
 });
 
 async function loadDataset() {
