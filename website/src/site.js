@@ -188,15 +188,15 @@
 })();
 
 (() => {
-  const home = document.querySelector('.home-page');
-  if (!(home instanceof HTMLElement)) return;
+  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page');
+  if (!(themedPage instanceof HTMLElement)) return;
 
   const media = window.matchMedia('(prefers-color-scheme: dark)');
   let themeChoice = null;
   try { themeChoice = window.localStorage.getItem('tutorbench-home-theme'); } catch { /* Storage is optional. */ }
   const themeButtons = Array.from(document.querySelectorAll('[data-theme-choice]'));
   function applyTheme(value) {
-    home.dataset.theme = value;
+    themedPage.dataset.theme = value;
     themeButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.themeChoice === value)));
   }
   applyTheme(themeChoice === 'light' || themeChoice === 'dark' ? themeChoice : media.matches ? 'dark' : 'light');
@@ -279,7 +279,7 @@
 
   const nav = document.querySelector('#primary-navigation');
   const toggle = document.querySelector('.nav-toggle');
-  home.addEventListener('keydown', (event) => {
+  themedPage.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && nav?.getAttribute('data-open') === 'true') {
       nav.setAttribute('data-open', 'false');
       toggle?.setAttribute('aria-expanded', 'false');
@@ -292,7 +292,7 @@
         if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
       });
     }, { threshold: 0.08 });
-    home.querySelectorAll('.home-dimensions, .home-data').forEach((section) => {
+    themedPage.querySelectorAll('.home-dimensions, .home-data').forEach((section) => {
       section.classList.add('reveal-ready'); observer.observe(section);
     });
   }
