@@ -4,6 +4,9 @@
 .home-page::before { display: none; }
 /* 背景跟随真实 Hero 高度，避免较长文案或窄屏在底部露出硬切边。 */
 .home-hero::before { content: ''; position: absolute; z-index: -1; inset: -88px 0 0; background: linear-gradient(90deg, transparent 3%, #f8faf7eb 10%, #f8faf7f0 40%, transparent 53%), url('./home-hero-bg.webp') center 48% / cover no-repeat; pointer-events: none; }
+/* 仅补强底角的已有叶片；前景低于杯字并淡出到内容区，不改变 Hero 结构。 */
+.home-hero::after { content: ''; position: absolute; z-index: -1; inset: auto 0 0; height: 160px; background: url('./foliage-left-near.webp') left -70px bottom -100px / 480px auto no-repeat, url('./foliage-right-mid.webp') right -55px bottom -105px / 480px auto no-repeat; filter: blur(3px); opacity: .65; mask-image: linear-gradient(90deg, #000 3%, #0000 12%, #0000 88%, #000 97%), linear-gradient(to top, #000 55%, #0000); mask-composite: intersect; pointer-events: none; }
+@media (min-width: 1201px) { .home-hero::before { background-size: cover, 102% auto; background-position: center, left 48%; } }
 .home-header { background: color-mix(in srgb, var(--bg) 95%, transparent); }
 .home-header .header-inner { min-height: 88px; gap: 24px; flex-wrap: nowrap; }
 .home-header .wordmark { flex-shrink: 0; gap: 10px; }
@@ -71,6 +74,7 @@
 .dimension-node strong { font-size: 18px; }
 .home-data { padding: 46px 0 42px; background: #1e5149 url('./home-open-data-bg.webp') center 52% / cover no-repeat; }
 .home-data::before { inset: 0; width: auto; background: linear-gradient(90deg, #103e38a6, #103e3866 55%, #103e3838); opacity: 1; mask-image: none; mix-blend-mode: normal; }
+.home-page:not([data-theme=dark]) .home-data::before { background: linear-gradient(90deg, #103e3894, #103e3857 55%, #103e382b); }
 .home-data-grid { grid-template-columns: 39% minmax(0, 1fr); gap: 1%; padding: 0; align-items: center; }
 .home-data-statement { display: block; }
 .home-data .eyebrow { font-size: 9px; margin: 0 0 12px; color: white; }
@@ -95,16 +99,16 @@
 .home-blog-copy .blog-meta { font-size: 11px; margin: 0 0 8px; color: var(--muted); }
 .home-blog-copy h3 { font-size: 21px; letter-spacing: -.035em; line-height: 1.1; margin: 0 0 10px; }
 .home-blog-copy p { font-size: 14px; line-height: 1.5; color: var(--muted); margin: 0; }
-.home-footer { display: block; background: var(--surface); color: var(--muted); border: 0; padding: 20px 0 12px; }
+.home-footer { display: block; background: var(--surface); color: var(--muted); border: 0; padding: 28px 0 20px; }
 .home-footer .shell { width: 94%; max-width: 1440px; }
-.home-footer-main { display: flex; align-items: center; gap: 16px; padding-bottom: 18px; }
+.home-footer-main { display: flex; align-items: center; gap: 16px; padding-bottom: 24px; }
 .home-footer-brand { color: var(--accent); font-size: 25px; letter-spacing: -.045em; white-space: nowrap; }
 .footer-descriptor { font-size: 10px; }
 .home-footer nav { margin-left: auto; margin-right: auto; gap: 22px; font-size: 10px; }
 .home-footer nav a+a { padding: 0; border: 0; }
 .home-footer .button { font: 11px/1.4 Arial, sans-serif; min-height: 36px; padding: 8px 16px; }
 .home-footer .github-link { margin: 0 12px; color: var(--ink); }
-.home-footer-bottom { border-top: 1px solid var(--line); display: flex; gap: 25px; padding-top: 15px; font-size: 10px; }
+.home-footer-bottom { border-top: 1px solid var(--line); display: flex; gap: 25px; padding-top: 21px; font-size: 10px; }
 .home-footer-bottom>span { margin-right: auto; }
 .home-evidence { display: block; margin: 10px 0 0; padding: 0; font-size: 10px; color: var(--muted); }
 .home-evidence p { max-width: 1050px; }
@@ -112,6 +116,7 @@
 .home-blog-card>a:focus-visible { outline-offset: -3px; border-radius: inherit; }
 .home-data :focus-visible { outline-color: #fff; }
 .home-page[data-theme=dark] .home-hero::before { opacity: .16; }
+.home-page[data-theme=dark] .home-hero::after { opacity: .2; }
 .home-page[data-theme=dark] .scroll-cue>span { background: var(--surface); }
 @media (min-width: 1550px) { .home-hero { padding-top: 45px; } .hero-foot { min-height: 150px; } }
 @media (max-width: 1200px) and (min-width: 901px) {
@@ -291,8 +296,8 @@
   .home-blog-copy { padding: 18px 20px 24px; }
   .home-blog-copy h3 { font-size: 24px; }
   .home-blog-card img { aspect-ratio: 2.15; }
-  .home-footer { padding: 25px 0; }
-  .home-footer-main { gap: 18px 12px; padding-bottom: 20px; }
+  .home-footer { padding: 31px 0; }
+  .home-footer-main { gap: 18px 12px; padding-bottom: 26px; }
   .footer-descriptor { font-size: 9px; }
   .home-footer .github-link { margin: 0; }
   .home-footer nav { flex-wrap: wrap; justify-content: flex-start; gap: 16px; font-size: 11px; }
