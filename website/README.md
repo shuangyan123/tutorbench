@@ -66,8 +66,10 @@ path and never emits private evaluation content.
 
 The homepage uses the supplied September 2026 art direction: an ivory/forest
 palette, serif thesis, case walkthrough, five-dimension path, and compact data
-footer. Its descriptor is “Measurement infrastructure for AI tutoring”; other
-pages retain their existing header. The approved T1 brand mark is unchanged.
+footer. Its descriptor is “Measurement infrastructure for AI tutoring”; the
+Results page now extends that Teachometry shell with an evidence-report layout
+and an explicit empty public-results state. The approved T1 brand mark is
+unchanged.
 
 `src/site/pages/home.ts` renders public cases only. Tabs expose the learner input,
 authored objective, rubric-method explanation, and public context. There are no

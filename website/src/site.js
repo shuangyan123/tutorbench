@@ -188,7 +188,7 @@
 })();
 
 (() => {
-  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page');
+  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page');
   if (!(themedPage instanceof HTMLElement)) return;
 
   const media = window.matchMedia('(prefers-color-scheme: dark)');
