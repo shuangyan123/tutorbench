@@ -178,7 +178,7 @@ function renderHeader(
   basePath: string,
   locale: SiteLocale,
 ): string {
-  if (activeRoute === "/" || activeRoute === "/data/") {
+  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/") {
     const links = [
       ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
       ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
@@ -187,13 +187,13 @@ function renderHeader(
     const benchmarkNavLabels: Readonly<Record<string, string>> = {
       Home: "首页", Benchmark: "基准", Method: "方法", Results: "结果", Cases: "案例", About: "关于", Blog: "博客",
     };
-    const headerLabel = (label: string): string => activeRoute === "/data/"
+    const headerLabel = (label: string): string => activeRoute === "/data/" || activeRoute === "/methodology/"
       ? `<span data-ui-text="benchmark-nav" data-ui-text-en="${escapeHtml(label)}" data-ui-text-zh-cn="${escapeHtml(benchmarkNavLabels[label] ?? label)}">${escapeHtml(locale === "zh-CN" ? benchmarkNavLabels[label] ?? label : label)}</span>`
       : label;
     return `<header class="site-header home-header"><div class="shell header-inner">
       <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="Teachometry home"><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">Teachometry</span><span class="wordmark-descriptor">Measurement infrastructure<br>for AI tutoring</span></span></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
-      <nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">${links.map(([label, route]) => `<a href="${escapeHtml(sitePath(basePath, route))}"${route === activeRoute ? ' aria-current="page"' : ""}>${headerLabel(label)}</a>`).join("")}${activeRoute === "/data/" ? `<label class="locale-switcher"><span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span><select data-locale-switcher aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}"><option value="en"${locale === "en" ? " selected" : ""}>English</option><option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>简体中文</option></select></label>` : ""}</nav>
+      <nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">${links.map(([label, route]) => `<a href="${escapeHtml(sitePath(basePath, route))}"${route === activeRoute ? ' aria-current="page"' : ""}>${headerLabel(label)}</a>`).join("")}${activeRoute === "/data/" || activeRoute === "/methodology/" ? `<label class="locale-switcher"><span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span><select data-locale-switcher aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}"><option value="en"${locale === "en" ? " selected" : ""}>English</option><option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>简体中文</option></select></label>` : ""}</nav>
       <div class="home-header-tools"><div class="theme-controls" role="group" aria-label="Color theme"><button type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme">${siteIcon("sun")}</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme">${siteIcon("moon")}</button></div><a class="github-link" href="${SITE_GITHUB_URL}" aria-label="GitHub repository" title="GitHub repository">${siteIcon("github")}</a><a class="button button-primary" href="${escapeHtml(sitePath(basePath, "/run/"))}">Get Started ${siteIcon("arrow")}</a></div>
     </div></header>`;
   }
@@ -270,15 +270,16 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="icon" type="image/png" sizes="32x32" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-32.png"))}">
     <link rel="icon" type="image/png" sizes="16x16" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-16.png"))}">
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
-    ${(page.route === "/" || page.route === "/data/") ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/") ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
     ${page.route === "/data/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/benchmark.css"))}">` : ""}
+    ${page.route === "/methodology/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/methodology.css"))}">` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
-  <body${page.route === "/" ? ' class="home-page"' : page.route === "/data/" ? ' class="home-page benchmark-page"' : ""}>
+  <body${page.route === "/" ? ' class="home-page"' : page.route === "/data/" ? ' class="home-page benchmark-page"' : page.route === "/methodology/" ? ' class="methodology-page"' : ""}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     ${renderHeader(page.route, basePath, locale)}
     <main id="main-content">${page.content}</main>
-    ${(page.route === "/" || page.route === "/data/") ? "" : renderFooter(context.benchmark ?? ({
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/") ? "" : renderFooter(context.benchmark ?? ({
       statusLabel: "Developer Preview",
       dataset: { id: TUTOR_EVAL_DATASET_ID, version: TUTOR_EVAL_DATASET_VERSION },
     }), locale)}
