@@ -6,11 +6,9 @@ import type {
 import {
   SITE_GITHUB_URL,
   escapeHtml,
-  formatDifficulty,
   humanize,
   renderDimensionPills,
   renderEmptyState,
-  renderKeyValueList,
   renderStatusBadge,
   renderUiText,
   type SitePage,
@@ -205,98 +203,150 @@ export function renderCasesPage(artifacts: PublicBenchmarkArtifacts): SitePage {
   );
 }
 
-function renderProfile(profile: TutorEvalPublicCase["tutorInput"]["studentProfile"]): string {
-  if (profile === undefined) {
-    return `<p class="muted">No additional public profile metadata.</p>`;
+function difficultyField(
+  value: TutorEvalPublicCase["metadata"]["difficulty"],
+  field: "learnerLevel" | "taskDifficulty" | "pedagogicalDifficulty",
+): string {
+  if (typeof value === "object" && value !== null) {
+    const fieldValue = value[field];
+    return field === "learnerLevel"
+      ? humanize(String(fieldValue))
+      : `${String(fieldValue)} / 5`;
   }
-  const items: Array<[string, string]> = [];
-  if (profile.level !== undefined) {
-    items.push(["Level", humanize(profile.level)]);
+  return value === undefined ? "Not specified" : humanize(String(value));
+}
+
+function renderCaseFacts(
+  items: readonly (readonly [string, string, string])[],
+): string {
+  return `<dl class="case-facts">${items
+    .map(
+      ([label, value, iconName]) => `<div><span class="case-fact-icon">${icon(iconName)}</span><div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div></div>`,
+    )
+    .join("")}</dl>`;
+}
+
+function renderCaseProfile(
+  profile: TutorEvalPublicCase["tutorInput"]["studentProfile"],
+  difficulty: TutorEvalPublicCase["metadata"]["difficulty"],
+): string {
+  const level = profile?.level ??
+    (typeof difficulty === "object" && difficulty !== null
+      ? difficulty.learnerLevel
+      : undefined);
+  const knownConcepts = profile?.knownConcepts?.length
+    ? profile.knownConcepts.join(", ")
+    : "Not specified";
+  const goal = profile?.goal ?? "Not specified";
+  return `<dl class="case-profile-list">
+    <div><dt>Learner level</dt><dd>${escapeHtml(level === undefined ? "Not specified" : humanize(level))}</dd></div>
+    <div><dt>Goal</dt><dd>${escapeHtml(goal)}</dd></div>
+    <div><dt>Known concepts</dt><dd>${escapeHtml(knownConcepts)}</dd></div>
+  </dl>`;
+}
+
+function renderCapabilityTags(tags: readonly string[]): string {
+  if (tags.length === 0) {
+    return `<p class="case-detail-muted">Not specified</p>`;
   }
-  if (profile.goal !== undefined) {
-    items.push(["Goal", profile.goal]);
-  }
-  if (profile.knownConcepts !== undefined && profile.knownConcepts.length > 0) {
-    items.push(["Known concepts", profile.knownConcepts.join(", ")]);
-  }
-  return renderKeyValueList(items);
+  return `<ul class="case-capability-list">${tags
+    .map((tag) => `<li>${escapeHtml(humanize(tag))}</li>`)
+    .join("")}</ul>`;
 }
 
 function renderConversation(
   conversation: TutorEvalPublicCase["tutorInput"]["conversationHistory"],
+  currentStudentMessage: string,
+  locale: string,
 ): string {
-  if (conversation === undefined || conversation.length === 0) {
-    return `<p class="muted">No prior conversation. This case starts with the current student message.</p>`;
-  }
-  return `<ol class="conversation-list">${conversation
+  const history = conversation ?? [];
+  const historyMarkup = history
     .map(
-      (message) => `<li><span class="conversation-role">${escapeHtml(humanize(message.role))}</span><p>${escapeHtml(message.text)}</p></li>`,
+      (message) => {
+        const isTutor = message.role.toLowerCase() === "tutor";
+        return `<li class="case-turn ${isTutor ? "case-turn-tutor" : "case-turn-student"}">
+          <span class="case-turn-avatar">${icon(isTutor ? "robot" : "user")}</span>
+          <div class="case-turn-bubble"><div class="case-turn-head"><strong>${escapeHtml(humanize(message.role))}</strong><span>Prior context</span></div><p lang="${escapeHtml(locale)}">${escapeHtml(message.text)}</p></div>
+        </li>`;
+      },
     )
-    .join("")}</ol>`;
+    .join("");
+  return `<ol class="case-transcript" aria-label="Tutor-visible conversation">${historyMarkup}
+    <li class="case-turn case-turn-student case-turn-current">
+      <span class="case-turn-avatar">${icon("user")}</span>
+      <div class="case-turn-bubble"><div class="case-turn-head"><strong>Student</strong><span>Current message</span></div><p lang="${escapeHtml(locale)}">${escapeHtml(currentStudentMessage)}</p></div>
+    </li>
+  </ol>${history.length === 0 ? `<p class="case-transcript-note"><span>${icon("info")}</span>There is no prior conversation. This case starts with the current student message.</p>` : ""}`;
+}
+
+function renderCaseBotanical(): string {
+  return `<svg class="case-detail-botanical" viewBox="0 0 280 220" fill="none" aria-hidden="true" focusable="false"><circle cx="184" cy="116" r="58" fill="currentColor" opacity=".08"/><path d="M150 196c-6-40 1-75 23-103 15-19 26-36 25-67" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M171 121c-28-7-46-22-55-46 24 3 43 16 55 46ZM175 101c-4-31 3-58 26-82 8 29 1 56-26 82ZM178 145c22-8 40-25 49-51-25 7-42 23-49 51ZM155 156c-27-1-48-12-64-33 26-4 48 7 64 33Z" stroke="currentColor" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round"/><path d="M168 124c-13 24-24 47-29 70" stroke="currentColor" stroke-width=".8" stroke-linecap="round" opacity=".7"/></svg>`;
 }
 
 export function renderCaseDetailPage(
   artifacts: PublicBenchmarkArtifacts,
   caseArtifact: TutorEvalPublicCase,
 ): SitePage {
-  const difficulty = formatDifficulty(caseArtifact.metadata.difficulty);
+  const difficulty = caseArtifact.metadata.difficulty;
   const capabilityTags = caseArtifact.metadata.capabilityTags ?? [];
+  const locale = caseArtifact.locale ?? "en";
+  const caseSummary = [
+    caseArtifact.tutorInput.problemContext,
+    caseArtifact.tutorInput.learningObjective,
+  ]
+    .filter((value): value is string => value !== undefined && value.trim().length > 0)
+    .join(" ");
+  const dossierFacts: readonly (readonly [string, string, string])[] = [
+    ["Case ID", caseArtifact.id, "bookmark"],
+    ["Dataset", `${artifacts.cases.datasetId}@${artifacts.cases.datasetVersion}`, "database"],
+    ["Version", caseArtifact.version, "refresh"],
+    ["Subject", humanize(caseArtifact.metadata.subject), "book"],
+    ["Topic", humanize(caseArtifact.metadata.topic), "document"],
+    ["Locale", locale, "guidance"],
+    ["Learner level", difficultyField(difficulty, "learnerLevel"), "adaptation"],
+    ["Task difficulty", difficultyField(difficulty, "taskDifficulty"), "chart"],
+    ["Pedagogical difficulty", difficultyField(difficulty, "pedagogicalDifficulty"), "chart"],
+    ["Student state", humanize(caseArtifact.metadata.studentState ?? "Not specified"), "user"],
+    ["Disclosure policy", humanize(caseArtifact.disclosurePolicy ?? "Not specified"), "shield"],
+  ];
   return page(
-    `${humanize(caseArtifact.metadata.topic)} — Tutor Benchmark`,
+    `${humanize(caseArtifact.metadata.topic)} — Teachometry`,
     `Public TutorEval case ${caseArtifact.id}: ${caseArtifact.tutorInput.learningObjective}`,
     `/data/cases/${encodeURIComponent(caseArtifact.id)}/`,
-    `<section class="page-intro">
-      <div class="shell narrow-shell">
-        <a class="back-link" href="/data/cases/">← Back to case explorer</a>
-        <div class="eyebrow-row">${renderStatusBadge("Public case", "preview")}<span class="eyebrow">${escapeHtml(caseArtifact.id)}</span></div>
-        <h1>${escapeHtml(humanize(caseArtifact.metadata.topic))}</h1>
-        <p class="lede">${escapeHtml(caseArtifact.tutorInput.learningObjective)}</p>
-      </div>
-    </section>
-    <section class="section">
-      <div class="shell detail-grid">
-        <div class="detail-main">
-          <section class="panel detail-section" aria-labelledby="student-context-title">
-            <div class="panel-heading"><div><p class="eyebrow">Tutor-visible context</p><h2 id="student-context-title">Student context</h2></div>${renderStatusBadge(humanize(caseArtifact.metadata.studentState ?? "Unspecified"), "muted")}</div>
-            <div class="student-message"><p class="quote-label">Current student message</p><p>“${escapeHtml(caseArtifact.tutorInput.studentMessage)}”</p></div>
-            ${caseArtifact.tutorInput.problemContext === undefined ? "" : `<div class="context-copy"><p class="quote-label">Problem context</p><p>${escapeHtml(caseArtifact.tutorInput.problemContext)}</p></div>`}
-            <div class="context-copy"><p class="quote-label">Learning objective</p><p>${escapeHtml(caseArtifact.tutorInput.learningObjective)}</p></div>
-          </section>
-          <section class="panel detail-section" aria-labelledby="conversation-title">
-            <p class="eyebrow">Context window</p><h2 id="conversation-title">Conversation history</h2>
-            ${renderConversation(caseArtifact.tutorInput.conversationHistory)}
-          </section>
-          <section class="panel detail-section" aria-labelledby="privacy-title">
-            <p class="eyebrow">Public boundary</p><h2 id="privacy-title">What this page does not expose</h2>
-            <p>This public development artifact intentionally excludes ground truth answers, known-misconception annotations, rubrics, and evaluator-only evidence. A future hidden challenge dataset must use the same fail-closed serialization boundary.</p>
-          </section>
+    `<div class="case-detail-main">
+      <section class="case-detail-hero" aria-labelledby="case-detail-title">
+        <div class="shell">
+          <div class="case-detail-breadcrumbs"><nav aria-label="Breadcrumb"><a href="/data/cases/">Cases</a><span aria-hidden="true">›</span><a href="/data/cases/#case-library">Case Library</a><span aria-hidden="true">›</span><span aria-current="page">${escapeHtml(caseArtifact.id)}</span></nav><a class="case-detail-back" href="/data/cases/">← Back to case explorer</a></div>
+          <div class="case-detail-hero-grid">
+            <div class="case-detail-hero-copy">
+              <div class="case-detail-identity"><span class="case-detail-bookmark">${icon("bookmark")}</span><span class="case-detail-id">${escapeHtml(caseArtifact.id)}</span><span class="case-detail-subject">${escapeHtml(humanize(caseArtifact.metadata.subject))}</span></div>
+              <h1 id="case-detail-title">${escapeHtml(humanize(caseArtifact.metadata.topic))}</h1>
+              <p class="case-detail-summary" lang="${escapeHtml(locale)}">${escapeHtml(caseSummary)}</p>
+            </div>
+            <div class="case-detail-hero-aside">${renderCaseBotanical()}<p>Authentic challenges.<br><em>Transparent benchmarks.</em></p><span>A closer look at an <br>authored public case.</span></div>
+          </div>
         </div>
-        <aside class="detail-side">
-          <section class="panel detail-section" aria-labelledby="case-meta-title">
-            <p class="eyebrow">Case metadata</p><h2 id="case-meta-title">Identity &amp; scope</h2>
-            ${renderKeyValueList([
-              ["Case ID", caseArtifact.id],
-              ["Case version", caseArtifact.version],
-              ["Dataset", `${artifacts.cases.datasetId}@${artifacts.cases.datasetVersion}`],
-              ["Subject", humanize(caseArtifact.metadata.subject)],
-              ["Topic", humanize(caseArtifact.metadata.topic)],
-              ["Difficulty", difficulty],
-              ["Disclosure policy", humanize(caseArtifact.disclosurePolicy ?? "Not specified")],
-            ])}
-            <p class="localized-case-locale">${renderUiText("targetLocale", "en")}: <code>${escapeHtml(caseArtifact.locale ?? "en")}</code></p>
-            ${caseArtifact.crossLocaleGroupId === undefined ? "" : `<p class="localized-case-locale">${renderUiText("crossLocaleGroup", "en")}: <code>${escapeHtml(caseArtifact.crossLocaleGroupId)}</code></p>`}
+      </section>
+      <section class="case-detail-section" aria-label="Public case file">
+        <div class="shell case-detail-layout">
+          <aside class="case-dossier" aria-labelledby="case-dossier-title">
+            <div class="case-dossier-content"><div class="case-section-heading"><span class="case-section-icon">${icon("document")}</span><div><h2 id="case-dossier-title">Case dossier</h2><p>Key information at a glance.</p></div></div>${renderCaseFacts(dossierFacts)}</div>
+            <div class="case-public-callout"><span class="case-callout-icon">${icon("check")}</span><div><strong>Public case</strong><p>This authored case is part of the public Teachometry development set. It is designed for research and evaluation, not a real classroom or user record.</p></div></div>
+          </aside>
+          <section class="case-context" aria-labelledby="case-context-title">
+            <header class="case-panel-heading"><span class="case-section-icon">${icon("guidance")}</span><div><h2 id="case-context-title">Tutor-visible context and conversation</h2><p>The following context is available to the tutor in this case.</p></div></header>
+            <div class="case-context-body">${caseArtifact.tutorInput.problemContext === undefined ? "" : `<div class="case-context-note" lang="${escapeHtml(locale)}"><span class="case-mini-label">Problem context</span><p>${escapeHtml(caseArtifact.tutorInput.problemContext)}</p></div>`}${renderConversation(caseArtifact.tutorInput.conversationHistory, caseArtifact.tutorInput.studentMessage, locale)}<p class="case-input-note"><span>${icon("document")}</span>This case file presents tutor-visible input context. It is not a generated trial, model response, or evaluation result.</p></div>
           </section>
-          <section class="panel detail-section" aria-labelledby="profile-title">
-            <p class="eyebrow">Student profile</p><h2 id="profile-title">Known public context</h2>
-            ${renderProfile(caseArtifact.tutorInput.studentProfile)}
-          </section>
-          <section class="panel detail-section" aria-labelledby="capabilities-title">
-            <p class="eyebrow">Taxonomy</p><h2 id="capabilities-title">Capability tags</h2>
-            ${renderDimensionPills(capabilityTags)}
-          </section>
-        </aside>
-      </div>
-    </section>`,
+          <aside class="case-annotations" aria-label="Case annotations">
+            <section class="case-annotation-block" aria-labelledby="objective-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("target")}</span><h2 id="objective-title">Learning objective</h2></div><p class="case-objective" lang="${escapeHtml(locale)}">${escapeHtml(caseArtifact.tutorInput.learningObjective)}</p></section>
+            <section class="case-annotation-block" aria-labelledby="profile-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("user")}</span><h2 id="profile-title">Student profile</h2></div>${renderCaseProfile(caseArtifact.tutorInput.studentProfile, difficulty)}</section>
+            <section class="case-annotation-block" aria-labelledby="capabilities-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("chart")}</span><h2 id="capabilities-title">Capability focus</h2></div>${renderCapabilityTags(capabilityTags)}</section>
+            <section class="case-annotation-block case-notes" aria-labelledby="notes-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("document")}</span><h2 id="notes-title">Case notes</h2></div><p>This case is an authored, structured scenario from the public Teachometry development set. It is not a real classroom record.</p></section>
+          </aside>
+          <section class="case-boundary" aria-labelledby="boundary-title"><div class="case-boundary-intro"><span class="case-boundary-icon">${icon("shield")}</span><div><h2 id="boundary-title">Public boundary</h2><p>To ensure a fair and transparent benchmark, only tutor-visible information is publicly released.</p></div></div><div class="case-boundary-exclusions"><strong>Not included in the public case file:</strong><ul class="case-exclusion-list"><li><span aria-hidden="true">×</span>Ground truth answers</li><li><span aria-hidden="true">×</span>Full evaluation rubrics</li><li><span aria-hidden="true">×</span>Known-misconception annotations</li><li><span aria-hidden="true">×</span>Evaluator-only evidence</li><li><span aria-hidden="true">×</span>Hidden challenge details</li><li><span aria-hidden="true">×</span>Any private or non-public data</li></ul></div></section>
+        </div>
+      </section>
+    </div>${renderTeachometryFooter(artifacts)}`,
   );
 }
 
