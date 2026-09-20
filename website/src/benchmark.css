@@ -1,0 +1,82 @@
+/* Benchmark only: composition follows the supplied reference, using Home's tokens. */
+.benchmark-page .shell { width: 86%; }
+.benchmark-hero { padding: 34px 0 48px; }
+.benchmark-hero-grid { display: grid; grid-template-columns: 1fr 1.08fr; gap: 4%; align-items: center; }
+.benchmark-thesis h1 { font: clamp(38px, 4.4vw, 64px)/1.02 var(--serif); letter-spacing: -.045em; margin: 16px 0 24px; }
+.benchmark-page em { color: var(--accent); font-weight: 400; }
+.benchmark-lede { font: 20px/1.38 var(--serif); color: var(--muted); }
+.benchmark-thesis .button { font: 16px/1.35 var(--serif); padding: 13px 17px; }
+.benchmark-principles { display: flex; gap: 18px; margin-top: 28px; color: var(--muted); font-size: 11px; flex-wrap: wrap; }
+.benchmark-principles span { display: inline-flex; align-items: center; gap: 9px; }
+.benchmark-principles .site-icon { color: var(--accent); }
+.benchmark-snapshot { padding: 26px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); min-width: 0; }
+.benchmark-snapshot-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.benchmark-snapshot-heading span { font-size: 10px; color: var(--muted); }
+.benchmark-page .eyebrow { font-size: 10px; letter-spacing: .15em; }
+.benchmark-facts { display: grid; grid-template-columns: repeat(4, 1fr); margin: 24px 0; }
+.benchmark-facts>div { display: flex; flex-direction: column; padding: 0 14px; border-right: 1px solid var(--line); }
+.benchmark-facts>div:first-child { padding-left: 0; }
+.benchmark-facts>div:last-child { border: 0; padding-right: 0; }
+.benchmark-facts dd { order: -1; font: 40px/1.15 var(--serif); margin: 0 0 8px; }
+.benchmark-facts dt { font: 15px/1.25 var(--serif); }
+.benchmark-facts small { font-size: 11px; color: var(--muted); margin-top: 8px; }
+.benchmark-matrix-wrap { overflow-x: auto; }
+.benchmark-matrix { width: 100%; border-collapse: separate; border-spacing: 3px; font-size: 12px; }
+.benchmark-matrix caption { text-align: left; font-size: 11px; color: var(--accent); margin-bottom: 12px; }
+.benchmark-matrix th { font-weight: 400; text-align: left; padding: 5px; background: transparent; }
+.benchmark-matrix td { text-align: center; background: var(--accent-soft); padding: 5px 12px; font-variant-numeric: tabular-nums; }
+.benchmark-dot { display: inline-block; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; margin-right: 12px; }
+.benchmark-denominator { font-size: 10px; color: var(--muted); margin: 12px 0 0; }
+.benchmark-small-link { display: inline-flex; gap: 8px; align-items: center; font-size: 11px; margin-top: 12px; color: var(--accent); }
+.benchmark-explore { padding: 40px 0; background: color-mix(in srgb, var(--accent-soft) 16%, var(--bg)); }
+.benchmark-explore-grid { display: grid; grid-template-columns: 1fr repeat(3, 1fr); gap: 20px; }
+.benchmark-section-intro { padding: 8px 12px 0 0; }
+.benchmark-section-intro h2 { font: 42px/1.04 var(--serif); letter-spacing: -.045em; margin: 18px 0; }
+.benchmark-section-intro>p:not(.eyebrow) { color: var(--muted); font-size: 14px; }
+.benchmark-entry { border-radius: 9px; background: color-mix(in srgb, var(--warm) 42%, var(--surface)); padding: 25px 23px; display: flex; flex-direction: column; align-items: start; }
+.benchmark-entry:nth-child(2) { background: color-mix(in srgb, var(--accent-soft) 65%, var(--surface)); }
+/* 暗色卡片保持深绿色层次，避免全局暖色 token 混出灰面。 */
+.benchmark-page[data-theme=dark] .benchmark-entry:nth-child(2) { background: color-mix(in srgb, var(--accent-soft) 65%, var(--surface)); }
+.benchmark-page[data-theme=dark] .benchmark-entry:nth-child(3) { background: color-mix(in srgb, var(--accent-soft) 52%, var(--surface)); }
+.benchmark-page[data-theme=dark] .benchmark-entry:nth-child(4) { background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface)); }
+.benchmark-entry-icon { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 45%, transparent); color: var(--accent); margin-bottom: 25px; }
+.benchmark-entry-icon .site-icon { width: 29px; height: 29px; }
+.benchmark-entry h3 { font: 24px/1.15 var(--serif); letter-spacing: -.04em; margin: 10px 0; }
+.benchmark-entry>p:not(.eyebrow) { font-size: 14px; color: var(--muted); }
+.benchmark-entry .text-link { margin-top: auto; padding-top: 20px; }
+.benchmark-entry .benchmark-trial-notice { font-size: 12px; }
+.benchmark-coverage { padding: 45px 0 35px; }
+.benchmark-coverage-grid { display: grid; grid-template-columns: 30% 1fr; gap: 3%; }
+.benchmark-coverage-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; align-items: start; }
+.benchmark-distribution { border: 1px solid var(--line); border-radius: 9px; background: var(--surface); padding: 17px; min-width: 0; }
+.benchmark-distribution h3 { font: 17px/1.25 var(--serif); display: flex; align-items: center; gap: 12px; margin: 0 0 15px; }
+.benchmark-icon { display: grid; place-items: center; width: 37px; height: 37px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); flex-shrink: 0; }
+.benchmark-distribution-body { display: grid; grid-template-columns: 67px 1fr; gap: 10px; }
+.benchmark-total { font: 35px/1.2 var(--serif); }
+.benchmark-total small { display: block; font: 11px/1.4 Arial,sans-serif; color: var(--muted); margin-top: 7px; }
+.benchmark-distribution ul { list-style: none; margin: 0; padding: 0; }
+.benchmark-distribution li { display: grid; grid-template-columns: minmax(70px,1fr) 55px 53px; gap: 7px; align-items: center; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+.benchmark-distribution li>span:first-child { overflow-wrap: anywhere; }
+.benchmark-distribution li>span:last-child { text-align: right; }
+.benchmark-track { height: 8px; border-radius: 3px; background: var(--surface-muted); overflow: hidden; }
+.benchmark-track i { display: block; height: 100%; background: #69a994; border-radius: inherit; }
+.benchmark-distribution details { margin-top: 12px; font-size: 11px; }
+.benchmark-distribution details ul { margin-top: 15px; }
+.benchmark-more { grid-column: 1/-1; font-size: 12px; color: var(--muted); }
+.benchmark-more>.benchmark-coverage-cards { margin-top: 20px; }
+.benchmark-page summary { cursor: pointer; color: var(--accent); }
+.benchmark-version { font-size: 11px !important; margin-top: 24px; overflow-wrap: anywhere; }
+.benchmark-open { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; padding: 30px; background: var(--accent-soft); border-radius: 9px; margin-bottom: 45px; }
+.benchmark-open .benchmark-entry-icon { margin: 0; }
+.benchmark-open h2 { font: 34px/1.2 var(--serif); margin: 8px 0 12px; color: var(--accent); }
+.benchmark-open p:not(.eyebrow) { font-size: 13px; color: var(--muted); max-width: 620px; margin: 0; }
+.benchmark-open-links { display: grid; gap: 10px; }
+.benchmark-open-links .button { font-size: 11px; }
+@media (max-width: 1100px) { .benchmark-page .shell { width: 90%; } .benchmark-distribution-body { grid-template-columns: 1fr; } .benchmark-total { display: flex; gap: 10px; align-items: baseline; } .benchmark-section-intro h2 { font-size: 34px; } .benchmark-thesis .button { font-size: 14px; } }
+@media (max-width: 800px) { .benchmark-hero-grid { grid-template-columns: 1fr; gap: 30px; } .benchmark-thesis h1 { font-size: 48px; } .benchmark-explore-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } .benchmark-explore-grid>.benchmark-section-intro { grid-column: 1/-1; } .benchmark-coverage-grid { grid-template-columns: 1fr; gap: 25px; } .benchmark-entry { padding: 20px 16px; } .benchmark-open { grid-template-columns: auto 1fr; } .benchmark-open-links { grid-column: 2; } }
+@media (max-width: 540px) { .benchmark-hero { padding-top: 20px; } .benchmark-thesis h1 { font-size: 42px; } .benchmark-snapshot { padding: 18px; } .benchmark-facts { grid-template-columns: repeat(2,1fr); gap: 20px; } .benchmark-facts>div { padding: 0; border: 0; } .benchmark-facts dd { font-size: 34px; } .benchmark-explore-grid,.benchmark-coverage-cards { grid-template-columns: 1fr; } .benchmark-entry { padding: 24px; } .benchmark-entry-icon { margin-bottom: 18px; } .benchmark-open { grid-template-columns: 1fr; padding: 24px; } .benchmark-open-links { grid-column: auto; } .benchmark-distribution-body { grid-template-columns: 65px 1fr; } .benchmark-total { display: block; } .benchmark-principles { gap: 12px; } }
+
+.benchmark-page .benchmark-thesis h1 em { font-style: italic; }
+.benchmark-page .home-header .nav-links { gap: clamp(10px, 1.6vw, 24px); }
+.benchmark-page .locale-switcher select { max-width: 95px; font-size: 11px; }
+@media (max-width: 540px) { .benchmark-lede { font-size: 18px; } }

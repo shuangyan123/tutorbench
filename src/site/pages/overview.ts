@@ -11,7 +11,6 @@ import {
   renderDimensionPills,
   renderEmptyState,
   renderKeyValueList,
-  renderMetric,
   renderStatusBadge,
   renderUiText,
   type SitePage,
@@ -142,40 +141,7 @@ export function renderModelDetailPage(artifacts: PublicBenchmarkArtifacts): Site
   );
 }
 
-export function renderDataIndexPage(artifacts: PublicBenchmarkArtifacts): SitePage {
-  const { benchmark } = artifacts;
-  return page(
-    "Data Explorer — Tutor Benchmark",
-    "Browse public TutorEval cases, coverage, heatmap contracts, and trial traceability.",
-    "/data/",
-    `<section class="page-intro">
-      <div class="shell narrow-shell">
-        <div class="eyebrow-row">${renderStatusBadge(benchmark.statusLabel, "preview")}<span class="eyebrow">Read-only benchmark data</span></div>
-        <h1>Data explorer</h1>
-        <p class="lede">The public data layer separates checked-in benchmark artifacts from the UI. Current cases are real synthetic development data; model results and trials remain empty until they can be published responsibly.</p>
-      </div>
-    </section>
-    <section class="section">
-      <div class="shell data-hub-grid">
-        <a class="route-card" href="/data/cases/"><span class="eyebrow">01 · Dataset</span><h2>Cases</h2><p>${escapeHtml(String(benchmark.dataset.caseCount))} public cases with subject, difficulty, learner state, capability, and disclosure metadata.</p><span class="text-link">Browse cases ↗</span></a>
-        <a class="route-card" href="/data/heatmap/"><span class="eyebrow">02 · Matrix</span><h2>Heatmap</h2><p>A reusable case × model-run contract, currently without public model trials.</p><span class="text-link">View heatmap status ↗</span></a>
-        <a class="route-card" href="/data/trials/"><span class="eyebrow">03 · Audit trail</span><h2>Trials</h2><p>Trace future leaderboard numbers to a case, Tutor response, rubric evidence, and sanitized metrics.</p><span class="text-link">View trial status ↗</span></a>
-      </div>
-    </section>
-    <section class="section section-muted">
-      <div class="shell">
-        ${renderSectionHeading("Coverage", "What is inside the current dataset", "Coverage is computed from the canonical dataset at build time, then serialized for the read-only website.")}
-        <div class="metric-grid">
-          ${renderMetric("Cases", String(benchmark.coverage.caseCount), "TutorEval 0.2A")}
-          ${renderMetric("Locales", String(Object.keys(benchmark.coverage.casesByLocale).length), Object.entries(benchmark.coverage.casesByLocale).map(([locale, count]) => `${locale}: ${count}`).join(" · "))}
-          ${renderMetric("Subjects", String(Object.keys(benchmark.coverage.casesBySubject).length), Object.keys(benchmark.coverage.casesBySubject).map(humanize).join(" · "))}
-          ${renderMetric("Capabilities", String(Object.keys(benchmark.coverage.casesByCapabilityTag).length), "Taxonomy tags")}
-          ${renderMetric("Policies", String(Object.keys(benchmark.coverage.casesByDisclosurePolicy).length), "Disclosure-policy buckets")}
-        </div>
-      </div>
-    </section>`,
-  );
-}
+export { renderDataIndexPage } from "./benchmark.js";
 
 export function renderCaseSummary(caseArtifact: PublicCaseArtifact["cases"][number]): string {
   const difficulty = formatDifficulty(caseArtifact.metadata.difficulty);
