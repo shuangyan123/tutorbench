@@ -5,6 +5,7 @@ const outputDirectory = resolve(process.cwd(), process.argv[2] ?? "website/dist"
 const requiredFiles = [
   "assets/home.css",
   "assets/benchmark.css",
+  "assets/case-detail.css",
   "data/index.html",
   ...["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"].map((name) => `assets/${name}.webp`),
   "index.html",
