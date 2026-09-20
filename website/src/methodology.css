@@ -554,6 +554,13 @@
   line-height: 1.35;
 }
 
+@media (min-width: 901px) {
+  .method-lens-node-4,
+  .method-lens-node-5 {
+    grid-template-columns: minmax(0, 1fr) 48px;
+  }
+}
+
 .method-dimensions-note {
   align-self: center;
   min-height: 130px;
