@@ -1,0 +1,276 @@
+/* Teachometry 404: an editorial dead end with a useful way forward. */
+
+body.not-found-page::before {
+  display: none;
+}
+
+.not-found-page main {
+  overflow: hidden;
+}
+
+.not-found-stage {
+  position: relative;
+  display: grid;
+  min-height: 390px;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 48px 28px 42px;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--accent-soft) 68%, transparent), transparent 50%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg) 94%, var(--surface-muted)), var(--bg));
+}
+
+.not-found-copy {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 760px);
+  text-align: center;
+  transform: translateY(-10px);
+}
+
+.not-found-copy h1 {
+  display: grid;
+  justify-items: center;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--teach-serif);
+  font-weight: 400;
+}
+
+.not-found-number {
+  display: block;
+  font-size: clamp(92px, 10vw, 158px);
+  line-height: .78;
+  letter-spacing: -.095em;
+}
+
+.not-found-title-copy {
+  display: block;
+  margin-top: 21px;
+  font-size: clamp(29px, 2.8vw, 42px);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+
+.not-found-description {
+  max-width: 660px;
+  margin: 16px auto 0;
+  color: var(--ink);
+  font: 16px/1.45 var(--teach-serif);
+}
+
+.not-found-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  margin-top: 26px;
+}
+
+.not-found-actions .button {
+  min-width: 174px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.not-found-actions .button .site-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.not-found-art {
+  position: absolute;
+  z-index: 1;
+  color: color-mix(in srgb, var(--accent) 72%, var(--line-strong));
+  pointer-events: none;
+  user-select: none;
+}
+
+.not-found-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.not-found-art-left {
+  top: 37px;
+  left: max(18px, calc(50% - 680px));
+  width: min(27vw, 390px);
+  height: 340px;
+}
+
+.not-found-art-right {
+  top: 31px;
+  right: max(-12px, calc(50% - 760px));
+  width: min(26vw, 360px);
+  height: 350px;
+}
+
+.not-found-trail,
+.not-found-stem,
+.not-found-leaf,
+.not-found-signpost,
+.not-found-sign,
+.not-found-ground {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.15;
+}
+
+.not-found-trail {
+  stroke-dasharray: 5 8;
+  opacity: .85;
+}
+
+.not-found-leaf {
+  fill: color-mix(in srgb, var(--accent-soft) 44%, transparent);
+}
+
+.not-found-sign {
+  fill: color-mix(in srgb, var(--bg) 82%, var(--surface-muted));
+}
+
+.not-found-sign-text {
+  fill: currentColor;
+  font-family: var(--teach-serif);
+  font-size: 15px;
+  font-style: italic;
+}
+
+.not-found-note {
+  position: absolute;
+  margin: 0;
+  color: color-mix(in srgb, var(--accent) 72%, var(--muted));
+  font: 18px/1.15 "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  letter-spacing: -.03em;
+  transform: rotate(-8deg);
+}
+
+.not-found-note-left {
+  top: 37px;
+  left: 135px;
+}
+
+.not-found-note-right {
+  top: 53px;
+  right: 3px;
+  transform: rotate(7deg);
+}
+
+.not-found-page[data-theme="dark"] .not-found-stage {
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--accent-soft) 76%, transparent), transparent 50%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg) 65%, var(--accent-soft)), var(--bg));
+}
+
+.not-found-page[data-theme="dark"] .not-found-art {
+  color: color-mix(in srgb, var(--accent) 86%, var(--line-strong));
+}
+
+.not-found-page[data-theme="dark"] .not-found-sign {
+  fill: color-mix(in srgb, var(--surface) 78%, var(--accent-soft));
+}
+
+@media (max-width: 1100px) {
+  .not-found-art {
+    display: none;
+  }
+
+  .not-found-copy {
+    width: min(100%, 700px);
+  }
+}
+
+@media (max-width: 760px) {
+  .not-found-stage {
+    min-height: 0;
+    padding: 58px 18px 60px;
+  }
+
+  .not-found-art {
+    display: none;
+  }
+
+  .not-found-note {
+    display: none;
+  }
+
+  .not-found-number {
+    font-size: clamp(86px, 25vw, 124px);
+  }
+
+  .not-found-title-copy {
+    max-width: 360px;
+    margin-top: 20px;
+    font-size: clamp(29px, 8.1vw, 38px);
+  }
+
+  .not-found-description {
+    max-width: 360px;
+    margin-top: 18px;
+    font-size: 16px;
+  }
+
+  .not-found-description br {
+    display: none;
+  }
+
+  .not-found-actions {
+    width: min(100%, 320px);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin: 28px auto 0;
+  }
+
+  .not-found-actions .button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .not-found-stage {
+    padding-inline: 14px;
+  }
+
+  .not-found-title-copy {
+    font-size: 28px;
+  }
+
+  .not-found-description {
+    font-size: 15px;
+  }
+
+  body.not-found-page .home-footer-main {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  body.not-found-page .home-footer-brand {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  body.not-found-page .footer-descriptor {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    white-space: normal;
+  }
+
+  body.not-found-page .home-footer .github-link {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  body.not-found-page .home-footer .button {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  body.not-found-page .home-footer nav {
+    grid-row: 4;
+  }
+}
