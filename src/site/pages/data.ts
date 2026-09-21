@@ -7,9 +7,7 @@ import {
   SITE_GITHUB_URL,
   escapeHtml,
   humanize,
-  renderDimensionPills,
   renderEmptyState,
-  renderStatusBadge,
   renderUiText,
   type SitePage,
 } from "../html.js";
@@ -350,38 +348,252 @@ export function renderCaseDetailPage(
   );
 }
 
+interface ExplorerStat {
+  readonly value: string;
+  readonly label: string;
+  readonly note: string;
+}
+
+interface ExplorerBreadcrumb {
+  readonly label: string;
+  readonly href?: string;
+}
+
+const explorerDimensionCopy: Readonly<Record<string, { readonly description: string; readonly icon: string }>> = {
+  correctness: { description: "Right or wrong information", icon: "correctness" },
+  diagnosis: { description: "Understanding learner needs", icon: "diagnosis" },
+  guidance: { description: "Quality of next steps", icon: "guidance" },
+  adaptation: { description: "Responsiveness to learner state", icon: "adaptation" },
+  actionability: { description: "Usability and follow-through", icon: "actionability" },
+};
+
+const trialFieldLabels: Readonly<Record<string, string>> = {
+  model: "Model identity",
+  modelVersion: "Model version",
+  datasetVersion: "Dataset version",
+  generationSpecId: "Generation spec ID",
+  generationSpecVersion: "Generation spec version",
+  promptVersion: "Prompt version",
+  promptSha256: "Prompt SHA-256",
+  caseVersion: "Case version",
+  runIndex: "Run index",
+  tutorResponse: "Tutor response",
+  correctness: "Correctness",
+  diagnosis: "Diagnosis",
+  guidance: "Guidance",
+  adaptation: "Adaptation",
+  actionability: "Actionability",
+  rubricResults: "Rubric results",
+  criticalFailures: "Critical failures",
+  answerLeakage: "Answer leakage",
+  judge: "Judge",
+  judgePromptVersion: "Judge prompt version",
+  tokens: "Tokens",
+  latency: "Latency",
+  cost: "Cost",
+};
+
+const trialFieldGroups = [
+  {
+    title: "Identity & execution",
+    description: "The versioned identities that make a run addressable.",
+    icon: "database",
+    fields: ["model", "modelVersion", "datasetVersion", "caseVersion", "runIndex"],
+  },
+  {
+    title: "Generation traceability",
+    description: "The configuration references needed to reproduce generation.",
+    icon: "package",
+    fields: ["generationSpecId", "generationSpecVersion", "promptVersion", "promptSha256"],
+  },
+  {
+    title: "Tutor evidence",
+    description: "The complete public Tutor response for the case.",
+    icon: "guidance",
+    fields: ["tutorResponse"],
+  },
+  {
+    title: "Evaluation evidence",
+    description: "Dimension results and failure evidence attached to the response.",
+    icon: "check",
+    fields: ["correctness", "diagnosis", "guidance", "adaptation", "actionability", "rubricResults", "criticalFailures", "answerLeakage"],
+  },
+  {
+    title: "Judge evidence",
+    description: "The evaluator identity and prompt version, when published.",
+    icon: "shield",
+    fields: ["judge", "judgePromptVersion"],
+  },
+  {
+    title: "Operational metrics",
+    description: "Sanitized run signals kept distinct from pedagogical scores.",
+    icon: "chart",
+    fields: ["tokens", "latency", "cost"],
+  },
+] as const;
+
+function explorerFieldLabel(field: string): string {
+  return trialFieldLabels[field] ?? humanize(field);
+}
+
+function renderExplorerBotanical(className: string): string {
+  return `<svg class="explorer-botanical ${escapeHtml(className)}" viewBox="0 0 260 340" fill="none" aria-hidden="true" focusable="false"><path d="M128 326c-4-72 8-137 42-193 22-36 38-72 42-121" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M153 224c-37-10-67-31-90-65 35 2 68 22 90 65ZM164 188c-5-45 8-84 39-118 9 43-2 82-39 118ZM177 251c35-11 63-35 83-72-38 9-67 34-83 72ZM136 278c-38-2-71-17-98-48 37-4 73 12 98 48Z" stroke="currentColor" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round"/><path d="M158 224c-18 34-31 67-39 102" stroke="currentColor" stroke-width=".8" stroke-linecap="round" opacity=".72"/></svg>`;
+}
+
+function renderExplorerStats(stats: readonly ExplorerStat[]): string {
+  return `<dl class="explorer-stats" aria-label="Public explorer status">${stats.map((stat) => `<div class="explorer-stat"><dd>${escapeHtml(stat.value)}</dd><dt>${escapeHtml(stat.label)}</dt><small>${escapeHtml(stat.note)}</small></div>`).join("")}</dl>`;
+}
+
+function renderExplorerHero(options: {
+  readonly kind: "heatmap" | "trials" | "detail";
+  readonly breadcrumbs: readonly ExplorerBreadcrumb[];
+  readonly eyebrow: string;
+  readonly heading: string;
+  readonly editorial: string;
+  readonly description: string;
+  readonly note: string;
+  readonly stats?: readonly ExplorerStat[];
+}): string {
+  const breadcrumbMarkup = options.breadcrumbs.map((item, index) => `${index > 0 ? `<span aria-hidden="true">›</span>` : ""}${item.href === undefined ? `<span aria-current="page">${escapeHtml(item.label)}</span>` : `<a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>`}`).join("");
+  return `<section class="explorer-hero explorer-${options.kind}-hero" aria-labelledby="${options.kind}-title"><div class="shell"><div class="explorer-hero-grid"><div class="explorer-hero-copy"><nav class="explorer-breadcrumbs" aria-label="Breadcrumb">${breadcrumbMarkup}</nav><p class="eyebrow">${escapeHtml(options.eyebrow)}</p><h1 id="${options.kind}-title">${escapeHtml(options.heading)}</h1><p class="explorer-hero-editorial">${escapeHtml(options.editorial).replaceAll("\n", "<br>")}</p><p class="explorer-hero-description">${escapeHtml(options.description)}</p></div><div class="explorer-hero-art">${renderExplorerBotanical(`explorer-botanical-${options.kind}`)}<p class="explorer-handwritten">${escapeHtml(options.note).replaceAll("\n", "<br>")}</p></div></div>${options.stats === undefined ? "" : renderExplorerStats(options.stats)}</div></section>`;
+}
+
+function renderExplorerTabs(items: readonly [string, string, boolean][], label: string): string {
+  return `<nav class="explorer-tabs" aria-label="${escapeHtml(label)}">${items.map(([text, href, current]) => `<a href="${escapeHtml(href)}"${current ? ' aria-current="page"' : ""}>${escapeHtml(text)}</a>`).join("")}</nav>`;
+}
+
+function renderHeatmapMatrix(artifacts: PublicBenchmarkArtifacts): string {
+  const visibleCases = artifacts.cases.cases.slice(0, 5);
+  const remaining = Math.max(0, artifacts.benchmark.dataset.caseCount - visibleCases.length);
+  return `<div class="explorer-table-frame explorer-matrix-frame"><div class="explorer-table-scroll" tabindex="0" aria-label="Scrollable evidence matrix"><table class="explorer-matrix"><caption>Case identity rows and versioned public model-run columns</caption><thead><tr><th scope="col" class="explorer-matrix-corner">Public cases ↓</th><th scope="col">Versioned public model runs →</th></tr><tr><th scope="col">Case identity</th><th scope="col" class="explorer-matrix-reserved-heading">No public model runs</th></tr></thead><tbody>${visibleCases.map((item) => `<tr><th scope="row"><a href="/data/cases/${encodeURIComponent(item.id)}/">${escapeHtml(item.id)}</a></th><td><div class="explorer-reserved-cell"><span class="explorer-reserved-grid" aria-hidden="true">${Array.from({ length: 5 }, () => "<i></i>").join("")}</span><span>${icon("clock")} No public run</span><small>Trial-linked evidence reserved</small></div></td></tr>`).join("")}${remaining > 0 ? `<tr class="explorer-more-row"><th scope="row">…</th><td>${escapeHtml(String(remaining))} more public case identities in the artifact</td></tr>` : ""}</tbody></table></div><p class="explorer-table-note">Rows are public case identities. Cells remain neutral until a versioned public model run and its trial artifact exist.</p></div>`;
+}
+
+function renderExplorerDimensions(benchmark: PublicBenchmarkArtifacts["benchmark"]): string {
+  return `<section id="dimensions" class="explorer-section" aria-labelledby="dimensions-title"><div class="explorer-section-heading"><div><p class="eyebrow">Evaluation dimensions</p><h2 id="dimensions-title">Five lenses for future evidence.</h2><p>Each dimension defines a future trial-linked view of observable tutoring behavior. None is scored on this page today.</p></div></div><div class="explorer-dimension-grid">${benchmark.dimensions.score.map((dimension) => { const copy = explorerDimensionCopy[dimension] ?? { description: "Defined by the public evaluation contract", icon: "document" }; return `<article class="explorer-dimension-card"><span class="explorer-card-icon">${icon(copy.icon)}</span><h3>${escapeHtml(humanize(dimension))}</h3><p>${escapeHtml(copy.description)}</p></article>`; }).join("")}</div></section>`;
+}
+
+function renderExplorerSource(artifacts: PublicBenchmarkArtifacts): string {
+  const { benchmark, cases, trials } = artifacts;
+  return `<aside class="explorer-source" aria-labelledby="explorer-source-title"><span class="explorer-source-icon">${icon("database")}</span><div><p class="eyebrow">Data source</p><h2 id="explorer-source-title">Public artifact contract</h2><p>Built from versioned public artifacts only. The website does not call a Judge or run a model in the browser.</p><dl><div><dt>Dataset</dt><dd>${escapeHtml(`${benchmark.dataset.id}@${benchmark.dataset.version}`)}</dd></div><div><dt>Public cases</dt><dd>${escapeHtml(String(cases.cases.length))}</dd></div><div><dt>Trial publication</dt><dd>${trials.available ? "Available" : "Not available"}</dd></div><div><dt>Artifact schema</dt><dd>${escapeHtml(String(benchmark.schemaVersion))}</dd></div></dl></div><a class="button button-secondary" href="/data/">Explore the data ${icon("arrow")}</a></aside>`;
+}
+
+function renderExplorerClosing(title: string, copy: string, links: readonly [string, string][], className: string): string {
+  return `<section class="explorer-closing ${escapeHtml(className)}" aria-labelledby="${escapeHtml(className)}-title"><div class="shell explorer-closing-grid"><div><p class="eyebrow">Public evidence, clearly bounded</p><h2 id="${escapeHtml(className)}-title">${escapeHtml(title)}</h2></div><p>${escapeHtml(copy)}</p><div class="explorer-closing-actions">${links.map(([label, href]) => `<a class="button ${href === "/methodology/" ? "button-secondary" : "button-primary"}" href="${escapeHtml(href)}">${escapeHtml(label)} ${icon("arrow")}</a>`).join("")}</div>${renderExplorerBotanical("explorer-closing-botanical")}</div></section>`;
+}
+
 export function renderHeatmapPage(artifacts: PublicBenchmarkArtifacts): SitePage {
-  const { benchmark, trials } = artifacts;
+  const { benchmark, models, trials } = artifacts;
   return page(
-    "Heatmap — Tutor Benchmark",
-    "A case-by-model trial matrix for future Tutor Benchmark public results.",
+    "Evidence Matrix — Teachometry",
+    "A public case-by-model evidence matrix reserved for versioned Teachometry trial artifacts.",
     "/data/heatmap/",
-    `<section class="page-intro"><div class="shell narrow-shell"><div class="eyebrow-row">${renderStatusBadge(benchmark.statusLabel, "preview")}<span class="eyebrow">Case × model runs</span></div><h1>Heatmap</h1><p class="lede">A reusable matrix contract for comparing case-level outcomes. The first public release does not manufacture cells for models that have not been run.</p></div></section>
-    <section class="section"><div class="shell"><div class="panel">${renderEmptyState("No public model trials available yet.", trials.notice, "Rows will be cases; columns will be versioned model runs; each cell will link to a trial detail record.")}
-      <div class="matrix-contract"><p class="eyebrow">Future matrix</p><div class="matrix"><div class="matrix-corner">Cases / Runs</div><div class="matrix-head">Model run A</div><div class="matrix-head">Model run B</div><div class="matrix-row-label">case-id</div><div class="matrix-cell">score / pass / failure</div><div class="matrix-cell">score / pass / failure</div></div></div>
-    </div></div></section>`,
+    `<div class="explorer-main heatmap-main">${renderExplorerHero({
+      kind: "heatmap",
+      breadcrumbs: [{ label: "Data", href: "/data/" }, { label: "Heatmap" }],
+      eyebrow: "Benchmark explorer",
+      heading: "Evidence Matrix",
+      editorial: "See the landscape\nat a glance.",
+      description: "The matrix will connect public benchmark cases with versioned public model runs and their trial evidence. Today, no public model trials are available yet.",
+      note: "Different perspectives.\nStronger evidence.",
+      stats: [
+        { value: String(trials.entries.length), label: "Public model trials", note: "No trials yet" },
+        { value: String(models.entries.length), label: "Public model profiles", note: "Reserved" },
+        { value: String(benchmark.dataset.caseCount), label: "Public cases", note: `${benchmark.dataset.id} dataset` },
+        { value: String(benchmark.dimensions.score.length), label: "Evaluation dimensions", note: benchmark.dimensions.score.map(humanize).join(" · ") },
+      ],
+    })}<section class="explorer-content"><div class="shell">${renderExplorerTabs([["Matrix", "#matrix", true], ["Dimensions", "#dimensions", false], ["How to read", "/methodology/", false], ["About", "/data/", false]], "Evidence matrix sections")}<section id="matrix" class="explorer-section explorer-matrix-section" aria-labelledby="matrix-title"><div class="explorer-section-heading"><div><p class="eyebrow">Case × model-run structure</p><h2 id="matrix-title">A reserved observatory for public evidence.</h2><p>Rows are real public cases. Columns are reserved for versioned model runs; each future populated cell will trace to a public trial detail record.</p></div><span class="explorer-section-mark">${icon("grid")}</span></div><div class="explorer-empty-callout"><span class="explorer-empty-icon">${icon("grid")}</span><div><h3>No public model trials available yet.</h3><p>${escapeHtml(trials.notice)} The matrix layout, dimensions, and case structure are defined and ready.</p></div><a class="button button-primary" href="/methodology/">Learn how the matrix works ${icon("arrow")}</a></div>${renderHeatmapMatrix(artifacts)}</section>${renderExplorerDimensions(benchmark)}${renderExplorerSource(artifacts)}</div></section>${renderExplorerClosing("From data to deeper understanding.", "Explore the public cases and methodology while the evidence matrix remains intentionally unpopulated.", [["View trials", "/data/trials/"], ["Read the methodology", "/methodology/"]], "heatmap-closing")}${renderTeachometryFooter(artifacts)}</div>`,
   );
+}
+
+function renderTrialLedger(artifacts: PublicBenchmarkArtifacts): string {
+  const { trials } = artifacts;
+  const columns = ["Trial ID", "Model ID", "Case ID", "Run index", "Evidence status"];
+  const rows = trials.entries.length === 0
+    ? `<tr><td colspan="${columns.length}"><div class="explorer-ledger-empty"><span class="explorer-empty-icon">${icon("document")}</span><strong>No public trials yet.</strong><p>${escapeHtml(trials.notice)}</p><small>Check back after public model runs are released.</small></div></td></tr>`
+    : trials.entries.map((entry) => `<tr><th scope="row"><a href="/data/trials/${encodeURIComponent(entry.id)}/">${escapeHtml(entry.id)}</a></th><td>${escapeHtml(entry.modelId)}</td><td>${escapeHtml(entry.caseId)}</td><td>${escapeHtml(String(entry.runIndex))}</td><td>Published artifact</td></tr>`).join("");
+  return `<div class="explorer-table-frame explorer-ledger-frame"><div class="explorer-table-scroll" tabindex="0" aria-label="Scrollable public trial ledger"><table class="explorer-ledger"><caption>Future public trial ledger</caption><thead><tr>${columns.map((column) => `<th scope="col">${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div><p class="explorer-table-note">The ledger exposes only the public trial summary identity contract: id, modelId, caseId, and runIndex.</p></div>`;
+}
+
+function renderTrialFieldGroups(fields: readonly string[]): string {
+  const fieldSet = new Set(fields);
+  const groupedFields = new Set<string>();
+  const cards = trialFieldGroups.map((group) => {
+    const present = group.fields.filter((field) => fieldSet.has(field));
+    present.forEach((field) => groupedFields.add(field));
+    if (present.length === 0) return "";
+    return `<article class="explorer-field-group"><span class="explorer-card-icon">${icon(group.icon)}</span><div><h3>${escapeHtml(group.title)}</h3><p>${escapeHtml(group.description)}</p><ul>${present.map((field) => `<li><code>${escapeHtml(field)}</code><span>${escapeHtml(explorerFieldLabel(field))}</span></li>`).join("")}</ul></div></article>`;
+  }).join("");
+  const additional = fields.filter((field) => !groupedFields.has(field));
+  return `${cards}${additional.length === 0 ? "" : `<article class="explorer-field-group"><span class="explorer-card-icon">${icon("list")}</span><div><h3>Additional contract fields</h3><p>Fields retained by the artifact contract but not assigned to a named evidence family.</p><ul>${additional.map((field) => `<li><code>${escapeHtml(field)}</code><span>${escapeHtml(explorerFieldLabel(field))}</span></li>`).join("")}</ul></div></article>`}`;
+}
+
+function renderTraceabilityChain(): string {
+  const stages = ["Benchmark version", "Model identity", "Trial", "Case", "Tutor response", "Evaluation evidence", "Sanitized metrics"];
+  return `<ol class="explorer-trace-chain" aria-label="Future trial traceability chain">${stages.map((stage) => `<li><span>${icon("arrow")}</span><strong>${escapeHtml(stage)}</strong><small>Future public evidence</small></li>`).join("")}</ol>`;
 }
 
 export function renderTrialsPage(artifacts: PublicBenchmarkArtifacts): SitePage {
-  const { benchmark, trials } = artifacts;
+  const { benchmark, models, trials } = artifacts;
   return page(
-    "Trials — Tutor Benchmark",
-    "Audit-ready trial records for future Tutor Benchmark results.",
+    "Model Trials — Teachometry",
+    "An audit ledger for future public Teachometry model trial evidence.",
     "/data/trials/",
-    `<section class="page-intro"><div class="shell narrow-shell"><div class="eyebrow-row">${renderStatusBadge(benchmark.statusLabel, "preview")}<span class="eyebrow">Audit trail</span></div><h1>Trials</h1><p class="lede">A leaderboard number should eventually trace to a model identity, case version, Tutor response, rubric evidence, and sanitized operational metrics.</p></div></section>
-    <section class="section"><div class="shell"><div class="panel">${renderEmptyState("No public trials available yet.", trials.notice, "Trial detail pages are reserved for public result artifacts; this website never calls a Judge from the browser.")}
-      <div class="traceability"><p class="eyebrow">Traceability contract</p><div class="trace-line"><span>Leaderboard</span><b>→</b><span>Model</span><b>→</b><span>Trial</span><b>→</b><span>Tutor response</span><b>→</b><span>Rubric evidence</span></div></div>
-      <div class="field-list"><p class="eyebrow">Future trial fields</p>${renderDimensionPills(trials.fields)}</div>
-    </div></div></section>`,
+    `<div class="explorer-main trials-main">${renderExplorerHero({
+      kind: "trials",
+      breadcrumbs: [{ label: "Data", href: "/data/" }, { label: "Trials" }],
+      eyebrow: "Benchmark explorer",
+      heading: "Model Trials",
+      editorial: "A transparent\naudit trail.",
+      description: "Future public trial records will connect model identity, case identity, execution context, Tutor response, evaluator evidence, and sanitized operational metrics.",
+      note: "Shared evidence.\nStronger teaching.",
+      stats: [
+        { value: String(trials.entries.length), label: "Public trials", note: "No released runs yet" },
+        { value: String(models.entries.length), label: "Public model profiles", note: "Reserved" },
+        { value: String(benchmark.dataset.caseCount), label: "Public cases", note: benchmark.dataset.id },
+        { value: trials.entries.length === 0 ? "Not available" : "Available", label: "Trial publication", note: "Public artifact state" },
+      ],
+    })}<section class="explorer-content"><div class="shell">${renderExplorerTabs([["All trials", "#trial-ledger", true], ["Fields", "#trial-fields", false], ["About", "/methodology/", false]], "Public trial sections")}<section id="trial-ledger" class="explorer-section explorer-ledger-section" aria-labelledby="trial-ledger-title"><div class="explorer-section-heading"><div><p class="eyebrow">Audit ledger</p><h2 id="trial-ledger-title">No row without a public artifact.</h2><p>Each future row will be an addressable evidence record. The current ledger is intentionally empty.</p></div><span class="explorer-section-mark">${icon("document")}</span></div>${renderTrialLedger(artifacts)}</section><section id="trial-fields" class="explorer-section explorer-fields-section" aria-labelledby="trial-fields-title"><div class="explorer-section-heading"><div><p class="eyebrow">Future trial schema</p><h2 id="trial-fields-title">What a trial includes.</h2><p>These families are derived from the current public trial field contract, not from a model run.</p></div></div><div class="explorer-field-grid">${renderTrialFieldGroups(trials.fields)}</div></section><section class="explorer-trace-section" aria-labelledby="trace-title"><div><p class="eyebrow">Traceability chain</p><h2 id="trace-title">From benchmark to evidence.</h2><p>Trials remain separate from model profiles and leaderboard eligibility. A future record will link these stages without implying a ranking or teaching-effectiveness claim.</p></div>${renderTraceabilityChain()}</section><aside class="explorer-relationship" aria-label="Public surface relationships"><span class="explorer-card-icon">${icon("link")}</span><p><strong>Keep the surfaces distinct.</strong> <a href="/models/">Models</a> describe published model identity; <a href="/leaderboard/">Results</a> show rankings only when publication criteria are satisfied; this page is the individual audit ledger.</p></aside></div></section>${renderExplorerClosing("Evidence you can follow.", "Future published results should remain traceable back to versioned cases, model identity, and the evidence that supports each claim.", [["View the results", "/leaderboard/"], ["Read the methodology", "/methodology/"]], "trials-closing")}${renderTeachometryFooter(artifacts)}</div>`,
   );
 }
 
+function renderDossierMeta(items: readonly (readonly [string, string, string?])[]): string {
+  return `<dl class="explorer-dossier-meta">${items.map(([label, value, note]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}${note === undefined ? "" : `<small>${escapeHtml(note)}</small>`}</dd></div>`).join("")}</dl>`;
+}
+
+function renderDetailEvidenceSections(artifacts: PublicBenchmarkArtifacts): string {
+  const availableFields = new Set(artifacts.trials.fields);
+  const sections = [
+    ["Configuration", "Model settings, environment, and execution details.", "package", ["model", "modelVersion", "generationSpecId", "generationSpecVersion", "promptVersion"]],
+    ["Case set", "Versioned benchmark cases used in this trial.", "database", ["datasetVersion", "caseVersion"]],
+    ["Tutor responses", "Complete Tutor responses and response metadata.", "guidance", ["tutorResponse"]],
+    ["Evaluation results", "Rubric scores and dimension breakdowns.", "check", ["correctness", "diagnosis", "guidance", "adaptation", "actionability", "rubricResults", "criticalFailures", "answerLeakage"]],
+    ["Artifacts", "Logs, traces, and sanitized supporting files.", "document", ["tokens", "latency", "cost"]],
+    ["Reproducibility", "Instructions, identities, and checksums.", "shield", ["promptSha256", "judge", "judgePromptVersion", "runIndex"]],
+  ] as const;
+  return `<div class="explorer-evidence-list">${sections.map(([title, description, iconName, fields]) => { const visibleFields = fields.filter((field) => availableFields.has(field)); return `<article class="explorer-evidence-row"><span class="explorer-evidence-icon">${icon(iconName)}</span><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p>${visibleFields.length === 0 ? "" : `<small>Contract fields: ${visibleFields.map(explorerFieldLabel).map(escapeHtml).join(" · ")}</small>`}</div><span class="explorer-unavailable">Not available</span></article>`; }).join("")}</div>`;
+}
+
+function renderDetailProvenance(): string {
+  const stages = ["Model identity", "Execution identity", "Case identity", "Tutor response", "Evaluator evidence", "Sanitized metrics"];
+  return `<ol class="explorer-provenance-chain" aria-label="Trial provenance chain">${stages.map((stage, index) => `<li><span class="explorer-provenance-number">${String(index + 1).padStart(2, "0")}</span><div><strong>${escapeHtml(stage)}</strong><small>Not available</small></div>${index === stages.length - 1 ? "" : `<span class="explorer-provenance-arrow" aria-hidden="true">↓</span>`}</li>`).join("")}</ol>`;
+}
+
 export function renderTrialDetailPage(artifacts: PublicBenchmarkArtifacts): SitePage {
+  const { benchmark } = artifacts;
+  const datasetContext = `${benchmark.dataset.id}@${benchmark.dataset.version}`;
+  const dimensionRows = benchmark.dimensions.score.map((dimension) => [humanize(dimension), "—"] as const);
   return page(
-    "Trial Detail — Tutor Benchmark",
-    "Reserved trial detail route for future public Tutor Benchmark result artifacts.",
+    "Trial Detail — Teachometry",
+    "Reserved Teachometry evidence dossier for a future public model trial artifact.",
     "/data/trials/[trialId]/",
-    `<section class="page-intro"><div class="shell narrow-shell"><a class="back-link" href="/data/trials/">← Back to trials</a><div class="eyebrow-row">${renderStatusBadge(artifacts.benchmark.statusLabel, "preview")}<span class="eyebrow">Trial detail contract</span></div><h1>Trial detail</h1><p class="lede">Trial pages are the future audit path from a leaderboard number to a case, Tutor response, rubric evidence, and sanitized metrics.</p></div></section><section class="section"><div class="shell">${renderEmptyState("No trial selected", "A future /data/trials/[trialId] route will be populated only from public, validated trial artifacts. The website will never execute a Judge to fill this page.")}</div></section>`,
+    `<div class="explorer-main detail-main">${renderExplorerHero({
+      kind: "detail",
+      breadcrumbs: [{ label: "Data", href: "/data/" }, { label: "Trials", href: "/data/trials/" }, { label: "Trial detail" }],
+      eyebrow: "Trial details",
+      heading: "Trial detail",
+      editorial: "A complete record of\nevidence.",
+      description: "This reserved route will show the complete record for a public model trial, including configuration, responses, evaluation results, and links to underlying artifacts.",
+      note: "Traceable evidence.\nReal progress.",
+    })}<section class="explorer-content"><div class="shell"><a class="explorer-back-link" href="/data/trials/">${icon("left")} Back to model trials</a><aside class="explorer-reserved-callout" aria-labelledby="reserved-title"><span class="explorer-reserved-callout-icon">${icon("clock")}</span><div><p class="eyebrow">Reserved evidence dossier</p><h2 id="reserved-title">No public trial is selected.</h2><p>This route resolves only from a public, validated trial artifact. No trial identity, model identity, Tutor response, score, metric, or trial evidence is inferred or generated here.</p></div></aside><section class="explorer-section explorer-overview-section" aria-labelledby="overview-title"><div class="explorer-section-heading"><div><p class="eyebrow">Schema-only dossier</p><h2 id="overview-title">Trial overview <span>(future)</span></h2><p>Current benchmark context is shown only to identify the public contract; it is not evidence of a model execution.</p></div></div><div class="explorer-overview-grid"><article class="explorer-dossier-card"><h3>Trial identity</h3>${renderDossierMeta([["Trial ID", "—"], ["Model", "—"], ["Model version", "—"], ["Case", "—"], ["Case version", "—"], ["Run index", "—"]])}</article><article class="explorer-dossier-card explorer-results-summary"><h3>Results summary <span>(future)</span></h3><div class="explorer-summary-empty"><span>${icon("clock")}</span><strong>No results yet</strong><p>Evaluation results will appear here once this trial is released.</p></div></article></div><article class="explorer-context-note"><span class="explorer-card-icon">${icon("database")}</span><div><strong>Current benchmark context only</strong><p>${escapeHtml(datasetContext)} · ${escapeHtml(String(benchmark.dataset.caseCount))} public cases · ${escapeHtml(String(benchmark.schemaVersion))} artifact schema. This context is not a model run, result, or trial.</p></div></article></section><section class="explorer-section explorer-evidence-section" aria-labelledby="evidence-title"><div class="explorer-section-heading"><div><p class="eyebrow">Evidence sections (future)</p><h2 id="evidence-title">A complete provenance record, when published.</h2><p>Each section remains neutral until the corresponding public artifact is available.</p></div></div>${renderDetailEvidenceSections(artifacts)}</section><section class="explorer-section explorer-dossier-fields-section" aria-labelledby="dossier-fields-title"><div class="explorer-section-heading"><div><p class="eyebrow">Evaluation contract</p><h2 id="dossier-fields-title">Dimensions and evidence fields.</h2><p>The five canonical dimensions remain separate from operational metrics and Judge metadata.</p></div></div><div class="explorer-dossier-columns"><article class="explorer-dossier-card"><h3>Evaluation dimensions</h3>${renderDossierMeta(dimensionRows)}</article><article class="explorer-dossier-card"><h3>Rubric, Judge &amp; metrics</h3>${renderDossierMeta([["Rubric results", "—"], ["Critical failures", "—"], ["Answer leakage", "—"], ["Judge", "—"], ["Judge prompt version", "—"], ["Tokens", "—"], ["Latency", "—"], ["Cost", "—"]])}</article></div></section><section class="explorer-section explorer-provenance-section" aria-labelledby="provenance-title"><div class="explorer-section-heading"><div><p class="eyebrow">Provenance chain</p><h2 id="provenance-title">Every stage must remain inspectable.</h2><p>The browser never calls a Judge to fill an unresolved stage.</p></div></div>${renderDetailProvenance()}</section></div></section>${renderExplorerClosing("From evidence to better teaching.", "Public trial records can make AI tutoring more transparent, comparable, and useful for real educational progress without overstating what the benchmark measures.", [["View all trials", "/data/trials/"], ["Read the methodology", "/methodology/"]], "detail-closing")}${renderTeachometryFooter(artifacts)}</div>`,
   );
 }

@@ -16,6 +16,7 @@ import {
 import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/index.js";
 import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
 import { renderHomePage } from "../src/site/pages/home.js";
+import { renderHeatmapPage, renderTrialDetailPage, renderTrialsPage } from "../src/site/pages/data.js";
 import { renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
 import { renderRunPage } from "../src/site/pages/developer.js";
 
@@ -174,6 +175,48 @@ test("models registry and reserved detail route remain evidence-bound", async ()
   assert.match(detailHtml, /tutor-eval-v0\.2a@0\.2a\.6/);
   assert.match(detailHtml, /No model identity, score, strength, weakness, or trial is inferred/);
   assert.doesNotMatch(detailHtml, inventedReferenceModels);
+});
+
+test("Teachometry benchmark explorer pages stay evidence-bound and use the public artifact contract", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const heatmapHtml = renderPage(renderHeatmapPage(artifacts), { basePath: "/preview" });
+  const trialsHtml = renderPage(renderTrialsPage(artifacts), { basePath: "/preview" });
+  const detailHtml = renderPage(renderTrialDetailPage(artifacts), { basePath: "/preview" });
+
+  assert.match(heatmapHtml, /<body class="home-page explorer-page heatmap-page">/);
+  assert.match(heatmapHtml, /Evidence Matrix/);
+  assert.match(heatmapHtml, /href="\/preview\/assets\/explorers\.css"/);
+  assert.match(heatmapHtml, /No public model trials available yet\./);
+  assert.match(heatmapHtml, /<dd>48<\/dd>/);
+  assert.match(heatmapHtml, /Correctness/);
+  assert.match(heatmapHtml, /Versioned public model runs/);
+  assert.doesNotMatch(heatmapHtml, /Model run A|Model run B|score \/ pass \/ failure|Higher evidence/);
+  assert.match(heatmapHtml, /class="home-footer"/);
+  assert.doesNotMatch(heatmapHtml, /class="site-footer"/);
+  assert.match(heatmapHtml, /href="\/preview\/data\/trials\/"/);
+  assert.match(heatmapHtml, /href="\/preview\/methodology\/"/);
+
+  assert.match(trialsHtml, /<body class="home-page explorer-page trials-page">/);
+  assert.match(trialsHtml, /Model Trials/);
+  assert.match(trialsHtml, /No public trials yet\./);
+  assert.match(trialsHtml, /generationSpecId/);
+  assert.match(trialsHtml, /promptSha256/);
+  assert.match(trialsHtml, /tutorResponse/);
+  assert.match(trialsHtml, /criticalFailures/);
+  assert.match(trialsHtml, /From benchmark to evidence/);
+  assert.doesNotMatch(trialsHtml, /<tbody>\s*<tr>\s*<th[^>]*>trial-/i);
+  assert.match(trialsHtml, /href="\/preview\/models\/"/);
+  assert.match(trialsHtml, /href="\/preview\/leaderboard\/"/);
+
+  assert.match(detailHtml, /<body class="home-page explorer-page trial-detail-page">/);
+  assert.match(detailHtml, /No public trial is selected\./);
+  assert.match(detailHtml, /Current benchmark context only/);
+  assert.match(detailHtml, /tutor-eval-v0\.2a@0\.2a\.6/);
+  assert.match(detailHtml, /Not available/);
+  assert.match(detailHtml, /No results yet/);
+  assert.doesNotMatch(detailHtml, /Trial TBD|fake|GPT-4o|Claude|Gemini|Model A|Model B|\b\d+%/i);
+  assert.match(detailHtml, /href="\/preview\/data\/trials\/"/);
+  assert.match(detailHtml, /class="home-footer"/);
 });
 
 test("static website build emits the public artifact files and route shell", async () => {
