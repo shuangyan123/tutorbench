@@ -16,6 +16,7 @@ import {
 import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/index.js";
 import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
 import { renderHomePage } from "../src/site/pages/home.js";
+import { renderRunPage } from "../src/site/pages/developer.js";
 
 test("homepage derives facts and escapes case content without inventing model results", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
@@ -149,6 +150,7 @@ test("generated public artifacts pass the runtime read-layer parser", async () =
 test("static website build emits the public artifact files and route shell", async () => {
   const outputDirectory = await mkdtemp(join(tmpdir(), "tutor-benchmark-website-"));
   try {
+    const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
     const routeCount = await buildWebsite({ outputDirectory });
     const casesJson = await readFile(join(outputDirectory, "public-data", "cases.json"), "utf8");
     const homeHtml = await readFile(join(outputDirectory, "index.html"), "utf8");
@@ -222,19 +224,45 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(leaderboardHtml, /results\.css/);
     assert.match(leaderboardHtml, /Readiness and evidence status/);
     assert.match(leaderboardHtml, /No ranking without evidence/);
-    assert.match(runHtml, /tutor:export-execution/);
-    assert.match(runHtml, /TutorExecutionPacket/);
-    assert.match(runHtml, /baseline-native-default/);
-    assert.match(runHtml, /Run the provider-free demo/);
+    assert.match(runHtml, /<body class="run-page">/);
+    assert.match(runHtml, /<header class="site-header home-header">/);
+    assert.match(runHtml, /<footer class="home-footer">/);
+    assert.doesNotMatch(runHtml, /href="\/assets\/home\.css"/);
+    assert.match(runHtml, /href="\/assets\/teachometry\.css"/);
+    assert.match(runHtml, /href="\/assets\/run\.css"/);
+    assert.match(runHtml, /From research<br>questions to<br><em>reproducible runs\.<\/em>/);
+    assert.match(runHtml, /Run TutorBench locally, generate reproducible evidence/);
+    assert.equal((runHtml.match(/data-run-tab="/g) ?? []).length, 4);
+    assert.equal((runHtml.match(/data-copy-run/g) ?? []).length, 4);
+    for (const tab of ["quickstart", "benchmark", "external-tutor", "advanced"]) {
+      assert.match(runHtml, new RegExp(`data-run-tab="${tab}"`));
+      assert.match(runHtml, new RegExp(`data-run-panel="${tab}"`));
+    }
+    assert.match(runHtml, /git clone https:\/\/github\.com\/shuangyan123\/tutorbench\.git/);
+    assert.match(runHtml, /npm ci/);
     assert.match(runHtml, /npm run quickstart/);
+    assert.match(runHtml, /npm install tutor-benchmark/);
+    assert.match(runHtml, /tutorbench quickstart/);
     assert.match(runHtml, /tutor-eval-v0\.1@0\.1/);
-    assert.match(runHtml, /Full benchmark/);
-    assert.match(runHtml, /Leaderboard.*Not eligible/s);
-    assert.match(runHtml, /Controlled optional generation parameters: none/);
-    assert.match(runHtml, /Use any language/);
-    assert.match(runHtml, /tutorbench run/);
-    assert.match(runHtml, /Real-model evidence/);
-    assert.match(runHtml, /preliminary, uncalibrated/);
+    assert.match(runHtml, /No Judge, no network connection/);
+    assert.match(runHtml, /no official score/);
+    assert.match(runHtml, /python examples\/http-python-tutor\/server\.py/);
+    assert.match(runHtml, /tutorbench run --http http:\/\/127\.0\.0\.1:8000\/respond --limit 3/);
+    assert.match(runHtml, /Default request timeout is 30 seconds/);
+    assert.match(runHtml, /Product Tutor and canonical model collection are different paths/);
+    assert.match(runHtml, /OpenAI Responses and DeepSeek Chat Completions are explicit Judge paths/);
+    assert.match(runHtml, /Calibrated public model results/);
+    assert.match(runHtml, /Official leaderboard rankings/);
+    assert.match(runHtml, /Reproducibility checklist/);
+    assert.match(runHtml, /Dataset version/);
+    assert.match(runHtml, /Same cases\.<br>Different Tutors\.<br><em>Comparable evidence\.<\/em>/);
+    for (const route of ["/docs/", "/methodology/", "/leaderboard/", "/data/cases/"]) {
+      assert.match(runHtml, new RegExp(`href="${route.replaceAll("/", "\\/")}"`));
+    }
+    assert.doesNotMatch(runHtml, /4\.6 \/ 5|official score:|model leaderboard row/i);
+    const previewRun = renderPage(renderRunPage(artifacts), { basePath: "/preview" });
+    assert.match(previewRun, /href="\/preview\/assets\/run\.css"/);
+    assert.match(previewRun, /href="\/preview\/docs\/"/);
     assert.match(methodologyHtml, /How do you<br>measure <em>teaching/);
     assert.match(methodologyHtml, /methodology\.css/);
     assert.match(methodologyHtml, /Structured case/);

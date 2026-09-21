@@ -3,7 +3,6 @@ import {
   escapeHtml,
   humanize,
   renderCodeBlock,
-  renderKeyValueList,
   renderStatusBadge,
   SITE_GITHUB_URL,
   type SitePage,
@@ -20,65 +19,162 @@ function page(
   return { title, description, route, content };
 }
 
+type RunConsolePanel = {
+  readonly id: string;
+  readonly label: string;
+  readonly title: string;
+  readonly summary: string;
+  readonly commands: string;
+  readonly facts: readonly string[];
+  readonly note: string;
+};
+
+function renderRunBotanical(className: string): string {
+  return `<svg class="run-botanical ${className}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.6" />
+      <path d="M133 190C103 155 76 123 54 83M126 236C93 219 56 198 22 166M143 140C170 119 194 91 215 58M119 277C88 265 53 250 16 224M153 103C179 91 204 71 228 44" stroke-width="1.15" />
+    </g>
+    <g fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-linejoin="round">
+      <path d="M54 83C41 67 29 49 32 32C50 37 65 54 68 72C63 78 59 81 54 83Z" stroke-width="1.05" />
+      <path d="M22 166C11 147 4 126 10 108C29 116 43 135 42 153C36 159 30 163 22 166Z" stroke-width="1.05" />
+      <path d="M215 58C214 39 219 20 234 8C240 27 235 46 222 60C219 60 217 59 215 58Z" stroke-width="1.05" />
+      <path d="M16 224C11 207 14 190 26 178C39 194 39 211 29 225C24 226 20 226 16 224Z" stroke-width="1.05" />
+      <path d="M228 44C228 27 235 12 248 4C252 21 246 38 236 47C233 47 230 46 228 44Z" stroke-width="1.05" />
+    </g>
+  </svg>`;
+}
+
+function renderRunConsolePanel(panel: RunConsolePanel, packagePath = false): string {
+  return `<section class="run-console-panel" data-run-panel="${escapeHtml(panel.id)}" role="tabpanel" id="run-panel-${escapeHtml(panel.id)}" aria-labelledby="run-tab-${escapeHtml(panel.id)}"${panel.id === "quickstart" ? "" : " hidden"}>
+    <div class="run-console-panel-heading"><div><h3>${escapeHtml(panel.title)}</h3><p>${escapeHtml(panel.summary)}</p></div><button class="run-copy" type="button" data-copy-run aria-label="Copy ${escapeHtml(panel.label)} command">${icon("copy")}<span data-copy-label>Copy</span></button></div>
+    ${renderCodeBlock(panel.commands, "bash")}
+    <ul class="run-console-facts">${panel.facts.map((fact) => `<li>${icon("check")}<span>${escapeHtml(fact)}</span></li>`).join("")}</ul>
+    <p class="run-console-note">${escapeHtml(panel.note)}</p>
+    ${packagePath ? `<div class="run-console-package" id="published-quickstart"><div><strong>Prefer the published package?</strong><span>Install the released CLI, then run the same deterministic demo.</span></div><code>npm install tutor-benchmark</code><code>tutorbench quickstart</code></div>` : ""}
+  </section>`;
+}
+
+function renderRunConsole(artifacts: PublicBenchmarkArtifacts): string {
+  const datasetLabel = artifacts.benchmark.dataset.id + "@" + artifacts.benchmark.dataset.version;
+  const panels: readonly RunConsolePanel[] = [
+    {
+      id: "quickstart",
+      label: "Quickstart",
+      title: "Get started (provider-free)",
+      summary: "Clone the repository and run the deterministic Quickstart.",
+      commands: [
+        "# 1. Clone the repository",
+        "git clone " + SITE_GITHUB_URL + ".git",
+        "cd tutorbench",
+        "",
+        "# 2. Install dependencies",
+        "npm ci",
+        "",
+        "# 3. Run the Quickstart (no API key)",
+        "npm run quickstart",
+      ].join("\n"),
+      facts: [
+        "Runs locally without an API key",
+        "Uses 4 fixed cases from tutor-eval-v0.1@0.1",
+        "No Judge, no network connection",
+        "Deterministic checks (no official score)",
+        "Not leaderboard eligible",
+      ],
+      note: "A development/smoke demonstration with no overall score; Quickstart does not weaken the canonical benchmark boundary.",
+    },
+    {
+      id: "benchmark",
+      label: "Benchmark",
+      title: "Run the canonical benchmark",
+      summary: "Use the current public dataset and preserve its fail-closed evaluator boundary.",
+      commands: "npm run benchmark",
+      facts: [
+        "Current dataset: " + datasetLabel,
+        String(artifacts.benchmark.dataset.caseCount) + " public cases in the canonical artifact",
+        "Judge-required criteria stay unresolved without an explicit Judge",
+        "No score is reported when required evidence is unavailable",
+      ],
+      note: "The canonical run is distinct from the four-case Quickstart and may report errors or no score without Judge configuration.",
+    },
+    {
+      id: "external-tutor",
+      label: "External Tutor",
+      title: "Connect an external Tutor over HTTP",
+      summary: "Run the repository example, then send TutorTurnInput to POST /respond.",
+      commands: [
+        "python examples/http-python-tutor/server.py",
+        "",
+        "tutorbench run --http http://127.0.0.1:8000/respond --limit 3",
+      ].join("\n"),
+      facts: [
+        "TutorTurnInput JSON in; { text, metrics? } JSON out",
+        "Default request timeout is 30 seconds",
+        "External requests are not retried automatically",
+        "Product Tutor evidence remains separate from canonical model evidence",
+      ],
+      note: "The adapter evaluates the Tutor response at the edge; evaluator-only evidence stays inside TutorBench.",
+    },
+    {
+      id: "advanced",
+      label: "Advanced",
+      title: "Freeze and inspect evidence paths",
+      summary: "Collect Product Tutor or canonical model responses, then evaluate a frozen corpus offline.",
+      commands: [
+        "tutorbench collect --http http://127.0.0.1:8000/respond --provider <provider> --model <actual-model-id> --prompt-version product-config-v3 --provenance external --limit 3 --output artifacts/product/product.json",
+        "",
+        "tutorbench collect-model --http http://127.0.0.1:9000/generate --provider <provider> --model <actual-model-id> --limit 3 --output artifacts/real-model/model.json",
+        "",
+        "tutorbench evaluate --corpus artifacts/real-model/model.json",
+      ].join("\n"),
+      facts: [
+        "Product Tutor and canonical model collection are different paths",
+        "TutorExecutionPacket and TutorGenerationSpec identify canonical requests",
+        "OpenAI Responses and DeepSeek Chat Completions are explicit Judge paths",
+        "Local artifacts remain preliminary, uncalibrated, and not public",
+      ],
+      note: "Collection is not publication, calibration, or leaderboard eligibility; frozen evidence can be inspected and replayed offline.",
+    },
+  ];
+  return `<div class="run-console" id="quickstart" aria-labelledby="run-console-title"><div class="run-console-tabs" role="tablist" aria-label="Run workflows">${panels.map((panel, index) => `<button type="button" role="tab" id="run-tab-${escapeHtml(panel.id)}" aria-controls="run-panel-${escapeHtml(panel.id)}" aria-selected="${index === 0}" tabindex="${index === 0 ? 0 : -1}" data-run-tab="${escapeHtml(panel.id)}">${escapeHtml(panel.label)}</button>`).join("")}</div><div class="run-console-panels"><h2 id="run-console-title" class="visually-hidden">Run workflows</h2>${panels.map((panel) => renderRunConsolePanel(panel, panel.id === "quickstart")).join("")}</div></div>`;
+}
+
+function renderRunStep(number: string, title: string, copy: string, glyph: string, last = false): string {
+  return `<li class="run-flow-step"><div class="run-flow-step-top"><span class="run-flow-number">${number}</span><span class="run-flow-icon">${icon(glyph)}</span></div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(copy)}</p>${last ? "" : `<span class="run-flow-arrow" aria-hidden="true">${icon("arrow")}</span>`}</li>`;
+}
+
+function renderRunCapabilityCard(
+  tone: string,
+  glyph: string,
+  title: string,
+  items: readonly string[],
+  linkLabel: string,
+  href: string,
+): string {
+  return `<article class="run-capability-card run-capability-${escapeHtml(tone)}"><span class="run-capability-icon">${icon(glyph)}</span><h3>${escapeHtml(title)}</h3><ul>${items.map((item) => `<li>${icon(tone === "blocked" ? "close" : "check")}<span>${escapeHtml(item)}</span></li>`).join("")}</ul><a class="text-link" href="${escapeHtml(href)}">${escapeHtml(linkLabel)} ${icon("arrow")}</a></article>`;
+}
+
+function renderRunChecklistItem(glyph: string, title: string, detail: string): string {
+  return `<li><span class="run-checklist-icon">${icon(glyph)}</span><span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(detail)}</small></span></li>`;
+}
+
+function renderRunArtifact(artifacts: PublicBenchmarkArtifacts): string {
+  const datasetLabel = artifacts.benchmark.dataset.id + "@" + artifacts.benchmark.dataset.version;
+  const caseIds = artifacts.cases.cases.slice(0, 4).map((item) => item.id);
+  return `<figure class="run-artifact" aria-labelledby="run-artifact-title"><div class="run-artifact-sheet run-artifact-sheet-back"></div><div class="run-artifact-sheet run-artifact-sheet-mid"></div><div class="run-artifact-card"><div class="run-artifact-fold"></div><p class="run-artifact-label">${escapeHtml(datasetLabel)}</p><h3 id="run-artifact-title">Structured cases<br>for transparent evaluation.</h3><ul>${caseIds.map((caseId) => `<li>${icon("document")}<code>${escapeHtml(caseId)}</code></li>`).join("")}${caseIds.length === 0 ? `<li>${icon("document")}<code>No public cases loaded</code></li>` : ""}</ul><span class="run-artifact-more">…</span></div><figcaption>Same cases.<br>Different Tutors.<br><em>Comparable evidence.</em></figcaption></figure>`;
+}
+
 export function renderRunPage(artifacts: PublicBenchmarkArtifacts): SitePage {
-  const quickstartCommands = `git clone ${SITE_GITHUB_URL}.git
-cd tutorbench
-npm ci
-npm run quickstart
-
-# Published v0.1.0 package:
-npm install tutor-benchmark
-tutorbench quickstart`;
-  const fullBenchmarkCommands = `npm run benchmark`;
-  const corpusCommands = `npm run tutor:export-execution -- -- --case fraction-misconception-001
-npm run tutor:export-cases
-npm run tutor:corpus:validate -- -- --corpus path/to/corpus.json
-npm run benchmark:corpus -- -- --corpus path/to/corpus.json`;
-  const collectionCommands = `tutorbench collect \\
-  --http http://127.0.0.1:8000/respond \\
-  --provider <provider> \\
-  --model <actual-model-id> \\
-  --prompt-version product-config-v3 \\
-  --provenance external \\
-  --limit 3 \\
-  --output artifacts/product/product.json
-
-tutorbench collect-model \\
-  --http http://127.0.0.1:9000/generate \\
-  --provider <provider> \\
-  --model <actual-model-id> \\
-  --limit 3 \\
-  --output artifacts/real-model/model.json
-
-tutorbench evaluate \\
-  --corpus artifacts/real-model/model.json`;
+  const datasetLabel = artifacts.benchmark.dataset.id + "@" + artifacts.benchmark.dataset.version;
   return page(
-    "Run the Benchmark — Tutor Benchmark",
-    "Run Tutor Benchmark locally with an adapter or a frozen Tutor response corpus.",
+    "Run — Teachometry",
+    "Run TutorBench locally, generate reproducible evidence, and inspect where a Tutor succeeds or fails.",
     "/run/",
-    `<section class="page-intro"><div class="shell narrow-shell"><div class="eyebrow-row">${renderStatusBadge(artifacts.benchmark.statusLabel, "preview")}<span class="eyebrow">Developer workflow</span></div><h1>Run TutorBench locally</h1><p class="lede">Start with a five-minute deterministic demonstration, then move to the full benchmark or the advanced evidence paths when you need them.</p></div></section>
-    <section class="section"><div class="shell run-grid"><div><p class="eyebrow">Quickstart</p><h2>Run the provider-free demo</h2><p>Quickstart needs no API key, Judge, or network connection. It runs four fixed cases from <code>tutor-eval-v0.1@0.1</code>, an existing development/smoke subset, and reports deterministic checks without an official score.</p>${renderCodeBlock(quickstartCommands, "bash")}</div><aside class="panel run-aside"><p class="eyebrow">Quickstart boundary</p>${renderKeyValueList([["Dataset", "tutor-eval-v0.1@0.1 (development smoke)"],["Cases", "4 fixed cases"],["Judge", "Not required"],["Network", "Disabled"],["Official score", "No"],["Leaderboard", "Not eligible"]])}<a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/quickstart.md" rel="noreferrer">Read the Quickstart guide ↗</a></aside></div></section>
-    <section class="section section-muted"><div class="shell run-grid"><div><p class="eyebrow">Full benchmark</p><h2>Run the canonical evaluation path</h2><p><code>npm run benchmark</code> remains the full local benchmark for <code>${escapeHtml(`${artifacts.benchmark.dataset.id}@${artifacts.benchmark.dataset.version}`)}</code>. Its semantic boundary includes Judge-required rubrics. Without an explicitly configured Judge, those criteria remain unresolved and the normal run reports errors with no score; Quickstart does not replace or weaken that behavior.</p>${renderCodeBlock(fullBenchmarkCommands, "bash")}</div><aside class="panel run-aside"><p class="eyebrow">Canonical status</p>${renderKeyValueList([["Dataset", `${artifacts.benchmark.dataset.id}@${artifacts.benchmark.dataset.version}`],["Cases", String(artifacts.benchmark.dataset.caseCount)],["Judge", "Explicitly configured when needed"],["No-Judge result", "Unresolved errors; no score"]])}<a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/release.md" rel="noreferrer">Read the release boundary ↗</a></aside></div></section>
-    <section class="section section-muted"><div class="shell run-grid"><div><p class="eyebrow">Use any language</p><h2>Connect an external Tutor over HTTP</h2><p>Any runtime that accepts JSON and serves <code>POST /respond</code> can implement the Tutor boundary. The adapter sends Tutor-visible input only and keeps Judge evidence on the evaluator side.</p>${renderCodeBlock(`python examples/http-python-tutor/server.py\n\n# Published package:\ntutorbench run \\\n  --http http://127.0.0.1:8000/respond \\\n  --limit 3\n\n# From a clone after npm run build:\nnode dist/src/cli/tutorbench.js run \\\n  --http http://127.0.0.1:8000/respond \\\n  --limit 3`, "bash")}</div><aside class="panel run-aside"><p class="eyebrow">HTTP v1</p><p><code>TutorTurnInput</code> JSON in; <code>{ text, metrics? }</code> JSON out. The default timeout is 30 seconds and the adapter does not retry external requests.</p><a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/examples/http-python-tutor/README.md" rel="noreferrer">Open the Python example ↗</a></aside></div></section>
-    <section class="section"><div class="shell run-grid"><div><p class="eyebrow">Real-model evidence</p><h2>Separate Product Tutor and canonical model evidence</h2><p>The Product path freezes TutorTurnInput responses without a generation spec. The canonical model path freezes exact execution-packet responses with a generation spec. Both keep failed case/runs in a sanitized report and replay offline; neither discovers credentials, retries calls, or writes website public data.</p>${renderCodeBlock(collectionCommands, "bash")}</div><aside class="panel run-aside"><p class="eyebrow">Preliminary only</p><p>Real-model artifacts are local and ignored by default. They remain preliminary, uncalibrated, and ineligible for the public leaderboard until host review, human/Judge calibration, and a publication review exist.</p><a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/real-model-baselines.md" rel="noreferrer">Read the collection guide ↗</a></aside></div></section>
-    <section class="section section-muted"><div class="shell"><p class="eyebrow">Canonical execution mode</p><h2>Freeze the benchmark conditions first</h2><p class="section-copy">Export a <code>TutorExecutionPacket</code> with the versioned <code>TutorGenerationSpec</code>, exact prompt identity, canonical messages, and output cap. The default <code>baseline-native-default</code> profile leaves optional temperature, reasoning, and seed controls unconstrained so provider-native behavior is not misrepresented as identical across vendors.</p>${renderCodeBlock(corpusCommands, "bash")}<div class="callout"><strong>Controlled optional generation parameters: none</strong><p><code>tutor:export-cases</code> is the semantic Tutor-visible adapter packet. <code>tutor:export-execution</code> is the canonical benchmark packet used to make model runs comparable. Neither packet includes evaluator-only annotations. The same benchmark does not imply that every provider exposes identical inference knobs.</p></div></div></section>
-    <section class="section"><div class="shell adapter-grid"><div><p class="eyebrow">Minimal adapter shape</p><h2>Keep the provider at the edge</h2><p class="section-copy">The adapter receives a typed, Tutor-visible input and returns a text response. Provider metadata stays outside the core benchmark result contract.</p></div>${renderCodeBlock(`import type { TutorUnderTest } from "./src/contracts/tutor.js";
-
-const tutor: TutorUnderTest = {
-  id: "my-tutor",
-  async respond(input) {
-    return {
-      text: await myTutor(input.currentStudentMessage),
-    };
-  },
-};`, "ts")}</div></section>
-    <section class="section section-dark"><div class="shell"><p class="eyebrow">Optional Judge path</p><h2>Explicit, offline by default</h2><p class="section-copy">The repository has separate opt-in OpenAI Responses and DeepSeek Chat Completions Judge providers. Dry-run/request tests stay offline; live execution requires explicit local configuration. The website build never calls a Judge provider and the browser never receives credentials.</p>${renderCodeBlock(`npm run judge:openai -- -- --dry-run
-
-# Frozen-corpus DeepSeek Judge subset:
-node dist/src/cli/tutorbench.js evaluate \\
-  --corpus artifacts/real-model/baseline.json \\
-  --limit 1 \\
-  --judge-deepseek`, "bash")}</div></section>`,
+    `<section class="run-hero" aria-labelledby="run-title"><div class="shell run-hero-grid"><div class="run-hero-copy"><p class="eyebrow">Run · Get started</p><h1 id="run-title">From research<br>questions to<br><em>reproducible runs.</em></h1><p class="run-hero-lede">Run TutorBench locally, generate reproducible evidence, and inspect where each Tutor succeeds—and where it still falls short. Start with the deterministic Quickstart, then move to the full benchmark or external Tutor/model evidence paths when needed.</p><div class="run-hero-actions"><a class="button button-primary" href="#quickstart">Run locally now ${icon("arrow")}</a><a class="button button-secondary" href="/docs/">${icon("book")} View the documentation</a></div><div class="run-hero-signals" aria-label="Run principles"><span>${icon("book")} Open source</span><span>${icon("shield")} Transparent evaluation</span><span>${icon("database")} Evidence-first</span></div></div><div class="run-hero-console"><p class="run-hero-annotation">Same questions.<br>Clearer evidence.</p>${renderRunConsole(artifacts)}</div></div></section>
+    <section class="run-flow-section" aria-labelledby="run-flow-title"><div class="shell run-flow-shell"><p class="eyebrow" id="run-flow-title">How to run</p><ol class="run-flow-list">${renderRunStep("1", "Install", "Clone the repository or install the published package.", "laptop")}${renderRunStep("2", "Run", "Start with Quickstart, then use the benchmark or external Tutor paths.", "play")}${renderRunStep("3", "Inspect", "Review outputs, frozen corpora, logs, evidence, and unresolved criteria.", "document", true)}</ol><div class="run-flow-note"><p>Traceable runs.<br><em>For better research.</em></p>${renderRunBotanical("run-botanical-flow")}</div></div></section>
+    <section class="run-capability-section" id="run-capabilities" aria-labelledby="run-capabilities-title"><div class="shell run-capability-layout"><div class="run-capability-main"><div class="run-section-heading"><div><p class="eyebrow">Execution boundaries</p><h2 id="run-capabilities-title">What can you run now?</h2><p>Different workflows serve different purposes. Here is what is available, what requires additional components, and what remains outside the current public scope.</p></div></div><div class="run-capability-grid">${renderRunCapabilityCard("local", "laptop", "Provider-free", ["Quickstart demonstration", "Public case/data inspection", "Frozen-corpus validation and replay", "Website and artifact workflows", "Dry-run and request validation"], "Run locally now", "#quickstart")}${renderRunCapabilityCard("external", "cloud", "External Tutor / model", ["HTTP Tutor adapter (POST /respond)", "Product Tutor collection", "Canonical model collection", "Explicit Judge providers (OpenAI Responses, DeepSeek)", "Advanced offline analysis workflows"], "See configuration guide", "/docs/")}${renderRunCapabilityCard("blocked", "ban", "Not yet public", ["Calibrated public model results", "Human calibration and validation", "Statistical validation", "Large-scale batch evaluation", "Official leaderboard rankings"], "Learn about the roadmap", "/methodology/#methodology-status")}</div></div><aside class="run-principle" aria-labelledby="run-principle-title"><p class="eyebrow">Our principle</p><blockquote id="run-principle-title">“Not just outputs,<br>but evidence you<br>can trust.”</blockquote><p>We design TutorBench so benchmark conditions, evaluator boundaries, and artifacts can be inspected and reproduced. When evidence is unavailable, the system should fail closed rather than silently invent a valid score.</p><a class="text-link" href="/methodology/">Read our methodology ${icon("arrow")}</a></aside></div></section>
+    <section class="run-repro-section" aria-labelledby="run-repro-title"><div class="shell run-repro-grid"><div class="run-checklist"><p class="eyebrow">Make the run legible</p><h2 id="run-repro-title">Reproducibility checklist</h2><p>Record the following information with your results to make them easy to verify, replay, and compare.</p><ul>${renderRunChecklistItem("database", "Dataset version", "e.g., " + datasetLabel)}${renderRunChecklistItem("bookmark", "Case or corpus identity", "Case IDs or frozen corpus")}${renderRunChecklistItem("target", "Prompt / generation spec", "Prompt templates and parameters")}${renderRunChecklistItem("robot", "Provider and model snapshot", "Model name, version, and settings (if applicable)")}${renderRunChecklistItem("list", "Run metadata", "Date, environment, configuration")}${renderRunChecklistItem("document", "Evidence output", "Logs, traces, and evaluation results")}</ul></div>${renderRunArtifact(artifacts)}<nav class="run-next-steps" aria-labelledby="run-next-title"><p class="eyebrow">Go deeper</p><h2 id="run-next-title">Next steps</h2><p>Explore related resources to go deeper.</p><div class="run-next-links"><a href="/docs/"><span>${icon("book")}<span><strong>Documentation</strong><small>Setup, configuration, and usage guides.</small></span></span>${icon("arrow")}</a><a href="/methodology/"><span>${icon("flask")}<span><strong>Methodology</strong><small>Learn how we evaluate tutoring behavior.</small></span></span>${icon("arrow")}</a><a href="/leaderboard/"><span>${icon("chart")}<span><strong>Results</strong><small>See benchmark results and analysis.</small></span></span>${icon("arrow")}</a><a href="/data/cases/"><span>${icon("grid")}<span><strong>Cases</strong><small>Browse and explore the evaluation scenarios.</small></span></span>${icon("arrow")}</a></div></nav></div></section>
+    ${renderTeachometryFooter(artifacts)}`,
   );
 }
 
