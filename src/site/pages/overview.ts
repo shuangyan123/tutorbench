@@ -8,8 +8,6 @@ import {
   escapeHtml,
   formatDifficulty,
   humanize,
-  renderDimensionPills,
-  renderEmptyState,
   renderStatusBadge,
   renderUiText,
   SITE_GITHUB_URL,
@@ -215,38 +213,201 @@ export function renderLeaderboardPage(artifacts: PublicBenchmarkArtifacts): Site
   );
 }
 
+const MODEL_FIELD_LABELS: Readonly<Record<string, string>> = {
+  model: "Model",
+  provider: "Provider",
+  modelVersion: "Snapshot / version",
+  benchmarkVersion: "Benchmark version",
+  overallTutorCapabilityScore: "Overall",
+  correctness: "Correctness",
+  diagnosis: "Diagnosis",
+  guidance: "Guidance",
+  adaptation: "Adaptation",
+  actionability: "Actionability",
+  criticalFailureRate: "Critical-failure rate",
+  answerLeakageRate: "Answer-leakage rate",
+  latencyMs: "Latency",
+  tokens: "Tokens",
+  cost: "Cost",
+  datasetVersion: "Dataset cohort",
+  generationSpecId: "Generation spec ID",
+  generationSpecVersion: "Generation spec version",
+  promptVersion: "Prompt version",
+  promptId: "Prompt identity",
+  promptSha256: "Prompt SHA-256",
+  maxOutputTokens: "Max output tokens",
+  runs: "Trial runs",
+};
+
+function modelFieldLabel(field: string): string {
+  return MODEL_FIELD_LABELS[field] ?? humanize(field);
+}
+
+interface ModelSchemaRow {
+  readonly field: string;
+  readonly value: string;
+  readonly note?: string;
+}
+
+function renderModelSchemaRows(rows: readonly ModelSchemaRow[]): string {
+  return rows.map((row) => `<div class="models-schema-row" data-schema-field="${escapeHtml(row.field)}"><dt>${escapeHtml(modelFieldLabel(row.field))}</dt><dd>${escapeHtml(row.value)}</dd>${row.note === undefined ? "" : `<small>${escapeHtml(row.note)}</small>`}</div>`).join("");
+}
+
+function renderModelSchemaPanel(
+  title: string,
+  description: string,
+  rows: readonly ModelSchemaRow[],
+  className = "",
+): string {
+  const headingId = `models-schema-${title.toLowerCase().replaceAll(" ", "-")}`;
+  return `<section class="models-schema-panel${className.length === 0 ? "" : ` ${className}`}" aria-labelledby="${escapeHtml(headingId)}"><p id="${escapeHtml(headingId)}" class="eyebrow">${escapeHtml(title)}</p><p class="models-schema-description">${escapeHtml(description)}</p><dl>${renderModelSchemaRows(rows)}</dl></section>`;
+}
+
+function renderModelsBotanical(className: string): string {
+  return `<svg class="models-botanical ${className}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.6" />
+      <path d="M133 190C103 155 76 123 54 83M126 236C93 219 56 198 22 166M143 140C170 119 194 91 215 58M119 277C88 265 53 250 16 224" stroke-width="1.15" />
+    </g>
+    <g fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-width="1">
+      <path d="M54 83C39 67 32 48 38 34C55 40 66 55 68 72C64 78 60 81 54 83Z" />
+      <path d="M22 166C10 149 8 130 17 115C33 124 42 141 38 157C33 162 28 165 22 166Z" />
+      <path d="M215 58C214 39 222 23 237 14C240 36 232 51 219 62Z" />
+      <path d="M192 18C194 36 188 51 177 61C168 49 170 34 180 24C184 20 188 18 192 18Z" />
+    </g>
+  </svg>`;
+}
+
+function renderModelsHeroArt(): string {
+  return `<div class="models-hero-art" aria-hidden="true">
+    <div class="models-hero-art-wash"></div>
+    <div class="models-hero-document models-hero-document-back"></div>
+    <div class="models-hero-document models-hero-document-front"><span></span><i></i><i></i><i></i><b></b><b></b><b></b></div>
+    ${renderModelsBotanical("models-hero-botanical")}
+    <p class="models-hero-note">Identity.<br>Context.<br><em>Evidence.</em></p>
+  </div>`;
+}
+
+function renderModelEvidenceRail(): string {
+  const items = [
+    ["document", "Evidence-first", "Profiles are derived from structured, versioned artifacts."],
+    ["search", "Traceable", "Keep the model, cohort, generation identity, and trials attached."],
+    ["chart", "Not a ranking", "A profile is an evidence record, not a claim of superiority."],
+  ] as const;
+  return `<aside class="models-evidence-rail" aria-label="Model evidence principles">${items.map(([iconName, title, copy]) => `<div class="models-evidence-item"><span class="models-evidence-icon">${icon(iconName)}</span><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(copy)}</p></div></div>`).join("")}</aside>`;
+}
+
+function modelContractRows(
+  benchmark: PublicBenchmarkArtifact,
+  models: PublicBenchmarkArtifacts["models"],
+): {
+  readonly identity: readonly ModelSchemaRow[];
+  readonly evaluation: readonly ModelSchemaRow[];
+  readonly traceability: readonly ModelSchemaRow[];
+} {
+  const modelFields = new Set(models.fields);
+  const identity = ["model", "provider", "modelVersion"]
+    .filter((field) => modelFields.has(field))
+    .map((field) => ({ field, value: "—" }));
+  const evaluation = [
+    "overallTutorCapabilityScore",
+    ...benchmark.dimensions.score,
+    ...benchmark.dimensions.operational,
+  ]
+    .filter((field, index, fields) => modelFields.has(field) && fields.indexOf(field) === index)
+    .map((field) => ({ field, value: "—" }));
+  const traceability = [
+    ...PUBLIC_BENCHMARK_GENERATION_TRACEABILITY_FIELDS,
+    "promptId",
+    "promptSha256",
+    "maxOutputTokens",
+    "runs",
+  ]
+    .filter((field, index, fields) => modelFields.has(field) && fields.indexOf(field) === index)
+    .map((field) => ({ field, value: "—" }));
+  return { identity, evaluation, traceability };
+}
+
+function renderModelsRegistryContract(
+  benchmark: PublicBenchmarkArtifact,
+  models: PublicBenchmarkArtifacts["models"],
+): string {
+  const rows = modelContractRows(benchmark, models);
+  const contextRows: ModelSchemaRow[] = [
+    { field: "benchmarkVersion", value: benchmark.benchmarkVersion, note: "Registry context only; no model run is implied." },
+    { field: "datasetVersion", value: `${benchmark.dataset.id}@${benchmark.dataset.version}`, note: "The cohort a future public artifact must identify." },
+  ];
+  return `<article id="profile-contract" class="models-contract" aria-labelledby="models-contract-title">
+    <header class="models-contract-heading"><span class="models-contract-icon">${icon("document")}</span><div><p class="eyebrow">Future profile contract</p><h3 id="models-contract-title">What a public model profile must carry</h3><p>Schema labels show the evidence boundary. Dashes are placeholders, not model results.</p></div></header>
+    <div class="models-contract-context">${renderModelSchemaRows(contextRows)}</div>
+    <div class="models-contract-grid">
+      ${renderModelSchemaPanel("Identity", "Identity is only publishable when it resolves to a versioned artifact.", rows.identity)}
+      ${renderModelSchemaPanel("Evaluation evidence", "Scores appear only when valid result records and their evaluation context are public.", rows.evaluation)}
+      ${renderModelSchemaPanel("Traceability", "Generation and trial identity keep a profile auditable and comparable.", rows.traceability)}
+    </div>
+    <p class="models-contract-footnote">Future strengths and weaknesses may be derived from stored category metrics, failure rates, and verified result evidence—not from a free-form post-hoc AI summary.</p>
+  </article>`;
+}
+
+function renderModelsStatus(benchmark: PublicBenchmarkArtifact, models: PublicBenchmarkArtifacts["models"]): string {
+  const statusRows = [
+    ["Public model artifact / schema", models.fields.length > 0 ? "Available" : "Not available", "The public contract is defined; entries remain empty."],
+    ["Calibrated public model runs", models.available ? `${models.entries.length} available` : "None", models.notice],
+    ["Public model profiles", models.entries.length > 0 ? `${models.entries.length} available` : "None", "Profiles require identity plus traceable evidence."],
+    ["Official public rankings", "None", "Results / Leaderboard remains the ranking surface."],
+    ["Human calibration", benchmark.calibration.independentHumanCalibration === "not_completed" ? "Not completed" : benchmark.calibration.independentHumanCalibration, "No human reference set is available."],
+    ["Judge-vs-human validation", benchmark.calibration.judgeVsHumanValidation === "not_completed" ? "Not completed" : benchmark.calibration.judgeVsHumanValidation, "No validation claim is made."],
+    ["Statistical validation", benchmark.calibration.statisticalValidation === "not_completed" ? "Not completed" : benchmark.calibration.statisticalValidation, "No statistical validation claim is made."],
+  ] as const;
+  return `<dl class="models-status-list">${statusRows.map(([label, value, note], index) => `<div class="models-status-row"><dt><span class="models-status-mark" aria-hidden="true">${icon(index === 0 ? "check" : "clock")}</span>${escapeHtml(label)}</dt><dd><strong>${escapeHtml(value)}</strong><small>${escapeHtml(note)}</small></dd></div>`).join("")}</dl>`;
+}
+
 export function renderModelsPage(artifacts: PublicBenchmarkArtifacts): SitePage {
   const { benchmark, models } = artifacts;
+  const publicModelCount = models.entries.length;
   return page(
-    "Models — Tutor Benchmark",
-    "Model identity and versioning for future Tutor Benchmark result artifacts.",
+    "Models — Teachometry",
+    "A transparent registry for model identity, benchmark context, and traceable public evidence.",
     "/models/",
-    `<section class="page-intro">
-      <div class="shell narrow-shell">
-        <div class="eyebrow-row">${renderStatusBadge(benchmark.statusLabel, "preview")}<span class="eyebrow">Model catalog</span></div>
-        <h1>Models</h1>
-        <p class="lede">Model pages will be derived from public, versioned result artifacts. They will not contain free-form AI summaries of strengths or weaknesses.</p>
-      </div>
-    </section>
-    <section class="section">
-      <div class="shell">
-        ${renderEmptyState("No public model profiles yet.", models.notice, "A model detail page will appear only when its identity, snapshot, dataset, prompt, and trial records are available.")}
-        <div class="panel schema-panel">
-          <p class="eyebrow">Model detail contract</p>
-          ${renderDimensionPills(["model identity", "provider", "snapshot/version", "overall score", "five category scores", "subject breakdown", "capability breakdown", "cost", "latency", "tokens"])}
-          <p class="muted">Strengths and weaknesses will be computed from the highest and lowest verified categories, failure rates, and other stored metrics—not generated after the fact by an LLM.</p>
-        </div>
-      </div>
-    </section>`,
+    `<div class="models-main">
+      <section class="models-hero" aria-labelledby="models-title"><div class="shell models-hero-grid"><div class="models-hero-copy"><p class="eyebrow">Models</p><h1 id="models-title">A transparent catalog<br>of <em>model evidence</em><br>for AI tutoring.</h1><p class="models-hero-lede">Public model profiles will be derived from versioned benchmark result artifacts. Each profile keeps model identity, execution context, benchmark cohort, and traceable evidence attached.</p><div class="button-row"><a class="button button-primary" href="#profile-contract">See the profile contract ${icon("arrow")}</a><a class="button button-secondary" href="/methodology/">${icon("book")} Read the methodology</a></div><p class="models-hero-boundary">${escapeHtml(models.notice)} Profiles are evidence records, not rankings.</p></div><div class="models-hero-side">${renderModelsHeroArt()}${renderModelEvidenceRail()}</div></div></section>
+      <section class="models-toolbar-section" aria-label="Public model registry controls"><div class="shell"><div class="models-toolbar"><div class="models-toolbar-group"><span class="eyebrow">Filter models</span><div class="models-toolbar-controls"><label><span class="visually-hidden">Provider</span><select disabled aria-label="Provider filter"><option>All providers</option></select></label><label><span class="visually-hidden">Model type</span><select disabled aria-label="Model type filter"><option>All model types</option></select></label><label><span class="visually-hidden">Evidence status</span><select disabled aria-label="Evidence status filter"><option>Evidence status</option></select></label><label class="models-search"><span class="visually-hidden">Search models</span>${icon("search")}<input type="search" disabled placeholder="Search models…" aria-label="Search models"></label></div></div><div class="models-view-group"><span class="eyebrow">View</span><div class="models-view-controls" role="group" aria-label="Registry view"><button type="button" disabled aria-label="Grid view" aria-pressed="true">${icon("grid")}</button><button type="button" disabled aria-label="List view" aria-pressed="false">${icon("list")}</button></div></div></div><p class="models-toolbar-note">${publicModelCount} public models · Filters become available when public model profiles exist.</p></div></section>
+      <section class="models-registry-section" aria-labelledby="models-registry-title"><div class="shell"><div class="models-registry-heading"><div><p class="eyebrow">Model registry</p><h2 id="models-registry-title">Model identity and evidence</h2></div><span class="models-count">${publicModelCount} public profiles</span></div><div class="models-registry-empty"><div class="models-empty-copy"><span class="models-empty-icon">${icon("database")}</span><p class="eyebrow">No public profiles</p><h3>No public model profiles yet.</h3><p>${escapeHtml(models.notice)}</p><p>A profile will appear only when model identity, snapshot/version, benchmark cohort, generation identity, and traceable trial records are available in a public artifact.</p><a class="text-link" href="/leaderboard/">View Results status ${icon("arrow")}</a></div>${renderModelsRegistryContract(benchmark, models)}</div></div></section>
+      <section class="models-interpretation-section" aria-labelledby="models-interpretation-title"><div class="shell models-interpretation-grid"><article class="models-approach"><p class="eyebrow">Our approach</p><h2 id="models-interpretation-title">Comparable evidence,<br><em>not claims.</em></h2><p>Future model profiles should be interpreted only within matched benchmark versions, dataset cohorts, generation conditions, and evaluation procedures. Teachometry measures observable tutoring behavior in structured authored cases—not long-term learning gains, retention, transfer, student satisfaction, or general classroom teaching effectiveness.</p><a class="button button-secondary" href="/methodology/#method-scope">Read the methodology ${icon("arrow")}</a>${renderModelsBotanical("models-approach-botanical")}</article><article class="models-publication"><p class="eyebrow">Current model-publication status</p><h2>Evidence before conclusions.</h2><p>There are no calibrated public model runs or public profiles yet. The registry stays empty until the publication boundary is met.</p>${renderModelsStatus(benchmark, models)}</article></div></section>
+      <section class="models-closing" aria-labelledby="models-closing-title"><div class="shell models-closing-grid"><div><p class="eyebrow">Looking ahead</p><h2 id="models-closing-title">Better evidence before more conclusions.</h2><p>The registry will grow only from public, versioned artifacts that satisfy the project’s publication and traceability boundaries.</p></div><div class="models-closing-actions"><a class="button button-primary" href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">${icon("github")} View on GitHub ${icon("arrow")}</a><a class="text-link" href="/leaderboard/">View Results status ${icon("arrow")}</a></div></div></section>
+      ${renderTeachometryFooter(artifacts)}
+    </div>`,
   );
 }
 
 export function renderModelDetailPage(artifacts: PublicBenchmarkArtifacts): SitePage {
+  const { benchmark, models, trials } = artifacts;
+  const contract = modelContractRows(benchmark, models);
+  const identityRows: ModelSchemaRow[] = [
+    { field: "model", value: "—" },
+    { field: "provider", value: "—" },
+    { field: "modelVersion", value: "—" },
+  ];
+  const contextRows: ModelSchemaRow[] = [
+    { field: "benchmarkVersion", value: benchmark.benchmarkVersion, note: "Registry context only; this does not show a model execution." },
+    { field: "datasetVersion", value: `${benchmark.dataset.id}@${benchmark.dataset.version}`, note: "Required cohort identity for a future public artifact." },
+    ...contract.traceability.filter((row) => row.field !== "datasetVersion").map((row) => ({ ...row, note: "— until a real public artifact resolves this route." })),
+  ];
+  const scoreRows: ModelSchemaRow[] = [
+    { field: "overallTutorCapabilityScore", value: "—" },
+    ...benchmark.dimensions.score.map((field) => ({ field, value: "—" })),
+  ];
   return page(
-    "Model Detail — Tutor Benchmark",
-    "Reserved model detail route for future public Tutor Benchmark result artifacts.",
+    "Model Detail — Teachometry",
+    "Reserved evidence dossier route for future public model result artifacts.",
     "/models/[modelId]/",
-    `<section class="page-intro"><div class="shell narrow-shell"><a class="back-link" href="/models/">← Back to models</a><div class="eyebrow-row">${renderStatusBadge(artifacts.benchmark.statusLabel, "preview")}<span class="eyebrow">Model detail contract</span></div><h1>Model detail</h1><p class="lede">Model-specific pages are reserved for versioned public result artifacts. No model identity or score is fabricated in the Developer Preview.</p></div></section><section class="section"><div class="shell">${renderEmptyState("No model selected", "A future /models/[modelId] route will resolve a model identity, snapshot, five category scores, and traceable trials from public data.")}</div></section>`,
+    `<div class="model-detail-main">
+      <section class="model-detail-hero" aria-labelledby="model-detail-title"><div class="shell model-detail-hero-grid"><div><a class="back-link" href="/models/">${icon("left")} Back to Models</a><p class="eyebrow">Model profile contract</p><h1 id="model-detail-title">No model selected</h1><p class="model-detail-lede">This route is reserved for future public result artifacts. No model identity, score, strength, weakness, or trial is inferred until a real versioned artifact resolves the route.</p><div class="button-row"><a class="button button-primary" href="/models/#profile-contract">View the profile contract ${icon("arrow")}</a><a class="button button-secondary" href="/leaderboard/">View Results status</a></div></div><aside class="model-detail-hero-card"><span class="models-empty-icon">${icon("document")}</span><strong>No public model dossier</strong><p>${escapeHtml(models.notice)}</p></aside></div></section>
+      <section class="model-dossier-section" aria-labelledby="model-dossier-title"><div class="shell"><div class="model-dossier-heading"><div><p class="eyebrow">Evidence dossier</p><h2 id="model-dossier-title">Schema-only profile</h2></div><span class="models-status-chip">Future result contract</span></div><p class="model-dossier-intro">The fields below describe what a resolved public profile must contain. Placeholder dashes are intentional and do not represent current result data.</p><div class="model-dossier-grid">${renderModelSchemaPanel("Identity", "A selected model must resolve from a stored public identity and snapshot.", identityRows, "model-dossier-panel")}${renderModelSchemaPanel("Benchmark context", "These values describe the current registry environment, not a model run.", contextRows, "model-dossier-panel")}${renderModelSchemaPanel("Result dimensions", "Scores remain unavailable until verified public trials and evaluation evidence exist.", scoreRows, "model-dossier-panel")}</div><div class="model-trial-boundary"><div><span class="models-contract-icon">${icon("database")}</span><div><p class="eyebrow">Trials</p><h3>No public model trials available yet.</h3><p>${escapeHtml(trials.notice)} Trial records are the audit path from a future result to a case, Tutor response, evaluator evidence, and sanitized metrics.</p></div></div><a class="text-link" href="/data/trials/">See the trial contract ${icon("arrow")}</a></div></div></section>
+      <section class="model-publication-section" aria-labelledby="model-publication-title"><div class="shell model-publication-grid"><div><p class="eyebrow">Publication boundary</p><h2 id="model-publication-title">Profiles appear when the evidence is ready.</h2><p>A model profile does not automatically imply leaderboard inclusion, a calibrated score, an official ranking, general model quality, or real classroom teaching effectiveness.</p></div><div class="model-publication-list"><p><span>${icon("check")}</span>Identity, snapshot, cohort, and generation context stay attached.</p><p><span>${icon("check")}</span>Strengths and weaknesses come from stored metrics and failure evidence.</p><p><span>${icon("check")}</span>Free-form post-hoc AI summaries do not become evidence.</p></div></div></section>
+      <section class="models-closing model-detail-closing" aria-labelledby="model-detail-closing-title"><div class="shell models-closing-grid"><div><p class="eyebrow">Looking ahead</p><h2 id="model-detail-closing-title">Better evidence before more conclusions.</h2><p>The registry will grow only from public, versioned artifacts that satisfy the project’s publication and traceability boundaries.</p></div><div class="models-closing-actions"><a class="button button-primary" href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">${icon("github")} View on GitHub ${icon("arrow")}</a><a class="text-link" href="/methodology/">Read the methodology ${icon("arrow")}</a><a class="text-link" href="/leaderboard/">View Results status ${icon("arrow")}</a></div></div></section>
+      ${renderTeachometryFooter(artifacts)}
+    </div>`,
   );
 }
 

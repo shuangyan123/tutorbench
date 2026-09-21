@@ -180,7 +180,8 @@ function renderHeader(
 ): string {
   const isCaseSurface = activeRoute === "/data/cases/" || activeRoute.startsWith("/data/cases/");
   const isBlogPage = activeRoute.startsWith("/blog/");
-  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || isBlogPage || isCaseSurface) {
+  const isModelsPage = activeRoute === "/models/" || activeRoute === "/models/[modelId]/";
+  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || isBlogPage || isCaseSurface || isModelsPage) {
     const links = [
       ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
       ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
@@ -260,6 +261,8 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const isCaseDetailRoute = page.route.startsWith("/data/cases/") && page.route !== "/data/cases/";
   const isBlogIndex = page.route === "/blog/";
   const isBlogPage = page.route.startsWith("/blog/");
+  const isModelDetailRoute = page.route === "/models/[modelId]/";
+  const isModelsPage = page.route === "/models/" || isModelDetailRoute;
   const bodyClass = page.route === "/"
     ? ' class="home-page"'
     : page.route === "/data/"
@@ -270,6 +273,10 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
           ? ' class="results-page"'
           : page.route === "/about/"
             ? ' class="about-page"'
+            : page.route === "/models/"
+              ? ' class="models-page"'
+              : isModelDetailRoute
+                ? ' class="model-detail-page"'
             : page.route === "/data/cases/"
               ? ' class="cases-page"'
               : isCaseDetailRoute
@@ -292,7 +299,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="icon" type="image/png" sizes="32x32" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-32.png"))}">
     <link rel="icon" type="image/png" sizes="16x16" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-16.png"))}">
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
-    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/teachometry.css"))}">` : ""}
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/teachometry.css"))}">` : ""}
     ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
     ${page.route === "/data/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/benchmark.css"))}">` : ""}
     ${page.route === "/methodology/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/methodology.css"))}">` : ""}
@@ -300,6 +307,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${page.route === "/data/cases/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/cases.css"))}">` : ""}
     ${isCaseDetailRoute ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/case-detail.css"))}">` : ""}
     ${page.route === "/about/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/about.css"))}">` : ""}
+    ${isModelsPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/models.css"))}">` : ""}
     ${isBlogPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
@@ -307,7 +315,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <a class="skip-link" href="#main-content">Skip to content</a>
     ${renderHeader(page.route, basePath, locale)}
     <main id="main-content">${page.content}</main>
-    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage) ? "" : renderFooter(context.benchmark ?? ({
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage) ? "" : renderFooter(context.benchmark ?? ({
       statusLabel: "Developer Preview",
       dataset: { id: TUTOR_EVAL_DATASET_ID, version: TUTOR_EVAL_DATASET_VERSION },
     }), locale)}

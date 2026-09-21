@@ -16,6 +16,7 @@ export function siteIcon(name: string): string {
     filter: '<path d="M4 6h16M7 12h10M10 18h4"/>',
     refresh: '<path d="M20 11a8 8 0 1 0 1 5"/><path d="M20 5v6h-6"/>',
     chart: '<path d="M5 20V11M12 20V5M19 20v-8"/><path d="M3 20h18"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     spark: '<path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z"/><path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z"/>',
     check: '<path d="m5 12 4 4L19 6"/>',
     close: '<path d="m6 6 12 12M18 6 6 18"/>',
