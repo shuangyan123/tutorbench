@@ -147,6 +147,7 @@ function routePages(
   artifacts: PublicBenchmarkArtifacts,
   audit: LocalAuditBuildData | undefined,
   locale: SiteLocale,
+  packageVersion: string,
 ): readonly RoutePage[] {
   const reviewTranslationLookup: ReviewTranslationLookup | undefined = audit === undefined
     ? undefined
@@ -164,7 +165,7 @@ function routePages(
     { outputRoute: "/run/", page: renderRunPage(artifacts) },
     { outputRoute: "/methodology/", page: renderMethodologyPage(artifacts) },
     { outputRoute: "/docs/", page: renderDocsPage(artifacts) },
-    { outputRoute: "/about/", page: renderAboutPage(artifacts) },
+    { outputRoute: "/about/", page: renderAboutPage(artifacts, packageVersion) },
     { outputRoute: "/community/", page: renderCommunityPage(locale) },
   ];
   const routePages = [
@@ -212,6 +213,17 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   }
   const dataset = await loadTutorEvalDataset(TUTOR_EVAL_DATASET_ID);
   const artifacts = buildPublicBenchmarkArtifacts(dataset);
+  const packageMetadata = JSON.parse(
+    await readFile(resolve(process.cwd(), "package.json"), "utf8"),
+  ) as unknown;
+  if (
+    typeof packageMetadata !== "object" ||
+    packageMetadata === null ||
+    typeof (packageMetadata as { readonly version?: unknown }).version !== "string"
+  ) {
+    throw new Error("package.json must expose a string version for the public website ledger.");
+  }
+  const packageVersion = (packageMetadata as { readonly version: string }).version;
   const locale = options.locale ?? "en";
   let audit: LocalAuditBuildData | undefined;
   if (options.evaluationPath !== undefined) {
@@ -258,6 +270,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "results.css"), join(outputDirectory, "assets", "results.css"));
   await copyFile(join(websiteRoot, "src", "cases.css"), join(outputDirectory, "assets", "cases.css"));
   await copyFile(join(websiteRoot, "src", "case-detail.css"), join(outputDirectory, "assets", "case-detail.css"));
+  await copyFile(join(websiteRoot, "src", "about.css"), join(outputDirectory, "assets", "about.css"));
   for (const name of ["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
     await copyFile(join(websiteRoot, "src", "images", `${name}.webp`), join(outputDirectory, "assets", `${name}.webp`));
   }
@@ -267,7 +280,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await writeJson(outputDirectory, "models.json", artifacts.models);
   await writeJson(outputDirectory, "trials.json", artifacts.trials);
 
-  const pages = routePages(artifacts, audit, locale);
+  const pages = routePages(artifacts, audit, locale, packageVersion);
   for (const routePage of pages) {
     await writePage(
       outputDirectory,
