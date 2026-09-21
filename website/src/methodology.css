@@ -1,53 +1,22 @@
 /* Methodology reconstruction: an open research notebook, not a card-grid variant. */
 .methodology-page {
-  --bg: #fbfcf9;
-  --surface: #ffffff;
-  --surface-muted: #eef7f3;
-  --ink: #0d3546;
-  --muted: #526b7b;
-  --line: #d7e7e2;
-  --line-strong: #8bb6b0;
-  --accent: #00635d;
-  --accent-strong: #07504e;
-  --accent-soft: #e1f3ec;
   --method-mint: #f0f8f5;
   --method-dark: #0b4d49;
   --method-dark-ink: #f1f8f4;
   --method-dark-muted: #c3dbd4;
-  --shell: 1280px;
-  --serif: Georgia, "Times New Roman", serif;
-  color-scheme: light;
   position: relative;
   isolation: isolate;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: Arial, "Segoe UI", sans-serif;
 }
 
 .methodology-page[data-theme="dark"] {
-  --bg: #102c2a;
-  --surface: #173b37;
-  --surface-muted: #1d4842;
-  --ink: #edf7f2;
-  --muted: #b1cbc4;
-  --line: #315b54;
-  --line-strong: #5d8a80;
-  --accent: #9bdbc6;
-  --accent-strong: #b8ead7;
-  --accent-soft: #205047;
   --method-mint: #153d38;
   --method-dark: #092824;
   --method-dark-ink: #eef8f3;
   --method-dark-muted: #bdd7ce;
-  color-scheme: dark;
 }
 
 .methodology-page [hidden] {
   display: none !important;
-}
-
-.methodology-page .shell {
-  width: min(calc(100% - 96px), var(--shell));
 }
 
 .methodology-page h1,
@@ -72,13 +41,6 @@
   font-style: italic;
 }
 
-.methodology-page .eyebrow {
-  color: var(--accent);
-  font: 600 10px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-}
-
 .methodology-page .text-link {
   color: var(--accent-strong);
   font: 15px/1.4 var(--serif);
@@ -91,65 +53,19 @@
   text-underline-offset: 4px;
 }
 
-.methodology-page .button {
-  display: inline-flex;
-  min-height: 46px;
-  align-items: center;
-  justify-content: center;
-  gap: 11px;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  padding: 10px 17px;
-  font: 14px/1.35 Arial, "Segoe UI", sans-serif;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.methodology-page .button-primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
-}
-
-.methodology-page .button-primary:hover {
-  border-color: var(--accent-strong);
-  background: var(--accent-strong);
-  color: #fff;
-}
-
 .methodology-page .button-secondary {
-  border-color: var(--line-strong);
   background: transparent;
   color: var(--accent-strong);
 }
 
 .methodology-page .button-secondary:hover {
-  border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent-strong);
-}
-
-.methodology-page .site-icon {
-  width: 19px;
-  height: 19px;
-  flex: 0 0 auto;
-  vertical-align: middle;
-}
-
-.methodology-page :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
 }
 
 .methodology-page .home-header .locale-switcher select {
   min-width: 82px;
   padding: 7px 25px 7px 9px;
-  border-color: var(--line);
-  border-radius: 5px;
-  background: var(--surface);
-  color: var(--ink);
-  font-size: 11px;
 }
 
 .method-hero {
@@ -1028,19 +944,6 @@
   font-size: 10px;
 }
 
-.methodology-page .home-footer {
-  background: var(--surface);
-}
-
-.methodology-page .home-footer .home-footer-brand,
-.methodology-page .home-footer .github-link {
-  color: var(--accent);
-}
-
-.methodology-page .home-footer .button-primary {
-  color: #fff;
-}
-
 .methodology-page[data-theme="dark"] .method-flow-node {
   background: color-mix(in srgb, var(--surface) 82%, var(--accent-soft));
 }
@@ -1059,10 +962,6 @@
 }
 
 @media (max-width: 1120px) {
-  .methodology-page .shell {
-    width: min(calc(100% - 64px), var(--shell));
-  }
-
   .method-hero-grid {
     grid-template-columns: minmax(0, .95fr) minmax(300px, 1.05fr);
     gap: 3%;
@@ -1105,10 +1004,6 @@
 }
 
 @media (max-width: 900px) {
-  .methodology-page .shell {
-    width: min(calc(100% - 48px), var(--shell));
-  }
-
   .method-hero-grid,
   .method-dimensions-grid,
   .method-architecture-grid,
@@ -1268,10 +1163,6 @@
 }
 
 @media (max-width: 640px) {
-  .methodology-page .shell {
-    width: calc(100% - 36px);
-  }
-
   .method-hero-copy {
     padding-top: 21px;
   }

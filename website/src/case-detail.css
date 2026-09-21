@@ -1,47 +1,13 @@
 /* Teachometry Case File surface. Loaded only for /data/cases/<caseId>/. */
 .case-detail-page {
-  --case-bg: #fbfcfa;
-  --case-surface: #ffffff;
-  --case-surface-muted: #eef7f3;
-  --case-ink: #0d2f4d;
-  --case-muted: #536b7f;
-  --case-line: #d7e8e3;
-  --case-line-strong: #9bbdb6;
-  --case-accent: #006d68;
-  --case-accent-strong: #04534f;
-  --case-accent-soft: #e4f4ef;
   --case-subject-bg: #fae9ed;
   --case-subject-ink: #7c4353;
   --case-boundary-bg: #fff0f2;
   --case-boundary-ink: #762a39;
   --case-boundary-accent: #e64561;
-  --case-shell: 1360px;
-  --case-serif: Georgia, "Times New Roman", serif;
-  /* The shared Teachometry header/footer use these surface aliases. */
-  --bg: var(--case-bg);
-  --surface: var(--case-surface);
-  --surface-muted: var(--case-surface-muted);
-  --ink: var(--case-ink);
-  --muted: var(--case-muted);
-  --line: var(--case-line);
-  --line-strong: var(--case-line-strong);
-  --accent: var(--case-accent);
-  --accent-strong: var(--case-accent-strong);
-  --accent-soft: var(--case-accent-soft);
-  --serif: var(--case-serif);
-  --shell: var(--case-shell);
   position: relative;
   isolation: isolate;
   overflow-x: hidden;
-  background: var(--case-bg);
-  color: var(--case-ink);
-  color-scheme: light;
-  font-family: Arial, "Segoe UI", sans-serif;
-}
-
-.case-detail-page .shell {
-  width: min(calc(100% - 80px), var(--case-shell));
-  max-width: var(--case-shell);
 }
 
 .case-detail-page a {
@@ -52,68 +18,9 @@
   color: var(--case-accent);
 }
 
-.case-detail-page .home-header {
-  position: relative;
-  z-index: 4;
-  border: 0;
-  background: transparent;
-  backdrop-filter: none;
-}
-
-.case-detail-page .home-header .header-inner {
-  min-height: 76px;
-}
-
-.case-detail-page .home-header .wordmark,
-.case-detail-page .home-header .wordmark-name {
-  color: var(--case-accent);
-}
-
-.case-detail-page .home-header .nav-links a[aria-current="page"] {
-  color: var(--case-accent);
-  font-weight: 700;
-  text-decoration: underline;
-  text-decoration-color: var(--case-accent);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 7px;
-}
-
-.case-detail-page .home-header .button-primary,
-.case-detail-page .home-footer .button-primary {
-  background: var(--case-accent);
-  border-color: var(--case-accent);
-  color: #ffffff;
-}
-
-.case-detail-page .home-header .button-primary:hover,
-.case-detail-page .home-footer .button-primary:hover {
-  background: var(--case-accent-strong);
-  color: #ffffff;
-}
-
-.case-detail-page .home-header .button .site-icon,
-.case-detail-page .home-footer .button .site-icon {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 auto;
-}
-
-.case-detail-page .theme-controls {
-  background: var(--case-surface);
-}
-
 .case-detail-page .home-header .locale-switcher select {
   min-width: 80px;
   padding: 5px 19px 5px 4px;
-  border: 0;
-  background: transparent;
-  color: var(--case-muted);
-  font-size: 11px;
-}
-
-.case-detail-page .theme-controls button,
-.case-detail-page .home-header .github-link {
-  color: var(--case-accent);
 }
 
 .case-detail-main {
@@ -800,53 +707,22 @@
   line-height: 1;
 }
 
-.case-detail-page .home-footer {
-  background: var(--case-surface);
-  color: var(--case-muted);
-}
-
-.case-detail-page .home-footer .shell {
-  width: min(calc(100% - 80px), var(--case-shell));
-}
-
 @media (prefers-color-scheme: dark) {
   .case-detail-page:not([data-theme="light"]) {
-    --case-bg: #102522;
-    --case-surface: #18342f;
-    --case-surface-muted: #213f39;
-    --case-ink: #eef7f2;
-    --case-muted: #b6cec6;
-    --case-line: #35584f;
-    --case-line-strong: #5b897d;
-    --case-accent: #a6decc;
-    --case-accent-strong: #bce8d8;
-    --case-accent-soft: #254a42;
     --case-subject-bg: #49343b;
     --case-subject-ink: #f1b7c3;
     --case-boundary-bg: #472f36;
     --case-boundary-ink: #ffd2d8;
     --case-boundary-accent: #ff9bad;
-    color-scheme: dark;
   }
 }
 
 .case-detail-page[data-theme="dark"] {
-  --case-bg: #102522;
-  --case-surface: #18342f;
-  --case-surface-muted: #213f39;
-  --case-ink: #eef7f2;
-  --case-muted: #b6cec6;
-  --case-line: #35584f;
-  --case-line-strong: #5b897d;
-  --case-accent: #a6decc;
-  --case-accent-strong: #bce8d8;
-  --case-accent-soft: #254a42;
   --case-subject-bg: #49343b;
   --case-subject-ink: #f1b7c3;
   --case-boundary-bg: #472f36;
   --case-boundary-ink: #ffd2d8;
   --case-boundary-accent: #ff9bad;
-  color-scheme: dark;
 }
 
 .case-detail-page[data-theme="dark"] .case-turn-bubble,
@@ -857,22 +733,6 @@
 .case-detail-page[data-theme="dark"] .case-boundary,
 .case-detail-page[data-theme="dark"] .case-boundary-exclusions {
   border-color: #75505a;
-}
-
-@media (prefers-color-scheme: dark) {
-  .case-detail-page:not([data-theme="light"]) .home-header .button-primary,
-  .case-detail-page:not([data-theme="light"]) .home-footer .button-primary,
-  .case-detail-page:not([data-theme="light"]) .home-header .button-primary:hover,
-  .case-detail-page:not([data-theme="light"]) .home-footer .button-primary:hover {
-    color: #102522;
-  }
-}
-
-.case-detail-page[data-theme="dark"] .home-header .button-primary,
-.case-detail-page[data-theme="dark"] .home-footer .button-primary,
-.case-detail-page[data-theme="dark"] .home-header .button-primary:hover,
-.case-detail-page[data-theme="dark"] .home-footer .button-primary:hover {
-  color: #102522;
 }
 
 @media (max-width: 1180px) {
@@ -904,11 +764,6 @@
 }
 
 @media (max-width: 900px) {
-  .case-detail-page .shell,
-  .case-detail-page .home-footer .shell {
-    width: calc(100% - 48px);
-  }
-
   .case-detail-hero {
     padding-top: 8px;
   }
@@ -939,30 +794,6 @@
 }
 
 @media (max-width: 820px) {
-  .case-detail-page .home-header .header-inner {
-    flex-wrap: wrap;
-    padding: 18px 0 10px;
-  }
-
-  .case-detail-page .home-header .nav-toggle {
-    display: block;
-  }
-
-  .case-detail-page .home-header .nav-links {
-    display: none;
-    order: 3;
-    width: 100%;
-    flex-basis: 100%;
-  }
-
-  .case-detail-page .home-header .nav-links[data-open="true"] {
-    display: flex;
-  }
-
-  .case-detail-page .home-header-tools {
-    margin-left: auto;
-  }
-
   .case-detail-hero-grid {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -1021,26 +852,6 @@
 }
 
 @media (max-width: 600px) {
-  .case-detail-page .shell,
-  .case-detail-page .home-footer .shell {
-    width: calc(100% - 36px);
-  }
-
-  .case-detail-page .home-header .wordmark-name {
-    font-size: 26px;
-  }
-
-  .case-detail-page .home-header .wordmark-descriptor {
-    font-size: 6px;
-  }
-
-  .case-detail-page .home-header-tools {
-    order: 4;
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .case-detail-page .home-header .button,
   .case-detail-page .home-footer .button {
     width: auto;
   }

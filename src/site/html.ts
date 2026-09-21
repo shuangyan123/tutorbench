@@ -292,6 +292,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="icon" type="image/png" sizes="32x32" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-32.png"))}">
     <link rel="icon" type="image/png" sizes="16x16" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-16.png"))}">
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/teachometry.css"))}">` : ""}
     ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
     ${page.route === "/data/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/benchmark.css"))}">` : ""}
     ${page.route === "/methodology/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/methodology.css"))}">` : ""}
