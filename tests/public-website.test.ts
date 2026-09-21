@@ -16,6 +16,7 @@ import {
 import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/index.js";
 import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
 import { renderHomePage } from "../src/site/pages/home.js";
+import { renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
 import { renderRunPage } from "../src/site/pages/developer.js";
 
 test("homepage derives facts and escapes case content without inventing model results", async () => {
@@ -147,6 +148,34 @@ test("generated public artifacts pass the runtime read-layer parser", async () =
   });
 });
 
+test("models registry and reserved detail route remain evidence-bound", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const modelsHtml = renderPage(renderModelsPage(artifacts));
+  const detailHtml = renderPage(renderModelDetailPage(artifacts));
+  const inventedReferenceModels = /GPT-4o|GPT-4o mini|Claude 3\.5 Sonnet|Gemini 1\.5 Pro|Llama 3\.1 70B|2 runs|OpenAI|Anthropic|Google|Meta/;
+
+  assert.match(modelsHtml, /<body class="models-page">/);
+  assert.match(modelsHtml, /models\.css/);
+  assert.match(modelsHtml, /No calibrated public model runs yet\./);
+  assert.match(modelsHtml, /0 public profiles/);
+  assert.match(modelsHtml, /Future profile contract/);
+  assert.match(modelsHtml, /Filters become available when public model profiles exist/);
+  assert.match(modelsHtml, /<select disabled/);
+  assert.match(modelsHtml, /<input type="search" disabled/);
+  assert.match(modelsHtml, /href="\/methodology\//);
+  assert.match(modelsHtml, /href="\/leaderboard\//);
+  assert.doesNotMatch(modelsHtml, inventedReferenceModels);
+  assert.doesNotMatch(modelsHtml, /Not a leaderboard yet/);
+
+  assert.match(detailHtml, /<body class="model-detail-page">/);
+  assert.match(detailHtml, /No model selected/);
+  assert.match(detailHtml, /Future result contract/);
+  assert.match(detailHtml, /No public model trials available yet\./);
+  assert.match(detailHtml, /tutor-eval-v0\.2a@0\.2a\.6/);
+  assert.match(detailHtml, /No model identity, score, strength, weakness, or trial is inferred/);
+  assert.doesNotMatch(detailHtml, inventedReferenceModels);
+});
+
 test("static website build emits the public artifact files and route shell", async () => {
   const outputDirectory = await mkdtemp(join(tmpdir(), "tutor-benchmark-website-"));
   try {
@@ -161,6 +190,11 @@ test("static website build emits the public artifact files and route shell", asy
     );
     const leaderboardHtml = await readFile(
       join(outputDirectory, "leaderboard", "index.html"),
+      "utf8",
+    );
+    const modelsHtml = await readFile(join(outputDirectory, "models", "index.html"), "utf8");
+    const modelDetailHtml = await readFile(
+      join(outputDirectory, "models", "[modelId]", "index.html"),
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
@@ -224,6 +258,22 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(leaderboardHtml, /results\.css/);
     assert.match(leaderboardHtml, /Readiness and evidence status/);
     assert.match(leaderboardHtml, /No ranking without evidence/);
+    assert.match(modelsHtml, /<title>Models — Teachometry<\/title>/);
+    assert.match(modelsHtml, /<body class="models-page">/);
+    assert.match(modelsHtml, /href="\/assets\/models\.css"/);
+    assert.match(modelsHtml, /No public model profiles yet\./);
+    assert.match(modelsHtml, /No calibrated public model runs yet\./);
+    assert.match(modelsHtml, /Comparable evidence,<br><em>not claims\.<\/em>/);
+    assert.doesNotMatch(modelsHtml, /GPT-4o|GPT-4o mini|Claude 3\.5 Sonnet|Gemini 1\.5 Pro|Llama 3\.1 70B|2 runs/);
+    assert.match(modelDetailHtml, /<title>Model Detail — Teachometry<\/title>/);
+    assert.match(modelDetailHtml, /<body class="model-detail-page">/);
+    assert.match(modelDetailHtml, /No model selected/);
+    assert.match(modelDetailHtml, /No public model trials available yet\./);
+    assert.doesNotMatch(modelDetailHtml, /GPT-4o|GPT-4o mini|Claude 3\.5 Sonnet|Gemini 1\.5 Pro|Llama 3\.1 70B/);
+    assert.match(runHtml, /tutor:export-execution/);
+    assert.match(runHtml, /TutorExecutionPacket/);
+    assert.match(runHtml, /baseline-native-default/);
+    assert.match(runHtml, /Get started \(provider-free\)/);
     assert.match(runHtml, /<body class="run-page">/);
     assert.match(runHtml, /<header class="site-header home-header">/);
     assert.match(runHtml, /<footer class="home-footer">/);

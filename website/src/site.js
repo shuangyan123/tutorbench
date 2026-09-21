@@ -302,7 +302,7 @@
 })();
 
 (() => {
-  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.about-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page') || document.querySelector('.blog-page') || document.querySelector('.run-page');
+  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.about-page') || document.querySelector('.models-page') || document.querySelector('.model-detail-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page') || document.querySelector('.blog-page') || document.querySelector('.run-page');
   if (!(themedPage instanceof HTMLElement)) return;
 
   const media = window.matchMedia('(prefers-color-scheme: dark)');
