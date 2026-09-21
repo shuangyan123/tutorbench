@@ -293,21 +293,36 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(docsHtml, /TutorBench Brand Policy/);
     assert.match(docsHtml, /CONTRIBUTING\.md/);
     assert.doesNotMatch(casesJson, /evaluatorOnly|groundTruth|knownMisconception|rubrics|misconceptions/);
-    assert.match(communityHtml, /Help improve TutorBench/);
+    assert.match(communityHtml, /<title>Community — Teachometry<\/title>/);
+    assert.match(communityHtml, /<body class="about-page community-page">/);
+    assert.match(communityHtml, /href="\/assets\/teachometry\.css"/);
+    assert.match(communityHtml, /href="\/assets\/community\.css"/);
+    assert.match(communityHtml, /A stronger evaluation system/);
+    assert.match(communityHtml, /is a shared effort\./);
     assert.match(communityHtml, /Applications not open yet/);
-    assert.match(communityHtml, /Public reviewer intake is not open/);
-    assert.match(communityHtml, /real Community Review campaign has not started/);
-    assert.match(communityHtml, /P5 human calibration has not started/);
+    assert.match(communityHtml, /Public intake is not open/);
+    assert.match(communityHtml, /Real Community Review campaign/);
+    assert.match(communityHtml, /P5 human calibration/);
     assert.match(communityHtml, /What we expect to ask when applications open/);
     assert.match(communityHtml, /One contact email for a future invitation/);
     assert.match(communityHtml, /Preferred review language/);
     assert.match(communityHtml, /Optional relevant experience summary/);
     assert.match(communityHtml, /Approximate availability category/);
     assert.match(communityHtml, /Application.*Manual review.*Invitation.*Consent.*Qualification.*Blind review/s);
-    assert.match(communityHtml, /href="\/community\/" aria-current="page"/);
+    assert.match(communityHtml, /Agreement ≠ correctness/);
+    assert.match(communityHtml, /Qualification ≠ calibration/);
+    assert.match(communityHtml, /Human review ≠ gold standard/);
+    assert.match(communityHtml, /Human review is a future evidence source/);
+    assert.match(communityHtml, /<ol class="community-process-list">/);
+    assert.equal((communityHtml.match(/class="community-process-step"/g) ?? []).length, 6);
+    assert.match(communityHtml, /<footer class="home-footer">/);
+    assert.doesNotMatch(communityHtml, /href="\/community\/" aria-current="page"/);
     assert.match(communityHtml, /href="\/data\/cases\/"/);
     assert.match(communityHtml, /href="\/methodology\/"/);
+    assert.match(communityHtml, /href="\/data\/"/);
     assert.doesNotMatch(communityHtml, /<form\b|<input\b|<a[^>]*>[^<]*(?:Apply now|Join now|Register|Start reviewing|Sign in as reviewer)/i);
+    assert.doesNotMatch(communityHtml, /120\+|80\+|200\+|25\+ countries/i);
+    assert.doesNotMatch(communityHtml, /Discussion Forum|Case review|Working group|TutorEval v0\.2a dataset/i);
     assert.doesNotMatch(communityHtml, /https?:\/\/[^"<\s]*(?:railway|auth0|oidc|community-review)/i);
   } finally {
     await rm(outputDirectory, { recursive: true, force: true });
@@ -324,18 +339,22 @@ test("community page renders meaningful Chinese content and runtime locale data"
     );
 
     assert.match(communityHtml, /<html lang="zh-CN" data-ui-locale="zh-CN">/);
-    assert.match(communityHtml, /参与 TutorBench/);
-    assert.match(communityHtml, /当前暂未开放参与申请/);
-    assert.match(communityHtml, /公开 reviewer intake 尚未开放/);
-    assert.match(communityHtml, /真实 Community Review 尚未启动/);
-    assert.match(communityHtml, /P5 人工校准尚未开始/);
+    assert.match(communityHtml, /更强的评测系统/);
+    assert.match(communityHtml, /需要共同完成/);
+    assert.match(communityHtml, /参与申请暂未开放/);
+    assert.match(communityHtml, /公开 intake 尚未开放/);
+    assert.match(communityHtml, /真实 Community Review/);
+    assert.match(communityHtml, /P5 人工校准/);
     assert.match(communityHtml, /开放申请后预计会询问什么/);
     assert.match(communityHtml, /用于未来邀请的一个联系邮箱/);
     assert.match(communityHtml, /可选的相关经验概述/);
     assert.match(communityHtml, /没有申请表、候补名单或 reviewer 登录入口/);
+    assert.match(communityHtml, /Agreement|一致性/);
     assert.match(communityHtml, /data-ui-text="communityHeroTitle"/);
-    assert.match(communityHtml, /data-ui-text-en="Help improve TutorBench"/);
-    assert.match(communityHtml, /data-ui-text-zh-cn="参与 TutorBench"/);
+    assert.match(communityHtml, /data-ui-text-en="A stronger evaluation system"/);
+    assert.match(communityHtml, /data-ui-text-zh-cn="更强的评测系统"/);
+    assert.match(communityHtml, /href="\/assets\/community\.css"/);
+    assert.doesNotMatch(communityHtml, /120\+|80\+|200\+|25\+ countries/i);
   } finally {
     await rm(outputDirectory, { recursive: true, force: true });
   }
@@ -354,6 +373,10 @@ test("static website build prefixes project-site paths without changing local de
       join(outputDirectory, "data", "cases", "index.html"),
       "utf8",
     );
+    const communityHtml = await readFile(
+      join(outputDirectory, "community", "index.html"),
+      "utf8",
+    );
 
     assert.match(homeHtml, /href="\/tutorbench\/leaderboard\//);
     assert.match(homeHtml, /href="\/tutorbench\/assets\/styles\.css"/);
@@ -366,6 +389,9 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(casesHtml, /data-case-locale="zh-CN"/);
     assert.match(casesHtml, /English/);
     assert.match(casesHtml, /Chinese/);
+    assert.match(communityHtml, /href="\/tutorbench\/assets\/teachometry\.css"/);
+    assert.match(communityHtml, /href="\/tutorbench\/assets\/community\.css"/);
+    assert.doesNotMatch(communityHtml, /href="\/assets\/community\.css"/);
     assert.doesNotMatch(homeHtml, /(?:href|src)="\/(?:leaderboard|assets)\//);
     assert.doesNotMatch(homeHtml, /(?:href|src)="\/assets\/brand\/tutorbench\//);
   } finally {
