@@ -179,7 +179,7 @@ function renderHeader(
   locale: SiteLocale,
 ): string {
   const isCaseSurface = activeRoute === "/data/cases/" || activeRoute.startsWith("/data/cases/");
-  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || isCaseSurface) {
+  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/blog/" || isCaseSurface) {
     const links = [
       ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
       ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
@@ -257,6 +257,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const siteUrl = context.siteUrl?.replace(/\/$/, "");
   const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${page.route}`;
   const isCaseDetailRoute = page.route.startsWith("/data/cases/") && page.route !== "/data/cases/";
+  const isBlogIndex = page.route === "/blog/";
   const pageMarkup = `<!doctype html>
 <html lang="${escapeHtml(locale)}" data-ui-locale="${escapeHtml(locale)}">
   <head>
@@ -272,20 +273,21 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="icon" type="image/png" sizes="32x32" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-32.png"))}">
     <link rel="icon" type="image/png" sizes="16x16" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-16.png"))}">
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
-    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogIndex) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
     ${page.route === "/data/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/benchmark.css"))}">` : ""}
     ${page.route === "/methodology/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/methodology.css"))}">` : ""}
     ${page.route === "/leaderboard/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/results.css"))}">` : ""}
     ${page.route === "/data/cases/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/cases.css"))}">` : ""}
     ${isCaseDetailRoute ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/case-detail.css"))}">` : ""}
     ${page.route === "/about/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/about.css"))}">` : ""}
+    ${isBlogIndex ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
-  <body${page.route === "/" ? ' class="home-page"' : page.route === "/data/" ? ' class="home-page benchmark-page"' : page.route === "/methodology/" ? ' class="methodology-page"' : page.route === "/leaderboard/" ? ' class="results-page"' : page.route === "/about/" ? ' class="about-page"' : page.route === "/data/cases/" ? ' class="cases-page"' : isCaseDetailRoute ? ' class="case-detail-page"' : ""}>
+  <body${page.route === "/" ? ' class="home-page"' : page.route === "/data/" ? ' class="home-page benchmark-page"' : page.route === "/methodology/" ? ' class="methodology-page"' : page.route === "/leaderboard/" ? ' class="results-page"' : page.route === "/about/" ? ' class="about-page"' : page.route === "/data/cases/" ? ' class="cases-page"' : isCaseDetailRoute ? ' class="case-detail-page"' : isBlogIndex ? ' class="blog-page"' : ""}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     ${renderHeader(page.route, basePath, locale)}
     <main id="main-content">${page.content}</main>
-    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute) ? "" : renderFooter(context.benchmark ?? ({
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogIndex) ? "" : renderFooter(context.benchmark ?? ({
       statusLabel: "Developer Preview",
       dataset: { id: TUTOR_EVAL_DATASET_ID, version: TUTOR_EVAL_DATASET_VERSION },
     }), locale)}
