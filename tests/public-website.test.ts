@@ -251,8 +251,18 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(runHtml, /Default request timeout is 30 seconds/);
     assert.match(runHtml, /Product Tutor and canonical model collection are different paths/);
     assert.match(runHtml, /OpenAI Responses and DeepSeek Chat Completions are explicit Judge paths/);
+    assert.match(runHtml, /npm run tutor:export-execution -- -- --case fraction-misconception-001/);
+    assert.match(runHtml, /npm run tutor:export-cases/);
+    assert.match(runHtml, /npm run tutor:corpus:validate -- -- --corpus path\/to\/corpus\.json/);
+    assert.match(runHtml, /npm run benchmark:corpus -- -- --corpus path\/to\/corpus\.json/);
+    assert.match(runHtml, /npm run judge:openai -- -- --dry-run/);
+    assert.match(runHtml, /--judge-deepseek/);
+    assert.match(runHtml, /baseline-native-default/);
+    assert.match(runHtml, /Controlled optional generation parameters: none/);
+    assert.match(runHtml, /provider-native behavior is not misrepresented as identical across vendors/);
     assert.match(runHtml, /Calibrated public model results/);
     assert.match(runHtml, /Official leaderboard rankings/);
+    assert.doesNotMatch(runHtml, /Large-scale batch evaluation/);
     assert.match(runHtml, /Reproducibility checklist/);
     assert.match(runHtml, /Dataset version/);
     assert.match(runHtml, /Same cases\.<br>Different Tutors\.<br><em>Comparable evidence\.<\/em>/);
