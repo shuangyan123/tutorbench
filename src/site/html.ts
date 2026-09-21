@@ -182,7 +182,7 @@ function renderHeader(
   const isBlogPage = activeRoute.startsWith("/blog/");
   const isModelsPage = activeRoute === "/models/" || activeRoute === "/models/[modelId]/";
   const isExplorerPage = activeRoute === "/data/heatmap/" || activeRoute === "/data/trials/" || activeRoute === "/data/trials/[trialId]/";
-  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/community/" || activeRoute === "/run/" || isBlogPage || isCaseSurface || isModelsPage || isExplorerPage) {
+  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/community/" || activeRoute === "/run/" || activeRoute === "/docs/" || isBlogPage || isCaseSurface || isModelsPage || isExplorerPage) {
     const links = [
       ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
       ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
@@ -268,9 +268,9 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const isTrialsPage = page.route === "/data/trials/";
   const isTrialDetailRoute = page.route === "/data/trials/[trialId]/";
   const isExplorerPage = isHeatmapPage || isTrialsPage || isTrialDetailRoute;
-  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
+  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
   const usesHomeStyles = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
-  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
+  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
   const bodyClass = page.route === "/"
     ? ' class="home-page"'
     : page.route === "/data/"
@@ -285,7 +285,9 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
               ? ' class="about-page community-page"'
               : page.route === "/run/"
                 ? ' class="run-page"'
-                : page.route === "/models/"
+                : page.route === "/docs/"
+                  ? ' class="docs-page"'
+                  : page.route === "/models/"
                   ? ' class="models-page"'
                     : isModelDetailRoute
                       ? ' class="model-detail-page"'
@@ -328,6 +330,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${isModelsPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/models.css"))}">` : ""}
     ${page.route === "/community/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/community.css"))}">` : ""}
     ${page.route === "/run/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/run.css"))}">` : ""}
+    ${page.route === "/docs/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/docs.css"))}">` : ""}
     ${isBlogPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     ${isExplorerPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/explorers.css"))}">` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>

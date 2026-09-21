@@ -302,7 +302,7 @@
 })();
 
 (() => {
-  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.about-page') || document.querySelector('.models-page') || document.querySelector('.model-detail-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page') || document.querySelector('.blog-page') || document.querySelector('.run-page');
+  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.about-page') || document.querySelector('.models-page') || document.querySelector('.model-detail-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page') || document.querySelector('.blog-page') || document.querySelector('.run-page') || document.querySelector('.docs-page');
   if (!(themedPage instanceof HTMLElement)) return;
 
   const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -410,6 +410,53 @@
       section.classList.add('reveal-ready'); observer.observe(section);
     });
   }
+})();
+
+(() => {
+  const docsPage = document.querySelector('.docs-page');
+  if (!(docsPage instanceof HTMLElement)) return;
+
+  const searchField = docsPage.querySelector('[data-doc-search]');
+  const clearButton = docsPage.querySelector('[data-doc-search-clear]');
+  const filterButtons = Array.from(docsPage.querySelectorAll('[data-doc-category]')).filter((element) => element instanceof HTMLButtonElement);
+  const entries = Array.from(docsPage.querySelectorAll('[data-doc-entry]')).filter((element) => element instanceof HTMLElement);
+  const status = docsPage.querySelector('[data-doc-status]');
+  const emptyState = docsPage.querySelector('[data-doc-empty]');
+  if (!(searchField instanceof HTMLInputElement)) return;
+
+  let activeCategory = 'all';
+
+  function update() {
+    const query = searchField.value.trim().toLowerCase();
+    let visibleCount = 0;
+    entries.forEach((entry) => {
+      const matchesCategory = activeCategory === 'all' || entry.getAttribute('data-doc-category') === activeCategory;
+      const matchesSearch = query.length === 0 || (entry.getAttribute('data-doc-search') ?? '').toLowerCase().includes(query);
+      const visible = matchesCategory && matchesSearch;
+      entry.hidden = !visible;
+      if (visible) visibleCount += 1;
+    });
+    if (status instanceof HTMLElement) {
+      status.textContent = visibleCount === entries.length && activeCategory === 'all' && query.length === 0
+        ? `Showing ${entries.length} references`
+        : `Showing ${visibleCount} of ${entries.length} references`;
+    }
+    if (emptyState instanceof HTMLElement) emptyState.hidden = visibleCount !== 0;
+    if (clearButton instanceof HTMLButtonElement) clearButton.hidden = query.length === 0;
+  }
+
+  filterButtons.forEach((button) => button.addEventListener('click', () => {
+    activeCategory = button.getAttribute('data-doc-category') ?? 'all';
+    filterButtons.forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate === button)));
+    update();
+  }));
+  searchField.addEventListener('input', update);
+  if (clearButton instanceof HTMLButtonElement) clearButton.addEventListener('click', () => {
+    searchField.value = '';
+    update();
+    searchField.focus();
+  });
+  update();
 })();
 
 (() => {
