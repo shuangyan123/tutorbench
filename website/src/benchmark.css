@@ -1,5 +1,4 @@
 /* Benchmark only: composition follows the supplied reference, using Home's tokens. */
-.benchmark-page .shell { width: 86%; }
 .benchmark-hero { padding: 34px 0 48px; }
 .benchmark-hero-grid { display: grid; grid-template-columns: 1fr 1.08fr; gap: 4%; align-items: center; }
 .benchmark-thesis h1 { font: clamp(38px, 4.4vw, 64px)/1.02 var(--serif); letter-spacing: -.045em; margin: 16px 0 24px; }
@@ -12,7 +11,6 @@
 .benchmark-snapshot { padding: 26px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); min-width: 0; }
 .benchmark-snapshot-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .benchmark-snapshot-heading span { font-size: 10px; color: var(--muted); }
-.benchmark-page .eyebrow { font-size: 10px; letter-spacing: .15em; }
 .benchmark-facts { display: grid; grid-template-columns: repeat(4, 1fr); margin: 24px 0; }
 .benchmark-facts>div { display: flex; flex-direction: column; padding: 0 14px; border-right: 1px solid var(--line); }
 .benchmark-facts>div:first-child { padding-left: 0; }
@@ -72,11 +70,10 @@
 .benchmark-open p:not(.eyebrow) { font-size: 13px; color: var(--muted); max-width: 620px; margin: 0; }
 .benchmark-open-links { display: grid; gap: 10px; }
 .benchmark-open-links .button { font-size: 11px; }
-@media (max-width: 1100px) { .benchmark-page .shell { width: 90%; } .benchmark-distribution-body { grid-template-columns: 1fr; } .benchmark-total { display: flex; gap: 10px; align-items: baseline; } .benchmark-section-intro h2 { font-size: 34px; } .benchmark-thesis .button { font-size: 14px; } }
+@media (max-width: 1100px) { .benchmark-distribution-body { grid-template-columns: 1fr; } .benchmark-total { display: flex; gap: 10px; align-items: baseline; } .benchmark-section-intro h2 { font-size: 34px; } .benchmark-thesis .button { font-size: 14px; } }
 @media (max-width: 800px) { .benchmark-hero-grid { grid-template-columns: 1fr; gap: 30px; } .benchmark-thesis h1 { font-size: 48px; } .benchmark-explore-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } .benchmark-explore-grid>.benchmark-section-intro { grid-column: 1/-1; } .benchmark-coverage-grid { grid-template-columns: 1fr; gap: 25px; } .benchmark-entry { padding: 20px 16px; } .benchmark-open { grid-template-columns: auto 1fr; } .benchmark-open-links { grid-column: 2; } }
 @media (max-width: 540px) { .benchmark-hero { padding-top: 20px; } .benchmark-thesis h1 { font-size: 42px; } .benchmark-snapshot { padding: 18px; } .benchmark-facts { grid-template-columns: repeat(2,1fr); gap: 20px; } .benchmark-facts>div { padding: 0; border: 0; } .benchmark-facts dd { font-size: 34px; } .benchmark-explore-grid,.benchmark-coverage-cards { grid-template-columns: 1fr; } .benchmark-entry { padding: 24px; } .benchmark-entry-icon { margin-bottom: 18px; } .benchmark-open { grid-template-columns: 1fr; padding: 24px; } .benchmark-open-links { grid-column: auto; } .benchmark-distribution-body { grid-template-columns: 65px 1fr; } .benchmark-total { display: block; } .benchmark-principles { gap: 12px; } }
 
 .benchmark-page .benchmark-thesis h1 em { font-style: italic; }
-.benchmark-page .home-header .nav-links { gap: clamp(10px, 1.6vw, 24px); }
-.benchmark-page .locale-switcher select { max-width: 95px; font-size: 11px; }
+.benchmark-page .locale-switcher select { max-width: 95px; }
 @media (max-width: 540px) { .benchmark-lede { font-size: 18px; } }

@@ -1,9 +1,10 @@
 /*
  * Teachometry visual system
  *
- * This layer is loaded last on the redesigned public surfaces. It owns the
- * shared chrome, outer shell, common controls, and brand tokens; page CSS
- * remains responsible for each surface's composition and semantic accents.
+ * This layer is loaded before page composition styles on the redesigned public
+ * surfaces. It owns the shared chrome, outer shell, common controls, and brand
+ * tokens; page CSS remains responsible for each surface's composition and
+ * semantic accents.
  */
 :root {
   --teach-bg-light: #f8faf7;
@@ -137,6 +138,8 @@ body.case-detail-page {
   --case-accent: var(--teach-accent-light);
   --case-accent-strong: var(--teach-accent-strong-light);
   --case-accent-soft: var(--teach-accent-soft-light);
+  --case-serif: var(--teach-serif);
+  --case-shell: var(--teach-shell-wide);
 }
 
 body.case-detail-page[data-theme="dark"] {
@@ -555,6 +558,31 @@ body:is(
   text-transform: uppercase;
 }
 
+:where(
+  .home-page,
+  .methodology-page,
+  .results-page,
+  .cases-page,
+  .about-page,
+  .blog-page
+) .site-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+
+/* These pages intentionally keep the approved compact 19px content-icon
+ * baseline; the variant lives here so page sheets do not repeat the primitive. */
+:is(
+  .methodology-page,
+  .cases-page,
+  .about-page
+) .site-icon {
+  width: 19px;
+  height: 19px;
+}
+
 body:is(
   .home-page,
   .methodology-page,
@@ -569,6 +597,7 @@ body:is(
   padding: 10px 16px;
   font: 13px/1.4 var(--teach-sans);
   gap: 10px;
+  white-space: nowrap;
 }
 
 body:is(
@@ -847,6 +876,17 @@ body:is(
   padding: 8px 16px;
   font: 11px/1.4 var(--teach-sans);
   gap: 10px;
+}
+
+/* These surfaces intentionally retain the approved narrow-screen CTA wrap;
+ * the home/benchmark/method/results CTAs remain single-line. */
+body:is(
+  .cases-page,
+  .case-detail-page,
+  .about-page,
+  .blog-page
+) .home-footer .button {
+  white-space: normal;
 }
 
 body:is(

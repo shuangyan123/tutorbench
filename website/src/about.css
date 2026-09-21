@@ -1,38 +1,10 @@
 /* Teachometry About: editorial, fact-bound, and intentionally separate from data surfaces. */
 
 .about-page {
-  --bg: #fbfcf8;
-  --surface: #ffffff;
-  --surface-muted: #eef6f2;
-  --ink: #163b58;
-  --muted: #56718a;
-  --line: #d5e4df;
-  --line-strong: #9dbdb8;
-  --accent: #086965;
-  --accent-strong: #07524f;
-  --accent-soft: #e1f2eb;
-  --serif: Georgia, "Times New Roman", serif;
-  --about-shell: 1248px;
   --about-botanical: #6fb7a7;
-  color-scheme: light;
   position: relative;
   isolation: isolate;
   overflow-x: hidden;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: Arial, "Segoe UI", sans-serif;
-}
-
-.about-page .shell {
-  width: min(calc(100% - 120px), var(--about-shell));
-  max-width: var(--about-shell);
-}
-
-.about-page .site-icon {
-  width: 19px;
-  height: 19px;
-  flex: 0 0 auto;
-  vertical-align: middle;
 }
 
 .about-page [hidden] {
@@ -52,13 +24,6 @@
   color: var(--muted);
 }
 
-.about-page .eyebrow {
-  color: var(--accent);
-  font: 600 10px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
 .about-page .text-link {
   display: inline-flex;
   align-items: center;
@@ -74,68 +39,22 @@
   text-underline-offset: 4px;
 }
 
+.about-page .button-secondary {
+  background: transparent;
+  color: var(--accent-strong);
+}
+
+.about-page .button-secondary:hover {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
 .about-page .button-row {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
   flex-wrap: wrap;
-}
-
-.about-page .button {
-  min-height: 44px;
-  border-radius: 4px;
-  padding: 10px 16px;
-  font: 14px/1.4 Arial, "Segoe UI", sans-serif;
-  letter-spacing: 0;
-  gap: 10px;
-}
-
-.about-page .button-primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #ffffff;
-}
-
-.about-page .button-primary:hover {
-  border-color: var(--accent-strong);
-  background: var(--accent-strong);
-  color: #ffffff;
-}
-
-.about-page .button-secondary {
-  border-color: var(--line-strong);
-  background: transparent;
-  color: var(--accent-strong);
-}
-
-.about-page .button-secondary:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent-strong);
-}
-
-.about-page .home-header {
-  background: color-mix(in srgb, var(--bg) 94%, transparent);
-}
-
-.about-page .home-header .header-inner {
-  width: min(calc(100% - 120px), var(--about-shell));
-  max-width: var(--about-shell);
-}
-
-.about-page .home-header .wordmark,
-.about-page .home-header .nav-links a,
-.about-page .home-header .github-link {
-  color: var(--ink);
-}
-
-.about-page .home-header .nav-links a[aria-current="page"] {
-  color: var(--accent);
-}
-
-.about-page .home-header .button-primary {
-  color: #ffffff;
 }
 
 .about-hero {
@@ -799,37 +718,8 @@
   font: 11px/1.3 Arial, "Segoe UI", sans-serif;
 }
 
-.about-page .home-footer {
-  border-top: 0;
-  background: var(--surface);
-}
-
-.about-page .home-footer .home-footer-brand,
-.about-page .home-footer .github-link {
-  color: var(--accent);
-}
-
-.about-page .home-footer .button-primary {
-  background: var(--accent);
-}
-
-.about-page .home-footer .button-primary:hover {
-  background: var(--accent-strong);
-}
-
 .about-page[data-theme="dark"] {
-  --bg: #102421;
-  --surface: #17332f;
-  --surface-muted: #203e38;
-  --ink: #edf7f0;
-  --muted: #b6cec5;
-  --line: #35564d;
-  --line-strong: #5c897b;
-  --accent: #a3dfca;
-  --accent-strong: #b9ebd8;
-  --accent-soft: #20493f;
   --about-botanical: #83c9b2;
-  color-scheme: dark;
 }
 
 .about-page[data-theme="dark"] .about-hero,
@@ -858,11 +748,6 @@
   background: var(--surface-muted);
 }
 
-.about-page[data-theme="dark"] .about-page .home-footer,
-.about-page[data-theme="dark"] .home-footer {
-  background: var(--surface);
-}
-
 .about-page[data-theme="dark"] .about-hero h1 em,
 .about-page[data-theme="dark"] .about-pull-quote,
 .about-page[data-theme="dark"] .about-boundary-copy code {
@@ -870,11 +755,6 @@
 }
 
 @media (max-width: 1150px) {
-  .about-page .shell,
-  .about-page .home-header .header-inner {
-    width: min(calc(100% - 80px), var(--about-shell));
-  }
-
   .about-hero-grid {
     grid-template-columns: minmax(0, 1fr) minmax(300px, 0.83fr);
     gap: 38px;
@@ -974,11 +854,6 @@
 }
 
 @media (max-width: 700px) {
-  .about-page .shell,
-  .about-page .home-header .header-inner {
-    width: calc(100% - 36px);
-  }
-
   .about-hero-grid {
     min-height: 0;
     padding: 36px 0 26px;

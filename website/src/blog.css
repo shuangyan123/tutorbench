@@ -1,62 +1,11 @@
 /* Teachometry Blog: an editorial journal surface, separate from the benchmark UI. */
 .blog-page {
-  --bg: #fbfcf8;
-  --surface: #ffffff;
-  --surface-muted: #edf6f2;
-  --ink: #123a5b;
-  --muted: #5b7490;
-  --line: #d8e6e1;
-  --line-strong: #a6c3bd;
-  --accent: #086965;
-  --accent-strong: #07534f;
-  --accent-soft: #e0f1eb;
   --blog-dark: #0d3532;
   --blog-dark-ink: #f2faf5;
   --blog-dark-muted: #c1d9d0;
-  --serif: Georgia, "Times New Roman", serif;
-  --blog-shell: 1248px;
   position: relative;
   isolation: isolate;
   overflow-x: hidden;
-  background: var(--bg);
-  color: var(--ink);
-  color-scheme: light;
-  font-family: Arial, "Segoe UI", sans-serif;
-}
-
-.blog-page .shell {
-  width: min(calc(100% - 72px), var(--blog-shell));
-  max-width: var(--blog-shell);
-}
-
-.blog-page .home-header {
-  background: color-mix(in srgb, var(--bg) 95%, transparent);
-}
-
-.blog-page .home-header .header-inner {
-  width: min(calc(100% - 72px), var(--blog-shell));
-  max-width: var(--blog-shell);
-}
-
-.blog-page .home-header .wordmark,
-.blog-page .home-header .nav-links a,
-.blog-page .home-header .github-link {
-  color: var(--ink);
-}
-
-.blog-page .home-header .nav-links a[aria-current="page"] {
-  color: var(--accent);
-}
-
-.blog-page .home-header .button-primary {
-  color: #ffffff;
-}
-
-.blog-page .site-icon {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 auto;
-  vertical-align: middle;
 }
 
 .blog-page h1,
@@ -72,42 +21,12 @@
   color: var(--muted);
 }
 
-.blog-page .eyebrow {
-  color: var(--accent);
-  font: 600 10px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.blog-page .button {
-  width: auto;
-  min-height: 44px;
-  border-radius: 4px;
-  padding: 10px 16px;
-  font: 14px/1.4 Arial, "Segoe UI", sans-serif;
-  gap: 10px;
-}
-
-.blog-page .button-primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #ffffff;
-}
-
-.blog-page .button-primary:hover {
-  border-color: var(--accent-strong);
-  background: var(--accent-strong);
-  color: #ffffff;
-}
-
 .blog-page .button-secondary {
-  border-color: var(--line-strong);
   background: transparent;
   color: var(--accent-strong);
 }
 
 .blog-page .button-secondary:hover {
-  border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent-strong);
 }
@@ -635,40 +554,10 @@
   color: #b4e6d6;
 }
 
-.blog-page .home-footer {
-  border-top: 1px solid var(--line);
-  background: var(--surface);
-}
-
-.blog-page .home-footer-brand,
-.blog-page .home-footer .github-link {
-  color: var(--accent);
-}
-
-.blog-page .home-footer .button-primary {
-  background: var(--accent);
-  color: #ffffff;
-}
-
-.blog-page .home-footer .button-primary:hover {
-  background: var(--accent-strong);
-}
-
 .blog-page[data-theme="dark"] {
-  --bg: #102421;
-  --surface: #18322e;
-  --surface-muted: #203d37;
-  --ink: #eff7f0;
-  --muted: #b7ccc6;
-  --line: #35544c;
-  --line-strong: #5b8075;
-  --accent: #afe0cf;
-  --accent-strong: #d0f1e5;
-  --accent-soft: #254a40;
   --blog-dark: #0b1b18;
   --blog-dark-ink: #f1faf5;
   --blog-dark-muted: #c1d8cf;
-  color-scheme: dark;
 }
 
 .blog-page[data-theme="dark"] .blog-botanical {
@@ -710,11 +599,6 @@
 }
 
 @media (max-width: 900px) {
-  .blog-page .shell,
-  .blog-page .home-header .header-inner {
-    width: calc(100% - 48px);
-  }
-
   .blog-hero-grid {
     grid-template-columns: 1fr;
     gap: 18px;
@@ -755,15 +639,6 @@
 }
 
 @media (max-width: 600px) {
-  .blog-page .shell,
-  .blog-page .home-header .header-inner {
-    width: calc(100% - 36px);
-  }
-
-  .blog-page .home-header .nav-links {
-    width: 100%;
-  }
-
   .blog-hero-grid {
     min-height: 0;
     padding: 35px 0 24px;
@@ -922,9 +797,6 @@
     gap: 14px;
   }
 
-  .blog-page .home-footer {
-    padding-top: 25px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -942,7 +814,6 @@
   --article-heading: #0a3b5d;
   --article-soft: #edf6f2;
   --article-idea-bg: #f0f7f3;
-  --article-shell: 1248px;
 }
 
 .blog-article-page .blog-article {
@@ -1183,7 +1054,7 @@
   scroll-margin-top: 112px;
 }
 
-.blog-article-page .article-content p {
+.blog-article-page .article-content p:not(.eyebrow) {
   margin: 0;
   color: var(--article-body);
   font: 17px/1.68 var(--serif);
@@ -1403,11 +1274,6 @@
   font-size: 13px;
 }
 
-.blog-article-page .home-footer {
-  border-top: 1px solid var(--line);
-  background: var(--surface);
-}
-
 .blog-article-page[data-theme="dark"] {
   --article-body: #bfd2ca;
   --article-heading: #f1f8f3;
@@ -1555,7 +1421,7 @@
     scroll-margin-top: 92px;
   }
 
-  .blog-article-page .article-content p {
+  .blog-article-page .article-content p:not(.eyebrow) {
     font-size: 16px;
     line-height: 1.65;
   }
