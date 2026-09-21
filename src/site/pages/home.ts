@@ -2,7 +2,7 @@ import type { PublicBenchmarkArtifacts, TutorEvalPublicCase } from "../../datase
 import { TUTOR_EVAL_EVALUATOR_VERSION } from "../../contracts/index.js";
 import { escapeHtml as e, humanize, SITE_GITHUB_URL, type SitePage } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
-import { renderTeachingAndSupervisionPage, renderWhyTeachingDoesNotScalePage } from "./blog.js";
+import { BLOG_POSTS } from "./blog.js";
 
 const dimensions = [
   ["diagnosis", "Diagnosis", "Whether it identifies the learner’s actual error, gap, or reasoning issue.", "Understands learner thinking"],
@@ -78,20 +78,12 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts): SitePage {
   };
 }
 
-// 复用已发布页面的编辑内容；第三栏是明确标注的索引，不虚构第三篇文章。
+// 第三栏是明确标注的索引，不虚构第三篇文章；文章卡片使用集中维护的真实元数据。
 function renderHomeBlog(): string {
-  const posts = [
-    [renderWhyTeachingDoesNotScalePage(), "home-blog-01.webp"],
-    [renderTeachingAndSupervisionPage(), "home-blog-02.webp"],
-  ] as const;
+  const posts = BLOG_POSTS;
   return `<section class="home-blog" aria-labelledby="home-blog-title">${renderFoliage(["left-mid", "right-near"])}<div class="shell">
     <div class="home-blog-heading"><div><h2 id="home-blog-title">Latest from the Blog</h2><p>Updates, insights, and research perspectives from Teachometry.</p></div><a href="/blog/">View all posts ${icon("arrow")}</a></div>
-    <div class="home-blog-grid">${posts.map(([post, image]) => {
-      const title = post.content.match(/<h1>(.*?)<\/h1>/)?.[1] ?? e(post.title);
-      const metadata = post.content.match(/<p class="eyebrow">(.*?)<\/p>/)?.[1] ?? "Perspective";
-      const excerpt = (post.content.match(/<p class="lede">(.*?)<\/p>/)?.[1] ?? e(post.description)).split(/(?<=\.) /)[0];
-      return `<article class="home-blog-card"><a href="${e(post.route)}"><img src="/assets/${image}" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">${metadata}</p><h3>${title}</h3><p>${excerpt}</p></div></a></article>`;
-    }).join("")}
+    <div class="home-blog-grid">${posts.map((post) => `<article class="home-blog-card"><a href="${e(post.route)}"><img src="/assets/${e(post.image)}" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">${e(post.category)} · ${e(post.publishedDate)}</p><h3>${e(post.title)}</h3><p>${e(post.excerpt)}</p></div></a></article>`).join("")}
     <aside class="home-blog-card home-blog-index"><a href="/blog/"><img src="/assets/home-blog-03.webp" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">Explore the journal · Blog index</p><h3>Ideas that should become testable questions.</h3><p>Long-form notes on AI teaching, measurement, and the future structure of education.</p></div></a></aside></div>
   </div></section>`;
 }

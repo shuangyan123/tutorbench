@@ -53,6 +53,7 @@ import {
   renderRunPage,
 } from "../site/pages/developer.js";
 import { renderCommunityPage } from "../site/pages/community.js";
+import { renderTeachometryFooter } from "../site/pages/home.js";
 import {
   renderBlogIndexPage,
   renderTeachingAndSupervisionPage,
@@ -271,6 +272,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "cases.css"), join(outputDirectory, "assets", "cases.css"));
   await copyFile(join(websiteRoot, "src", "case-detail.css"), join(outputDirectory, "assets", "case-detail.css"));
   await copyFile(join(websiteRoot, "src", "about.css"), join(outputDirectory, "assets", "about.css"));
+  await copyFile(join(websiteRoot, "src", "blog.css"), join(outputDirectory, "assets", "blog.css"));
   for (const name of ["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
     await copyFile(join(websiteRoot, "src", "images", `${name}.webp`), join(outputDirectory, "assets", `${name}.webp`));
   }
@@ -293,7 +295,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   }
 
   const blogPages = [
-    renderBlogIndexPage(),
+    renderBlogIndexPage(renderTeachometryFooter(artifacts)),
     renderWhyTeachingDoesNotScalePage(),
     renderTeachingAndSupervisionPage(),
   ];

@@ -5,7 +5,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { buildWebsite } from "../src/cli/website-build.js";
+import { renderPage } from "../src/site/html.js";
 import {
+  BLOG_POSTS,
   renderBlogIndexPage,
   renderTeachingAndSupervisionPage,
   renderWhyTeachingDoesNotScalePage,
@@ -26,6 +28,22 @@ test("Teachometry blog renderers keep hypotheses separate from benchmark claims"
   assert.match(supervision.content, /Human authority; machine execution/);
   assert.match(supervision.content, /A research program, not a prediction/);
   assert.doesNotMatch(supervision.content, /90%.*will|will.*90%/i);
+});
+
+test("the Blog index exposes only explicit published metadata and base-path-safe links", () => {
+  assert.equal(BLOG_POSTS.length, 2);
+  assert.deepEqual(BLOG_POSTS.map((post) => post.route), [
+    "/blog/why-teaching-does-not-scale/",
+    "/blog/teaching-and-supervision-are-different-jobs/",
+  ]);
+  assert.ok(BLOG_POSTS.every((post) => post.publishedDate === "September 17, 2026"));
+
+  const html = renderPage(renderBlogIndexPage(), { basePath: "/preview" });
+  assert.match(html, /href="\/preview\/assets\/blog\.css"/);
+  assert.match(html, /src="\/preview\/assets\/home-blog-01\.webp"/);
+  assert.match(html, /href="\/preview\/blog\/why-teaching-does-not-scale\/"/);
+  assert.match(html, /href="\/preview\/methodology\/"/);
+  assert.doesNotMatch(html, /Beyond Correct Answers|Measuring What Matters|RSS feed|Subscribe|Topics/);
 });
 
 test("website build publishes the Teachometry blog index and essays", async () => {
