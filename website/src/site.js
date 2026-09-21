@@ -1,4 +1,4 @@
-/* global HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLSelectElement, HTMLElement, URLSearchParams, document, history, window */
+/* global HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLSelectElement, HTMLElement, URLSearchParams, document, history, navigator, window */
 
 (() => {
   const navToggle = document.querySelector(".nav-toggle");
@@ -302,7 +302,7 @@
 })();
 
 (() => {
-  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.about-page') || document.querySelector('.models-page') || document.querySelector('.model-detail-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page') || document.querySelector('.blog-page');
+  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.about-page') || document.querySelector('.models-page') || document.querySelector('.model-detail-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page') || document.querySelector('.blog-page') || document.querySelector('.run-page');
   if (!(themedPage instanceof HTMLElement)) return;
 
   const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -410,4 +410,75 @@
       section.classList.add('reveal-ready'); observer.observe(section);
     });
   }
+})();
+
+(() => {
+  const runConsole = document.querySelector('.run-console');
+  if (!(runConsole instanceof HTMLElement)) return;
+
+  const tabs = Array.from(runConsole.querySelectorAll('[data-run-tab]')).filter((element) => element instanceof HTMLButtonElement);
+  const panels = Array.from(runConsole.querySelectorAll('[data-run-panel]')).filter((element) => element instanceof HTMLElement);
+
+  function selectTab(id, focus = false) {
+    tabs.forEach((tab) => {
+      const active = tab.dataset.runTab === id;
+      tab.setAttribute('aria-selected', String(active));
+      tab.tabIndex = active ? 0 : -1;
+      if (active && focus) tab.focus();
+    });
+    panels.forEach((panel) => { panel.hidden = panel.dataset.runPanel !== id; });
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectTab(tab.dataset.runTab ?? 'quickstart'));
+    tab.addEventListener('keydown', (event) => {
+      const next = event.key === 'ArrowRight' ? (index + 1) % tabs.length
+        : event.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length
+          : event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : null;
+      if (next !== null) {
+        event.preventDefault();
+        selectTab(tabs[next].dataset.runTab ?? 'quickstart', true);
+      }
+    });
+  });
+
+  async function copyPanelCommand(button) {
+    const panel = button.closest('[data-run-panel]');
+    const code = panel?.querySelector('code');
+    if (!(code instanceof HTMLElement)) return;
+    const value = code.textContent ?? '';
+    let copied = false;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+        copied = true;
+      }
+    } catch {
+      copied = false;
+    }
+    if (!copied) {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      try {
+        copied = document.execCommand('copy');
+      } catch {
+        copied = false;
+      }
+      selection?.removeAllRanges();
+    }
+    const label = button.querySelector('[data-copy-label]');
+    if (label instanceof HTMLElement) label.textContent = copied ? 'Copied' : 'Copy failed';
+    button.setAttribute('aria-label', copied ? 'Command copied' : 'Copy failed');
+    window.setTimeout(() => {
+      if (label instanceof HTMLElement) label.textContent = 'Copy';
+      button.setAttribute('aria-label', 'Copy active command');
+    }, 1800);
+  }
+
+  runConsole.querySelectorAll('[data-copy-run]').forEach((element) => {
+    if (element instanceof HTMLButtonElement) element.addEventListener('click', () => { void copyPanelCommand(element); });
+  });
 })();

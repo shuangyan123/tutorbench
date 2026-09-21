@@ -17,6 +17,7 @@ import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/cont
 import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
 import { renderHomePage } from "../src/site/pages/home.js";
 import { renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
+import { renderRunPage } from "../src/site/pages/developer.js";
 
 test("homepage derives facts and escapes case content without inventing model results", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
@@ -178,6 +179,7 @@ test("models registry and reserved detail route remain evidence-bound", async ()
 test("static website build emits the public artifact files and route shell", async () => {
   const outputDirectory = await mkdtemp(join(tmpdir(), "tutor-benchmark-website-"));
   try {
+    const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
     const routeCount = await buildWebsite({ outputDirectory });
     const casesJson = await readFile(join(outputDirectory, "public-data", "cases.json"), "utf8");
     const homeHtml = await readFile(join(outputDirectory, "index.html"), "utf8");
@@ -271,16 +273,56 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(runHtml, /tutor:export-execution/);
     assert.match(runHtml, /TutorExecutionPacket/);
     assert.match(runHtml, /baseline-native-default/);
-    assert.match(runHtml, /Run the provider-free demo/);
+    assert.match(runHtml, /Get started \(provider-free\)/);
+    assert.match(runHtml, /<body class="run-page">/);
+    assert.match(runHtml, /<header class="site-header home-header">/);
+    assert.match(runHtml, /<footer class="home-footer">/);
+    assert.doesNotMatch(runHtml, /href="\/assets\/home\.css"/);
+    assert.match(runHtml, /href="\/assets\/teachometry\.css"/);
+    assert.match(runHtml, /href="\/assets\/run\.css"/);
+    assert.match(runHtml, /From research<br>questions to<br><em>reproducible runs\.<\/em>/);
+    assert.match(runHtml, /Run TutorBench locally, generate reproducible evidence/);
+    assert.equal((runHtml.match(/data-run-tab="/g) ?? []).length, 4);
+    assert.equal((runHtml.match(/data-copy-run/g) ?? []).length, 4);
+    for (const tab of ["quickstart", "benchmark", "external-tutor", "advanced"]) {
+      assert.match(runHtml, new RegExp(`data-run-tab="${tab}"`));
+      assert.match(runHtml, new RegExp(`data-run-panel="${tab}"`));
+    }
+    assert.match(runHtml, /git clone https:\/\/github\.com\/shuangyan123\/tutorbench\.git/);
+    assert.match(runHtml, /npm ci/);
     assert.match(runHtml, /npm run quickstart/);
+    assert.match(runHtml, /npm install tutor-benchmark/);
+    assert.match(runHtml, /tutorbench quickstart/);
     assert.match(runHtml, /tutor-eval-v0\.1@0\.1/);
-    assert.match(runHtml, /Full benchmark/);
-    assert.match(runHtml, /Leaderboard.*Not eligible/s);
+    assert.match(runHtml, /No Judge, no network connection/);
+    assert.match(runHtml, /no official score/);
+    assert.match(runHtml, /python examples\/http-python-tutor\/server\.py/);
+    assert.match(runHtml, /tutorbench run --http http:\/\/127\.0\.0\.1:8000\/respond --limit 3/);
+    assert.match(runHtml, /Default request timeout is 30 seconds/);
+    assert.match(runHtml, /Product Tutor and canonical model collection are different paths/);
+    assert.match(runHtml, /OpenAI Responses and DeepSeek Chat Completions are explicit Judge paths/);
+    assert.match(runHtml, /npm run tutor:export-execution -- -- --case fraction-misconception-001/);
+    assert.match(runHtml, /npm run tutor:export-cases/);
+    assert.match(runHtml, /npm run tutor:corpus:validate -- -- --corpus path\/to\/corpus\.json/);
+    assert.match(runHtml, /npm run benchmark:corpus -- -- --corpus path\/to\/corpus\.json/);
+    assert.match(runHtml, /npm run judge:openai -- -- --dry-run/);
+    assert.match(runHtml, /--judge-deepseek/);
+    assert.match(runHtml, /baseline-native-default/);
     assert.match(runHtml, /Controlled optional generation parameters: none/);
-    assert.match(runHtml, /Use any language/);
-    assert.match(runHtml, /tutorbench run/);
-    assert.match(runHtml, /Real-model evidence/);
-    assert.match(runHtml, /preliminary, uncalibrated/);
+    assert.match(runHtml, /provider-native behavior is not misrepresented as identical across vendors/);
+    assert.match(runHtml, /Calibrated public model results/);
+    assert.match(runHtml, /Official leaderboard rankings/);
+    assert.doesNotMatch(runHtml, /Large-scale batch evaluation/);
+    assert.match(runHtml, /Reproducibility checklist/);
+    assert.match(runHtml, /Dataset version/);
+    assert.match(runHtml, /Same cases\.<br>Different Tutors\.<br><em>Comparable evidence\.<\/em>/);
+    for (const route of ["/docs/", "/methodology/", "/leaderboard/", "/data/cases/"]) {
+      assert.match(runHtml, new RegExp(`href="${route.replaceAll("/", "\\/")}"`));
+    }
+    assert.doesNotMatch(runHtml, /4\.6 \/ 5|official score:|model leaderboard row/i);
+    const previewRun = renderPage(renderRunPage(artifacts), { basePath: "/preview" });
+    assert.match(previewRun, /href="\/preview\/assets\/run\.css"/);
+    assert.match(previewRun, /href="\/preview\/docs\/"/);
     assert.match(methodologyHtml, /How do you<br>measure <em>teaching/);
     assert.match(methodologyHtml, /methodology\.css/);
     assert.match(methodologyHtml, /Structured case/);
@@ -339,21 +381,36 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(docsHtml, /TutorBench Brand Policy/);
     assert.match(docsHtml, /CONTRIBUTING\.md/);
     assert.doesNotMatch(casesJson, /evaluatorOnly|groundTruth|knownMisconception|rubrics|misconceptions/);
-    assert.match(communityHtml, /Help improve TutorBench/);
+    assert.match(communityHtml, /<title>Community — Teachometry<\/title>/);
+    assert.match(communityHtml, /<body class="about-page community-page">/);
+    assert.match(communityHtml, /href="\/assets\/teachometry\.css"/);
+    assert.match(communityHtml, /href="\/assets\/community\.css"/);
+    assert.match(communityHtml, /A stronger evaluation system/);
+    assert.match(communityHtml, /is a shared effort\./);
     assert.match(communityHtml, /Applications not open yet/);
-    assert.match(communityHtml, /Public reviewer intake is not open/);
-    assert.match(communityHtml, /real Community Review campaign has not started/);
-    assert.match(communityHtml, /P5 human calibration has not started/);
+    assert.match(communityHtml, /Public intake is not open/);
+    assert.match(communityHtml, /Real Community Review campaign/);
+    assert.match(communityHtml, /P5 human calibration/);
     assert.match(communityHtml, /What we expect to ask when applications open/);
     assert.match(communityHtml, /One contact email for a future invitation/);
     assert.match(communityHtml, /Preferred review language/);
     assert.match(communityHtml, /Optional relevant experience summary/);
     assert.match(communityHtml, /Approximate availability category/);
     assert.match(communityHtml, /Application.*Manual review.*Invitation.*Consent.*Qualification.*Blind review/s);
-    assert.match(communityHtml, /href="\/community\/" aria-current="page"/);
+    assert.match(communityHtml, /Agreement ≠ correctness/);
+    assert.match(communityHtml, /Qualification ≠ calibration/);
+    assert.match(communityHtml, /Human review ≠ gold standard/);
+    assert.match(communityHtml, /Human review is a future evidence source/);
+    assert.match(communityHtml, /<ol class="community-process-list">/);
+    assert.equal((communityHtml.match(/class="community-process-step"/g) ?? []).length, 6);
+    assert.match(communityHtml, /<footer class="home-footer">/);
+    assert.doesNotMatch(communityHtml, /href="\/community\/" aria-current="page"/);
     assert.match(communityHtml, /href="\/data\/cases\/"/);
     assert.match(communityHtml, /href="\/methodology\/"/);
+    assert.match(communityHtml, /href="\/data\/"/);
     assert.doesNotMatch(communityHtml, /<form\b|<input\b|<a[^>]*>[^<]*(?:Apply now|Join now|Register|Start reviewing|Sign in as reviewer)/i);
+    assert.doesNotMatch(communityHtml, /120\+|80\+|200\+|25\+ countries/i);
+    assert.doesNotMatch(communityHtml, /Discussion Forum|Case review|Working group|TutorEval v0\.2a dataset/i);
     assert.doesNotMatch(communityHtml, /https?:\/\/[^"<\s]*(?:railway|auth0|oidc|community-review)/i);
   } finally {
     await rm(outputDirectory, { recursive: true, force: true });
@@ -370,18 +427,22 @@ test("community page renders meaningful Chinese content and runtime locale data"
     );
 
     assert.match(communityHtml, /<html lang="zh-CN" data-ui-locale="zh-CN">/);
-    assert.match(communityHtml, /参与 TutorBench/);
-    assert.match(communityHtml, /当前暂未开放参与申请/);
-    assert.match(communityHtml, /公开 reviewer intake 尚未开放/);
-    assert.match(communityHtml, /真实 Community Review 尚未启动/);
-    assert.match(communityHtml, /P5 人工校准尚未开始/);
+    assert.match(communityHtml, /更强的评测系统/);
+    assert.match(communityHtml, /需要共同完成/);
+    assert.match(communityHtml, /参与申请暂未开放/);
+    assert.match(communityHtml, /公开 intake 尚未开放/);
+    assert.match(communityHtml, /真实 Community Review/);
+    assert.match(communityHtml, /P5 人工校准/);
     assert.match(communityHtml, /开放申请后预计会询问什么/);
     assert.match(communityHtml, /用于未来邀请的一个联系邮箱/);
     assert.match(communityHtml, /可选的相关经验概述/);
     assert.match(communityHtml, /没有申请表、候补名单或 reviewer 登录入口/);
+    assert.match(communityHtml, /Agreement|一致性/);
     assert.match(communityHtml, /data-ui-text="communityHeroTitle"/);
-    assert.match(communityHtml, /data-ui-text-en="Help improve TutorBench"/);
-    assert.match(communityHtml, /data-ui-text-zh-cn="参与 TutorBench"/);
+    assert.match(communityHtml, /data-ui-text-en="A stronger evaluation system"/);
+    assert.match(communityHtml, /data-ui-text-zh-cn="更强的评测系统"/);
+    assert.match(communityHtml, /href="\/assets\/community\.css"/);
+    assert.doesNotMatch(communityHtml, /120\+|80\+|200\+|25\+ countries/i);
   } finally {
     await rm(outputDirectory, { recursive: true, force: true });
   }
@@ -400,6 +461,10 @@ test("static website build prefixes project-site paths without changing local de
       join(outputDirectory, "data", "cases", "index.html"),
       "utf8",
     );
+    const communityHtml = await readFile(
+      join(outputDirectory, "community", "index.html"),
+      "utf8",
+    );
 
     assert.match(homeHtml, /href="\/tutorbench\/leaderboard\//);
     assert.match(homeHtml, /href="\/tutorbench\/assets\/styles\.css"/);
@@ -412,6 +477,9 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(casesHtml, /data-case-locale="zh-CN"/);
     assert.match(casesHtml, /English/);
     assert.match(casesHtml, /Chinese/);
+    assert.match(communityHtml, /href="\/tutorbench\/assets\/teachometry\.css"/);
+    assert.match(communityHtml, /href="\/tutorbench\/assets\/community\.css"/);
+    assert.doesNotMatch(communityHtml, /href="\/assets\/community\.css"/);
     assert.doesNotMatch(homeHtml, /(?:href|src)="\/(?:leaderboard|assets)\//);
     assert.doesNotMatch(homeHtml, /(?:href|src)="\/assets\/brand\/tutorbench\//);
   } finally {
