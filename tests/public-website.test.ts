@@ -17,7 +17,7 @@ import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/cont
 import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
 import { renderHomePage } from "../src/site/pages/home.js";
 import { renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
-import { renderRunPage } from "../src/site/pages/developer.js";
+import { renderDocsPage, renderRunPage } from "../src/site/pages/developer.js";
 
 test("homepage derives facts and escapes case content without inventing model results", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
@@ -174,6 +174,58 @@ test("models registry and reserved detail route remain evidence-bound", async ()
   assert.match(detailHtml, /tutor-eval-v0\.2a@0\.2a\.6/);
   assert.match(detailHtml, /No model identity, score, strength, weakness, or trial is inferred/);
   assert.doesNotMatch(detailHtml, inventedReferenceModels);
+});
+
+test("Docs uses the Teachometry shell and a real repository reference center", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const docsHtml = renderPage(renderDocsPage(artifacts), { basePath: "/preview" });
+
+  assert.match(docsHtml, /<title>Docs — Teachometry<\/title>/);
+  assert.match(docsHtml, /<body class="docs-page">/);
+  assert.match(docsHtml, /<header class="site-header home-header">/);
+  assert.match(docsHtml, /<footer class="home-footer">/);
+  assert.doesNotMatch(docsHtml, /<footer class="site-footer">/);
+  assert.match(docsHtml, /href="\/preview\/assets\/styles\.css"/);
+  assert.match(docsHtml, /href="\/preview\/assets\/teachometry\.css"/);
+  assert.match(docsHtml, /href="\/preview\/assets\/docs\.css"/);
+  assert.doesNotMatch(docsHtml, /href="\/preview\/assets\/home\.css"/);
+  assert.match(docsHtml, /data-doc-search/);
+  assert.match(docsHtml, /data-doc-category="getting-started"/);
+  assert.match(docsHtml, /id="overview"/);
+  assert.match(docsHtml, /id="quickstart"/);
+  assert.match(docsHtml, /id="documentation-index"/);
+  assert.match(docsHtml, /id="evidence-boundaries"/);
+  assert.match(docsHtml, /id="governance"/);
+  assert.match(docsHtml, /id="next-steps"/);
+  assert.match(docsHtml, /git clone https:\/\/github\.com\/shuangyan123\/tutorbench\.git/);
+  assert.match(docsHtml, /npm install tutor-benchmark/);
+  assert.match(docsHtml, /tutorbench quickstart/);
+  assert.match(docsHtml, /Node 24/);
+  assert.match(docsHtml, /no official benchmark score/);
+  for (const path of [
+    "README.md",
+    "docs/quickstart.md",
+    "docs/tutor-eval-v0.2a.md",
+    "docs/tutor-eval-v0.4a.md",
+    "docs/real-model-baselines.md",
+    "docs/community-review-protocol.md",
+    "docs/community-review-application-gate.md",
+    "docs/roadmap.md",
+    "docs/licensing.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+  ]) {
+    assert.match(docsHtml, new RegExp(`github\\.com/shuangyan123/tutorbench/blob/main/${path.replaceAll(".", "\\.")}`));
+  }
+  for (const route of ["/run/", "/methodology/", "/data/", "/models/", "/leaderboard/", "/community/"]) {
+    assert.match(docsHtml, new RegExp(`href="/preview${route.replaceAll("/", "\\/")}`));
+  }
+  assert.match(docsHtml, /Apache-2\.0/);
+  assert.match(docsHtml, /CC BY 4\.0/);
+  assert.match(docsHtml, /TutorBench Brand Policy/);
+  assert.match(docsHtml, /public applications, reviewer intake, and a real Community Review campaign have not started/);
+  assert.doesNotMatch(docsHtml, /pip install teachometry|GPT-4o|Claude|Webhooks|Community forum/);
+  assert.ok((docsHtml.match(/data-doc-entry/g) ?? []).length >= 11);
 });
 
 test("static website build emits the public artifact files and route shell", async () => {
@@ -351,6 +403,14 @@ test("static website build emits the public artifact files and route shell", asy
     assert.doesNotMatch(methodologyHtml, /L2-B PRIVATE STAGING.*PASS/);
     assert.match(docsHtml, /Participation application gate/);
     assert.match(docsHtml, /closed-to-open launch checklist/);
+    assert.match(docsHtml, /<title>Docs — Teachometry<\/title>/);
+    assert.match(docsHtml, /<body class="docs-page">/);
+    assert.match(docsHtml, /href="\/assets\/teachometry\.css"/);
+    assert.match(docsHtml, /href="\/assets\/docs\.css"/);
+    assert.match(docsHtml, /<footer class="home-footer">/);
+    assert.doesNotMatch(docsHtml, /<footer class="site-footer">/);
+    assert.match(docsHtml, /Documentation index/);
+    assert.match(docsHtml, /Quickstart ≠ official benchmark score/);
     assert.match(methodologyHtml, /human calibration have not started/);
     assert.match(methodologyHtml, /Judge-vs-human validation and statistical validation are not completed/);
     assert.match(aboutHtml, /<title>About — Teachometry<\/title>/);
@@ -465,6 +525,7 @@ test("static website build prefixes project-site paths without changing local de
       join(outputDirectory, "community", "index.html"),
       "utf8",
     );
+    const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
 
     assert.match(homeHtml, /href="\/tutorbench\/leaderboard\//);
     assert.match(homeHtml, /href="\/tutorbench\/assets\/styles\.css"/);
@@ -479,6 +540,12 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(casesHtml, /Chinese/);
     assert.match(communityHtml, /href="\/tutorbench\/assets\/teachometry\.css"/);
     assert.match(communityHtml, /href="\/tutorbench\/assets\/community\.css"/);
+    assert.match(docsHtml, /href="\/tutorbench\/assets\/docs\.css"/);
+    assert.match(docsHtml, /href="\/tutorbench\/run\//);
+    assert.match(docsHtml, /href="\/tutorbench\/methodology\//);
+    assert.match(docsHtml, /href="\/tutorbench\/data\//);
+    assert.match(docsHtml, /href="\/tutorbench\/models\//);
+    assert.doesNotMatch(docsHtml, /href="\/assets\/docs\.css"/);
     assert.doesNotMatch(communityHtml, /href="\/assets\/community\.css"/);
     assert.doesNotMatch(homeHtml, /(?:href|src)="\/(?:leaderboard|assets)\//);
     assert.doesNotMatch(homeHtml, /(?:href|src)="\/assets\/brand\/tutorbench\//);

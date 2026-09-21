@@ -3,7 +3,6 @@ import {
   escapeHtml,
   humanize,
   renderCodeBlock,
-  renderStatusBadge,
   SITE_GITHUB_URL,
   type SitePage,
 } from "../html.js";
@@ -365,22 +364,320 @@ export function renderMethodologyPage(artifacts: PublicBenchmarkArtifacts): Site
   );
 }
 
+type DocsNavigationItem = {
+  readonly label: string;
+  readonly href: string;
+  readonly glyph: string;
+  readonly external?: boolean;
+};
+
+type DocsNavigationGroup = {
+  readonly label: string;
+  readonly items: readonly DocsNavigationItem[];
+};
+
+type DocsIndexEntry = DocsNavigationItem & {
+  readonly summary: string;
+  readonly category: string;
+  readonly categoryLabel: string;
+  readonly pathLabel: string;
+};
+
+function docsRepositoryHref(path: string): string {
+  return `${SITE_GITHUB_URL}/blob/main/${path}`;
+}
+
+const docsNavigation: readonly DocsNavigationGroup[] = [
+  {
+    label: "Getting Started",
+    items: [
+      { label: "Overview", href: "#overview", glyph: "book" },
+      { label: "Quickstart", href: "#quickstart", glyph: "play" },
+      { label: "Run TutorBench", href: "/run/", glyph: "laptop" },
+      { label: "README", href: docsRepositoryHref("README.md"), glyph: "document", external: true },
+    ],
+  },
+  {
+    label: "Benchmark & Data",
+    items: [
+      { label: "TutorEval 0.2A", href: docsRepositoryHref("docs/tutor-eval-v0.2a.md"), glyph: "grid", external: true },
+      { label: "Portable response corpus", href: docsRepositoryHref("docs/tutor-eval-v0.4a.md"), glyph: "database", external: true },
+      { label: "Methodology", href: "/methodology/", glyph: "flask" },
+      { label: "Public benchmark", href: "/data/", glyph: "chart" },
+      { label: "Cases", href: "/data/cases/", glyph: "grid" },
+    ],
+  },
+  {
+    label: "Execution & Evidence",
+    items: [
+      { label: "Real-model baselines", href: docsRepositoryHref("docs/real-model-baselines.md"), glyph: "cloud", external: true },
+      { label: "Run workflows", href: "/run/", glyph: "play" },
+      { label: "Models registry", href: "/models/", glyph: "robot" },
+      { label: "Results status", href: "/leaderboard/", glyph: "chart" },
+    ],
+  },
+  {
+    label: "Human Review",
+    items: [
+      { label: "Community Review protocol", href: docsRepositoryHref("docs/community-review-protocol.md"), glyph: "user", external: true },
+      { label: "Participation application gate", href: docsRepositoryHref("docs/community-review-application-gate.md"), glyph: "shield", external: true },
+      { label: "Community status", href: "/community/", glyph: "user" },
+    ],
+  },
+  {
+    label: "Governance",
+    items: [
+      { label: "Roadmap", href: docsRepositoryHref("docs/roadmap.md"), glyph: "bookmark", external: true },
+      { label: "Licensing", href: docsRepositoryHref("docs/licensing.md"), glyph: "document", external: true },
+      { label: "Contributing", href: docsRepositoryHref("CONTRIBUTING.md"), glyph: "user", external: true },
+      { label: "Security", href: docsRepositoryHref("SECURITY.md"), glyph: "shield", external: true },
+    ],
+  },
+];
+
+const docsIndex: readonly DocsIndexEntry[] = [
+  {
+    label: "README",
+    href: docsRepositoryHref("README.md"),
+    glyph: "document",
+    external: true,
+    summary: "Repository orientation, architecture, privacy, benchmark integrity, and current project boundaries.",
+    category: "getting-started",
+    categoryLabel: "Getting Started",
+    pathLabel: "README.md",
+  },
+  {
+    label: "TutorBench Quickstart",
+    href: docsRepositoryHref("docs/quickstart.md"),
+    glyph: "play",
+    external: true,
+    summary: "The provider-free, network-free, Judge-free five-minute development demonstration.",
+    category: "getting-started",
+    categoryLabel: "Getting Started",
+    pathLabel: "docs/quickstart.md",
+  },
+  {
+    label: "Run TutorBench",
+    href: "/run/",
+    glyph: "laptop",
+    summary: "Public entry point for the Quickstart, benchmark, Tutor adapters, and evidence workflows.",
+    category: "getting-started",
+    categoryLabel: "Getting Started",
+    pathLabel: "/run/",
+  },
+  {
+    label: "TutorEval 0.2A",
+    href: docsRepositoryHref("docs/tutor-eval-v0.2a.md"),
+    glyph: "grid",
+    external: true,
+    summary: "Synthetic case design, five observable-behavior dimensions, rubric semantics, and disclosure boundaries.",
+    category: "benchmark-data",
+    categoryLabel: "Benchmark & Data",
+    pathLabel: "docs/tutor-eval-v0.2a.md",
+  },
+  {
+    label: "Portable response corpus",
+    href: docsRepositoryHref("docs/tutor-eval-v0.4a.md"),
+    glyph: "database",
+    external: true,
+    summary: "The generate → freeze → evaluate → annotate → calibrate lifecycle and portable corpus contract.",
+    category: "benchmark-data",
+    categoryLabel: "Benchmark & Data",
+    pathLabel: "docs/tutor-eval-v0.4a.md",
+  },
+  {
+    label: "Methodology",
+    href: "/methodology/",
+    glyph: "flask",
+    summary: "How the public benchmark evaluates observable tutoring behavior and where evidence remains limited.",
+    category: "benchmark-data",
+    categoryLabel: "Benchmark & Data",
+    pathLabel: "/methodology/",
+  },
+  {
+    label: "Public benchmark",
+    href: "/data/",
+    glyph: "chart",
+    summary: "A public view into the versioned dataset, coverage, and disclosure-safe benchmark artifacts.",
+    category: "benchmark-data",
+    categoryLabel: "Benchmark & Data",
+    pathLabel: "/data/",
+  },
+  {
+    label: "Cases",
+    href: "/data/cases/",
+    glyph: "grid",
+    summary: "Browse the authored public cases without exposing evaluator-only answers or rubrics.",
+    category: "benchmark-data",
+    categoryLabel: "Benchmark & Data",
+    pathLabel: "/data/cases/",
+  },
+  {
+    label: "Real-model baselines",
+    href: docsRepositoryHref("docs/real-model-baselines.md"),
+    glyph: "cloud",
+    external: true,
+    summary: "Separate Product Tutor and canonical model collection paths, with private preliminary evidence semantics.",
+    category: "execution-evidence",
+    categoryLabel: "Execution & Evidence",
+    pathLabel: "docs/real-model-baselines.md",
+  },
+  {
+    label: "Models registry",
+    href: "/models/",
+    glyph: "robot",
+    summary: "The public model surface and its reserved evidence contract; no calibrated public profiles are implied.",
+    category: "execution-evidence",
+    categoryLabel: "Execution & Evidence",
+    pathLabel: "/models/",
+  },
+  {
+    label: "Results status",
+    href: "/leaderboard/",
+    glyph: "chart",
+    summary: "Readiness and evidence status for public results, without inventing ranking rows or scores.",
+    category: "execution-evidence",
+    categoryLabel: "Execution & Evidence",
+    pathLabel: "/leaderboard/",
+  },
+  {
+    label: "Frozen corpus semantic replay",
+    href: docsRepositoryHref("docs/frozen-corpus-semantic-replay.md"),
+    glyph: "refresh",
+    external: true,
+    summary: "Versioned replay boundaries for validating frozen evidence without silently changing its meaning.",
+    category: "execution-evidence",
+    categoryLabel: "Execution & Evidence",
+    pathLabel: "docs/frozen-corpus-semantic-replay.md",
+  },
+  {
+    label: "Community Review protocol",
+    href: docsRepositoryHref("docs/community-review-protocol.md"),
+    glyph: "user",
+    external: true,
+    summary: "P3 contracts, blindness, qualification boundaries, freeze semantics, agreement limits, and P4 deployment-readiness status.",
+    category: "human-review",
+    categoryLabel: "Human Review",
+    pathLabel: "docs/community-review-protocol.md",
+  },
+  {
+    label: "Participation application gate",
+    href: docsRepositoryHref("docs/community-review-application-gate.md"),
+    glyph: "shield",
+    external: true,
+    summary: "The closed-to-open launch checklist and application contract; public application and reviewer intake remain closed.",
+    category: "human-review",
+    categoryLabel: "Human Review",
+    pathLabel: "docs/community-review-application-gate.md",
+  },
+  {
+    label: "Community status",
+    href: "/community/",
+    glyph: "user",
+    summary: "Public participation information without an application form, reviewer login, or live campaign claim.",
+    category: "human-review",
+    categoryLabel: "Human Review",
+    pathLabel: "/community/",
+  },
+  {
+    label: "Roadmap",
+    href: docsRepositoryHref("docs/roadmap.md"),
+    glyph: "bookmark",
+    external: true,
+    summary: "The current phase map for benchmark, Judge, Tutor integration, review, and public product work.",
+    category: "governance",
+    categoryLabel: "Governance",
+    pathLabel: "docs/roadmap.md",
+  },
+  {
+    label: "Licensing",
+    href: docsRepositoryHref("docs/licensing.md"),
+    glyph: "document",
+    external: true,
+    summary: "Separate software, authored benchmark-content, and TutorBench brand licensing scopes.",
+    category: "governance",
+    categoryLabel: "Governance",
+    pathLabel: "docs/licensing.md",
+  },
+  {
+    label: "Contributing",
+    href: docsRepositoryHref("CONTRIBUTING.md"),
+    glyph: "user",
+    external: true,
+    summary: "Contribution categories, local quality gates, benchmark-content proposals, and evidence boundaries.",
+    category: "governance",
+    categoryLabel: "Governance",
+    pathLabel: "CONTRIBUTING.md",
+  },
+  {
+    label: "Security",
+    href: docsRepositoryHref("SECURITY.md"),
+    glyph: "shield",
+    external: true,
+    summary: "The public Developer Preview security policy and its current reporting boundary.",
+    category: "governance",
+    categoryLabel: "Governance",
+    pathLabel: "SECURITY.md",
+  },
+];
+
+function renderDocsBotanical(className: string): string {
+  return `<svg class="docs-botanical ${escapeHtml(className)}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.35" />
+      <path d="M133 190C103 155 76 123 54 83M126 236C93 219 56 198 22 166M143 140C170 119 194 91 215 58M119 277C88 265 53 250 16 224M153 103C179 91 204 71 228 44" stroke-width="1.05" />
+    </g>
+    <g fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-linejoin="round">
+      <path d="M54 83C41 67 29 49 32 32C50 37 65 54 68 72C63 78 59 81 54 83Z" stroke-width=".9" />
+      <path d="M22 166C11 147 4 126 10 108C29 116 43 135 42 153C36 159 30 163 22 166Z" stroke-width=".9" />
+      <path d="M215 58C214 39 219 20 234 8C240 27 235 46 222 60C219 60 217 59 215 58Z" stroke-width=".9" />
+      <path d="M16 224C11 207 14 190 26 178C39 194 39 211 29 225C24 226 20 226 16 224Z" stroke-width=".9" />
+      <path d="M228 44C228 27 235 12 248 4C252 21 246 38 236 47C233 47 230 46 228 44Z" stroke-width=".9" />
+    </g>
+  </svg>`;
+}
+
+function renderDocsNavigation(groups: readonly DocsNavigationGroup[]): string {
+  return groups.map((group) => `<section class="docs-nav-group"><h2>${escapeHtml(group.label)}</h2><ul>${group.items.map((item) => `<li><a class="docs-nav-link" href="${escapeHtml(item.href)}"${item.external ? ' rel="noreferrer"' : ""}${item.href === "#overview" ? ' aria-current="page"' : ""}>${icon(item.glyph)}<span>${escapeHtml(item.label)}</span>${item.external ? `<span class="docs-nav-external" aria-hidden="true">${icon("arrow")}</span>` : ""}</a></li>`).join("")}</ul></section>`).join("");
+}
+
+function renderDocsCodeBlock(label: string, code: string): string {
+  return `<div class="docs-code"><div class="docs-code-heading"><span>${escapeHtml(label)}</span><span class="docs-code-language">bash</span></div><pre><code>${escapeHtml(code)}</code></pre></div>`;
+}
+
+function renderDocsEntryPoint(glyph: string, title: string, summary: string, label: string, href: string, external = false): string {
+  return `<a class="docs-entry-point" href="${escapeHtml(href)}"${external ? ' rel="noreferrer"' : ""}><span class="docs-entry-icon">${icon(glyph)}</span><span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(summary)}</small><em>${escapeHtml(label)} ${icon("arrow")}</em></span></a>`;
+}
+
+function renderDocsIndexEntry(entry: DocsIndexEntry): string {
+  const searchText = [entry.label, entry.summary, entry.categoryLabel, entry.pathLabel].join(" ");
+  return `<article class="docs-index-entry" data-doc-entry data-doc-category="${escapeHtml(entry.category)}" data-doc-search="${escapeHtml(searchText)}"><a href="${escapeHtml(entry.href)}"${entry.external ? ' rel="noreferrer"' : ""}><span class="docs-index-icon">${icon(entry.glyph)}</span><span class="docs-index-copy"><span class="docs-index-category">${escapeHtml(entry.categoryLabel)}</span><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(entry.summary)}</span><small class="docs-index-source">${escapeHtml(entry.external ? "GitHub" : "Teachometry")} · ${escapeHtml(entry.pathLabel)}${entry.external ? ` ${icon("arrow")}` : ""}</small></span></a></article>`;
+}
+
 export function renderDocsPage(artifacts: PublicBenchmarkArtifacts): SitePage {
+  const datasetLabel = `${artifacts.benchmark.dataset.id}@${artifacts.benchmark.dataset.version}`;
+  const scoreDimensions = artifacts.benchmark.dimensions.score.map(humanize).join(" · ");
+  const quickstartRepository = [
+    "git clone https://github.com/shuangyan123/tutorbench.git",
+    "cd tutorbench",
+    "npm ci",
+    "npm run quickstart",
+  ].join("\n");
+  const quickstartPackage = ["npm install tutor-benchmark", "tutorbench quickstart"].join("\n");
   return page(
-    "Docs — Tutor Benchmark",
-    "Repository guides for TutorEval, adapters, corpora, Judge boundaries, licensing, and the public Developer Preview.",
+    "Docs — Teachometry",
+    "Repository documentation for TutorBench setup, benchmark contracts, execution workflows, evidence boundaries, and governance.",
     "/docs/",
-    `<section class="page-intro"><div class="shell narrow-shell"><div class="eyebrow-row">${renderStatusBadge(artifacts.benchmark.statusLabel, "preview")}<span class="eyebrow">Repository guides</span></div><h1>Docs</h1><p class="lede">The website is a map into the repository’s existing contracts and guides. It does not replace the source documentation.</p></div></section>
-    <section class="section"><div class="shell doc-grid">
-      <a class="route-card" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/README.md" rel="noreferrer"><span class="eyebrow">Start here</span><h2>README</h2><p>Architecture, quick start, privacy, benchmark integrity, and current roadmap position.</p><span class="text-link">Read README ↗</span></a>
-      <a class="route-card" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/tutor-eval-v0.2a.md" rel="noreferrer"><span class="eyebrow">Dataset</span><h2>TutorEval 0.2A</h2><p>Taxonomy, case design, disclosure policies, counterfactual pairs, and integrity checks.</p><span class="text-link">Read dataset guide ↗</span></a>
-      <a class="route-card" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/tutor-eval-v0.4a.md" rel="noreferrer"><span class="eyebrow">Adapters</span><h2>Response corpus</h2><p>Stable Tutor response corpus boundaries and offline replay behavior.</p><span class="text-link">Read corpus guide ↗</span></a>
-      <a class="route-card" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/real-model-baselines.md" rel="noreferrer"><span class="eyebrow">Evidence</span><h2>Real-model baselines</h2><p>Collect, validate, replay, and evaluate local preliminary Tutor evidence without publishing it automatically.</p><span class="text-link">Read collection guide ↗</span></a>
-      <a class="route-card" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/community-review-protocol.md" rel="noreferrer"><span class="eyebrow">Human review</span><h2>Community Review protocol</h2><p>P3 contracts, blindness, qualification boundaries, freeze semantics, agreement limits, and P4 deployment-readiness status.</p><span class="text-link">Read protocol guide ↗</span></a>
-      <a class="route-card" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/community-review-application-gate.md" rel="noreferrer"><span class="eyebrow">Human review</span><h2>Participation application gate</h2><p>Future application contract, applicant/reviewer separation, and the hard closed-to-open launch checklist. Public application intake remains closed.</p><span class="text-link">Read application gate ↗</span></a>
-      <a class="route-card" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/roadmap.md" rel="noreferrer"><span class="eyebrow">Status</span><h2>Roadmap</h2><p>Methodology phases and the separate public website/productization track.</p><span class="text-link">Read roadmap ↗</span></a>
-    </div></section>
-    <section class="section section-muted"><div class="shell two-column"><div><p class="eyebrow">License & governance</p><h2>Defined for the Developer Preview.</h2></div><div><p class="section-copy"><strong>Software</strong> — Apache-2.0<br><strong>Benchmark content</strong> — CC BY 4.0<br><strong>Brand</strong> — TutorBench Brand Policy</p><p><a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/licensing.md" rel="noreferrer">Read the licensing scope ↗</a><br><a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/LICENSE" rel="noreferrer">Read the software license ↗</a><br><a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/LICENSES/CC-BY-4.0.txt" rel="noreferrer">Read the content license pointer ↗</a><br><a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/LICENSES/BRAND-POLICY.md" rel="noreferrer">Read the TutorBench Brand Policy ↗</a></p><p><a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/CONTRIBUTING.md" rel="noreferrer">Contribute ↗</a> · <a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/SECURITY.md" rel="noreferrer">Security Policy ↗</a></p></div></div></section>`,
+    `<section class="docs-hero" aria-labelledby="docs-title"><div class="shell docs-hero-shell"><div class="docs-hero-copy"><p class="eyebrow">Documentation</p><h1 id="docs-title">Documentation</h1><p class="docs-hero-lede">Reference, setup, CLI, artifacts, and evaluation workflows.</p><p class="docs-hero-note">Navigate TutorBench’s versioned repository guides and public reference surfaces.</p></div><div class="docs-hero-art"><p>Evidence<br>you can<br>trace.</p>${renderDocsBotanical("docs-botanical-hero")}</div><div class="docs-hero-controls"><form class="docs-search" role="search" aria-label="Search documentation"><label for="docs-search-input">Search documentation</label><span class="docs-search-icon">${icon("search")}</span><input id="docs-search-input" type="search" data-doc-search placeholder="Search documentation…" autocomplete="off"><button type="reset" data-doc-search-clear aria-label="Clear documentation search" hidden>${icon("close")}</button></form><div class="docs-category-filters" role="group" aria-label="Filter documentation by category"><button type="button" data-doc-category="all" aria-pressed="true">All docs</button><button type="button" data-doc-category="getting-started" aria-pressed="false">Getting Started</button><button type="button" data-doc-category="benchmark-data" aria-pressed="false">Benchmark &amp; Data</button><button type="button" data-doc-category="execution-evidence" aria-pressed="false">Execution &amp; Evidence</button><button type="button" data-doc-category="human-review" aria-pressed="false">Human Review</button><button type="button" data-doc-category="governance" aria-pressed="false">Governance</button></div></div></div></section>
+    <section class="docs-workspace" aria-label="Documentation center"><div class="shell docs-shell"><details class="docs-mobile-nav"><summary>Browse documentation navigation</summary><nav aria-label="Mobile documentation navigation">${renderDocsNavigation(docsNavigation)}</nav></details><div class="docs-layout"><nav class="docs-sidebar" aria-label="Documentation navigation">${renderDocsNavigation(docsNavigation)}</nav><article class="docs-content"><div class="docs-breadcrumbs" aria-label="Breadcrumb"><a href="/docs/">Docs</a><span aria-hidden="true">›</span><span>Reference center</span></div>
+      <section class="docs-section docs-overview" id="overview" aria-labelledby="overview-title"><p class="docs-section-kicker">Getting Started / Overview</p><h2 id="overview-title">Overview</h2><p class="docs-lede">TutorBench is provider-neutral measurement infrastructure for observable AI tutoring behavior. This page maps the public Teachometry surface to the repository contracts and guides that define setup, execution, artifacts, and interpretation.</p><p class="docs-boundary-line">The website is a map into the repository’s existing contracts and guides. It does not replace the source documentation.</p><div class="docs-facts"><div><span>Canonical snapshot</span><strong>${escapeHtml(datasetLabel)}</strong></div><div><span>Public cases</span><strong>${escapeHtml(String(artifacts.benchmark.dataset.caseCount))}</strong></div><div><span>Score dimensions</span><strong>${escapeHtml(scoreDimensions)}</strong></div></div><div class="docs-entry-points">${renderDocsEntryPoint("laptop", "Set up", "Start with the real five-minute path.", "Open Quickstart", "#quickstart")}${renderDocsEntryPoint("play", "Run evaluations", "Choose the workflow that matches your evidence.", "Open Run", "/run/")}${renderDocsEntryPoint("database", "Work with artifacts", "Understand packets, corpora, and replay.", "Read 0.4A guide", docsRepositoryHref("docs/tutor-eval-v0.4a.md"), true)}${renderDocsEntryPoint("chart", "Understand results", "Read the method before interpreting output.", "Read methodology", "/methodology/")}</div></section>
+      <section class="docs-section docs-quickstart" id="quickstart" aria-labelledby="quickstart-title"><div class="docs-section-heading"><p class="docs-section-kicker">Getting Started / Quickstart</p><h2 id="quickstart-title">Quickstart</h2><p>Install the repository with Node 24, then run a deterministic local demonstration without provider credentials or network access.</p></div><div class="docs-runtime"><span>Runtime requirement</span><strong>Node 24</strong><code>&gt;=24 &lt;25</code></div><div class="docs-code-grid">${renderDocsCodeBlock("Repository clone", quickstartRepository)}${renderDocsCodeBlock("Published npm package", quickstartPackage)}</div><div class="docs-callout docs-callout-positive"><span class="docs-callout-mark">✓</span><p><strong>Provider-free, network-free, Judge-free.</strong> Quickstart uses four fixed development/smoke cases from <code>tutor-eval-v0.1@0.1</code>. It is not the canonical scoring cohort, produces no official benchmark score, and is not leaderboard eligible.</p></div></section>
+      <section class="docs-section docs-index-section" id="documentation-index" aria-labelledby="documentation-index-title"><div class="docs-section-heading docs-index-heading"><div><p class="docs-section-kicker">Reference map</p><h2 id="documentation-index-title">Documentation index</h2><p>A curated route into the current repository. GitHub links open the source file; site links open the corresponding public surface.</p></div><p class="docs-index-status" data-doc-status aria-live="polite">Showing ${docsIndex.length} references</p></div><div class="docs-index-grid">${docsIndex.map(renderDocsIndexEntry).join("")}</div><p class="docs-no-results" data-doc-empty role="status" hidden>No documentation matches this search and category.</p></section>
+      <section class="docs-section docs-evidence" id="evidence-boundaries" aria-labelledby="evidence-title"><div class="docs-section-heading"><p class="docs-section-kicker">Interpretation boundaries</p><h2 id="evidence-title">Read the evidence carefully.</h2><p>These distinctions keep a useful development surface from making claims the repository does not support.</p></div><div class="docs-boundary-grid"><article><span>${icon("play")}</span><h3>Quickstart ≠ official benchmark score</h3><p>It is a deterministic development/smoke demonstration, not calibrated benchmark evidence.</p></article><article><span>${icon("cloud")}</span><h3>Collection ≠ publication</h3><p>Product Tutor and canonical model corpora remain preliminary unless publication requirements are met.</p></article><article><span>${icon("shield")}</span><h3>Judge ≠ ground truth</h3><p>A Judge is an evaluator boundary. Unresolved criteria stay unresolved when required evidence is unavailable.</p></article><article><span>${icon("user")}</span><h3>Human review ≠ automatic gold standard</h3><p>Human evidence can strengthen the method without becoming unquestionable ground truth.</p></article></div></section>
+      <section class="docs-section docs-governance" id="governance" aria-labelledby="governance-title"><div class="docs-governance-intro"><p class="docs-section-kicker">Governance &amp; contribution</p><h2 id="governance-title">Defined boundaries for an open repository.</h2><p>Software, authored benchmark content, and the TutorBench name have deliberately separate scopes. Contributions can propose software, cases, rubrics, methodology, documentation, adapters, website changes, and calibration/audit infrastructure.</p><p class="docs-status-note"><strong>Community status:</strong> public participation information is available; public applications, reviewer intake, and a real Community Review campaign have not started.</p></div><div class="docs-license-panel"><div><span>Software</span><strong>Apache-2.0</strong><a href="${escapeHtml(docsRepositoryHref("LICENSE"))}" rel="noreferrer">Read LICENSE ${icon("arrow")}</a></div><div><span>Benchmark content (authored)</span><strong>CC BY 4.0</strong><a href="${escapeHtml(docsRepositoryHref("LICENSES/CC-BY-4.0.txt"))}" rel="noreferrer">Read content license ${icon("arrow")}</a></div><div><span>Name &amp; visual assets</span><strong>TutorBench Brand Policy</strong><a href="${escapeHtml(docsRepositoryHref("LICENSES/BRAND-POLICY.md"))}" rel="noreferrer">Read brand policy ${icon("arrow")}</a></div></div><div class="docs-governance-links"><a href="${escapeHtml(docsRepositoryHref("docs/licensing.md"))}" rel="noreferrer">Licensing scope ${icon("arrow")}</a><a href="${escapeHtml(docsRepositoryHref("CONTRIBUTING.md"))}" rel="noreferrer">Contributing ${icon("arrow")}</a><a href="${escapeHtml(docsRepositoryHref("SECURITY.md"))}" rel="noreferrer">Security Policy ${icon("arrow")}</a><p>The Security Policy does not enable GitHub Private Vulnerability Reporting and does not invent a private reporting address.</p></div></section>
+      <section class="docs-section docs-next-steps" id="next-steps" aria-labelledby="next-steps-title"><div class="docs-section-heading"><p class="docs-section-kicker">Continue the reference path</p><h2 id="next-steps-title">Next steps</h2><p>Move from orientation to the repository surface that matches your question.</p></div><div class="docs-next-grid">${renderDocsEntryPoint("play", "Run TutorBench", "Start with the provider-free path.", "Open Run", "/run/")}${renderDocsEntryPoint("flask", "Read methodology", "Understand dimensions and evaluator boundaries.", "Read methodology", "/methodology/")}${renderDocsEntryPoint("grid", "Browse public data", "Inspect cases and public artifact context.", "Open benchmark", "/data/")}${renderDocsEntryPoint("github", "Browse repository docs", "Read the versioned source guides.", "View GitHub", SITE_GITHUB_URL, true)}</div></section></article><aside class="docs-toc" aria-label="On this page"><p>On this page</p><nav><a href="#overview" aria-current="true">Overview</a><a href="#quickstart">Quickstart</a><a href="#documentation-index">Documentation index</a><a href="#evidence-boundaries">Evidence boundaries</a><a href="#governance">Governance</a><a href="#next-steps">Next steps</a></nav><div class="docs-toc-note"><span>Reference, not replacement.</span><p>Source files remain the authority for contracts, commands, and status.</p></div></aside></div></div></section>
+    <section class="docs-closing" aria-labelledby="docs-closing-title"><div class="shell docs-closing-inner"><div><p class="docs-section-kicker">Still looking?</p><h2 id="docs-closing-title">Find more in the guides, methodology, or repository.</h2></div><div class="docs-closing-actions"><a class="button button-secondary" href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">Browse repository docs ${icon("arrow")}</a><a class="button button-primary" href="/run/">Run TutorBench ${icon("arrow")}</a></div>${renderDocsBotanical("docs-botanical-closing")}</div></section>
+    ${renderTeachometryFooter(artifacts)}`,
   );
 }
 
