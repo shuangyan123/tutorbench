@@ -180,7 +180,7 @@ function renderHeader(
 ): string {
   const isCaseSurface = activeRoute === "/data/cases/" || activeRoute.startsWith("/data/cases/");
   const isBlogPage = activeRoute.startsWith("/blog/");
-  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/community/" || isBlogPage || isCaseSurface) {
+  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/community/" || activeRoute === "/run/" || isBlogPage || isCaseSurface) {
     const links = [
       ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
       ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
@@ -260,7 +260,9 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const isCaseDetailRoute = page.route.startsWith("/data/cases/") && page.route !== "/data/cases/";
   const isBlogIndex = page.route === "/blog/";
   const isBlogPage = page.route.startsWith("/blog/");
-  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
+  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
+  const usesHomeStyles = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
+  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
   const bodyClass = page.route === "/"
     ? ' class="home-page"'
     : page.route === "/data/"
@@ -273,13 +275,15 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
             ? ' class="about-page"'
             : page.route === "/community/"
               ? ' class="about-page community-page"'
-              : page.route === "/data/cases/"
-                ? ' class="cases-page"'
-                : isCaseDetailRoute
-                  ? ' class="case-detail-page"'
-                  : isBlogPage
-                    ? ` class="blog-page${isBlogIndex ? "" : " blog-article-page"}"`
-                    : "";
+              : page.route === "/run/"
+                ? ' class="run-page"'
+                : page.route === "/data/cases/"
+                  ? ' class="cases-page"'
+                  : isCaseDetailRoute
+                    ? ' class="case-detail-page"'
+                    : isBlogPage
+                      ? ` class="blog-page${isBlogIndex ? "" : " blog-article-page"}"`
+                      : "";
   const pageMarkup = `<!doctype html>
 <html lang="${escapeHtml(locale)}" data-ui-locale="${escapeHtml(locale)}">
   <head>
@@ -296,7 +300,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="icon" type="image/png" sizes="16x16" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-16.png"))}">
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
     ${isTeachometryPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/teachometry.css"))}">` : ""}
-    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
+    ${usesHomeStyles ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
     ${page.route === "/data/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/benchmark.css"))}">` : ""}
     ${page.route === "/methodology/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/methodology.css"))}">` : ""}
     ${page.route === "/leaderboard/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/results.css"))}">` : ""}
@@ -304,6 +308,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${isCaseDetailRoute ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/case-detail.css"))}">` : ""}
     ${page.route === "/about/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/about.css"))}">` : ""}
     ${page.route === "/community/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/community.css"))}">` : ""}
+    ${page.route === "/run/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/run.css"))}">` : ""}
     ${isBlogPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
@@ -311,7 +316,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <a class="skip-link" href="#main-content">Skip to content</a>
     ${renderHeader(page.route, basePath, locale)}
     <main id="main-content">${page.content}</main>
-    ${isTeachometryPage ? "" : renderFooter(context.benchmark ?? ({
+    ${usesTeachometryFooter ? "" : renderFooter(context.benchmark ?? ({
       statusLabel: "Developer Preview",
       dataset: { id: TUTOR_EVAL_DATASET_ID, version: TUTOR_EVAL_DATASET_VERSION },
     }), locale)}

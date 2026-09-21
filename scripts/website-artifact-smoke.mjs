@@ -8,6 +8,7 @@ const requiredFiles = [
   "assets/blog.css",
   "assets/benchmark.css",
   "assets/case-detail.css",
+  "assets/run.css",
   "data/index.html",
   ...["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"].map((name) => `assets/${name}.webp`),
   "index.html",
