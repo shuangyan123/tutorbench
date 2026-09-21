@@ -302,7 +302,7 @@
 })();
 
 (() => {
-  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page');
+  const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.about-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page');
   if (!(themedPage instanceof HTMLElement)) return;
 
   const media = window.matchMedia('(prefers-color-scheme: dark)');

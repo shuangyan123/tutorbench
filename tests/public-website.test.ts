@@ -162,6 +162,7 @@ test("static website build emits the public artifact files and route shell", asy
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
+    const aboutHtml = await readFile(join(outputDirectory, "about", "index.html"), "utf8");
     const communityHtml = await readFile(
       join(outputDirectory, "community", "index.html"),
       "utf8",
@@ -264,6 +265,25 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(docsHtml, /closed-to-open launch checklist/);
     assert.match(methodologyHtml, /human calibration have not started/);
     assert.match(methodologyHtml, /Judge-vs-human validation and statistical validation are not completed/);
+    assert.match(aboutHtml, /<title>About — Teachometry<\/title>/);
+    assert.match(aboutHtml, /<body class="about-page">/);
+    assert.match(aboutHtml, /href="\/assets\/home\.css"/);
+    assert.match(aboutHtml, /href="\/assets\/about\.css"/);
+    assert.match(aboutHtml, /<footer class="home-footer">/);
+    assert.doesNotMatch(aboutHtml, /<footer class="site-footer">/);
+    assert.match(aboutHtml, /A model can know\s*<br>the answer\s*<br><em>without being\s*<br>a good tutor\.<\/em>/);
+    assert.match(aboutHtml, /Answers <span>≠<\/span> Teaching\./);
+    assert.match(aboutHtml, /We measure tutors\.<br>We don’t build the tutor\./);
+    assert.match(aboutHtml, /TutorUnderTest/);
+    assert.match(aboutHtml, /tutor-benchmark@0\.1\.0 published/);
+    assert.match(aboutHtml, /tutor-eval-v0\.2a@0\.2a\.6/);
+    assert.match(aboutHtml, /48 synthetic cases/);
+    assert.match(aboutHtml, /No calibrated public model runs yet\./);
+    assert.match(aboutHtml, /Apache-2\.0/);
+    assert.match(aboutHtml, /CC BY 4\.0/);
+    assert.match(aboutHtml, /TutorBench Brand Policy/);
+    assert.doesNotMatch(aboutHtml, /MIT License/);
+    assert.doesNotMatch(aboutHtml, /Conceptual understanding|Communication and clarity/);
     assert.match(docsHtml, /Community Review protocol/);
     assert.doesNotMatch(docsHtml, /not-yet-deployed P4 service/);
     assert.match(docsHtml, /P4 deployment-readiness status/);
