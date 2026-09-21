@@ -276,6 +276,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "blog.css"), join(outputDirectory, "assets", "blog.css"));
   await copyFile(join(websiteRoot, "src", "models.css"), join(outputDirectory, "assets", "models.css"));
   await copyFile(join(websiteRoot, "src", "teachometry.css"), join(outputDirectory, "assets", "teachometry.css"));
+  await copyFile(join(websiteRoot, "src", "explorers.css"), join(outputDirectory, "assets", "explorers.css"));
   await copyFile(join(websiteRoot, "src", "run.css"), join(outputDirectory, "assets", "run.css"));
   await copyFile(join(websiteRoot, "src", "docs.css"), join(outputDirectory, "assets", "docs.css"));
   for (const name of ["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {

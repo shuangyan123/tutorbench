@@ -24,6 +24,7 @@ export function siteIcon(name: string): string {
     package: '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>',
     book: '<path d="M12 5C8 2 4 2 2 4v16c3-2 6-2 10 0 4-2 7-2 10 0V4c-3-2-6-2-10 1Zm0 0v15"/>',
     database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/>',
+    link: '<path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/>',
     laptop: '<rect x="5" y="4" width="14" height="11" rx="1.5"/><path d="M3 19h18M8 19h8"/>',
     play: '<path d="m9 6 9 6-9 6V6Z"/>',
     cloud: '<path d="M7 19h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 9.5 4.5 4.5 0 0 0 7 19Z"/>',
