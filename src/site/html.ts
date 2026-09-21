@@ -179,7 +179,8 @@ function renderHeader(
   locale: SiteLocale,
 ): string {
   const isCaseSurface = activeRoute === "/data/cases/" || activeRoute.startsWith("/data/cases/");
-  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/blog/" || isCaseSurface) {
+  const isBlogPage = activeRoute.startsWith("/blog/");
+  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || isBlogPage || isCaseSurface) {
     const links = [
       ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
       ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
@@ -194,7 +195,7 @@ function renderHeader(
     return `<header class="site-header home-header"><div class="shell header-inner">
       <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="Teachometry home"><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">Teachometry</span><span class="wordmark-descriptor">Measurement infrastructure<br>for AI tutoring</span></span></a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
-      <nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">${links.map(([label, route]) => `<a href="${escapeHtml(sitePath(basePath, route))}"${route === activeRoute || (route === "/data/cases/" && isCaseSurface) ? ' aria-current="page"' : ""}>${headerLabel(label)}</a>`).join("")}${activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || isCaseSurface ? `<label class="locale-switcher"><span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span><select data-locale-switcher aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}"><option value="en"${locale === "en" ? " selected" : ""}>English</option><option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>简体中文</option></select></label>` : ""}</nav>
+      <nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">${links.map(([label, route]) => `<a href="${escapeHtml(sitePath(basePath, route))}"${route === activeRoute || (route === "/data/cases/" && isCaseSurface) || (route === "/blog/" && isBlogPage) ? ' aria-current="page"' : ""}>${headerLabel(label)}</a>`).join("")}${activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || isCaseSurface ? `<label class="locale-switcher"><span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span><select data-locale-switcher aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}"><option value="en"${locale === "en" ? " selected" : ""}>English</option><option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>简体中文</option></select></label>` : ""}</nav>
       <div class="home-header-tools"><div class="theme-controls" role="group" aria-label="Color theme"><button type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme">${siteIcon("sun")}</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme">${siteIcon("moon")}</button></div><a class="github-link" href="${SITE_GITHUB_URL}" aria-label="GitHub repository" title="GitHub repository">${siteIcon("github")}</a><a class="button button-primary" href="${escapeHtml(sitePath(basePath, "/run/"))}">Get Started ${siteIcon("arrow")}</a></div>
     </div></header>`;
   }
@@ -258,6 +259,24 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${page.route}`;
   const isCaseDetailRoute = page.route.startsWith("/data/cases/") && page.route !== "/data/cases/";
   const isBlogIndex = page.route === "/blog/";
+  const isBlogPage = page.route.startsWith("/blog/");
+  const bodyClass = page.route === "/"
+    ? ' class="home-page"'
+    : page.route === "/data/"
+      ? ' class="home-page benchmark-page"'
+      : page.route === "/methodology/"
+        ? ' class="methodology-page"'
+        : page.route === "/leaderboard/"
+          ? ' class="results-page"'
+          : page.route === "/about/"
+            ? ' class="about-page"'
+            : page.route === "/data/cases/"
+              ? ' class="cases-page"'
+              : isCaseDetailRoute
+                ? ' class="case-detail-page"'
+                : isBlogPage
+                  ? ` class="blog-page${isBlogIndex ? "" : " blog-article-page"}"`
+                  : "";
   const pageMarkup = `<!doctype html>
 <html lang="${escapeHtml(locale)}" data-ui-locale="${escapeHtml(locale)}">
   <head>
@@ -273,21 +292,21 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="icon" type="image/png" sizes="32x32" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-32.png"))}">
     <link rel="icon" type="image/png" sizes="16x16" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-16.png"))}">
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
-    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogIndex) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage) ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
     ${page.route === "/data/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/benchmark.css"))}">` : ""}
     ${page.route === "/methodology/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/methodology.css"))}">` : ""}
     ${page.route === "/leaderboard/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/results.css"))}">` : ""}
     ${page.route === "/data/cases/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/cases.css"))}">` : ""}
     ${isCaseDetailRoute ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/case-detail.css"))}">` : ""}
     ${page.route === "/about/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/about.css"))}">` : ""}
-    ${isBlogIndex ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
+    ${isBlogPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
-  <body${page.route === "/" ? ' class="home-page"' : page.route === "/data/" ? ' class="home-page benchmark-page"' : page.route === "/methodology/" ? ' class="methodology-page"' : page.route === "/leaderboard/" ? ' class="results-page"' : page.route === "/about/" ? ' class="about-page"' : page.route === "/data/cases/" ? ' class="cases-page"' : isCaseDetailRoute ? ' class="case-detail-page"' : isBlogIndex ? ' class="blog-page"' : ""}>
+  <body${bodyClass}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     ${renderHeader(page.route, basePath, locale)}
     <main id="main-content">${page.content}</main>
-    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogIndex) ? "" : renderFooter(context.benchmark ?? ({
+    ${(page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage) ? "" : renderFooter(context.benchmark ?? ({
       statusLabel: "Developer Preview",
       dataset: { id: TUTOR_EVAL_DATASET_ID, version: TUTOR_EVAL_DATASET_VERSION },
     }), locale)}
