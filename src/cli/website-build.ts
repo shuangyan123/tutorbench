@@ -296,8 +296,8 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
 
   const blogPages = [
     renderBlogIndexPage(renderTeachometryFooter(artifacts)),
-    renderWhyTeachingDoesNotScalePage(),
-    renderTeachingAndSupervisionPage(),
+    renderWhyTeachingDoesNotScalePage(renderTeachometryFooter(artifacts)),
+    renderTeachingAndSupervisionPage(renderTeachometryFooter(artifacts)),
   ];
   for (const blogPage of blogPages) {
     await writePage(
