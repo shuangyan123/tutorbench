@@ -54,6 +54,7 @@ import {
 } from "../site/pages/developer.js";
 import { renderCommunityPage } from "../site/pages/community.js";
 import { renderTeachometryFooter } from "../site/pages/home.js";
+import { renderNotFoundPage } from "../site/pages/not-found.js";
 import {
   renderBlogIndexPage,
   renderTeachingAndSupervisionPage,
@@ -279,6 +280,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "explorers.css"), join(outputDirectory, "assets", "explorers.css"));
   await copyFile(join(websiteRoot, "src", "run.css"), join(outputDirectory, "assets", "run.css"));
   await copyFile(join(websiteRoot, "src", "docs.css"), join(outputDirectory, "assets", "docs.css"));
+  await copyFile(join(websiteRoot, "src", "not-found.css"), join(outputDirectory, "assets", "not-found.css"));
   for (const name of ["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
     await copyFile(join(websiteRoot, "src", "images", `${name}.webp`), join(outputDirectory, "assets", `${name}.webp`));
   }
@@ -319,12 +321,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await writeFile(
     join(outputDirectory, "404.html"),
     renderPage(
-      {
-        title: "Page not found — Tutor Benchmark",
-        description: "The requested Tutor Benchmark page could not be found.",
-        route: "/404.html",
-        content: `<section class="page-intro"><div class="shell narrow-shell"><h1>Page not found</h1><p class="lede">This route is not part of the public Developer Preview.</p><a class="button button-primary" href="/">Return home</a></div></section>`,
-      },
+      renderNotFoundPage(artifacts),
       {
         benchmark: artifacts.benchmark,
         ...(options.siteUrl === undefined ? {} : { siteUrl: options.siteUrl }),

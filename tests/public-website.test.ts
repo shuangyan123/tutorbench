@@ -19,6 +19,7 @@ import { renderHomePage } from "../src/site/pages/home.js";
 import { renderHeatmapPage, renderTrialDetailPage, renderTrialsPage } from "../src/site/pages/data.js";
 import { renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
 import { renderDocsPage, renderRunPage } from "../src/site/pages/developer.js";
+import { renderNotFoundPage } from "../src/site/pages/not-found.js";
 
 test("homepage derives facts and escapes case content without inventing model results", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
@@ -271,6 +272,29 @@ test("Docs uses the Teachometry shell and a real repository reference center", a
   assert.ok((docsHtml.match(/data-doc-entry/g) ?? []).length >= 11);
 });
 
+test("404 uses the Teachometry shell, helpful public routes, and isolated page CSS", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const html = renderPage(renderNotFoundPage(artifacts), { basePath: "/preview" });
+
+  assert.match(html, /<title>Page not found — Teachometry<\/title>/);
+  assert.match(html, /<meta name="description" content="The requested page is not part of the public Teachometry site\."/);
+  assert.match(html, /<body class="home-page not-found-page">/);
+  assert.match(html, /<header class="site-header home-header">/);
+  assert.match(html, /<footer class="home-footer">/);
+  assert.match(html, /href="\/preview\/assets\/styles\.css"/);
+  assert.match(html, /href="\/preview\/assets\/teachometry\.css"/);
+  assert.match(html, /href="\/preview\/assets\/not-found\.css"/);
+  assert.doesNotMatch(html, /href="\/preview\/assets\/(?:home|docs|explorers)\.css"/);
+  assert.match(html, /<span class="not-found-number">404<\/span>/);
+  assert.match(html, /This trail doesn’t lead to a public artifact\./);
+  assert.match(html, /href="\/preview\/">Return home/);
+  assert.match(html, /href="\/preview\/data\/">Explore the benchmark/);
+  assert.match(html, /href="\/preview\/docs\/">Read the documentation/);
+  assert.doesNotMatch(html, /Page not found — Tutor Benchmark|This route is not part of the public Developer Preview|audit\/runs|evaluatorOnly|groundTruth|knownMisconception/);
+  assert.match(html, /aria-hidden="true"[\s\S]*not-found-signpost/);
+  assert.doesNotMatch(html, /<footer class="site-footer">/);
+});
+
 test("static website build emits the public artifact files and route shell", async () => {
   const outputDirectory = await mkdtemp(join(tmpdir(), "tutor-benchmark-website-"));
   try {
@@ -293,6 +317,7 @@ test("static website build emits the public artifact files and route shell", asy
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
+    const notFoundHtml = await readFile(join(outputDirectory, "404.html"), "utf8");
     const aboutHtml = await readFile(join(outputDirectory, "about", "index.html"), "utf8");
     const communityHtml = await readFile(
       join(outputDirectory, "community", "index.html"),
@@ -300,6 +325,14 @@ test("static website build emits the public artifact files and route shell", asy
     );
 
     assert.equal(routeCount, 62);
+    assert.match(notFoundHtml, /<title>Page not found — Teachometry<\/title>/);
+    assert.match(notFoundHtml, /<body class="home-page not-found-page">/);
+    assert.match(notFoundHtml, /<header class="site-header home-header">/);
+    assert.match(notFoundHtml, /<footer class="home-footer">/);
+    assert.match(notFoundHtml, /href="\/assets\/teachometry\.css"/);
+    assert.match(notFoundHtml, /href="\/assets\/not-found\.css"/);
+    assert.match(notFoundHtml, /This trail doesn’t lead to a public artifact\./);
+    assert.doesNotMatch(notFoundHtml, /Page not found — Tutor Benchmark|class="site-footer"/);
     assert.match(homeHtml, /Developer Preview/);
     assert.match(homeHtml, /No calibrated public model runs yet\./);
     assert.match(homeHtml, /href="\/leaderboard\//);
@@ -569,6 +602,7 @@ test("static website build prefixes project-site paths without changing local de
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
+    const notFoundHtml = await readFile(join(outputDirectory, "404.html"), "utf8");
 
     assert.match(homeHtml, /href="\/tutorbench\/leaderboard\//);
     assert.match(homeHtml, /href="\/tutorbench\/assets\/styles\.css"/);
@@ -588,6 +622,9 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(docsHtml, /href="\/tutorbench\/methodology\//);
     assert.match(docsHtml, /href="\/tutorbench\/data\//);
     assert.match(docsHtml, /href="\/tutorbench\/models\//);
+    assert.match(notFoundHtml, /href="\/tutorbench\/assets\/not-found\.css"/);
+    assert.match(notFoundHtml, /href="\/tutorbench\/data\/">Explore the benchmark/);
+    assert.match(notFoundHtml, /href="\/tutorbench\/docs\/">Read the documentation/);
     assert.doesNotMatch(docsHtml, /href="\/assets\/docs\.css"/);
     assert.doesNotMatch(communityHtml, /href="\/assets\/community\.css"/);
     assert.doesNotMatch(homeHtml, /(?:href|src)="\/(?:leaderboard|assets)\//);

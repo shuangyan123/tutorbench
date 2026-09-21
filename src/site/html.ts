@@ -182,7 +182,7 @@ function renderHeader(
   const isBlogPage = activeRoute.startsWith("/blog/");
   const isModelsPage = activeRoute === "/models/" || activeRoute === "/models/[modelId]/";
   const isExplorerPage = activeRoute === "/data/heatmap/" || activeRoute === "/data/trials/" || activeRoute === "/data/trials/[trialId]/";
-  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/community/" || activeRoute === "/run/" || activeRoute === "/docs/" || isBlogPage || isCaseSurface || isModelsPage || isExplorerPage) {
+  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/community/" || activeRoute === "/run/" || activeRoute === "/docs/" || activeRoute === "/404.html" || isBlogPage || isCaseSurface || isModelsPage || isExplorerPage) {
     const links = [
       ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
       ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
@@ -268,10 +268,13 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const isTrialsPage = page.route === "/data/trials/";
   const isTrialDetailRoute = page.route === "/data/trials/[trialId]/";
   const isExplorerPage = isHeatmapPage || isTrialsPage || isTrialDetailRoute;
-  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
+  const isNotFoundPage = page.route === "/404.html";
+  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
   const usesHomeStyles = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
-  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
-  const bodyClass = page.route === "/"
+  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
+  const bodyClass = isNotFoundPage
+    ? ' class="home-page not-found-page"'
+    : page.route === "/"
     ? ' class="home-page"'
     : page.route === "/data/"
       ? ' class="home-page benchmark-page"'
@@ -333,6 +336,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${page.route === "/docs/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/docs.css"))}">` : ""}
     ${isBlogPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     ${isExplorerPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/explorers.css"))}">` : ""}
+    ${isNotFoundPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/not-found.css"))}">` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
   <body${bodyClass}>
