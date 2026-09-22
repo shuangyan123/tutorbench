@@ -94,7 +94,11 @@
     "release:verify": "node scripts/verify-release-candidate.mjs",
     "worktree:audit": "node scripts/worktree-cleanup.mjs",
     "worktree:cleanup": "node scripts/worktree-cleanup.mjs --apply",
-    "test:worktree": "node --test scripts/worktree-cleanup.test.mjs"
+    "test:worktree": "node --test scripts/worktree-cleanup.test.mjs",
+    "baseline:local:plan": "npm run build && node scripts/local-real-model-baseline.mjs plan",
+    "baseline:local:smoke": "npm run build && node scripts/local-real-model-baseline.mjs smoke",
+    "baseline:local:full": "npm run build && node scripts/local-real-model-baseline.mjs full",
+    "test:local-baseline": "node --test scripts/local-real-model-baseline.test.mjs"
   },
   "devDependencies": {
     "@auth0/auth0-spa-js": "2.27.0",
