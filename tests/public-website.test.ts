@@ -60,7 +60,7 @@ test("shared public header keeps one canonical language-control geometry", async
     assert.equal((html.match(/class="locale-switcher"/g) ?? []).length, 1);
   }
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
-  assert.match(styles, /\.locale-switcher select \{[\s\S]*?width: 92px;[\s\S]*?height: var\(--teach-button-height\);/);
+  assert.match(styles, /\.locale-switcher select \{[\s\S]*?width: var\(--teach-locale-control-width\);[\s\S]*?height: var\(--teach-button-height\);/);
   for (const file of ["benchmark.css", "methodology.css", "results.css", "cases.css", "case-detail.css"]) {
     const pageStyles = await readFile(join(process.cwd(), "website", "src", file), "utf8");
     assert.doesNotMatch(pageStyles, /locale-switcher select/u);
