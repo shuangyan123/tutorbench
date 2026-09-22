@@ -160,19 +160,6 @@ export function renderKeyValueList(items: readonly [string, string][]): string {
     .join("")}</dl>`;
 }
 
-function navLink(
-  labelKey: SiteUiTextKey,
-  route: string,
-  activeRoute: string,
-  basePath: string,
-  locale: SiteLocale,
-): string {
-  const active =
-    activeRoute === route ||
-    (route === "/data/" && activeRoute.startsWith("/data/"));
-  return `<a href="${escapeHtml(sitePath(basePath, route))}"${active ? ' aria-current="page"' : ""}>${renderUiText(labelKey, locale)}</a>`;
-}
-
 function renderHeader(
   activeRoute: string,
   basePath: string,
@@ -180,56 +167,43 @@ function renderHeader(
 ): string {
   const isCaseSurface = activeRoute === "/data/cases/" || activeRoute.startsWith("/data/cases/");
   const isBlogPage = activeRoute.startsWith("/blog/");
-  const isModelsPage = activeRoute === "/models/" || activeRoute === "/models/[modelId]/";
-  const isExplorerPage = activeRoute === "/data/heatmap/" || activeRoute === "/data/trials/" || activeRoute === "/data/trials/[trialId]/";
-  if (activeRoute === "/" || activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/about/" || activeRoute === "/community/" || activeRoute === "/run/" || activeRoute === "/docs/" || activeRoute === "/404.html" || isBlogPage || isCaseSurface || isModelsPage || isExplorerPage) {
-    const links = [
-      ["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"],
-      ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"],
-      ["Blog", "/blog/"],
-    ] as const;
-    const benchmarkNavLabels: Readonly<Record<string, string>> = {
-      Home: "首页", Benchmark: "基准", Method: "方法", Results: "结果", Cases: "案例", About: "关于", Blog: "博客",
-    };
-    const headerLabel = (label: string): string => activeRoute === "/data/" || activeRoute === "/methodology/" || isCaseSurface
-      ? `<span data-ui-text="benchmark-nav" data-ui-text-en="${escapeHtml(label)}" data-ui-text-zh-cn="${escapeHtml(benchmarkNavLabels[label] ?? label)}">${escapeHtml(locale === "zh-CN" ? benchmarkNavLabels[label] ?? label : label)}</span>`
-      : label;
-    return `<header class="site-header home-header"><div class="shell header-inner">
-      <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="Teachometry home"><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">Teachometry</span><span class="wordmark-descriptor">Measurement infrastructure<br>for AI tutoring</span></span></a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
-      <nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">${links.map(([label, route]) => `<a href="${escapeHtml(sitePath(basePath, route))}"${route === activeRoute || (route === "/data/" && isExplorerPage) || (route === "/data/cases/" && isCaseSurface) || (route === "/blog/" && isBlogPage) ? ' aria-current="page"' : ""}>${headerLabel(label)}</a>`).join("")}${activeRoute === "/data/" || activeRoute === "/methodology/" || activeRoute === "/leaderboard/" || activeRoute === "/community/" || isCaseSurface ? `<label class="locale-switcher"><span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span><select data-locale-switcher aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}"><option value="en"${locale === "en" ? " selected" : ""}>English</option><option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>简体中文</option></select></label>` : ""}</nav>
-      <div class="home-header-tools"><div class="theme-controls" role="group" aria-label="Color theme"><button type="button" data-theme-choice="light" aria-label="Light theme" title="Light theme">${siteIcon("sun")}</button><button type="button" data-theme-choice="dark" aria-label="Dark theme" title="Dark theme">${siteIcon("moon")}</button></div><a class="github-link" href="${SITE_GITHUB_URL}" aria-label="GitHub repository" title="GitHub repository">${siteIcon("github")}</a><a class="button button-primary" href="${escapeHtml(sitePath(basePath, "/run/"))}">Get Started ${siteIcon("arrow")}</a></div>
-    </div></header>`;
-  }
-  return `<header class="site-header">
-    <div class="shell header-inner">
-      <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="TutorBench home">
-        <img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt="">
-        <span class="wordmark-copy">
-          <span class="wordmark-name">TutorBench</span>
-          <span class="wordmark-descriptor">AI Tutor 评测基准</span>
-        </span>
-      </a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
-      <nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">
-        ${navLink("leaderboard", "/leaderboard/", activeRoute, basePath, locale)}
-        ${navLink("data", "/data/", activeRoute, basePath, locale)}
-        ${navLink("run", "/run/", activeRoute, basePath, locale)}
-        ${navLink("methodology", "/methodology/", activeRoute, basePath, locale)}
-        ${navLink("docs", "/docs/", activeRoute, basePath, locale)}
-        ${navLink("community", "/community/", activeRoute, basePath, locale)}
-        <a href="${escapeHtml(sitePath(basePath, "/blog/"))}"${activeRoute.startsWith("/blog/") ? ' aria-current="page"' : ""}>Blog</a>
-        <a href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">GitHub ↗</a>
-        <label class="locale-switcher">
-          <span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span>
-          <select data-locale-switcher aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}">
-            <option value="en"${locale === "en" ? " selected" : ""}>${escapeHtml(siteText("en", "english"))}</option>
-            <option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>${escapeHtml(siteText("zh-CN", "chinese"))}</option>
-          </select>
-        </label>
-      </nav>
+  const isExplorerPage =
+    activeRoute === "/data/heatmap/" ||
+    activeRoute === "/data/trials/" ||
+    activeRoute === "/data/trials/[trialId]/";
+  const links = [
+    ["homeNav", "/"],
+    ["benchmarkNav", "/data/"],
+    ["methodNav", "/methodology/"],
+    ["resultsNav", "/leaderboard/"],
+    ["casesNav", "/data/cases/"],
+    ["aboutNav", "/about/"],
+    ["blogNav", "/blog/"],
+  ] as const satisfies readonly (readonly [SiteUiTextKey, string])[];
+
+  const isActive = (route: string): boolean =>
+    route === activeRoute ||
+    (route === "/data/" && isExplorerPage) ||
+    (route === "/data/cases/" && isCaseSurface) ||
+    (route === "/blog/" && isBlogPage);
+
+  const localizedAttribute = (
+    attribute: "aria-label" | "title",
+    key: SiteUiTextKey,
+  ): string =>
+    `${attribute}="${escapeHtml(siteText(locale, key))}" data-ui-${attribute === "aria-label" ? "aria" : "title"}-en="${escapeHtml(siteText("en", key))}" data-ui-${attribute === "aria-label" ? "aria" : "title"}-zh-cn="${escapeHtml(siteText("zh-CN", key))}"`;
+
+  return `<header class="site-header home-header"><div class="shell header-inner">
+    <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" ${localizedAttribute("aria-label", "teachometryHome")}><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">Teachometry</span><span class="wordmark-descriptor">${renderUiText("brandDescriptor", locale)}</span></span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" ${localizedAttribute("aria-label", "menu")}>${renderUiText("menu", locale)}</button>
+    <nav id="primary-navigation" class="nav-links" ${localizedAttribute("aria-label", "primaryNavigation")}>${links.map(([labelKey, route]) => `<a href="${escapeHtml(sitePath(basePath, route))}"${isActive(route) ? ' aria-current="page"' : ""}>${renderUiText(labelKey, locale)}</a>`).join("")}</nav>
+    <div class="home-header-tools">
+      <label class="locale-switcher"><span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span><select data-locale-switcher ${localizedAttribute("aria-label", "selectLanguage")}><option value="en"${locale === "en" ? " selected" : ""}>${escapeHtml(siteText("en", "english"))}</option><option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>${escapeHtml(siteText("zh-CN", "chinese"))}</option></select></label>
+      <div class="theme-controls" role="group" ${localizedAttribute("aria-label", "colorTheme")}><button type="button" data-theme-choice="light" ${localizedAttribute("aria-label", "lightTheme")} ${localizedAttribute("title", "lightTheme")}>${siteIcon("sun")}</button><button type="button" data-theme-choice="dark" ${localizedAttribute("aria-label", "darkTheme")} ${localizedAttribute("title", "darkTheme")}>${siteIcon("moon")}</button></div>
+      <a class="github-link" href="${SITE_GITHUB_URL}" ${localizedAttribute("aria-label", "githubRepository")} ${localizedAttribute("title", "githubRepository")}>${siteIcon("github")}</a>
+      <a class="button button-primary" href="${escapeHtml(sitePath(basePath, "/run/"))}">${renderUiText("getStarted", locale)} ${siteIcon("arrow")}</a>
     </div>
-  </header>`;
+  </div></header>`;
 }
 
 function renderFooter(benchmark: SiteFooterBenchmark, locale: SiteLocale): string {
