@@ -160,6 +160,19 @@ export function renderKeyValueList(items: readonly [string, string][]): string {
     .join("")}</dl>`;
 }
 
+function navLink(
+  labelKey: SiteUiTextKey,
+  route: string,
+  activeRoute: string,
+  basePath: string,
+  locale: SiteLocale,
+): string {
+  const active =
+    activeRoute === route ||
+    (route === "/data/" && activeRoute.startsWith("/data/"));
+  return `<a href="${escapeHtml(sitePath(basePath, route))}"${active ? ' aria-current="page"' : ""}>${renderUiText(labelKey, locale)}</a>`;
+}
+
 function renderHeader(
   activeRoute: string,
   basePath: string,
@@ -167,10 +180,58 @@ function renderHeader(
 ): string {
   const isCaseSurface = activeRoute === "/data/cases/" || activeRoute.startsWith("/data/cases/");
   const isBlogPage = activeRoute.startsWith("/blog/");
+  const isModelsPage = activeRoute === "/models/" || activeRoute === "/models/[modelId]/";
   const isExplorerPage =
     activeRoute === "/data/heatmap/" ||
     activeRoute === "/data/trials/" ||
     activeRoute === "/data/trials/[trialId]/";
+  const usesPublicTeachometryChrome =
+    activeRoute === "/" ||
+    activeRoute === "/data/" ||
+    activeRoute === "/methodology/" ||
+    activeRoute === "/leaderboard/" ||
+    activeRoute === "/about/" ||
+    activeRoute === "/community/" ||
+    activeRoute === "/run/" ||
+    activeRoute === "/docs/" ||
+    activeRoute === "/404.html" ||
+    isBlogPage ||
+    isCaseSurface ||
+    isModelsPage ||
+    isExplorerPage;
+
+  if (!usesPublicTeachometryChrome) {
+    return `<header class="site-header">
+      <div class="shell header-inner">
+        <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="TutorBench home">
+          <img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt="">
+          <span class="wordmark-copy">
+            <span class="wordmark-name">TutorBench</span>
+            <span class="wordmark-descriptor">AI Tutor 评测基准</span>
+          </span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">${renderUiText("menu", locale)}</button>
+        <nav id="primary-navigation" class="nav-links" aria-label="${escapeHtml(siteText(locale, "primaryNavigation"))}">
+          ${navLink("leaderboard", "/leaderboard/", activeRoute, basePath, locale)}
+          ${navLink("data", "/data/", activeRoute, basePath, locale)}
+          ${navLink("run", "/run/", activeRoute, basePath, locale)}
+          ${navLink("methodology", "/methodology/", activeRoute, basePath, locale)}
+          ${navLink("docs", "/docs/", activeRoute, basePath, locale)}
+          ${navLink("community", "/community/", activeRoute, basePath, locale)}
+          <a href="${escapeHtml(sitePath(basePath, "/blog/"))}"${activeRoute.startsWith("/blog/") ? ' aria-current="page"' : ""}>Blog</a>
+          <a href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">GitHub ↗</a>
+          <label class="locale-switcher">
+            <span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span>
+            <select data-locale-switcher aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}">
+              <option value="en"${locale === "en" ? " selected" : ""}>${escapeHtml(siteText("en", "english"))}</option>
+              <option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>${escapeHtml(siteText("zh-CN", "chinese"))}</option>
+            </select>
+          </label>
+        </nav>
+      </div>
+    </header>`;
+  }
+
   const links = [
     ["homeNav", "/"],
     ["benchmarkNav", "/data/"],
