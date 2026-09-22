@@ -28,10 +28,6 @@
   color: var(--accent);
 }
 
-.results-page .home-header .locale-switcher select {
-  min-width: 80px;
-  padding: 5px 19px 5px 4px;
-}
 
 /* Results keeps the approved compact footer navigation/mark metrics. */
 body.results-page .home-footer nav {
