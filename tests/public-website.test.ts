@@ -40,6 +40,35 @@ test("homepage derives facts and escapes case content without inventing model re
   assert.match(content, /No model response or model score is published here/);
 });
 
+test("shared public header is consistent, localized, and exposes language controls", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const pages = [
+    renderPage(renderHomePage(artifacts), { locale: "zh-CN" }),
+    renderPage(renderRunPage(artifacts), { locale: "zh-CN" }),
+    renderPage(renderDocsPage(artifacts), { locale: "zh-CN" }),
+  ];
+
+  for (const html of pages) {
+    assert.match(html, /<header class="site-header home-header">/);
+    assert.equal((html.match(/data-locale-switcher/g) ?? []).length, 1);
+    assert.match(html, /data-ui-text="homeNav"/);
+    assert.match(html, /data-ui-text="benchmarkNav"/);
+    assert.match(html, /data-ui-text="methodNav"/);
+    assert.match(html, /data-ui-text="resultsNav"/);
+    assert.match(html, /data-ui-text="casesNav"/);
+    assert.match(html, /data-ui-text="aboutNav"/);
+    assert.match(html, /data-ui-text="blogNav"/);
+    assert.match(html, /data-ui-text="brandDescriptor"/);
+    assert.match(html, /data-ui-text="getStarted"/);
+    assert.match(html, /data-ui-aria-en="Primary navigation"/);
+    assert.match(html, /data-ui-aria-zh-cn="主导航"/);
+    assert.match(html, /data-ui-title-zh-cn="GitHub 仓库"/);
+    assert.match(html, /<html lang="zh-CN" data-ui-locale="zh-CN">/);
+    assert.match(html, />首页</);
+    assert.match(html, />开始使用</);
+  }
+});
+
 test("home reconstruction uses real blog routes and cases reuse the Teachometry shell", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const page = renderHomePage(artifacts);
