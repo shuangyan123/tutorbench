@@ -66,9 +66,13 @@ Use only when the user explicitly asks to continue an existing open PR or addres
 - Verify PR base, head branch, exact PR HEAD SHA, and ownership before writing.
 - Continue that exact branch; do not create a second PR for the same task.
 
-## 4. Hard preflight for repository-content writes
+## 4. Startup stale-worktree reconciliation and hard preflight
 
-Before mode C writes, establish the exact base and safe task location. With local Git, inspect at minimum:
+Before a new mode C repository-content write task, first reconcile stale disposable worktrees
+from earlier completed tasks when the local environment permits it. This is part of startup
+housekeeping, not a requirement that the previous Codex process remain alive after Merge.
+
+Preferred local startup sequence from the canonical main worktree:
 
 ```bash
 git status --short
@@ -78,9 +82,38 @@ git rev-parse HEAD
 git fetch origin
 git rev-parse origin/main
 git worktree list --porcelain
+npm run worktree:audit
 ```
 
-The preflight must establish:
+If and only if the invoking canonical main worktree is attached, clean, free of unfinished
+Git state, on `main`, and can be synchronized to the freshly fetched exact `origin/main`
+without discarding user work, synchronize it with:
+
+```bash
+git pull --ff-only origin main
+```
+
+Then run:
+
+```bash
+npm run worktree:audit
+npm run worktree:cleanup
+npm run worktree:audit
+```
+
+Startup cleanup is automatic for entries classified `SAFE_TO_REMOVE`; do not ask the user
+for a separate cleanup confirmation. The repository-owned guard must remain the authority:
+never replace it with directory-name guesses, `git worktree remove --force`, manual folder
+deletion, reset/stash/clean, metadata pruning, or branch deletion.
+
+If startup cleanup cannot run safely because the canonical main worktree is dirty, detached,
+mid-operation, unavailable, behind in a way that cannot fast-forward safely, or otherwise
+ambiguous, skip the cleanup mutation and preserve all work. A skipped cleanup is not by
+itself permission to alter or discard the blocking state. Continue the new task only if an
+independent safe task location can still be established; otherwise stop and report the
+preflight blocker.
+
+After startup reconciliation, the mode C preflight must establish:
 
 - latest `origin/main` SHA is known;
 - selected task location is clean, attached, and free of unfinished merge/rebase/cherry-pick/revert;
@@ -89,7 +122,7 @@ The preflight must establish:
 
 If the normal worktree is occupied by another verified task/PR, leave it untouched. A disposable task worktree may be used when isolation is materially useful. Never stash, reset, restore, clean, force-checkout, prune, or delete unknown/user-owned work to make the preflight pass.
 
-For mode D, inspect the existing PR first and bind all writes to the exact verified PR head branch/HEAD SHA.
+For mode D, inspect the existing PR first and bind all writes to the exact verified PR head branch/HEAD SHA. Startup stale-worktree reconciliation is not required before continuing an existing PR when doing so would disturb that PR's checked-out worktree.
 
 ## 5. Branch and connector write invariant
 
@@ -128,8 +161,10 @@ clean synchronized main worktree
 
 Use a disposable worktree when another task/PR must remain checked out or switching would disturb user work. Before creating/removing one, verify path, branch, HEAD, status, and ownership. Never force-remove or prune an unknown/user-owned worktree.
 
-After an authorized merge, use the repository-owned guard rather than relying
-on prose-only cleanup:
+After Merge, use the repository-owned guard rather than relying
+on prose-only cleanup. If the process that implemented the task is no longer running,
+the next new-task startup reconciliation in Section 4 must recover and remove any
+now-safe stale worktree:
 
 ```bash
 npm run worktree:audit
@@ -457,7 +492,7 @@ Normal repository-content delivery is:
 ```text
 Understand scope
 -> select workflow mode
--> audit
+-> startup stale-worktree reconciliation for new write tasks when locally safe
 -> exact-base preflight
 -> fresh task branch
 -> implement
@@ -481,7 +516,11 @@ Understand scope
 
 If a separate reviewer/orchestrator owns the review gate, the implementation worker
 stops at `READY FOR REVIEW` and hands off the exact PR HEAD; the orchestrator then
-continues the same lifecycle. If an explicit-approval action is required and not
-authorized, stop at `EXPLICIT APPROVAL REQUIRED`.
+continues the same lifecycle. The implementation process does not need to remain alive
+until Merge. Any merged disposable worktree left behind is reconciled automatically by
+the next new-task startup under Section 4 when it is proven `SAFE_TO_REMOVE`.
+
+If an explicit-approval action is required and not authorized, stop at
+`EXPLICIT APPROVAL REQUIRED`.
 
 If any critical condition fails, preserve the last safe continuation state instead of bypassing the guardrail.
