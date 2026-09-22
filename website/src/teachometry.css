@@ -780,7 +780,24 @@ body:is(
   width: 20px;
   height: 20px;
   flex: 0 0 auto;
+  overflow: visible;
   vertical-align: middle;
+}
+
+body:is(
+  .home-page,
+  .methodology-page,
+  .results-page,
+  .cases-page,
+  .case-detail-page,
+  .about-page,
+  .blog-page,
+  .models-page,
+  .model-detail-page,
+  .run-page,
+  .docs-page
+) .site-icon > * {
+  vector-effect: non-scaling-stroke;
 }
 
 /* These pages intentionally keep the approved compact 19px content-icon
