@@ -372,6 +372,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${isBlogPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     ${isExplorerPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/explorers.css"))}">` : ""}
     ${isNotFoundPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/not-found.css"))}">` : ""}
+    ${isTeachometryPage ? `<script type="speculationrules">{"prerender":[{"source":"document","where":{"selector_matches":"#primary-navigation a[href]"},"eagerness":"moderate"}]}</script>` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
   <body${bodyClass}>
