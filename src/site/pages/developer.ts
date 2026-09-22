@@ -29,17 +29,22 @@ type RunConsolePanel = {
 };
 
 function renderRunBotanical(className: string): string {
-  return `<svg class="run-botanical ${className}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  return `<svg class="run-botanical ${className}" viewBox="0 0 260 350" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.6" />
-      <path d="M133 190C103 155 76 123 54 83M126 236C93 219 56 198 22 166M143 140C170 119 194 91 215 58M119 277C88 265 53 250 16 224M153 103C179 91 204 71 228 44" stroke-width="1.15" />
+      <path d="M126 344C126 298 129 251 138 207C149 151 168 94 208 24" stroke-width="1.55"/>
+      <path d="M136 221C108 192 83 159 61 116M131 269C98 252 67 228 36 195M147 178C176 156 200 126 224 91M126 309C93 296 59 278 27 252M162 139C190 124 217 103 239 78" stroke-width="1.05"/>
+      <path d="M68 119C86 128 101 142 113 160M42 197C64 204 83 214 99 226M222 93C205 102 190 113 177 128M31 253C53 258 73 266 91 278M238 80C218 86 201 95 186 106" stroke-width=".8" opacity=".72"/>
     </g>
-    <g fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-linejoin="round">
-      <path d="M54 83C41 67 29 49 32 32C50 37 65 54 68 72C63 78 59 81 54 83Z" stroke-width="1.05" />
-      <path d="M22 166C11 147 4 126 10 108C29 116 43 135 42 153C36 159 30 163 22 166Z" stroke-width="1.05" />
-      <path d="M215 58C214 39 219 20 234 8C240 27 235 46 222 60C219 60 217 59 215 58Z" stroke-width="1.05" />
-      <path d="M16 224C11 207 14 190 26 178C39 194 39 211 29 225C24 226 20 226 16 224Z" stroke-width="1.05" />
-      <path d="M228 44C228 27 235 12 248 4C252 21 246 38 236 47C233 47 230 46 228 44Z" stroke-width="1.05" />
+    <g fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-linejoin="round">
+      <path d="M61 116C45 96 35 73 40 53C62 61 78 81 79 103C74 109 68 113 61 116Z" stroke-width="1"/>
+      <path d="M36 195C22 175 16 152 24 132C44 142 58 163 55 182C49 188 43 192 36 195Z" stroke-width="1"/>
+      <path d="M224 91C223 69 230 46 247 31C254 52 248 76 232 93C229 93 226 92 224 91Z" stroke-width="1"/>
+      <path d="M27 252C20 233 23 213 38 199C53 217 53 237 41 253C36 254 31 254 27 252Z" stroke-width="1"/>
+      <path d="M239 78C239 58 247 39 262 29C267 48 261 68 249 80C245 81 242 80 239 78Z" stroke-width="1"/>
+      <path d="M207 25C210 48 206 70 194 89C182 79 178 61 184 45C190 35 197 28 207 25Z" stroke-width="1"/>
+    </g>
+    <g fill="none" stroke="currentColor" stroke-linecap="round" opacity=".45">
+      <path d="M53 59C58 73 62 88 61 113M31 139C36 152 38 166 36 191M245 38C240 53 234 68 225 88M39 207C35 221 31 235 28 249M258 35C252 48 246 62 240 76M190 48C198 59 202 71 194 86" stroke-width=".65"/>
     </g>
   </svg>`;
 }
@@ -325,24 +330,23 @@ function renderMethodologyStatus(artifacts: PublicBenchmarkArtifacts): string {
 }
 
 function renderMethodologyBotanical(className: string): string {
-  return `<svg class="method-botanical ${className}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  return `<svg class="method-botanical ${className}" viewBox="0 0 260 350" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.6" />
-      <path d="M133 190C103 155 76 123 54 83" stroke-width="1.15" />
-      <path d="M126 236C93 219 56 198 22 166" stroke-width="1.15" />
-      <path d="M143 140C170 119 194 91 215 58" stroke-width="1.15" />
-      <path d="M119 277C88 265 53 250 16 224" stroke-width="1.15" />
-      <path d="M153 103C179 91 204 71 228 44" stroke-width="1.15" />
-      <path d="M115 295C91 302 61 305 32 300" stroke-width="1.05" />
+      <path d="M128 345C126 298 129 249 139 203C151 146 171 88 210 20" stroke-width="1.5"/>
+      <path d="M137 218C110 187 86 153 62 111M131 268C100 251 68 228 34 193M149 174C178 151 202 120 225 86M125 309C94 297 61 279 28 252M164 135C191 120 217 99 241 74M121 327C98 333 72 335 45 331" stroke-width="1.05"/>
+      <path d="M70 113C86 123 101 138 113 156M42 195C62 202 82 213 99 224M223 88C206 98 191 110 178 124M31 253C51 258 72 266 90 277M239 76C220 83 203 92 188 103M50 330C69 322 88 318 108 319" stroke-width=".8" opacity=".72"/>
     </g>
-    <g fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-linejoin="round">
-      <path d="M54 83C41 67 29 49 32 32C50 37 65 54 68 72C63 78 59 81 54 83Z" stroke-width="1.05" />
-      <path d="M22 166C11 147 4 126 10 108C29 116 43 135 42 153C36 159 30 163 22 166Z" stroke-width="1.05" />
-      <path d="M215 58C214 39 219 20 234 8C240 27 235 46 222 60C219 60 217 59 215 58Z" stroke-width="1.05" />
-      <path d="M16 224C11 207 14 190 26 178C39 194 39 211 29 225C24 226 20 226 16 224Z" stroke-width="1.05" />
-      <path d="M228 44C228 27 235 12 248 4C252 21 246 38 236 47C233 47 230 46 228 44Z" stroke-width="1.05" />
-      <path d="M32 300C20 289 13 275 17 261C34 267 46 280 46 294C42 298 37 300 32 300Z" stroke-width="1.05" />
-      <path d="M192 18C194 39 191 57 180 73C171 64 168 48 174 35C179 27 185 21 192 18Z" stroke-width="1.05" />
+    <g fill="currentColor" fill-opacity=".065" stroke="currentColor" stroke-linejoin="round">
+      <path d="M62 111C45 91 35 68 40 48C62 56 78 76 80 99C74 105 69 109 62 111Z" stroke-width="1"/>
+      <path d="M34 193C21 174 16 151 24 131C45 141 58 162 55 181C49 187 42 191 34 193Z" stroke-width="1"/>
+      <path d="M225 86C224 65 231 43 248 28C255 49 249 73 233 89C230 89 227 88 225 86Z" stroke-width="1"/>
+      <path d="M28 252C21 233 24 213 39 198C54 216 54 237 42 253C37 254 32 254 28 252Z" stroke-width="1"/>
+      <path d="M241 74C241 54 248 36 263 26C268 45 262 65 250 77C246 78 243 77 241 74Z" stroke-width="1"/>
+      <path d="M210 20C213 43 209 65 197 84C185 74 181 57 187 40C193 31 201 23 210 20Z" stroke-width="1"/>
+      <path d="M45 331C31 322 23 309 25 294C43 299 56 312 59 326C55 329 50 331 45 331Z" stroke-width="1"/>
+    </g>
+    <g fill="none" stroke="currentColor" stroke-linecap="round" opacity=".42">
+      <path d="M53 54C59 69 62 85 62 108M31 137C37 152 38 166 35 189M247 35C241 51 235 66 226 83M40 206C36 221 31 236 29 249M260 33C253 47 247 60 242 72M192 43C200 55 203 67 197 81M31 299C38 309 43 318 45 328" stroke-width=".65"/>
     </g>
   </svg>`;
 }
