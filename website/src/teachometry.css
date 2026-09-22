@@ -1696,21 +1696,6 @@ body:is(
     animation: teach-locale-refresh 180ms ease-out both;
   }
 
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-    .run-page,
-    .docs-page
-  ) main {
-    animation: teach-page-enter 220ms ease-out both;
-  }
 }
 
 @keyframes teach-nav-indicator {
@@ -1720,11 +1705,6 @@ body:is(
 
 @keyframes teach-locale-refresh {
   from { opacity: .72; transform: translateY(1px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes teach-page-enter {
-  from { opacity: .72; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 

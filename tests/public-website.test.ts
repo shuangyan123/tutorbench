@@ -67,6 +67,18 @@ test("shared public header keeps one canonical language-control geometry", async
   }
 });
 
+test("public navigation avoids an artificial page-entry delay and warms likely targets", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const html = renderPage(renderHomePage(artifacts));
+  assert.match(html, /<script type="speculationrules">/);
+  assert.match(html, /#primary-navigation a\[href\]/);
+  const chromeStyles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
+  assert.doesNotMatch(chromeStyles, /teach-page-enter/);
+  const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
+  assert.match(siteScript, /prefetchRoute/);
+  assert.match(siteScript, /prefetch\.rel = "prefetch"/);
+});
+
 test("shared public header is consistent, localized, and exposes language controls", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const pages = [
