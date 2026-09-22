@@ -407,6 +407,8 @@ body:is(
   .docs-page
 ) .theme-controls {
   display: inline-flex;
+  height: var(--teach-button-height);
+  box-sizing: border-box;
   align-items: center;
   gap: 2px;
   padding: 4px;
@@ -501,8 +503,9 @@ body:is(
   .docs-page
 ) .home-header .github-link {
   display: inline-flex;
-  width: var(--teach-control-size);
-  height: var(--teach-control-size);
+  width: var(--teach-button-height);
+  height: var(--teach-button-height);
+  box-sizing: border-box;
   align-items: center;
   justify-content: center;
   margin: 0;
@@ -645,10 +648,32 @@ body:is(
   .model-detail-page,
   .run-page,
   .docs-page
+) .locale-switcher {
+  flex: 0 0 auto;
+}
+
+body:is(
+  .home-page,
+  .methodology-page,
+  .results-page,
+  .cases-page,
+  .case-detail-page,
+  .about-page,
+  .blog-page,
+  .models-page,
+  .model-detail-page,
+  .run-page,
+  .docs-page
 ) .locale-switcher select {
-  min-height: 30px;
+  width: 92px;
+  min-width: 92px;
+  max-width: 92px;
+  height: var(--teach-button-height);
+  min-height: var(--teach-button-height);
+  box-sizing: border-box;
+  padding: 0 28px 0 10px;
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: var(--teach-button-radius);
   background: var(--surface);
   color: var(--ink);
   font: 11px/1.4 var(--teach-sans);

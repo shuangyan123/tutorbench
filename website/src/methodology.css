@@ -63,10 +63,6 @@
   color: var(--accent-strong);
 }
 
-.methodology-page .home-header .locale-switcher select {
-  min-width: 82px;
-  padding: 7px 25px 7px 9px;
-}
 
 .method-hero {
   position: relative;

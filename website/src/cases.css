@@ -22,10 +22,6 @@
   color: var(--accent);
 }
 
-.cases-page .home-header .locale-switcher select {
-  min-width: 80px;
-  padding: 5px 19px 5px 4px;
-}
 
 .cases-main {
   overflow: clip;

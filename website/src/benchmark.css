@@ -75,5 +75,4 @@
 @media (max-width: 540px) { .benchmark-hero { padding-top: 20px; } .benchmark-thesis h1 { font-size: 42px; } .benchmark-snapshot { padding: 18px; } .benchmark-facts { grid-template-columns: repeat(2,1fr); gap: 20px; } .benchmark-facts>div { padding: 0; border: 0; } .benchmark-facts dd { font-size: 34px; } .benchmark-explore-grid,.benchmark-coverage-cards { grid-template-columns: 1fr; } .benchmark-entry { padding: 24px; } .benchmark-entry-icon { margin-bottom: 18px; } .benchmark-open { grid-template-columns: 1fr; padding: 24px; } .benchmark-open-links { grid-column: auto; } .benchmark-distribution-body { grid-template-columns: 65px 1fr; } .benchmark-total { display: block; } .benchmark-principles { gap: 12px; } }
 
 .benchmark-page .benchmark-thesis h1 em { font-style: italic; }
-.benchmark-page .locale-switcher select { max-width: 95px; }
 @media (max-width: 540px) { .benchmark-lede { font-size: 18px; } }
