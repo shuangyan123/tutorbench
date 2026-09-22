@@ -4,6 +4,19 @@ export type SiteLocale = (typeof SITE_LOCALES)[number];
 export const DEFAULT_SITE_LOCALE = "en" as const;
 
 export type SiteUiTextKey =
+  | "homeNav"
+  | "benchmarkNav"
+  | "methodNav"
+  | "resultsNav"
+  | "casesNav"
+  | "aboutNav"
+  | "blogNav"
+  | "getStarted"
+  | "menu"
+  | "brandDescriptor"
+  | "lightTheme"
+  | "darkTheme"
+  | "githubRepository"
   | "leaderboard"
   | "data"
   | "run"
@@ -223,6 +236,19 @@ export type SiteUiTextKey =
 
 const translations: Record<SiteLocale, Record<SiteUiTextKey, string>> = {
   en: {
+    homeNav: "Home",
+    benchmarkNav: "Benchmark",
+    methodNav: "Method",
+    resultsNav: "Results",
+    casesNav: "Cases",
+    aboutNav: "About",
+    blogNav: "Blog",
+    getStarted: "Get Started",
+    menu: "Menu",
+    brandDescriptor: "Measurement infrastructure for AI tutoring",
+    lightTheme: "Light theme",
+    darkTheme: "Dark theme",
+    githubRepository: "GitHub repository",
     leaderboard: "Leaderboard",
     data: "Data",
     run: "Run",
@@ -441,6 +467,19 @@ const translations: Record<SiteLocale, Record<SiteUiTextKey, string>> = {
     communityWatchGitHub: "Follow the repository on GitHub ↗",
   },
   "zh-CN": {
+    homeNav: "首页",
+    benchmarkNav: "基准",
+    methodNav: "方法",
+    resultsNav: "结果",
+    casesNav: "案例",
+    aboutNav: "关于",
+    blogNav: "博客",
+    getStarted: "开始使用",
+    menu: "菜单",
+    brandDescriptor: "AI 辅导的测量基础设施",
+    lightTheme: "浅色主题",
+    darkTheme: "深色主题",
+    githubRepository: "GitHub 仓库",
     leaderboard: "排行榜",
     data: "数据",
     run: "运行",
