@@ -80,8 +80,7 @@ body.model-detail-page {
   z-index: -1;
   inset: 0;
   background:
-    linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 95%, transparent) 35%, color-mix(in srgb, var(--bg) 48%, transparent) 63%, color-mix(in srgb, var(--bg) 20%, transparent) 100%),
-    url("./home-hero-bg.webp") center 45% / cover no-repeat;
+    linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 95%, transparent) 35%, color-mix(in srgb, var(--bg) 48%, transparent) 63%, color-mix(in srgb, var(--bg) 20%, transparent) 100%);
   content: "";
   opacity: 0.92;
 }
@@ -1062,8 +1061,7 @@ body.model-detail-page .models-closing .eyebrow,
 
 body.models-page[data-theme="dark"] .models-hero::before {
   background:
-    linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 42%, color-mix(in srgb, var(--bg) 62%, transparent) 100%),
-    url("./home-hero-bg.webp") center 45% / cover no-repeat;
+    linear-gradient(90deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 42%, color-mix(in srgb, var(--bg) 62%, transparent) 100%);
   opacity: 0.3;
 }
 
@@ -1192,9 +1190,7 @@ body.model-detail-page[data-theme="dark"] .models-closing {
 
 @media (max-width: 600px) {
   .models-hero::before {
-    background:
-      linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 52%, color-mix(in srgb, var(--bg) 48%, transparent) 100%),
-      url("./home-hero-bg.webp") 68% bottom / auto 430px no-repeat;
+    background: linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 52%, color-mix(in srgb, var(--bg) 48%, transparent) 100%);
     opacity: 0.55;
   }
 

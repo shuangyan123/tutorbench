@@ -14,6 +14,7 @@ import {
   type SitePage,
 } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
+import { renderDecorativeSvg } from "../illustrations.js";
 import { renderTeachometryFooter } from "./home.js";
 
 function page(
@@ -61,7 +62,10 @@ function resultsFieldLabel(field: string): string {
 }
 
 function renderResultsHeroArt(): string {
-  return `<svg class="results-hero-svg" viewBox="0 0 720 410" role="img" aria-label="Decorative line drawing of a report and leaves">
+  return renderDecorativeSvg({
+    className: "results-hero-svg",
+    viewBox: "0 0 720 410",
+    body: `
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path class="results-leaf-stem" d="M94 322C156 256 188 186 192 66" />
       <path class="results-leaf-stem" d="M90 320C62 262 47 218 53 172" />
@@ -80,11 +84,12 @@ function renderResultsHeroArt(): string {
       <path class="results-leaf" d="M650 292C617 278 601 255 605 230C631 236 648 258 650 292Z" />
       <path class="results-leaf" d="M673 253C680 225 698 208 719 208C716 235 699 252 673 253Z" />
     </g>
-  </svg>`;
+  `,
+  });
 }
 
 function renderResultsBotanical(): string {
-  return `<svg class="results-botanical" viewBox="0 0 220 260" aria-hidden="true">
+  return `<svg class="results-botanical" viewBox="0 0 220 260" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M108 258C108 207 119 158 147 113C166 83 184 54 193 16" stroke-width="1.4" />
       <path d="M127 177C99 153 73 125 50 92M116 216C83 206 55 190 24 166M141 132C165 120 188 99 208 75" stroke-width="1" />
@@ -264,7 +269,7 @@ function renderModelSchemaPanel(
 }
 
 function renderModelsBotanical(className: string): string {
-  return `<svg class="models-botanical ${className}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  return `<svg class="models-botanical ${className}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.6" />
       <path d="M133 190C103 155 76 123 54 83M126 236C93 219 56 198 22 166M143 140C170 119 194 91 215 58M119 277C88 265 53 250 16 224" stroke-width="1.15" />

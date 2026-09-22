@@ -29,7 +29,7 @@ type RunConsolePanel = {
 };
 
 function renderRunBotanical(className: string): string {
-  return `<svg class="run-botanical ${className}" viewBox="0 0 260 350" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  return `<svg class="run-botanical ${className}" viewBox="0 0 260 350" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M126 344C126 298 129 251 138 207C149 151 168 94 208 24" stroke-width="1.55"/>
       <path d="M136 221C108 192 83 159 61 116M131 269C98 252 67 228 36 195M147 178C176 156 200 126 224 91M126 309C93 296 59 278 27 252M162 139C190 124 217 103 239 78" stroke-width="1.05"/>
@@ -264,7 +264,7 @@ function renderMethodologyPipeline(): string {
 
 function renderMethodologyLens(scoreDimensions: readonly string[]): string {
   return `<div class="method-lens" aria-label="Five complementary evaluation dimensions around observable tutoring behavior">
-    <svg class="method-lens-lines" viewBox="0 0 620 360" preserveAspectRatio="none" aria-hidden="true"><path d="M310 180 310 34M310 180 553 105M310 180 532 302M310 180 84 302M310 180 67 105"/></svg>
+    <svg class="method-lens-lines" viewBox="0 0 620 360" preserveAspectRatio="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><path d="M310 180 310 34M310 180 553 105M310 180 532 302M310 180 84 302M310 180 67 105"/></svg>
     <div class="method-lens-core"><span>Observable<br>tutoring<br>behavior</span></div>
     <ul class="method-lens-nodes">${scoreDimensions.map((dimension, index) => {
       const details = methodologyDimension(dimension);
@@ -330,7 +330,7 @@ function renderMethodologyStatus(artifacts: PublicBenchmarkArtifacts): string {
 }
 
 function renderMethodologyBotanical(className: string): string {
-  return `<svg class="method-botanical ${className}" viewBox="0 0 260 350" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  return `<svg class="method-botanical ${className}" viewBox="0 0 260 350" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M128 345C126 298 129 249 139 203C151 146 171 88 210 20" stroke-width="1.5"/>
       <path d="M137 218C110 187 86 153 62 111M131 268C100 251 68 228 34 193M149 174C178 151 202 120 225 86M125 309C94 297 61 279 28 252M164 135C191 120 217 99 241 74M121 327C98 333 72 335 45 331" stroke-width="1.05"/>
@@ -626,7 +626,7 @@ const docsIndex: readonly DocsIndexEntry[] = [
 ];
 
 function renderDocsBotanical(className: string): string {
-  return `<svg class="docs-botanical ${escapeHtml(className)}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  return `<svg class="docs-botanical ${escapeHtml(className)}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.35" />
       <path d="M133 190C103 155 76 123 54 83M126 236C93 219 56 198 22 166M143 140C170 119 194 91 215 58M119 277C88 265 53 250 16 224M153 103C179 91 204 71 228 44" stroke-width="1.05" />

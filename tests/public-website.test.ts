@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -14,11 +14,14 @@ import {
   type PublicBenchmarkArtifacts,
 } from "../src/datasets/index.js";
 import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/index.js";
+import { PUBLIC_SITE_RASTER_ASSETS } from "../src/site/assets.js";
 import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
+import { renderEditorialBotanical } from "../src/site/illustrations.js";
 import { renderHomePage } from "../src/site/pages/home.js";
 import { renderHeatmapPage, renderTrialDetailPage, renderTrialsPage } from "../src/site/pages/data.js";
-import { renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
+import { renderLeaderboardPage, renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
 import { renderDocsPage, renderRunPage } from "../src/site/pages/developer.js";
+import { renderCommunityPage } from "../src/site/pages/community.js";
 import { renderNotFoundPage } from "../src/site/pages/not-found.js";
 
 test("homepage derives facts and escapes case content without inventing model results", async () => {
@@ -120,7 +123,7 @@ test("home reconstruction uses real blog routes and cases reuse the Teachometry 
   assert.equal((home.match(/<article class="home-blog-card">/g) ?? []).length, 2);
   assert.match(home, /September 17, 2026/);
   assert.doesNotMatch(home, /Sep 10, 2024|Why Observable Behavior Matters in AI Tutoring/);
-  for (const image of ["home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
+  for (const image of PUBLIC_SITE_RASTER_ASSETS.filter((asset) => asset !== "foliage.png" && asset !== "home-hero-bg.webp" && asset !== "home-open-data-bg.webp").map((asset) => asset.replace(/\.webp$/, ""))) {
     assert.ok(home.includes(`src="/preview/assets/${image}.webp"`));
   }
   assert.ok(home.indexOf('class="home-data"') < home.indexOf('class="home-blog"'));
@@ -130,6 +133,59 @@ test("home reconstruction uses real blog routes and cases reuse the Teachometry 
   assert.match(other, /href="\/assets\/cases\.css"/);
   assert.match(other, /<body class="cases-page">/);
   assert.doesNotMatch(other, /home-blog|site-footer|home-page/);
+});
+
+test("decorative site illustrations use explicit non-semantic SVG attributes", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const resultsHtml = renderPage(renderLeaderboardPage(artifacts));
+  const resultsHeroSvg = resultsHtml.match(/<svg class="results-hero-svg"[^>]*>/u)?.[0];
+  assert.ok(resultsHeroSvg);
+  assert.match(resultsHeroSvg, /aria-hidden="true"/u);
+  assert.match(resultsHeroSvg, /focusable="false"/u);
+  assert.match(resultsHeroSvg, /shape-rendering="geometricPrecision"/u);
+  assert.doesNotMatch(resultsHeroSvg, /role="img"|aria-label=/u);
+
+  const editorialSvg = renderEditorialBotanical("test-editorial");
+  assert.match(editorialSvg, /class="test-editorial"/u);
+  assert.match(editorialSvg, /aria-hidden="true"/u);
+  assert.match(editorialSvg, /focusable="false"/u);
+  assert.match(editorialSvg, /shape-rendering="geometricPrecision"/u);
+  assert.match(editorialSvg, /M34 294 24 271/u);
+
+  const communityHtml = renderPage(renderCommunityPage(artifacts, "en"));
+  const ecosystemSvg = communityHtml.match(/<svg class="community-ecosystem-lines"[^>]*>/u)?.[0];
+  assert.ok(ecosystemSvg);
+  assert.match(ecosystemSvg, /aria-hidden="true"/u);
+  assert.match(ecosystemSvg, /focusable="false"/u);
+  assert.match(ecosystemSvg, /shape-rendering="geometricPrecision"/u);
+});
+
+test("public raster inventory is explicit and CSS image references stay self-contained", async () => {
+  const imageDirectory = join(process.cwd(), "website", "src", "images");
+  const sourceRasterAssets = (await readdir(imageDirectory))
+    .filter((name) => /\.(?:png|webp)$/u.test(name))
+    .sort();
+  assert.deepEqual(sourceRasterAssets, [...PUBLIC_SITE_RASTER_ASSETS].sort());
+
+  const stylesheetNames = (await readdir(join(process.cwd(), "website", "src")))
+    .filter((name) => name.endsWith(".css"));
+  for (const stylesheetName of stylesheetNames) {
+    const stylesheet = await readFile(join(process.cwd(), "website", "src", stylesheetName), "utf8");
+    for (const match of stylesheet.matchAll(/url\(["']?\.\/([^)'"\s]+)["']?\)/gu)) {
+      assert.ok(
+        PUBLIC_SITE_RASTER_ASSETS.includes(match[1] as (typeof PUBLIC_SITE_RASTER_ASSETS)[number]),
+        `${stylesheetName} references an unlisted raster asset: ${match[1]}`,
+      );
+    }
+  }
+});
+
+test("route photo reuse stays scoped to compatible visual subjects", async () => {
+  const communityStyles = await readFile(join(process.cwd(), "website", "src", "community.css"), "utf8");
+  const modelStyles = await readFile(join(process.cwd(), "website", "src", "models.css"), "utf8");
+  assert.match(communityStyles, /community-task-media[\s\S]*home-blog-03\.webp/u);
+  assert.match(communityStyles, /community-closing-image[\s\S]*home-blog-01\.webp/u);
+  assert.doesNotMatch(modelStyles, /models-hero[\s\S]*home-hero-bg\.webp/u);
 });
 
 async function loadDataset() {
@@ -430,16 +486,30 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /Measurement infrastructure/);
     assert.match(homeHtml, /rel="icon" href="\/assets\/brand\/tutorbench\/raster\/favicon\.ico"/);
     assert.match(homeHtml, /rel="icon" type="image\/png" sizes="32x32" href="\/assets\/brand\/tutorbench\/raster\/favicon-32\.png"/);
-    assert.deepEqual(
-      await readFile(join(outputDirectory, "assets", "foliage.png")),
-      await readFile(join(process.cwd(), "website", "src", "images", "foliage.png")),
-    );
-    for (const name of ["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
+    for (const asset of PUBLIC_SITE_RASTER_ASSETS) {
       assert.deepEqual(
-        await readFile(join(outputDirectory, "assets", `${name}.webp`)),
-        await readFile(join(process.cwd(), "website", "src", "images", `${name}.webp`)),
-        `Home build must preserve the supplied asset bytes: ${name}`,
+        await readFile(join(outputDirectory, "assets", asset)),
+        await readFile(join(process.cwd(), "website", "src", "images", asset)),
+        `Website build must preserve the reviewed asset bytes: ${asset}`,
       );
+    }
+    const generatedHtmlFiles = (await readdir(outputDirectory, { recursive: true }))
+      .filter((name): name is string => typeof name === "string" && name.endsWith(".html"));
+    for (const htmlFile of generatedHtmlFiles) {
+      const html = await readFile(join(outputDirectory, htmlFile), "utf8");
+      for (const match of html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/gu)) {
+        const source = match[1];
+        assert.ok(source !== undefined);
+        if (source === undefined) continue;
+        assert.doesNotMatch(source, /^(?:https?:)?\/\//u, `Generated HTML hotlinks an image: ${source}`);
+        const rasterMatch = source.match(/\/assets\/([^/]+\.(?:png|webp))$/u);
+        if (rasterMatch !== null) {
+          assert.ok(
+            PUBLIC_SITE_RASTER_ASSETS.includes(rasterMatch[1] as (typeof PUBLIC_SITE_RASTER_ASSETS)[number]),
+            `Generated HTML references an unlisted raster asset: ${rasterMatch[1]}`,
+          );
+        }
+      }
     }
     for (const assetPath of TUTORBENCH_BRAND_ASSET_PATHS) {
       assert.deepEqual(

@@ -5,7 +5,7 @@ import { renderTeachometryFooter } from "./home.js";
 
 function renderNotFoundArtwork(): string {
   return `<div class="not-found-art not-found-art-left" aria-hidden="true">
-    <svg viewBox="0 0 420 340" fill="none" focusable="false">
+    <svg viewBox="0 0 420 340" fill="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
       <path class="not-found-trail" d="M218 124C133 112 105 62 62 92C15 124 78 178 145 169C215 160 257 192 221 230C189 263 108 270 67 318" />
       <path class="not-found-stem" d="M142 314C128 265 129 208 145 150C155 115 167 81 166 46" />
       <path class="not-found-leaf" d="M145 187C104 174 80 148 73 113C108 119 134 143 145 187Z" />
@@ -21,7 +21,7 @@ function renderNotFoundArtwork(): string {
     <p class="not-found-note not-found-note-left">Different<br>paths.<br>A clearer<br>direction.</p>
   </div>
   <div class="not-found-art not-found-art-right" aria-hidden="true">
-    <svg viewBox="0 0 450 350" fill="none" focusable="false">
+    <svg viewBox="0 0 450 350" fill="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
       <path class="not-found-trail" d="M314 170C365 156 396 122 429 132C459 142 428 183 383 184C339 185 317 204 344 226C369 247 405 252 427 239" />
       <path class="not-found-signpost" d="M154 318C160 243 159 163 161 58" />
       <path class="not-found-signpost" d="M148 318H175" />
