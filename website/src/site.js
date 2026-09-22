@@ -48,6 +48,20 @@
         element.textContent = translated;
       }
     });
+    document.querySelectorAll("[data-ui-aria-en]").forEach((element) => {
+      const attribute = locale === "zh-CN" ? "data-ui-aria-zh-cn" : "data-ui-aria-en";
+      const translated = element.getAttribute(attribute);
+      if (translated !== null) {
+        element.setAttribute("aria-label", translated);
+      }
+    });
+    document.querySelectorAll("[data-ui-title-en]").forEach((element) => {
+      const attribute = locale === "zh-CN" ? "data-ui-title-zh-cn" : "data-ui-title-en";
+      const translated = element.getAttribute(attribute);
+      if (translated !== null) {
+        element.setAttribute("title", translated);
+      }
+    });
     document.querySelectorAll("[data-case-count-value]").forEach((element) => {
       const templateAttribute = locale === "zh-CN"
         ? "data-case-count-template-zh-cn"
@@ -80,7 +94,9 @@
       } catch {
         // A private browsing policy may deny storage; the current page still switches.
       }
+      document.documentElement.classList.add("locale-transition");
       applyLocale(locale);
+      window.setTimeout(() => document.documentElement.classList.remove("locale-transition"), 180);
     });
   }
 
