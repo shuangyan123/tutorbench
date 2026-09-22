@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -14,13 +14,16 @@ import {
   type PublicBenchmarkArtifacts,
 } from "../src/datasets/index.js";
 import { TUTOR_EVAL_DATASET_ID, TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/index.js";
-import { PUBLIC_SITE_RASTER_ASSETS } from "../src/site/assets.js";
+import {
+  PUBLIC_SITE_BOTANICAL_ASSETS,
+  PUBLIC_SITE_RASTER_ASSETS,
+} from "../src/site/assets.js";
 import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
 import { renderEditorialBotanical } from "../src/site/illustrations.js";
 import { renderHomePage } from "../src/site/pages/home.js";
 import { renderHeatmapPage, renderTrialDetailPage, renderTrialsPage } from "../src/site/pages/data.js";
 import { renderLeaderboardPage, renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
-import { renderDocsPage, renderRunPage } from "../src/site/pages/developer.js";
+import { renderAboutPage, renderDocsPage, renderRunPage } from "../src/site/pages/developer.js";
 import { renderCommunityPage } from "../src/site/pages/community.js";
 import { renderNotFoundPage } from "../src/site/pages/not-found.js";
 
@@ -160,6 +163,30 @@ test("decorative site illustrations use explicit non-semantic SVG attributes", a
   assert.match(ecosystemSvg, /shape-rendering="geometricPrecision"/u);
 });
 
+test("page botanical artwork stays external, vector-only, and page-specific", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const pages = {
+    about: renderPage(renderAboutPage(artifacts, "0.1.0")),
+    community: renderPage(renderCommunityPage(artifacts, "en")),
+    models: renderPage(renderModelsPage(artifacts)),
+  } as const;
+
+  for (const pageKey of ["about", "community", "models"] as const) {
+    const asset = PUBLIC_SITE_BOTANICAL_ASSETS[pageKey];
+    const svg = await readFile(join(process.cwd(), "website", "src", "assets", asset.svg), "utf8");
+    const image = await stat(join(process.cwd(), "website", "src", "assets", asset.image));
+    assert.match(svg, new RegExp(`<g id="${asset.svgId}"`));
+    assert.doesNotMatch(svg, /<image\b|data:image|<metadata\b/u);
+    assert.ok(image.size > 100_000, `${pageKey} botanical photo should retain useful resolution`);
+    assert.match(pages[pageKey], new RegExp(`href="/assets/${asset.svg}#${asset.svgId}"`));
+    assert.match(pages[pageKey], new RegExp(`src="/assets/${asset.image}"`));
+  }
+
+  assert.doesNotMatch(pages.about, /community-botanical|models-botanical/u);
+  assert.doesNotMatch(pages.community, /about-botanical|models-botanical/u);
+  assert.doesNotMatch(pages.models, /about-botanical|community-botanical/u);
+});
+
 test("public raster inventory is explicit and CSS image references stay self-contained", async () => {
   const imageDirectory = join(process.cwd(), "website", "src", "images");
   const sourceRasterAssets = (await readdir(imageDirectory))
@@ -183,9 +210,11 @@ test("public raster inventory is explicit and CSS image references stay self-con
 test("route photo reuse stays scoped to compatible visual subjects", async () => {
   const communityStyles = await readFile(join(process.cwd(), "website", "src", "community.css"), "utf8");
   const modelStyles = await readFile(join(process.cwd(), "website", "src", "models.css"), "utf8");
-  assert.match(communityStyles, /community-task-media[\s\S]*home-blog-03\.webp/u);
+  assert.match(communityStyles, /community-task-media[\s\S]*community-botanical-photo/u);
+  assert.doesNotMatch(communityStyles, /community-task-media[\s\S]*home-blog-03\.webp/u);
   assert.match(communityStyles, /community-closing-image[\s\S]*home-blog-01\.webp/u);
-  assert.doesNotMatch(modelStyles, /models-hero[\s\S]*home-hero-bg\.webp/u);
+  assert.match(modelStyles, /models-botanical-photo/u);
+  assert.doesNotMatch(modelStyles, /models-hero[\s\S]*foliage-(?:right|left)-near\.webp/u);
 });
 
 async function loadDataset() {
