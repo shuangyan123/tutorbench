@@ -263,7 +263,10 @@ head: verified task branch
 
 PR body should include Summary, Architecture/Behavior, Compatibility, Testing (only commands actually run), and Residual risks.
 
-Creating a PR is not Merge authorization.
+Creating a PR does not bypass the merge gate. For an ordinary scoped engineering task,
+the user's authorization to perform the task already covers delivery through review,
+Merge, final-main verification, and safe cleanup unless the user explicitly limits the
+phase or the task crosses an explicit-approval boundary in Section 20.
 
 ## 18. Remote verification
 
@@ -284,7 +287,7 @@ Remote CI must be bound to the current exact PR HEAD. If HEAD changes, old CI ca
 
 Workflow reruns are remote mutations; rerun only when authorized by task scope or explicit user instruction. Do not silently rerun a failed/cancelled workflow merely to seek green status.
 
-## 19. Merge eligibility is not Merge authorization
+## 19. Merge eligibility gate
 
 A PR is **merge-eligible** only when all applicable technical conditions are true:
 
@@ -303,22 +306,46 @@ PR HEAD = exact validated HEAD
 
 Immediately before Merge, re-read PR HEAD SHA. If it changed, validate the new HEAD first.
 
-These conditions establish technical eligibility only. They do not authorize Merge.
+These conditions are mandatory. Ordinary task authorization never permits bypassing them.
 
-## 20. Merge authorization gate
+## 20. Delivery authorization and explicit-approval boundary
 
-Merge requires explicit, unambiguous authorization for the current task. Authorization may be given in advance for that task or immediately before Merge, but must clearly cover the Merge action.
+For an ordinary scoped repository engineering task, authorization to do the task includes
+the normal delivery lifecycle through commit, push, PR, review, exact-head CI, Merge,
+final-main verification, and safe worktree cleanup. Do not ask for a redundant
+"merge?" confirmation after the task has already been authorized.
 
-Do not infer Merge authorization from:
+A later user instruction can always narrow the boundary, for example "PR only",
+"do not merge", "stop after tests", or "leave this open". Obey the narrower boundary.
 
-- green CI;
-- PR creation;
-- approval to implement/fix/push;
-- approval to create an issue;
-- authorization from another task;
-- silence or lack of objections.
+If an implementation worker is operating under a separate reviewer/orchestrator, the
+worker must not treat its own implementation as independent review. It should deliver
+the exact PR HEAD and verification evidence to the reviewer/orchestrator. The
+reviewer/orchestrator may complete Merge and cleanup once Section 19 is satisfied,
+without asking the user for a second ordinary-engineering confirmation.
 
-If technical eligibility is satisfied but Merge authorization is absent, stop at **READY TO MERGE** and ask/wait for authorization.
+The following actions require task-specific explicit authorization in the user's
+request or a later confirmation. If the current request already clearly authorizes
+the action, do not ask again:
+
+- package publication, GitHub Release creation, public launch, or deployment that
+  changes an externally visible release boundary;
+- paid/live provider or model API execution, especially batch runs that incur cost
+  or transmit non-public inputs;
+- first publication or website integration of real model evidence, calibration
+  evidence, benchmark rankings, or other externally consequential benchmark claims;
+- purchases such as domains or paid services;
+- destructive or hard-to-reverse deletion of important data, repositories, cloud
+  resources, production state, or persistent storage;
+- secrets, credentials, permissions, authentication, or security-policy changes with
+  production/external consequences;
+- product-direction choices or benchmark methodology/scoring-policy changes that were
+  not already clearly included in the authorized task scope.
+
+If an explicit-approval action is required but not authorized, stop at
+**EXPLICIT APPROVAL REQUIRED** with the safe completed evidence; do not perform the
+action. This approval boundary is about external consequence, not ordinary Merge
+ceremony.
 
 ## 21. Never bypass protections
 
@@ -340,7 +367,7 @@ If an unintended or unauthorized mutation occurs, including a direct `main` file
 
 Recovery authorization is limited to undoing the accidental effect; it is not permission for unrelated edits.
 
-## 23. Cleanup after an authorized Merge
+## 23. Cleanup after Merge
 
 Begin cleanup only after remote evidence confirms:
 
@@ -411,7 +438,7 @@ Pull Request
 - remote checks/review state
 
 Merge
-- READY TO MERGE / MERGED / NOT AUTHORIZED / BLOCKED
+- READY FOR REVIEW / MERGED / EXPLICIT APPROVAL REQUIRED / BLOCKED
 - if merged: method, merge SHA, final main SHA
 
 Cleanup/post-merge
@@ -442,8 +469,8 @@ Understand scope
 -> PR
 -> exact-head remote CI/review
 -> establish merge eligibility
--> obtain/verify current-task Merge authorization
--> Merge
+-> honor any explicit stop or high-impact approval boundary
+-> Merge ordinary scoped work without redundant user confirmation
 -> verify merge result/final main
 -> npm run worktree:audit
 -> npm run worktree:cleanup when SAFE_TO_REMOVE is proven
@@ -452,6 +479,9 @@ Understand scope
 -> STOP
 ```
 
-If Merge authorization is not present, stop at `READY TO MERGE` rather than merging.
+If a separate reviewer/orchestrator owns the review gate, the implementation worker
+stops at `READY FOR REVIEW` and hands off the exact PR HEAD; the orchestrator then
+continues the same lifecycle. If an explicit-approval action is required and not
+authorized, stop at `EXPLICIT APPROVAL REQUIRED`.
 
 If any critical condition fails, preserve the last safe continuation state instead of bypassing the guardrail.
