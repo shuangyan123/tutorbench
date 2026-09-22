@@ -1,10 +1,14 @@
 # First real bilingual Tutor baseline
 
-This procedure records the historical local, preliminary, uncalibrated Tutor
-corpus for `tutor-eval-v0.2a@0.2a.3`: 24 English cases plus 24 `zh-CN` cases.
-It does not change the dataset, generation profile, evaluator,
-Judge rubrics, scoring, response identity, or public website. Codex and CI do
-not make provider calls; the commands below are manual operator commands.
+The current canonical dataset is `tutor-eval-v0.2a@0.2a.6`: 24 English cases
+plus 24 `zh-CN` cases. Real-model collection is preliminary and uncalibrated;
+it does not change the dataset, generation profile, evaluator, Judge rubrics,
+scoring, response identity, or public website. Codex and CI do not make
+provider calls unless an operator explicitly runs one of the live collection
+commands below.
+
+Historical artifact examples later in this document retain their recorded
+dataset/model identities and must not be rewritten as current evidence.
 
 The three provider boundaries remain separate:
 
@@ -14,9 +18,61 @@ TutorResponseCorpus -> evaluator / Judge provider -> evaluation artifact
 evaluation artifact -> optional local Review Translation sidecar -> private Audit
 ```
 
+## Zero-paid-API local baseline runner
+
+For a genuine model served locally through an OpenAI-compatible endpoint, use
+the repository-owned three-stage runner. It only accepts a loopback canonical
+host endpoint, requires an explicit model identity and baseline ID, never
+invokes a Judge, and never publishes artifacts.
+
+Configure the upstream local model bridge in one terminal:
+
+```powershell
+$env:TUTOR_MODEL_AUTH_MODE = "none"
+$env:TUTOR_MODEL_BASE_URL = "http://127.0.0.1:11434/v1"
+$env:TUTOR_MODEL = "<exact local model id>"
+$env:TUTOR_MODEL_API_PATH = "/chat/completions"
+$env:TUTOR_MODEL_MAX_OUTPUT_TOKENS_FIELD = "max_tokens"
+$env:TUTOR_MODEL_REASONING_SPLIT = "disabled"
+$env:TUTOR_MODEL_REQUIRE_REASONING_SEPARATION = "false"
+node examples/canonical-model-host/chat-completions-server.mjs
+```
+
+In a second terminal bind the baseline identity:
+
+```powershell
+$env:TUTORBENCH_LOCAL_MODEL = $env:TUTOR_MODEL
+$env:TUTORBENCH_LOCAL_PROVIDER = "local"
+$env:TUTORBENCH_BASELINE_ID = "preliminary-local-<model>-001"
+# Optional trustworthy snapshot/version:
+# $env:TUTORBENCH_LOCAL_MODEL_VERSION = "<snapshot>"
+```
+
+Then execute the stages deliberately:
+
+```powershell
+npm run baseline:local:plan
+npm run baseline:local:smoke
+# Inspect the four recorded responses and report before continuing.
+npm run baseline:local:full
+```
+
+`baseline:local:plan` is a zero-call dry run over the fixed bilingual smoke
+cohort. `baseline:local:smoke` records exactly four responses (two English,
+two `zh-CN`), validates the partial corpus, and writes an offline evaluation
+without a Judge. `baseline:local:full` requires that exact smoke corpus,
+resumes it in place, collects only the missing cases, requires 48/48 full
+coverage, and rewrites the offline evaluation for the full frozen corpus.
+
+The runner writes only under ignored `artifacts/real-model/` paths. A genuine
+local model run is real-model evidence, but remains
+`preliminary / uncalibrated / publicLeaderboardEligible=false`. A synthetic
+or fake local server remains a fixture and must not be represented as a real
+baseline.
+
 ## Configure the Tutor host
 
-Build with the repository-supported Node 22 runtime first:
+Build with the repository-supported Node 24 runtime first:
 
 ```powershell
 npm ci
