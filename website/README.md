@@ -81,9 +81,19 @@ in the walkthrough, not a quality score. Dataset counts/version come from the
 public artifact; evaluator version comes from the existing contract constant.
 
 Case and dimension navigation support keyboard use; small screens retain all
-five nodes in a horizontally scrollable path. The homepage supports system theme,
-an optional locally saved theme choice, and reduced motion. Interface language
-selection remains on the data/methodology pages; homepage editorial copy is English.
+five nodes in a horizontally scrollable path. The shared Teachometry header is
+rendered consistently across public routes, including Run and Docs. Theme and
+interface-language choices are available from the same header on every public
+page and persist locally when storage is available. Shared navigation, controls,
+and accessibility labels switch between English and Simplified Chinese at
+runtime. Page-specific editorial copy remains translated only where the page
+already provides localized content; changing interface language does not invent
+translations for English-only research prose.
+
+Motion is intentionally restrained: header controls, active navigation, mobile
+menu disclosure, and page entry use short transforms/opacity transitions only
+when `prefers-reduced-motion` permits them. Reduced-motion users receive the
+same state changes without animation.
 
 `website/src/images/foliage.png` is an optimized decorative derivative of the
 user-supplied visual reference and rendered homepage capture. It is not a brand
