@@ -123,6 +123,7 @@ async function startChatCompletionsHost(
   options: {
     readonly reasoningSplit?: "enabled" | "disabled";
     readonly requireReasoningSeparation?: boolean;
+    readonly authMode?: "bearer" | "none";
   } = {},
 ): Promise<HostProcess> {
   const child = spawn(
@@ -132,7 +133,10 @@ async function startChatCompletionsHost(
       cwd: process.cwd(),
       env: {
         ...process.env,
-        TUTOR_MODEL_API_KEY: "synthetic-test-key",
+        ...(options.authMode === "none"
+          ? { TUTOR_MODEL_API_KEY: undefined }
+          : { TUTOR_MODEL_API_KEY: "synthetic-test-key" }),
+        TUTOR_MODEL_AUTH_MODE: options.authMode ?? "bearer",
         TUTOR_MODEL: "fake-model",
         TUTOR_MODEL_BASE_URL: baseURL,
         TUTOR_MODEL_API_PATH: "/chat/completions",
@@ -312,6 +316,57 @@ test("OpenAI canonical host fails provider errors without retrying", async () =>
     await host.close();
     await provider.close();
   }
+});
+
+test("generic Chat Completions canonical host supports no-auth loopback providers", async () => {
+  const provider = await startFakeProvider({
+    choices: [{
+      message: { content: "A local model response." },
+      finish_reason: "stop",
+    }],
+    usage: { prompt_tokens: 5, completion_tokens: 4, total_tokens: 9 },
+  });
+  const host = await startChatCompletionsHost(provider.baseURL, { authMode: "none" });
+  try {
+    const response = await fetch(host.endpoint, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(await packet()),
+    });
+    assert.equal(response.status, 200);
+    const body = await response.json() as { output: { text: string } };
+    assert.equal(body.output.text, "A local model response.");
+    assert.equal(provider.requests.length, 1);
+  } finally {
+    await host.close();
+    await provider.close();
+  }
+});
+
+test("generic Chat Completions canonical host rejects no-auth non-loopback providers", async () => {
+  const child = spawn(
+    process.execPath,
+    [resolve(process.cwd(), "examples/canonical-model-host/chat-completions-server.mjs")],
+    {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        TUTOR_MODEL_API_KEY: undefined,
+        TUTOR_MODEL_AUTH_MODE: "none",
+        TUTOR_MODEL: "fake-model",
+        TUTOR_MODEL_BASE_URL: "https://example.com/v1",
+        TUTOR_MODEL_API_PATH: "/chat/completions",
+        TUTOR_MODEL_MAX_OUTPUT_TOKENS_FIELD: "max_tokens",
+        CANONICAL_MODEL_HOST_PORT: "0",
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  let stderr = "";
+  child.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString("utf8"); });
+  const [code] = await once(child, "exit") as [number | null, NodeJS.Signals | null];
+  assert.notEqual(code, 0);
+  assert.match(stderr, /TUTOR_MODEL_AUTH_MODE=none is allowed only for a loopback/u);
 });
 
 test("generic Chat Completions canonical host forwards visible messages and strips provider fields", async () => {
