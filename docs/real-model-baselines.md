@@ -153,20 +153,31 @@ protocol fixture only. It contains no provider SDK or credentials and must not
 be used to claim a real baseline. The same directory also contains an
 OpenAI-specific `openai-server.mjs` and a provider-neutral
 `chat-completions-server.mjs`. The latter reads
-`TUTOR_MODEL_API_KEY`, `TUTOR_MODEL_BASE_URL`, `TUTOR_MODEL`, and explicit
-path/output-token-field settings from the local environment; it makes one
-request per packet, performs no provider retry, and returns only final visible
-content. Set `TUTOR_MODEL_REASONING_SPLIT=enabled` for a MiniMax reasoning
-model so the host sends `reasoning_split: true`; pair it with
+`TUTOR_MODEL_BASE_URL`, `TUTOR_MODEL`, and explicit
+path/output-token-field settings from the local environment; bearer mode also
+requires `TUTOR_MODEL_API_KEY`. It makes one request per packet, performs no
+provider retry, and returns only final visible content. Set
+`TUTOR_MODEL_REASONING_SPLIT=enabled` for a MiniMax reasoning model so the
+host sends `reasoning_split: true`; pair it with
 `TUTOR_MODEL_REQUIRE_REASONING_SEPARATION=true` to reject an unsplit
 `<think>...</think>` wrapper rather than guessing which text is final. For
 DeepSeek, leave the optional split setting disabled: its separate
 `reasoning_content` field is ignored and only `message.content` is returned.
-Both hosts are local integration code, not Benchmark Core or package
-runtime dependencies, and neither is invoked by CI. See [the first real
-baseline procedure](first-real-baseline.md) for DeepSeek/MiniMax setup,
-bilingual smoke, full collection, resume, validation, Judge, and private
-Review Translation order.
+
+A local OpenAI-compatible model server may use
+`TUTOR_MODEL_AUTH_MODE=none`. This mode intentionally omits
+`TUTOR_MODEL_API_KEY` and the Authorization header, and is accepted only when
+`TUTOR_MODEL_BASE_URL` resolves syntactically to loopback
+(`localhost`, `127.0.0.1`, or `::1`). Non-loopback no-auth configuration
+fails closed. A genuine local model collected through this canonical boundary
+is real-model evidence, but remains preliminary, uncalibrated, and
+`publicLeaderboardEligible: false`; a synthetic fixture does not become real
+evidence merely because it runs locally.
+
+Both hosts are local integration code, not Benchmark Core or package runtime
+dependencies, and neither is invoked by CI. See [the first real baseline
+procedure](first-real-baseline.md) for provider setup, bilingual smoke, full
+collection, resume, validation, Judge, and private Review Translation order.
 
 ## Failure, retry, and coverage semantics
 

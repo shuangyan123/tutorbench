@@ -43,6 +43,31 @@ unsplit `<think>...</think>` content. The host always returns only final
 `message.content`; provider reasoning fields and payload metadata do not enter
 the Tutor response or corpus.
 
+For a local OpenAI-compatible server that does not require authentication, set
+`TUTOR_MODEL_AUTH_MODE=none` and point `TUTOR_MODEL_BASE_URL` at loopback
+(`localhost`, `127.0.0.1`, or `::1`). In that mode
+`TUTOR_MODEL_API_KEY` is not required and the bridge sends no Authorization
+header. No-auth mode is rejected for non-loopback URLs so this convenience
+cannot silently weaken a remote-provider credential boundary.
+
+Example for a local OpenAI-compatible endpoint:
+
+```powershell
+$env:TUTOR_MODEL_AUTH_MODE = "none"
+$env:TUTOR_MODEL_BASE_URL = "http://127.0.0.1:11434/v1"
+$env:TUTOR_MODEL = "<exact local model id>"
+$env:TUTOR_MODEL_API_PATH = "/chat/completions"
+$env:TUTOR_MODEL_MAX_OUTPUT_TOKENS_FIELD = "max_tokens"
+$env:TUTOR_MODEL_REASONING_SPLIT = "disabled"
+$env:TUTOR_MODEL_REQUIRE_REASONING_SEPARATION = "false"
+node examples/canonical-model-host/chat-completions-server.mjs
+```
+
+The local server remains outside Benchmark Core. A genuine local model run can
+produce preliminary `recorded_model` evidence without paid API quota, but it
+is still uncalibrated and not leaderboard-eligible. Synthetic/fake local
+servers remain test fixtures and must not be represented as model evidence.
+
 In another terminal, first perform the required dry-run, then a 1–3 case smoke
 run, and only after reviewing it consider the complete 24-case run. The exact
 sequence and ignored artifact paths are documented in
