@@ -1,4 +1,5 @@
 import { escapeHtml } from "./html.js";
+import type { PublicSiteBotanicalAsset } from "./assets.js";
 
 export interface DecorativeSvgOptions {
   readonly className: string;
@@ -16,6 +17,18 @@ export function renderDecorativeSvg(options: DecorativeSvgOptions): string {
     ? ""
     : ` preserveAspectRatio="${escapeHtml(options.preserveAspectRatio)}"`;
   return `<svg class="${escapeHtml(options.className)}" viewBox="${escapeHtml(options.viewBox)}"${preserveAspectRatio} fill="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">${options.body}</svg>`;
+}
+
+/**
+ * References a reviewed external SVG symbol while keeping the host element's
+ * currentColor. This preserves theme control without putting the SVG paths in
+ * a page template or embedding any raster content in the vector asset.
+ */
+export function renderBotanicalSvg(
+  className: string,
+  asset: PublicSiteBotanicalAsset,
+): string {
+  return `<svg class="${escapeHtml(className)}" viewBox="${escapeHtml(asset.svgViewBox)}" preserveAspectRatio="xMidYMid meet" fill="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><use href="/assets/${escapeHtml(asset.svg)}#${escapeHtml(asset.svgId)}"></use></svg>`;
 }
 
 /**

@@ -27,7 +27,10 @@ import {
   type SitePage,
 } from "../site/html.js";
 import { resolveSiteLocale, type SiteLocale } from "../site/i18n.js";
-import { PUBLIC_SITE_RASTER_ASSETS } from "../site/assets.js";
+import {
+  PUBLIC_SITE_BOTANICAL_ASSET_PATHS,
+  PUBLIC_SITE_RASTER_ASSETS,
+} from "../site/assets.js";
 import {
   renderDataIndexPage,
   renderHomePage,
@@ -282,10 +285,13 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "docs.css"), join(outputDirectory, "assets", "docs.css"));
   await copyFile(join(websiteRoot, "src", "not-found.css"), join(outputDirectory, "assets", "not-found.css"));
   for (const asset of PUBLIC_SITE_RASTER_ASSETS) {
-    await copyFile(
-      join(websiteRoot, "src", "images", asset),
-      join(outputDirectory, "assets", asset),
-    );
+    const destination = join(outputDirectory, "assets", asset);
+    await copyFile(join(websiteRoot, "src", "images", asset), destination);
+  }
+  for (const asset of PUBLIC_SITE_BOTANICAL_ASSET_PATHS) {
+    const destination = join(outputDirectory, "assets", asset);
+    await mkdir(dirname(destination), { recursive: true });
+    await copyFile(join(websiteRoot, "src", "assets", asset), destination);
   }
   await copyBrandAssets(outputDirectory);
   await writeJson(outputDirectory, "benchmark.json", artifacts.benchmark);

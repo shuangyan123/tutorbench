@@ -158,10 +158,24 @@ body.model-detail-page {
   bottom: -120px;
   width: 620px;
   height: 620px;
-  background: url("./foliage-right-near.webp") right bottom / contain no-repeat;
+  background: radial-gradient(circle, color-mix(in srgb, var(--models-mint-strong) 70%, transparent), transparent 68%);
   content: "";
-  opacity: 0.78;
+  opacity: 0.76;
+}
+
+.models-botanical-photo {
+  position: absolute;
+  z-index: 0;
+  right: -42px;
+  bottom: -84px;
+  width: 520px;
+  height: 590px;
+  object-fit: cover;
+  object-position: 34% center;
+  border-radius: 46% 0 0 46%;
+  opacity: 0.52;
   filter: saturate(0.82);
+  mask-image: linear-gradient(90deg, transparent 0, #000 32%, #000 100%);
 }
 
 .models-hero-art-wash {
@@ -789,9 +803,9 @@ body.model-detail-page {
   bottom: -160px;
   width: 430px;
   height: 430px;
-  background: url("./foliage-left-near.webp") left bottom / contain no-repeat;
+  background: radial-gradient(circle, color-mix(in srgb, var(--models-mint-strong) 36%, transparent), transparent 70%);
   content: "";
-  opacity: 0.64;
+  opacity: 0.5;
 }
 
 .models-closing-grid {
@@ -1067,6 +1081,11 @@ body.models-page[data-theme="dark"] .models-hero::before {
 
 body.models-page[data-theme="dark"] .models-hero-art::before {
   opacity: 0.18;
+}
+
+body.models-page[data-theme="dark"] .models-botanical-photo {
+  opacity: 0.2;
+  filter: saturate(0.7) brightness(0.66);
 }
 
 body.models-page[data-theme="dark"] .models-empty-copy,

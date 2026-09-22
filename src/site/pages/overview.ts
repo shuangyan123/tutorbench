@@ -14,7 +14,8 @@ import {
   type SitePage,
 } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
-import { renderDecorativeSvg } from "../illustrations.js";
+import { PUBLIC_SITE_BOTANICAL_ASSETS } from "../assets.js";
+import { renderBotanicalSvg, renderDecorativeSvg } from "../illustrations.js";
 import { renderTeachometryFooter } from "./home.js";
 
 function page(
@@ -269,22 +270,12 @@ function renderModelSchemaPanel(
 }
 
 function renderModelsBotanical(className: string): string {
-  return `<svg class="models-botanical ${className}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
-    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.6" />
-      <path d="M133 190C103 155 76 123 54 83M126 236C93 219 56 198 22 166M143 140C170 119 194 91 215 58M119 277C88 265 53 250 16 224" stroke-width="1.15" />
-    </g>
-    <g fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-width="1">
-      <path d="M54 83C39 67 32 48 38 34C55 40 66 55 68 72C64 78 60 81 54 83Z" />
-      <path d="M22 166C10 149 8 130 17 115C33 124 42 141 38 157C33 162 28 165 22 166Z" />
-      <path d="M215 58C214 39 222 23 237 14C240 36 232 51 219 62Z" />
-      <path d="M192 18C194 36 188 51 177 61C168 49 170 34 180 24C184 20 188 18 192 18Z" />
-    </g>
-  </svg>`;
+  return renderBotanicalSvg(`models-botanical ${className}`, PUBLIC_SITE_BOTANICAL_ASSETS.models);
 }
 
 function renderModelsHeroArt(): string {
   return `<div class="models-hero-art" aria-hidden="true">
+    <img class="models-botanical-photo" src="/assets/botanical/images/models-botanical-photo.jpg" width="1122" height="1402" fetchpriority="high" decoding="async" alt="">
     <div class="models-hero-art-wash"></div>
     <div class="models-hero-document models-hero-document-back"></div>
     <div class="models-hero-document models-hero-document-front"><span></span><i></i><i></i><i></i><b></b><b></b><b></b></div>
