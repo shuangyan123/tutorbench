@@ -367,7 +367,7 @@ body:is(
   .run-page,
   .docs-page
 ) .home-header .nav-links a[aria-current="page"] {
-  font-weight: 600;
+  font-weight: inherit;
   text-decoration: underline;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 1px;
