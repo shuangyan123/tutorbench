@@ -1,4 +1,4 @@
-/* global HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLSelectElement, HTMLElement, URLSearchParams, document, history, navigator, window */
+/* global HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLSelectElement, HTMLElement, URL, URLSearchParams, document, history, navigator, window */
 
 (() => {
   const navToggle = document.querySelector(".nav-toggle");
