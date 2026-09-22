@@ -1,5 +1,10 @@
 # Real-model baseline collection
 
+For the fail-closed path from a completed canonical model corpus and
+evaluation artifact to a reviewed preliminary public bundle, see
+[Public Evidence Publication Pipeline v1](public-evidence-publication.md).
+That pipeline is offline-only and does not publish to the website.
+
 Tutor Benchmark has two deliberately separate frozen-evidence paths. Both
 produce the same `TutorResponseCorpus`, can be replayed and evaluated offline,
 and remain preliminary until independently reviewed and calibrated.
