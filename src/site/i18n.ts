@@ -17,6 +17,9 @@ export type SiteUiTextKey =
   | "lightTheme"
   | "darkTheme"
   | "githubRepository"
+  | "primaryNavigation"
+  | "colorTheme"
+  | "teachometryHome"
   | "leaderboard"
   | "data"
   | "run"
@@ -249,6 +252,9 @@ const translations: Record<SiteLocale, Record<SiteUiTextKey, string>> = {
     lightTheme: "Light theme",
     darkTheme: "Dark theme",
     githubRepository: "GitHub repository",
+    primaryNavigation: "Primary navigation",
+    colorTheme: "Color theme",
+    teachometryHome: "Teachometry home",
     leaderboard: "Leaderboard",
     data: "Data",
     run: "Run",
@@ -480,6 +486,9 @@ const translations: Record<SiteLocale, Record<SiteUiTextKey, string>> = {
     lightTheme: "浅色主题",
     darkTheme: "深色主题",
     githubRepository: "GitHub 仓库",
+    primaryNavigation: "主导航",
+    colorTheme: "颜色主题",
+    teachometryHome: "Teachometry 首页",
     leaderboard: "排行榜",
     data: "数据",
     run: "运行",
