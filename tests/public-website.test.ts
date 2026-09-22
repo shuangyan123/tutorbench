@@ -40,6 +40,15 @@ test("homepage derives facts and escapes case content without inventing model re
   assert.match(content, /No model response or model score is published here/);
 });
 
+test("locale selector reserves text and chevron space consistently", async () => {
+  const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
+  assert.match(styles, /--teach-locale-control-width: 112px;/);
+  assert.match(styles, /\.locale-switcher::after \{/);
+  assert.match(styles, /appearance: none;/);
+  assert.match(styles, /padding: 0 38px 0 12px;/);
+  assert.match(styles, /font: 12px\/1\.4 var\(--teach-sans\);/);
+});
+
 test("shared public header keeps one canonical language-control geometry", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const pages = [
