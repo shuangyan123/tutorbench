@@ -86,6 +86,16 @@ function maxOutputTokensFieldEnvironment(environment) {
   return field;
 }
 
+function authModeEnvironment(environment) {
+  const mode = environment.TUTOR_MODEL_AUTH_MODE?.trim() || "bearer";
+  if (mode !== "bearer" && mode !== "none") {
+    throw new CanonicalHostConfigurationError(
+      "TUTOR_MODEL_AUTH_MODE must be bearer or none.",
+    );
+  }
+  return mode;
+}
+
 function reasoningSplitEnvironment(environment) {
   const mode = environment.TUTOR_MODEL_REASONING_SPLIT?.trim() || "disabled";
   if (mode !== "enabled" && mode !== "disabled") {
@@ -112,7 +122,15 @@ function requireReasoningSeparationEnvironment(environment) {
   );
 }
 
-function validateBaseUrl(environment) {
+function isLoopbackHostname(hostname) {
+  const normalized = hostname.toLowerCase();
+  return normalized === "localhost" ||
+    normalized === "127.0.0.1" ||
+    normalized === "[::1]" ||
+    normalized === "::1";
+}
+
+function validateBaseUrl(environment, authMode) {
   const raw = requiredEnvironment("TUTOR_MODEL_BASE_URL", environment);
   let parsed;
   try {
@@ -133,14 +151,23 @@ function validateBaseUrl(environment) {
       "TUTOR_MODEL_BASE_URL must be a valid http or https URL without credentials.",
     );
   }
+  if (authMode === "none" && !isLoopbackHostname(parsed.hostname)) {
+    throw new CanonicalHostConfigurationError(
+      "TUTOR_MODEL_AUTH_MODE=none is allowed only for a loopback TUTOR_MODEL_BASE_URL.",
+    );
+  }
   return parsed.toString().replace(/\/+$/u, "");
 }
 
 function readConfiguration(environment = process.env) {
+  const authMode = authModeEnvironment(environment);
   return {
-    apiKey: requiredEnvironment("TUTOR_MODEL_API_KEY", environment),
+    authMode,
+    ...(authMode === "bearer"
+      ? { apiKey: requiredEnvironment("TUTOR_MODEL_API_KEY", environment) }
+      : {}),
     model: requiredEnvironment("TUTOR_MODEL", environment),
-    baseUrl: validateBaseUrl(environment),
+    baseUrl: validateBaseUrl(environment, authMode),
     apiPath: endpointPathEnvironment(environment),
     maxOutputTokensField: maxOutputTokensFieldEnvironment(environment),
     reasoningSplit: reasoningSplitEnvironment(environment),
@@ -247,8 +274,10 @@ async function executePacket(packet, configuration) {
     response = await fetch(`${configuration.baseUrl}${configuration.apiPath}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${configuration.apiKey}`,
         "Content-Type": "application/json",
+        ...(configuration.authMode === "bearer"
+          ? { Authorization: `Bearer ${configuration.apiKey}` }
+          : {}),
       },
       body: requestBody,
       signal: controller.signal,
