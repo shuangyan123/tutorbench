@@ -12,6 +12,25 @@
     });
   }
 
+  const prefetchedRoutes = new Set();
+  function prefetchRoute(link) {
+    if (!(link instanceof HTMLAnchorElement)) return;
+    const url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin || url.pathname === window.location.pathname || prefetchedRoutes.has(url.href)) return;
+    prefetchedRoutes.add(url.href);
+    const prefetch = document.createElement("link");
+    prefetch.rel = "prefetch";
+    prefetch.href = url.href;
+    prefetch.as = "document";
+    document.head.append(prefetch);
+  }
+
+  document.querySelectorAll("#primary-navigation a[href]").forEach((link) => {
+    link.addEventListener("pointerenter", () => prefetchRoute(link), { once: true });
+    link.addEventListener("focus", () => prefetchRoute(link), { once: true });
+    link.addEventListener("touchstart", () => prefetchRoute(link), { once: true, passive: true });
+  });
+
   const localeSwitcher = document.querySelector("[data-locale-switcher]");
   const localeStorageKey = "tutor-benchmark-ui-locale";
 
