@@ -49,6 +49,7 @@
   --teach-icon-size: 18px;
   --teach-button-height: 40px;
   --teach-button-radius: 5px;
+  --teach-locale-control-width: 112px;
 }
 
 body:is(
@@ -649,7 +650,34 @@ body:is(
   .run-page,
   .docs-page
 ) .locale-switcher {
+  position: relative;
   flex: 0 0 auto;
+  color: var(--ink);
+}
+
+body:is(
+  .home-page,
+  .methodology-page,
+  .results-page,
+  .cases-page,
+  .case-detail-page,
+  .about-page,
+  .blog-page,
+  .models-page,
+  .model-detail-page,
+  .run-page,
+  .docs-page
+) .locale-switcher::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  pointer-events: none;
+  transform: translateY(-65%) rotate(45deg);
 }
 
 body:is(
@@ -665,18 +693,56 @@ body:is(
   .run-page,
   .docs-page
 ) .locale-switcher select {
-  width: 92px;
-  min-width: 92px;
-  max-width: 92px;
+  appearance: none;
+  -webkit-appearance: none;
+  width: var(--teach-locale-control-width);
+  min-width: var(--teach-locale-control-width);
+  max-width: var(--teach-locale-control-width);
   height: var(--teach-button-height);
   min-height: var(--teach-button-height);
   box-sizing: border-box;
-  padding: 0 28px 0 10px;
+  padding: 0 38px 0 12px;
   border: 1px solid var(--line);
   border-radius: var(--teach-button-radius);
   background: var(--surface);
   color: var(--ink);
-  font: 11px/1.4 var(--teach-sans);
+  font: 12px/1.4 var(--teach-sans);
+}
+
+@media (forced-colors: active) {
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .locale-switcher::after {
+    display: none;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .locale-switcher select {
+    appearance: auto;
+    -webkit-appearance: auto;
+    padding-right: 12px;
+  }
 }
 
 /* Shared semantic layers and control geometry. */
