@@ -50,7 +50,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "npm run build && node --test dist/tests/*.test.js",
+    "test": "npm run build && node --test dist/tests/*.test.js scripts/local-real-model-baseline.test.mjs",
     "build": "tsc -p tsconfig.json",
     "quickstart": "npm run build && node dist/src/cli/tutorbench.js quickstart",
     "benchmark": "npm run build && node dist/src/cli/benchmark.js",
