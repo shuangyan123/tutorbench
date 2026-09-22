@@ -1,5 +1,6 @@
 import { escapeHtml as e, type SitePage } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
+import { renderEditorialBotanical } from "../illustrations.js";
 
 const BLOG_PUBLISHED_DATE = "September 17, 2026";
 
@@ -183,26 +184,7 @@ function page(
 }
 
 function renderBotanical(): string {
-  return `<svg class="blog-botanical" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.6" />
-      <path d="M133 190C103 155 76 123 54 83" stroke-width="1.15" />
-      <path d="M126 236C93 219 56 198 22 166" stroke-width="1.15" />
-      <path d="M143 140C170 119 194 91 215 58" stroke-width="1.15" />
-      <path d="M119 277C88 265 53 250 16 224" stroke-width="1.15" />
-      <path d="M153 103C179 91 204 71 228 44" stroke-width="1.15" />
-      <path d="M115 295C91 302 61 305 32 300" stroke-width="1.05" />
-    </g>
-    <g fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-linejoin="round">
-      <path d="M54 83C41 67 29 49 32 32C50 37 65 54 68 72C63 78 59 81 54 83Z" stroke-width="1.05" />
-      <path d="M22 166C11 147 4 126 10 108C29 116 43 135 42 153C36 159 30 163 22 166Z" stroke-width="1.05" />
-      <path d="M215 58C214 39 219 20 234 8C240 27 235 46 222 60C219 60 217 59 215 58Z" stroke-width="1.05" />
-      <path d="M16 224C11 207 14 190 26 178C39 194 39 211 29 225C24 226 20 226 16 224Z" stroke-width="1.05" />
-      <path d="M228 44C228 27 235 12 248 4C252 21 246 38 236 47C233 47 230 46 228 44Z" stroke-width="1.05" />
-      <path d="M32 300C20 289 13 275 17 261C34 267 46 280 46 294C42 298 37 300 32 300Z" stroke-width="1.05" />
-      <path d="M192 18C194 39 191 57 180 73C171 64 168 48 174 35C179 27 185 21 192 18Z" stroke-width="1.05" />
-    </g>
-  </svg>`;
+  return renderEditorialBotanical("blog-botanical");
 }
 
 function renderPostCard(post: BlogPostSummary): string {

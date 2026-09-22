@@ -278,7 +278,7 @@ function renderConversation(
 }
 
 function renderCaseBotanical(): string {
-  return `<svg class="case-detail-botanical" viewBox="0 0 280 220" fill="none" aria-hidden="true" focusable="false"><circle cx="184" cy="116" r="58" fill="currentColor" opacity=".08"/><path d="M150 196c-6-40 1-75 23-103 15-19 26-36 25-67" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M171 121c-28-7-46-22-55-46 24 3 43 16 55 46ZM175 101c-4-31 3-58 26-82 8 29 1 56-26 82ZM178 145c22-8 40-25 49-51-25 7-42 23-49 51ZM155 156c-27-1-48-12-64-33 26-4 48 7 64 33Z" stroke="currentColor" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round"/><path d="M168 124c-13 24-24 47-29 70" stroke="currentColor" stroke-width=".8" stroke-linecap="round" opacity=".7"/></svg>`;
+  return `<svg class="case-detail-botanical" viewBox="0 0 280 220" fill="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><circle cx="184" cy="116" r="58" fill="currentColor" opacity=".08"/><path d="M150 196c-6-40 1-75 23-103 15-19 26-36 25-67" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M171 121c-28-7-46-22-55-46 24 3 43 16 55 46ZM175 101c-4-31 3-58 26-82 8 29 1 56-26 82ZM178 145c22-8 40-25 49-51-25 7-42 23-49 51ZM155 156c-27-1-48-12-64-33 26-4 48 7 64 33Z" stroke="currentColor" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round"/><path d="M168 124c-13 24-24 47-29 70" stroke="currentColor" stroke-width=".8" stroke-linecap="round" opacity=".7"/></svg>`;
 }
 
 export function renderCaseDetailPage(
@@ -437,7 +437,7 @@ function explorerFieldLabel(field: string): string {
 }
 
 function renderExplorerBotanical(className: string): string {
-  return `<svg class="explorer-botanical ${escapeHtml(className)}" viewBox="0 0 260 340" fill="none" aria-hidden="true" focusable="false"><path d="M128 326c-4-72 8-137 42-193 22-36 38-72 42-121" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M153 224c-37-10-67-31-90-65 35 2 68 22 90 65ZM164 188c-5-45 8-84 39-118 9 43-2 82-39 118ZM177 251c35-11 63-35 83-72-38 9-67 34-83 72ZM136 278c-38-2-71-17-98-48 37-4 73 12 98 48Z" stroke="currentColor" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round"/><path d="M158 224c-18 34-31 67-39 102" stroke="currentColor" stroke-width=".8" stroke-linecap="round" opacity=".72"/></svg>`;
+  return `<svg class="explorer-botanical ${escapeHtml(className)}" viewBox="0 0 260 340" fill="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><path d="M128 326c-4-72 8-137 42-193 22-36 38-72 42-121" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M153 224c-37-10-67-31-90-65 35 2 68 22 90 65ZM164 188c-5-45 8-84 39-118 9 43-2 82-39 118ZM177 251c35-11 63-35 83-72-38 9-67 34-83 72ZM136 278c-38-2-71-17-98-48 37-4 73 12 98 48Z" stroke="currentColor" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round"/><path d="M158 224c-18 34-31 67-39 102" stroke="currentColor" stroke-width=".8" stroke-linecap="round" opacity=".72"/></svg>`;
 }
 
 function renderExplorerStats(stats: readonly ExplorerStat[]): string {

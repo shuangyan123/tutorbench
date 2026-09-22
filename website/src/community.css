@@ -552,7 +552,7 @@
   overflow: hidden;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--accent-strong) 16%, transparent), color-mix(in srgb, var(--accent-strong) 64%, transparent)),
-    url("./home-hero-bg.webp") center / cover no-repeat;
+    url("./home-blog-03.webp") 68% center / cover no-repeat;
 }
 
 .community-task-media::after {
@@ -1062,7 +1062,7 @@
   width: 42%;
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--accent-strong) 24%, transparent), color-mix(in srgb, var(--community-wash) 88%, transparent)),
-    url("./home-hero-bg.webp") 62% center / cover no-repeat;
+    url("./home-blog-01.webp") 62% center / cover no-repeat;
   opacity: 0.82;
   mask-image: linear-gradient(90deg, #000 0, #000 64%, transparent 100%);
 }
@@ -1132,13 +1132,13 @@
 .community-page[data-theme="dark"] .community-task-media {
   background:
     linear-gradient(180deg, color-mix(in srgb, #0b342f 34%, transparent), color-mix(in srgb, #0b342f 78%, transparent)),
-    url("./home-hero-bg.webp") center / cover no-repeat;
+    url("./home-blog-03.webp") 68% center / cover no-repeat;
 }
 
 .community-page[data-theme="dark"] .community-closing-image {
   background:
     linear-gradient(90deg, color-mix(in srgb, #0b342f 46%, transparent), color-mix(in srgb, var(--community-wash) 94%, transparent)),
-    url("./home-hero-bg.webp") 62% center / cover no-repeat;
+    url("./home-blog-01.webp") 62% center / cover no-repeat;
   opacity: 0.62;
 }
 

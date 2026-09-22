@@ -27,6 +27,7 @@ import {
   type SitePage,
 } from "../site/html.js";
 import { resolveSiteLocale, type SiteLocale } from "../site/i18n.js";
+import { PUBLIC_SITE_RASTER_ASSETS } from "../site/assets.js";
 import {
   renderDataIndexPage,
   renderHomePage,
@@ -265,7 +266,6 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await mkdir(join(outputDirectory, "assets"), { recursive: true });
   await writeFile(join(outputDirectory, "assets", "styles.css"), stylesheet, "utf8");
   await writeFile(join(outputDirectory, "assets", "site.js"), clientScript, "utf8");
-  await copyFile(join(websiteRoot, "src", "images", "foliage.png"), join(outputDirectory, "assets", "foliage.png"));
   await copyFile(join(websiteRoot, "src", "home.css"), join(outputDirectory, "assets", "home.css"));
   await copyFile(join(websiteRoot, "src", "benchmark.css"), join(outputDirectory, "assets", "benchmark.css"));
   await copyFile(join(websiteRoot, "src", "methodology.css"), join(outputDirectory, "assets", "methodology.css"));
@@ -281,8 +281,11 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "run.css"), join(outputDirectory, "assets", "run.css"));
   await copyFile(join(websiteRoot, "src", "docs.css"), join(outputDirectory, "assets", "docs.css"));
   await copyFile(join(websiteRoot, "src", "not-found.css"), join(outputDirectory, "assets", "not-found.css"));
-  for (const name of ["home-hero-bg", "home-open-data-bg", "home-blog-01", "home-blog-02", "home-blog-03", "foliage-left-near", "foliage-left-mid", "foliage-right-mid", "foliage-right-near"]) {
-    await copyFile(join(websiteRoot, "src", "images", `${name}.webp`), join(outputDirectory, "assets", `${name}.webp`));
+  for (const asset of PUBLIC_SITE_RASTER_ASSETS) {
+    await copyFile(
+      join(websiteRoot, "src", "images", asset),
+      join(outputDirectory, "assets", asset),
+    );
   }
   await copyBrandAssets(outputDirectory);
   await writeJson(outputDirectory, "benchmark.json", artifacts.benchmark);

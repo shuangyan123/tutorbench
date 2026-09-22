@@ -6,6 +6,7 @@ import {
   type SitePage,
 } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
+import { renderEditorialBotanical } from "../illustrations.js";
 import { siteText, type SiteLocale, type SiteUiTextKey } from "../i18n.js";
 import { renderTeachometryFooter } from "./home.js";
 
@@ -14,20 +15,7 @@ function ui(key: SiteUiTextKey, locale: SiteLocale): string {
 }
 
 function renderCommunityBotanical(className: string): string {
-  return `<svg class="community-botanical ${className}" viewBox="0 0 240 330" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M120 326C119 276 122 218 137 160C149 114 162 67 192 18" stroke-width="1.6" />
-      <path d="M133 190C103 155 76 123 54 83M126 236C93 219 56 198 22 166M143 140C170 119 194 91 215 58M119 277C88 265 53 250 16 224M153 103C179 91 204 71 228 44M115 295C91 302 61 305 32 300" stroke-width="1.15" />
-    </g>
-    <g fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-linejoin="round">
-      <path d="M54 83C41 67 29 49 32 32C50 37 65 54 68 72C63 78 59 81 54 83Z" stroke-width="1.05" />
-      <path d="M22 166C11 147 4 126 10 108C29 116 43 135 42 153C36 159 30 163 22 166Z" stroke-width="1.05" />
-      <path d="M215 58C214 39 219 20 234 8C240 27 235 46 222 60C219 60 217 59 215 58Z" stroke-width="1.05" />
-      <path d="M16 224C11 207 14 190 26 178C39 194 39 211 29 225C24 226 20 226 16 224Z" stroke-width="1.05" />
-      <path d="M32 300C20 289 13 275 17 261C34 267 46 280 46 294C42 298 37 300 32 300Z" stroke-width="1.05" />
-      <path d="M192 18C194 39 191 57 180 73C171 64 168 48 174 35C179 27 185 21 192 18Z" stroke-width="1.05" />
-    </g>
-  </svg>`;
+  return renderEditorialBotanical(`community-botanical ${className}`, false);
 }
 
 function renderEcosystemNode(
@@ -121,6 +109,9 @@ export function renderCommunityPage(
     <section class="community-evidence" aria-labelledby="community-evidence-title"><div class="shell"><div class="community-evidence-heading"><div><p class="eyebrow">${ui("communityEvidenceEyebrow", locale)}</p><h2 id="community-evidence-title">${ui("communityEvidenceTitle", locale)}</h2></div><p>${ui("communityEvidenceCopy", locale)}</p></div><div class="community-evidence-grid">${renderEvidenceCard("01", "communityEvidenceFirst", "communityEvidenceFirstCopy", locale, "document")}${renderEvidenceCard("02", "communityEvidenceAgreement", "communityEvidenceAgreementCopy", locale, "chart")}${renderEvidenceCard("03", "communityEvidenceQualification", "communityEvidenceQualificationCopy", locale, "shield")}${renderEvidenceCard("04", "communityEvidenceGold", "communityEvidenceGoldCopy", locale, "target")}</div></div></section>
     <section class="community-principles" aria-labelledby="community-principles-title"><div class="shell community-principles-shell"><div class="community-principles-heading"><div><p class="eyebrow">${ui("communityPrinciplesEyebrow", locale)}</p><h2 id="community-principles-title">${ui("communityPrinciplesTitle", locale)}</h2></div><p>${ui("communityPrinciplesCopy", locale)}</p></div><div class="community-principles-grid">${renderPrinciple("01", "communityPrincipleEvidence", "communityPrincipleEvidenceCopy", locale, "document")}${renderPrinciple("02", "communityPrincipleMethods", "communityPrincipleMethodsCopy", locale, "list")}${renderPrinciple("03", "communityPrincipleContext", "communityPrincipleContextCopy", locale, "guidance")}${renderPrinciple("04", "communityPrinciplePerspectives", "communityPrinciplePerspectivesCopy", locale, "user")}</div>${renderCommunityBotanical("community-principles-botanical")}</div></section>
     <section class="community-closing" aria-labelledby="community-closing-title"><div class="community-closing-image" aria-hidden="true"></div><div class="shell community-closing-grid"><div><p class="eyebrow">${ui("communityWatchEyebrow", locale)}</p><h2 id="community-closing-title">${ui("communityWatchTitle", locale)}</h2></div><div><p>${ui("communityWatchCopy", locale)}</p><div class="button-row"><a class="button button-primary" href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">${ui("communityWatchGitHub", locale)} ${icon("arrow")}</a><a class="button button-secondary" href="/data/">${ui("communityWatchHomepage", locale)}</a><a class="text-link" href="/methodology/">${ui("communityWatchMethodology", locale)} ${icon("arrow")}</a></div></div>${renderCommunityBotanical("community-closing-botanical")}</div></section>
-    ${renderTeachometryFooter(artifacts)}`,
+    ${renderTeachometryFooter(artifacts)}`.replace(
+      /<svg class="community-ecosystem-lines"([^>]*)>/u,
+      '<svg class="community-ecosystem-lines"$1 focusable="false" shape-rendering="geometricPrecision">',
+    ),
   };
 }
