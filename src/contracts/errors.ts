@@ -29,6 +29,13 @@ export type BenchmarkErrorCode =
   | "tutor_execution_packet_invalid"
   | "tutor_response_corpus_invalid"
   | "tutor_response_replay_incompatible"
+  | "tutor_scenario_vnext_invalid"
+  | "tutor_scenario_suite_not_found"
+  | "tutor_finding_invalid"
+  | "tutor_health_scoring_profile_invalid"
+  | "tutor_health_report_invalid"
+  | "tutor_health_report_case_run_duplicate"
+  | "tutor_health_report_source_mismatch"
   | "adapter_failed"
   | "evaluation_failed"
   | "runner_failed";
@@ -75,6 +82,13 @@ const stableMessages: Record<BenchmarkErrorCode, string> = {
   tutor_response_corpus_invalid: "Tutor response corpus is invalid.",
   tutor_response_replay_incompatible:
     "Tutor response corpus replay compatibility is not approved.",
+  tutor_scenario_vnext_invalid: "Tutor Scenario vNext data is invalid.",
+  tutor_scenario_suite_not_found: "Tutor Scenario suite was not found.",
+  tutor_finding_invalid: "Tutor Finding data is invalid.",
+  tutor_health_scoring_profile_invalid: "Tutor Health scoring profile is invalid.",
+  tutor_health_report_invalid: "Tutor Health report is invalid.",
+  tutor_health_report_case_run_duplicate: "Tutor Health source evaluation has duplicate case runs.",
+  tutor_health_report_source_mismatch: "Tutor Health source evaluation does not match its scenario suite.",
   adapter_failed: "Tutor adapter failed for this scenario.",
   evaluation_failed: "Evaluator failed for this scenario.",
   runner_failed: "Benchmark runner failed.",
@@ -111,7 +125,14 @@ export class BenchmarkConfigurationError extends Error {
     | "tutor_generation_execution_unsupported"
     | "tutor_execution_packet_invalid"
     | "tutor_response_corpus_invalid"
-    | "tutor_response_replay_incompatible";
+    | "tutor_response_replay_incompatible"
+    | "tutor_scenario_vnext_invalid"
+    | "tutor_scenario_suite_not_found"
+    | "tutor_finding_invalid"
+    | "tutor_health_scoring_profile_invalid"
+    | "tutor_health_report_invalid"
+    | "tutor_health_report_case_run_duplicate"
+    | "tutor_health_report_source_mismatch";
 
   constructor(
     code:
@@ -144,7 +165,14 @@ export class BenchmarkConfigurationError extends Error {
       | "tutor_generation_execution_unsupported"
       | "tutor_execution_packet_invalid"
       | "tutor_response_corpus_invalid"
-      | "tutor_response_replay_incompatible",
+      | "tutor_response_replay_incompatible"
+      | "tutor_scenario_vnext_invalid"
+      | "tutor_scenario_suite_not_found"
+      | "tutor_finding_invalid"
+      | "tutor_health_scoring_profile_invalid"
+      | "tutor_health_report_invalid"
+      | "tutor_health_report_case_run_duplicate"
+      | "tutor_health_report_source_mismatch",
   ) {
     super(stableMessages[code]);
     this.name = "BenchmarkConfigurationError";

@@ -240,3 +240,24 @@ the real Community Review campaign.
 - Inter-rater agreement
 
 ## 0.8 Benchmark Release / Stabilization — NOT STARTED
+
+## Finding-First Real-World Evaluation — INITIAL SLICE IMPLEMENTED; NOT VALIDATED
+
+- [x] Additive, runtime-validated Scenario vNext, health-dimension, observation,
+      evidence-reference, and Finding v1 contracts
+- [x] 13 authored synthetic Productive Struggle & Intervention decision-point
+      scenarios with a controlled multi-turn repeated-failure history
+- [x] Additive compiler and runner/report bridge through the existing TutorEval
+      evaluator and Judge boundaries
+- [x] Finding-first JSON and text reporting with explicit health-dimension
+      weights and ERROR/unresolved handling
+- [x] Architecture and claim-limit documentation
+- [ ] Independent content review and human reliability evidence for the suite
+- [ ] Calibrated confidence interpretation or validated weighting profiles
+- [ ] Stateful multi-turn Tutor episode execution
+- [ ] Any learner-outcome study or claim
+- [ ] Dashboard or autonomous learner simulator
+
+The `core-tutor@0.1.0` profile and initial suite are design artifacts. Their
+scores are descriptive; they do not establish general tutor competence,
+learning effectiveness, or WiseTutor policy.

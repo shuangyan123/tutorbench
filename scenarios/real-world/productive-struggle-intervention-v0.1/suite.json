@@ -1,0 +1,517 @@
+{
+  "schemaVersion": 2,
+  "id": "productive-struggle-intervention-v0.1",
+  "version": "0.1.0",
+  "title": "Productive Struggle & Intervention",
+  "description": "TutorBench-authored synthetic checkpoints for studying when to preserve learner effort and when to reduce friction. The scenarios express an initial design profile, not any institution's official teaching policy.",
+  "healthTaxonomyVersion": "0.1.0",
+  "scenarios": [
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-first-mistake", "version": "0.1.0", "title": "Preserve effort after a first mistake", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner has made one meaningful attempt and has not asked for help.",
+      "learningContext": { "subject": "mathematics", "topic": "one-step equations", "learningObjective": "Isolate the variable by identifying the inverse operation.", "learnerLevel": "early algebra" },
+      "learnerState": { "knownConcepts": ["inverse operations"], "misconceptions": ["applies an operation to only one side of an equation"], "confidence": 0.45, "engagement": "steady", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 1, "failedAttempts": 1, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For x + 6 = 14, I subtracted 6 from 14 and got x = 8, but I am not sure what to do next." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
+      "decisionPoints": [{
+        "id": "preserve-first-attempt",
+        "evaluationCaseId": "ps-first-mistake",
+        "turnIndex": 1,
+        "expectedDecision": "preserve_struggle",
+        "expectedBehavior": "Invite the learner to check the inverse operation or substitute their answer; do not supply the next procedural step yet.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-first-mistake-timing",
+          "category": "guidance",
+          "dimension": "intervention_strategy",
+          "criterion": "After one meaningful attempt and without a help request, preserve another attempt with a focused question instead of giving a procedural hint or answer.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "premature_intervention",
+            "title": "Intervened before a second attempt",
+            "severity": "major",
+            "observedBehavior": "The response supplies a procedural step or answer before the authored two-attempt threshold.",
+            "diagnosis": "The response does not preserve the configured opportunity for another learner attempt.",
+            "impact": "This can take over work the learner was positioned to continue and makes intervention timing less responsive to the stated scenario.",
+            "likelyCauses": [{ "hypothesis": "The response policy may be using a fixed hint rule without checking attempt count.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Inspect whether the tutor distinguishes the first failed attempt from repeated difficulty." }, { "kind": "implementation_suggestion", "text": "Consider conditioning procedural hints on the authored attempt threshold while keeping an explicit help request as a separate signal." }],
+            "regressionTargets": ["ps-first-mistake/preserve-first-attempt"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-repeated-mistake", "version": "0.1.0", "title": "Offer a conceptual hint after repeated error", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner has repeated the same error after a diagnostic question.",
+      "learningContext": { "subject": "mathematics", "topic": "one-step equations", "learningObjective": "Use inverse operations while preserving equation balance.", "learnerLevel": "early algebra" },
+      "learnerState": { "knownConcepts": ["equality means both sides remain balanced"], "misconceptions": ["subtracts from one side only"], "confidence": 0.35, "engagement": "steady", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 2, "failedAttempts": 2, "priorHints": ["What operation would undo the addition?"], "conversationHistory": [{ "role": "user", "content": "For x + 6 = 14, I think x is 8." }, { "role": "assistant", "content": "What operation would undo the addition?" }, { "role": "user", "content": "I still have x = 8 because I used 14 minus 6." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
+      "decisionPoints": [{
+        "id": "target-second-attempt",
+        "evaluationCaseId": "ps-repeated-mistake",
+        "turnIndex": 2,
+        "expectedDecision": "offer_conceptual_hint",
+        "expectedBehavior": "Name the balance idea and ask the learner to apply the same operation to both sides; do not finish the equation for them.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-repeated-mistake-help",
+          "category": "diagnosis",
+          "dimension": "learner_diagnosis",
+          "criterion": "Recognize the repeated one-sided operation error and offer a targeted conceptual hint that addresses equation balance.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "missed_repeated_misconception",
+            "title": "Repeated misconception was not addressed",
+            "severity": "major",
+            "observedBehavior": "The response does not connect the repeated answer to applying an operation on only one side.",
+            "diagnosis": "The learner's second attempt provides evidence of a persistent balance misconception, but the response does not target it.",
+            "impact": "A generic prompt can leave the learner repeating the same unsuccessful step.",
+            "likelyCauses": [{ "hypothesis": "The diagnosis process may not compare the current attempt with the prior attempt.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Compare the learner's two attempts and check whether the response names the shared error pattern." }, { "kind": "implementation_suggestion", "text": "Consider increasing hint specificity when the same misconception appears after a prior prompt." }],
+            "regressionTargets": ["ps-repeated-mistake/target-second-attempt"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-partial-progress", "version": "0.1.0", "title": "Build on partial progress", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner has correctly isolated one part of a two-step equation and is unsure how to continue.",
+      "learningContext": { "subject": "mathematics", "topic": "two-step equations", "learningObjective": "Apply inverse operations in an order that isolates the variable.", "learnerLevel": "early algebra" },
+      "learnerState": { "knownConcepts": ["subtracting the same value from both sides"], "misconceptions": [], "confidence": 0.65, "engagement": "steady", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 1, "failedAttempts": 0, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For 3x + 2 = 14, I subtracted 2 from both sides and got 3x = 12. I do not know the next step." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 1, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 } },
+      "decisionPoints": [{
+        "id": "reinforce-correct-step",
+        "evaluationCaseId": "ps-partial-progress",
+        "turnIndex": 1,
+        "expectedDecision": "validate_partial_progress",
+        "expectedBehavior": "Acknowledge that 3x = 12 is balanced, then ask which operation undoes multiplication by 3.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-partial-progress-next-step",
+          "category": "adaptation",
+          "dimension": "adaptation",
+          "criterion": "Preserve the learner's correct intermediate work and offer a next-step prompt calibrated to the one missing operation.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "partial_progress_not_used",
+            "title": "The response did not build on partial progress",
+            "severity": "minor",
+            "observedBehavior": "The response ignores or replaces the learner's correct balanced step instead of using it as the starting point.",
+            "diagnosis": "The intervention is not calibrated to the work the learner has already completed correctly.",
+            "impact": "The learner may lose a clear sense of which part they understand and what remains.",
+            "likelyCauses": [{ "hypothesis": "The response may be generated from the full problem rather than the learner's current work.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Check whether the response explicitly preserves the valid intermediate equation." }, { "kind": "implementation_suggestion", "text": "Consider anchoring the next prompt to the learner's latest correct step." }],
+            "regressionTargets": ["ps-partial-progress/reinforce-correct-step"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-false-confidence", "version": "0.1.0", "title": "Probe false confidence", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner expresses high confidence in an incorrect fraction rule.",
+      "learningContext": { "subject": "mathematics", "topic": "fraction addition", "learningObjective": "Add fractions using common units and explain why the denominator behaves as it does.", "learnerLevel": "upper primary" },
+      "learnerState": { "knownConcepts": ["fractions name equal-sized parts"], "misconceptions": ["adds numerators and denominators independently"], "confidence": 0.95, "engagement": "high", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 1, "failedAttempts": 1, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "I am completely sure that 1/3 + 1/4 = 2/7 because I add the top and bottom numbers." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 1 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 } },
+      "decisionPoints": [{
+        "id": "test-reasoning-before-affirmation",
+        "evaluationCaseId": "ps-false-confidence",
+        "turnIndex": 1,
+        "expectedDecision": "probe_understanding",
+        "expectedBehavior": "Avoid affirming the answer; ask the learner to compare the size of one third and one quarter or to represent the parts visually.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-false-confidence-probe",
+          "category": "diagnosis",
+          "dimension": "learner_diagnosis",
+          "criterion": "Do not treat confidence as evidence of correctness; identify the denominator misconception and probe it with a representation or comparison.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "false_confidence_missed",
+            "title": "Confidence was mistaken for understanding",
+            "severity": "major",
+            "observedBehavior": "The response affirms or builds on the incorrect independent-denominator rule without probing it.",
+            "diagnosis": "The stated confidence conflicts with the learner's explicit incorrect reasoning.",
+            "impact": "Unchallenged false confidence can make the misconception harder to notice in a later task.",
+            "likelyCauses": [{ "hypothesis": "The response may be overweighting self-reported certainty relative to demonstrated reasoning.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Check whether the response addresses the explanation, not only the learner's confidence statement." }, { "kind": "implementation_suggestion", "text": "Consider using a short prediction or visual comparison when confidence and reasoning conflict." }],
+            "regressionTargets": ["ps-false-confidence/test-reasoning-before-affirmation"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-explicit-help-request", "version": "0.1.0", "title": "Respond to an explicit help request", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner asks for a hint after one unsuccessful attempt; the request changes the appropriate intervention timing.",
+      "learningContext": { "subject": "mathematics", "topic": "one-step equations", "learningObjective": "Find an inverse operation and apply it to both sides.", "learnerLevel": "early algebra" },
+      "learnerState": { "knownConcepts": ["addition and subtraction"], "misconceptions": ["uncertain which operation to undo first"], "confidence": 0.3, "engagement": "steady", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 1, "failedAttempts": 1, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For x + 9 = 15 I tried x = 24, but that does not seem right. Can you give me a small hint?" }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 1, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 } },
+      "decisionPoints": [{
+        "id": "honor-small-hint-request",
+        "evaluationCaseId": "ps-explicit-help-request",
+        "turnIndex": 1,
+        "expectedDecision": "offer_conceptual_hint",
+        "expectedBehavior": "Acknowledge the request and give one small cue about undoing addition, then leave the learner to compute.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-explicit-help-request-hint",
+          "category": "guidance",
+          "dimension": "intervention_strategy",
+          "criterion": "Honor the explicit request with a bounded conceptual hint while withholding the final answer and remaining work.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "help_request_mishandled",
+            "title": "The explicit help request was not handled proportionally",
+            "severity": "minor",
+            "observedBehavior": "The response either withholds any usable cue or completes the problem after the learner asked only for a small hint.",
+            "diagnosis": "The response does not match the requested support level.",
+            "impact": "Too little support can stall the learner; too much can take over the next step.",
+            "likelyCauses": [{ "hypothesis": "The response policy may not distinguish a bounded hint request from a request for a full solution.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Compare the requested help level with the amount of work supplied in the response." }, { "kind": "implementation_suggestion", "text": "Consider using a smallest-useful-hint response before offering additional scaffolding." }],
+            "regressionTargets": ["ps-explicit-help-request/honor-small-hint-request"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-frustration", "version": "0.1.0", "title": "Reduce friction when frustration is explicit", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "After repeated failure, the learner expresses frustration and self-blame.",
+      "learningContext": { "subject": "mathematics", "topic": "integer operations", "learningObjective": "Use a number line to reason about subtracting a negative number.", "learnerLevel": "upper primary" },
+      "learnerState": { "knownConcepts": ["negative numbers on a number line"], "misconceptions": ["treats subtracting a negative as moving left"], "confidence": 0.15, "engagement": "frustrated", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 3, "failedAttempts": 3, "priorHints": ["Picture the number line.", "Picture the number line again."], "conversationHistory": [{ "role": "user", "content": "I think 5 - (-2) is 3." }, { "role": "assistant", "content": "Picture the number line." }, { "role": "user", "content": "I still moved two places left." }, { "role": "assistant", "content": "Picture the number line again." }, { "role": "user", "content": "I keep getting this wrong. Maybe I am just bad at math." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
+      "decisionPoints": [{
+        "id": "support-without-taking-over",
+        "evaluationCaseId": "ps-frustration",
+        "turnIndex": 3,
+        "expectedDecision": "support_emotion",
+        "expectedBehavior": "Respond without judgment, reduce the next step to one manageable number-line move, and invite the learner to decide its direction.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-frustration-support",
+          "category": "actionability",
+          "dimension": "interaction_quality",
+          "criterion": "Acknowledge the frustration respectfully and make the next task smaller without labeling ability or supplying the full answer.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "frustration_not_supported",
+            "title": "The response did not reduce friction after frustration",
+            "severity": "major",
+            "observedBehavior": "The response ignores or dismisses explicit frustration, or replaces the learner's work with a full answer.",
+            "diagnosis": "The response does not adapt support to the learner's stated emotional and task state.",
+            "impact": "The current interaction may become harder to continue productively.",
+            "likelyCauses": [{ "hypothesis": "The response policy may treat frustration as ordinary task content instead of a cue to simplify support.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Review whether the response acknowledges the learner's words and proposes a smaller next action." }, { "kind": "implementation_suggestion", "text": "Consider adding a brief, nonjudgmental reset followed by one concrete learner-controlled step." }],
+            "regressionTargets": ["ps-frustration/support-without-taking-over"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-near-mastery", "version": "0.1.0", "title": "Fade support near mastery", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner has made two independent correct steps after earlier difficulty.",
+      "learningContext": { "subject": "mathematics", "topic": "two-step equations", "learningObjective": "Complete an equation independently after demonstrating the inverse-operation sequence.", "learnerLevel": "early algebra" },
+      "learnerState": { "knownConcepts": ["inverse operations", "maintaining equality"], "misconceptions": [], "confidence": 0.75, "engagement": "high", "masteryState": "near_mastery" },
+      "trajectory": { "attemptCount": 4, "failedAttempts": 2, "priorHints": ["Undo the addition first.", "Now consider what undoes multiplication."], "conversationHistory": [{ "role": "user", "content": "For 4x + 3 = 19, I tried x = 4 but got stuck." }, { "role": "assistant", "content": "What operation would undo the +3?" }, { "role": "user", "content": "Subtract 3 from both sides: 4x = 16." }, { "role": "assistant", "content": "What undoes multiplying by 4?" }, { "role": "user", "content": "Divide both sides by 4 and get x = 4. I think I can do another one." }, { "role": "assistant", "content": "Try the next example on your own." }, { "role": "user", "content": "I solved 5x + 2 = 17 by subtracting 2 and dividing by 5. What should I check?" }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 }, "mastery": { "independentSuccessesToConfirm": 2 } },
+      "decisionPoints": [{
+        "id": "fade-after-independent-work",
+        "evaluationCaseId": "ps-near-mastery",
+        "turnIndex": 4,
+        "expectedDecision": "fade_support",
+        "expectedBehavior": "Recognize the independent sequence and ask for a quick check or transfer explanation instead of repeating step-by-step instruction.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-near-mastery-fade",
+          "category": "adaptation",
+          "dimension": "adaptation",
+          "criterion": "Fade procedural scaffolding after the learner demonstrates repeated independent success and preserve a learner-owned check or transfer step.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "support_not_faded",
+            "title": "Support stayed high after independent progress",
+            "severity": "minor",
+            "observedBehavior": "The response repeats procedural scaffolding despite the learner completing the recent sequence independently.",
+            "diagnosis": "The response does not use recent independent work to reduce support.",
+            "impact": "Repeated instruction can obscure whether the learner can transfer the method without prompts.",
+            "likelyCauses": [{ "hypothesis": "The adaptation policy may not incorporate recent independent-success evidence.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Compare recent learner turns with the amount of scaffolding in the response." }, { "kind": "implementation_suggestion", "text": "Consider fading from procedural hints to a brief self-check or transfer prompt after the authored success threshold." }],
+            "regressionTargets": ["ps-near-mastery/fade-after-independent-work"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-same-misconception", "version": "0.1.0", "title": "Address a repeated misconception directly", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner repeats an incorrect fraction comparison after one general question.",
+      "learningContext": { "subject": "mathematics", "topic": "fraction comparison", "learningObjective": "Compare fractions by reasoning about equal-sized parts or equivalent fractions.", "learnerLevel": "upper primary" },
+      "learnerState": { "knownConcepts": ["unit fractions"], "misconceptions": ["assumes a larger denominator always means a larger fraction"], "confidence": 0.6, "engagement": "steady", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 2, "failedAttempts": 2, "priorHints": ["What does the denominator count?"], "conversationHistory": [{ "role": "user", "content": "I think 1/8 is larger than 1/5 because 8 is larger than 5." }, { "role": "assistant", "content": "What does the denominator count?" }, { "role": "user", "content": "It counts the pieces, so eight pieces must make a larger fraction." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
+      "decisionPoints": [{
+        "id": "contrast-equal-whole-pieces",
+        "evaluationCaseId": "ps-same-misconception",
+        "turnIndex": 2,
+        "expectedDecision": "ask_diagnostic_question",
+        "expectedBehavior": "Use one shared whole to contrast the size of eighths and fifths; ask the learner to revise the comparison.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-same-misconception-diagnosis",
+          "category": "diagnosis",
+          "dimension": "learner_diagnosis",
+          "criterion": "Use the repeated denominator reasoning to target the misconception with a concrete same-whole comparison rather than repeat the same broad question.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "repeated_misconception_unaddressed",
+            "title": "The repeated misconception remained unaddressed",
+            "severity": "major",
+            "observedBehavior": "The response repeats a broad prompt or accepts the comparison without contrasting equal-sized wholes.",
+            "diagnosis": "The learner's second explanation identifies a stable denominator-size misconception.",
+            "impact": "The learner may continue to apply whole-number size reasoning to the denominator.",
+            "likelyCauses": [{ "hypothesis": "The response policy may not use repeated reasoning as a signal to make the hint more specific.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Check whether the tutor's second response is more targeted than its first prompt." }, { "kind": "implementation_suggestion", "text": "Consider using a same-whole visual comparison after the learner repeats the denominator rule." }],
+            "regressionTargets": ["ps-same-misconception/contrast-equal-whole-pieces"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-independent-progress", "version": "0.1.0", "title": "Avoid interrupting independent progress", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner has solved the current equation correctly and explains both operations independently.",
+      "learningContext": { "subject": "mathematics", "topic": "two-step equations", "learningObjective": "Recognize when a learner can continue independently and invite transfer.", "learnerLevel": "early algebra" },
+      "learnerState": { "knownConcepts": ["inverse operations", "equation balance"], "misconceptions": [], "confidence": 0.85, "engagement": "high", "masteryState": "near_mastery" },
+      "trajectory": { "attemptCount": 2, "failedAttempts": 0, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For 2x + 5 = 17, I subtracted 5 and divided by 2. I got x = 6." }, { "role": "assistant", "content": "Can you explain why those steps keep the equation balanced?" }, { "role": "user", "content": "I did the inverse operation on both sides each time. I checked 2(6) + 5 = 17." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 }, "mastery": { "independentSuccessesToConfirm": 2 } },
+      "decisionPoints": [{
+        "id": "invite-transfer-not-reteach",
+        "evaluationCaseId": "ps-independent-progress",
+        "turnIndex": 2,
+        "expectedDecision": "fade_support",
+        "expectedBehavior": "Acknowledge the check and invite a new example or a concise explanation; do not restart the solution steps.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-independent-progress-fade",
+          "category": "adaptation",
+          "dimension": "adaptation",
+          "criterion": "Recognize the correct independent solution and avoid inserting unrequested step-by-step help.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "independent_progress_interrupted",
+            "title": "The response interrupted independent progress",
+            "severity": "minor",
+            "observedBehavior": "The response reteaches the completed steps or supplies unnecessary procedural guidance.",
+            "diagnosis": "The response does not reflect the learner's demonstrated independent work.",
+            "impact": "Unnecessary intervention can reduce the learner's opportunity to explain or transfer the method.",
+            "likelyCauses": [{ "hypothesis": "The response policy may not distinguish independent success from a request for more explanation.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Check whether the response starts from the learner's successful explanation and verification." }, { "kind": "implementation_suggestion", "text": "Consider using an optional transfer question after a correct independent solution." }],
+            "regressionTargets": ["ps-independent-progress/invite-transfer-not-reteach"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-overhelping-answer-leak", "version": "0.1.0", "title": "Protect the learner's attempt from answer leakage", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "After one attempt, the learner asks whether the setup is right; the authored policy disallows giving the answer.",
+      "learningContext": { "subject": "mathematics", "topic": "two-step equations", "learningObjective": "Let the learner complete the equation after a bounded setup cue.", "learnerLevel": "early algebra" },
+      "learnerState": { "knownConcepts": ["subtraction", "division"], "misconceptions": [], "confidence": 0.55, "engagement": "steady", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 1, "failedAttempts": 0, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For 3x + 2 = 14, I wrote 3x = 12. Is that setup okay?" }] },
+      "teachingPolicy": { "disclosure": "no_answer", "intervention": { "firstHintAfterFailedAttempts": 1 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 } },
+      "decisionPoints": [{
+        "id": "keep-final-answer-with-learner",
+        "evaluationCaseId": "ps-overhelping-answer-leak",
+        "turnIndex": 1,
+        "expectedDecision": "protect_learning_integrity",
+        "expectedBehavior": "Confirm the valid setup and ask the learner which operation isolates x; do not state x = 4 or complete the solution.",
+        "evaluationCriteria": [
+          {
+            "rubricId": "ps-overhelping-scope",
+            "category": "guidance",
+            "dimension": "intervention_strategy",
+            "criterion": "Build only on the valid setup and leave the remaining operation for the learner under the no-answer policy.",
+            "weight": 1,
+            "evaluationType": "judge",
+            "behavior": "required",
+            "failureFinding": {
+              "type": "overhelping",
+              "title": "The response took over the remaining work",
+              "severity": "major",
+              "observedBehavior": "The response completes the remaining operation instead of leaving the learner a next step.",
+              "diagnosis": "The amount of scaffolding exceeds the learner's current request and the authored disclosure policy.",
+              "impact": "The learner loses the opportunity to complete and verify the final step.",
+              "likelyCauses": [{ "hypothesis": "The response policy may favor solution completion over the requested check of intermediate work.", "confidence": 0.5 }],
+              "recommendations": [{ "kind": "diagnostic", "text": "Inspect whether the response confirms only the valid setup or supplies the remaining result." }, { "kind": "implementation_suggestion", "text": "Consider separating intermediate-work validation from final-answer disclosure." }],
+              "regressionTargets": ["ps-overhelping-answer-leak/keep-final-answer-with-learner"],
+              "confidence": 0.75
+            }
+          },
+          {
+            "rubricId": "ps-overhelping-answer-leak-deterministic",
+            "category": "correctness",
+            "dimension": "learning_integrity",
+            "criterion": "Do not disclose the forbidden final answer x = 4.",
+            "weight": 1,
+            "evaluationType": "deterministic",
+            "behavior": "prohibited",
+            "evaluatorId": "direct_answer_leak",
+            "config": { "forbiddenFinalAnswer": "x = 4" },
+            "criticalFailure": { "type": "answer_leakage", "severity": "critical" },
+            "failureFinding": {
+              "type": "answer_leakage",
+              "title": "The response disclosed the final answer",
+              "severity": "critical",
+              "observedBehavior": "The deterministic answer-leak evaluator matched the forbidden final answer.",
+              "diagnosis": "The response contains the answer prohibited by this scenario's no-answer policy.",
+              "impact": "The learner's remaining work is completed for them and the release gate should fail.",
+              "likelyCauses": [],
+              "recommendations": [{ "kind": "diagnostic", "text": "Inspect the referenced response turn and confirm which answer string matched the case's forbidden answer." }, { "kind": "implementation_suggestion", "text": "Consider adding a policy-aware final-answer guard for no-answer cases while preserving allowed disclosure cases." }],
+              "regressionTargets": ["ps-overhelping-answer-leak/keep-final-answer-with-learner"],
+              "confidence": 0.95
+            }
+          }
+        ]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-underhelping", "version": "0.1.0", "title": "Reduce friction after persistent failure", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner has made four failed attempts and received only broad prompts.",
+      "learningContext": { "subject": "mathematics", "topic": "fraction equivalence", "learningObjective": "Use equivalent fractions to compare values.", "learnerLevel": "upper primary" },
+      "learnerState": { "knownConcepts": ["equal-sized parts"], "misconceptions": ["compares numerators without common units"], "confidence": 0.2, "engagement": "low", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 4, "failedAttempts": 4, "priorHints": ["Try again.", "Look more carefully.", "What do you notice?"], "conversationHistory": [{ "role": "user", "content": "I think 2/3 is smaller than 3/5 because 2 is less than 3." }, { "role": "assistant", "content": "Try again." }, { "role": "user", "content": "I still think the smaller numerator means smaller." }, { "role": "assistant", "content": "Look more carefully." }, { "role": "user", "content": "I do not see it." }, { "role": "assistant", "content": "What do you notice?" }, { "role": "user", "content": "I still cannot compare them." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
+      "decisionPoints": [{
+        "id": "escalate-after-four-failures",
+        "evaluationCaseId": "ps-underhelping",
+        "turnIndex": 4,
+        "expectedDecision": "escalate_support",
+        "expectedBehavior": "Introduce a common-denominator representation or a concrete same-whole comparison, then ask the learner to choose the next comparison step.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-underhelping-escalation",
+          "category": "guidance",
+          "dimension": "intervention_strategy",
+          "criterion": "After four failed attempts and three broad prompts, increase scaffolding specificity with a concrete comparison rather than repeat an open-ended prompt.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "underhelping_after_repeated_failure",
+            "title": "Support did not increase after persistent failure",
+            "severity": "major",
+            "observedBehavior": "The response repeats a broad prompt or offers no concrete comparison after four unsuccessful attempts.",
+            "diagnosis": "The authored escalation threshold has been crossed without a corresponding increase in support specificity.",
+            "impact": "The learner may remain stuck despite clear evidence that the current support level is insufficient.",
+            "likelyCauses": [{ "hypothesis": "The intervention policy may not track consecutive unsuccessful attempts.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Review hint specificity across all four attempts and locate whether any new actionable scaffold appears." }, { "kind": "implementation_suggestion", "text": "Consider a staged hint policy that moves from open prompts to a concrete representation after the configured threshold." }],
+            "regressionTargets": ["ps-underhelping/escalate-after-four-failures"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-multiturn-hint-escalation", "version": "0.1.0", "title": "Escalate after the same hint fails twice", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "A controlled three-attempt trajectory: the same misconception persists after a light conceptual hint and a repeated low-specificity hint.",
+      "learningContext": { "subject": "mathematics", "topic": "square roots", "learningObjective": "Use the inverse relationship between squaring and square roots to solve x² = 9.", "learnerLevel": "early algebra" },
+      "learnerState": { "knownConcepts": ["squaring a number"], "misconceptions": ["assumes the inverse operation changes x² directly to x without taking a square root"], "confidence": 0.4, "engagement": "steady", "masteryState": "developing" },
+      "trajectory": { "attemptCount": 3, "failedAttempts": 3, "priorHints": ["What operation reverses squaring?", "Think about the operation that undoes squaring."], "conversationHistory": [{ "role": "user", "content": "For x² = 9, I think x = 9." }, { "role": "assistant", "content": "What operation reverses squaring?" }, { "role": "user", "content": "I still think x is 9 because the right side is 9." }, { "role": "assistant", "content": "Think about the operation that undoes squaring." }, { "role": "user", "content": "I am still not sure. Maybe x is 9." }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
+      "decisionPoints": [{
+        "id": "increase-specificity-at-third-attempt",
+        "evaluationCaseId": "ps-multiturn-hint-escalation",
+        "turnIndex": 3,
+        "expectedDecision": "escalate_support",
+        "expectedBehavior": "Make the square-root relationship explicit with a small concrete check, such as asking which number squared gives 9; leave the learner to state the value.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-multiturn-hint-escalation-specificity",
+          "category": "adaptation",
+          "dimension": "intervention_strategy",
+          "criterion": "After the same misconception persists through two low-specificity hints, increase scaffolding specificity and do not simply repeat the prior hint.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "late_hint_escalation",
+            "title": "Hint specificity did not increase at the threshold",
+            "severity": "major",
+            "observedBehavior": "The response repeats a prior low-specificity hint or leaves the repeated square-root misconception without a concrete scaffold.",
+            "diagnosis": "The third failed attempt crosses the authored escalation threshold, but support does not become more specific.",
+            "impact": "Repeated friction is preserved after evidence shows that the current hint level has not helped.",
+            "likelyCauses": [{ "hypothesis": "The policy may count hints without checking whether the learner's misconception changed.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Compare the specificity of the current hint with both prior hints and the learner's repeated response." }, { "kind": "implementation_suggestion", "text": "Consider a threshold rule that escalates one level after repeated failure on the same misconception." }],
+            "regressionTargets": ["ps-multiturn-hint-escalation/increase-specificity-at-third-attempt"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    },
+    {
+      "schemaVersion": 2,
+      "identity": { "id": "ps-hint-fading", "version": "0.1.0", "title": "Fade a hint after the learner uses it", "suiteId": "productive-struggle-intervention-v0.1" },
+      "description": "The learner applies a conceptual hint successfully and asks what to do next.",
+      "learningContext": { "subject": "mathematics", "topic": "equivalent fractions", "learningObjective": "Move from a supported example to an independent comparison.", "learnerLevel": "upper primary" },
+      "learnerState": { "knownConcepts": ["multiplying numerator and denominator by the same number"], "misconceptions": [], "confidence": 0.7, "engagement": "high", "masteryState": "near_mastery" },
+      "trajectory": { "attemptCount": 3, "failedAttempts": 1, "priorHints": ["Can you make both fractions use twelfths?"], "conversationHistory": [{ "role": "user", "content": "I do not know how to compare 2/3 and 3/4." }, { "role": "assistant", "content": "Can you make both fractions use twelfths?" }, { "role": "user", "content": "2/3 is 8/12 and 3/4 is 9/12, so 3/4 is larger. Can I try one on my own?" }] },
+      "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 1 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 }, "mastery": { "independentSuccessesToConfirm": 2 } },
+      "decisionPoints": [{
+        "id": "withdraw-scaffold-and-transfer",
+        "evaluationCaseId": "ps-hint-fading",
+        "turnIndex": 2,
+        "expectedDecision": "fade_support",
+        "expectedBehavior": "Recognize the learner's correct use of the hint, agree to an independent try, and avoid giving another procedural hint unless requested.",
+        "evaluationCriteria": [{
+          "rubricId": "ps-hint-fading-transfer",
+          "category": "adaptation",
+          "dimension": "adaptation",
+          "criterion": "Fade the prior scaffold after the learner applies it correctly and explicitly requests an independent attempt.",
+          "weight": 1,
+          "evaluationType": "judge",
+          "behavior": "required",
+          "failureFinding": {
+            "type": "hint_not_faded_after_progress",
+            "title": "The prior hint was not faded after progress",
+            "severity": "minor",
+            "observedBehavior": "The response continues the same procedural hint despite the learner applying it correctly and asking to try independently.",
+            "diagnosis": "The response does not adapt support to the learner's successful use of the previous hint.",
+            "impact": "The learner's explicit request for independent practice is not honored.",
+            "likelyCauses": [{ "hypothesis": "The support policy may not treat successful hint use as evidence for fading.", "confidence": 0.5 }],
+            "recommendations": [{ "kind": "diagnostic", "text": "Check whether the tutor acknowledges the successful independent comparison and the request to try alone." }, { "kind": "implementation_suggestion", "text": "Consider fading to a brief invitation to continue independently after a correct supported step." }],
+            "regressionTargets": ["ps-hint-fading/withdraw-scaffold-and-transfer"],
+            "confidence": 0.75
+          }
+        }]
+      }]
+    }
+  ]
+}
