@@ -502,18 +502,21 @@
           if (chapterIndex === index) chapter.setAttribute('aria-current', 'step');
           else chapter.removeAttribute('aria-current');
         });
-        visual.dataset.homeStoryActive = String(index);
-        story.dataset.homeStoryActiveIndex = String(index);
-        if (currentIndex instanceof HTMLElement) currentIndex.textContent = `0${index + 1} / 0${chapters.length}`;
+        const visualIndex = Math.max(0, index);
+        visual.dataset.homeStoryActive = String(visualIndex);
+        if (index < 0) delete story.dataset.homeStoryActiveIndex;
+        else story.dataset.homeStoryActiveIndex = String(index);
+        if (currentIndex instanceof HTMLElement) currentIndex.textContent = `0${visualIndex + 1} / 0${chapters.length}`;
       }
 
       function updateActiveChapter() {
         frame = 0;
         const marker = Math.max(120, window.innerHeight * 0.5);
-        let nextIndex = 0;
+        let nextIndex = -1;
         chapters.forEach((chapter, index) => {
           if (chapter.getBoundingClientRect().top <= marker) nextIndex = index;
         });
+        story.dataset.homeStoryChapterEntered = String(nextIndex >= 0);
         setActive(nextIndex);
       }
 
@@ -531,6 +534,8 @@
         if (frame !== 0) window.cancelAnimationFrame(frame);
         frame = 0;
         activeIndex = -1;
+        delete story.dataset.homeStoryEnhanced;
+        delete story.dataset.homeStoryChapterEntered;
         delete story.dataset.homeStoryActiveIndex;
         visual.dataset.homeStoryActive = '0';
         chapters.forEach((chapter) => chapter.removeAttribute('aria-current'));
@@ -542,11 +547,12 @@
         tracking = true;
         window.addEventListener('scroll', scheduleUpdate, { passive: true });
         window.addEventListener('resize', scheduleUpdate);
-        scheduleUpdate();
+        updateActiveChapter();
+        story.dataset.homeStoryEnhanced = 'true';
       }
 
       function syncTracking() {
-        // 五个章节始终按普通文档流可读；桌面滚动只同步右侧装饰视觉。
+        // 只在桌面非减弱动态模式启用视觉聚焦；退出增强态时恢复全部章节。
         if (desktop.matches && !reducedMotion.matches) startTracking();
         else stopTracking();
       }

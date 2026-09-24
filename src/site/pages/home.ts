@@ -46,7 +46,7 @@ function renderCase(item: TutorEvalPublicCase, index: number, count: number, sel
 }
 
 function renderDimensions(): string {
-  return `<section class="home-dimensions" id="dimensions" data-home-story aria-labelledby="measure-title">${renderFoliage(["right-mid"])}<div class="shell home-story-layout">
+  return `<section class="home-dimensions" id="dimensions" data-home-story aria-labelledby="measure-title"><div class="shell home-story-layout">
     <div class="home-story-copy">
       <header class="home-story-intro"><p class="eyebrow">Five dimensions of tutoring</p><h2 id="measure-title">More than<br><em>right or wrong.</em></h2><p>Teachometry examines observable tutoring behavior with structured rubrics and transparent evaluation. Each dimension captures a distinct aspect of a response in an authored scenario.</p><a class="text-link" href="/methodology/">Explore the evaluation method ${icon("arrow")}</a></header>
       <div class="home-story-chapters">${dimensions.map(([id, label, description, summary, question], index) => `<article class="home-story-chapter" data-home-story-chapter="${index}" aria-labelledby="home-story-question-${id}">
@@ -60,23 +60,38 @@ function renderDimensions(): string {
     <figure class="home-story-stage" data-home-story-visual data-home-story-active="0">
       <div class="home-story-stage-heading"><figcaption>Response under evaluation</figcaption><span data-home-story-current aria-hidden="true">01 / 05</span></div>
       <svg class="home-story-response" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
-        <g class="home-response-silhouette" fill="none" stroke="var(--line-strong)" stroke-linecap="round" stroke-width="8">
-          <path d="M82 102h176M82 148h578M82 194h414M82 240h516M82 286h302M82 332h566M82 378h448M82 424h540"/>
+        <g class="home-response-specimen" fill="none" stroke="var(--line-strong)" stroke-linecap="square" stroke-width="2" opacity=".72">
+          <g class="home-response-paragraph"><path d="M112 88h468M112 106h326M112 124h418"/></g>
+          <g class="home-response-paragraph"><path d="M112 178h392M112 196h468M112 214h295"/></g>
+          <g class="home-response-paragraph"><path d="M112 284h472M112 302h352"/></g>
+          <g class="home-response-paragraph"><path d="M112 385h434M112 403h320M112 421h486"/></g>
         </g>
-        <g class="home-story-state" data-home-story-state="0" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M48 194H70" stroke-dasharray="3 7"/><circle cx="38" cy="194" r="7" fill="var(--accent)" stroke="none"/><rect x="68" y="173" width="448" height="42" fill="var(--accent-soft)" fill-opacity=".58"/><path d="M82 194h414" stroke-width="8"/>
+        <g class="home-story-state" data-home-story-state="0" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter">
+          <rect x="103" y="162" width="410" height="32" fill="var(--accent-soft)" fill-opacity=".42" stroke="none"/>
+          <path d="M91 160v36M91 160h10M91 196h10M76 178h11" stroke-dasharray="2 5" opacity=".72"/>
+          <path d="M112 178h392" stroke-width="2.8"/>
         </g>
-        <g class="home-story-state" data-home-story-state="1" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M96 194C206 194 206 250 316 250S426 306 536 306h94"/><circle cx="206" cy="206" r="6" fill="var(--bg)"/><circle cx="316" cy="250" r="6" fill="var(--bg)"/><circle cx="426" cy="294" r="6" fill="var(--bg)"/><path d="M620 298l12 8-12 8"/>
+        <g class="home-story-state" data-home-story-state="1" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter">
+          <path d="M90 98v194M90 106h13M90 178h13M90 284h13" stroke-dasharray="1 6" opacity=".58"/>
+          <path d="M112 106h214M112 178h266M112 284h314" stroke-width="2.7"/>
+          <path d="M90 106h9M90 178h9M90 284h9" stroke-width="2.4"/>
         </g>
-        <g class="home-story-state" data-home-story-state="2" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M96 202C198 202 214 250 348 260M96 260H348M96 318C198 318 214 270 348 260" stroke-dasharray="4 8"/><path d="M348 260H632" stroke-width="4"/><circle cx="348" cy="260" r="9" fill="var(--bg)" stroke-width="3"/><path d="M618 248l14 12-14 12" stroke-width="3"/>
+        <g class="home-story-state" data-home-story-state="2" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+          <path d="M580 106h72v252M580 196h72M584 284h68" stroke="var(--line)" stroke-width="1.6" stroke-dasharray="2 6" opacity=".78"/>
+          <path d="M652 358h17v31M104 386v35M104 386h9M104 421h9M669 386v35M669 386h-9M669 421h-9" stroke="var(--accent)" stroke-width="2"/>
+          <rect x="111" y="389" width="328" height="28" fill="var(--accent-soft)" fill-opacity=".44" stroke="none"/>
+          <path d="M112 403h320M683 397v13" stroke="var(--accent)" stroke-width="2.8"/>
         </g>
-        <g class="home-story-state" data-home-story-state="3" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round">
-          <path d="M76 148H670M76 286H670M76 378H670" stroke-dasharray="3 8" opacity=".65"/><path d="M258 138v20m238-20v20M374 276v20m224-20v20M190 368v20m308-20v20"/><path d="M82 148h578M82 286h302M82 378h448" stroke-width="5"/>
+        <g class="home-story-state" data-home-story-state="3" fill="none" stroke="var(--accent)" stroke-linecap="square">
+          <rect x="105" y="270" width="365" height="27" fill="var(--accent-soft)" fill-opacity=".38" stroke="none"/>
+          <path d="M112 284h352M104 311h490" stroke-width="2.3"/>
+          <path d="M112 307v9M352 307v9M584 307v9" stroke-width="1.6" opacity=".78"/>
         </g>
-        <g class="home-story-state" data-home-story-state="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M82 286H258M258 286C350 286 350 194 438 194H656M258 286C350 286 350 378 438 378H610" stroke="var(--line-strong)" stroke-width="2.5" stroke-dasharray="4 8"/><path d="M82 286H258C350 286 350 194 438 194H656" stroke="var(--accent)" stroke-width="4"/><circle cx="258" cy="286" r="8" fill="var(--bg)" stroke="var(--accent)" stroke-width="3"/><circle cx="656" cy="194" r="7" fill="var(--accent)"/>
+        <g class="home-story-state" data-home-story-state="4" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+          <path d="M70 284v36M70 284h11M70 320h11M81 302h15M96 302v-18h9M96 302v18h9" stroke="var(--line-strong)" stroke-width="1.8"/>
+          <path d="M104 284h8M104 302h8" stroke="var(--line-strong)" stroke-width="1.6" opacity=".72"/>
+          <rect x="110" y="271" width="367" height="25" fill="var(--accent-soft)" fill-opacity=".38" stroke="none"/>
+          <path d="M112 284h352" stroke="var(--accent)" stroke-width="2.8"/>
         </g>
       </svg>
     </figure>

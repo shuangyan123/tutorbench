@@ -63,6 +63,7 @@
 .home-story-stage-heading figcaption { color: var(--ink); }
 .home-story-stage-heading [data-home-story-current] { flex: 0 0 auto; font-variant-numeric: tabular-nums; }
 .home-story-response { display: block; width: 100%; height: 100%; min-height: 0; flex: 1 1 auto; overflow: visible; }
+.home-response-specimen { opacity: .76; }
 .home-story-state { opacity: 0; }
 .home-story-stage[data-home-story-active="0"] [data-home-story-state="0"],
 .home-story-stage[data-home-story-active="1"] [data-home-story-state="1"],
@@ -235,6 +236,31 @@
 
 @media (min-width: 1024px) {
   .home-story-stage { z-index: 1; }
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  [data-home-story-enhanced="true"] .home-story-chapter {
+    transition: opacity 260ms ease, transform 260ms ease;
+  }
+  [data-home-story-enhanced="true"] .home-story-chapter:not([aria-current="step"]) {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  [data-home-story-enhanced="true"] .home-story-chapter[aria-current="step"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  [data-home-story-enhanced="true"][data-home-story-chapter-entered="true"] .home-story-intro {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 260ms ease, transform 260ms ease;
+  }
+  [data-home-story-enhanced="true"][data-home-story-chapter-entered="true"] .home-story-intro:focus-within {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
 }
 
 @media (width < 1024px) {

@@ -164,7 +164,7 @@ test("home reconstruction uses real blog routes and cases reuse the Teachometry 
   assert.equal((home.match(/<article class="home-blog-card">/g) ?? []).length, 2);
   assert.match(home, /September 17, 2026/);
   assert.doesNotMatch(home, /Sep 10, 2024|Why Observable Behavior Matters in AI Tutoring/);
-  for (const image of PUBLIC_SITE_RASTER_ASSETS.filter((asset) => asset !== "foliage.png" && asset !== "home-hero-bg.webp" && asset !== "home-open-data-bg.webp").map((asset) => asset.replace(/\.webp$/, ""))) {
+  for (const image of PUBLIC_SITE_RASTER_ASSETS.filter((asset) => asset !== "foliage.png" && asset !== "foliage-right-mid.webp" && asset !== "home-hero-bg.webp" && asset !== "home-open-data-bg.webp").map((asset) => asset.replace(/\.webp$/, ""))) {
     assert.ok(home.includes(`src="/preview/assets/${image}.webp"`));
   }
   assert.ok(home.indexOf('class="home-data"') < home.indexOf('class="home-blog"'));
@@ -541,6 +541,9 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /Five dimensions of tutoring/);
     assert.match(homeHtml, /More than<br><em>right or wrong\.<\/em>/);
     assert.match(homeHtml, /Teachometry examines observable tutoring behavior with structured rubrics and transparent evaluation\. Each dimension captures a distinct aspect of a response in an authored scenario\./);
+    const homeStorySection = homeHtml.match(/<section class="home-dimensions"[\s\S]*?<\/section>/u)?.[0];
+    assert.ok(homeStorySection);
+    assert.doesNotMatch(homeStorySection, /foliage-layer/iu);
     const homeStoryQuestions = [
       "Did it understand the learner?",
       "Did it help the learner move forward?",
@@ -559,6 +562,17 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeStorySvg, /aria-hidden="true"/u);
     assert.match(homeStorySvg, /focusable="false"/u);
     assert.doesNotMatch(homeStorySvg, /<text|Diagnosis|Guidance|learner|benchmark/iu);
+    const responseParagraphs = homeStorySvg.match(/<g class="home-response-paragraph">[\s\S]*?<\/g>/gu) ?? [];
+    assert.equal(responseParagraphs.length, 4);
+    for (const paragraph of responseParagraphs) {
+      const lineCount = (paragraph.match(/M\d+\s+\d+h\d+/gu) ?? []).length;
+      assert.ok(lineCount >= 2 && lineCount <= 4, `Editorial response paragraph line count: ${lineCount}`);
+    }
+    const homeStoryChapters = homeHtml.match(/<article class="home-story-chapter"[\s\S]*?<\/article>/gu) ?? [];
+    assert.equal(homeStoryChapters.length, 5);
+    for (const chapter of homeStoryChapters) {
+      assert.doesNotMatch(chapter, /<(?:a|button|input|select|textarea)\b/iu);
+    }
     for (const state of ["0", "1", "2", "3", "4"]) {
       assert.match(homeStorySvg, new RegExp(`data-home-story-state="${state}"`));
     }
@@ -744,13 +758,21 @@ test("static website build emits the public artifact files and route shell", asy
     assert.ok(homeStoryScriptStart >= 0 && homeStoryScriptEnd > homeStoryScriptStart);
     const homeStoryScript = siteScript.slice(homeStoryScriptStart, homeStoryScriptEnd);
     assert.match(homeStoryScript, /requestAnimationFrame\(updateActiveChapter\)/);
+    assert.match(homeStoryScript, /let nextIndex = -1/);
     assert.match(homeStoryScript, /addEventListener\('scroll', scheduleUpdate, \{ passive: true \}\)/);
     assert.match(homeStoryScript, /min-width: 1024px/);
     assert.match(homeStoryScript, /!desktop\.matches \|\| reducedMotion\.matches/);
     assert.match(homeStoryScript, /homeStoryActive/);
+    assert.match(homeStoryScript, /story\.dataset\.homeStoryEnhanced = 'true'/);
+    assert.match(homeStoryScript, /delete story\.dataset\.homeStoryEnhanced/);
+    assert.match(homeStoryScript, /homeStoryChapterEntered/);
     assert.match(homeStoryScript, /prefers-reduced-motion: reduce/);
     assert.doesNotMatch(homeStoryScript, /wheel|touchmove|preventDefault/);
     assert.match(homeStyles, /\.home-story-stage \{ position: sticky;/);
+    assert.match(homeStyles, /@media \(min-width: 1024px\) and \(prefers-reduced-motion: no-preference\)[\s\S]*?\[data-home-story-enhanced="true"\] \.home-story-chapter:not\(\[aria-current="step"\]\)[\s\S]*?opacity: 0;/);
+    assert.match(homeStyles, /\.home-story-chapter\[aria-current="step"\][\s\S]*?opacity: 1;[\s\S]*?translateY\(0\)/);
+    assert.match(homeStyles, /transition: opacity 260ms ease, transform 260ms ease/);
+    assert.match(homeStyles, /data-home-story-chapter-entered="true"\] \.home-story-intro/);
     assert.match(homeStyles, /@media \(width < 1024px\)[\s\S]*?\.home-story-stage \{ position: relative;/);
     assert.match(homeStyles, /@media \(max-width: 640px\)[\s\S]*?\.home-story-stage \{ display: none;/);
     assert.match(homeStyles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.home-story-stage \{ position: relative;/);
