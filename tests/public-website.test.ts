@@ -528,8 +528,8 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /No calibrated public model runs yet\./);
     assert.match(homeHtml, /href="\/leaderboard\//);
     assert.match(homeHtml, /href="\/community\//);
-    assert.match(homeHtml, /Before we trust<br>AI tutors, <em>measure<\/em>/);
-    assert.match(homeHtml, /href="\/data\/cases\/">Explore the Benchmark/);
+    assert.match(homeHtml, /Test how AI tutors<br><em>behave<\/em>/);
+    assert.match(homeHtml, /href="\/run\/">Run an Evaluation/);
     assert.match(homeHtml, /href="\/methodology\/">[\s\S]*Read the Methodology/);
     assert.match(homeHtml, /data-case-walkthrough/);
     assert.match(homeHtml, /Illustrative case walkthrough/);
