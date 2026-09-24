@@ -614,7 +614,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(runHtml, /href="\/assets\/teachometry\.css"/);
     assert.match(runHtml, /href="\/assets\/run\.css"/);
     assert.match(runHtml, /From research<br>questions to<br><em>reproducible runs\.<\/em>/);
-    assert.match(runHtml, /Run TutorBench locally, generate reproducible evidence/);
+    assert.match(runHtml, /Run TutorBench locally, then connect an external Tutor to the Tutor Health workflow/);
     assert.equal((runHtml.match(/data-run-tab="/g) ?? []).length, 4);
     assert.equal((runHtml.match(/data-copy-run/g) ?? []).length, 4);
     for (const tab of ["quickstart", "benchmark", "external-tutor", "advanced"]) {
