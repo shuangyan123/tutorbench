@@ -1268,7 +1268,7 @@ body:is(
   margin-right: auto;
 }
 
-@media (max-width: 1100px) and (min-width: 901px) {
+@media (max-width: 1100px) and (min-width: 1024px) {
   body:is(
     .home-page,
     .methodology-page,
@@ -1321,13 +1321,32 @@ body:is(
     gap: 12px;
   }
 
+}
+
+@media (max-width: 1100px) and (min-width: 901px) {
   .methodology-page .method-hero,
   .methodology-page .method-scope-not-measure {
     overflow: clip;
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1023px) {
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header {
+    min-height: 0;
+  }
+
   body:is(
     .home-page,
     .methodology-page,
@@ -1346,8 +1365,8 @@ body:is(
     min-height: 0;
     height: auto;
     flex-wrap: wrap;
-    gap: 16px;
-    padding: 18px 0 10px;
+    gap: 10px 12px;
+    padding: 10px 0;
   }
 
   body:is(
@@ -1396,13 +1415,14 @@ body:is(
   .docs-page
   ) .home-header .nav-toggle {
     display: inline-flex;
-    min-height: 32px;
+    min-width: 60px;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
     margin-left: auto;
     border: 1px solid var(--line-strong);
     border-radius: var(--teach-button-radius);
-    padding: 7px 10px;
+    padding: 8px 12px;
     background: var(--surface);
     color: var(--ink);
     font: 12px/1.4 var(--teach-sans);
@@ -1425,9 +1445,12 @@ body:is(
     flex: 0 0 100%;
     order: 3;
     justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 12px 24px;
-    padding: 12px 0 2px;
+    gap: 4px 16px;
+    padding: 10px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   body:is(
@@ -1443,7 +1466,46 @@ body:is(
   .run-page,
   .docs-page
   ) .home-header .nav-links[data-open="true"] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-links a {
     display: flex;
+    min-width: 0;
+    min-height: 44px;
+    align-items: center;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-links a[aria-current="page"] {
+    text-underline-offset: 4px;
   }
 
   body:is(
@@ -1459,14 +1521,117 @@ body:is(
   .run-page,
   .docs-page
   ) .home-header-tools {
+    display: none;
     width: 100%;
-    min-height: var(--teach-button-height);
+    flex: 0 0 100%;
     order: 4;
-    justify-content: flex-end;
-    gap: 16px;
+    justify-content: space-between;
+    gap: 12px;
     margin: 0;
   }
 
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-links[data-open="true"] ~ .home-header-tools {
+    display: flex;
+    align-items: center;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header-tools .locale-switcher select {
+    min-height: 44px;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .theme-controls {
+    height: 48px;
+    padding: 3px;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .theme-controls button {
+    width: 40px;
+    height: 40px;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header-tools > .github-link {
+    width: 44px;
+    height: 44px;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header-tools > .button-primary {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 900px) {
   body:is(
     .home-page,
     .methodology-page,
@@ -1665,6 +1830,98 @@ body:is(
   }
 }
 
+@media (max-width: 640px) {
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .home-header-tools {
+    display: none;
+    grid-template-columns: minmax(0, 1fr) auto 44px;
+    align-items: center;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-links[data-open="true"] ~ .home-header-tools {
+    display: grid;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header-tools > .locale-switcher {
+    min-width: 0;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header-tools > .locale-switcher select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header-tools > .button-primary {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+}
+
 
 /* Shared chrome motion: subtle feedback, no layout-shifting animation. */
 @media (prefers-reduced-motion: no-preference) {
@@ -1723,56 +1980,6 @@ body:is(
 @keyframes teach-locale-refresh {
   from { opacity: .72; transform: translateY(1px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-    .run-page,
-    .docs-page
-  ) .home-header .nav-links {
-    display: flex;
-    visibility: hidden;
-    max-height: 0;
-    overflow: clip;
-    opacity: 0;
-    transform: translateY(-6px);
-    pointer-events: none;
-    transition:
-      max-height 220ms ease,
-      opacity 160ms ease,
-      transform 180ms ease,
-      visibility 0s linear 220ms;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-    .run-page,
-    .docs-page
-  ) .home-header .nav-links[data-open="true"] {
-    visibility: visible;
-    max-height: 180px;
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-    transition-delay: 0s;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
