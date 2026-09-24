@@ -1,7 +1,7 @@
 {
   "name": "tutor-benchmark",
   "version": "0.1.0",
-  "description": "A provider-independent Developer Preview for evaluating observable AI tutoring behavior.",
+  "description": "Provider-neutral real-world evaluation and regression infrastructure for AI tutoring systems.",
   "license": "SEE LICENSE IN LICENSES.md",
   "keywords": [
     "ai tutoring",

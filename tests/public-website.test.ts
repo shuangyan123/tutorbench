@@ -44,6 +44,21 @@ test("homepage derives facts and escapes case content without inventing model re
   assert.doesNotMatch(content, /<img src=x/);
   assert.match(content, /Not scored · no model run/);
   assert.match(content, /No model response or model score is published here/);
+  assert.match(content, /Test how AI tutors/);
+  assert.match(content, /Run an Evaluation/);
+  assert.match(content, /diagnose concrete failures/);
+});
+
+test("run page exposes Tutor Health as the product-facing external Tutor workflow", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const page = renderRunPage(artifacts);
+  assert.match(page.description, /diagnose real-world tutoring behavior/);
+  assert.match(page.content, /data-run-tab="health"/);
+  assert.match(page.content, /tutorbench health/);
+  assert.match(page.content, /productive-struggle-intervention-v0\.1/);
+  assert.match(page.content, /health-report\.json/);
+  assert.match(page.content, /No-Judge runs stay UNRESOLVED/);
+  assert.match(page.content, /not a validated general tutor-quality or learner-outcome measure/);
 });
 
 test("locale selector reserves text and chevron space consistently", async () => {
@@ -513,8 +528,8 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /No calibrated public model runs yet\./);
     assert.match(homeHtml, /href="\/leaderboard\//);
     assert.match(homeHtml, /href="\/community\//);
-    assert.match(homeHtml, /Before we trust<br>AI tutors, <em>measure<\/em>/);
-    assert.match(homeHtml, /href="\/data\/cases\/">Explore the Benchmark/);
+    assert.match(homeHtml, /Test how AI tutors<br><em>behave<\/em>/);
+    assert.match(homeHtml, /href="\/run\/">Run an Evaluation/);
     assert.match(homeHtml, /href="\/methodology\/">[\s\S]*Read the Methodology/);
     assert.match(homeHtml, /data-case-walkthrough/);
     assert.match(homeHtml, /Illustrative case walkthrough/);
@@ -599,10 +614,10 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(runHtml, /href="\/assets\/teachometry\.css"/);
     assert.match(runHtml, /href="\/assets\/run\.css"/);
     assert.match(runHtml, /From research<br>questions to<br><em>reproducible runs\.<\/em>/);
-    assert.match(runHtml, /Run TutorBench locally, generate reproducible evidence/);
-    assert.equal((runHtml.match(/data-run-tab="/g) ?? []).length, 4);
-    assert.equal((runHtml.match(/data-copy-run/g) ?? []).length, 4);
-    for (const tab of ["quickstart", "benchmark", "external-tutor", "advanced"]) {
+    assert.match(runHtml, /Run TutorBench locally, then connect an external Tutor to the Tutor Health workflow/);
+    assert.equal((runHtml.match(/data-run-tab="/g) ?? []).length, 5);
+    assert.equal((runHtml.match(/data-copy-run/g) ?? []).length, 5);
+    for (const tab of ["quickstart", "health", "benchmark", "external-tutor", "advanced"]) {
       assert.match(runHtml, new RegExp(`data-run-tab="${tab}"`));
       assert.match(runHtml, new RegExp(`data-run-panel="${tab}"`));
     }

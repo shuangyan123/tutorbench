@@ -4,10 +4,13 @@
 
 # TutorBench
 
-AI Tutor 评测基准
+Real-world evaluation and regression infrastructure for AI tutoring systems.
 
-Tutor Benchmark measures how well AI models teach, not just whether they know
-the answer.
+TutorBench tests how an AI tutor behaves in authored learning situations,
+diagnoses concrete pedagogical failures, and preserves the evidence needed to
+fix and retest them. The canonical TutorEval benchmark remains the measurement
+foundation; Tutor Health adds scenario-based, finding-first evaluation for
+product-facing workflows.
 
 ## Why TutorBench exists
 
@@ -21,18 +24,27 @@ can answer a question correctly and still fail to diagnose misunderstanding,
 guide reasoning, adapt its help, or preserve learner agency. Before AI
 tutoring can be trusted at scale, those capabilities need to be measurable.
 
-TutorBench exists as reproducible, provider-neutral measurement infrastructure
-for that problem: measure observable tutoring behavior, diagnose weaknesses,
-and identify directions for improvement. It is designed to support better AI
-tutoring systems—not merely produce a leaderboard.
+TutorBench exists as reproducible, provider-neutral quality infrastructure for
+that problem: test observable tutoring decisions in context, diagnose where a
+Tutor failed, and make the result reproducible enough to retest after a product
+change. It is designed to support better AI tutoring systems—not merely produce
+a leaderboard.
 
 The approved T1 trajectory mark and its usage rules are documented in
 [`assets/brand/tutorbench/README.md`](assets/brand/tutorbench/README.md).
 
-- 48 synthetic TutorEval cases (24 English + 24 zh-CN)
-- 5 subjects
-- 5 tutoring capability categories
-- deterministic evaluators plus an optional semantic Judge boundary
+Current public surfaces include:
+
+- a 13-scenario Productive Struggle & Intervention suite for Tutor Health;
+- explicit Tutor Health coverage, Release Gate, evidence-backed Findings, and
+  regression targets;
+- the canonical 48-case TutorEval dataset (24 English + 24 zh-CN) across five
+  subjects and five historical TutorEval scoring categories;
+- deterministic evaluators plus optional semantic Judge providers.
+
+The current Tutor Health suite is an authored synthetic design artifact. It
+assesses 5/7 health dimensions and reports that partial coverage explicitly; it
+is not a validated general measure of tutor quality or learner outcomes.
 
 This repository evaluates a `TutorUnderTest`. It is not a tutor product, chat
 application, prompt playground, model leaderboard, or Review Workspace
@@ -70,9 +82,54 @@ tutorbench quickstart
 See [`docs/quickstart.md`](docs/quickstart.md) for the exact subset identity,
 eligibility boundary, and failure semantics.
 
-## Run the full benchmark
+## Run a Tutor Health evaluation
 
-The canonical full benchmark remains a separate path:
+For an external Tutor, the product-facing path is `tutorbench health`:
+
+```bash
+tutorbench health \
+  --http https://partner.example.com/respond \
+  --suite productive-struggle-intervention-v0.1 \
+  --tutor-provider partner \
+  --tutor-model production \
+  --prompt-version v17 \
+  --output artifacts/partner-pilot
+```
+
+The command evaluates the registered real-world scenario suite through the
+existing TutorEval evaluator boundary and writes:
+
+```text
+artifacts/partner-pilot/
+├── evaluation.json
+├── health-report.json
+└── health-report.txt
+```
+
+`evaluation.json` preserves the underlying `TutorEvalRunResult`; the Health
+Report adds the summary score, explicit coverage, Release Gate, Findings,
+evidence references, and regression targets. Tutor provider, model/config, and
+prompt version are recorded in the evaluation artifact so baseline and candidate
+runs can be distinguished without relying on filenames.
+
+Judge providers are opt-in:
+
+```bash
+tutorbench health ... --judge-openai
+tutorbench health ... --judge-deepseek
+tutorbench health ... --judge-chat-completions
+```
+
+Without a Judge, Judge-owned checks stay unresolved, the report clearly marks
+the evidence as incomplete, and the command exits with code `2`. Missing
+evidence is never silently converted into a pedagogical pass.
+
+See [`docs/real-world-finding-first-evaluation.md`](docs/real-world-finding-first-evaluation.md)
+for the current scenario, coverage, Finding, and claim boundaries.
+
+## Run the canonical TutorEval benchmark
+
+The canonical full benchmark remains a separate foundational path:
 
 ```bash
 npm run benchmark
@@ -132,9 +189,11 @@ const dataset = await loadTutorEvalDataset("tutor-eval-v0.1");
 const result = await runTutorBenchmark({ tutor, dataset });
 ```
 
-The canonical 0.2A dataset is the default. It intentionally contains both
-deterministic and Judge-required rubrics; a Judge is optional, but unresolved
-Judge evidence is reported as an error rather than silently omitted.
+The canonical 0.2A dataset is the default for the historical TutorEval runner.
+It intentionally contains both deterministic and Judge-required rubrics; a
+Judge is optional, but unresolved Judge evidence is reported as an error rather
+than silently omitted. Tutor Health is additive and does not replace or rewrite
+these historical TutorEval semantics.
 The current snapshot is `tutor-eval-v0.2a@0.2a.6`, composed from immutable
 `0.2a.5` English / zh-CN snapshots plus the versioned fraction-pair override.
 The previous English-only `0.2a.1` snapshot and bilingual `0.2a.2`, `0.2a.3`,
@@ -272,11 +331,15 @@ and the [critical-failure quality-gate audit](docs/critical-failure-quality-gate
 The package root is the stable local-evaluation surface:
 
 - `TutorUnderTest`, `TutorTurnInput`, and `TutorTurnOutput`
-- `runTutorBenchmark` for the small default runner
-- `runTutorEval` for explicit dataset and runner control
-- `loadTutorEvalDataset` for the checked-in public datasets
+- `runTutorHealthEvaluation` for Scenario vNext → TutorEval → Tutor Health
+  evaluation
+- `loadTutorScenarioSuiteVNext` and `formatTutorHealthReport` for the current
+  finding-first workflow
+- `runTutorBenchmark` for the small historical/default benchmark runner
+- `runTutorEval` for explicit TutorEval dataset and runner control
+- `loadTutorEvalDataset` for the checked-in public TutorEval datasets
 - `createHttpTutor` for a provider-neutral HTTP Tutor adapter
-- typed TutorEval dataset and result contracts
+- typed TutorEval, Scenario vNext, Finding, and Tutor Health contracts
 
 Corpus/replay, generation packets, calibration, site generation, and provider
 implementations remain explicit advanced modules. They are not prerequisites
