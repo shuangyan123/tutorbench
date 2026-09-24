@@ -17,6 +17,7 @@ export {
   TUTOR_EVAL_LEGACY_DATASET_VERSION,
   TUTOR_CASE_LOCALES,
   DEFAULT_TUTOR_CASE_LOCALE,
+  parseTutorScenarioSuiteVNext,
   toTutorTurnInput,
 } from "./contracts/index.js";
 export { runTutorBenchmark, runTutorEval } from "./runner/index.js";

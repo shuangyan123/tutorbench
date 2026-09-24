@@ -177,10 +177,13 @@ as canonical foundation-model evidence.
 The package root is the stable public surface:
 
 - `TutorUnderTest`, `TutorTurnInput`, `TutorTurnOutput`
-- `runTutorBenchmark`, `runTutorEval`
-- `loadTutorEvalDataset`
+- `runTutorBenchmark`, `runTutorEval`, `runTutorHealthEvaluation`
+- `loadTutorEvalDataset`, `loadTutorScenarioSuiteVNext`
+- `parseTutorScenarioSuiteVNext` for runtime validation of caller-owned
+  private Scenario vNext suites
+- `formatTutorHealthReport`, `writeTutorHealthReport`
 - `createHttpTutor`
-- TutorEval dataset and result types
+- TutorEval, Scenario vNext, Finding, and Tutor Health types
 
 Advanced or experimental modules remain explicit repository modules:
 
@@ -206,6 +209,29 @@ types part of the default import path.
 
 The modes are additive. A product integration is one possible Tutor, not the
 execution host required by the benchmark.
+
+## Design-partner private evaluation boundary
+
+The public repository owns provider-neutral contracts, synthetic public suites,
+runtime validation, runners, reports, and blank intake guidance. Partner
+confidential material stays outside tracked public paths.
+
+A private partner suite does not need a new public CLI registry entry. The
+stable package API accepts a caller-owned, runtime-validated
+`TutorScenarioSuiteVNext` directly:
+
+```text
+private intake
+  -> authored private Scenario vNext JSON
+  -> parseTutorScenarioSuiteVNext
+  -> runTutorHealthEvaluation({ suite, ... })
+  -> ignored/private baseline artifacts
+  -> partner change
+  -> candidate rerun
+```
+
+See [`design-partner-pilot.md`](design-partner-pilot.md) for privacy,
+provenance, publication, and claim boundaries.
 
 ## Review Workspace role
 
