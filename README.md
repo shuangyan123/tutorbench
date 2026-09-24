@@ -127,6 +127,20 @@ evidence is never silently converted into a pedagogical pass.
 See [`docs/real-world-finding-first-evaluation.md`](docs/real-world-finding-first-evaluation.md)
 for the current scenario, coverage, Finding, and claim boundaries.
 
+## Design-partner pilots
+
+Real partner scenarios and artifacts are private by default. Do not copy raw
+production chats, private prompts, credentials, identifiable learner data, or
+partner-confidential policy material into this public repository.
+
+Use the [Design Partner Pilot Boundary](docs/design-partner-pilot.md) and the
+[Scenario Intake Template](docs/design-partner-scenario-intake-template.md) to
+turn a partner teaching-policy boundary into a small private Scenario vNext
+suite. Private suites can be runtime-validated through the stable package API
+with `parseTutorScenarioSuiteVNext` and passed directly to
+`runTutorHealthEvaluation`; they do not need to be registered under the
+public `scenarios/` tree.
+
 ## Run the canonical TutorEval benchmark
 
 The canonical full benchmark remains a separate foundational path:
@@ -333,8 +347,8 @@ The package root is the stable local-evaluation surface:
 - `TutorUnderTest`, `TutorTurnInput`, and `TutorTurnOutput`
 - `runTutorHealthEvaluation` for Scenario vNext → TutorEval → Tutor Health
   evaluation
-- `loadTutorScenarioSuiteVNext` and `formatTutorHealthReport` for the current
-  finding-first workflow
+- `loadTutorScenarioSuiteVNext`, `parseTutorScenarioSuiteVNext`, and
+  `formatTutorHealthReport` for public or private finding-first workflows
 - `runTutorBenchmark` for the small historical/default benchmark runner
 - `runTutorEval` for explicit TutorEval dataset and runner control
 - `loadTutorEvalDataset` for the checked-in public TutorEval datasets
