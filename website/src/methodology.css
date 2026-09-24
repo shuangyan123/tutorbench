@@ -329,7 +329,7 @@
 
 .method-story {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
   align-items: start;
   gap: clamp(34px, 5.6vw, 82px);
   margin-top: clamp(20px, 3vw, 42px);
@@ -344,7 +344,7 @@
 
 .method-story-chapter {
   display: flex;
-  min-height: clamp(500px, 76svh, 760px);
+  min-height: clamp(450px, 66svh, 660px);
   flex-direction: column;
   justify-content: center;
   padding: 36px clamp(10px, 1.8vw, 26px) 36px 0;
@@ -411,12 +411,13 @@
 
 .method-story-stage {
   position: sticky;
-  top: 12vh;
+  top: 9vh;
   display: grid;
   width: 100%;
-  max-width: 590px;
-  height: min(76svh, 720px);
-  min-height: 360px;
+  max-width: 660px;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 640 / 520;
   align-self: start;
   justify-self: end;
   place-items: center;
@@ -444,56 +445,93 @@
 .method-story-map {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 100%;
   overflow: visible;
+}
+
+.method-story-overview {
+  display: none;
 }
 
 .method-story-orbit {
   fill: none;
   stroke: var(--line-strong);
-  stroke-dasharray: 1 7;
+  stroke-dasharray: 1 8;
   stroke-linecap: round;
-  stroke-width: 1;
+  stroke-width: 1.2;
 }
 
-.method-story-spoke,
-.method-story-node {
-  opacity: .42;
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.method-story-spoke path {
+.method-story-hub-link {
   fill: none;
   stroke: var(--line-strong);
-  stroke-width: 1.1;
-  transition: stroke 180ms ease, stroke-width 180ms ease;
+  stroke-width: 1.2;
 }
 
-.method-story-spoke.is-active {
+.method-story-visual {
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 320ms ease, transform 320ms ease;
+}
+
+.method-story:not([data-method-story-active-index]) .method-story-visual:first-child,
+.method-story-visual.is-active {
   opacity: 1;
+  transform: none;
 }
 
-.method-story-spoke.is-active path {
+.method-story-line {
+  fill: none;
   stroke: var(--accent);
-  stroke-dasharray: 5 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   stroke-width: 1.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.method-story-line--secondary,
+.method-story-line--reference {
+  stroke: var(--line-strong);
+  stroke-dasharray: 2 7;
+  stroke-width: 1.1;
+}
+
+.method-story-line--arrow {
+  stroke-width: 1.4;
+}
+
+.method-story-point {
+  fill: var(--surface);
+  stroke: var(--line-strong);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.method-story-point--target,
+.method-story-point--step,
+.method-story-point--split {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
 }
 
 .method-story-node {
+  opacity: .55;
   transform-box: fill-box;
   transform-origin: center;
+  transition: opacity 320ms ease, transform 320ms ease;
 }
 
 .method-story-node.is-active {
   opacity: 1;
-  transform: scale(1.08);
+  transform: scale(1.04);
 }
 
 .method-story-node circle {
   fill: var(--surface);
   stroke: var(--line-strong);
-  stroke-width: 1.2;
-  transition: fill 180ms ease, stroke 180ms ease, stroke-width 180ms ease;
+  stroke-width: 1.3;
+  vector-effect: non-scaling-stroke;
+  transition: fill 320ms ease, stroke 320ms ease, stroke-width 320ms ease;
 }
 
 .method-story-node.is-active circle {
@@ -504,7 +542,7 @@
 
 .method-story-node text {
   fill: var(--muted);
-  font: 600 15px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  font: 600 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
   text-anchor: middle;
   dominant-baseline: central;
 }
@@ -515,10 +553,10 @@
 
 .method-story-center {
   position: absolute;
-  top: 50%;
+  top: 80.8%;
   left: 50%;
   display: grid;
-  width: clamp(140px, 18vw, 176px);
+  width: clamp(136px, 16vw, 164px);
   aspect-ratio: 1;
   place-content: center;
   border: 1px solid var(--line-strong);
@@ -529,6 +567,26 @@
   letter-spacing: -.035em;
   text-align: center;
   transform: translate(-50%, -50%);
+}
+
+.method-story-overview-track {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1.2;
+}
+
+.method-story-overview-node circle,
+.method-story-overview-core {
+  fill: var(--surface);
+  stroke: var(--accent);
+  stroke-width: 1.3;
+}
+
+.method-story-overview-node text {
+  fill: var(--accent-strong);
+  font: 600 8px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-anchor: middle;
+  dominant-baseline: central;
 }
 
 .method-dimensions-note {
@@ -1131,9 +1189,38 @@
     width: min(100%, 500px);
     height: auto;
     min-height: 0;
-    aspect-ratio: 640 / 520;
+    aspect-ratio: auto;
+    grid-template-rows: auto auto;
     align-self: center;
     margin-bottom: 8px;
+  }
+
+  .method-story-stage-index {
+    display: none;
+  }
+
+  .method-story-map {
+    display: none;
+  }
+
+  .method-story-overview {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .method-story-center {
+    position: static;
+    display: block;
+    width: auto;
+    aspect-ratio: auto;
+    margin-top: 2px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 17px;
+    text-align: center;
+    transform: none;
   }
 
   .method-story-chapter {
@@ -1299,15 +1386,8 @@
     font-size: 39px;
   }
 
-  .method-story-stage-index {
-    top: 3%;
-    right: 3%;
-    font-size: 10px;
-  }
-
-  .method-story-center {
-    width: clamp(118px, 37vw, 148px);
-    font-size: 16px;
+  .method-story-stage {
+    display: none;
   }
 
   .method-story-chapter h3 {
@@ -1430,12 +1510,42 @@
     transition: none !important;
   }
 
-  .method-story-stage-index {
+  .method-story-stage {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  .method-story-stage-index,
+  .method-story-map {
     display: none;
   }
 
-  .method-story-spoke,
-  .method-story-node {
+  .method-story-overview {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .method-story-center {
+    position: static;
+    display: block;
+    width: auto;
+    aspect-ratio: auto;
+    margin-top: 2px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 17px;
+    text-align: center;
+    transform: none;
+  }
+
+  .method-story-visual,
+  .method-story-node,
+  .method-story-spoke {
     opacity: 1;
     transform: none;
   }

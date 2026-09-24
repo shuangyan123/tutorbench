@@ -264,13 +264,84 @@ function renderMethodologyPipeline(): string {
   return `<ol class="method-pipeline-list" aria-label="Five-stage evaluation pipeline">${methodologyPipeline.map(([number, title, copy, glyph], index) => `<li class="method-pipeline-stage"><div class="method-stage-icon">${icon(glyph)}</div><div><p class="method-stage-number">${number}</p><h3>${title}</h3></div><p>${copy}</p>${index === methodologyPipeline.length - 1 ? "" : `<span class="method-pipeline-arrow" aria-hidden="true">${icon("arrow")}</span>`}</li>`).join("")}</ol>`;
 }
 
+function methodologyVisualKind(dimension: string): string {
+  return methodologyDimensionDetails[dimension] ? dimension : "general";
+}
+
+function renderMethodologyVisualMotif(visualKind: string): string {
+  switch (visualKind) {
+    case "correctness":
+      return [
+        '<path class="method-story-line method-story-line--reference" d="M92 166H279"/>',
+        '<path class="method-story-line method-story-line--main" d="M92 102H191C224 102 244 121 272 166H320V336"/>',
+        '<path class="method-story-line method-story-line--secondary" d="M92 230H191C224 230 244 211 272 166"/>',
+        '<circle class="method-story-point" cx="92" cy="102" r="5"/>',
+        '<circle class="method-story-point" cx="92" cy="230" r="5"/>',
+        '<circle class="method-story-point method-story-point--target" cx="272" cy="166" r="9"/>',
+      ].join("");
+    case "diagnosis":
+      return [
+        '<path class="method-story-line method-story-line--main" d="M92 166H176C207 166 214 146 230 126L258 91C275 70 311 80 311 107C311 131 288 143 265 130L230 166H320V336"/>',
+        '<path class="method-story-line method-story-line--secondary" d="M176 166H320"/>',
+        '<circle class="method-story-point" cx="92" cy="166" r="5"/>',
+        '<circle class="method-story-point method-story-point--target" cx="284" cy="106" r="24"/>',
+        '<circle class="method-story-point method-story-point--focus" cx="284" cy="106" r="10"/>',
+      ].join("");
+    case "guidance":
+      return [
+        '<path class="method-story-line method-story-line--main" d="M92 276H160V230H218V184H276V138H334V184L320 336"/>',
+        '<path class="method-story-line method-story-line--secondary" d="M92 276H334"/>',
+        '<circle class="method-story-point" cx="92" cy="276" r="5"/>',
+        '<circle class="method-story-point method-story-point--step" cx="160" cy="230" r="7"/>',
+        '<circle class="method-story-point method-story-point--step" cx="218" cy="184" r="7"/>',
+        '<circle class="method-story-point method-story-point--step" cx="276" cy="138" r="7"/>',
+        '<circle class="method-story-point method-story-point--target" cx="334" cy="184" r="9"/>',
+      ].join("");
+    case "adaptation":
+      return [
+        '<path class="method-story-line method-story-line--main" d="M92 166H177C205 166 212 147 235 122L261 95C279 76 309 84 309 106C309 129 288 139 264 126L235 166C212 185 205 166 177 166H320V336"/>',
+        '<path class="method-story-line method-story-line--secondary" d="M177 166C205 166 212 185 235 210L261 237C279 256 309 248 309 226C309 203 288 193 264 206L235 166"/>',
+        '<circle class="method-story-point method-story-point--split" cx="177" cy="166" r="11"/>',
+        '<circle class="method-story-point method-story-point--target" cx="309" cy="106" r="8"/>',
+        '<circle class="method-story-point" cx="309" cy="226" r="6"/>',
+      ].join("");
+    case "actionability":
+      return [
+        '<path class="method-story-line method-story-line--main" d="M92 92C152 92 175 115 228 166H320V336"/>',
+        '<path class="method-story-line method-story-line--main" d="M92 166H228"/>',
+        '<path class="method-story-line method-story-line--main" d="M92 240C152 240 175 217 228 166"/>',
+        '<circle class="method-story-point" cx="92" cy="92" r="5"/>',
+        '<circle class="method-story-point" cx="92" cy="166" r="5"/>',
+        '<circle class="method-story-point" cx="92" cy="240" r="5"/>',
+        '<circle class="method-story-point method-story-point--target" cx="228" cy="166" r="11"/>',
+        '<path class="method-story-line method-story-line--arrow" d="M304 319L320 336L336 319"/>',
+      ].join("");
+    default:
+      return [
+        '<path class="method-story-line method-story-line--main" d="M92 166H240C280 166 320 206 320 246V336"/>',
+        '<circle class="method-story-point" cx="92" cy="166" r="5"/>',
+        '<circle class="method-story-point method-story-point--target" cx="240" cy="166" r="9"/>',
+      ].join("");
+  }
+}
+
+function methodologyVisualAnchor(visualKind: string): readonly [number, number] {
+  return visualKind === "guidance" ? [92, 276] : [92, 166];
+}
+
+function renderMethodologyVisual(dimension: string, index: number, number: string): string {
+  const visualKind = methodologyVisualKind(dimension);
+  const [x, y] = methodologyVisualAnchor(visualKind);
+
+  return '<g class="method-story-visual" data-method-story-visual="' + index + '" data-method-visual-state="' + visualKind + '">' +
+    '<g class="method-story-spoke" data-method-story-spoke="' + index + '">' + renderMethodologyVisualMotif(visualKind) + '</g>' +
+    '<g class="method-story-node" data-method-story-node="' + index + '"><circle cx="' + x + '" cy="' + y + '" r="19"></circle><text x="' + x + '" y="' + y + '">' + number + '</text></g></g>';
+}
+
 function renderMethodologyLens(scoreDimensions: readonly string[]): string {
   const dimensions = scoreDimensions.map((dimension, index) => {
     const details = methodologyDimension(dimension);
-    const angle = (Math.PI * 2 * index) / Math.max(scoreDimensions.length, 1) - Math.PI / 2;
-    const x = (320 + 220 * Math.cos(angle)).toFixed(2);
-    const y = (260 + 185 * Math.sin(angle)).toFixed(2);
-    return { details, index, number: String(index + 1).padStart(2, "0"), x, y };
+    return { dimension, details, index, number: String(index + 1).padStart(2, "0") };
   });
   const total = String(dimensions.length).padStart(2, "0");
   const chapterMarkup = dimensions.map(({ details, index, number }) =>
@@ -280,19 +351,20 @@ function renderMethodologyLens(scoreDimensions: readonly string[]): string {
     '<p class="method-story-description">' + escapeHtml(details.description) + '</p>' +
     '<p class="method-story-lens"><span>What we look for</span>' + escapeHtml(details.lens) + '</p></li>'
   ).join("");
-  const spokeMarkup = dimensions.map(({ index, x, y }) =>
-    '<g class="method-story-spoke" data-method-story-spoke="' + index + '"><path d="M 320 260 L ' + x + " " + y + '"></path></g>'
-  ).join("");
-  const nodeMarkup = dimensions.map(({ index, number, x, y }) =>
-    '<g class="method-story-node" data-method-story-node="' + index + '"><circle cx="' + x + '" cy="' + y + '" r="27"></circle><text x="' + x + '" y="' + y + '">' + number + '</text></g>'
-  ).join("");
+  const visualMarkup = dimensions.map(({ dimension, index, number }) => renderMethodologyVisual(dimension, index, number)).join("");
+  const overviewNodes = dimensions.map(({ index, number }) => {
+    const x = dimensions.length <= 1 ? 320 : 48 + (index * 482) / (dimensions.length - 1);
+    return '<g class="method-story-overview-node"><circle cx="' + x.toFixed(2) + '" cy="42" r="14"></circle><text x="' + x.toFixed(2) + '" y="42">' + number + '</text></g>';
+  }).join("");
 
   return '<div class="method-story" data-method-story>' +
     '<ol class="method-story-chapters" aria-label="' + escapeHtml(String(dimensions.length)) + ' benchmark score dimensions">' + chapterMarkup + '</ol>' +
-    '<figure class="method-story-stage">' +
+    '<figure class="method-story-stage" data-method-story-stage>' +
     '<p class="method-story-stage-index" aria-hidden="true"><span data-method-story-current>01</span><span> / ' + total + '</span></p>' +
     '<svg class="method-story-map" viewBox="0 0 640 520" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
-    '<circle class="method-story-orbit" cx="320" cy="260" r="105"></circle><g class="method-story-spokes">' + spokeMarkup + '</g><g class="method-story-nodes">' + nodeMarkup + '</g></svg>' +
+    '<circle class="method-story-orbit" cx="320" cy="420" r="84"></circle><path class="method-story-hub-link" d="M320 336V360"/><g class="method-story-visuals">' + visualMarkup + '</g></svg>' +
+    '<svg class="method-story-overview" viewBox="0 0 640 84" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
+    '<path class="method-story-overview-track" d="M48 42H580"/><g class="method-story-overview-nodes">' + overviewNodes + '</g><circle class="method-story-overview-core" cx="592" cy="42" r="6"/></svg>' +
     '<figcaption class="method-story-center">Observable<br>tutoring<br>behavior</figcaption></figure></div>';
 }
 

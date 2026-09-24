@@ -341,12 +341,15 @@
   if (!(story instanceof HTMLElement)) return;
 
   const chapters = [...story.querySelectorAll('[data-method-story-chapter]')];
+  const visuals = [...story.querySelectorAll('[data-method-story-visual]')];
   const nodes = [...story.querySelectorAll('[data-method-story-node]')];
   const spokes = [...story.querySelectorAll('[data-method-story-spoke]')];
   const currentIndex = story.querySelector('[data-method-story-current]');
+  const desktop = window.matchMedia('(min-width: 901px)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
   let activeIndex = -1;
+  let tracking = false;
 
   function setActive(index) {
     if (index === activeIndex) return;
@@ -356,22 +359,28 @@
       if (chapterIndex === index) chapter.setAttribute('aria-current', 'step');
       else chapter.removeAttribute('aria-current');
     });
+    visuals.forEach((visual) => {
+      visual.classList.toggle('is-active', visual.getAttribute('data-method-story-visual') === String(index));
+    });
     nodes.forEach((node) => {
       node.classList.toggle('is-active', node.getAttribute('data-method-story-node') === String(index));
     });
     spokes.forEach((spoke) => {
       spoke.classList.toggle('is-active', spoke.getAttribute('data-method-story-spoke') === String(index));
     });
+    story.dataset.methodStoryActiveIndex = String(index);
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = String(index + 1).padStart(2, '0');
   }
 
   function updateActiveChapter() {
     frame = 0;
-    const marker = Math.max(40, window.innerHeight * 0.46);
+    const marker = Math.max(40, window.innerHeight * 0.5);
     let nextIndex = 0;
 
     chapters.forEach((chapter, index) => {
-      if (chapter.getBoundingClientRect().top <= marker) nextIndex = index;
+      const heading = chapter.querySelector('h3');
+      const anchor = heading instanceof HTMLElement ? heading : chapter;
+      if (anchor.getBoundingClientRect().top <= marker) nextIndex = index;
     });
     setActive(nextIndex);
   }
@@ -382,11 +391,16 @@
   }
 
   function stopTracking() {
-    window.removeEventListener('scroll', scheduleUpdate);
-    window.removeEventListener('resize', scheduleUpdate);
+    if (tracking) {
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      tracking = false;
+    }
     if (frame !== 0) window.cancelAnimationFrame(frame);
     frame = 0;
     activeIndex = -1;
+    delete story.dataset.methodStoryActiveIndex;
+    visuals.forEach((visual) => visual.classList.remove('is-active'));
     chapters.forEach((chapter) => chapter.removeAttribute('aria-current'));
     nodes.forEach((node) => node.classList.remove('is-active'));
     spokes.forEach((spoke) => spoke.classList.remove('is-active'));
@@ -394,17 +408,21 @@
   }
 
   function startTracking() {
-    if (reducedMotion.matches) return;
+    if (tracking || !desktop.matches || reducedMotion.matches) return;
+    tracking = true;
     window.addEventListener('scroll', scheduleUpdate, { passive: true });
     window.addEventListener('resize', scheduleUpdate);
     scheduleUpdate();
   }
 
-  reducedMotion.addEventListener('change', () => {
-    if (reducedMotion.matches) stopTracking();
-    else startTracking();
-  });
-  startTracking();
+  function syncTracking() {
+    if (desktop.matches && !reducedMotion.matches) startTracking();
+    else stopTracking();
+  }
+
+  desktop.addEventListener('change', syncTracking);
+  reducedMotion.addEventListener('change', syncTracking);
+  syncTracking();
 })();
 
 (() => {
