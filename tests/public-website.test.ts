@@ -88,8 +88,15 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
 test("shared public header is consistent, localized, and exposes language controls", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const chromeStyles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
-  const mobileHeaderStyles = chromeStyles
-    .slice(chromeStyles.indexOf("@media (max-width: 900px)"), chromeStyles.indexOf("@media (prefers-reduced-motion: no-preference)"))
+  const compactHeaderStart = chromeStyles.indexOf("@media (max-width: 1023px)");
+  const pageResponsiveStart = chromeStyles.indexOf("@media (max-width: 900px)");
+  assert.ok(compactHeaderStart >= 0);
+  assert.ok(pageResponsiveStart > compactHeaderStart);
+  const compactHeaderStyles = chromeStyles
+    .slice(compactHeaderStart, pageResponsiveStart)
+    .replace(/\s+/g, " ");
+  const pageResponsiveStyles = chromeStyles
+    .slice(pageResponsiveStart, chromeStyles.indexOf("@media (max-width: 640px)"))
     .replace(/\s+/g, " ");
   const pages = [
     renderPage(renderHomePage(artifacts), { locale: "zh-CN" }),
@@ -120,9 +127,14 @@ test("shared public header is consistent, localized, and exposes language contro
     assert.match(html, />开始使用</);
   }
 
-  assert.ok(mobileHeaderStyles.includes(".home-header-tools { display: none;"));
-  assert.ok(mobileHeaderStyles.includes('.home-header .nav-links[data-open="true"] ~ .home-header-tools { display: flex;'));
-  assert.ok(mobileHeaderStyles.includes("grid-template-columns: repeat(2, minmax(0, 1fr));"));
+  assert.ok(compactHeaderStyles.includes(".home-header-tools { display: none;"));
+  assert.ok(compactHeaderStyles.includes('.home-header .nav-links[data-open="true"] ~ .home-header-tools { display: flex;'));
+  assert.ok(compactHeaderStyles.includes("grid-template-columns: repeat(2, minmax(0, 1fr));"));
+  assert.match(chromeStyles, /@media \(max-width: 1100px\) and \(min-width: 1024px\) \{[\s\S]*?\.home-header \.header-inner/);
+  assert.doesNotMatch(pageResponsiveStyles, /\.home-header(?:\s|[.#:{,]|$)/);
+  assert.match(pageResponsiveStyles, /main \.shell/);
+  assert.match(pageResponsiveStyles, /\.home-footer/);
+  assert.match(chromeStyles, /@media \(max-width: 640px\) \{[\s\S]*?\.home-header-tools > \.button-primary \{[\s\S]*?grid-column: 1 \/ -1;/);
 });
 
 test("home reconstruction uses real blog routes and cases reuse the Teachometry shell", async () => {

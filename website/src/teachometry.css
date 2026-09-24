@@ -1268,7 +1268,7 @@ body:is(
   margin-right: auto;
 }
 
-@media (max-width: 1100px) and (min-width: 901px) {
+@media (max-width: 1100px) and (min-width: 1024px) {
   body:is(
     .home-page,
     .methodology-page,
@@ -1321,13 +1321,16 @@ body:is(
     gap: 12px;
   }
 
+}
+
+@media (max-width: 1100px) and (min-width: 901px) {
   .methodology-page .method-hero,
   .methodology-page .method-scope-not-measure {
     overflow: clip;
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1023px) {
   body:is(
     .home-page,
     .methodology-page,
@@ -1626,7 +1629,9 @@ body:is(
   ) .home-header-tools > .button-primary {
     min-height: 44px;
   }
+}
 
+@media (max-width: 900px) {
   body:is(
     .home-page,
     .methodology-page,
