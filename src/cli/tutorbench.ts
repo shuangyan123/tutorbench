@@ -22,6 +22,12 @@ import {
   type BenchmarkCorpusCliOptions,
 } from "./tutorbench-evaluate.js";
 import {
+  parseTutorHealthCliOptions,
+  printTutorHealthHelp,
+  runTutorHealthCli,
+  type TutorHealthCliOptions,
+} from "./tutorbench-health.js";
+import {
   parseTutorbenchCollectArgs,
   printTutorbenchCollectHelp,
   runTutorbenchCollect,
@@ -130,12 +136,16 @@ export interface TutorbenchRunOptions {
 }
 
 export type TutorbenchCliOptions =
-  | { readonly help: true; readonly helpCommand?: "quickstart" | "collect" | "collect-model" | "evaluate" | "review-translate" | "judge-word-context-discrimination" | "judge-candidate-comparison" | "judge-material-requirement-discrimination" | "human-reference-calibration" | "human-reference-pilot-export" | "human-reference-pilot-import" | "human-reference-judge-comparison" | "human-reference-semantic-audit-export" | "human-reference-semantic-audit-import" | "human-reference-semantic-audit" | "human-reference-semantic-audit-qualification-export" | "human-reference-semantic-audit-qualification-import" | "human-reference-semantic-audit-localized-export" | "human-reference-semantic-audit-localized-import" | "human-reference-semantic-audit-localized" }
+  | { readonly help: true; readonly helpCommand?: "quickstart" | "collect" | "collect-model" | "evaluate" | "health" | "review-translate" | "judge-word-context-discrimination" | "judge-candidate-comparison" | "judge-material-requirement-discrimination" | "human-reference-calibration" | "human-reference-pilot-export" | "human-reference-pilot-import" | "human-reference-judge-comparison" | "human-reference-semantic-audit-export" | "human-reference-semantic-audit-import" | "human-reference-semantic-audit" | "human-reference-semantic-audit-qualification-export" | "human-reference-semantic-audit-qualification-import" | "human-reference-semantic-audit-localized-export" | "human-reference-semantic-audit-localized-import" | "human-reference-semantic-audit-localized" }
   | { readonly help: false; readonly quickstart: TutorbenchQuickstartCliOptions }
   | { readonly help: false; readonly run: TutorbenchRunOptions }
   | { readonly help: false; readonly collect: TutorbenchCollectCliOptions }
   | { readonly help: false; readonly collectModel: TutorbenchCollectModelCliOptions }
   | { readonly help: false; readonly evaluate: BenchmarkCorpusCliOptions }
+  | {
+      readonly help: false;
+      readonly health: Extract<TutorHealthCliOptions, { readonly help: false }>;
+    }
   | { readonly help: false; readonly reviewTranslate: ReviewTranslateCliOptions }
   | { readonly help: false; readonly judgeWordContextDiscrimination: JudgeWordContextDiscriminationCliOptions }
   | { readonly help: false; readonly judgeCandidateComparison: JudgeCandidateComparisonCliOptions }
@@ -170,6 +180,12 @@ export function parseTutorbenchArgs(
     return evaluate.help
       ? { help: true, helpCommand: "evaluate" }
       : { help: false, evaluate };
+  }
+  if (args[0] === "health") {
+    const health = parseTutorHealthCliOptions(args.slice(1));
+    return health.help
+      ? { help: true, helpCommand: "health" }
+      : { help: false, health };
   }
   if (args[0] === "review-translate") {
     const reviewTranslate = parseReviewTranslateArgs(args.slice(1));
@@ -420,6 +436,7 @@ Usage:
   tutorbench collect --http <url> --provider <id> --model <id> --prompt-version <id> --provenance <value> [options]
   tutorbench collect-model --http <url> --provider <id> --model <id> [options]
   tutorbench evaluate --corpus <path> [options]
+  tutorbench health --http <url> --tutor-provider <id> --tutor-model <id> --prompt-version <id> [options]
   tutorbench review-translate --evaluation <path> --output <path> [options]
   tutorbench judge-word-context-discrimination --judge-deepseek [options]
   tutorbench judge-candidate-comparison [options]
@@ -443,6 +460,7 @@ Commands:
   collect               Freeze Product Tutor responses from TutorTurnInput
   collect-model         Freeze canonical model responses from ExecutionPacket
   evaluate              Offline corpus replay and preliminary evaluation
+  health                Run finding-first Tutor Health against an external HTTP Tutor
   review-translate      Build an isolated, review-only translation sidecar
   judge-word-context-discrimination
                          Run the fixed A/B/C word-context Judge diagnostic
@@ -489,8 +507,8 @@ Run options:
 The external Tutor response must be JSON shaped as { "text": string, "metrics"?: object }.
 No automatic retry is performed.
 
-  Use \`tutorbench collect --help\`, \`tutorbench collect-model --help\`, and
-  \`tutorbench evaluate --help\` for command-specific options.`);
+  Use \`tutorbench collect --help\`, \`tutorbench collect-model --help\`,
+  \`tutorbench evaluate --help\`, and \`tutorbench health --help\` for command-specific options.`);
 }
 
 function selectedDataset(
@@ -574,6 +592,8 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
       printTutorbenchCollectModelHelp();
     } else if (options.helpCommand === "evaluate") {
       printBenchmarkCorpusHelp();
+    } else if (options.helpCommand === "health") {
+      printTutorHealthHelp();
     } else if (options.helpCommand === "review-translate") {
       printReviewTranslateHelp();
     } else if (options.helpCommand === "judge-word-context-discrimination") {
@@ -689,6 +709,8 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
   } else if ("humanReferenceSemanticAuditV2" in options) {
     if (options.humanReferenceSemanticAuditV2.help) return;
     await runHumanReferenceSemanticAuditV2(options.humanReferenceSemanticAuditV2);
+  } else if ("health" in options) {
+    process.exitCode = await runTutorHealthCli(options.health);
   } else {
     if (options.evaluate.help) {
       printBenchmarkCorpusHelp();
@@ -708,6 +730,7 @@ async function runAsExecutable(): Promise<void> {
       (error instanceof Error && (
         error.name === "HttpTutorConfigurationError" ||
         error.name === "HttpTutorExecutionHostConfigurationError" ||
+        error.name === "OpenAIJudgeConfigurationError" ||
         error.name === "DeepSeekJudgeConfigurationError" ||
         error.name === "MaterialRequirementJudgeConfigurationError" ||
         error.name === "MiniMaxJudgeConfigurationError" ||

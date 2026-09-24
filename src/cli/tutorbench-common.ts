@@ -39,3 +39,15 @@ export function positiveTutorbenchInteger(value: string, option: string): number
   }
   return parsed;
 }
+
+export function assertSingleJudgeProviderSelection(
+  openAI: boolean,
+  deepSeek: boolean,
+  chatCompletions: boolean,
+): void {
+  if ([openAI, deepSeek, chatCompletions].filter(Boolean).length > 1) {
+    throw new TutorbenchCliUsageError(
+      "Judge provider flags are mutually exclusive: choose one of --judge-openai, --judge-deepseek, or --judge-chat-completions.",
+    );
+  }
+}
