@@ -1330,7 +1330,7 @@ body:is(
   }
 }
 
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   body:is(
     .home-page,
     .methodology-page,

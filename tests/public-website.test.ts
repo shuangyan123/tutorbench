@@ -103,7 +103,7 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
 test("shared public header is consistent, localized, and exposes language controls", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const chromeStyles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
-  const compactHeaderStart = chromeStyles.indexOf("@media (max-width: 1023px)");
+  const compactHeaderStart = chromeStyles.indexOf("@media (width < 1024px)");
   const pageResponsiveStart = chromeStyles.indexOf("@media (max-width: 900px)");
   assert.ok(compactHeaderStart >= 0);
   assert.ok(pageResponsiveStart > compactHeaderStart);
