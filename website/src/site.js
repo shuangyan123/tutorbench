@@ -337,6 +337,77 @@
 })();
 
 (() => {
+  const story = document.querySelector('[data-method-story]');
+  if (!(story instanceof HTMLElement)) return;
+
+  const chapters = [...story.querySelectorAll('[data-method-story-chapter]')];
+  const nodes = [...story.querySelectorAll('[data-method-story-node]')];
+  const spokes = [...story.querySelectorAll('[data-method-story-spoke]')];
+  const currentIndex = story.querySelector('[data-method-story-current]');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let frame = 0;
+  let activeIndex = -1;
+
+  function setActive(index) {
+    if (index === activeIndex) return;
+    activeIndex = index;
+
+    chapters.forEach((chapter, chapterIndex) => {
+      if (chapterIndex === index) chapter.setAttribute('aria-current', 'step');
+      else chapter.removeAttribute('aria-current');
+    });
+    nodes.forEach((node) => {
+      node.classList.toggle('is-active', node.getAttribute('data-method-story-node') === String(index));
+    });
+    spokes.forEach((spoke) => {
+      spoke.classList.toggle('is-active', spoke.getAttribute('data-method-story-spoke') === String(index));
+    });
+    if (currentIndex instanceof HTMLElement) currentIndex.textContent = String(index + 1).padStart(2, '0');
+  }
+
+  function updateActiveChapter() {
+    frame = 0;
+    const marker = Math.max(40, window.innerHeight * 0.46);
+    let nextIndex = 0;
+
+    chapters.forEach((chapter, index) => {
+      if (chapter.getBoundingClientRect().top <= marker) nextIndex = index;
+    });
+    setActive(nextIndex);
+  }
+
+  function scheduleUpdate() {
+    if (frame !== 0) return;
+    frame = window.requestAnimationFrame(updateActiveChapter);
+  }
+
+  function stopTracking() {
+    window.removeEventListener('scroll', scheduleUpdate);
+    window.removeEventListener('resize', scheduleUpdate);
+    if (frame !== 0) window.cancelAnimationFrame(frame);
+    frame = 0;
+    activeIndex = -1;
+    chapters.forEach((chapter) => chapter.removeAttribute('aria-current'));
+    nodes.forEach((node) => node.classList.remove('is-active'));
+    spokes.forEach((spoke) => spoke.classList.remove('is-active'));
+    if (currentIndex instanceof HTMLElement) currentIndex.textContent = '';
+  }
+
+  function startTracking() {
+    if (reducedMotion.matches) return;
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+    scheduleUpdate();
+  }
+
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) stopTracking();
+    else startTracking();
+  });
+  startTracking();
+})();
+
+(() => {
   const themedPage = document.querySelector('.home-page') || document.querySelector('.methodology-page') || document.querySelector('.results-page') || document.querySelector('.about-page') || document.querySelector('.models-page') || document.querySelector('.model-detail-page') || document.querySelector('.cases-page') || document.querySelector('.case-detail-page') || document.querySelector('.blog-page') || document.querySelector('.run-page') || document.querySelector('.docs-page');
   if (!(themedPage instanceof HTMLElement)) return;
 

@@ -265,14 +265,35 @@ function renderMethodologyPipeline(): string {
 }
 
 function renderMethodologyLens(scoreDimensions: readonly string[]): string {
-  return `<div class="method-lens" aria-label="Five complementary evaluation dimensions around observable tutoring behavior">
-    <svg class="method-lens-lines" viewBox="0 0 620 360" preserveAspectRatio="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><path d="M310 180 310 34M310 180 553 105M310 180 532 302M310 180 84 302M310 180 67 105"/></svg>
-    <div class="method-lens-core"><span>Observable<br>tutoring<br>behavior</span></div>
-    <ul class="method-lens-nodes">${scoreDimensions.map((dimension, index) => {
-      const details = methodologyDimension(dimension);
-      return `<li class="method-lens-node method-lens-node-${index + 1}"><span class="method-lens-disc">${icon(details.icon)}</span><span class="method-lens-copy"><strong>${escapeHtml(details.label)}</strong><small>${escapeHtml(details.lens)}</small></span></li>`;
-    }).join("")}</ul>
-  </div>`;
+  const dimensions = scoreDimensions.map((dimension, index) => {
+    const details = methodologyDimension(dimension);
+    const angle = (Math.PI * 2 * index) / Math.max(scoreDimensions.length, 1) - Math.PI / 2;
+    const x = (320 + 220 * Math.cos(angle)).toFixed(2);
+    const y = (260 + 185 * Math.sin(angle)).toFixed(2);
+    return { details, index, number: String(index + 1).padStart(2, "0"), x, y };
+  });
+  const total = String(dimensions.length).padStart(2, "0");
+  const chapterMarkup = dimensions.map(({ details, index, number }) =>
+    '<li class="method-story-chapter" data-method-story-chapter data-method-story-index="' + index + '">' +
+    '<p class="method-story-number"><span>DIMENSION ' + number + '</span><span>Score lens</span></p>' +
+    '<h3>' + escapeHtml(details.label) + '</h3>' +
+    '<p class="method-story-description">' + escapeHtml(details.description) + '</p>' +
+    '<p class="method-story-lens"><span>What we look for</span>' + escapeHtml(details.lens) + '</p></li>'
+  ).join("");
+  const spokeMarkup = dimensions.map(({ index, x, y }) =>
+    '<g class="method-story-spoke" data-method-story-spoke="' + index + '"><path d="M 320 260 L ' + x + " " + y + '"></path></g>'
+  ).join("");
+  const nodeMarkup = dimensions.map(({ index, number, x, y }) =>
+    '<g class="method-story-node" data-method-story-node="' + index + '"><circle cx="' + x + '" cy="' + y + '" r="27"></circle><text x="' + x + '" y="' + y + '">' + number + '</text></g>'
+  ).join("");
+
+  return '<div class="method-story" data-method-story>' +
+    '<ol class="method-story-chapters" aria-label="' + escapeHtml(String(dimensions.length)) + ' benchmark score dimensions">' + chapterMarkup + '</ol>' +
+    '<figure class="method-story-stage">' +
+    '<p class="method-story-stage-index" aria-hidden="true"><span data-method-story-current>01</span><span> / ' + total + '</span></p>' +
+    '<svg class="method-story-map" viewBox="0 0 640 520" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
+    '<circle class="method-story-orbit" cx="320" cy="260" r="105"></circle><g class="method-story-spokes">' + spokeMarkup + '</g><g class="method-story-nodes">' + nodeMarkup + '</g></svg>' +
+    '<figcaption class="method-story-center">Observable<br>tutoring<br>behavior</figcaption></figure></div>';
 }
 
 function renderMethodologyArchitecture(): string {

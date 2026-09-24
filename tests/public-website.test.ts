@@ -626,6 +626,13 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(methodologyHtml, /Atomic rubrics/);
     assert.match(methodologyHtml, /Benchmark result/);
     assert.match(methodologyHtml, /Observable tutoring behavior/);
+    const scoreDimensionCount = artifacts.benchmark.dimensions.score.length;
+    assert.equal((methodologyHtml.match(/class="method-story-chapter"/g) ?? []).length, scoreDimensionCount);
+    assert.equal((methodologyHtml.match(/class="method-story-node"/g) ?? []).length, scoreDimensionCount);
+    assert.equal((methodologyHtml.match(/class="method-story-spoke"/g) ?? []).length, scoreDimensionCount);
+    assert.match(methodologyHtml, /data-method-story-current>01/);
+    assert.match(methodologyHtml, /Whether the Tutor stays factually and conceptually correct/);
+    assert.match(methodologyHtml, /What we look for/);
     for (const dimension of ["Correctness", "Diagnosis", "Guidance", "Adaptation", "Actionability"]) {
       assert.match(methodologyHtml, new RegExp(dimension));
     }
@@ -656,6 +663,19 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(docsHtml, /Quickstart ≠ official benchmark score/);
     assert.match(methodologyHtml, /human calibration have not started/);
     assert.match(methodologyHtml, /Judge-vs-human validation and statistical validation are not completed/);
+    const methodologyStyles = await readFile(join(process.cwd(), "website", "src", "methodology.css"), "utf8");
+    const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
+    const storyScriptStart = siteScript.indexOf("const story = document.querySelector('[data-method-story]')");
+    const storyScriptEnd = siteScript.indexOf("\n})();", storyScriptStart);
+    assert.ok(storyScriptStart >= 0 && storyScriptEnd > storyScriptStart);
+    const storyScript = siteScript.slice(storyScriptStart, storyScriptEnd);
+    assert.match(storyScript, /requestAnimationFrame\(updateActiveChapter\)/);
+    assert.match(storyScript, /addEventListener\('scroll', scheduleUpdate, \{ passive: true \}\)/);
+    assert.match(storyScript, /prefers-reduced-motion: reduce/);
+    assert.doesNotMatch(storyScript, /wheel|touchmove|preventDefault/);
+    assert.match(methodologyStyles, /\.method-story-stage \{\s*position: sticky;/);
+    assert.match(methodologyStyles, /@media \(max-width: 900px\) \{[\s\S]*?\.method-story-stage \{\s*position: relative;/);
+    assert.match(methodologyStyles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.method-story-spoke,\s*\.method-story-node \{\s*opacity: 1;/);
     assert.match(aboutHtml, /<title>About — Teachometry<\/title>/);
     assert.match(aboutHtml, /<body class="about-page">/);
     assert.match(aboutHtml, /href="\/assets\/home\.css"/);
