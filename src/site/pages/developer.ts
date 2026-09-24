@@ -264,15 +264,140 @@ function renderMethodologyPipeline(): string {
   return `<ol class="method-pipeline-list" aria-label="Five-stage evaluation pipeline">${methodologyPipeline.map(([number, title, copy, glyph], index) => `<li class="method-pipeline-stage"><div class="method-stage-icon">${icon(glyph)}</div><div><p class="method-stage-number">${number}</p><h3>${title}</h3></div><p>${copy}</p>${index === methodologyPipeline.length - 1 ? "" : `<span class="method-pipeline-arrow" aria-hidden="true">${icon("arrow")}</span>`}</li>`).join("")}</ol>`;
 }
 
+function methodologyVisualKind(dimension: string): string {
+  return methodologyDimensionDetails[dimension] ? dimension : "general";
+}
+
+type MethodologyVisualLine = "main" | "secondary" | "reference" | "arrow" | "tick";
+type MethodologyVisualPoint = "default" | "step" | "target" | "split" | "focus";
+
+function methodologyVisualPath(kind: MethodologyVisualLine, d: string): string {
+  return '<path class="method-story-line method-story-line--' + kind + '" d="' + d + '"/>';
+}
+
+function methodologyVisualPoint(kind: MethodologyVisualPoint, x: number, y: number, radius: number): string {
+  const modifier = kind === "default" ? "" : " method-story-point--" + kind;
+  return '<circle class="method-story-point' + modifier + '" cx="' + x + '" cy="' + y + '" r="' + radius + '"/>';
+}
+
+function renderMethodologyVisualMotif(visualKind: string): string {
+  switch (visualKind) {
+    case "correctness":
+      return [
+        methodologyVisualPath("reference", "M70 210H408"),
+        methodologyVisualPath("main", "M76 116C151 116 177 172 248 181S351 211 410 210C442 209 458 227 458 252C458 278 477 286 486 299"),
+        methodologyVisualPath("secondary", "M76 292C149 292 177 238 248 232S354 210 410 210"),
+        methodologyVisualPath("tick", "M408 201V219"),
+        methodologyVisualPoint("default", 76, 292, 4),
+        methodologyVisualPoint("target", 410, 210, 8),
+        methodologyVisualPoint("focus", 285, 210, 3),
+      ].join("");
+    case "diagnosis":
+      return [
+        methodologyVisualPath("reference", "M72 254H538"),
+        methodologyVisualPath("main", "M72 254H185C219 254 230 222 249 194C269 166 293 133 319 150C340 164 337 193 315 194C293 194 286 169 300 153C317 134 347 143 350 170C354 205 327 222 324 251C319 281 354 305 360 336"),
+        methodologyVisualPath("tick", "M266 164H276M356 164H366M316 113V123M316 215V225"),
+        '<circle class="method-story-point method-story-point--inspection" cx="316" cy="169" r="39"/>',
+        methodologyVisualPoint("focus", 316, 169, 4),
+      ].join("");
+    case "guidance":
+      return [
+        methodologyVisualPath("main", "M76 416C127 406 154 373 188 365C223 356 236 374 262 348C288 322 282 299 320 284C355 271 376 278 396 248C413 224 422 200 452 183C472 171 490 168 510 174"),
+        methodologyVisualPath("secondary", "M510 174C568 212 554 281 526 344"),
+        methodologyVisualPoint("step", 188, 365, 6),
+        methodologyVisualPoint("step", 320, 284, 7),
+        methodologyVisualPoint("step", 396, 248, 5),
+        methodologyVisualPoint("target", 506, 173, 8),
+      ].join("");
+    case "adaptation":
+      return [
+        methodologyVisualPath("main", "M76 230H194C232 230 242 187 274 151C304 117 345 80 383 99C421 118 411 176 438 205C454 222 465 237 474 254C490 284 507 313 513 342"),
+        methodologyVisualPath("secondary", "M194 230C234 230 244 278 275 311C308 346 356 371 397 339C433 312 452 278 474 254"),
+        methodologyVisualPoint("split", 194, 230, 9),
+        methodologyVisualPoint("target", 383, 99, 8),
+        methodologyVisualPoint("default", 397, 339, 5),
+        methodologyVisualPoint("step", 474, 254, 7),
+      ].join("");
+    case "actionability":
+      return [
+        methodologyVisualPath("main", "M76 82C153 82 190 141 247 177C278 197 300 209 336 214"),
+        methodologyVisualPath("main", "M76 214C159 214 243 214 336 214"),
+        methodologyVisualPath("main", "M76 340C153 340 190 285 247 250C278 231 300 219 336 214"),
+        methodologyVisualPath("main", "M344 214H546"),
+        methodologyVisualPath("arrow", "M533 201L546 214L533 227"),
+        methodologyVisualPoint("default", 76, 214, 4),
+        methodologyVisualPoint("default", 76, 340, 4),
+        methodologyVisualPoint("target", 350, 214, 8),
+      ].join("");
+    default:
+      return [
+        methodologyVisualPath("main", "M76 220C160 220 192 208 264 220S358 260 398 288C435 315 462 333 492 343"),
+        methodologyVisualPoint("default", 76, 220, 5),
+        methodologyVisualPoint("target", 398, 288, 9),
+      ].join("");
+  }
+}
+
+function methodologyVisualIndexPosition(visualKind: string): readonly [number, number] {
+  switch (visualKind) {
+    case "diagnosis": return [72, 254];
+    case "guidance": return [76, 416];
+    case "adaptation": return [76, 230];
+    case "actionability": return [76, 82];
+    default: return [76, 116];
+  }
+}
+
+function methodologyVisualAnchor(visualKind: string): readonly [number, number] {
+  switch (visualKind) {
+    case "correctness": return [486, 365];
+    case "diagnosis": return [360, 402];
+    case "guidance": return [526, 410];
+    case "adaptation": return [535, 408];
+    case "actionability": return [520, 424];
+    default: return [492, 390];
+  }
+}
+
+function renderMethodologyVisual(dimension: string, index: number, number: string): string {
+  const visualKind = methodologyVisualKind(dimension);
+  const [indexX, indexY] = methodologyVisualIndexPosition(visualKind);
+  const [anchorX, anchorY] = methodologyVisualAnchor(visualKind);
+
+  return '<g class="method-story-visual" data-method-story-visual="' + index + '" data-method-visual-state="' + visualKind + '">' +
+    '<circle class="method-story-orbit" cx="' + anchorX + '" cy="' + anchorY + '" r="66"/>' +
+    '<g class="method-story-spoke" data-method-story-spoke="' + index + '">' + renderMethodologyVisualMotif(visualKind) + '</g>' +
+    '<g class="method-story-node" data-method-story-node="' + index + '"><circle cx="' + indexX + '" cy="' + indexY + '" r="19"></circle><text x="' + indexX + '" y="' + indexY + '">' + number + '</text></g></g>';
+}
+
 function renderMethodologyLens(scoreDimensions: readonly string[]): string {
-  return `<div class="method-lens" aria-label="Five complementary evaluation dimensions around observable tutoring behavior">
-    <svg class="method-lens-lines" viewBox="0 0 620 360" preserveAspectRatio="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><path d="M310 180 310 34M310 180 553 105M310 180 532 302M310 180 84 302M310 180 67 105"/></svg>
-    <div class="method-lens-core"><span>Observable<br>tutoring<br>behavior</span></div>
-    <ul class="method-lens-nodes">${scoreDimensions.map((dimension, index) => {
-      const details = methodologyDimension(dimension);
-      return `<li class="method-lens-node method-lens-node-${index + 1}"><span class="method-lens-disc">${icon(details.icon)}</span><span class="method-lens-copy"><strong>${escapeHtml(details.label)}</strong><small>${escapeHtml(details.lens)}</small></span></li>`;
-    }).join("")}</ul>
-  </div>`;
+  const dimensions = scoreDimensions.map((dimension, index) => {
+    const details = methodologyDimension(dimension);
+    return { dimension, details, index, number: String(index + 1).padStart(2, "0") };
+  });
+  const total = String(dimensions.length).padStart(2, "0");
+  const chapterMarkup = dimensions.map(({ details, index, number }) =>
+    '<li class="method-story-chapter" data-method-story-chapter data-method-story-index="' + index + '">' +
+    '<p class="method-story-number"><span>DIMENSION ' + number + '</span><span>Score lens</span></p>' +
+    '<h3>' + escapeHtml(details.label) + '</h3>' +
+    '<p class="method-story-description">' + escapeHtml(details.description) + '</p>' +
+    '<p class="method-story-lens"><span>What we look for</span>' + escapeHtml(details.lens) + '</p></li>'
+  ).join("");
+  const visualMarkup = dimensions.map(({ dimension, index, number }) => renderMethodologyVisual(dimension, index, number)).join("");
+  const overviewNodes = dimensions.map(({ index, number }) => {
+    const x = dimensions.length <= 1 ? 320 : 48 + (index * 482) / (dimensions.length - 1);
+    return '<g class="method-story-overview-node"><circle cx="' + x.toFixed(2) + '" cy="42" r="14"></circle><text x="' + x.toFixed(2) + '" y="42">' + number + '</text></g>';
+  }).join("");
+
+  return '<div class="method-story" data-method-story>' +
+    '<ol class="method-story-chapters" aria-label="' + escapeHtml(String(dimensions.length)) + ' benchmark score dimensions">' + chapterMarkup + '</ol>' +
+    '<figure class="method-story-stage" data-method-story-stage>' +
+    '<p class="method-story-stage-index" aria-hidden="true"><span data-method-story-current>01</span><span> / ' + total + '</span></p>' +
+    '<svg class="method-story-map" viewBox="0 0 640 520" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
+    '<g class="method-story-visuals">' + visualMarkup + '</g></svg>' +
+    '<svg class="method-story-overview" viewBox="0 0 640 84" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
+    '<path class="method-story-overview-track" d="M48 42H580"/><g class="method-story-overview-nodes">' + overviewNodes + '</g><circle class="method-story-overview-core" cx="592" cy="42" r="6"/></svg>' +
+    '<figcaption class="method-story-center">Observable<br>tutoring<br>behavior</figcaption></figure></div>';
 }
 
 function renderMethodologyArchitecture(): string {
