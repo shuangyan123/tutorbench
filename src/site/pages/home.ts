@@ -5,11 +5,11 @@ import { siteIcon as icon } from "../icons.js";
 import { BLOG_POSTS } from "./blog.js";
 
 const dimensions = [
-  ["diagnosis", "Diagnosis", "Whether it identifies the learner’s actual error, gap, or reasoning issue.", "Understands learner thinking"],
-  ["guidance", "Guidance", "Whether its explanation or hint helps the learner make progress.", "Provides helpful, appropriate hints"],
-  ["actionability", "Actionability", "Whether it leaves the learner with a clear, executable next step.", "Gives concrete next-step suggestions"],
-  ["correctness", "Correctness", "Whether the Tutor stays factually and conceptually correct.", "Maintains factual and conceptual accuracy"],
-  ["adaptation", "Adaptation", "Whether it changes its help for the learner’s state and context.", "Adjusts to learner needs and context"],
+  ["diagnosis", "Diagnosis", "Whether it identifies the learner’s actual error, gap, or reasoning issue.", "Understands learner thinking", "Did it understand the learner?"],
+  ["guidance", "Guidance", "Whether its explanation or hint helps the learner make progress.", "Provides helpful, appropriate hints", "Did it help the learner move forward?"],
+  ["actionability", "Actionability", "Whether it leaves the learner with a clear, executable next step.", "Gives concrete next-step suggestions", "Does the learner know what to do next?"],
+  ["correctness", "Correctness", "Whether the Tutor stays factually and conceptually correct.", "Maintains factual and conceptual accuracy", "Is the help actually correct?"],
+  ["adaptation", "Adaptation", "Whether it changes its help for the learner’s state and context.", "Adjusts to learner needs and context", "Did it respond to this learner, not just any learner?"],
 ] as const;
 
 // 装饰层不参与内容、读屏或点击；仅 Home 使用随包提供的透明前景。
@@ -46,14 +46,55 @@ function renderCase(item: TutorEvalPublicCase, index: number, count: number, sel
 }
 
 function renderDimensions(): string {
-  return `<section class="home-dimensions" id="dimensions" aria-labelledby="measure-title">${renderFoliage(["right-mid"])}<div class="shell dimension-layout">
-    <div class="dimension-intro"><p class="eyebrow">Five dimensions of tutoring</p><h2 id="measure-title">More than<br><em>right or wrong.</em></h2><p>Teachometry examines observable tutoring behavior with structured rubrics and transparent evaluation. Each dimension captures a distinct aspect of a response in an authored scenario.</p><a class="text-link" href="/methodology/">Explore the evaluation method ${icon("arrow")}</a></div>
-    <div class="dimension-explorer" data-dimension-explorer>
-      <div class="dimension-detail-row"><div class="dimension-details" aria-live="polite">${dimensions.map(([id, label, description], index) => `<article class="dimension-detail" data-dimension-detail="${index}"${index === 0 ? "" : " hidden"}><span class="dimension-disc">${icon(id)}</span><div><h3>${label}</h3><p>${description}</p><div class="dimension-progress"><span aria-hidden="true"><i style="--step:${(index + 1) * 20}%"></i></span><small>Dimension ${index + 1} / ${dimensions.length}</small></div></div></article>`).join("")}</div><p class="handwritten dimension-note">Look beyond<br>the final answer.<svg viewBox="0 0 80 35" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><path d="M76 3Q35 1 4 30m3-13L4 30l17-3" fill="none" stroke="currentColor"/></svg></p><div class="dimension-arrows"><button class="round-control" type="button" data-dimension-prev aria-label="Previous dimension">${icon("left")}</button><button class="round-control" type="button" data-dimension-next aria-label="Next dimension">${icon("right")}</button></div></div>
-      <div class="dimension-path"><svg class="path-line" viewBox="0 0 800 90" preserveAspectRatio="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><defs><linearGradient id="path-colors"><stop stop-color="#8cd6b6"/><stop offset="1" stop-color="#dbce94"/></linearGradient></defs><path d="M70 45Q115 24 160 45T250 45T340 45T430 45T520 45T610 45T730 45" fill="none" stroke="url(#path-colors)"/><g fill="#a0d8bf" stroke="#fff" stroke-width="3"><circle cx="160" cy="45" r="5"/><circle cx="340" cy="45" r="5"/></g><g fill="#d8cd93" stroke="#fff" stroke-width="3"><circle cx="520" cy="45" r="5"/><circle cx="680" cy="42" r="5"/></g></svg>
-        <div class="dimension-nodes" role="group" aria-label="Explore five dimensions">${dimensions.map(([id, label, , short], index) => `<button type="button" class="dimension-node" data-dimension="${index}" aria-pressed="${index === 0}" aria-label="${label}"><span class="dimension-disc">${icon(id)}</span><span class="dimension-number">0${index + 1}</span><strong>${label}</strong><span class="dimension-summary">${short}</span></button>`).join("")}</div>
-      </div>
+  return `<section class="home-dimensions" id="dimensions" data-home-story aria-labelledby="measure-title"><div class="shell home-story-layout">
+    <div class="home-story-copy">
+      <header class="home-story-intro"><p class="eyebrow">Five dimensions of tutoring</p><h2 id="measure-title">More than<br><em>right or wrong.</em></h2><p>Teachometry examines observable tutoring behavior with structured rubrics and transparent evaluation. Each dimension captures a distinct aspect of a response in an authored scenario.</p><a class="text-link" href="/methodology/">Explore the evaluation method ${icon("arrow")}</a></header>
+      <div class="home-story-chapters">${dimensions.map(([id, label, description, summary, question], index) => `<article class="home-story-chapter" data-home-story-chapter="${index}" aria-labelledby="home-story-question-${id}">
+        <p class="home-story-index"><span>0${index + 1}</span><span class="home-story-total" aria-hidden="true"> / 0${dimensions.length}</span></p>
+        <h3 id="home-story-question-${id}">${question}</h3>
+        <p class="home-story-dimension">${label}</p>
+        <p class="home-story-description">${description}</p>
+        <p class="home-story-summary">${summary}</p>
+      </article>`).join("")}</div>
     </div>
+    <figure class="home-story-stage" data-home-story-visual data-home-story-active="0">
+      <div class="home-story-stage-heading"><figcaption>Response under evaluation</figcaption><span data-home-story-current aria-hidden="true">01 / 05</span></div>
+      <svg class="home-story-response" viewBox="0 0 760 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
+        <g class="home-response-specimen" fill="none" stroke="var(--line-strong)" stroke-linecap="square" stroke-width="2" opacity=".72">
+          <g class="home-response-paragraph"><path d="M112 88h468M112 106h326M112 124h418"/></g>
+          <g class="home-response-paragraph"><path d="M112 178h392M112 196h468M112 214h295"/></g>
+          <g class="home-response-paragraph"><path d="M112 284h472M112 302h352"/></g>
+          <g class="home-response-paragraph"><path d="M112 385h434M112 403h320M112 421h486"/></g>
+        </g>
+        <g class="home-story-state" data-home-story-state="0" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter">
+          <rect x="103" y="162" width="410" height="32" fill="var(--accent-soft)" fill-opacity=".42" stroke="none"/>
+          <path d="M91 160v36M91 160h10M91 196h10M76 178h11" stroke-dasharray="2 5" opacity=".72"/>
+          <path d="M112 178h392" stroke-width="2.8"/>
+        </g>
+        <g class="home-story-state" data-home-story-state="1" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter">
+          <path d="M90 98v194M90 106h13M90 178h13M90 284h13" stroke-dasharray="1 6" opacity=".58"/>
+          <path d="M112 106h214M112 178h266M112 284h314" stroke-width="2.7"/>
+          <path d="M90 106h9M90 178h9M90 284h9" stroke-width="2.4"/>
+        </g>
+        <g class="home-story-state" data-home-story-state="2" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+          <path d="M580 106h72v252M580 196h72M584 284h68" stroke="var(--line)" stroke-width="1.6" stroke-dasharray="2 6" opacity=".78"/>
+          <path d="M652 358h17v31M104 386v35M104 386h9M104 421h9M669 386v35M669 386h-9M669 421h-9" stroke="var(--accent)" stroke-width="2"/>
+          <rect x="111" y="389" width="328" height="28" fill="var(--accent-soft)" fill-opacity=".44" stroke="none"/>
+          <path d="M112 403h320M683 397v13" stroke="var(--accent)" stroke-width="2.8"/>
+        </g>
+        <g class="home-story-state" data-home-story-state="3" fill="none" stroke="var(--accent)" stroke-linecap="square">
+          <rect x="105" y="270" width="365" height="27" fill="var(--accent-soft)" fill-opacity=".38" stroke="none"/>
+          <path d="M112 284h352M104 311h490" stroke-width="2.3"/>
+          <path d="M112 307v9M352 307v9M584 307v9" stroke-width="1.6" opacity=".78"/>
+        </g>
+        <g class="home-story-state" data-home-story-state="4" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+          <path d="M70 284v36M70 284h11M70 320h11M81 302h15M96 302v-18h9M96 302v18h9" stroke="var(--line-strong)" stroke-width="1.8"/>
+          <path d="M104 284h8M104 302h8" stroke="var(--line-strong)" stroke-width="1.6" opacity=".72"/>
+          <rect x="110" y="271" width="367" height="25" fill="var(--accent-soft)" fill-opacity=".38" stroke="none"/>
+          <path d="M112 284h352" stroke="var(--accent)" stroke-width="2.8"/>
+        </g>
+      </svg>
+    </figure>
   </div></section>`;
 }
 

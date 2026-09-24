@@ -483,36 +483,84 @@
     });
   }
 
-  const explorer = document.querySelector('[data-dimension-explorer]');
-  if (explorer instanceof HTMLElement) {
-    const nodes = Array.from(explorer.querySelectorAll('[data-dimension]'));
-    const details = Array.from(explorer.querySelectorAll('[data-dimension-detail]'));
-    let active = 0;
-    function selectDimension(index, focus = false) {
-      active = (index + nodes.length) % nodes.length;
-      nodes.forEach((node, itemIndex) => node.setAttribute('aria-pressed', String(active === itemIndex)));
-      details.forEach((detail, itemIndex) => { detail.hidden = active !== itemIndex; });
-      if (focus) nodes[active].focus();
-      // 仅横向滚动节点容器，避免 hover 或方向按钮让整页跳动。
-      const path = explorer.querySelector('.dimension-path');
-      if (path instanceof HTMLElement && path.scrollWidth > path.clientWidth) {
-        const nodeRect = nodes[active].getBoundingClientRect();
-        const pathRect = path.getBoundingClientRect();
-        path.scrollLeft += nodeRect.left - pathRect.left - (path.clientWidth - nodeRect.width) / 2;
+  const story = document.querySelector('[data-home-story]');
+  if (story instanceof HTMLElement) {
+    const chapters = Array.from(story.querySelectorAll('[data-home-story-chapter]'));
+    const visual = story.querySelector('[data-home-story-visual]');
+    const currentIndex = story.querySelector('[data-home-story-current]');
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let frame = 0;
+    let activeIndex = -1;
+    let tracking = false;
+
+    if (visual instanceof HTMLElement && chapters.length > 0) {
+      function setActive(index) {
+        if (index === activeIndex) return;
+        activeIndex = index;
+        chapters.forEach((chapter, chapterIndex) => {
+          if (chapterIndex === index) chapter.setAttribute('aria-current', 'step');
+          else chapter.removeAttribute('aria-current');
+        });
+        const visualIndex = Math.max(0, index);
+        visual.dataset.homeStoryActive = String(visualIndex);
+        if (index < 0) delete story.dataset.homeStoryActiveIndex;
+        else story.dataset.homeStoryActiveIndex = String(index);
+        if (currentIndex instanceof HTMLElement) currentIndex.textContent = `0${visualIndex + 1} / 0${chapters.length}`;
       }
+
+      function updateActiveChapter() {
+        frame = 0;
+        const marker = Math.max(120, window.innerHeight * 0.5);
+        let nextIndex = -1;
+        chapters.forEach((chapter, index) => {
+          if (chapter.getBoundingClientRect().top <= marker) nextIndex = index;
+        });
+        story.dataset.homeStoryChapterEntered = String(nextIndex >= 0);
+        setActive(nextIndex);
+      }
+
+      function scheduleUpdate() {
+        if (frame !== 0) return;
+        frame = window.requestAnimationFrame(updateActiveChapter);
+      }
+
+      function stopTracking() {
+        if (tracking) {
+          window.removeEventListener('scroll', scheduleUpdate);
+          window.removeEventListener('resize', scheduleUpdate);
+          tracking = false;
+        }
+        if (frame !== 0) window.cancelAnimationFrame(frame);
+        frame = 0;
+        activeIndex = -1;
+        delete story.dataset.homeStoryEnhanced;
+        delete story.dataset.homeStoryChapterEntered;
+        delete story.dataset.homeStoryActiveIndex;
+        visual.dataset.homeStoryActive = '0';
+        chapters.forEach((chapter) => chapter.removeAttribute('aria-current'));
+        if (currentIndex instanceof HTMLElement) currentIndex.textContent = `01 / 0${chapters.length}`;
+      }
+
+      function startTracking() {
+        if (tracking || !desktop.matches || reducedMotion.matches) return;
+        tracking = true;
+        window.addEventListener('scroll', scheduleUpdate, { passive: true });
+        window.addEventListener('resize', scheduleUpdate);
+        updateActiveChapter();
+        story.dataset.homeStoryEnhanced = 'true';
+      }
+
+      function syncTracking() {
+        // 只在桌面非减弱动态模式启用视觉聚焦；退出增强态时恢复全部章节。
+        if (desktop.matches && !reducedMotion.matches) startTracking();
+        else stopTracking();
+      }
+
+      desktop.addEventListener('change', syncTracking);
+      reducedMotion.addEventListener('change', syncTracking);
+      syncTracking();
     }
-    nodes.forEach((node, index) => {
-      node.addEventListener('click', () => selectDimension(index));
-      node.addEventListener('focus', () => selectDimension(index));
-      node.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse') selectDimension(index); });
-      node.addEventListener('keydown', (event) => {
-        const next = event.key === 'ArrowRight' ? index + 1 : event.key === 'ArrowLeft' ? index - 1
-          : event.key === 'Home' ? 0 : event.key === 'End' ? nodes.length - 1 : null;
-        if (next !== null) { event.preventDefault(); selectDimension(next, true); }
-      });
-    });
-    explorer.querySelector('[data-dimension-prev]')?.addEventListener('click', () => selectDimension(active - 1));
-    explorer.querySelector('[data-dimension-next]')?.addEventListener('click', () => selectDimension(active + 1));
   }
 
   const nav = document.querySelector('#primary-navigation');
@@ -530,7 +578,7 @@
         if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
       });
     }, { threshold: 0.08 });
-    themedPage.querySelectorAll('.home-dimensions, .home-data').forEach((section) => {
+    themedPage.querySelectorAll('.home-data').forEach((section) => {
       section.classList.add('reveal-ready'); observer.observe(section);
     });
   }
