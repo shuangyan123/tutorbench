@@ -87,6 +87,10 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
 
 test("shared public header is consistent, localized, and exposes language controls", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const chromeStyles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
+  const mobileHeaderStyles = chromeStyles
+    .slice(chromeStyles.indexOf("@media (max-width: 900px)"), chromeStyles.indexOf("@media (prefers-reduced-motion: no-preference)"))
+    .replace(/\s+/g, " ");
   const pages = [
     renderPage(renderHomePage(artifacts), { locale: "zh-CN" }),
     renderPage(renderRunPage(artifacts), { locale: "zh-CN" }),
@@ -95,6 +99,9 @@ test("shared public header is consistent, localized, and exposes language contro
 
   for (const html of pages) {
     assert.match(html, /<header class="site-header home-header">/);
+    assert.equal((html.match(/class="nav-toggle"/g) ?? []).length, 1);
+    assert.equal((html.match(/id="primary-navigation"/g) ?? []).length, 1);
+    assert.match(html, /aria-expanded="false" aria-controls="primary-navigation"/);
     assert.equal((html.match(/data-locale-switcher/g) ?? []).length, 1);
     assert.match(html, /data-ui-text="homeNav"/);
     assert.match(html, /data-ui-text="benchmarkNav"/);
@@ -112,6 +119,10 @@ test("shared public header is consistent, localized, and exposes language contro
     assert.match(html, />首页</);
     assert.match(html, />开始使用</);
   }
+
+  assert.ok(mobileHeaderStyles.includes(".home-header-tools { display: none;"));
+  assert.ok(mobileHeaderStyles.includes('.home-header .nav-links[data-open="true"] ~ .home-header-tools { display: flex;'));
+  assert.ok(mobileHeaderStyles.includes("grid-template-columns: repeat(2, minmax(0, 1fr));"));
 });
 
 test("home reconstruction uses real blog routes and cases reuse the Teachometry shell", async () => {
