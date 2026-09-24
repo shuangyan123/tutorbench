@@ -252,6 +252,10 @@ the real Community Review campaign.
 - [x] Finding-first JSON and text reporting with explicit health-dimension
       weights and ERROR/unresolved handling
 - [x] Architecture and claim-limit documentation
+- [x] External design-partner Tutor Health CLI with explicit Tutor provenance,
+      artifact output, Judge-provider reuse, and fail-closed no-Judge semantics
+- [ ] First real design-partner baseline -> product change -> rerun evidence loop
+- [ ] Baseline/candidate regression comparison with new/resolved/persistent Findings
 - [ ] Independent content review and human reliability evidence for the suite
 - [ ] Calibrated confidence interpretation or validated weighting profiles
 - [ ] Stateful multi-turn Tutor episode execution
