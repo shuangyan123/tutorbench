@@ -32,6 +32,7 @@ import {
 } from "./tutor-case-common.js";
 import type { TutorBaselineArtifactMetadata } from "../collection/index.js";
 import {
+  assertSingleJudgeProviderSelection,
   nextTutorbenchValue,
   positiveTutorbenchInteger,
   tutorbenchOptionValue,
@@ -172,12 +173,7 @@ export function parseBenchmarkCorpusCliOptions(
   if (corpusPath === undefined || corpusPath.length === 0) {
     throw new BenchmarkConfigurationError("tutor_response_corpus_invalid");
   }
-  const judgeModes = [liveJudge, deepSeekJudge, chatCompletionsJudge].filter(Boolean).length;
-  if (judgeModes > 1) {
-    throw new TutorbenchCliUsageError(
-      "Judge provider flags are mutually exclusive: choose one of --judge-openai, --judge-deepseek, or --judge-chat-completions.",
-    );
-  }
+  assertSingleJudgeProviderSelection(liveJudge, deepSeekJudge, chatCompletionsJudge);
   return {
     corpusPath,
     requireFull,

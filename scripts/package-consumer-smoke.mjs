@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createServer } from "node:http";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -32,15 +33,16 @@ function run(command, args, cwd, environment = process.env, options = {}) {
     });
     child.once("error", reject);
     child.once("close", (code) => {
-      if (code !== 0) {
+      const exitCode = code ?? 1;
+      if (exitCode !== (options.expectedExitCode ?? 0)) {
         reject(
           new Error(
-            `${command} ${args.join(" ")} failed with exit code ${code}.\n${stdout}\n${stderr}`,
+            `${command} ${args.join(" ")} failed with exit code ${exitCode}.\n${stdout}\n${stderr}`,
           ),
         );
         return;
       }
-      resolveResult({ stdout, stderr });
+      resolveResult({ exitCode, stdout, stderr });
     });
   });
 }
@@ -313,6 +315,10 @@ console.log("consumer API smoke passed");
       /tutorbench quickstart \[options\]/.test(help.stdout),
       "Installed tutorbench executable did not expose Quickstart help.",
     );
+    assertCondition(
+      /tutorbench health --http <url>/.test(help.stdout),
+      "Installed tutorbench executable did not expose Tutor Health.",
+    );
     const quickstart = await run(
       executable,
       [...executableArguments, "quickstart"],
@@ -360,6 +366,65 @@ console.log("consumer API smoke passed");
       /Frozen responses are replayed locally/.test(evaluateHelp.stdout),
       "Installed tutorbench executable did not run evaluate --help.",
     );
+    const healthServer = createServer((_request, response) => {
+      response.setHeader("content-type", "application/json");
+      response.end(JSON.stringify({ text: "Try one small step." }));
+    });
+    await new Promise((resolveListen, reject) => {
+      healthServer.once("error", reject);
+      healthServer.listen(0, "127.0.0.1", resolveListen);
+    });
+    const healthAddress = healthServer.address();
+    assertCondition(
+      healthAddress !== null && typeof healthAddress !== "string",
+      "Package Tutor Health smoke server did not bind a TCP port.",
+    );
+    const healthOutputDirectory = join(consumerRoot, "health-output");
+    try {
+      const health = await run(
+        executable,
+        [
+          ...executableArguments,
+          "health",
+          "--http",
+          `http://127.0.0.1:${healthAddress.port}/respond`,
+          "--suite",
+          "productive-struggle-intervention-v0.1",
+          "--output",
+          healthOutputDirectory,
+          "--tutor-provider",
+          "package-smoke",
+          "--tutor-model",
+          "fixture",
+          "--prompt-version",
+          "v1",
+        ],
+        consumerRoot,
+        environment,
+        { expectedExitCode: 2 },
+      );
+      assertCondition(
+        /Tutor Health Score:/.test(health.stdout) &&
+          /Release Gate: UNRESOLVED/.test(health.stdout) &&
+          /not complete evaluation evidence/i.test(health.stdout),
+        "Installed tutorbench health did not complete with an explicit unresolved Judge status.",
+      );
+      const healthEvaluation = JSON.parse(
+        await readFile(join(healthOutputDirectory, "evaluation.json"), "utf8"),
+      );
+      assertCondition(
+        healthEvaluation.tutor?.provider === "package-smoke" &&
+          healthEvaluation.tutor?.promptVersion === "v1",
+        "Installed tutorbench health did not preserve CLI Tutor provenance.",
+      );
+      for (const artifact of ["health-report.json", "health-report.txt"]) {
+        await readFile(join(healthOutputDirectory, artifact));
+      }
+    } finally {
+      await new Promise((resolveClose, reject) => {
+        healthServer.close((error) => (error === undefined ? resolveClose() : reject(error)));
+      });
+    }
     console.log(`Package consumer smoke passed: ${packInfo.filename}`);
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
