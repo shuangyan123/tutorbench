@@ -1,5 +1,6 @@
 import type {
   StudentState,
+  TutorLearnerModelContext,
   TutorConversationMessage,
   TutorTurnInput,
 } from "./tutor.js";
@@ -91,6 +92,8 @@ export interface TutorEvalStudentProfile {
   readonly misconceptions?: readonly string[];
   readonly level?: string;
   readonly goal?: string;
+  /** Explicit Tutor-visible learner memory; evaluator reference state stays elsewhere. */
+  readonly learnerModel?: TutorLearnerModelContext;
 }
 
 export interface TutorEvalGroundTruth {
@@ -186,6 +189,9 @@ function profileToStudentState(
     misconceptions: profile?.misconceptions ?? [],
     level: profile?.level ?? "unspecified",
     goal: profile?.goal ?? "unspecified",
+    ...(profile?.learnerModel === undefined
+      ? {}
+      : { learnerModel: profile.learnerModel }),
   };
 }
 

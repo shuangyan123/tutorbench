@@ -7,11 +7,23 @@ export interface TutorConversationMessage {
   readonly text: string;
 }
 
+export type TutorLearnerEngagement = "low" | "steady" | "high" | "frustrated";
+export type TutorMasteryState = "novice" | "developing" | "near_mastery" | "mastered";
+
+/** Optional, intentionally Tutor-visible learner-model or memory context. */
+export interface TutorLearnerModelContext {
+  readonly memorySummary?: string;
+  readonly confidence?: number;
+  readonly engagement?: TutorLearnerEngagement;
+  readonly masteryState?: TutorMasteryState;
+}
+
 export interface StudentState {
   readonly knownConcepts: readonly string[];
   readonly misconceptions: readonly string[];
   readonly level: string;
   readonly goal: string;
+  readonly learnerModel?: TutorLearnerModelContext;
 }
 
 export interface TutorTurnInput {

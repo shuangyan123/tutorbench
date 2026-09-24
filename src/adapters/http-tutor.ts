@@ -87,6 +87,9 @@ function serializeTutorTurnInput(input: TutorTurnInput): TutorTurnInput {
       misconceptions: [...input.studentState.misconceptions],
       level: input.studentState.level,
       goal: input.studentState.goal,
+      ...(input.studentState.learnerModel === undefined
+        ? {}
+        : { learnerModel: { ...input.studentState.learnerModel } }),
     },
   };
 }

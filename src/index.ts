@@ -3,7 +3,7 @@
  * Advanced corpus, calibration, generation, and provider modules stay behind
  * their explicit internal paths so the default import surface stays small.
  */
-export { loadTutorEvalDataset } from "./datasets/index.js";
+export { loadTutorEvalDataset, loadTutorScenarioSuiteVNext } from "./datasets/index.js";
 export {
   TUTOR_EVAL_DATASET_ID,
   TUTOR_EVAL_DATASET_VERSION,
@@ -20,6 +20,12 @@ export {
   toTutorTurnInput,
 } from "./contracts/index.js";
 export { runTutorBenchmark, runTutorEval } from "./runner/index.js";
+export { runTutorHealthEvaluation } from "./runner/index.js";
+export {
+  buildTutorHealthReport,
+  formatTutorHealthReport,
+  writeTutorHealthReport,
+} from "./reporting/index.js";
 export { createHttpTutor } from "./adapters/http-tutor.js";
 export * from "./community-review/index.js";
 export * from "./contracts/community-review-application.js";
@@ -39,6 +45,19 @@ export type {
   TutorEvalCase,
   TutorEvalDataset,
 } from "./contracts/tutor-eval.js";
+export type {
+  TutorScenarioSuiteVNext,
+  TutorScenarioVNext,
+  TutorScenarioDecisionPoint,
+} from "./contracts/tutor-scenario-vnext.js";
+export type {
+  TutorEvidenceRef,
+  TutorFinding,
+  TutorHealthReport,
+  TutorHealthScoringProfile,
+  TutorObservation,
+  TutorHealthDimension,
+} from "./contracts/tutor-health.js";
 export type { TutorCaseLocale } from "./contracts/locale.js";
 export type { HttpTutorOptions } from "./adapters/http-tutor.js";
 export type { TutorEvalRubric } from "./contracts/rubric.js";
@@ -57,3 +76,7 @@ export type {
   TutorEvalJudgeRunOptions,
   TutorEvalTutorOptions,
 } from "./runner/tutor-eval-runner.js";
+export type {
+  RunTutorHealthEvaluationOptions,
+  TutorHealthEvaluationRun,
+} from "./runner/tutor-health-runner.js";

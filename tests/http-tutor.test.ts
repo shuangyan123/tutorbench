@@ -177,6 +177,26 @@ test("HTTP v1 fixtures preserve the small public contract", async () => {
 
 test("HTTP Tutor adapter runs through the real public benchmark runner", async () => {
   let receivedRequest: Record<string, unknown> | null = null;
+  const learnerModel = {
+    memorySummary: "Learner prefers visual worked examples.",
+    confidence: 0.7,
+  };
+  const baseDataset = deterministicDataset();
+  const baseCase = baseDataset.cases[0];
+  assert.ok(baseCase);
+  const dataset: TutorEvalDataset = {
+    ...baseDataset,
+    cases: [{
+      ...baseCase,
+      tutorInput: {
+        ...baseCase.tutorInput,
+        studentProfile: {
+          ...baseCase.tutorInput.studentProfile,
+          learnerModel,
+        },
+      },
+    }],
+  };
   const server = await startServer(async (request, response) => {
     receivedRequest = JSON.parse(await readRequestBody(request)) as Record<string, unknown>;
     response.setHeader("content-type", "application/json");
@@ -196,7 +216,7 @@ test("HTTP Tutor adapter runs through the real public benchmark runner", async (
   try {
     const result = await runTutorBenchmark({
       tutor: createHttpTutor({ id: "python-like-tutor", endpoint: server.endpoint }),
-      dataset: deterministicDataset(),
+      dataset,
       runId: "http-run",
     });
 
@@ -214,6 +234,10 @@ test("HTTP Tutor adapter runs through the real public benchmark runner", async (
       "studentState",
     ]);
     const serializedRequest = JSON.stringify(request);
+    assert.deepEqual(
+      (request.studentState as Record<string, unknown>).learnerModel,
+      learnerModel,
+    );
     assert.doesNotMatch(
       serializedRequest,
       /evaluatorOnly|groundTruth|rubrics|rubricId|criticalFailure|Judge|reference|hidden-misconception/i,

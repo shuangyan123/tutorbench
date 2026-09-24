@@ -7,7 +7,10 @@ import { dirname, join, resolve } from "node:path";
 const repositoryRoot = resolve(fileURLToPath(new URL("../", import.meta.url)));
 const npmCommand = process.platform === "win32" ? process.execPath : "npm";
 const npmArguments = process.platform === "win32"
-  ? [join(dirname(process.execPath), "node_modules/npm/bin/npm-cli.js")]
+  ? [
+      process.env.npm_execpath ??
+        join(dirname(process.execPath), "node_modules/npm/bin/npm-cli.js"),
+    ]
   : [];
 
 function run(command, args, cwd, environment = process.env, options = {}) {
@@ -134,6 +137,7 @@ async function main() {
       "scenarios/tutor-eval-v0.2a/cases.json",
       "scenarios/tutor-eval-v0.2a/cases.zh-CN.json",
       "scenarios/tutor-eval-v0.1/cases.json",
+      "scenarios/real-world/productive-struggle-intervention-v0.1/suite.json",
       "prompts/tutor-baseline-system-v0.1.md",
       "assets/brand/tutorbench/web/tutorbench-mark.svg",
       "assets/brand/tutorbench/raster/favicon-32.png",
@@ -206,7 +210,10 @@ async function main() {
       `import {
   communityReviewFingerprint,
   createHttpTutor,
+  formatTutorHealthReport,
   loadTutorEvalDataset,
+  loadTutorScenarioSuiteVNext,
+  runTutorHealthEvaluation,
   runTutorBenchmark,
 } from "tutor-benchmark";
 
@@ -237,6 +244,25 @@ const result = await runTutorBenchmark({
 });
 if (result.caseRunCount !== 1 || result.datasetId !== dataset.id) {
   throw new Error("Installed package public runner did not execute one case.");
+}
+const suite = await loadTutorScenarioSuiteVNext();
+if (suite.scenarios.length !== 13) {
+  throw new Error("Installed package did not load the finding-first scenario suite.");
+}
+const healthRun = await runTutorHealthEvaluation({
+  tutor: {
+    id: "package-health-smoke",
+    async respond() {
+      return { text: "Try the next small step." };
+    },
+  },
+});
+if (
+  healthRun.evaluation.datasetId !== suite.id ||
+  healthRun.report.releaseGate !== "UNRESOLVED" ||
+  !formatTutorHealthReport(healthRun.report).includes("Tutor Health Score:")
+) {
+  throw new Error("Installed package finding-first runner/report did not preserve unresolved Judge status.");
 }
 const httpTutor = createHttpTutor({
   id: "package-consumer-http",
