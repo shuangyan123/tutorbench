@@ -46,6 +46,7 @@ test("package root exposes createHttpTutor without replacing the direct runner",
   assert.equal(typeof publicApi.runTutorBenchmark, "function");
   assert.equal(typeof publicApi.runTutorEval, "function");
   assert.equal(typeof publicApi.loadTutorScenarioSuiteVNext, "function");
+  assert.equal(typeof publicApi.parseTutorScenarioSuiteVNext, "function");
   assert.equal(typeof publicApi.runTutorHealthEvaluation, "function");
   assert.equal(typeof publicApi.formatTutorHealthReport, "function");
 });
