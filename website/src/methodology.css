@@ -457,15 +457,10 @@
 .method-story-orbit {
   fill: none;
   stroke: var(--line-strong);
+  stroke-opacity: .58;
   stroke-dasharray: 1 8;
   stroke-linecap: round;
-  stroke-width: 1.2;
-}
-
-.method-story-hub-link {
-  fill: none;
-  stroke: var(--line-strong);
-  stroke-width: 1.2;
+  stroke-width: 1;
 }
 
 .method-story-visual {
@@ -500,6 +495,11 @@
   stroke-width: 1.4;
 }
 
+.method-story-line--tick {
+  stroke: var(--line-strong);
+  stroke-width: .8;
+}
+
 .method-story-point {
   fill: var(--surface);
   stroke: var(--line-strong);
@@ -509,9 +509,18 @@
 
 .method-story-point--target,
 .method-story-point--step,
-.method-story-point--split {
+.method-story-point--split,
+.method-story-point--focus {
   fill: var(--accent-soft);
   stroke: var(--accent);
+}
+
+.method-story-point--inspection {
+  fill: none;
+  stroke: var(--accent);
+  stroke-dasharray: 1 6;
+  stroke-width: 1.1;
+  opacity: .62;
 }
 
 .method-story-node {
@@ -553,20 +562,46 @@
 
 .method-story-center {
   position: absolute;
-  top: 80.8%;
-  left: 50%;
+  top: 70.2%;
+  left: 76%;
   display: grid;
-  width: clamp(136px, 16vw, 164px);
+  width: clamp(98px, 8.5vw, 122px);
   aspect-ratio: 1;
   place-content: center;
-  border: 1px solid var(--line-strong);
+  border: 1px solid color-mix(in srgb, var(--line-strong) 62%, transparent);
   border-radius: 50%;
   background: var(--surface);
   color: var(--accent-strong);
-  font: 400 clamp(17px, 1.8vw, 22px)/1.04 var(--serif);
+  font: 400 clamp(13px, 1.25vw, 16px)/1.04 var(--serif);
   letter-spacing: -.035em;
   text-align: center;
   transform: translate(-50%, -50%);
+}
+
+.method-story:not([data-method-story-active-index]) .method-story-center,
+.method-story:has(.method-story-visual.is-active[data-method-visual-state="correctness"]) .method-story-center {
+  top: 70.2%;
+  left: 75.94%;
+}
+
+.method-story:has(.method-story-visual.is-active[data-method-visual-state="diagnosis"]) .method-story-center {
+  top: 77.31%;
+  left: 56.25%;
+}
+
+.method-story:has(.method-story-visual.is-active[data-method-visual-state="guidance"]) .method-story-center {
+  top: 78.85%;
+  left: 82.19%;
+}
+
+.method-story:has(.method-story-visual.is-active[data-method-visual-state="adaptation"]) .method-story-center {
+  top: 78.46%;
+  left: 83.59%;
+}
+
+.method-story:has(.method-story-visual.is-active[data-method-visual-state="actionability"]) .method-story-center {
+  top: 81.54%;
+  left: 81.25%;
 }
 
 .method-story-overview-track {

@@ -268,74 +268,106 @@ function methodologyVisualKind(dimension: string): string {
   return methodologyDimensionDetails[dimension] ? dimension : "general";
 }
 
+type MethodologyVisualLine = "main" | "secondary" | "reference" | "arrow" | "tick";
+type MethodologyVisualPoint = "default" | "step" | "target" | "split" | "focus";
+
+function methodologyVisualPath(kind: MethodologyVisualLine, d: string): string {
+  return '<path class="method-story-line method-story-line--' + kind + '" d="' + d + '"/>';
+}
+
+function methodologyVisualPoint(kind: MethodologyVisualPoint, x: number, y: number, radius: number): string {
+  const modifier = kind === "default" ? "" : " method-story-point--" + kind;
+  return '<circle class="method-story-point' + modifier + '" cx="' + x + '" cy="' + y + '" r="' + radius + '"/>';
+}
+
 function renderMethodologyVisualMotif(visualKind: string): string {
   switch (visualKind) {
     case "correctness":
       return [
-        '<path class="method-story-line method-story-line--reference" d="M92 166H279"/>',
-        '<path class="method-story-line method-story-line--main" d="M92 102H191C224 102 244 121 272 166H320V336"/>',
-        '<path class="method-story-line method-story-line--secondary" d="M92 230H191C224 230 244 211 272 166"/>',
-        '<circle class="method-story-point" cx="92" cy="102" r="5"/>',
-        '<circle class="method-story-point" cx="92" cy="230" r="5"/>',
-        '<circle class="method-story-point method-story-point--target" cx="272" cy="166" r="9"/>',
+        methodologyVisualPath("reference", "M70 210H408"),
+        methodologyVisualPath("main", "M76 116C151 116 177 172 248 181S351 211 410 210C442 209 458 227 458 252C458 278 477 286 486 299"),
+        methodologyVisualPath("secondary", "M76 292C149 292 177 238 248 232S354 210 410 210"),
+        methodologyVisualPath("tick", "M408 201V219"),
+        methodologyVisualPoint("default", 76, 292, 4),
+        methodologyVisualPoint("target", 410, 210, 8),
+        methodologyVisualPoint("focus", 285, 210, 3),
       ].join("");
     case "diagnosis":
       return [
-        '<path class="method-story-line method-story-line--main" d="M92 166H176C207 166 214 146 230 126L258 91C275 70 311 80 311 107C311 131 288 143 265 130L230 166H320V336"/>',
-        '<path class="method-story-line method-story-line--secondary" d="M176 166H320"/>',
-        '<circle class="method-story-point" cx="92" cy="166" r="5"/>',
-        '<circle class="method-story-point method-story-point--target" cx="284" cy="106" r="24"/>',
-        '<circle class="method-story-point method-story-point--focus" cx="284" cy="106" r="10"/>',
+        methodologyVisualPath("reference", "M72 254H538"),
+        methodologyVisualPath("main", "M72 254H185C219 254 230 222 249 194C269 166 293 133 319 150C340 164 337 193 315 194C293 194 286 169 300 153C317 134 347 143 350 170C354 205 327 222 324 251C319 281 354 305 360 336"),
+        methodologyVisualPath("tick", "M266 164H276M356 164H366M316 113V123M316 215V225"),
+        '<circle class="method-story-point method-story-point--inspection" cx="316" cy="169" r="39"/>',
+        methodologyVisualPoint("focus", 316, 169, 4),
       ].join("");
     case "guidance":
       return [
-        '<path class="method-story-line method-story-line--main" d="M92 276H160V230H218V184H276V138H334V184L320 336"/>',
-        '<path class="method-story-line method-story-line--secondary" d="M92 276H334"/>',
-        '<circle class="method-story-point" cx="92" cy="276" r="5"/>',
-        '<circle class="method-story-point method-story-point--step" cx="160" cy="230" r="7"/>',
-        '<circle class="method-story-point method-story-point--step" cx="218" cy="184" r="7"/>',
-        '<circle class="method-story-point method-story-point--step" cx="276" cy="138" r="7"/>',
-        '<circle class="method-story-point method-story-point--target" cx="334" cy="184" r="9"/>',
+        methodologyVisualPath("main", "M76 416C127 406 154 373 188 365C223 356 236 374 262 348C288 322 282 299 320 284C355 271 376 278 396 248C413 224 422 200 452 183C472 171 490 168 510 174"),
+        methodologyVisualPath("secondary", "M510 174C568 212 554 281 526 344"),
+        methodologyVisualPoint("step", 188, 365, 6),
+        methodologyVisualPoint("step", 320, 284, 7),
+        methodologyVisualPoint("step", 396, 248, 5),
+        methodologyVisualPoint("target", 506, 173, 8),
       ].join("");
     case "adaptation":
       return [
-        '<path class="method-story-line method-story-line--main" d="M92 166H177C205 166 212 147 235 122L261 95C279 76 309 84 309 106C309 129 288 139 264 126L235 166C212 185 205 166 177 166H320V336"/>',
-        '<path class="method-story-line method-story-line--secondary" d="M177 166C205 166 212 185 235 210L261 237C279 256 309 248 309 226C309 203 288 193 264 206L235 166"/>',
-        '<circle class="method-story-point method-story-point--split" cx="177" cy="166" r="11"/>',
-        '<circle class="method-story-point method-story-point--target" cx="309" cy="106" r="8"/>',
-        '<circle class="method-story-point" cx="309" cy="226" r="6"/>',
+        methodologyVisualPath("main", "M76 230H194C232 230 242 187 274 151C304 117 345 80 383 99C421 118 411 176 438 205C454 222 465 237 474 254C490 284 507 313 513 342"),
+        methodologyVisualPath("secondary", "M194 230C234 230 244 278 275 311C308 346 356 371 397 339C433 312 452 278 474 254"),
+        methodologyVisualPoint("split", 194, 230, 9),
+        methodologyVisualPoint("target", 383, 99, 8),
+        methodologyVisualPoint("default", 397, 339, 5),
+        methodologyVisualPoint("step", 474, 254, 7),
       ].join("");
     case "actionability":
       return [
-        '<path class="method-story-line method-story-line--main" d="M92 92C152 92 175 115 228 166H320V336"/>',
-        '<path class="method-story-line method-story-line--main" d="M92 166H228"/>',
-        '<path class="method-story-line method-story-line--main" d="M92 240C152 240 175 217 228 166"/>',
-        '<circle class="method-story-point" cx="92" cy="92" r="5"/>',
-        '<circle class="method-story-point" cx="92" cy="166" r="5"/>',
-        '<circle class="method-story-point" cx="92" cy="240" r="5"/>',
-        '<circle class="method-story-point method-story-point--target" cx="228" cy="166" r="11"/>',
-        '<path class="method-story-line method-story-line--arrow" d="M304 319L320 336L336 319"/>',
+        methodologyVisualPath("main", "M76 82C153 82 190 141 247 177C278 197 300 209 336 214"),
+        methodologyVisualPath("main", "M76 214C159 214 243 214 336 214"),
+        methodologyVisualPath("main", "M76 340C153 340 190 285 247 250C278 231 300 219 336 214"),
+        methodologyVisualPath("main", "M344 214H546"),
+        methodologyVisualPath("arrow", "M533 201L546 214L533 227"),
+        methodologyVisualPoint("default", 76, 214, 4),
+        methodologyVisualPoint("default", 76, 340, 4),
+        methodologyVisualPoint("target", 350, 214, 8),
       ].join("");
     default:
       return [
-        '<path class="method-story-line method-story-line--main" d="M92 166H240C280 166 320 206 320 246V336"/>',
-        '<circle class="method-story-point" cx="92" cy="166" r="5"/>',
-        '<circle class="method-story-point method-story-point--target" cx="240" cy="166" r="9"/>',
+        methodologyVisualPath("main", "M76 220C160 220 192 208 264 220S358 260 398 288C435 315 462 333 492 343"),
+        methodologyVisualPoint("default", 76, 220, 5),
+        methodologyVisualPoint("target", 398, 288, 9),
       ].join("");
   }
 }
 
+function methodologyVisualIndexPosition(visualKind: string): readonly [number, number] {
+  switch (visualKind) {
+    case "diagnosis": return [72, 254];
+    case "guidance": return [76, 416];
+    case "adaptation": return [76, 230];
+    case "actionability": return [76, 82];
+    default: return [76, 116];
+  }
+}
+
 function methodologyVisualAnchor(visualKind: string): readonly [number, number] {
-  return visualKind === "guidance" ? [92, 276] : [92, 166];
+  switch (visualKind) {
+    case "correctness": return [486, 365];
+    case "diagnosis": return [360, 402];
+    case "guidance": return [526, 410];
+    case "adaptation": return [535, 408];
+    case "actionability": return [520, 424];
+    default: return [492, 390];
+  }
 }
 
 function renderMethodologyVisual(dimension: string, index: number, number: string): string {
   const visualKind = methodologyVisualKind(dimension);
-  const [x, y] = methodologyVisualAnchor(visualKind);
+  const [indexX, indexY] = methodologyVisualIndexPosition(visualKind);
+  const [anchorX, anchorY] = methodologyVisualAnchor(visualKind);
 
   return '<g class="method-story-visual" data-method-story-visual="' + index + '" data-method-visual-state="' + visualKind + '">' +
+    '<circle class="method-story-orbit" cx="' + anchorX + '" cy="' + anchorY + '" r="66"/>' +
     '<g class="method-story-spoke" data-method-story-spoke="' + index + '">' + renderMethodologyVisualMotif(visualKind) + '</g>' +
-    '<g class="method-story-node" data-method-story-node="' + index + '"><circle cx="' + x + '" cy="' + y + '" r="19"></circle><text x="' + x + '" y="' + y + '">' + number + '</text></g></g>';
+    '<g class="method-story-node" data-method-story-node="' + index + '"><circle cx="' + indexX + '" cy="' + indexY + '" r="19"></circle><text x="' + indexX + '" y="' + indexY + '">' + number + '</text></g></g>';
 }
 
 function renderMethodologyLens(scoreDimensions: readonly string[]): string {
@@ -362,7 +394,7 @@ function renderMethodologyLens(scoreDimensions: readonly string[]): string {
     '<figure class="method-story-stage" data-method-story-stage>' +
     '<p class="method-story-stage-index" aria-hidden="true"><span data-method-story-current>01</span><span> / ' + total + '</span></p>' +
     '<svg class="method-story-map" viewBox="0 0 640 520" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
-    '<circle class="method-story-orbit" cx="320" cy="420" r="84"></circle><path class="method-story-hub-link" d="M320 336V360"/><g class="method-story-visuals">' + visualMarkup + '</g></svg>' +
+    '<g class="method-story-visuals">' + visualMarkup + '</g></svg>' +
     '<svg class="method-story-overview" viewBox="0 0 640 84" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
     '<path class="method-story-overview-track" d="M48 42H580"/><g class="method-story-overview-nodes">' + overviewNodes + '</g><circle class="method-story-overview-core" cx="592" cy="42" r="6"/></svg>' +
     '<figcaption class="method-story-center">Observable<br>tutoring<br>behavior</figcaption></figure></div>';
