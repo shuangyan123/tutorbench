@@ -254,6 +254,8 @@ the real Community Review campaign.
 - [x] Architecture and claim-limit documentation
 - [x] External design-partner Tutor Health CLI with explicit Tutor provenance,
       artifact output, Judge-provider reuse, and fail-closed no-Judge semantics
+- [x] Private design-partner pilot boundary, Scenario Intake template, and
+      stable runtime validation for caller-owned private Scenario vNext suites
 - [ ] First real design-partner baseline -> product change -> rerun evidence loop
 - [ ] Baseline/candidate regression comparison with new/resolved/persistent Findings
 - [ ] Independent content review and human reliability evidence for the suite
