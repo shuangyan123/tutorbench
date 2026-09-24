@@ -215,6 +215,7 @@ async function main() {
   formatTutorHealthReport,
   loadTutorEvalDataset,
   loadTutorScenarioSuiteVNext,
+  parseTutorScenarioSuiteVNext,
   runTutorHealthEvaluation,
   runTutorBenchmark,
 } from "tutor-benchmark";
@@ -250,6 +251,10 @@ if (result.caseRunCount !== 1 || result.datasetId !== dataset.id) {
 const suite = await loadTutorScenarioSuiteVNext();
 if (suite.scenarios.length !== 13) {
   throw new Error("Installed package did not load the finding-first scenario suite.");
+}
+const parsedPrivateSuite = parseTutorScenarioSuiteVNext(structuredClone(suite));
+if (parsedPrivateSuite.id !== suite.id || parsedPrivateSuite.version !== suite.version) {
+  throw new Error("Installed package did not expose Scenario vNext runtime validation.");
 }
 const healthRun = await runTutorHealthEvaluation({
   tutor: {
