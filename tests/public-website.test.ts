@@ -44,6 +44,21 @@ test("homepage derives facts and escapes case content without inventing model re
   assert.doesNotMatch(content, /<img src=x/);
   assert.match(content, /Not scored · no model run/);
   assert.match(content, /No model response or model score is published here/);
+  assert.match(content, /Test how AI tutors/);
+  assert.match(content, /Run an Evaluation/);
+  assert.match(content, /diagnose concrete failures/);
+});
+
+test("run page exposes Tutor Health as the product-facing external Tutor workflow", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const page = renderRunPage(artifacts);
+  assert.match(page.description, /diagnose real-world tutoring behavior/);
+  assert.match(page.content, /data-run-tab="health"/);
+  assert.match(page.content, /tutorbench health/);
+  assert.match(page.content, /productive-struggle-intervention-v0\.1/);
+  assert.match(page.content, /health-report\.json/);
+  assert.match(page.content, /No-Judge runs stay UNRESOLVED/);
+  assert.match(page.content, /not a validated general tutor-quality or learner-outcome measure/);
 });
 
 test("locale selector reserves text and chevron space consistently", async () => {
