@@ -536,7 +536,32 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /Not scored · no model run/);
     assert.match(homeHtml, /No model response or model score is published here/);
     assert.equal((homeHtml.match(/data-home-case[ >]/g) ?? []).length, 48);
-    assert.equal((homeHtml.match(/data-dimension="[0-4]"/g) ?? []).length, 5);
+    assert.equal((homeHtml.match(/data-home-story-chapter="[0-4]"/g) ?? []).length, 5);
+    assert.doesNotMatch(homeHtml, /data-dimension-explorer|data-dimension-detail|data-dimension-prev|data-dimension-next/);
+    assert.match(homeHtml, /Five dimensions of tutoring/);
+    assert.match(homeHtml, /More than<br><em>right or wrong\.<\/em>/);
+    assert.match(homeHtml, /Teachometry examines observable tutoring behavior with structured rubrics and transparent evaluation\. Each dimension captures a distinct aspect of a response in an authored scenario\./);
+    const homeStoryQuestions = [
+      "Did it understand the learner?",
+      "Did it help the learner move forward?",
+      "Does the learner know what to do next?",
+      "Is the help actually correct?",
+      "Did it respond to this learner, not just any learner?",
+    ];
+    let previousHomeQuestion = -1;
+    for (const question of homeStoryQuestions) {
+      const questionPosition = homeHtml.indexOf(question);
+      assert.ok(questionPosition > previousHomeQuestion, `Home story question order: ${question}`);
+      previousHomeQuestion = questionPosition;
+    }
+    const homeStorySvg = homeHtml.match(/<svg class="home-story-response"[\s\S]*?<\/svg>/u)?.[0];
+    assert.ok(homeStorySvg);
+    assert.match(homeStorySvg, /aria-hidden="true"/u);
+    assert.match(homeStorySvg, /focusable="false"/u);
+    assert.doesNotMatch(homeStorySvg, /<text|Diagnosis|Guidance|learner|benchmark/iu);
+    for (const state of ["0", "1", "2", "3", "4"]) {
+      assert.match(homeStorySvg, new RegExp(`data-home-story-state="${state}"`));
+    }
     assert.ok(homeHtml.indexOf('class="home-hero"') < homeHtml.indexOf('class="home-dimensions"'));
     assert.ok(homeHtml.indexOf('class="home-dimensions"') < homeHtml.indexOf('class="home-data"'));
     assert.match(homeHtml, /Synthetic cases/);
@@ -712,7 +737,23 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(methodologyHtml, /human calibration have not started/);
     assert.match(methodologyHtml, /Judge-vs-human validation and statistical validation are not completed/);
     const methodologyStyles = await readFile(join(process.cwd(), "website", "src", "methodology.css"), "utf8");
+    const homeStyles = await readFile(join(process.cwd(), "website", "src", "home.css"), "utf8");
     const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
+    const homeStoryScriptStart = siteScript.indexOf("const story = document.querySelector('[data-home-story]')");
+    const homeStoryScriptEnd = siteScript.indexOf("\n  const nav = document.querySelector('#primary-navigation')", homeStoryScriptStart);
+    assert.ok(homeStoryScriptStart >= 0 && homeStoryScriptEnd > homeStoryScriptStart);
+    const homeStoryScript = siteScript.slice(homeStoryScriptStart, homeStoryScriptEnd);
+    assert.match(homeStoryScript, /requestAnimationFrame\(updateActiveChapter\)/);
+    assert.match(homeStoryScript, /addEventListener\('scroll', scheduleUpdate, \{ passive: true \}\)/);
+    assert.match(homeStoryScript, /min-width: 1024px/);
+    assert.match(homeStoryScript, /!desktop\.matches \|\| reducedMotion\.matches/);
+    assert.match(homeStoryScript, /homeStoryActive/);
+    assert.match(homeStoryScript, /prefers-reduced-motion: reduce/);
+    assert.doesNotMatch(homeStoryScript, /wheel|touchmove|preventDefault/);
+    assert.match(homeStyles, /\.home-story-stage \{ position: sticky;/);
+    assert.match(homeStyles, /@media \(width < 1024px\)[\s\S]*?\.home-story-stage \{ position: relative;/);
+    assert.match(homeStyles, /@media \(max-width: 640px\)[\s\S]*?\.home-story-stage \{ display: none;/);
+    assert.match(homeStyles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.home-story-stage \{ position: relative;/);
     const storyScriptStart = siteScript.indexOf("const story = document.querySelector('[data-method-story]')");
     const storyScriptEnd = siteScript.indexOf("\n})();", storyScriptStart);
     assert.ok(storyScriptStart >= 0 && storyScriptEnd > storyScriptStart);
