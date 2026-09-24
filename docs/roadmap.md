@@ -258,6 +258,8 @@ the real Community Review campaign.
 - [ ] Any learner-outcome study or claim
 - [ ] Dashboard or autonomous learner simulator
 
-The `core-tutor@0.1.0` profile and initial suite are design artifacts. Their
-scores are descriptive; they do not establish general tutor competence,
-learning effectiveness, or WiseTutor policy.
+The `productive-struggle-intervention@0.1.0` profile and initial suite are
+design artifacts. Their summary scores are descriptive and carry explicit
+dimension and case-run coverage; this suite does not establish a complete
+`core-tutor` profile, general tutor competence, learning effectiveness, or
+WiseTutor policy.

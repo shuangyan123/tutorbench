@@ -15,7 +15,7 @@ import type {
 
 export const PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID =
   "productive-struggle-intervention-v0.1" as const;
-export const PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_VERSION = "0.1.0" as const;
+export const PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_VERSION = "0.2.0" as const;
 
 const scenarioSuitePath = new URL(
   "../../../scenarios/real-world/productive-struggle-intervention-v0.1/suite.json",
@@ -44,7 +44,10 @@ function contextForDecisionPoint(
   decisionPoint: TutorScenarioDecisionPoint,
 ) {
   return {
-    learnerState: decisionPoint.learnerState ?? scenario.learnerState,
+    tutorVisibleContext:
+      decisionPoint.tutorVisibleContext ?? scenario.tutorVisibleContext,
+    evaluatorReferenceState:
+      decisionPoint.evaluatorReferenceState ?? scenario.evaluatorReferenceState,
     trajectory: decisionPoint.trajectory ?? scenario.trajectory,
   };
 }
@@ -60,7 +63,7 @@ export function tutorScenarioSuiteToTutorEvalDataset(
   const suite = parseTutorScenarioSuiteVNext(suiteValue);
   const cases = suite.scenarios.flatMap((scenario) =>
     scenario.decisionPoints.map((decisionPoint) => {
-      const { learnerState, trajectory } = contextForDecisionPoint(
+      const { tutorVisibleContext, evaluatorReferenceState, trajectory } = contextForDecisionPoint(
         scenario,
         decisionPoint,
       );
@@ -83,7 +86,12 @@ export function tutorScenarioSuiteToTutorEvalDataset(
           ? {}
           : { criticalFailure: criterion.criticalFailure }),
       }));
-      const knownMisconception = learnerState.misconceptions.join("; ");
+      const knownMisconception = evaluatorReferenceState.misconceptions
+        .map(
+          (reference) =>
+            `${reference.statement} (supported by authored learner turn${reference.evidenceLearnerTurns.length === 1 ? "" : "s"} ${reference.evidenceLearnerTurns.join(", ")})`,
+        )
+        .join("; ");
       const caseValue = {
         schemaVersion: 1,
         id: decisionPoint.evaluationCaseId,
@@ -96,7 +104,10 @@ export function tutorScenarioSuiteToTutorEvalDataset(
         tutorInput: {
           learningObjective: scenario.learningContext.learningObjective,
           studentProfile: {
-            knownConcepts: learnerState.knownConcepts,
+            knownConcepts: tutorVisibleContext.knownConcepts,
+            ...(tutorVisibleContext.learnerModel === undefined
+              ? {}
+              : { learnerModel: tutorVisibleContext.learnerModel }),
             level: scenario.learningContext.learnerLevel,
             goal: scenario.learningContext.learningObjective,
           },

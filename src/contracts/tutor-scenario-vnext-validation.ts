@@ -10,6 +10,8 @@ import {
 import {
   TUTOR_SCENARIO_VNEXT_SCHEMA_VERSION,
   type TutorScenarioDecisionPoint,
+  type TutorScenarioEvaluatorReferenceState,
+  type TutorScenarioMisconceptionReference,
   type TutorScenarioEvaluationCriterion,
   type TutorScenarioSuiteVNext,
   type TutorScenarioVNext,
@@ -197,23 +199,65 @@ function isEvaluationCriterion(value: unknown): value is TutorScenarioEvaluation
   }
 }
 
-function isLearnerState(value: unknown): boolean {
+function isTutorVisibleContext(value: unknown): boolean {
   const record = asRecord(value);
   if (
     record === null ||
-    !hasOnlyKeys(record, [
-      "knownConcepts",
-      "misconceptions",
-      "confidence",
-      "engagement",
-      "masteryState",
-    ]) ||
+    !hasOnlyKeys(record, ["knownConcepts", "learnerModel"]) ||
     !isBoundedTextArray(record.knownConcepts) ||
-    !isBoundedTextArray(record.misconceptions)
+    (record.learnerModel !== undefined && !isTutorLearnerModel(record.learnerModel))
   ) {
     return false;
   }
+  return true;
+}
+
+function isTutorLearnerModel(value: unknown): boolean {
+  const record = asRecord(value);
   return (
+    record !== null &&
+    hasOnlyKeys(record, ["memorySummary", "confidence", "engagement", "masteryState"]) &&
+    (record.memorySummary === undefined || isText(record.memorySummary, 2_000)) &&
+    (record.confidence === undefined || isUnitInterval(record.confidence)) &&
+    (record.engagement === undefined || engagements.has(String(record.engagement))) &&
+    (record.masteryState === undefined || masteryStates.has(String(record.masteryState)))
+  );
+}
+
+function isMisconceptionReference(
+  value: unknown,
+  learnerTurnCount: number,
+): value is TutorScenarioMisconceptionReference {
+  const record = asRecord(value);
+  return (
+    record !== null &&
+    hasOnlyKeys(record, ["statement", "evidenceLearnerTurns"]) &&
+    isText(record.statement, 500) &&
+    Array.isArray(record.evidenceLearnerTurns) &&
+    record.evidenceLearnerTurns.length > 0 &&
+    record.evidenceLearnerTurns.length <= 20 &&
+    record.evidenceLearnerTurns.every((turn) =>
+      isBoundedInteger(turn, 1, learnerTurnCount),
+    ) &&
+    new Set(record.evidenceLearnerTurns).size === record.evidenceLearnerTurns.length
+  );
+}
+
+function isEvaluatorReferenceState(
+  value: unknown,
+  trajectory: UnknownRecord,
+): value is TutorScenarioEvaluatorReferenceState {
+  const record = asRecord(value);
+  const history = trajectory.conversationHistory as UnknownRecord[];
+  const learnerTurnCount = history.filter((message) => message.role === "user").length;
+  return (
+    record !== null &&
+    hasOnlyKeys(record, ["misconceptions", "confidence", "engagement", "masteryState"]) &&
+    Array.isArray(record.misconceptions) &&
+    record.misconceptions.length <= 20 &&
+    record.misconceptions.every((reference) =>
+      isMisconceptionReference(reference, learnerTurnCount),
+    ) &&
     (record.confidence === undefined || isUnitInterval(record.confidence)) &&
     (record.engagement === undefined || engagements.has(String(record.engagement))) &&
     (record.masteryState === undefined || masteryStates.has(String(record.masteryState)))
@@ -247,7 +291,10 @@ function isTrajectory(value: unknown): boolean {
   }) && asRecord(record.conversationHistory.at(-1))?.role === "user";
 }
 
-function isTeachingPolicy(value: unknown, learnerState: UnknownRecord): boolean {
+function isTeachingPolicy(
+  value: unknown,
+  evaluatorReferenceState: UnknownRecord,
+): boolean {
   const record = asRecord(value);
   if (
     record === null ||
@@ -297,8 +344,8 @@ function isTeachingPolicy(value: unknown, learnerState: UnknownRecord): boolean 
     }
   }
   return !(
-    (learnerState.masteryState === "near_mastery" ||
-      learnerState.masteryState === "mastered") &&
+    (evaluatorReferenceState.masteryState === "near_mastery" ||
+      evaluatorReferenceState.masteryState === "mastered") &&
     record.mastery === undefined
   );
 }
@@ -316,7 +363,8 @@ function isDecisionPoint(
       "id",
       "evaluationCaseId",
       "turnIndex",
-      "learnerState",
+      "tutorVisibleContext",
+      "evaluatorReferenceState",
       "trajectory",
       "expectedDecision",
       "expectedBehavior",
@@ -330,7 +378,8 @@ function isDecisionPoint(
     !Array.isArray(record.evaluationCriteria) ||
     record.evaluationCriteria.length === 0 ||
     record.evaluationCriteria.length > 30 ||
-    (record.learnerState !== undefined && !isLearnerState(record.learnerState)) ||
+    (record.tutorVisibleContext !== undefined &&
+      !isTutorVisibleContext(record.tutorVisibleContext)) ||
     (record.trajectory !== undefined && !isTrajectory(record.trajectory))
   ) {
     return false;
@@ -340,19 +389,20 @@ function isDecisionPoint(
   }
   evaluationCaseIds.add(record.evaluationCaseId);
 
-  const learnerState =
-    (record.learnerState as UnknownRecord | undefined) ??
-    (scenario.learnerState as UnknownRecord);
   const trajectory =
     (record.trajectory as UnknownRecord | undefined) ??
     (scenario.trajectory as UnknownRecord);
+  const evaluatorReferenceState =
+    (record.evaluatorReferenceState as UnknownRecord | undefined) ??
+    (scenario.evaluatorReferenceState as UnknownRecord);
   const assistantTurns = (trajectory.conversationHistory as UnknownRecord[]).filter(
     (message) => message.role === "assistant",
   ).length;
   if (
     record.turnIndex !== assistantTurns + 1 ||
     record.turnIndex > (trajectory.attemptCount as number) ||
-    !isTeachingPolicy(scenario.teachingPolicy, learnerState)
+    !isEvaluatorReferenceState(evaluatorReferenceState, trajectory) ||
+    !isTeachingPolicy(scenario.teachingPolicy, evaluatorReferenceState)
   ) {
     return false;
   }
@@ -383,14 +433,15 @@ function isScenario(
       "identity",
       "description",
       "learningContext",
-      "learnerState",
+      "tutorVisibleContext",
+      "evaluatorReferenceState",
       "trajectory",
       "teachingPolicy",
       "decisionPoints",
     ]) ||
     record.schemaVersion !== TUTOR_SCENARIO_VNEXT_SCHEMA_VERSION ||
     !isText(record.description, 2_000) ||
-    !isLearnerState(record.learnerState) ||
+    !isTutorVisibleContext(record.tutorVisibleContext) ||
     !isTrajectory(record.trajectory) ||
     !Array.isArray(record.decisionPoints) ||
     record.decisionPoints.length === 0 ||
@@ -414,6 +465,13 @@ function isScenario(
     !isText(learningContext.topic, 200) ||
     !isText(learningContext.learningObjective, 1_000) ||
     !isText(learningContext.learnerLevel, 120)
+  ) {
+    return false;
+  }
+  const trajectory = asRecord(record.trajectory);
+  if (
+    trajectory === null ||
+    !isEvaluatorReferenceState(record.evaluatorReferenceState, trajectory)
   ) {
     return false;
   }

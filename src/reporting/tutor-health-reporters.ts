@@ -11,6 +11,7 @@ import {
   TUTOR_HEALTH_DIMENSION_LABELS,
   DEFAULT_TUTOR_HEALTH_SCORING_PROFILE,
   TUTOR_FINDING_SCHEMA_VERSION,
+  TUTOR_HEALTH_REPORT_SCHEMA_VERSION,
   type TutorEvidenceRef,
   type TutorFinding,
   type TutorHealthDimension,
@@ -411,6 +412,62 @@ function profileWeightedHealthScore(
   return totalWeight === 0 ? null : Math.round(weightedScore / totalWeight);
 }
 
+function buildTutorHealthCoverage(
+  suite: TutorScenarioSuiteVNext,
+  evaluation: TutorEvalRunResult,
+  dimensions: TutorHealthReport["dimensionScores"],
+  profile: TutorHealthScoringProfile,
+): TutorHealthReport["coverage"] {
+  const profileDimensions = TUTOR_HEALTH_DIMENSIONS.filter(
+    (dimension) => profile.dimensionWeights[dimension] > 0,
+  );
+  const scoredDimensions = profileDimensions.filter(
+    (dimension) => dimensions[dimension].score !== null,
+  );
+  const totalProfileWeight = profileDimensions.reduce(
+    (total, dimension) => total + profile.dimensionWeights[dimension],
+    0,
+  );
+  const scoredProfileWeight = scoredDimensions.reduce(
+    (total, dimension) => total + profile.dimensionWeights[dimension],
+    0,
+  );
+  const decisionPointCount = suite.scenarios.reduce(
+    (total, scenario) => total + scenario.decisionPoints.length,
+    0,
+  );
+  const expectedCaseRunCount = decisionPointCount * evaluation.runsPerCase;
+  const presentCaseRunCount = evaluation.caseResults.length;
+  const profileWeightRatio = scoredProfileWeight / totalProfileWeight;
+  const caseRunRatio = presentCaseRunCount / expectedCaseRunCount;
+  const status =
+    profileWeightRatio === 1 && caseRunRatio === 1
+      ? "complete"
+      : scoredProfileWeight > 0 && presentCaseRunCount > 0
+        ? "partial"
+        : "none";
+
+  return {
+    assessedDimensionCount: scoredDimensions.length,
+    totalProfileDimensionCount: profileDimensions.length,
+    scoredProfileWeight,
+    totalProfileWeight,
+    profileWeightRatio,
+    status,
+    evaluationScope: {
+      kind: "scenario_suite",
+      suiteId: suite.id,
+      suiteVersion: suite.version,
+      scenarioCount: suite.scenarios.length,
+      decisionPointCount,
+      runsPerCase: evaluation.runsPerCase,
+      expectedCaseRunCount,
+      presentCaseRunCount,
+      caseRunRatio,
+    },
+  };
+}
+
 /** Builds a finding-first view from authored checkpoints and existing TutorEval evidence. */
 export function buildTutorHealthReport(options: {
   readonly suite: TutorScenarioSuiteVNext;
@@ -668,8 +725,14 @@ export function buildTutorHealthReport(options: {
     : hasUnresolvedEvaluation
       ? "UNRESOLVED"
       : "PASS";
+  const coverage = buildTutorHealthCoverage(
+    options.suite,
+    options.evaluation,
+    dimensionScores,
+    profile,
+  );
   const report: TutorHealthReport = {
-    schemaVersion: 1,
+    schemaVersion: TUTOR_HEALTH_REPORT_SCHEMA_VERSION,
     sourceScenarioSuite: {
       id: options.suite.id,
       version: options.suite.version,
@@ -684,6 +747,7 @@ export function buildTutorHealthReport(options: {
         : { evaluatorVersion: options.evaluation.evaluatorVersion }),
     },
     scoringProfile: profile,
+    coverage,
     healthScore: profileWeightedHealthScore(dimensionScores, profile),
     releaseGate,
     findingCounts,
@@ -761,8 +825,12 @@ export function formatTutorHealthReport(
       `  CONFIDENCE: ${Math.round(finding.confidence * 100)}% uncalibrated evidence strength`,
     ];
   });
+  const coverage = report.coverage;
+  const profileCoverage = `${coverage.assessedDimensionCount}/${coverage.totalProfileDimensionCount} dimensions; weight ${coverage.scoredProfileWeight}/${coverage.totalProfileWeight} (${Math.round(coverage.profileWeightRatio * 100)}%)`;
+  const scope = coverage.evaluationScope;
   return [
-    `Tutor Health Score: ${report.healthScore === null ? "n/a" : `${report.healthScore}/100`}`,
+    `Tutor Health Score: ${report.healthScore === null ? "n/a" : `${report.healthScore}/100`} — ${coverage.status.toUpperCase()} COVERAGE (scored dimensions only: ${profileCoverage})`,
+    `Evaluation scope: ${scope.suiteId}@${scope.suiteVersion}; ${scope.scenarioCount} scenarios, ${scope.decisionPointCount} decision points; ${scope.presentCaseRunCount}/${scope.expectedCaseRunCount} case-runs (${Math.round(scope.caseRunRatio * 100)}%)`,
     `Release Gate: ${report.releaseGate}`,
     `Findings: critical ${report.findingCounts.critical}, major ${report.findingCounts.major}, minor ${report.findingCounts.minor}, info ${report.findingCounts.info}`,
     `Scoring profile: ${report.scoringProfile.id}@${report.scoringProfile.version}`,

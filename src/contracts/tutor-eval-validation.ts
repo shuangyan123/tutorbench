@@ -34,7 +34,10 @@ import {
   isTutorEvalDifficultyLevel,
   type TutorEvalDifficulty,
 } from "./tutor-eval-taxonomy.js";
-import type { TutorConversationMessage } from "./tutor.js";
+import type {
+  TutorConversationMessage,
+  TutorLearnerModelContext,
+} from "./tutor.js";
 import { readTutorCaseLocale } from "./locale.js";
 import { TUTOR_EVAL_DISCLOSURE_POLICIES } from "./tutor-eval-disclosure.js";
 
@@ -76,6 +79,9 @@ const rubricBehaviors = new Set<NonNullable<TutorEvalRubric["behavior"]>>([
   "desirable",
   "prohibited",
 ]);
+
+const learnerEngagements = ["low", "steady", "high", "frustrated"] as const;
+const learnerMasteryStates = ["novice", "developing", "near_mastery", "mastered"] as const;
 
 const reservedVisibleAnnotationKeys = new Set([
   "evaluatorOnly",
@@ -204,11 +210,13 @@ function parseStudentProfile(value: unknown): TutorEvalStudentProfile | null {
   const misconceptions = readStringArray(record, "misconceptions");
   const level = readOptionalString(record, "level");
   const goal = readOptionalString(record, "goal");
+  const learnerModel = parseLearnerModel(record.learnerModel);
   if (
     knownConcepts === null ||
     misconceptions === null ||
     level === null ||
-    goal === null
+    goal === null ||
+    learnerModel === null
   ) {
     return null;
   }
@@ -217,6 +225,47 @@ function parseStudentProfile(value: unknown): TutorEvalStudentProfile | null {
     ...(misconceptions === undefined ? {} : { misconceptions }),
     ...(level === undefined ? {} : { level }),
     ...(goal === undefined ? {} : { goal }),
+    ...(learnerModel === undefined ? {} : { learnerModel }),
+  };
+}
+
+function parseLearnerModel(
+  value: unknown,
+): TutorLearnerModelContext | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const record = asRecord(value);
+  if (
+    record === null ||
+    Object.keys(record).some(
+      (key) => !["memorySummary", "confidence", "engagement", "masteryState"].includes(key),
+    )
+  ) {
+    return null;
+  }
+  const memorySummary = readOptionalString(record, "memorySummary");
+  const engagement = readOptionalEnum(record, "engagement", learnerEngagements);
+  const masteryState = readOptionalEnum(record, "masteryState", learnerMasteryStates);
+  const confidence = record.confidence;
+  if (
+    memorySummary === null ||
+    (typeof memorySummary === "string" && memorySummary.length > 2_000) ||
+    engagement === null ||
+    masteryState === null ||
+    (confidence !== undefined &&
+      (typeof confidence !== "number" ||
+        !Number.isFinite(confidence) ||
+        confidence < 0 ||
+        confidence > 1))
+  ) {
+    return null;
+  }
+  return {
+    ...(memorySummary === undefined ? {} : { memorySummary }),
+    ...(confidence === undefined ? {} : { confidence }),
+    ...(engagement === undefined ? {} : { engagement }),
+    ...(masteryState === undefined ? {} : { masteryState }),
   };
 }
 

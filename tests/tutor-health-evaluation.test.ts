@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   BenchmarkConfigurationError,
+  DEFAULT_TUTOR_HEALTH_SCORING_PROFILE,
   assertValidTutorEvalRunResult,
   parseTutorEvalCase,
   parseTutorFinding,
@@ -103,7 +104,105 @@ test("the vNext suite validates and compiles into the existing TutorEval runner 
   assert.equal(tutorInput.currentStudentMessage, "It counts the pieces, so eight pieces must make a larger fraction.");
 });
 
-test("vNext validation rejects impossible learner-state and intervention-policy combinations", async () => {
+test("authored algebra errors are visible and evaluator misconceptions cite those learner turns", async () => {
+  const suite = await loadTutorScenarioSuiteVNext();
+  const dataset = tutorScenarioSuiteToTutorEvalDataset(suite);
+  const first = suite.scenarios.find((scenario) => scenario.identity.id === "ps-first-mistake");
+  const repeated = suite.scenarios.find((scenario) => scenario.identity.id === "ps-repeated-mistake");
+  assert.ok(first);
+  assert.ok(repeated);
+
+  const firstLearnerText = first.trajectory.conversationHistory[0]?.content ?? "";
+  assert.match(firstLearnerText, /only the left side/);
+  assert.match(firstLearnerText, /x = 14/);
+  assert.doesNotMatch(firstLearnerText, /not sure what to do next|can you help/i);
+  assert.deepEqual(
+    first.evaluatorReferenceState.misconceptions[0]?.evidenceLearnerTurns,
+    [1],
+  );
+
+  const repeatedLearnerTurns = repeated.trajectory.conversationHistory
+    .filter((message) => message.role === "user")
+    .map((message) => message.content);
+  assert.equal(repeatedLearnerTurns.length, 2);
+  assert.ok(repeatedLearnerTurns.every((turn) => /only the left side|left 14 unchanged/.test(turn)));
+  assert.match(repeatedLearnerTurns[1] ?? "", /x = 14/);
+  assert.deepEqual(
+    repeated.evaluatorReferenceState.misconceptions[0]?.evidenceLearnerTurns,
+    [1, 2],
+  );
+
+  for (const scenarioId of ["ps-first-mistake", "ps-repeated-mistake"]) {
+    const scenario = suite.scenarios.find((candidate) => candidate.identity.id === scenarioId);
+    const caseValue = dataset.cases.find((candidate) => candidate.id === scenarioId);
+    assert.ok(scenario);
+    assert.ok(caseValue);
+    const tutorInput = toTutorTurnInput(caseValue);
+    assert.deepEqual(tutorInput.studentState.misconceptions, []);
+    assert.doesNotMatch(JSON.stringify(tutorInput), /one side of an equation/);
+    assert.match(caseValue.evaluatorOnly.knownMisconception ?? "", /supported by authored learner turns? 1/);
+  }
+});
+
+test("square-root escalation is constrained to the unique nonnegative solution", async () => {
+  const suite = await loadTutorScenarioSuiteVNext();
+  const scenario = suite.scenarios.find(
+    (candidate) => candidate.identity.id === "ps-multiturn-hint-escalation",
+  );
+  assert.ok(scenario);
+  assert.match(scenario.learningContext.learningObjective, /x² = 9.*x ≥ 0.*x = 3/);
+  assert.match(
+    scenario.trajectory.conversationHistory[0]?.content ?? "",
+    /x² = 9 with x ≥ 0/,
+  );
+});
+
+test("authored Tutor-visible learner model crosses the Tutor boundary while reference truth does not", async () => {
+  const suite = await loadTutorScenarioSuiteVNext();
+  const authored = structuredClone(suite) as unknown as {
+    scenarios: Array<{
+      identity: { id: string };
+      tutorVisibleContext: { learnerModel?: { memorySummary?: string; confidence?: number } };
+    }>;
+  };
+  const first = authored.scenarios.find((scenario) => scenario.identity.id === "ps-first-mistake");
+  assert.ok(first);
+  first.tutorVisibleContext.learnerModel = {
+    memorySummary: "Learner prefers a worked visual balance model.",
+    confidence: 0.7,
+  };
+  const visibleSuite = parseTutorScenarioSuiteVNext(authored);
+  const dataset = tutorScenarioSuiteToTutorEvalDataset(visibleSuite);
+  const caseValue = dataset.cases.find((candidate) => candidate.id === "ps-first-mistake");
+  assert.ok(caseValue);
+  const tutorInput = toTutorTurnInput(caseValue);
+  assert.deepEqual(tutorInput.studentState.learnerModel, first.tutorVisibleContext.learnerModel);
+  assert.doesNotMatch(JSON.stringify(tutorInput), /applies an operation to only one side/);
+  assert.match(caseValue.evaluatorOnly.knownMisconception ?? "", /applies an operation to only one side/);
+
+  const missingEvidence = structuredClone(suite) as unknown as {
+    scenarios: Array<{
+      identity: { id: string };
+      evaluatorReferenceState: { misconceptions: Array<{ evidenceLearnerTurns: number[] }> };
+    }>;
+  };
+  const referencedScenario = missingEvidence.scenarios.find(
+    (scenario) => scenario.identity.id === "ps-first-mistake",
+  );
+  assert.ok(referencedScenario);
+  referencedScenario.evaluatorReferenceState.misconceptions[0]!.evidenceLearnerTurns = [2];
+  assertErrorCode(
+    () => parseTutorScenarioSuiteVNext(missingEvidence),
+    "tutor_scenario_vnext_invalid",
+  );
+  referencedScenario.evaluatorReferenceState.misconceptions[0]!.evidenceLearnerTurns = [];
+  assertErrorCode(
+    () => parseTutorScenarioSuiteVNext(missingEvidence),
+    "tutor_scenario_vnext_invalid",
+  );
+});
+
+test("vNext validation rejects impossible reference-state and intervention-policy combinations", async () => {
   const suite = await loadTutorScenarioSuiteVNext();
   const failedAttemptOverflow = structuredClone(suite) as unknown as {
     scenarios: Array<{ trajectory: { attemptCount: number; failedAttempts: number } }>;
@@ -131,11 +230,11 @@ test("vNext validation rejects impossible learner-state and intervention-policy 
   const missingMasteryPolicy = structuredClone(suite) as unknown as {
     scenarios: Array<{
       teachingPolicy: { mastery?: { independentSuccessesToConfirm: number } };
-      learnerState: { masteryState?: string };
+      evaluatorReferenceState: { masteryState?: string };
     }>;
   };
   const nearMastery = missingMasteryPolicy.scenarios.find(
-    (scenario) => scenario.learnerState.masteryState === "near_mastery",
+    (scenario) => scenario.evaluatorReferenceState.masteryState === "near_mastery",
   );
   assert.ok(nearMastery);
   delete nearMastery.teachingPolicy.mastery;
@@ -286,6 +385,70 @@ test("critical answer leakage fails the release gate despite a high health score
   assert.doesNotMatch(formatTutorHealthReport(report), new RegExp(privateJudgeEvidence));
 });
 
+test("Tutor Health reports scored dimensions and incomplete suite runs beside its summary score", async () => {
+  const suite = await loadTutorScenarioSuiteVNext();
+  const { evaluation, report } = await runTutorHealthEvaluation({
+    suite,
+    tutor: fixtureTutor(),
+    tutorDescriptor: { provider: "synthetic", model: "coverage-test", promptVersion: "1" },
+    judge: fixtureJudge(() => ({ result: "PASS" })),
+    runId: "full-coverage-test",
+  });
+
+  assert.equal(report.scoringProfile.id, "productive-struggle-intervention");
+  assert.equal(report.scoringProfile.version, "0.1.0");
+  assert.equal(report.dimensionScores.content_correctness.score, null);
+  assert.equal(report.dimensionScores.reliability_policy.score, null);
+  assert.equal(report.coverage.assessedDimensionCount, 5);
+  assert.equal(report.coverage.totalProfileDimensionCount, 7);
+  assert.equal(report.coverage.scoredProfileWeight, 5);
+  assert.equal(report.coverage.totalProfileWeight, 7);
+  assert.equal(report.coverage.profileWeightRatio, 5 / 7);
+  assert.equal(report.coverage.status, "partial");
+  assert.deepEqual(report.coverage.evaluationScope, {
+    kind: "scenario_suite",
+    suiteId: suite.id,
+    suiteVersion: suite.version,
+    scenarioCount: 13,
+    decisionPointCount: 13,
+    runsPerCase: 1,
+    expectedCaseRunCount: 13,
+    presentCaseRunCount: 13,
+    caseRunRatio: 1,
+  });
+  const fullText = formatTutorHealthReport(report);
+  assert.match(fullText, /Tutor Health Score: .*PARTIAL COVERAGE \(scored dimensions only: 5\/7 dimensions; weight 5\/7 \(71%\)\)/);
+  assert.match(fullText, /productive-struggle-intervention-v0\.1@0\.2\.0; 13 scenarios.*13\/13 case-runs/);
+  assertErrorCode(
+    () => parseTutorHealthReport({ ...report, coverage: { ...report.coverage, status: "complete" } }),
+    "tutor_health_report_invalid",
+  );
+  const coreTutorReport = buildTutorHealthReport({
+    suite,
+    evaluation,
+    scoringProfile: { ...DEFAULT_TUTOR_HEALTH_SCORING_PROFILE, id: "core-tutor" },
+  });
+  assert.equal(coreTutorReport.coverage.assessedDimensionCount, 5);
+  assert.equal(coreTutorReport.coverage.totalProfileDimensionCount, 7);
+  assert.equal(coreTutorReport.coverage.status, "partial");
+
+  const dataset = tutorScenarioSuiteToTutorEvalDataset(suite);
+  const partialEvaluation = await runTutorEval({
+    dataset: { ...dataset, cases: dataset.cases.slice(0, 5) },
+    tutor: fixtureTutor(),
+    tutorDescriptor: { provider: "synthetic", model: "partial-coverage-test", promptVersion: "1" },
+    judge: fixtureJudge(() => ({ result: "PASS" })),
+    runId: "partial-coverage-test",
+  });
+  const partialReport = buildTutorHealthReport({ suite, evaluation: partialEvaluation });
+  assert.equal(partialReport.coverage.status, "partial");
+  assert.equal(partialReport.coverage.evaluationScope.expectedCaseRunCount, 13);
+  assert.equal(partialReport.coverage.evaluationScope.presentCaseRunCount, 5);
+  assert.equal(partialReport.coverage.evaluationScope.caseRunRatio, 5 / 13);
+  assert.match(formatTutorHealthReport(partialReport), /PARTIAL COVERAGE/);
+  assert.match(formatTutorHealthReport(partialReport), /5\/13 case-runs/);
+});
+
 test("Judge infrastructure errors remain unresolved and do not create pedagogical failure findings", async () => {
   const suite = await loadTutorScenarioSuiteVNext();
   const { evaluation, report } = await runTutorHealthEvaluation({
@@ -429,7 +592,7 @@ test("report builder rejects evaluation artifacts from a different suite identit
   assertErrorCode(
     () =>
       buildTutorHealthReport({
-        suite: { ...suite, version: "0.2.0" },
+        suite: { ...suite, version: "0.2.1" },
         evaluation,
       }),
     "tutor_health_report_source_mismatch",

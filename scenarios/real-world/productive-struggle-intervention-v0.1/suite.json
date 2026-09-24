@@ -1,18 +1,19 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "id": "productive-struggle-intervention-v0.1",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Productive Struggle & Intervention",
   "description": "TutorBench-authored synthetic checkpoints for studying when to preserve learner effort and when to reduce friction. The scenarios express an initial design profile, not any institution's official teaching policy.",
   "healthTaxonomyVersion": "0.1.0",
   "scenarios": [
     {
-      "schemaVersion": 2,
-      "identity": { "id": "ps-first-mistake", "version": "0.1.0", "title": "Preserve effort after a first mistake", "suiteId": "productive-struggle-intervention-v0.1" },
+      "schemaVersion": 3,
+      "identity": { "id": "ps-first-mistake", "version": "0.1.1", "title": "Preserve effort after a first mistake", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner has made one meaningful attempt and has not asked for help.",
       "learningContext": { "subject": "mathematics", "topic": "one-step equations", "learningObjective": "Isolate the variable by identifying the inverse operation.", "learnerLevel": "early algebra" },
-      "learnerState": { "knownConcepts": ["inverse operations"], "misconceptions": ["applies an operation to only one side of an equation"], "confidence": 0.45, "engagement": "steady", "masteryState": "developing" },
-      "trajectory": { "attemptCount": 1, "failedAttempts": 1, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For x + 6 = 14, I subtracted 6 from 14 and got x = 8, but I am not sure what to do next." }] },
+      "tutorVisibleContext": {"knownConcepts":["inverse operations"]},
+      "evaluatorReferenceState": {"misconceptions":[{"statement":"applies an operation to only one side of an equation","evidenceLearnerTurns":[1]}],"confidence":0.45,"engagement":"steady","masteryState":"developing"},
+      "trajectory": {"attemptCount":1,"failedAttempts":1,"priorHints":[],"conversationHistory":[{"role":"user","content":"For x + 6 = 14, I subtracted 6 from only the left side: x + 6 - 6 = 14, so I wrote x = 14."}]},
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
       "decisionPoints": [{
         "id": "preserve-first-attempt",
@@ -44,12 +45,13 @@
       }]
     },
     {
-      "schemaVersion": 2,
-      "identity": { "id": "ps-repeated-mistake", "version": "0.1.0", "title": "Offer a conceptual hint after repeated error", "suiteId": "productive-struggle-intervention-v0.1" },
+      "schemaVersion": 3,
+      "identity": { "id": "ps-repeated-mistake", "version": "0.1.1", "title": "Offer a conceptual hint after repeated error", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner has repeated the same error after a diagnostic question.",
       "learningContext": { "subject": "mathematics", "topic": "one-step equations", "learningObjective": "Use inverse operations while preserving equation balance.", "learnerLevel": "early algebra" },
-      "learnerState": { "knownConcepts": ["equality means both sides remain balanced"], "misconceptions": ["subtracts from one side only"], "confidence": 0.35, "engagement": "steady", "masteryState": "developing" },
-      "trajectory": { "attemptCount": 2, "failedAttempts": 2, "priorHints": ["What operation would undo the addition?"], "conversationHistory": [{ "role": "user", "content": "For x + 6 = 14, I think x is 8." }, { "role": "assistant", "content": "What operation would undo the addition?" }, { "role": "user", "content": "I still have x = 8 because I used 14 minus 6." }] },
+      "tutorVisibleContext": {"knownConcepts":["equality means both sides remain balanced"]},
+      "evaluatorReferenceState": {"misconceptions":[{"statement":"subtracts from one side only","evidenceLearnerTurns":[1,2]}],"confidence":0.35,"engagement":"steady","masteryState":"developing"},
+      "trajectory": {"attemptCount":2,"failedAttempts":2,"priorHints":["What operation would undo the addition?"],"conversationHistory":[{"role":"user","content":"For x + 6 = 14, I subtracted 6 from only the left side: x + 6 - 6 = 14, so I wrote x = 14."},{"role":"assistant","content":"What happened to the right side when you subtracted 6 from the left?"},{"role":"user","content":"I left 14 unchanged and still got x = 14. I thought removing +6 next to x was enough."}]},
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
       "decisionPoints": [{
         "id": "target-second-attempt",
@@ -81,11 +83,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-partial-progress", "version": "0.1.0", "title": "Build on partial progress", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner has correctly isolated one part of a two-step equation and is unsure how to continue.",
       "learningContext": { "subject": "mathematics", "topic": "two-step equations", "learningObjective": "Apply inverse operations in an order that isolates the variable.", "learnerLevel": "early algebra" },
-      "learnerState": { "knownConcepts": ["subtracting the same value from both sides"], "misconceptions": [], "confidence": 0.65, "engagement": "steady", "masteryState": "developing" },
+      "tutorVisibleContext": {"knownConcepts":["subtracting the same value from both sides"]},
+      "evaluatorReferenceState": {"misconceptions":[],"confidence":0.65,"engagement":"steady","masteryState":"developing"},
       "trajectory": { "attemptCount": 1, "failedAttempts": 0, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For 3x + 2 = 14, I subtracted 2 from both sides and got 3x = 12. I do not know the next step." }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 1, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 } },
       "decisionPoints": [{
@@ -118,11 +121,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-false-confidence", "version": "0.1.0", "title": "Probe false confidence", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner expresses high confidence in an incorrect fraction rule.",
       "learningContext": { "subject": "mathematics", "topic": "fraction addition", "learningObjective": "Add fractions using common units and explain why the denominator behaves as it does.", "learnerLevel": "upper primary" },
-      "learnerState": { "knownConcepts": ["fractions name equal-sized parts"], "misconceptions": ["adds numerators and denominators independently"], "confidence": 0.95, "engagement": "high", "masteryState": "developing" },
+      "tutorVisibleContext": {"knownConcepts":["fractions name equal-sized parts"]},
+      "evaluatorReferenceState": {"misconceptions":[{"statement":"adds numerators and denominators independently","evidenceLearnerTurns":[1]}],"confidence":0.95,"engagement":"high","masteryState":"developing"},
       "trajectory": { "attemptCount": 1, "failedAttempts": 1, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "I am completely sure that 1/3 + 1/4 = 2/7 because I add the top and bottom numbers." }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 1 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 } },
       "decisionPoints": [{
@@ -155,11 +159,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-explicit-help-request", "version": "0.1.0", "title": "Respond to an explicit help request", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner asks for a hint after one unsuccessful attempt; the request changes the appropriate intervention timing.",
       "learningContext": { "subject": "mathematics", "topic": "one-step equations", "learningObjective": "Find an inverse operation and apply it to both sides.", "learnerLevel": "early algebra" },
-      "learnerState": { "knownConcepts": ["addition and subtraction"], "misconceptions": ["uncertain which operation to undo first"], "confidence": 0.3, "engagement": "steady", "masteryState": "developing" },
+      "tutorVisibleContext": {"knownConcepts":["addition and subtraction"]},
+      "evaluatorReferenceState": {"misconceptions":[{"statement":"uncertain which operation to undo first","evidenceLearnerTurns":[1]}],"confidence":0.3,"engagement":"steady","masteryState":"developing"},
       "trajectory": { "attemptCount": 1, "failedAttempts": 1, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For x + 9 = 15 I tried x = 24, but that does not seem right. Can you give me a small hint?" }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 1, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 } },
       "decisionPoints": [{
@@ -192,11 +197,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-frustration", "version": "0.1.0", "title": "Reduce friction when frustration is explicit", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "After repeated failure, the learner expresses frustration and self-blame.",
       "learningContext": { "subject": "mathematics", "topic": "integer operations", "learningObjective": "Use a number line to reason about subtracting a negative number.", "learnerLevel": "upper primary" },
-      "learnerState": { "knownConcepts": ["negative numbers on a number line"], "misconceptions": ["treats subtracting a negative as moving left"], "confidence": 0.15, "engagement": "frustrated", "masteryState": "developing" },
+      "tutorVisibleContext": {"knownConcepts":["negative numbers on a number line"]},
+      "evaluatorReferenceState": {"misconceptions":[{"statement":"treats subtracting a negative as moving left","evidenceLearnerTurns":[1,2]}],"confidence":0.15,"engagement":"frustrated","masteryState":"developing"},
       "trajectory": { "attemptCount": 3, "failedAttempts": 3, "priorHints": ["Picture the number line.", "Picture the number line again."], "conversationHistory": [{ "role": "user", "content": "I think 5 - (-2) is 3." }, { "role": "assistant", "content": "Picture the number line." }, { "role": "user", "content": "I still moved two places left." }, { "role": "assistant", "content": "Picture the number line again." }, { "role": "user", "content": "I keep getting this wrong. Maybe I am just bad at math." }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
       "decisionPoints": [{
@@ -229,11 +235,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-near-mastery", "version": "0.1.0", "title": "Fade support near mastery", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner has made two independent correct steps after earlier difficulty.",
       "learningContext": { "subject": "mathematics", "topic": "two-step equations", "learningObjective": "Complete an equation independently after demonstrating the inverse-operation sequence.", "learnerLevel": "early algebra" },
-      "learnerState": { "knownConcepts": ["inverse operations", "maintaining equality"], "misconceptions": [], "confidence": 0.75, "engagement": "high", "masteryState": "near_mastery" },
+      "tutorVisibleContext": {"knownConcepts":["inverse operations","maintaining equality"]},
+      "evaluatorReferenceState": {"misconceptions":[],"confidence":0.75,"engagement":"high","masteryState":"near_mastery"},
       "trajectory": { "attemptCount": 4, "failedAttempts": 2, "priorHints": ["Undo the addition first.", "Now consider what undoes multiplication."], "conversationHistory": [{ "role": "user", "content": "For 4x + 3 = 19, I tried x = 4 but got stuck." }, { "role": "assistant", "content": "What operation would undo the +3?" }, { "role": "user", "content": "Subtract 3 from both sides: 4x = 16." }, { "role": "assistant", "content": "What undoes multiplying by 4?" }, { "role": "user", "content": "Divide both sides by 4 and get x = 4. I think I can do another one." }, { "role": "assistant", "content": "Try the next example on your own." }, { "role": "user", "content": "I solved 5x + 2 = 17 by subtracting 2 and dividing by 5. What should I check?" }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 }, "mastery": { "independentSuccessesToConfirm": 2 } },
       "decisionPoints": [{
@@ -266,11 +273,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-same-misconception", "version": "0.1.0", "title": "Address a repeated misconception directly", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner repeats an incorrect fraction comparison after one general question.",
       "learningContext": { "subject": "mathematics", "topic": "fraction comparison", "learningObjective": "Compare fractions by reasoning about equal-sized parts or equivalent fractions.", "learnerLevel": "upper primary" },
-      "learnerState": { "knownConcepts": ["unit fractions"], "misconceptions": ["assumes a larger denominator always means a larger fraction"], "confidence": 0.6, "engagement": "steady", "masteryState": "developing" },
+      "tutorVisibleContext": {"knownConcepts":["unit fractions"]},
+      "evaluatorReferenceState": {"misconceptions":[{"statement":"assumes a larger denominator always means a larger fraction","evidenceLearnerTurns":[1,2]}],"confidence":0.6,"engagement":"steady","masteryState":"developing"},
       "trajectory": { "attemptCount": 2, "failedAttempts": 2, "priorHints": ["What does the denominator count?"], "conversationHistory": [{ "role": "user", "content": "I think 1/8 is larger than 1/5 because 8 is larger than 5." }, { "role": "assistant", "content": "What does the denominator count?" }, { "role": "user", "content": "It counts the pieces, so eight pieces must make a larger fraction." }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
       "decisionPoints": [{
@@ -303,11 +311,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-independent-progress", "version": "0.1.0", "title": "Avoid interrupting independent progress", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner has solved the current equation correctly and explains both operations independently.",
       "learningContext": { "subject": "mathematics", "topic": "two-step equations", "learningObjective": "Recognize when a learner can continue independently and invite transfer.", "learnerLevel": "early algebra" },
-      "learnerState": { "knownConcepts": ["inverse operations", "equation balance"], "misconceptions": [], "confidence": 0.85, "engagement": "high", "masteryState": "near_mastery" },
+      "tutorVisibleContext": {"knownConcepts":["inverse operations","equation balance"]},
+      "evaluatorReferenceState": {"misconceptions":[],"confidence":0.85,"engagement":"high","masteryState":"near_mastery"},
       "trajectory": { "attemptCount": 2, "failedAttempts": 0, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For 2x + 5 = 17, I subtracted 5 and divided by 2. I got x = 6." }, { "role": "assistant", "content": "Can you explain why those steps keep the equation balanced?" }, { "role": "user", "content": "I did the inverse operation on both sides each time. I checked 2(6) + 5 = 17." }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 }, "mastery": { "independentSuccessesToConfirm": 2 } },
       "decisionPoints": [{
@@ -340,11 +349,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-overhelping-answer-leak", "version": "0.1.0", "title": "Protect the learner's attempt from answer leakage", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "After one attempt, the learner asks whether the setup is right; the authored policy disallows giving the answer.",
       "learningContext": { "subject": "mathematics", "topic": "two-step equations", "learningObjective": "Let the learner complete the equation after a bounded setup cue.", "learnerLevel": "early algebra" },
-      "learnerState": { "knownConcepts": ["subtraction", "division"], "misconceptions": [], "confidence": 0.55, "engagement": "steady", "masteryState": "developing" },
+      "tutorVisibleContext": {"knownConcepts":["subtraction","division"]},
+      "evaluatorReferenceState": {"misconceptions":[],"confidence":0.55,"engagement":"steady","masteryState":"developing"},
       "trajectory": { "attemptCount": 1, "failedAttempts": 0, "priorHints": [], "conversationHistory": [{ "role": "user", "content": "For 3x + 2 = 14, I wrote 3x = 12. Is that setup okay?" }] },
       "teachingPolicy": { "disclosure": "no_answer", "intervention": { "firstHintAfterFailedAttempts": 1 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 } },
       "decisionPoints": [{
@@ -403,11 +413,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-underhelping", "version": "0.1.0", "title": "Reduce friction after persistent failure", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner has made four failed attempts and received only broad prompts.",
       "learningContext": { "subject": "mathematics", "topic": "fraction equivalence", "learningObjective": "Use equivalent fractions to compare values.", "learnerLevel": "upper primary" },
-      "learnerState": { "knownConcepts": ["equal-sized parts"], "misconceptions": ["compares numerators without common units"], "confidence": 0.2, "engagement": "low", "masteryState": "developing" },
+      "tutorVisibleContext": {"knownConcepts":["equal-sized parts"]},
+      "evaluatorReferenceState": {"misconceptions":[{"statement":"compares numerators without common units","evidenceLearnerTurns":[1,2]}],"confidence":0.2,"engagement":"low","masteryState":"developing"},
       "trajectory": { "attemptCount": 4, "failedAttempts": 4, "priorHints": ["Try again.", "Look more carefully.", "What do you notice?"], "conversationHistory": [{ "role": "user", "content": "I think 2/3 is smaller than 3/5 because 2 is less than 3." }, { "role": "assistant", "content": "Try again." }, { "role": "user", "content": "I still think the smaller numerator means smaller." }, { "role": "assistant", "content": "Look more carefully." }, { "role": "user", "content": "I do not see it." }, { "role": "assistant", "content": "What do you notice?" }, { "role": "user", "content": "I still cannot compare them." }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
       "decisionPoints": [{
@@ -440,12 +451,13 @@
       }]
     },
     {
-      "schemaVersion": 2,
-      "identity": { "id": "ps-multiturn-hint-escalation", "version": "0.1.0", "title": "Escalate after the same hint fails twice", "suiteId": "productive-struggle-intervention-v0.1" },
+      "schemaVersion": 3,
+      "identity": { "id": "ps-multiturn-hint-escalation", "version": "0.1.1", "title": "Escalate after the same hint fails twice", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "A controlled three-attempt trajectory: the same misconception persists after a light conceptual hint and a repeated low-specificity hint.",
-      "learningContext": { "subject": "mathematics", "topic": "square roots", "learningObjective": "Use the inverse relationship between squaring and square roots to solve x² = 9.", "learnerLevel": "early algebra" },
-      "learnerState": { "knownConcepts": ["squaring a number"], "misconceptions": ["assumes the inverse operation changes x² directly to x without taking a square root"], "confidence": 0.4, "engagement": "steady", "masteryState": "developing" },
-      "trajectory": { "attemptCount": 3, "failedAttempts": 3, "priorHints": ["What operation reverses squaring?", "Think about the operation that undoes squaring."], "conversationHistory": [{ "role": "user", "content": "For x² = 9, I think x = 9." }, { "role": "assistant", "content": "What operation reverses squaring?" }, { "role": "user", "content": "I still think x is 9 because the right side is 9." }, { "role": "assistant", "content": "Think about the operation that undoes squaring." }, { "role": "user", "content": "I am still not sure. Maybe x is 9." }] },
+      "learningContext": {"subject":"mathematics","topic":"square roots","learningObjective":"Solve x² = 9 over the domain x ≥ 0 and identify its unique solution x = 3.","learnerLevel":"early algebra"},
+      "tutorVisibleContext": {"knownConcepts":["squaring a number"]},
+      "evaluatorReferenceState": {"misconceptions":[{"statement":"assumes the inverse operation changes x² directly to x without taking a square root","evidenceLearnerTurns":[1,2,3]}],"confidence":0.4,"engagement":"steady","masteryState":"developing"},
+      "trajectory": {"attemptCount":3,"failedAttempts":3,"priorHints":["What operation reverses squaring?","Think about the operation that undoes squaring."],"conversationHistory":[{"role":"user","content":"For x² = 9 with x ≥ 0, I think x = 9."},{"role":"assistant","content":"What operation reverses squaring?"},{"role":"user","content":"I still think x is 9 because the right side is 9."},{"role":"assistant","content":"Think about the operation that undoes squaring."},{"role":"user","content":"I am still not sure. Maybe x is 9."}]},
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 2, "escalateAfterFailedAttempts": 3 }, "productiveStruggle": { "minimumMeaningfulAttempts": 2 } },
       "decisionPoints": [{
         "id": "increase-specificity-at-third-attempt",
@@ -477,11 +489,12 @@
       }]
     },
     {
-      "schemaVersion": 2,
+      "schemaVersion": 3,
       "identity": { "id": "ps-hint-fading", "version": "0.1.0", "title": "Fade a hint after the learner uses it", "suiteId": "productive-struggle-intervention-v0.1" },
       "description": "The learner applies a conceptual hint successfully and asks what to do next.",
       "learningContext": { "subject": "mathematics", "topic": "equivalent fractions", "learningObjective": "Move from a supported example to an independent comparison.", "learnerLevel": "upper primary" },
-      "learnerState": { "knownConcepts": ["multiplying numerator and denominator by the same number"], "misconceptions": [], "confidence": 0.7, "engagement": "high", "masteryState": "near_mastery" },
+      "tutorVisibleContext": {"knownConcepts":["multiplying numerator and denominator by the same number"]},
+      "evaluatorReferenceState": {"misconceptions":[],"confidence":0.7,"engagement":"high","masteryState":"near_mastery"},
       "trajectory": { "attemptCount": 3, "failedAttempts": 1, "priorHints": ["Can you make both fractions use twelfths?"], "conversationHistory": [{ "role": "user", "content": "I do not know how to compare 2/3 and 3/4." }, { "role": "assistant", "content": "Can you make both fractions use twelfths?" }, { "role": "user", "content": "2/3 is 8/12 and 3/4 is 9/12, so 3/4 is larger. Can I try one on my own?" }] },
       "teachingPolicy": { "disclosure": "hint_only", "intervention": { "firstHintAfterFailedAttempts": 1 }, "productiveStruggle": { "minimumMeaningfulAttempts": 1 }, "mastery": { "independentSuccessesToConfirm": 2 } },
       "decisionPoints": [{

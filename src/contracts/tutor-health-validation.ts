@@ -283,6 +283,8 @@ export function isTutorHealthScoringProfile(
         (weights[dimension] as number) >= 0 &&
         (weights[dimension] as number) <= 100,
     ) &&
+    (record.id !== "core-tutor" ||
+      TUTOR_HEALTH_DIMENSIONS.every((dimension) => (weights[dimension] as number) > 0)) &&
     TUTOR_HEALTH_DIMENSIONS.some((dimension) => (weights[dimension] as number) > 0)
   );
 }
@@ -322,6 +324,110 @@ function isUnresolved(value: unknown): boolean {
   );
 }
 
+function nearlyEqual(left: number, right: number): boolean {
+  return Math.abs(left - right) <= 1e-9;
+}
+
+function isCoverageConsistent(
+  value: unknown,
+  profileValue: unknown,
+  dimensionsValue: unknown,
+  scenarioSuiteValue: unknown,
+  sourceEvaluationValue: unknown,
+): boolean {
+  const coverage = asRecord(value);
+  const scope = asRecord(coverage?.evaluationScope);
+  const profile = asRecord(profileValue);
+  const weights = asRecord(profile?.dimensionWeights);
+  const dimensions = asRecord(dimensionsValue);
+  const suite = asRecord(scenarioSuiteValue);
+  const source = asRecord(sourceEvaluationValue);
+  if (
+    coverage === null ||
+    !hasOnlyKeys(coverage, [
+      "assessedDimensionCount",
+      "totalProfileDimensionCount",
+      "scoredProfileWeight",
+      "totalProfileWeight",
+      "profileWeightRatio",
+      "status",
+      "evaluationScope",
+    ]) ||
+    scope === null ||
+    !hasOnlyKeys(scope, [
+      "kind",
+      "suiteId",
+      "suiteVersion",
+      "scenarioCount",
+      "decisionPointCount",
+      "runsPerCase",
+      "expectedCaseRunCount",
+      "presentCaseRunCount",
+      "caseRunRatio",
+    ]) ||
+    coverage.status !== "complete" &&
+      coverage.status !== "partial" &&
+      coverage.status !== "none" ||
+    !isBoundedInteger(coverage.assessedDimensionCount) ||
+    !isBoundedInteger(coverage.totalProfileDimensionCount, 1, TUTOR_HEALTH_DIMENSIONS.length) ||
+    !isBoundedInteger(scope.scenarioCount, 1, 100_000) ||
+    !isBoundedInteger(scope.decisionPointCount, 1, 100_000) ||
+    !isBoundedInteger(scope.runsPerCase, 1, 10_000) ||
+    !isBoundedInteger(scope.expectedCaseRunCount, 1, 1_000_000) ||
+    !isBoundedInteger(scope.presentCaseRunCount, 0, 1_000_000) ||
+    !isUnitInterval(coverage.profileWeightRatio) ||
+    !isUnitInterval(scope.caseRunRatio) ||
+    typeof coverage.scoredProfileWeight !== "number" ||
+    !Number.isFinite(coverage.scoredProfileWeight) ||
+    coverage.scoredProfileWeight < 0 ||
+    typeof coverage.totalProfileWeight !== "number" ||
+    !Number.isFinite(coverage.totalProfileWeight) ||
+    coverage.totalProfileWeight <= 0 ||
+    scope.kind !== "scenario_suite" ||
+    scope.suiteId !== suite?.id ||
+    scope.suiteVersion !== suite?.version ||
+    scope.suiteId !== source?.datasetId ||
+    scope.suiteVersion !== source?.datasetVersion ||
+    scope.expectedCaseRunCount !== scope.decisionPointCount * scope.runsPerCase ||
+    scope.presentCaseRunCount > scope.expectedCaseRunCount
+  ) {
+    return false;
+  }
+
+  const activeDimensions = TUTOR_HEALTH_DIMENSIONS.filter(
+    (dimension) => (weights?.[dimension] as number) > 0,
+  );
+  const assessedDimensions = activeDimensions.filter(
+    (dimension) => asRecord(dimensions?.[dimension])?.score !== null,
+  );
+  const totalProfileWeight = activeDimensions.reduce(
+    (total, dimension) => total + (weights?.[dimension] as number),
+    0,
+  );
+  const scoredProfileWeight = assessedDimensions.reduce(
+    (total, dimension) => total + (weights?.[dimension] as number),
+    0,
+  );
+  const profileWeightRatio = scoredProfileWeight / totalProfileWeight;
+  const caseRunRatio = scope.presentCaseRunCount / scope.expectedCaseRunCount;
+  const expectedStatus =
+    nearlyEqual(profileWeightRatio, 1) && nearlyEqual(caseRunRatio, 1)
+      ? "complete"
+      : scoredProfileWeight > 0 && scope.presentCaseRunCount > 0
+        ? "partial"
+        : "none";
+
+  return (
+    coverage.totalProfileDimensionCount === activeDimensions.length &&
+    coverage.assessedDimensionCount === assessedDimensions.length &&
+    nearlyEqual(coverage.totalProfileWeight, totalProfileWeight) &&
+    nearlyEqual(coverage.scoredProfileWeight, scoredProfileWeight) &&
+    nearlyEqual(coverage.profileWeightRatio, profileWeightRatio) &&
+    nearlyEqual(scope.caseRunRatio, caseRunRatio) &&
+    coverage.status === expectedStatus
+  );
+}
+
 function sameSeverityCounts(findings: readonly TutorFinding[], value: unknown): boolean {
   const record = asRecord(value);
   if (record === null || !hasOnlyKeys(record, ["info", "minor", "major", "critical"])) {
@@ -351,6 +457,7 @@ export function isTutorHealthReport(value: unknown): value is TutorHealthReport 
       "sourceScenarioSuite",
       "sourceEvaluation",
       "scoringProfile",
+      "coverage",
       "healthScore",
       "releaseGate",
       "findingCounts",
@@ -383,6 +490,13 @@ export function isTutorHealthReport(value: unknown): value is TutorHealthReport 
     dimensions === null ||
     !hasOnlyKeys(dimensions, TUTOR_HEALTH_DIMENSIONS) ||
     !TUTOR_HEALTH_DIMENSIONS.every((dimension) => isDimensionScore(dimensions[dimension])) ||
+    !isCoverageConsistent(
+      record.coverage,
+      record.scoringProfile,
+      dimensions,
+      scenarioSuite,
+      source,
+    ) ||
     !Array.isArray(observations) ||
     observations.length > 100_000 ||
     !observations.every(isTutorObservation) ||

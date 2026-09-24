@@ -5,6 +5,9 @@ scenario suite, result transformation, and reports are implemented. This does
 not establish a validated general measure of tutoring quality or learner
 outcomes.
 
+Scenario contracts use schema v3 (suite data version `0.2.0`); Tutor Health
+reports use schema v2 to carry validated coverage and evaluation-scope fields.
+
 ## Why add a finding-first view
 
 Response-level rubric scores are useful for repeatable comparisons, but they
@@ -31,8 +34,12 @@ Evaluation Run
   -> Regression Target
 ```
 
-A scenario records identity/version, suite, learning context, learner state,
-an authored trajectory, teaching policy, and one or more decision points. Each
+A schema-v3 scenario separates `tutorVisibleContext` from
+`evaluatorReferenceState`. Only the authored visible context (known concepts
+and an optional tutor-owned learner-model or memory summary) compiles into the
+Tutor input. Evaluator reference truth, including misconception annotations,
+stays behind the existing `evaluatorOnly` firewall; each misconception must
+cite one or more observable learner turns in the authored trajectory. Each
 decision point compiles to a normal `TutorEvalCase`. The existing runner still
 owns Tutor execution, deterministic/Judge routing, rubric aggregation, ERROR
 handling, and critical-failure quality gates.
@@ -67,11 +74,16 @@ category-to-dimension conversion is applied.
 
 The report uses the existing rubric result score and rubric weight. ERROR and
 missing results are excluded and listed as unresolved. Dimension scores are
-weighted means on a 0-100 integer scale; the overall Tutor Health Score is the
-configured weighted mean of dimensions with scored evidence. The exported
-`core-tutor@0.1.0` profile lists all seven weights explicitly at `1`. This is a
-starter reporting profile, not a universally correct or empirically validated
-weighting. Organizations can pass another versioned profile.
+weighted means on a 0-100 integer scale; the summary score is the configured
+weighted mean of dimensions with scored evidence. The default
+`productive-struggle-intervention@0.1.0` profile is suite-specific. Report
+coverage states the assessed and total profile dimensions, scored and total
+profile weight, suite identity, and expected and present case-runs. The text
+headline puts coverage next to the score. A high summary score with partial
+coverage is not presented as a complete Tutor Health profile. In particular,
+this 13-scenario suite has no `content_correctness` or `reliability_policy`
+criteria and cannot establish complete `core-tutor` coverage. Organizations
+can pass another versioned profile.
 
 Tutor Health Score is an attention summary. Findings and their evidence remain
 the diagnostic source of truth. The Release Gate fails when an existing

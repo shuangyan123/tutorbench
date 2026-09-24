@@ -1,15 +1,35 @@
 import type { DisclosurePolicy, TutorEvalCategory } from "./tutor-eval.js";
 import type { DeterministicEvaluatorId, DeterministicEvaluatorConfig, TutorEvalRubricBehavior, TutorEvalRubricFailure } from "./rubric.js";
 import type { TutorHealthDimension, TutorFindingTemplate } from "./tutor-health.js";
+import type {
+  TutorLearnerEngagement,
+  TutorLearnerModelContext,
+  TutorMasteryState,
+} from "./tutor.js";
 
-export const TUTOR_SCENARIO_VNEXT_SCHEMA_VERSION = 2 as const;
+export const TUTOR_SCENARIO_VNEXT_SCHEMA_VERSION = 3 as const;
 
-export type TutorScenarioEngagement = "low" | "steady" | "high" | "frustrated";
-export type TutorScenarioMasteryState =
-  | "novice"
-  | "developing"
-  | "near_mastery"
-  | "mastered";
+export type TutorScenarioEngagement = TutorLearnerEngagement;
+export type TutorScenarioMasteryState = TutorMasteryState;
+
+export interface TutorScenarioTutorVisibleContext {
+  readonly knownConcepts: readonly string[];
+  /** Only this authored model/memory object is eligible to cross the Tutor boundary. */
+  readonly learnerModel?: TutorLearnerModelContext;
+}
+
+export interface TutorScenarioMisconceptionReference {
+  readonly statement: string;
+  /** 1-based learner-message positions in the selected authored trajectory. */
+  readonly evidenceLearnerTurns: readonly number[];
+}
+
+export interface TutorScenarioEvaluatorReferenceState {
+  readonly misconceptions: readonly TutorScenarioMisconceptionReference[];
+  readonly confidence?: number;
+  readonly engagement?: TutorScenarioEngagement;
+  readonly masteryState?: TutorScenarioMasteryState;
+}
 
 export type TutorTeachingDecision =
   | "preserve_struggle"
@@ -43,7 +63,8 @@ export interface TutorScenarioDecisionPoint {
   /** 1-based Tutor response position after the authored conversation history. */
   readonly turnIndex: number;
   /** Optional authored checkpoint snapshot for multi-point scenario branches. */
-  readonly learnerState?: TutorScenarioVNext["learnerState"];
+  readonly tutorVisibleContext?: TutorScenarioTutorVisibleContext;
+  readonly evaluatorReferenceState?: TutorScenarioEvaluatorReferenceState;
   readonly trajectory?: TutorScenarioVNext["trajectory"];
   readonly expectedDecision: TutorTeachingDecision;
   readonly expectedBehavior: string;
@@ -65,13 +86,10 @@ export interface TutorScenarioVNext {
     readonly learningObjective: string;
     readonly learnerLevel: string;
   };
-  readonly learnerState: {
-    readonly knownConcepts: readonly string[];
-    readonly misconceptions: readonly string[];
-    readonly confidence?: number;
-    readonly engagement?: TutorScenarioEngagement;
-    readonly masteryState?: TutorScenarioMasteryState;
-  };
+  /** Context intentionally shared with TutorUnderTest through TutorTurnInput. */
+  readonly tutorVisibleContext: TutorScenarioTutorVisibleContext;
+  /** Evaluator/reference truth; misconception annotations must cite learner turns. */
+  readonly evaluatorReferenceState: TutorScenarioEvaluatorReferenceState;
   readonly trajectory: {
     /** Attempts completed before the Tutor response at a decision point. */
     readonly attemptCount: number;

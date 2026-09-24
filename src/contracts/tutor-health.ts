@@ -30,7 +30,7 @@ export const TUTOR_HEALTH_DIMENSION_LABELS: Readonly<
 };
 
 export const TUTOR_FINDING_SCHEMA_VERSION = 1 as const;
-export const TUTOR_HEALTH_REPORT_SCHEMA_VERSION = 1 as const;
+export const TUTOR_HEALTH_REPORT_SCHEMA_VERSION = 2 as const;
 
 export type TutorFindingSeverity =
   | "info"
@@ -175,12 +175,12 @@ export interface TutorHealthScoringProfile {
 }
 
 /**
- * Explicit starter weights for the first authored suite. They are a reporting
- * default, not a validated universal weighting profile.
+ * Explicit starter weights for the Productive Struggle suite. This is a
+ * suite-scoped reporting profile, not a complete core-tutor profile.
  */
 export const DEFAULT_TUTOR_HEALTH_SCORING_PROFILE: TutorHealthScoringProfile = {
   schemaVersion: TUTOR_HEALTH_PROFILE_SCHEMA_VERSION,
-  id: "core-tutor",
+  id: "productive-struggle-intervention",
   version: "0.1.0",
   dimensionWeights: {
     content_correctness: 1,
@@ -206,6 +206,31 @@ export interface TutorHealthFindingCounts {
   readonly minor: number;
   readonly major: number;
   readonly critical: number;
+}
+
+export type TutorHealthCoverageStatus = "complete" | "partial" | "none";
+
+export interface TutorHealthEvaluationScope {
+  readonly kind: "scenario_suite";
+  readonly suiteId: string;
+  readonly suiteVersion: string;
+  readonly scenarioCount: number;
+  readonly decisionPointCount: number;
+  readonly runsPerCase: number;
+  readonly expectedCaseRunCount: number;
+  readonly presentCaseRunCount: number;
+  readonly caseRunRatio: number;
+}
+
+export interface TutorHealthCoverage {
+  readonly assessedDimensionCount: number;
+  readonly totalProfileDimensionCount: number;
+  readonly scoredProfileWeight: number;
+  readonly totalProfileWeight: number;
+  /** Scored profile weight divided by the profile's total configured weight. */
+  readonly profileWeightRatio: number;
+  readonly status: TutorHealthCoverageStatus;
+  readonly evaluationScope: TutorHealthEvaluationScope;
 }
 
 export type TutorHealthUnresolvedReason =
@@ -236,6 +261,7 @@ export interface TutorHealthReport {
     readonly evaluatorVersion?: string;
   };
   readonly scoringProfile: TutorHealthScoringProfile;
+  readonly coverage: TutorHealthCoverage;
   /** Integer 0-100 score; null means no scored evidence was available. */
   readonly healthScore: number | null;
   readonly releaseGate: TutorReleaseGate;
