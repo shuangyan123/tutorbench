@@ -76,6 +76,7 @@ test("stress plan builds swapped blind presentations and hides operator expectat
           presentation.packet.strategyProfile.archetypeId,
           presentation.packet.archetypeId,
         );
+        assert.ok(presentation.packet.strategyProfile.domainScope.length > 0);
         assert.ok(presentation.packet.strategyProfile.taskFamily.length > 0);
         assert.ok(presentation.packet.strategyProfile.criteria.length > 0);
       }
@@ -178,7 +179,7 @@ test("unavailable evaluator evidence stays incomplete rather than becoming seman
 });
 
 test("equivalent-strategy fixtures are explicitly tie expectations across open-ended disciplines", async () => {
-  const { pilot, suite, registry } = await loadInputs();
+  const { pilot, suite } = await loadInputs();
   const ties = suite.fixtures.filter(
     (fixture) => fixture.contrast === "equivalent_strategies",
   );
@@ -207,6 +208,7 @@ test("strategy profiles are specific to exact archetypes rather than broad disci
       (candidate) => candidate.id === profile.archetypeId,
     );
     assert.ok(archetype);
+    assert.ok(profile.domainScope.length > 0);
     assert.ok(profile.taskFamily.length > 0);
     assert.ok(profile.strategyScope.length > 0);
     assert.ok(profile.nonGoals.some((item) => /No universal/i.test(item)));
@@ -216,6 +218,7 @@ test("strategy profiles are specific to exact archetypes rather than broad disci
     (profile) => profile.archetypeId === "programming-d5-algorithm",
   );
   assert.ok(programming);
+  assert.match(programming.domainScope, /computer-science\.algorithms/);
   assert.match(programming.taskFamily, /pair-sum/);
   assert.ok(
     programming.nonGoals.some((item) => /debugging|refactoring|systems design/i.test(item)),
