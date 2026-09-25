@@ -1,0 +1,117 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import test from "node:test";
+
+import {
+  BenchmarkConfigurationError,
+  CASE_SYSTEM_VNEXT_DISCIPLINES,
+  parseCaseSystemVNextPilot,
+} from "../src/contracts/index.js";
+
+async function loadPilot() {
+  const path = new URL(
+    "../scenarios/case-system-vnext/pilot-archetypes.json",
+    import.meta.url,
+  );
+  const raw = await readFile(fileURLToPath(path), "utf8");
+  return parseCaseSystemVNextPilot(JSON.parse(raw) as unknown);
+}
+
+test("Case System vNext pilot has exactly one D1/D3/D5 archetype per discipline", async () => {
+  const pilot = await loadPilot();
+  assert.equal(pilot.id, "case-system-vnext-pilot");
+  assert.equal(pilot.version, "0.1.0");
+  assert.equal(pilot.archetypes.length, 15);
+
+  for (const discipline of CASE_SYSTEM_VNEXT_DISCIPLINES) {
+    const depths = pilot.archetypes
+      .filter((archetype) => archetype.discipline === discipline)
+      .map((archetype) => archetype.contentDepth)
+      .sort((a, b) => a - b);
+    assert.deepEqual(depths, [1, 3, 5], discipline);
+  }
+});
+
+test("human-optimal pilot archetypes bind optimality to learner-visible prerequisites", async () => {
+  const pilot = await loadPilot();
+  const humanOptimal = pilot.archetypes.filter(
+    (archetype) => archetype.referenceReasoning.optimalityMode === "human_optimal",
+  );
+  assert.ok(humanOptimal.length >= 4);
+
+  for (const archetype of humanOptimal) {
+    assert.ok(archetype.prerequisiteBoundary.knownConcepts.length > 0, archetype.id);
+    assert.ok(
+      archetype.referenceReasoning.humanOptimalInstanceStrategies.length > 0,
+      archetype.id,
+    );
+    assert.ok(
+      archetype.referenceReasoning.humanOptimalGeneralStrategies.length > 0,
+      archetype.id,
+    );
+    assert.equal(archetype.referenceReasoning.machineSearchCost, "out_of_scope");
+  }
+});
+
+test("open-ended pilot archetypes do not fabricate a unique optimal solution", async () => {
+  const pilot = await loadPilot();
+  for (const id of ["writing-d1-local-revision", "history-d1-source"]) {
+    const archetype = pilot.archetypes.find((candidate) => candidate.id === id);
+    assert.ok(archetype);
+    assert.equal(archetype.referenceReasoning.optimalityMode, "not_applicable");
+    assert.equal(archetype.referenceReasoning.humanOptimalInstanceStrategies.length, 0);
+    assert.equal(archetype.referenceReasoning.humanOptimalGeneralStrategies.length, 0);
+    assert.ok(archetype.referenceReasoning.alternativeHumanValidStrategies.length > 0);
+  }
+});
+
+test("pilot validation rejects missing matrix cells and invalid optimality claims", async () => {
+  const pilot = await loadPilot();
+
+  const missing = structuredClone(pilot) as unknown as {
+    archetypes: unknown[];
+  };
+  missing.archetypes.pop();
+  assert.throws(
+    () => parseCaseSystemVNextPilot(missing),
+    (error: unknown) =>
+      error instanceof BenchmarkConfigurationError &&
+      error.code === "case_system_vnext_invalid",
+  );
+
+  const invalidOptimal = structuredClone(pilot) as unknown as {
+    archetypes: Array<{
+      referenceReasoning: {
+        optimalityMode: string;
+        humanOptimalInstanceStrategies: unknown[];
+        humanOptimalGeneralStrategies: unknown[];
+      };
+    }>;
+  };
+  const humanOptimal = invalidOptimal.archetypes.find(
+    (archetype) => archetype.referenceReasoning.optimalityMode === "human_optimal",
+  );
+  assert.ok(humanOptimal);
+  humanOptimal.referenceReasoning.humanOptimalInstanceStrategies = [];
+  assert.throws(
+    () => parseCaseSystemVNextPilot(invalidOptimal),
+    (error: unknown) =>
+      error instanceof BenchmarkConfigurationError &&
+      error.code === "case_system_vnext_invalid",
+  );
+});
+
+test("pilot covers multi-turn and episode authoring targets without claiming executable H3 behavior", async () => {
+  const pilot = await loadPilot();
+  const horizons = new Set(pilot.archetypes.map((archetype) => archetype.interactionHorizon));
+  assert.ok(horizons.has(1));
+  assert.ok(horizons.has(2));
+  assert.ok(horizons.has(3));
+
+  const episodeTargets = pilot.archetypes.filter(
+    (archetype) => archetype.interactionHorizon === 3,
+  );
+  assert.ok(episodeTargets.length >= 5);
+  assert.ok(episodeTargets.every((archetype) => archetype.authoringStatus === "pilot"));
+});
