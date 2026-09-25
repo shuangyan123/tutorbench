@@ -30,6 +30,7 @@ export type BenchmarkErrorCode =
   | "tutor_response_corpus_invalid"
   | "tutor_response_replay_incompatible"
   | "tutor_scenario_vnext_invalid"
+  | "case_system_vnext_invalid"
   | "tutor_scenario_suite_not_found"
   | "tutor_finding_invalid"
   | "tutor_health_scoring_profile_invalid"
@@ -83,6 +84,7 @@ const stableMessages: Record<BenchmarkErrorCode, string> = {
   tutor_response_replay_incompatible:
     "Tutor response corpus replay compatibility is not approved.",
   tutor_scenario_vnext_invalid: "Tutor Scenario vNext data is invalid.",
+  case_system_vnext_invalid: "Case System vNext pilot data is invalid.",
   tutor_scenario_suite_not_found: "Tutor Scenario suite was not found.",
   tutor_finding_invalid: "Tutor Finding data is invalid.",
   tutor_health_scoring_profile_invalid: "Tutor Health scoring profile is invalid.",
@@ -127,6 +129,7 @@ export class BenchmarkConfigurationError extends Error {
     | "tutor_response_corpus_invalid"
     | "tutor_response_replay_incompatible"
     | "tutor_scenario_vnext_invalid"
+    | "case_system_vnext_invalid"
     | "tutor_scenario_suite_not_found"
     | "tutor_finding_invalid"
     | "tutor_health_scoring_profile_invalid"
@@ -167,6 +170,7 @@ export class BenchmarkConfigurationError extends Error {
       | "tutor_response_corpus_invalid"
       | "tutor_response_replay_incompatible"
       | "tutor_scenario_vnext_invalid"
+    | "case_system_vnext_invalid"
       | "tutor_scenario_suite_not_found"
       | "tutor_finding_invalid"
       | "tutor_health_scoring_profile_invalid"

@@ -18,6 +18,7 @@ export {
   TUTOR_CASE_LOCALES,
   DEFAULT_TUTOR_CASE_LOCALE,
   parseTutorScenarioSuiteVNext,
+  parseCaseSystemVNextPilot,
   toTutorTurnInput,
 } from "./contracts/index.js";
 export { runTutorBenchmark, runTutorEval } from "./runner/index.js";
@@ -46,6 +47,12 @@ export type {
   TutorEvalCase,
   TutorEvalDataset,
 } from "./contracts/tutor-eval.js";
+export type {
+  CaseSystemVNextArchetype,
+  CaseSystemVNextPilot,
+  CaseSystemVNextReferenceReasoning,
+  CaseSystemVNextReasoningStrategy,
+} from "./contracts/case-system-vnext.js";
 export type {
   TutorScenarioSuiteVNext,
   TutorScenarioVNext,

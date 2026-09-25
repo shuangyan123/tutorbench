@@ -1,0 +1,958 @@
+{
+  "schemaVersion": 1,
+  "id": "case-system-vnext-pilot",
+  "version": "0.1.0",
+  "title": "Case System vNext D1/D3/D5 Pilot Archetypes",
+  "description": "Fifteen non-canonical archetypes covering five discipline profiles at D1, D3, and D5. These records define authoring structure only; they are not executable TutorEval cases, calibrated measures, or learner-outcome evidence.",
+  "archetypes": [
+    {
+      "schemaVersion": 1,
+      "id": "math-d1-equivalence",
+      "version": "0.1.0",
+      "title": "Mathematics D1 — Equivalent representations",
+      "discipline": "mathematics",
+      "topic": "equivalent numerical representations",
+      "learnerLevel": "upper-primary",
+      "contentDepth": 1,
+      "pedagogicalDifficulty": 2,
+      "interactionHorizon": 1,
+      "coreTask": "Verify whether two familiar numerical representations are equivalent and explain one visible reason without taking over the learner's work.",
+      "learnerStates": [
+        "uncertain_but_correct",
+        "partial_understanding"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "whole-number arithmetic",
+          "basic fractions or decimals"
+        ],
+        "allowedMethods": [
+          "mental arithmetic",
+          "simple visual or symbolic equivalence"
+        ],
+        "excludedMethods": [
+          "calculator-only verification"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "human_optimal",
+        "humanOptimalInstanceStrategies": [
+          {
+            "id": "direct-equivalence",
+            "label": "Direct equivalence",
+            "keyInsight": "Transform one representation into the other using one familiar equivalence move.",
+            "effectiveReasoningSteps": 2,
+            "applicability": "Specific pairs where a direct rewrite is available."
+          }
+        ],
+        "humanOptimalGeneralStrategies": [
+          {
+            "id": "normalize-representations",
+            "label": "Normalize to a shared representation",
+            "keyInsight": "Convert both values into a common representation and compare.",
+            "effectiveReasoningSteps": 3,
+            "applicability": "General comparison of familiar fraction/decimal/percent forms."
+          }
+        ],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "visual-model",
+            "label": "Visual model",
+            "keyInsight": "Use an area or number-line representation to establish equivalence.",
+            "applicability": "Useful when symbolic fluency is weak."
+          }
+        ],
+        "avoidableDetours": [
+          "performing long arithmetic when a direct equivalence is visible"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Use the same equivalence principle with different values.",
+        "farTransfer": "Recognize equivalence when the same quantity appears in a different representation."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "math-d3-algebra-diagnosis",
+      "version": "0.1.0",
+      "title": "Mathematics D3 — Multi-step algebra diagnosis",
+      "discipline": "mathematics",
+      "topic": "multi-step linear equations",
+      "learnerLevel": "early-algebra",
+      "contentDepth": 3,
+      "pedagogicalDifficulty": 4,
+      "interactionHorizon": 2,
+      "coreTask": "Diagnose a consequential intermediate algebra error, preserve valid work, and guide the learner through the smallest useful correction.",
+      "learnerStates": [
+        "procedural_error",
+        "repeated_failure",
+        "partial_progress"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "inverse operations",
+          "maintaining equality"
+        ],
+        "allowedMethods": [
+          "equivalent transformations",
+          "substitution check"
+        ],
+        "excludedMethods": [
+          "answer-only correction"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "human_optimal",
+        "humanOptimalInstanceStrategies": [
+          {
+            "id": "repair-local-step",
+            "label": "Repair the first invalid transformation",
+            "keyInsight": "Locate the earliest invalid equality-preserving move and correct only that step.",
+            "effectiveReasoningSteps": 3,
+            "applicability": "A concrete equation with one localized error."
+          }
+        ],
+        "humanOptimalGeneralStrategies": [
+          {
+            "id": "invariant-balance",
+            "label": "Maintain equality invariant",
+            "keyInsight": "At each step apply an inverse operation to both sides, simplifying until the variable is isolated.",
+            "effectiveReasoningSteps": 4,
+            "applicability": "General one-variable linear equations within the prerequisite boundary."
+          }
+        ],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "substitution-backcheck",
+            "label": "Back-substitution check",
+            "keyInsight": "Test a proposed value in the original equation to localize whether the error is in solving or checking.",
+            "applicability": "Useful for verification but not always the shortest repair."
+          }
+        ],
+        "avoidableDetours": [
+          "restarting the entire solution despite correct intermediate work",
+          "repeating the same low-specificity hint after the same error"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Change coefficients while preserving the same error structure.",
+        "farTransfer": "Transfer the equality-invariant reasoning to a word problem translated into an equation."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "math-d5-generalization",
+      "version": "0.1.0",
+      "title": "Mathematics D5 — From instance insight to general method",
+      "discipline": "mathematics",
+      "topic": "algebraic structure and generalization",
+      "learnerLevel": "secondary",
+      "contentDepth": 5,
+      "pedagogicalDifficulty": 5,
+      "interactionHorizon": 3,
+      "coreTask": "Use a structurally efficient solution on a specific expression, then help the learner justify and generalize the underlying identity without presenting an unexplained shortcut.",
+      "learnerStates": [
+        "partial_understanding",
+        "near_mastery",
+        "false_confidence"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "distributive property",
+          "squares",
+          "basic symbolic manipulation"
+        ],
+        "allowedMethods": [
+          "factoring",
+          "algebraic expansion",
+          "pattern checking"
+        ],
+        "excludedMethods": [
+          "memorized identity with no justification"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "human_optimal",
+        "humanOptimalInstanceStrategies": [
+          {
+            "id": "symmetric-product",
+            "label": "Exploit symmetric factors",
+            "keyInsight": "Recognize factors of the form (a-d)(a+d) and use a²-d².",
+            "effectiveReasoningSteps": 3,
+            "applicability": "Instances with symmetric factors around a center."
+          }
+        ],
+        "humanOptimalGeneralStrategies": [
+          {
+            "id": "difference-of-squares",
+            "label": "Derive difference of squares",
+            "keyInsight": "Expand (a-d)(a+d), show cancellation of middle terms, and state a²-d².",
+            "effectiveReasoningSteps": 4,
+            "applicability": "All products of conjugate binomials within the stated algebra domain."
+          }
+        ],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "full-expansion",
+            "label": "Full expansion",
+            "keyInsight": "Multiply all terms and simplify.",
+            "applicability": "Always valid here but mechanically longer for symmetric instances."
+          }
+        ],
+        "avoidableDetours": [
+          "long multiplication after the symmetric structure is already accessible",
+          "stating the identity as a black box when derivation is the learning target"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Solve a new symmetric product with different center and offset.",
+        "farTransfer": "Recognize the same identity inside a factoring or geometry problem."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "science-d1-graph",
+      "version": "0.1.0",
+      "title": "Science D1 — Direct representation interpretation",
+      "discipline": "science",
+      "topic": "reading scientific graphs",
+      "learnerLevel": "middle-school",
+      "contentDepth": 1,
+      "pedagogicalDifficulty": 2,
+      "interactionHorizon": 1,
+      "coreTask": "Read an explicit trend or value from a graph without adding a causal claim that the graph does not establish.",
+      "learnerStates": [
+        "novice",
+        "uncertain_but_correct"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "axes and units",
+          "increasing and decreasing trends"
+        ],
+        "allowedMethods": [
+          "direct graph reading",
+          "simple comparison"
+        ],
+        "excludedMethods": [
+          "unsupported causal inference"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "bounded_strategy_set",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "read-axis-then-trend",
+            "label": "Read axes then trend",
+            "keyInsight": "Identify variables and units, then state the observed relationship.",
+            "applicability": "General direct graph interpretation."
+          }
+        ],
+        "avoidableDetours": [
+          "inventing a mechanism when only correlation is shown"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Read the same variables from a differently scaled graph.",
+        "farTransfer": "Distinguish an observed association from a causal explanation in a short study description."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "science-d3-causal",
+      "version": "0.1.0",
+      "title": "Science D3 — Multi-variable causal explanation",
+      "discipline": "science",
+      "topic": "causal reasoning across variables",
+      "learnerLevel": "secondary",
+      "contentDepth": 3,
+      "pedagogicalDifficulty": 4,
+      "interactionHorizon": 2,
+      "coreTask": "Repair an explanation that confuses correlation, mechanism, and a relevant control variable while preserving supported parts of the learner's reasoning.",
+      "learnerStates": [
+        "conceptual_misconception",
+        "partial_progress",
+        "false_confidence"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "independent and dependent variables",
+          "correlation does not prove causation"
+        ],
+        "allowedMethods": [
+          "mechanistic explanation",
+          "controlled comparison"
+        ],
+        "excludedMethods": [
+          "single-factor assertion without evidence"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "bounded_strategy_set",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "mechanism-plus-control",
+            "label": "Mechanism plus control",
+            "keyInsight": "Connect the proposed mechanism to observed evidence and identify a control or alternative variable that must be considered.",
+            "applicability": "General causal explanation under limited evidence."
+          },
+          {
+            "id": "competing-hypotheses",
+            "label": "Competing hypotheses",
+            "keyInsight": "State at least two plausible explanations and identify evidence that would discriminate them.",
+            "applicability": "Useful when current evidence underdetermines cause."
+          }
+        ],
+        "avoidableDetours": [
+          "treating correlation as proof of causation",
+          "listing variables without explaining their role"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Apply the same causal structure to a new experiment with changed surface variables.",
+        "farTransfer": "Identify a confound in a different domain while preserving the same evidence logic."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "science-d5-investigation",
+      "version": "0.1.0",
+      "title": "Science D5 — Design an investigation under uncertainty",
+      "discipline": "science",
+      "topic": "experimental design and model comparison",
+      "learnerLevel": "secondary",
+      "contentDepth": 5,
+      "pedagogicalDifficulty": 5,
+      "interactionHorizon": 3,
+      "coreTask": "Design an interpretable investigation that discriminates between competing explanations while making uncertainty, controls, and measurement limits explicit.",
+      "learnerStates": [
+        "partial_understanding",
+        "near_mastery",
+        "repeated_failure"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "controlled experiments",
+          "measurement error",
+          "hypothesis testing"
+        ],
+        "allowedMethods": [
+          "control groups",
+          "replication",
+          "operational definitions"
+        ],
+        "excludedMethods": [
+          "claiming certainty from one noisy observation"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "bounded_strategy_set",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "discriminating-experiment",
+            "label": "Discriminating experiment",
+            "keyInsight": "Vary the factor on which competing models make different predictions while controlling major confounds.",
+            "applicability": "General model-comparison investigations."
+          },
+          {
+            "id": "triangulated-evidence",
+            "label": "Triangulated evidence",
+            "keyInsight": "Combine complementary measurements when one instrument or design cannot isolate the mechanism.",
+            "applicability": "Useful under measurement limitations."
+          }
+        ],
+        "avoidableDetours": [
+          "adding many measurements that do not discriminate the hypotheses",
+          "ignoring a known confound",
+          "treating absence of evidence as proof"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Modify one control variable and explain how the design must change.",
+        "farTransfer": "Transfer the discrimination logic to a new scientific domain with different measurements."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "programming-d1-trace",
+      "version": "0.1.0",
+      "title": "Programming D1 — Trace a local state change",
+      "discipline": "programming",
+      "topic": "program tracing",
+      "learnerLevel": "introductory",
+      "contentDepth": 1,
+      "pedagogicalDifficulty": 2,
+      "interactionHorizon": 1,
+      "coreTask": "Trace a short deterministic program and explain the specific state change responsible for the output.",
+      "learnerStates": [
+        "novice",
+        "uncertain_but_correct"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "variables",
+          "assignment",
+          "basic control flow"
+        ],
+        "allowedMethods": [
+          "manual trace",
+          "small state table"
+        ],
+        "excludedMethods": [
+          "running the program as the only explanation"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "human_optimal",
+        "humanOptimalInstanceStrategies": [
+          {
+            "id": "minimal-trace",
+            "label": "Minimal trace",
+            "keyInsight": "Track only variables that affect the requested output through the relevant statements.",
+            "effectiveReasoningSteps": 3,
+            "applicability": "Short deterministic programs with local state."
+          }
+        ],
+        "humanOptimalGeneralStrategies": [
+          {
+            "id": "dependency-trace",
+            "label": "Dependency-focused trace",
+            "keyInsight": "Follow data dependencies from inputs through assignments to the observed output.",
+            "effectiveReasoningSteps": 4,
+            "applicability": "General small deterministic traces."
+          }
+        ],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "full-state-table",
+            "label": "Full state table",
+            "keyInsight": "Record every variable after every line.",
+            "applicability": "Reliable but often more mechanical."
+          }
+        ],
+        "avoidableDetours": [
+          "recording irrelevant state at every line"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Trace the same pattern with changed initial values.",
+        "farTransfer": "Identify which assignments matter in a larger function with irrelevant local state."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "programming-d3-debug",
+      "version": "0.1.0",
+      "title": "Programming D3 — Stateful debugging",
+      "discipline": "programming",
+      "topic": "debugging interacting state",
+      "learnerLevel": "intermediate",
+      "contentDepth": 3,
+      "pedagogicalDifficulty": 4,
+      "interactionHorizon": 2,
+      "coreTask": "Locate the earliest state transition that violates the intended invariant and guide a minimal repair rather than rewriting the whole program.",
+      "learnerStates": [
+        "procedural_error",
+        "repeated_failure",
+        "partial_progress"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "functions",
+          "loops",
+          "mutable collections"
+        ],
+        "allowedMethods": [
+          "manual trace",
+          "invariant check",
+          "small targeted test"
+        ],
+        "excludedMethods": [
+          "wholesale rewrite without diagnosis"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "human_optimal",
+        "humanOptimalInstanceStrategies": [
+          {
+            "id": "first-bad-state",
+            "label": "Find the first bad state",
+            "keyInsight": "Trace only until the first invariant violation, then repair the responsible operation.",
+            "effectiveReasoningSteps": 4,
+            "applicability": "A concrete deterministic bug with reproducible state corruption."
+          }
+        ],
+        "humanOptimalGeneralStrategies": [
+          {
+            "id": "invariant-driven-debugging",
+            "label": "Invariant-driven debugging",
+            "keyInsight": "State the intended invariant, instrument checkpoints, and narrow the first point where it fails.",
+            "effectiveReasoningSteps": 5,
+            "applicability": "General stateful debugging problems."
+          }
+        ],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "binary-search-checkpoints",
+            "label": "Checkpoint narrowing",
+            "keyInsight": "Place observations at coarse boundaries and narrow the failing region.",
+            "applicability": "Useful for longer deterministic flows."
+          }
+        ],
+        "avoidableDetours": [
+          "changing multiple components before localizing the fault",
+          "adding logging everywhere without a hypothesis"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Debug a structurally similar bug with a different container or loop.",
+        "farTransfer": "Apply invariant-driven debugging to an asynchronous or recursive variant."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "programming-d5-algorithm",
+      "version": "0.1.0",
+      "title": "Programming D5 — Derive a reusable algorithm",
+      "discipline": "programming",
+      "topic": "algorithm design and complexity",
+      "learnerLevel": "advanced-secondary",
+      "contentDepth": 5,
+      "pedagogicalDifficulty": 5,
+      "interactionHorizon": 3,
+      "coreTask": "Move from a brute-force correct solution to a human-understandable efficient algorithm, justify the key data-structure insight, and distinguish the reusable method from an instance trick.",
+      "learnerStates": [
+        "partial_understanding",
+        "near_mastery",
+        "false_confidence"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "arrays",
+          "hash maps or sets",
+          "Big-O basics"
+        ],
+        "allowedMethods": [
+          "complexity analysis",
+          "invariant reasoning",
+          "hash lookup"
+        ],
+        "excludedMethods": [
+          "opaque library solution with no reasoning"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "human_optimal",
+        "humanOptimalInstanceStrategies": [
+          {
+            "id": "complement-lookup",
+            "label": "Use complement lookup",
+            "keyInsight": "For each element, ask whether the required complement has already been seen.",
+            "effectiveReasoningSteps": 4,
+            "applicability": "Concrete pair-sum instances under expected O(1) hash lookup."
+          }
+        ],
+        "humanOptimalGeneralStrategies": [
+          {
+            "id": "one-pass-complement-map",
+            "label": "One-pass complement method",
+            "keyInsight": "Maintain a seen set/map so each item is processed once while checking its complement.",
+            "effectiveReasoningSteps": 5,
+            "applicability": "General two-sum style existence/index problems under hashable values."
+          }
+        ],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "sort-two-pointers",
+            "label": "Sort and use two pointers",
+            "keyInsight": "Sort values then move two pointers according to the current sum.",
+            "applicability": "Valid with O(n log n) preprocessing and useful when ordering helps."
+          }
+        ],
+        "avoidableDetours": [
+          "nested-pair enumeration when hash lookup is allowed and taught",
+          "giving code before explaining why complement lookup removes one loop"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Apply the method to a new target and changed input order.",
+        "farTransfer": "Recognize the complement/inverse-query pattern in a related pair-matching problem."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "writing-d1-local-revision",
+      "version": "0.1.0",
+      "title": "Language/Writing D1 — Local revision",
+      "discipline": "language_writing",
+      "topic": "sentence-level clarity",
+      "learnerLevel": "secondary",
+      "contentDepth": 1,
+      "pedagogicalDifficulty": 2,
+      "interactionHorizon": 1,
+      "coreTask": "Revise one sentence to satisfy an explicit clarity or grammar constraint while explaining the local change.",
+      "learnerStates": [
+        "novice",
+        "uncertain_but_correct"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "basic sentence structure"
+        ],
+        "allowedMethods": [
+          "local rewrite",
+          "brief explanation"
+        ],
+        "excludedMethods": [
+          "rewriting unrelated surrounding content"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "not_applicable",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "minimal-local-edit",
+            "label": "Minimal local edit",
+            "keyInsight": "Change only the words or punctuation needed to satisfy the stated constraint.",
+            "applicability": "General sentence-level revision."
+          }
+        ],
+        "avoidableDetours": [
+          "rewriting the student's voice unnecessarily",
+          "changing meaning while fixing surface form"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Revise a new sentence with the same local issue.",
+        "farTransfer": "Identify the same issue inside a paragraph without rewriting the paragraph wholesale."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "writing-d3-argument",
+      "version": "0.1.0",
+      "title": "Language/Writing D3 — Repair argument coherence",
+      "discipline": "language_writing",
+      "topic": "claim-evidence-warrant coherence",
+      "learnerLevel": "secondary",
+      "contentDepth": 3,
+      "pedagogicalDifficulty": 4,
+      "interactionHorizon": 2,
+      "coreTask": "Diagnose whether the main weakness is the claim, evidence, or warrant and guide a targeted revision while preserving defensible material.",
+      "learnerStates": [
+        "partial_understanding",
+        "conceptual_misconception",
+        "partial_progress"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "claim and evidence",
+          "paragraph structure"
+        ],
+        "allowedMethods": [
+          "outline",
+          "warrant explanation",
+          "targeted revision"
+        ],
+        "excludedMethods": [
+          "full essay rewrite"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "bounded_strategy_set",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "claim-evidence-warrant",
+            "label": "Repair the weakest link",
+            "keyInsight": "Identify the unsupported connection and revise the claim, evidence, or warrant that causes it.",
+            "applicability": "General argument repair."
+          },
+          {
+            "id": "counterexample-test",
+            "label": "Counterexample test",
+            "keyInsight": "Test whether the claim overreaches by considering a plausible counterexample or limitation.",
+            "applicability": "Useful for overbroad claims."
+          }
+        ],
+        "avoidableDetours": [
+          "adding more evidence when the real problem is the warrant",
+          "rewriting the full paragraph before naming the reasoning gap"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Repair a new paragraph with the same claim-evidence mismatch.",
+        "farTransfer": "Transfer the same diagnostic to a different genre or audience."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "writing-d5-synthesis",
+      "version": "0.1.0",
+      "title": "Language/Writing D5 — Multi-source synthesis",
+      "discipline": "language_writing",
+      "topic": "source synthesis and original argument",
+      "learnerLevel": "advanced-secondary",
+      "contentDepth": 5,
+      "pedagogicalDifficulty": 5,
+      "interactionHorizon": 3,
+      "coreTask": "Synthesize partially conflicting sources into an original argument with explicit evidence boundaries, uncertainty, and source attribution.",
+      "learnerStates": [
+        "partial_understanding",
+        "near_mastery",
+        "false_confidence"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "source attribution",
+          "argument structure",
+          "distinguishing summary from analysis"
+        ],
+        "allowedMethods": [
+          "thematic synthesis",
+          "source comparison",
+          "qualification"
+        ],
+        "excludedMethods": [
+          "fabricated consensus",
+          "single-source paraphrase presented as synthesis"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "bounded_strategy_set",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "claim-centered-synthesis",
+            "label": "Claim-centered synthesis",
+            "keyInsight": "Organize sources around a defensible claim, showing where evidence converges and diverges.",
+            "applicability": "General evidence synthesis."
+          },
+          {
+            "id": "tension-centered-synthesis",
+            "label": "Tension-centered synthesis",
+            "keyInsight": "Use a genuine disagreement or limitation among sources to structure the analysis.",
+            "applicability": "Useful when sources do not support one simple consensus."
+          }
+        ],
+        "avoidableDetours": [
+          "serially summarizing sources without synthesis",
+          "erasing uncertainty to make the argument sound stronger"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Synthesize a new source set with the same evidence pattern.",
+        "farTransfer": "Transfer the synthesis strategy to a different genre, such as a policy memo."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "history-d1-source",
+      "version": "0.1.0",
+      "title": "History/Social Science D1 — Explicit source interpretation",
+      "discipline": "history_social_science",
+      "topic": "source reading and chronology",
+      "learnerLevel": "secondary",
+      "contentDepth": 1,
+      "pedagogicalDifficulty": 2,
+      "interactionHorizon": 1,
+      "coreTask": "Identify an explicit source claim, speaker position, or chronological relationship without importing unsupported background assumptions.",
+      "learnerStates": [
+        "novice",
+        "uncertain_but_correct"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "basic source reading",
+          "chronology"
+        ],
+        "allowedMethods": [
+          "quote/paraphrase with attribution",
+          "timeline ordering"
+        ],
+        "excludedMethods": [
+          "unsupported motive inference"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "not_applicable",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "source-grounded-reading",
+            "label": "Source-grounded reading",
+            "keyInsight": "Anchor the answer to what the source explicitly states and distinguish that from inference.",
+            "applicability": "General direct source interpretation."
+          }
+        ],
+        "avoidableDetours": [
+          "adding motives or context not supported by the provided source"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Interpret a new source with the same explicit-evidence requirement.",
+        "farTransfer": "Distinguish explicit evidence from inference in a source from a different period."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "history-d3-multicausal",
+      "version": "0.1.0",
+      "title": "History/Social Science D3 — Multi-cause explanation",
+      "discipline": "history_social_science",
+      "topic": "historical causal explanation",
+      "learnerLevel": "secondary",
+      "contentDepth": 3,
+      "pedagogicalDifficulty": 4,
+      "interactionHorizon": 2,
+      "coreTask": "Build or repair a causal explanation that distinguishes background conditions, triggers, mechanisms, and consequences using cited evidence.",
+      "learnerStates": [
+        "partial_understanding",
+        "conceptual_misconception",
+        "false_confidence"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "cause and consequence",
+          "source evidence"
+        ],
+        "allowedMethods": [
+          "causal chain",
+          "categorizing causes",
+          "source comparison"
+        ],
+        "excludedMethods": [
+          "single-cause certainty without evidence"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "bounded_strategy_set",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "causal-chain",
+            "label": "Causal chain",
+            "keyInsight": "Connect conditions, triggers, mechanisms, and outcomes while citing evidence at each major link.",
+            "applicability": "General historical explanation."
+          },
+          {
+            "id": "comparative-causes",
+            "label": "Compare causal contributions",
+            "keyInsight": "Evaluate several causes by scope, timing, and evidentiary support rather than naming only one.",
+            "applicability": "Useful for multi-causal events."
+          }
+        ],
+        "avoidableDetours": [
+          "listing causes without explaining mechanisms",
+          "treating chronology alone as causation"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Explain a different event using the same condition-trigger-mechanism structure.",
+        "farTransfer": "Transfer multi-causal reasoning to a social-science policy outcome."
+      },
+      "authoringStatus": "pilot"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "history-d5-conflicting-sources",
+      "version": "0.1.0",
+      "title": "History/Social Science D5 — Conflicting-source synthesis",
+      "discipline": "history_social_science",
+      "topic": "corroboration and competing interpretations",
+      "learnerLevel": "advanced-secondary",
+      "contentDepth": 5,
+      "pedagogicalDifficulty": 5,
+      "interactionHorizon": 3,
+      "coreTask": "Synthesize conflicting sources or interpretations, weigh provenance and evidence, state uncertainty, and identify what additional evidence would change the conclusion.",
+      "learnerStates": [
+        "partial_understanding",
+        "near_mastery",
+        "false_confidence"
+      ],
+      "prerequisiteBoundary": {
+        "knownConcepts": [
+          "primary vs secondary sources",
+          "provenance",
+          "corroboration"
+        ],
+        "allowedMethods": [
+          "source comparison",
+          "qualification",
+          "evidence weighting"
+        ],
+        "excludedMethods": [
+          "declaring one source correct solely because it is primary"
+        ]
+      },
+      "referenceReasoning": {
+        "optimalityMode": "bounded_strategy_set",
+        "humanOptimalInstanceStrategies": [],
+        "humanOptimalGeneralStrategies": [],
+        "alternativeHumanValidStrategies": [
+          {
+            "id": "corroboration-matrix",
+            "label": "Corroboration matrix",
+            "keyInsight": "Compare claims, provenance, incentives, and independent support before drawing a bounded conclusion.",
+            "applicability": "General conflicting-source analysis."
+          },
+          {
+            "id": "interpretation-conditions",
+            "label": "Conditional interpretations",
+            "keyInsight": "State which evidence would support each interpretation and where current evidence remains underdetermined.",
+            "applicability": "Useful when disagreement cannot be resolved cleanly."
+          }
+        ],
+        "avoidableDetours": [
+          "averaging conflicting claims into false consensus",
+          "equating source disagreement with equal evidentiary strength"
+        ],
+        "machineSearchCost": "out_of_scope"
+      },
+      "transfer": {
+        "nearTransfer": "Evaluate a new source set with one changed provenance feature.",
+        "farTransfer": "Transfer corroboration logic to conflicting statistical or policy claims."
+      },
+      "authoringStatus": "pilot"
+    }
+  ]
+}
