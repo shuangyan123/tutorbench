@@ -53,8 +53,8 @@ test("stress plan builds swapped blind presentations and hides operator expectat
   const { pilot, suite, registry } = await loadInputs();
   const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, registry, 3);
 
-  assert.equal(plan.fixtures.length, 7);
-  assert.equal(plan.plannedJudgmentCount, 7 * 3 * 2);
+  assert.equal(plan.fixtures.length, 11);
+  assert.equal(plan.plannedJudgmentCount, 11 * 3 * 2);
 
   for (const fixture of plan.fixtures) {
     assert.equal(fixture.repetitions.length, 3);
@@ -131,8 +131,8 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   );
 
   assert.equal(report.observedJudgmentCount, report.plannedJudgmentCount);
-  assert.equal(report.overall.comparableCount, 7 * 2);
-  assert.equal(report.overall.expectedMatchCount, 7 * 2);
+  assert.equal(report.overall.comparableCount, 11 * 2);
+  assert.equal(report.overall.expectedMatchCount, 11 * 2);
   assert.equal(report.overall.expectedMatchShare, 1);
   assert.equal(report.overall.orderSensitiveCount, 0);
   assert.equal(report.overall.incompleteCount, 0);
@@ -144,6 +144,7 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   assert.equal(report.byContrast.generalization_target.expectedMatchShare, 1);
   assert.equal(report.byContrast.prerequisite_compatibility.expectedMatchShare, 1);
   assert.equal(report.byContrast.equivalent_strategies.expectedMatchShare, 1);
+  assert.equal(report.byContrast.domain_strategy_alignment.expectedMatchShare, 1);
 });
 
 test("position-following judgments are classified as order-sensitive, not as a tie", async () => {
@@ -254,7 +255,7 @@ test("audit-seeded taxonomy preserves all 23 research domains and profile refere
 test("strategy profiles are layered below audit domains and exact archetypes", async () => {
   const { pilot, registry } = await loadInputs();
 
-  assert.equal(registry.profiles.length, 4);
+  assert.equal(registry.profiles.length, 8);
   for (const profile of registry.profiles) {
     const archetype = pilot.archetypes.find(
       (candidate) => candidate.id === profile.archetypeId,
@@ -285,6 +286,60 @@ test("strategy profiles are layered below audit domains and exact archetypes", a
   );
   assert.ok(writing);
   assert.equal(writing.evaluationMode, "acceptable_strategy_set");
+
+  const physics = registry.profiles.find(
+    (profile) => profile.id === "physics-d1-position-time-graph",
+  );
+  assert.ok(physics);
+  assert.equal(physics.academicContext.domainId, "physics");
+  assert.equal(physics.academicContext.specialization, "kinematics");
+  assert.ok(physics.criteria.some((criterion) => criterion.id === "scope-control"));
+
+  const chemistry = registry.profiles.find(
+    (profile) => profile.id === "chemistry-d5-kinetics-discrimination",
+  );
+  assert.ok(chemistry);
+  assert.equal(chemistry.academicContext.domainId, "chemistry");
+  assert.equal(chemistry.evaluationMode, "pareto_tradeoff");
+  assert.ok(chemistry.criteria.some((criterion) => criterion.id === "factor-identifiability"));
+
+  const biology = registry.profiles.find(
+    (profile) => profile.id === "biology-d3-causal-control",
+  );
+  assert.ok(biology);
+  assert.equal(biology.academicContext.domainId, "biology");
+  assert.ok(biology.criteria.some((criterion) => criterion.id === "teleology-restraint"));
+
+  const pythonDebugging = registry.profiles.find(
+    (profile) => profile.id === "computer-science-python-d3-debugging",
+  );
+  assert.ok(pythonDebugging);
+  assert.equal(pythonDebugging.academicContext.domainId, "computer_science");
+  assert.equal(pythonDebugging.academicContext.specialization, "python");
+  assert.ok(pythonDebugging.criteria.some((criterion) => criterion.id === "fault-localization"));
+});
+
+test("domain-specific stress fixtures cover physics chemistry biology and Python debugging", async () => {
+  const { suite, registry } = await loadInputs();
+  const domainFixtures = suite.fixtures.filter(
+    (fixture) => fixture.contrast === "domain_strategy_alignment",
+  );
+  assert.equal(domainFixtures.length, 4);
+
+  const domains = new Set(
+    domainFixtures.map((fixture) =>
+      registry.profiles.find((profile) => profile.id === fixture.strategyProfileId)
+        ?.academicContext.domainId,
+    ),
+  );
+  assert.ok(domains.has("physics"));
+  assert.ok(domains.has("chemistry"));
+  assert.ok(domains.has("biology"));
+  assert.ok(domains.has("computer_science"));
+
+  for (const fixture of domainFixtures) {
+    assert.equal(fixture.expected.kind, "preference");
+  }
 });
 
 test("stress plan rejects a fabricated preference for equivalent strategies", async () => {
