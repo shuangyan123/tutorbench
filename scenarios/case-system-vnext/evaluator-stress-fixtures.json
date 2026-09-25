@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "id": "case-system-vnext-evaluator-stress-fixtures",
+  "version": "0.1.0",
+  "title": "Case System vNext evaluator stress fixtures",
+  "description": "Developer-authored diagnostic contrasts for testing whether a pairwise evaluator can distinguish human efficiency, opacity, generalization target, prerequisite compatibility, and equally defensible strategies. Expectations are not human calibration gold.",
+  "fixtures": [
+    {
+      "id": "math-human-efficiency",
+      "archetypeId": "math-d5-generalization",
+      "contrast": "human_efficiency",
+      "teachingTarget": "Solve the concrete symmetric product efficiently using ideas already available to the learner.",
+      "learnerState": "partial_understanding",
+      "candidates": [
+        {
+          "id": "mechanical",
+          "responseText": "48 × 52 = 48 × 50 + 48 × 2 = 2400 + 96 = 2496."
+        },
+        {
+          "id": "structural",
+          "responseText": "48 × 52 = (50 - 2)(50 + 2) = 50² - 2² = 2496. The useful observation is that the factors are equally far from 50."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "structural"
+      },
+      "rationale": "Both are correct, but the structural route uses an accessible pattern and avoids unnecessary mechanical expansion."
+    },
+    {
+      "id": "math-opacity",
+      "archetypeId": "math-d5-generalization",
+      "contrast": "opacity",
+      "teachingTarget": "Use an efficient method, but make the key reasoning understandable and locally verifiable to this learner.",
+      "learnerState": "partial_understanding",
+      "candidates": [
+        {
+          "id": "opaque",
+          "responseText": "By the conjugate identity, the answer is 2496."
+        },
+        {
+          "id": "explained",
+          "responseText": "48 × 52 = (50 - 2)(50 + 2). Expanding (a-d)(a+d) makes the middle terms cancel, so it equals a²-d²; here that is 2500 - 4 = 2496."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "explained"
+      },
+      "rationale": "A shorter opaque assertion should not beat a prerequisite-compatible explanation of the same efficient structure."
+    },
+    {
+      "id": "math-generalization",
+      "archetypeId": "math-d5-generalization",
+      "contrast": "generalization_target",
+      "teachingTarget": "After solving the instance, help the learner articulate the reusable general method.",
+      "learnerState": "near_mastery",
+      "candidates": [
+        {
+          "id": "instance-only",
+          "responseText": "48 × 52 = (50 - 2)(50 + 2) = 2500 - 4 = 2496."
+        },
+        {
+          "id": "generalizes",
+          "responseText": "48 × 52 = (50 - 2)(50 + 2) = 2500 - 4 = 2496. More generally, (a-d)(a+d)=a²-d² because the +ad and -ad terms cancel."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "generalizes"
+      },
+      "rationale": "The teaching target explicitly calls for generalization, so surfacing and justifying the reusable structure should matter."
+    },
+    {
+      "id": "programming-prerequisite",
+      "archetypeId": "programming-d5-algorithm",
+      "contrast": "prerequisite_compatibility",
+      "teachingTarget": "Improve the learner's algorithm using only data structures and complexity ideas already in the prerequisite boundary.",
+      "learnerState": "partial_understanding",
+      "candidates": [
+        {
+          "id": "advanced-opaque",
+          "responseText": "Use a Bloom filter plus a probabilistic membership pass; that removes the nested loop."
+        },
+        {
+          "id": "accessible-hash",
+          "responseText": "Keep a set of values already seen. For each x, check whether target - x is in the set; if not, add x. That replaces repeated pair scanning with one pass and hash lookups."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "accessible-hash"
+      },
+      "rationale": "The hash-set method is inside the authored prerequisites and explains the inverse-query insight; the advanced shortcut is outside them."
+    },
+    {
+      "id": "programming-human-efficiency",
+      "archetypeId": "programming-d5-algorithm",
+      "contrast": "human_efficiency",
+      "teachingTarget": "Derive a reusable solution that removes unnecessary pair enumeration while remaining understandable.",
+      "learnerState": "near_mastery",
+      "candidates": [
+        {
+          "id": "nested",
+          "responseText": "For each index i, scan every later index j and test whether nums[i] + nums[j] equals target."
+        },
+        {
+          "id": "one-pass",
+          "responseText": "For each x, the only partner that can work is target - x. Store earlier values in a set and ask whether that complement has appeared; this gives a one-pass reusable method."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "one-pass"
+      },
+      "rationale": "The one-pass response exposes the key human-understandable insight that removes the nested search."
+    },
+    {
+      "id": "science-equivalent-strategies",
+      "archetypeId": "science-d5-investigation",
+      "contrast": "equivalent_strategies",
+      "teachingTarget": "Design an investigation that can discriminate between the competing explanations while acknowledging measurement limits.",
+      "learnerState": "near_mastery",
+      "candidates": [
+        {
+          "id": "controlled-factor",
+          "responseText": "Change the factor on which the two explanations predict different outcomes, keep the major confounds fixed, repeat the measurement, and compare the predicted pattern."
+        },
+        {
+          "id": "triangulated",
+          "responseText": "Use two complementary measurements that respond differently under the competing explanations, repeat both under controlled conditions, and compare whether the evidence converges."
+        }
+      ],
+      "expected": {
+        "kind": "tie"
+      },
+      "rationale": "Both strategies are explicitly acceptable in the archetype and neither should win without additional authored constraints."
+    },
+    {
+      "id": "writing-equivalent-strategies",
+      "archetypeId": "writing-d5-synthesis",
+      "contrast": "equivalent_strategies",
+      "teachingTarget": "Help the learner synthesize conflicting sources into a defensible argument without erasing uncertainty.",
+      "learnerState": "partial_understanding",
+      "candidates": [
+        {
+          "id": "claim-centered",
+          "responseText": "Organize the paragraph around one bounded claim, then show which sources support it, which qualify it, and where evidence diverges."
+        },
+        {
+          "id": "tension-centered",
+          "responseText": "Organize the paragraph around the main disagreement between the sources, then explain what each source can support and why the conflict matters for the conclusion."
+        }
+      ],
+      "expected": {
+        "kind": "tie"
+      },
+      "rationale": "Both are acceptable authored synthesis strategies; the evaluator should not impose a single preferred writing style."
+    },
+    {
+      "id": "history-opacity",
+      "archetypeId": "history-d5-conflicting-sources",
+      "contrast": "opacity",
+      "teachingTarget": "Evaluate conflicting sources by making the evidence and provenance reasoning explicit rather than declaring a source authoritative.",
+      "learnerState": "false_confidence",
+      "candidates": [
+        {
+          "id": "authority-shortcut",
+          "responseText": "Source A is primary, so it is more reliable and should be trusted over Source B."
+        },
+        {
+          "id": "corroborates",
+          "responseText": "Being primary does not automatically make Source A more reliable. Compare what each source claims, who produced it and why, and whether independent evidence corroborates the disputed points before drawing a bounded conclusion."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "corroborates"
+      },
+      "rationale": "The second response makes the corroboration logic explicit and avoids the prohibited primary-source authority shortcut."
+    }
+  ]
+}
