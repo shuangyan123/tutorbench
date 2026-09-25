@@ -307,6 +307,26 @@ function normalizeRepetition(
     return normalizeOne(presentation, judgment);
   });
 
+  const presentationResult = (
+    presentation: CaseSystemVNextStressPresentationPlan,
+  ): CaseSystemVNextStressRepetitionResult["presentations"][number] => {
+    const judgment = byId.get(presentation.packet.presentationId);
+    if (judgment === undefined) invalid();
+    return {
+      presentationId: presentation.assignment.presentationId,
+      aCandidateId: presentation.assignment.aCandidateId,
+      bCandidateId: presentation.assignment.bCandidateId,
+      status: judgment.status,
+      ...(judgment.outcome === undefined ? {} : { outcome: judgment.outcome }),
+      ...(judgment.reason === undefined ? {} : { reason: judgment.reason }),
+    };
+  };
+
+  const presentations: CaseSystemVNextStressRepetitionResult["presentations"] = [
+    presentationResult(repetition.presentations[0]),
+    presentationResult(repetition.presentations[1]),
+  ];
+
   let outcome: CaseSystemVNextStressCanonicalOutcome = { kind: "incomparable" };
   let consistency: CaseSystemVNextStressRepetitionResult["consistency"];
 
@@ -369,6 +389,7 @@ function normalizeRepetition(
 
   return {
     repetition: repetition.repetition,
+    presentations,
     outcome,
     consistency,
     expectedMatch,
@@ -427,6 +448,25 @@ function summarizeFixture(
     incompleteCount: repetitions.filter(
       (result) => result.consistency === "incomplete_evidence",
     ).length,
+    inconsistentCount: repetitions.filter(
+      (result) => result.consistency === "inconsistent",
+    ).length,
+    okJudgmentCount: repetitions.reduce(
+      (sum, result) =>
+        sum + result.presentations.filter((presentation) => presentation.status === "ok").length,
+      0,
+    ),
+    unavailableJudgmentCount: repetitions.reduce(
+      (sum, result) =>
+        sum +
+        result.presentations.filter((presentation) => presentation.status === "unavailable").length,
+      0,
+    ),
+    invalidJudgmentCount: repetitions.reduce(
+      (sum, result) =>
+        sum + result.presentations.filter((presentation) => presentation.status === "invalid").length,
+      0,
+    ),
     modalOutcome: modalOutcome as
       | "preference"
       | "equivalent"
@@ -473,6 +513,22 @@ function aggregate(
     ),
     incompleteCount: results.reduce(
       (sum, result) => sum + result.incompleteCount,
+      0,
+    ),
+    inconsistentCount: results.reduce(
+      (sum, result) => sum + result.inconsistentCount,
+      0,
+    ),
+    okJudgmentCount: results.reduce(
+      (sum, result) => sum + result.okJudgmentCount,
+      0,
+    ),
+    unavailableJudgmentCount: results.reduce(
+      (sum, result) => sum + result.unavailableJudgmentCount,
+      0,
+    ),
+    invalidJudgmentCount: results.reduce(
+      (sum, result) => sum + result.invalidJudgmentCount,
       0,
     ),
   };
