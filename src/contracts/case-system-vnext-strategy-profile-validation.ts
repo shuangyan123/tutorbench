@@ -1,4 +1,5 @@
 import { BenchmarkConfigurationError } from "./errors.js";
+import { CASE_SYSTEM_VNEXT_DOMAIN_IDS } from "./case-system-vnext-domain-taxonomy.js";
 import {
   CASE_SYSTEM_VNEXT_STRATEGY_PROFILE_SCHEMA_VERSION,
   type CaseSystemVNextStrategyProfile,
@@ -55,9 +56,10 @@ function isProfile(value: unknown): value is CaseSystemVNextStrategyProfile {
   const academicContext = asRecord(record.academicContext);
   if (
     academicContext === null ||
-    !hasOnlyKeys(academicContext, ["disciplineFamily","subject","specialization","practice"]) ||
-    !isText(academicContext.disciplineFamily, 120) ||
-    !isText(academicContext.subject, 120) ||
+    !hasOnlyKeys(academicContext, ["domainId","disciplineFamily","subject","specialization","practice"]) ||
+    !CASE_SYSTEM_VNEXT_DOMAIN_IDS.includes(academicContext.domainId as never) ||
+    (academicContext.disciplineFamily !== undefined && !isText(academicContext.disciplineFamily, 120)) ||
+    (academicContext.subject !== undefined && !isText(academicContext.subject, 120)) ||
     (academicContext.specialization !== undefined && !isText(academicContext.specialization, 120)) ||
     (academicContext.practice !== undefined && !isText(academicContext.practice, 120))
   ) return false;
