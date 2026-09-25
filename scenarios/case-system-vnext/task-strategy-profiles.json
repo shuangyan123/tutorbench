@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "case-system-vnext-strategy-profiles",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Case System vNext task-specific strategy profiles",
-  "description": "Pilot task-specific strategy profiles layered over shared base rules and anchored to the audit-seeded 23-domain taxonomy. Broad domain membership never defines the final task strategy.",
+  "description": "Pilot task-specific strategy profiles layered over shared base rules and anchored to the audit-seeded 23-domain taxonomy. Physics, Chemistry, Biology, Computer Science, Mathematics, Writing/Rhetoric, and History profiles are task-scoped; broad domain membership never defines the final strategy.",
   "profiles": [
     {
       "schemaVersion": 1,
@@ -191,6 +191,209 @@
         "specialization": "source_analysis",
         "practice": "corroboration",
         "domainId": "history"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "physics-d1-position-time-graph",
+      "version": "0.1.0",
+      "archetypeId": "science-d1-graph",
+      "taskFamily": "position-time-graph-interpretation",
+      "strategyScope": "Interpreting a position-time graph by separating directly observable kinematic relationships from unsupported causal or force claims.",
+      "evaluationMode": "ordered_preference",
+      "criteria": [
+        {
+          "id": "representation-fidelity",
+          "label": "Representation fidelity",
+          "description": "Claims follow from the actual axes, scale, interval, and graphical structure rather than from an imagined physical story."
+        },
+        {
+          "id": "kinematic-validity",
+          "label": "Kinematic validity",
+          "description": "The response correctly distinguishes position, displacement, slope-related motion information, and what is not directly encoded."
+        },
+        {
+          "id": "scope-control",
+          "label": "Scope control",
+          "description": "The response does not infer force, intent, or mechanism from a position-time graph without additional evidence."
+        },
+        {
+          "id": "unit-interval-awareness",
+          "label": "Unit and interval awareness",
+          "description": "The response attends to units and the exact interval being interpreted."
+        }
+      ],
+      "constraints": [
+        "Use only graph-supported kinematic claims unless additional physical evidence is explicitly supplied.",
+        "Do not reward a causal explanation for sounding physically plausible if the graph does not identify the cause."
+      ],
+      "nonGoals": [
+        "No universal Physics strategy ranking.",
+        "No transfer of this profile to force diagrams, energy reasoning, circuits, thermodynamics, or experimental design."
+      ],
+      "status": "pilot",
+      "academicContext": {
+        "disciplineFamily": "natural_sciences",
+        "subject": "physics",
+        "specialization": "kinematics",
+        "practice": "graph_interpretation",
+        "domainId": "physics"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "chemistry-d5-kinetics-discrimination",
+      "version": "0.1.0",
+      "archetypeId": "science-d5-investigation",
+      "taskFamily": "kinetics-factor-discrimination",
+      "strategyScope": "Designing a kinetics experiment that separates temperature and concentration effects while preserving chemical control conditions and measurement interpretability.",
+      "evaluationMode": "pareto_tradeoff",
+      "criteria": [
+        {
+          "id": "factor-identifiability",
+          "label": "Factor identifiability",
+          "description": "The design allows temperature and concentration effects to be distinguished rather than changing them in an uninterpretable bundle."
+        },
+        {
+          "id": "chemical-control",
+          "label": "Chemical control",
+          "description": "Other reaction conditions that materially affect rate are held fixed or explicitly accounted for."
+        },
+        {
+          "id": "rate-measurement-validity",
+          "label": "Rate measurement validity",
+          "description": "The proposed observable genuinely supports reaction-rate comparison and acknowledges measurement uncertainty."
+        },
+        {
+          "id": "replication-information-value",
+          "label": "Replication and information value",
+          "description": "Replicates or additional conditions add discriminating evidence rather than procedural volume."
+        },
+        {
+          "id": "mechanism-restraint",
+          "label": "Mechanism restraint",
+          "description": "The response does not claim a detailed kinetic mechanism from evidence that only supports a rate-factor relationship."
+        }
+      ],
+      "constraints": [
+        "Temperature and concentration must not be varied together unless the design can separately identify their contributions.",
+        "A single noisy observation is insufficient for a confident kinetic conclusion."
+      ],
+      "nonGoals": [
+        "No universal Chemistry strategy ranking.",
+        "No transfer of this profile to stoichiometry, equilibrium, spectroscopy, or organic reaction mechanisms."
+      ],
+      "status": "pilot",
+      "academicContext": {
+        "disciplineFamily": "natural_sciences",
+        "subject": "chemistry",
+        "specialization": "chemical_kinetics",
+        "practice": "experimental_design",
+        "domainId": "chemistry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "biology-d3-causal-control",
+      "version": "0.1.0",
+      "archetypeId": "science-d3-causal",
+      "taskFamily": "biological-causal-explanation-from-experiment",
+      "strategyScope": "Repairing a biological causal explanation by connecting observations to a plausible mechanism while controlling alternative biological and environmental explanations.",
+      "evaluationMode": "acceptable_strategy_set",
+      "criteria": [
+        {
+          "id": "mechanism-evidence-link",
+          "label": "Mechanism-evidence link",
+          "description": "A proposed biological mechanism is tied to observations instead of being asserted from correlation alone."
+        },
+        {
+          "id": "control-awareness",
+          "label": "Control awareness",
+          "description": "Relevant biological or environmental controls are identified when they could explain the observed result."
+        },
+        {
+          "id": "alternative-hypotheses",
+          "label": "Alternative hypotheses",
+          "description": "Competing explanations are preserved when the current evidence does not discriminate among them."
+        },
+        {
+          "id": "biological-level-consistency",
+          "label": "Biological level consistency",
+          "description": "The explanation does not jump between organismal, cellular, molecular, or ecological levels without a justified bridge."
+        },
+        {
+          "id": "teleology-restraint",
+          "label": "Teleology restraint",
+          "description": "Purpose-language is not substituted for a causal biological mechanism."
+        }
+      ],
+      "constraints": [
+        "Correlation may motivate a mechanism hypothesis but cannot by itself establish that mechanism.",
+        "Biological variation and uncontrolled environmental factors must remain visible when material."
+      ],
+      "nonGoals": [
+        "No universal Biology strategy ranking.",
+        "No transfer of this profile to genetics probability, taxonomy, physiology calculation, or evolutionary inference."
+      ],
+      "status": "pilot",
+      "academicContext": {
+        "disciplineFamily": "natural_sciences",
+        "subject": "biology",
+        "specialization": "experimental_biology",
+        "practice": "causal_explanation",
+        "domainId": "biology"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "computer-science-python-d3-debugging",
+      "version": "0.1.0",
+      "archetypeId": "programming-d3-debug",
+      "taskFamily": "python-mutable-state-debugging",
+      "strategyScope": "Debugging a deterministic Python mutable-state defect by localizing the first violated invariant and proposing the smallest evidence-backed repair.",
+      "evaluationMode": "ordered_preference",
+      "criteria": [
+        {
+          "id": "fault-localization",
+          "label": "Fault localization",
+          "description": "The response identifies the earliest state transition that makes the observed execution diverge from the intended invariant."
+        },
+        {
+          "id": "python-semantics",
+          "label": "Python semantics",
+          "description": "The diagnosis respects Python list/dict mutation, aliasing, evaluation order, and function-call behavior relevant to the case."
+        },
+        {
+          "id": "evidence-backed-diagnosis",
+          "label": "Evidence-backed diagnosis",
+          "description": "The proposed cause is supported by a trace, targeted test, or invariant check rather than by speculative rewriting."
+        },
+        {
+          "id": "patch-minimality",
+          "label": "Patch minimality",
+          "description": "The repair changes only what is needed to restore the intended invariant unless broader refactoring is part of the task."
+        },
+        {
+          "id": "regression-awareness",
+          "label": "Regression awareness",
+          "description": "The response checks or names the behavior that should remain unchanged after the repair."
+        }
+      ],
+      "constraints": [
+        "Use Python semantics actually present in the authored case.",
+        "Do not reward a wholesale rewrite when the fault can be localized and minimally repaired."
+      ],
+      "nonGoals": [
+        "No universal Computer Science debugging strategy ranking.",
+        "No transfer of this profile to Java object models, Rust ownership, asynchronous systems debugging, or algorithm-design complexity."
+      ],
+      "status": "pilot",
+      "academicContext": {
+        "disciplineFamily": "computing",
+        "subject": "computer_science",
+        "specialization": "python",
+        "practice": "debugging",
+        "domainId": "computer_science"
       }
     }
   ]
