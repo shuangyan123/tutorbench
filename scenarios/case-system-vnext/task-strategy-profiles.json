@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "id": "case-system-vnext-strategy-profiles",
+  "version": "0.1.0",
+  "title": "Case System vNext task-specific strategy profiles",
+  "description": "Pilot task-specific strategy profiles layered over shared base rules and anchored to the audit-seeded 23-domain taxonomy. Broad domain membership never defines the final task strategy.",
+  "profiles": [
+    {
+      "schemaVersion": 1,
+      "id": "math-d5-structural-generalization",
+      "version": "0.1.0",
+      "archetypeId": "math-d5-generalization",
+      "taskFamily": "algebraic-structure-and-generalization",
+      "strategyScope": "Solving and generalizing conjugate-product structure for a learner who already knows distributive reasoning and basic symbolic manipulation.",
+      "evaluationMode": "ordered_preference",
+      "criteria": [
+        {
+          "id": "correctness",
+          "label": "Correctness",
+          "description": "The reasoning and result are mathematically valid."
+        },
+        {
+          "id": "human-efficiency",
+          "label": "Human reasoning efficiency",
+          "description": "The visible route avoids unnecessary mechanical work when an accessible structural route exists."
+        },
+        {
+          "id": "transparency",
+          "label": "Reasoning transparency",
+          "description": "The key structural move is justified at the learner's prerequisite level."
+        },
+        {
+          "id": "generalization",
+          "label": "Generalization quality",
+          "description": "When the teaching target calls for it, the response exposes and justifies the reusable identity."
+        }
+      ],
+      "constraints": [
+        "Respect the authored prerequisite boundary.",
+        "Do not reward hidden model search, token brevity, or unexplained theorem invocation."
+      ],
+      "nonGoals": [
+        "No universal mathematics strategy ranking.",
+        "No claim that the shortest symbolic derivation is always pedagogically best."
+      ],
+      "status": "pilot",
+      "academicContext": {
+        "disciplineFamily": "formal_sciences",
+        "subject": "mathematics",
+        "specialization": "algebra",
+        "practice": "proof_and_generalization",
+        "domainId": "mathematics"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "programming-d5-pair-sum-algorithm",
+      "version": "0.1.0",
+      "archetypeId": "programming-d5-algorithm",
+      "taskFamily": "pair-sum-algorithm-design",
+      "strategyScope": "Deriving a reusable pair-sum solution under an authored prerequisite set that includes hash maps/sets and Big-O basics.",
+      "evaluationMode": "ordered_preference",
+      "criteria": [
+        {
+          "id": "correctness",
+          "label": "Correctness",
+          "description": "The algorithm solves the stated problem under the given constraints."
+        },
+        {
+          "id": "complexity-fit",
+          "label": "Complexity fit",
+          "description": "The method avoids unnecessary pair enumeration when the allowed data structures support a better asymptotic route."
+        },
+        {
+          "id": "insight-transparency",
+          "label": "Insight transparency",
+          "description": "The response explains why complement lookup removes one search dimension."
+        },
+        {
+          "id": "prerequisite-fit",
+          "label": "Prerequisite fit",
+          "description": "The method stays inside the learner's known concepts and allowed methods."
+        }
+      ],
+      "constraints": [
+        "Hash lookup is in scope.",
+        "Do not prefer a more advanced structure merely because it is more sophisticated."
+      ],
+      "nonGoals": [
+        "No universal programming strategy ranking.",
+        "No transfer of this profile to debugging, refactoring, systems design, or testing."
+      ],
+      "status": "pilot",
+      "academicContext": {
+        "disciplineFamily": "computing",
+        "subject": "computer_science",
+        "specialization": "algorithms",
+        "practice": "code_implementation",
+        "domainId": "computer_science"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "writing-d5-conflicting-source-synthesis",
+      "version": "0.1.0",
+      "archetypeId": "writing-d5-synthesis",
+      "taskFamily": "conflicting-source-synthesis",
+      "strategyScope": "Synthesizing partially conflicting sources into an original argument while preserving evidence boundaries and uncertainty.",
+      "evaluationMode": "acceptable_strategy_set",
+      "criteria": [
+        {
+          "id": "claim-coherence",
+          "label": "Claim coherence",
+          "description": "The organizing claim or tension remains logically coherent."
+        },
+        {
+          "id": "source-integration",
+          "label": "Source integration",
+          "description": "Sources are related to one another rather than serially summarized."
+        },
+        {
+          "id": "evidence-fidelity",
+          "label": "Evidence fidelity",
+          "description": "The response does not overstate what sources support."
+        },
+        {
+          "id": "uncertainty-preservation",
+          "label": "Uncertainty preservation",
+          "description": "Real disagreement or limitation is retained rather than flattened into false consensus."
+        }
+      ],
+      "constraints": [
+        "Preserve source attribution and uncertainty.",
+        "Different valid organizing structures may be equally acceptable."
+      ],
+      "nonGoals": [
+        "No universal writing style ranking.",
+        "No preference for claim-centered over tension-centered synthesis absent an authored task constraint."
+      ],
+      "status": "pilot",
+      "academicContext": {
+        "disciplineFamily": "humanities",
+        "subject": "composition_rhetoric",
+        "specialization": "argumentation",
+        "practice": "source_synthesis",
+        "domainId": "writing_rhetoric"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "history-d5-source-corroboration",
+      "version": "0.1.0",
+      "archetypeId": "history-d5-conflicting-sources",
+      "taskFamily": "conflicting-source-corroboration",
+      "strategyScope": "Weighing conflicting historical or social-science sources using provenance, claims, and independent corroboration.",
+      "evaluationMode": "acceptable_strategy_set",
+      "criteria": [
+        {
+          "id": "provenance-reasoning",
+          "label": "Provenance reasoning",
+          "description": "Source origin, incentives, and context are used as evidence rather than as automatic authority."
+        },
+        {
+          "id": "corroboration",
+          "label": "Corroboration",
+          "description": "Claims are checked against independent evidence or cross-source consistency."
+        },
+        {
+          "id": "evidentiary-weight",
+          "label": "Evidentiary weight",
+          "description": "Conflicting sources are not treated as equally strong merely because they disagree."
+        },
+        {
+          "id": "bounded-conclusion",
+          "label": "Bounded conclusion",
+          "description": "The conclusion matches the available evidence and leaves unresolved uncertainty explicit."
+        }
+      ],
+      "constraints": [
+        "Primary-source status is not sufficient for preference.",
+        "Do not collapse disagreement into false equivalence."
+      ],
+      "nonGoals": [
+        "No universal history strategy ranking.",
+        "No claim that one source type is categorically superior."
+      ],
+      "status": "pilot",
+      "academicContext": {
+        "disciplineFamily": "humanities_social_sciences",
+        "subject": "history",
+        "specialization": "source_analysis",
+        "practice": "corroboration",
+        "domainId": "history"
+      }
+    }
+  ]
+}

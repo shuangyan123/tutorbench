@@ -1,7 +1,6 @@
 import { BenchmarkConfigurationError } from "./errors.js";
 import {
   CASE_SYSTEM_VNEXT_CONTENT_DEPTHS,
-  CASE_SYSTEM_VNEXT_DISCIPLINES,
   CASE_SYSTEM_VNEXT_INTERACTION_HORIZONS,
   CASE_SYSTEM_VNEXT_LEARNER_STATES,
   CASE_SYSTEM_VNEXT_PEDAGOGICAL_DIFFICULTIES,
@@ -10,6 +9,7 @@ import {
   type CaseSystemVNextPilot,
   type CaseSystemVNextReasoningStrategy,
 } from "./case-system-vnext.js";
+import { CASE_SYSTEM_VNEXT_DOMAIN_IDS } from "./case-system-vnext-domain-taxonomy.js";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -100,7 +100,9 @@ function isArchetype(value: unknown): value is CaseSystemVNextArchetype {
       "id",
       "version",
       "title",
-      "discipline",
+      "domainId",
+      "subdomain",
+      "practice",
       "topic",
       "learnerLevel",
       "contentDepth",
@@ -118,7 +120,9 @@ function isArchetype(value: unknown): value is CaseSystemVNextArchetype {
     !/^[a-z][a-z0-9-]*$/.test(record.id) ||
     !isText(record.version, 50) ||
     !isText(record.title, 200) ||
-    !CASE_SYSTEM_VNEXT_DISCIPLINES.includes(record.discipline as never) ||
+    !CASE_SYSTEM_VNEXT_DOMAIN_IDS.includes(record.domainId as never) ||
+    !isText(record.subdomain, 200) ||
+    !isText(record.practice, 200) ||
     !isText(record.topic, 200) ||
     !isText(record.learnerLevel, 100) ||
     !CASE_SYSTEM_VNEXT_CONTENT_DEPTHS.includes(record.contentDepth as never) ||
@@ -169,24 +173,25 @@ export function parseCaseSystemVNextPilot(value: unknown): CaseSystemVNextPilot 
 
   const ids = new Set<string>();
   const cells = new Set<string>();
+  const domains = new Set<string>();
+  const depths = new Set<number>();
   for (const archetype of record.archetypes as CaseSystemVNextArchetype[]) {
     if (ids.has(archetype.id)) {
       throw new BenchmarkConfigurationError("case_system_vnext_invalid");
     }
     ids.add(archetype.id);
-    const cell = `${archetype.discipline}:D${archetype.contentDepth}`;
+    domains.add(archetype.domainId);
+    depths.add(archetype.contentDepth);
+    const cell =
+      `${archetype.domainId}:${archetype.subdomain}:${archetype.practice}:D${archetype.contentDepth}`;
     if (cells.has(cell)) {
       throw new BenchmarkConfigurationError("case_system_vnext_invalid");
     }
     cells.add(cell);
   }
 
-  for (const discipline of CASE_SYSTEM_VNEXT_DISCIPLINES) {
-    for (const depth of [1, 3, 5] as const) {
-      if (!cells.has(`${discipline}:D${depth}`)) {
-        throw new BenchmarkConfigurationError("case_system_vnext_invalid");
-      }
-    }
+  if (domains.size < 7 || ![1, 3, 5].every((depth) => depths.has(depth))) {
+    throw new BenchmarkConfigurationError("case_system_vnext_invalid");
   }
 
   return record as unknown as CaseSystemVNextPilot;

@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "id": "case-system-vnext-domain-taxonomy",
+  "version": "0.1.0",
+  "source": {
+    "audit": "TutorBench Evaluation Framework / Pedagogy Taxonomy Research Audit",
+    "auditDate": "2026-09-11",
+    "section": "5.2",
+    "disposition": "design_preference_pending_expert_validation"
+  },
+  "domains": [
+    {
+      "id": "mathematics",
+      "label": "Mathematics",
+      "evidenceAndReasoningNorms": [
+        "definitions and stated assumptions",
+        "deductive chains and proof obligations",
+        "quantifiers, counterexamples, and distinction between verification and proof"
+      ],
+      "teachingRiskExamples": [
+        "rewarding a correct final answer despite circular or invalid proof",
+        "treating numerical checks as a substitute for general proof"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "statistics",
+      "label": "Statistics",
+      "evidenceAndReasoningNorms": [
+        "data-generating process and sampling",
+        "variation, measurement, estimation uncertainty, and model fit",
+        "separation of association from causal identification"
+      ],
+      "teachingRiskExamples": [
+        "formulaically correct work with an invalid interpretation",
+        "ignoring selection, sampling, or measurement bias"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "physics",
+      "label": "Physics",
+      "evidenceAndReasoningNorms": [
+        "system boundaries and idealizations",
+        "conservation laws, dimensions, approximations, and regime of validity",
+        "explicit model assumptions"
+      ],
+      "teachingRiskExamples": [
+        "reusing a formula after its assumptions no longer hold",
+        "treating a model representation as the physical system itself"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "chemistry",
+      "label": "Chemistry",
+      "evidenceAndReasoningNorms": [
+        "coordination of macroscopic observations, microscopic mechanisms, and symbolic representations",
+        "mass and charge conservation",
+        "conditions, energetics, kinetics, and safety where relevant"
+      ],
+      "teachingRiskExamples": [
+        "confusing representational convenience with literal particle mechanism",
+        "ignoring reaction conditions or conservation constraints"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "biology",
+      "label": "Biology",
+      "evidenceAndReasoningNorms": [
+        "multi-level mechanisms involving entities, activities, and organization",
+        "evolutionary and functional explanation without teleology",
+        "experimental control and biological variation"
+      ],
+      "teachingRiskExamples": [
+        "replacing mechanism with purpose language",
+        "treating correlation or a marker as a sufficient disease mechanism"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "earth_environmental_science",
+      "label": "Earth / environmental science",
+      "evidenceAndReasoningNorms": [
+        "historical observation and multi-scale systems",
+        "spatial and temporal heterogeneity",
+        "models, uncertainty, and limits of extrapolation"
+      ],
+      "teachingRiskExamples": [
+        "inferring climate from a single weather event",
+        "generalizing from one location or observation without scope limits"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "computer_science",
+      "label": "Computer science",
+      "evidenceAndReasoningNorms": [
+        "specification and observable program behavior",
+        "algorithmic invariants and correctness arguments",
+        "reproducible execution, testing, and complexity"
+      ],
+      "teachingRiskExamples": [
+        "assuming one passing test proves general correctness",
+        "changing code without evidence that localizes the fault"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "engineering",
+      "label": "Engineering",
+      "evidenceAndReasoningNorms": [
+        "requirements and constraints",
+        "verification, risk, reliability, and trade-off reasoning",
+        "multiple feasible designs under competing objectives"
+      ],
+      "teachingRiskExamples": [
+        "forcing one unique optimal design without stated objective weights",
+        "ignoring manufacturability, safety, cost, or reliability constraints"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "medicine_health_sciences",
+      "label": "Medicine / health sciences",
+      "evidenceAndReasoningNorms": [
+        "quality of clinical evidence and prior risk",
+        "differential reasoning and conditional decisions",
+        "supervision, escalation, uncertainty, and patient safety"
+      ],
+      "teachingRiskExamples": [
+        "presenting a teaching-case inference as clinical competence",
+        "failing to recognize uncertainty or escalation signals"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "psychology",
+      "label": "Psychology",
+      "evidenceAndReasoningNorms": [
+        "construct operationalization and measurement",
+        "research design, causal identification, reproducibility, and population scope",
+        "distinction between group evidence and individual inference"
+      ],
+      "teachingRiskExamples": [
+        "treating a scale score as the construct itself",
+        "using correlational evidence to assert an individual diagnosis"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "economics",
+      "label": "Economics",
+      "evidenceAndReasoningNorms": [
+        "mechanisms and model assumptions",
+        "identification, heterogeneity, and external validity",
+        "separation of empirical claims from normative objectives"
+      ],
+      "teachingRiskExamples": [
+        "confusing observed price movement with identified causal shock",
+        "blending efficiency, distributional values, and empirical estimates"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "sociology",
+      "label": "Sociology",
+      "evidenceAndReasoningNorms": [
+        "sampling and historical context",
+        "institutional mechanisms",
+        "quantitative and qualitative evidence with positionality and scope"
+      ],
+      "teachingRiskExamples": [
+        "using group averages to stereotype individuals",
+        "treating survey, interview, and administrative data as interchangeable evidence"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "political_science_civics",
+      "label": "Political science / civics",
+      "evidenceAndReasoningNorms": [
+        "distinction between factual and value claims",
+        "institutional evidence and causal claims",
+        "competing perspectives and public reasoning weighted by evidence"
+      ],
+      "teachingRiskExamples": [
+        "treating evidence-backed and unsupported claims as equally supported",
+        "collapsing policy trade-offs into a single value judgment"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "history",
+      "label": "History",
+      "evidenceAndReasoningNorms": [
+        "sourcing and provenance",
+        "contextualization",
+        "corroboration and independence of sources"
+      ],
+      "teachingRiskExamples": [
+        "treating primary-source status as automatic authority",
+        "allowing an interpretation that conflicts with the available source evidence"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "law",
+      "label": "Law",
+      "evidenceAndReasoningNorms": [
+        "jurisdiction, controlling authority, and temporal validity",
+        "rule-to-fact application",
+        "counterargument and adverse authority"
+      ],
+      "teachingRiskExamples": [
+        "applying a correct rule from the wrong jurisdiction or date",
+        "ignoring authority hierarchy or material factual distinctions"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "philosophy",
+      "label": "Philosophy",
+      "evidenceAndReasoningNorms": [
+        "conceptual clarification and explicit premises",
+        "logical validity and soundness",
+        "objections, replies, and distinction among defensible positions"
+      ],
+      "teachingRiskExamples": [
+        "rewarding agreement with the rubric author's position",
+        "treating disagreement as error when multiple arguments are defensible"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "languages_second_language_learning",
+      "label": "Languages / second-language learning",
+      "evidenceAndReasoningNorms": [
+        "communicative purpose and comprehension",
+        "pragmatics, interaction, mediation, and register",
+        "language development and acceptable variation"
+      ],
+      "teachingRiskExamples": [
+        "treating one native-speaker form as the only valid expression",
+        "penalizing variation that does not impair the communicative target"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "literature",
+      "label": "Literature",
+      "evidenceAndReasoningNorms": [
+        "textual evidence",
+        "narrative or formal features",
+        "historical and genre context with internally coherent interpretation"
+      ],
+      "teachingRiskExamples": [
+        "forcing one interpretation despite multiple text-supported readings",
+        "treating interpretive plurality as permission for evidence-free claims"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "writing_rhetoric",
+      "label": "Writing / rhetoric",
+      "evidenceAndReasoningNorms": [
+        "audience and purpose",
+        "argument, evidence, genre, and revision process",
+        "authorial intent and language diversity"
+      ],
+      "teachingRiskExamples": [
+        "equating a polished product with demonstrated learner mastery",
+        "rewriting the learner's voice without a task-specific reason"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "business_finance_accounting",
+      "label": "Business / finance / accounting",
+      "evidenceAndReasoningNorms": [
+        "data quality and accounting or regulatory context",
+        "assumptions, decision objectives, risk, and time applicability",
+        "separation of rule application from business judgment"
+      ],
+      "teachingRiskExamples": [
+        "using one profitability metric as a complete decision criterion",
+        "ignoring regulatory, risk, or timing constraints"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "arts_music_design",
+      "label": "Arts / music / design",
+      "evidenceAndReasoningNorms": [
+        "artifact or performance evidence",
+        "technique, form, expressive intent, and context",
+        "creative process and revision"
+      ],
+      "teachingRiskExamples": [
+        "substituting generic aesthetic preference for task evidence",
+        "judging process skills only from a textual description of performance"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "vocational_procedural_education",
+      "label": "Vocational / procedural education",
+      "evidenceAndReasoningNorms": [
+        "observable operation and sequence",
+        "tool conditions, quality standards, and safety stops",
+        "recovery procedures and performance evidence"
+      ],
+      "teachingRiskExamples": [
+        "treating verbal recall of a procedure as safe execution competence",
+        "ignoring stop/recovery conditions in procedural guidance"
+      ],
+      "status": "research_seed"
+    },
+    {
+      "id": "interdisciplinary_emerging_fields",
+      "label": "Interdisciplinary / emerging fields",
+      "evidenceAndReasoningNorms": [
+        "compatibility of assumptions and evidence across contributing fields",
+        "boundary objects, uncertainty, and scope transfer",
+        "explicit handling of stakeholder or objective conflicts"
+      ],
+      "teachingRiskExamples": [
+        "assuming evidence valid in one field automatically supports another field's conclusion",
+        "hiding cross-domain uncertainty behind a single blended answer"
+      ],
+      "status": "research_seed"
+    }
+  ]
+}

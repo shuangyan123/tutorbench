@@ -52,7 +52,7 @@ Case System vNext does **not**:
 
 ```text
 Case Archetype
-├── Discipline Profile
+├── Audit-seeded Domain Profile
 ├── Content Depth
 ├── Pedagogical Difficulty
 ├── Interaction Horizon
@@ -86,32 +86,119 @@ Case Archetype
     └── far-transfer target
 ```
 
-Not every field is required for every discipline. A `DisciplineProfile`
+Not every field is required for every discipline. A `DomainProfile`
 determines which reference fields are meaningful.
 
-## 1. Discipline Profile
+## 0.1 Domain taxonomy source
 
-A discipline profile captures the evidence and reasoning norms of a domain.
-The first proposed profiles are:
+The first-level domain taxonomy is seeded from section 5.2 of the external
+**TutorBench Evaluation Framework / Pedagogy Taxonomy Research Audit**
+(2026-09-11), which proposed a 23-domain coverage matrix. That matrix is used
+as a research-backed design seed, not as a validated measurement ontology.
 
-- mathematics;
-- science;
-- programming;
-- language / writing;
-- history / social science.
+The 23 domain seeds are:
+
+Mathematics; Statistics; Physics; Chemistry; Biology; Earth / environmental
+science; Computer science; Engineering; Medicine / health sciences;
+Psychology; Economics; Sociology; Political science / civics; History; Law;
+Philosophy; Languages / second-language learning; Literature; Writing /
+rhetoric; Business / finance / accounting; Arts / music / design; Vocational /
+procedural education; Interdisciplinary / emerging fields.
+
+These domains define the first subject-level evidence norms. They are then
+refined into specializations, practices, task families, and exact archetype
+strategy profiles. A broad family such as "science" is not a final strategy
+scope.
+
+The source disposition remains **design preference / pending expert
+validation**. TutorBench must not describe the 23-domain matrix as a validated
+educational taxonomy or calibrated scale.
+
+## 1. Domain Profile
+
+A domain profile captures first-level evidence and reasoning norms. The initial
+domain vocabulary is the audit-seeded 23-domain matrix above rather than a
+five-bucket `science / programming / language-writing / social-science`
+shortcut.
 
 A profile may define:
 
-- what counts as a valid solution or response;
-- what kinds of evidence are required;
+- what counts as valid evidence or a valid response;
+- what kinds of reasoning are material in that domain;
 - whether a unique answer is expected;
 - whether algorithmic / procedural efficiency is meaningful;
-- acceptable forms of explanation;
+- acceptable forms of explanation or representation;
 - domain-specific reliability checks;
+- domain-specific teaching risks;
 - domain-specific transfer expectations.
 
-This prevents a mathematics-style answer model from being imposed on history,
-writing, or other open-ended domains.
+The domain layer is still not the final strategy layer. Physics, Chemistry,
+Biology, Computer Science, History, Writing/Rhetoric, and other domains may
+require further specialization before a strategy preference is justified.
+
+## 1.1 Strategy adaptation is task-specific
+
+The broad discipline-family field is a coverage and organization label. It does
+**not** define one universal strategy policy.
+
+Case System vNext uses layered rules:
+
+```text
+shared base evaluation rules
+  -> discipline family
+     -> concrete subject
+        -> specialization / language / branch
+           -> practice or task family
+              -> archetype
+                 -> task-specific strategy profile
+```
+
+Examples:
+
+```text
+natural_sciences -> physics -> mechanics -> quantitative_problem_solving
+natural_sciences -> chemistry -> organic_chemistry -> mechanism_explanation
+natural_sciences -> biology -> genetics -> causal_modeling
+
+computing -> computer_science -> python -> debugging
+computing -> computer_science -> java -> object_oriented_design
+computing -> computer_science -> rust -> ownership_and_borrowing
+
+humanities_social_sciences -> history -> source_analysis -> corroboration
+language_arts -> composition -> argumentative_writing -> source_synthesis
+```
+
+"Writing" is therefore treated primarily as a cross-cutting practice/task
+family rather than as one academic discipline. Likewise, "science" is a family:
+physics, chemistry, biology, earth science, and other subjects require their
+own subject-level profiles. Programming-language-specific instruction may also
+require Python-, Java-, Rust-, JavaScript-, or other language-specific profiles.
+
+For example, `programming` must not imply one programming-wide notion of an
+optimal strategy. An algorithm-design profile may care about correctness,
+complexity, and reusable algorithmic insight, while a debugging profile may
+instead care about fault localization, evidence, patch minimality, and
+regression risk. Those profiles must be authored separately.
+
+Likewise, an experimental-design profile in empirical science, a quantitative
+physics problem, a chemistry mechanism explanation, and a biological causal
+model should not inherit one generic `science` strategy ranking.
+
+The same rule applies to writing and the humanities: argumentative source
+synthesis, sentence revision, literary interpretation, historical
+corroboration, and policy analysis require different strategy references.
+
+A task-specific profile may use one of several evaluation modes:
+
+- ordered preference when the authored constraints support a defensible
+  ordering;
+- Pareto trade-off when strategies optimize competing dimensions;
+- acceptable strategy set when multiple approaches are defensible;
+- no strategy ranking when ranking itself is not meaningful.
+
+This keeps "human-optimal instance/general strategy" as a valid construct for
+tasks where it is defensible, rather than a universal cross-disciplinary
+assumption.
 
 ## 2. Content Depth: D1–D5
 
@@ -362,7 +449,7 @@ Possible observable criteria include:
 - generalization support;
 - distinction between a special case and a general rule;
 - near-transfer support;
-- far-transfer support where the discipline profile makes that meaningful.
+- far-transfer support where the domain profile makes that meaningful.
 
 Candidate Findings include:
 

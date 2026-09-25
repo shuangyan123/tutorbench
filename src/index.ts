@@ -19,10 +19,17 @@ export {
   DEFAULT_TUTOR_CASE_LOCALE,
   parseTutorScenarioSuiteVNext,
   parseCaseSystemVNextPilot,
+  parseCaseSystemVNextStrategyProfileRegistry,
+  parseCaseSystemVNextDomainTaxonomy,
   toTutorTurnInput,
 } from "./contracts/index.js";
 export { runTutorBenchmark, runTutorEval } from "./runner/index.js";
 export { runTutorHealthEvaluation } from "./runner/index.js";
+export {
+  buildCaseSystemVNextEvaluatorStressPlan,
+  runCaseSystemVNextEvaluatorStress,
+  CaseSystemVNextEvaluatorStressError,
+} from "./case-system-vnext/index.js";
 export {
   buildTutorHealthReport,
   formatTutorHealthReport,
@@ -47,6 +54,23 @@ export type {
   TutorEvalCase,
   TutorEvalDataset,
 } from "./contracts/tutor-eval.js";
+export type {
+  CaseSystemVNextDomainId,
+  CaseSystemVNextDomainProfile,
+  CaseSystemVNextDomainTaxonomy,
+} from "./contracts/case-system-vnext-domain-taxonomy.js";
+export type {
+  CaseSystemVNextStrategyProfile,
+  CaseSystemVNextStrategyProfileRegistry,
+  CaseSystemVNextStrategyCriterion,
+} from "./contracts/case-system-vnext-strategy-profile.js";
+export type {
+  CaseSystemVNextEvaluatorStressReport,
+  CaseSystemVNextStressBlindPacket,
+  CaseSystemVNextStressFixtureSuite,
+  CaseSystemVNextStressJudge,
+  CaseSystemVNextStressPlan,
+} from "./contracts/case-system-vnext-evaluator-stress.js";
 export type {
   CaseSystemVNextArchetype,
   CaseSystemVNextPilot,

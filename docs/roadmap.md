@@ -34,16 +34,18 @@
 
 - [x] Define multi-axis authoring model: discipline profile, D1-D5 content depth, P1-P5 pedagogical difficulty, and H1-H3 interaction horizon
 - [x] Define prerequisite-bounded human-optimal instance and general reasoning concepts
-- [x] Define a 25-cell five-discipline × five-depth coverage matrix
-- [x] Define a 15-archetype D1/D3/D5 pilot before full matrix expansion
+- [x] Replace the provisional five-discipline matrix with the audit-seeded 23-domain taxonomy and explicit gap coverage
+- [x] Migrate the 15-archetype pilot to seven audit-seeded domains with explicit subdomain/practice metadata
 - [x] Preserve frozen `tutor-eval-v0.2a` semantics and current Tutor Health behavior
 - [x] Implement a versioned vNext pilot-archetype schema after methodology review
 - [x] Author the first 15 D1/D3/D5 pilot archetypes; independent methodology/content review remains pending
-- [ ] Validate evaluator distinctions for efficient, opaque, brute-force, and non-generalizable reasoning
+- [x] Add provider-neutral evaluator stress harness for efficiency, opacity, generalization, prerequisite compatibility, and equivalent-strategy ties
+- [ ] Run repeated live-Judge stress tests and independently review fixture expectations
 - [ ] Decide whether Reasoning & Transfer becomes a Tutor Health dimension or remains a separate profile/reporting area
 
-See [Case System vNext](case-system-vnext.md) and the
-[Core Coverage Matrix](case-system-vnext-coverage-matrix.md).
+See [Case System vNext](case-system-vnext.md), the
+[Core Coverage Matrix](case-system-vnext-coverage-matrix.md), and the
+[Evaluator Stress Test](case-system-vnext-evaluator-stress.md).
 
 ## 0.3 LLM-as-Judge Calibration — PARTIAL: 0.3A hybrid + 0.3B OpenAI provider
 

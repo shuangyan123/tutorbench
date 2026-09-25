@@ -1,16 +1,15 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "case-system-vnext-pilot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Case System vNext D1/D3/D5 Pilot Archetypes",
-  "description": "Fifteen non-canonical archetypes covering five discipline profiles at D1, D3, and D5. These records define authoring structure only; they are not executable TutorEval cases, calibrated measures, or learner-outcome evidence.",
+  "description": "Fifteen non-canonical archetypes spanning seven audit-seeded domains at selected D1/D3/D5 depths. These records define authoring structure only; they are not executable TutorEval cases, calibrated measures, representative domain coverage, or learner-outcome evidence.",
   "archetypes": [
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "math-d1-equivalence",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Mathematics D1 — Equivalent representations",
-      "discipline": "mathematics",
       "topic": "equivalent numerical representations",
       "learnerLevel": "upper-primary",
       "contentDepth": 1,
@@ -71,14 +70,16 @@
         "nearTransfer": "Use the same equivalence principle with different values.",
         "farTransfer": "Recognize equivalence when the same quantity appears in a different representation."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "mathematics",
+      "subdomain": "arithmetic_and_representation",
+      "practice": "equivalence_reasoning"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "math-d3-algebra-diagnosis",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Mathematics D3 — Multi-step algebra diagnosis",
-      "discipline": "mathematics",
       "topic": "multi-step linear equations",
       "learnerLevel": "early-algebra",
       "contentDepth": 3,
@@ -141,14 +142,16 @@
         "nearTransfer": "Change coefficients while preserving the same error structure.",
         "farTransfer": "Transfer the equality-invariant reasoning to a word problem translated into an equation."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "mathematics",
+      "subdomain": "algebra",
+      "practice": "error_diagnosis"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "math-d5-generalization",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Mathematics D5 — From instance insight to general method",
-      "discipline": "mathematics",
       "topic": "algebraic structure and generalization",
       "learnerLevel": "secondary",
       "contentDepth": 5,
@@ -213,35 +216,39 @@
         "nearTransfer": "Solve a new symmetric product with different center and offset.",
         "farTransfer": "Recognize the same identity inside a factoring or geometry problem."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "mathematics",
+      "subdomain": "algebra",
+      "practice": "proof_and_generalization"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "science-d1-graph",
-      "version": "0.1.0",
-      "title": "Science D1 — Direct representation interpretation",
-      "discipline": "science",
-      "topic": "reading scientific graphs",
+      "version": "0.2.0",
+      "title": "Physics D1 — Interpret a position–time graph",
+      "topic": "position–time graph interpretation",
       "learnerLevel": "middle-school",
       "contentDepth": 1,
       "pedagogicalDifficulty": 2,
       "interactionHorizon": 1,
-      "coreTask": "Read an explicit trend or value from a graph without adding a causal claim that the graph does not establish.",
+      "coreTask": "Read a position-versus-time graph, identify an explicit trend or interval behavior, and avoid inferring a force or mechanism that the graph alone does not establish.",
       "learnerStates": [
         "novice",
         "uncertain_but_correct"
       ],
       "prerequisiteBoundary": {
         "knownConcepts": [
-          "axes and units",
-          "increasing and decreasing trends"
+          "graph axes and units",
+          "position and time",
+          "increasing, decreasing, and constant trends"
         ],
         "allowedMethods": [
           "direct graph reading",
-          "simple comparison"
+          "interval comparison",
+          "qualitative slope interpretation"
         ],
         "excludedMethods": [
-          "unsupported causal inference"
+          "unsupported force or causal inference"
         ]
       },
       "referenceReasoning": {
@@ -250,35 +257,37 @@
         "humanOptimalGeneralStrategies": [],
         "alternativeHumanValidStrategies": [
           {
-            "id": "read-axis-then-trend",
-            "label": "Read axes then trend",
-            "keyInsight": "Identify variables and units, then state the observed relationship.",
-            "applicability": "General direct graph interpretation."
+            "id": "read-axes-then-motion",
+            "label": "Read axes, interval, then motion claim",
+            "keyInsight": "Identify the graphed variables and interval first, then state only the motion relationship supported by the position–time graph.",
+            "applicability": "Direct qualitative interpretation of position–time graphs."
           }
         ],
         "avoidableDetours": [
-          "inventing a mechanism when only correlation is shown"
+          "inventing a force or causal mechanism from a position–time graph alone"
         ],
         "machineSearchCost": "out_of_scope"
       },
       "transfer": {
-        "nearTransfer": "Read the same variables from a differently scaled graph.",
-        "farTransfer": "Distinguish an observed association from a causal explanation in a short study description."
+        "nearTransfer": "Interpret a position–time graph with a different scale or piecewise interval.",
+        "farTransfer": "Distinguish what a velocity–time graph directly shows from causal claims that require additional physical information."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "physics",
+      "subdomain": "kinematics",
+      "practice": "graph_interpretation"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "science-d3-causal",
-      "version": "0.1.0",
-      "title": "Science D3 — Multi-variable causal explanation",
-      "discipline": "science",
-      "topic": "causal reasoning across variables",
+      "version": "0.2.0",
+      "title": "Biology D3 — Repair a causal explanation from an experiment",
+      "topic": "biological causal explanation and controls",
       "learnerLevel": "secondary",
       "contentDepth": 3,
       "pedagogicalDifficulty": 4,
       "interactionHorizon": 2,
-      "coreTask": "Repair an explanation that confuses correlation, mechanism, and a relevant control variable while preserving supported parts of the learner's reasoning.",
+      "coreTask": "Repair an explanation of a plant-growth experiment that confuses an observed association with mechanism and overlooks a relevant biological or environmental control variable.",
       "learnerStates": [
         "conceptual_misconception",
         "partial_progress",
@@ -287,14 +296,16 @@
       "prerequisiteBoundary": {
         "knownConcepts": [
           "independent and dependent variables",
-          "correlation does not prove causation"
+          "basic experimental controls",
+          "correlation does not by itself establish mechanism"
         ],
         "allowedMethods": [
-          "mechanistic explanation",
-          "controlled comparison"
+          "mechanistic biological explanation",
+          "controlled comparison",
+          "competing-hypothesis reasoning"
         ],
         "excludedMethods": [
-          "single-factor assertion without evidence"
+          "single-factor causal certainty without controlled evidence"
         ]
       },
       "referenceReasoning": {
@@ -305,40 +316,42 @@
           {
             "id": "mechanism-plus-control",
             "label": "Mechanism plus control",
-            "keyInsight": "Connect the proposed mechanism to observed evidence and identify a control or alternative variable that must be considered.",
-            "applicability": "General causal explanation under limited evidence."
+            "keyInsight": "Connect the proposed biological mechanism to the observed growth evidence and identify a relevant control such as light, water, or initial plant condition.",
+            "applicability": "Biological causal explanation from a controlled or partially controlled experiment."
           },
           {
-            "id": "competing-hypotheses",
-            "label": "Competing hypotheses",
-            "keyInsight": "State at least two plausible explanations and identify evidence that would discriminate them.",
-            "applicability": "Useful when current evidence underdetermines cause."
+            "id": "competing-biological-hypotheses",
+            "label": "Competing biological hypotheses",
+            "keyInsight": "State plausible biological/environmental explanations and identify the observation or control that would discriminate them.",
+            "applicability": "When current experimental evidence underdetermines the mechanism."
           }
         ],
         "avoidableDetours": [
-          "treating correlation as proof of causation",
-          "listing variables without explaining their role"
+          "treating growth correlation as proof of one biological mechanism",
+          "listing environmental variables without explaining how they confound the inference"
         ],
         "machineSearchCost": "out_of_scope"
       },
       "transfer": {
-        "nearTransfer": "Apply the same causal structure to a new experiment with changed surface variables.",
-        "farTransfer": "Identify a confound in a different domain while preserving the same evidence logic."
+        "nearTransfer": "Apply the same control-and-mechanism reasoning to a new plant-growth experiment with a different manipulated variable.",
+        "farTransfer": "Use the same causal-evidence logic in a different biological system, such as microbial growth or inheritance observations."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "biology",
+      "subdomain": "experimental_biology",
+      "practice": "causal_explanation"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "science-d5-investigation",
-      "version": "0.1.0",
-      "title": "Science D5 — Design an investigation under uncertainty",
-      "discipline": "science",
-      "topic": "experimental design and model comparison",
+      "version": "0.2.0",
+      "title": "Chemistry D5 — Design a discriminating kinetics experiment",
+      "topic": "chemical kinetics experimental design",
       "learnerLevel": "secondary",
       "contentDepth": 5,
       "pedagogicalDifficulty": 5,
       "interactionHorizon": 3,
-      "coreTask": "Design an interpretable investigation that discriminates between competing explanations while making uncertainty, controls, and measurement limits explicit.",
+      "coreTask": "Design an interpretable experiment that distinguishes whether an observed reaction-rate change is driven by temperature or reactant concentration while controlling other relevant chemical conditions and measurement limits.",
       "learnerStates": [
         "partial_understanding",
         "near_mastery",
@@ -346,17 +359,20 @@
       ],
       "prerequisiteBoundary": {
         "knownConcepts": [
+          "reaction rate",
+          "concentration",
+          "temperature effects",
           "controlled experiments",
-          "measurement error",
-          "hypothesis testing"
+          "measurement uncertainty"
         ],
         "allowedMethods": [
-          "control groups",
+          "one-variable-at-a-time controlled comparison",
           "replication",
+          "rate measurement",
           "operational definitions"
         ],
         "excludedMethods": [
-          "claiming certainty from one noisy observation"
+          "claiming a kinetic mechanism or cause from one uncontrolled observation"
         ]
       },
       "referenceReasoning": {
@@ -365,56 +381,60 @@
         "humanOptimalGeneralStrategies": [],
         "alternativeHumanValidStrategies": [
           {
-            "id": "discriminating-experiment",
-            "label": "Discriminating experiment",
-            "keyInsight": "Vary the factor on which competing models make different predictions while controlling major confounds.",
-            "applicability": "General model-comparison investigations."
+            "id": "factorial-contrast",
+            "label": "Controlled factor contrast",
+            "keyInsight": "Vary temperature and concentration in controlled conditions that separate their predictions while holding other reaction conditions fixed.",
+            "applicability": "Kinetics experiments where temperature and concentration are plausible competing drivers."
           },
           {
-            "id": "triangulated-evidence",
-            "label": "Triangulated evidence",
-            "keyInsight": "Combine complementary measurements when one instrument or design cannot isolate the mechanism.",
-            "applicability": "Useful under measurement limitations."
+            "id": "replicated-rate-series",
+            "label": "Replicated rate series",
+            "keyInsight": "Measure reaction rate across a small controlled series for one factor while fixing the other, then repeat for the second factor with uncertainty reported.",
+            "applicability": "When direct factorial comparison is impractical but controlled series are feasible."
           }
         ],
         "avoidableDetours": [
-          "adding many measurements that do not discriminate the hypotheses",
-          "ignoring a known confound",
-          "treating absence of evidence as proof"
+          "adding measurements that do not distinguish temperature from concentration effects",
+          "changing both variables without a design that separates their contributions",
+          "treating one noisy rate measurement as decisive"
         ],
         "machineSearchCost": "out_of_scope"
       },
       "transfer": {
-        "nearTransfer": "Modify one control variable and explain how the design must change.",
-        "farTransfer": "Transfer the discrimination logic to a new scientific domain with different measurements."
+        "nearTransfer": "Redesign the experiment when a catalyst is introduced as an additional controlled factor.",
+        "farTransfer": "Transfer the discriminating-design logic to another chemistry question in which two mechanisms predict different observable trends."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "chemistry",
+      "subdomain": "chemical_kinetics",
+      "practice": "experimental_design"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "programming-d1-trace",
-      "version": "0.1.0",
-      "title": "Programming D1 — Trace a local state change",
-      "discipline": "programming",
-      "topic": "program tracing",
+      "version": "0.2.0",
+      "title": "Computer Science D1 — Trace Python state",
+      "topic": "Python program tracing",
       "learnerLevel": "introductory",
       "contentDepth": 1,
       "pedagogicalDifficulty": 2,
       "interactionHorizon": 1,
-      "coreTask": "Trace a short deterministic program and explain the specific state change responsible for the output.",
+      "coreTask": "Trace a short deterministic Python snippet and explain the specific variable or collection state change responsible for the output.",
       "learnerStates": [
         "novice",
         "uncertain_but_correct"
       ],
       "prerequisiteBoundary": {
         "knownConcepts": [
-          "variables",
+          "Python variables",
           "assignment",
+          "lists",
           "basic control flow"
         ],
         "allowedMethods": [
           "manual trace",
-          "small state table"
+          "small state table",
+          "Python evaluation-order reasoning"
         ],
         "excludedMethods": [
           "running the program as the only explanation"
@@ -457,20 +477,22 @@
         "nearTransfer": "Trace the same pattern with changed initial values.",
         "farTransfer": "Identify which assignments matter in a larger function with irrelevant local state."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "computer_science",
+      "subdomain": "python",
+      "practice": "program_tracing"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "programming-d3-debug",
-      "version": "0.1.0",
-      "title": "Programming D3 — Stateful debugging",
-      "discipline": "programming",
-      "topic": "debugging interacting state",
+      "version": "0.2.0",
+      "title": "Computer Science D3 — Debug Python mutable state",
+      "topic": "Python debugging of interacting mutable state",
       "learnerLevel": "intermediate",
       "contentDepth": 3,
       "pedagogicalDifficulty": 4,
       "interactionHorizon": 2,
-      "coreTask": "Locate the earliest state transition that violates the intended invariant and guide a minimal repair rather than rewriting the whole program.",
+      "coreTask": "Locate the earliest Python list or dictionary state transition that violates the intended invariant and guide a minimal repair rather than rewriting the whole program.",
       "learnerStates": [
         "procedural_error",
         "repeated_failure",
@@ -478,14 +500,15 @@
       ],
       "prerequisiteBoundary": {
         "knownConcepts": [
-          "functions",
+          "Python functions",
           "loops",
-          "mutable collections"
+          "mutable lists or dictionaries",
+          "references/aliasing at an introductory level"
         ],
         "allowedMethods": [
           "manual trace",
           "invariant check",
-          "small targeted test"
+          "small targeted Python test"
         ],
         "excludedMethods": [
           "wholesale rewrite without diagnosis"
@@ -529,15 +552,17 @@
         "nearTransfer": "Debug a structurally similar bug with a different container or loop.",
         "farTransfer": "Apply invariant-driven debugging to an asynchronous or recursive variant."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "computer_science",
+      "subdomain": "python",
+      "practice": "debugging"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "programming-d5-algorithm",
-      "version": "0.1.0",
-      "title": "Programming D5 — Derive a reusable algorithm",
-      "discipline": "programming",
-      "topic": "algorithm design and complexity",
+      "version": "0.2.0",
+      "title": "Computer Science D5 — Derive a reusable pair-sum algorithm",
+      "topic": "pair-sum algorithm design and complexity",
       "learnerLevel": "advanced-secondary",
       "contentDepth": 5,
       "pedagogicalDifficulty": 5,
@@ -601,14 +626,16 @@
         "nearTransfer": "Apply the method to a new target and changed input order.",
         "farTransfer": "Recognize the complement/inverse-query pattern in a related pair-matching problem."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "computer_science",
+      "subdomain": "algorithms",
+      "practice": "algorithm_design"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "writing-d1-local-revision",
-      "version": "0.1.0",
-      "title": "Language/Writing D1 — Local revision",
-      "discipline": "language_writing",
+      "version": "0.2.0",
+      "title": "Writing / Rhetoric D1 — Local revision",
       "topic": "sentence-level clarity",
       "learnerLevel": "secondary",
       "contentDepth": 1,
@@ -653,14 +680,16 @@
         "nearTransfer": "Revise a new sentence with the same local issue.",
         "farTransfer": "Identify the same issue inside a paragraph without rewriting the paragraph wholesale."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "writing_rhetoric",
+      "subdomain": "sentence_revision",
+      "practice": "local_revision"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "writing-d3-argument",
-      "version": "0.1.0",
-      "title": "Language/Writing D3 — Repair argument coherence",
-      "discipline": "language_writing",
+      "version": "0.2.0",
+      "title": "Writing / Rhetoric D3 — Repair argument coherence",
       "topic": "claim-evidence-warrant coherence",
       "learnerLevel": "secondary",
       "contentDepth": 3,
@@ -714,14 +743,16 @@
         "nearTransfer": "Repair a new paragraph with the same claim-evidence mismatch.",
         "farTransfer": "Transfer the same diagnostic to a different genre or audience."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "writing_rhetoric",
+      "subdomain": "argumentation",
+      "practice": "argument_revision"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "writing-d5-synthesis",
-      "version": "0.1.0",
-      "title": "Language/Writing D5 — Multi-source synthesis",
-      "discipline": "language_writing",
+      "version": "0.2.0",
+      "title": "Writing / Rhetoric D5 — Multi-source synthesis",
       "topic": "source synthesis and original argument",
       "learnerLevel": "advanced-secondary",
       "contentDepth": 5,
@@ -777,14 +808,16 @@
         "nearTransfer": "Synthesize a new source set with the same evidence pattern.",
         "farTransfer": "Transfer the synthesis strategy to a different genre, such as a policy memo."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "writing_rhetoric",
+      "subdomain": "source_synthesis",
+      "practice": "argumentative_synthesis"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "history-d1-source",
-      "version": "0.1.0",
-      "title": "History/Social Science D1 — Explicit source interpretation",
-      "discipline": "history_social_science",
+      "version": "0.2.0",
+      "title": "History D1 — Explicit source interpretation",
       "topic": "source reading and chronology",
       "learnerLevel": "secondary",
       "contentDepth": 1,
@@ -829,14 +862,16 @@
         "nearTransfer": "Interpret a new source with the same explicit-evidence requirement.",
         "farTransfer": "Distinguish explicit evidence from inference in a source from a different period."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "history",
+      "subdomain": "source_analysis",
+      "practice": "sourcing"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "history-d3-multicausal",
-      "version": "0.1.0",
-      "title": "History/Social Science D3 — Multi-cause explanation",
-      "discipline": "history_social_science",
+      "version": "0.2.0",
+      "title": "History D3 — Multi-cause explanation",
       "topic": "historical causal explanation",
       "learnerLevel": "secondary",
       "contentDepth": 3,
@@ -890,14 +925,16 @@
         "nearTransfer": "Explain a different event using the same condition-trigger-mechanism structure.",
         "farTransfer": "Transfer multi-causal reasoning to a social-science policy outcome."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "history",
+      "subdomain": "causal_explanation",
+      "practice": "historical_reasoning"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "history-d5-conflicting-sources",
-      "version": "0.1.0",
-      "title": "History/Social Science D5 — Conflicting-source synthesis",
-      "discipline": "history_social_science",
+      "version": "0.2.0",
+      "title": "History D5 — Conflicting-source synthesis",
       "topic": "corroboration and competing interpretations",
       "learnerLevel": "advanced-secondary",
       "contentDepth": 5,
@@ -952,7 +989,10 @@
         "nearTransfer": "Evaluate a new source set with one changed provenance feature.",
         "farTransfer": "Transfer corroboration logic to conflicting statistical or policy claims."
       },
-      "authoringStatus": "pilot"
+      "authoringStatus": "pilot",
+      "domainId": "history",
+      "subdomain": "source_analysis",
+      "practice": "corroboration"
     }
   ]
 }

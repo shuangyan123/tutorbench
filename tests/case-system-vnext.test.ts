@@ -5,7 +5,6 @@ import test from "node:test";
 
 import {
   BenchmarkConfigurationError,
-  CASE_SYSTEM_VNEXT_DISCIPLINES,
   parseCaseSystemVNextPilot,
 } from "../src/contracts/index.js";
 
@@ -20,19 +19,37 @@ async function loadPilot() {
   return parseCaseSystemVNextPilot(JSON.parse(raw) as unknown);
 }
 
-test("Case System vNext pilot has exactly one D1/D3/D5 archetype per discipline", async () => {
+test("Case System vNext pilot uses audit-seeded domains with explicit subdomain and practice", async () => {
   const pilot = await loadPilot();
   assert.equal(pilot.id, "case-system-vnext-pilot");
-  assert.equal(pilot.version, "0.1.0");
+  assert.equal(pilot.version, "0.2.0");
   assert.equal(pilot.archetypes.length, 15);
 
-  for (const discipline of CASE_SYSTEM_VNEXT_DISCIPLINES) {
-    const depths = pilot.archetypes
-      .filter((archetype) => archetype.discipline === discipline)
-      .map((archetype) => archetype.contentDepth)
-      .sort((a, b) => a - b);
-    assert.deepEqual(depths, [1, 3, 5], discipline);
+  const domainIds = new Set(pilot.archetypes.map((archetype) => archetype.domainId));
+  for (const required of [
+    "mathematics",
+    "physics",
+    "chemistry",
+    "biology",
+    "computer_science",
+    "writing_rhetoric",
+    "history",
+  ] as const) {
+    assert.ok(domainIds.has(required), required);
   }
+
+  assert.ok(
+    pilot.archetypes.every(
+      (archetype) =>
+        archetype.subdomain.length > 0 &&
+        archetype.practice.length > 0,
+    ),
+  );
+
+  const depths = new Set(pilot.archetypes.map((archetype) => archetype.contentDepth));
+  assert.ok(depths.has(1));
+  assert.ok(depths.has(3));
+  assert.ok(depths.has(5));
 });
 
 test("human-optimal pilot archetypes bind optimality to learner-visible prerequisites", async () => {
@@ -68,7 +85,7 @@ test("open-ended pilot archetypes do not fabricate a unique optimal solution", a
   }
 });
 
-test("pilot validation rejects missing matrix cells and invalid optimality claims", async () => {
+test("pilot validation rejects incomplete domain coverage and invalid optimality claims", async () => {
   const pilot = await loadPilot();
 
   const missing = structuredClone(pilot) as unknown as {
