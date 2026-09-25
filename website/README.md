@@ -1,10 +1,10 @@
-# Tutor Benchmark Public Website
+# Teachometry Public Website
 
 The website is a static, read-only Developer Preview generated from the
 canonical TutorEval 0.2A dataset.
 
-The public header uses the approved TutorBench T1 trajectory mark and the
-`AI Tutor 评测基准` descriptor. The website build copies the canonical SVG
+The public header presents **Teachometry** as the product/project identity and
+uses the TutorBench T1 trajectory mark for the open-source evaluation engine. The website build copies the canonical SVG
 variants and supplied favicon files into `assets/brand/tutorbench/`; it does
 not redraw or rasterize the primary mark.
 
@@ -66,7 +66,7 @@ path and never emits private evaluation content.
 
 The homepage uses the supplied September 2026 art direction: an ivory/forest
 palette, serif thesis, case walkthrough, five-dimension path, and compact data
-footer. Its descriptor is “Measurement infrastructure for AI tutoring”; the
+footer. Its descriptor is “Real-world evaluation for AI tutoring”; the
 Results page now extends that Teachometry shell with an evidence-report layout
 and an explicit empty public-results state. The Models page uses the same shell
 for an evidence registry and reserved schema-only dossier route; its current
