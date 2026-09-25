@@ -44,9 +44,10 @@ function isReasoningStrategy(value: unknown): value is CaseSystemVNextReasoningS
     isText(record.keyInsight, 1_000) &&
     isText(record.applicability, 1_000) &&
     (record.effectiveReasoningSteps === undefined ||
-      (Number.isInteger(record.effectiveReasoningSteps) &&
-        Number(record.effectiveReasoningSteps) >= 1 &&
-        Number(record.effectiveReasoningSteps) <= 50));
+      (typeof record.effectiveReasoningSteps === "number" &&
+        Number.isInteger(record.effectiveReasoningSteps) &&
+        record.effectiveReasoningSteps >= 1 &&
+        record.effectiveReasoningSteps <= 50));
 }
 
 function isReferenceReasoning(value: unknown): boolean {
