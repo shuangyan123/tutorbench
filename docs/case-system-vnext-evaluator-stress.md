@@ -13,7 +13,9 @@ It tests the evaluator, not the Tutor.
 ## Protocol
 
 Each fixture contains two developer-authored candidate Tutor responses with one
-controlled contrast. The operator owns the expected diagnostic relationship.
+controlled contrast. Every fixture is also bound to one exact, versioned
+**task-specific strategy profile**. The broad discipline label is not itself an
+evaluation strategy. The operator owns the expected diagnostic relationship.
 The Judge-facing packet never contains that expectation, rationale, candidate
 IDs, provider IDs, model IDs, latency, token use, or hidden model reasoning.
 
@@ -31,6 +33,25 @@ assignment sidecar.
 A stable preference requires the same underlying response to win after the
 A/B swap. If the evaluator follows presentation position, the result is
 `order_sensitive`, not a tie.
+
+## Task-specific strategy profiles
+
+The initial registry deliberately avoids one strategy for an entire broad
+discipline. Current examples are scoped to:
+
+- `mathematics.algebra.symbolic-structure` / algebraic structural generalization;
+- `computer-science.algorithms.array-search` / pair-sum algorithm design;
+- `empirical-science.experimental-design.model-discrimination` / discriminating investigations;
+- `academic-writing.argumentative-source-synthesis` / conflicting-source synthesis;
+- `history.source-analysis.corroboration` / historical source corroboration.
+
+These profiles have different evaluation modes and criteria. Programming
+algorithm design therefore cannot silently supply the strategy policy for
+debugging or systems design; experimental design cannot stand in for all of
+science; source synthesis cannot stand in for all writing.
+
+New task families require their own profile or must explicitly declare that no
+strategy ranking is supported.
 
 ## Five initial contrasts
 
