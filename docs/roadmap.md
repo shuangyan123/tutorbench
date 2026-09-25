@@ -43,6 +43,7 @@
 - [x] Add precise Physics, Chemistry, Biology, and Python-debugging strategy profiles with domain-specific stress fixtures
 - [x] Add explicit learning-oriented vs exam-oriented teaching objective profiles and counterfactual stress fixtures
 - [x] Split evaluator stress no-winner semantics into equivalent, non-dominated, and insufficient-evidence outcomes
+- [x] Add explicit live DeepSeek V4.1 Flash stress CLI and strict blind-result adapter; real run evidence pending
 - [ ] Run repeated live-Judge stress tests and independently review fixture expectations
 - [ ] Decide whether Reasoning & Transfer becomes a Tutor Health dimension or remains a separate profile/reporting area
 
