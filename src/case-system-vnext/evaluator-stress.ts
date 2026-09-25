@@ -46,7 +46,7 @@ const comparisonInstruction = [
   "Compare only the two candidate Tutor responses against the authored Case System vNext evidence in this packet.",
   "Apply the shared base criteria first, then the exact task-specific strategy profile, then the teaching-objective profile for this learning-oriented or exam-oriented context.",
   "Do not reward response length, stylistic polish, hidden model computation, inference speed, token count, tool use, or brute-force search.",
-  "A_BETTER means candidate A is substantively better for the authored contrast; B_BETTER means candidate B is substantively better; TIE means no substantive difference is supported.",
+  "A_BETTER and B_BETTER mean one candidate is substantively better for the authored contrast. EQUIVALENT means the candidates are materially equivalent under the authored criteria. NON_DOMINATED means each has defensible advantages and the authored criteria do not justify an overall ordering. INSUFFICIENT_EVIDENCE means the packet does not contain enough evidence to support any of those judgments.",
   "Do not invent a unique optimal strategy when the referenceReasoning says bounded_strategy_set or not_applicable.",
 ].join(" ");
 
@@ -156,7 +156,11 @@ function validateFixture(
         (candidate) => candidate.id === fixture.expected.candidateId,
       )
     ) invalid();
-  } else if (fixture.expected.kind === "tie") {
+  } else if (
+    fixture.expected.kind === "equivalent" ||
+    fixture.expected.kind === "non_dominated" ||
+    fixture.expected.kind === "insufficient_evidence"
+  ) {
     if (fixture.expected.candidateId !== undefined) invalid();
   } else {
     invalid();
@@ -164,7 +168,17 @@ function validateFixture(
 
   if (
     fixture.contrast === "equivalent_strategies" &&
-    fixture.expected.kind !== "tie"
+    fixture.expected.kind !== "equivalent"
+  ) invalid();
+
+  if (
+    fixture.contrast === "pareto_tradeoff" &&
+    fixture.expected.kind !== "non_dominated"
+  ) invalid();
+
+  if (
+    fixture.contrast === "evidence_sufficiency" &&
+    fixture.expected.kind !== "insufficient_evidence"
   ) invalid();
 
   if (
@@ -241,7 +255,11 @@ export function buildCaseSystemVNextEvaluatorStressPlan(
 function normalizeOne(
   plan: CaseSystemVNextStressPresentationPlan,
   judgment: CaseSystemVNextStressPresentationJudgment,
-): { status: CaseSystemVNextStressPresentationJudgment["status"]; winnerCandidateId: string | null; rawOutcome?: CaseSystemVNextStressPresentationJudgment["outcome"] } {
+): {
+  status: CaseSystemVNextStressPresentationJudgment["status"];
+  winnerCandidateId: string | null;
+  rawOutcome?: CaseSystemVNextStressPresentationJudgment["outcome"];
+} {
   if (judgment.presentationId !== plan.assignment.presentationId) invalid();
   if (judgment.status === "ok" && judgment.outcome === undefined) invalid();
   if (judgment.status !== "ok" && judgment.outcome !== undefined) invalid();
@@ -249,8 +267,16 @@ function normalizeOne(
   if (judgment.status !== "ok") {
     return { status: judgment.status, winnerCandidateId: null };
   }
-  if (judgment.outcome === "TIE") {
-    return { status: "ok", winnerCandidateId: null, rawOutcome: "TIE" };
+  if (
+    judgment.outcome === "EQUIVALENT" ||
+    judgment.outcome === "NON_DOMINATED" ||
+    judgment.outcome === "INSUFFICIENT_EVIDENCE"
+  ) {
+    return {
+      status: "ok",
+      winnerCandidateId: null,
+      rawOutcome: judgment.outcome,
+    };
   }
   if (judgment.outcome === "A_BETTER") {
     return {
@@ -289,13 +315,31 @@ function normalizeRepetition(
   } else {
     const [first, second] = normalized;
     if (first === undefined || second === undefined) invalid();
-    const firstTie = first.rawOutcome === "TIE";
-    const secondTie = second.rawOutcome === "TIE";
-    if (firstTie && secondTie) {
-      consistency = "stable_tie";
-      outcome = { kind: "tie" };
-    } else if (firstTie || secondTie) {
-      consistency = "inconsistent";
+
+    const semanticOutcome = (
+      value: typeof first.rawOutcome,
+    ): "equivalent" | "non_dominated" | "insufficient_evidence" | null => {
+      if (value === "EQUIVALENT") return "equivalent";
+      if (value === "NON_DOMINATED") return "non_dominated";
+      if (value === "INSUFFICIENT_EVIDENCE") return "insufficient_evidence";
+      return null;
+    };
+
+    const firstSemantic = semanticOutcome(first.rawOutcome);
+    const secondSemantic = semanticOutcome(second.rawOutcome);
+
+    if (firstSemantic !== null || secondSemantic !== null) {
+      if (firstSemantic !== null && firstSemantic === secondSemantic) {
+        outcome = { kind: firstSemantic };
+        consistency =
+          firstSemantic === "equivalent"
+            ? "stable_equivalent"
+            : firstSemantic === "non_dominated"
+              ? "stable_non_dominated"
+              : "stable_insufficient_evidence";
+      } else {
+        consistency = "inconsistent";
+      }
     } else if (
       first.winnerCandidateId !== null &&
       second.winnerCandidateId !== null &&
@@ -317,10 +361,10 @@ function normalizeRepetition(
   let expectedMatch: boolean | null = null;
   if (outcome.kind !== "incomparable") {
     expectedMatch =
-      fixture.expected.kind === "tie"
-        ? outcome.kind === "tie"
-        : outcome.kind === "preference" &&
-          outcome.candidateId === fixture.expected.candidateId;
+      fixture.expected.kind === "preference"
+        ? outcome.kind === "preference" &&
+          outcome.candidateId === fixture.expected.candidateId
+        : outcome.kind === fixture.expected.kind;
   }
 
   return {
@@ -371,10 +415,24 @@ function summarizeFixture(
     orderSensitiveCount: repetitions.filter(
       (result) => result.consistency === "order_sensitive",
     ).length,
+    equivalentCount: repetitions.filter(
+      (result) => result.outcome.kind === "equivalent",
+    ).length,
+    nonDominatedCount: repetitions.filter(
+      (result) => result.outcome.kind === "non_dominated",
+    ).length,
+    insufficientEvidenceCount: repetitions.filter(
+      (result) => result.outcome.kind === "insufficient_evidence",
+    ).length,
     incompleteCount: repetitions.filter(
       (result) => result.consistency === "incomplete_evidence",
     ).length,
-    modalOutcome: modalOutcome as "preference" | "tie" | "incomparable",
+    modalOutcome: modalOutcome as
+      | "preference"
+      | "equivalent"
+      | "non_dominated"
+      | "insufficient_evidence"
+      | "incomparable",
     ...(modalCandidateId === undefined ? {} : { modalCandidateId }),
     modalCount,
     modalShare: modalCount / repetitions.length,
@@ -399,6 +457,18 @@ function aggregate(
       comparableCount === 0 ? null : expectedMatchCount / comparableCount,
     orderSensitiveCount: results.reduce(
       (sum, result) => sum + result.orderSensitiveCount,
+      0,
+    ),
+    equivalentCount: results.reduce(
+      (sum, result) => sum + result.equivalentCount,
+      0,
+    ),
+    nonDominatedCount: results.reduce(
+      (sum, result) => sum + result.nonDominatedCount,
+      0,
+    ),
+    insufficientEvidenceCount: results.reduce(
+      (sum, result) => sum + result.insufficientEvidenceCount,
       0,
     ),
     incompleteCount: results.reduce(
@@ -461,6 +531,7 @@ export async function runCaseSystemVNextEvaluatorStress(
     interpretationBoundary: [
       "Fixture expectations are developer-authored diagnostics, not human calibration gold.",
       "Expected-match share is a stress-test diagnostic, not evaluator accuracy.",
+      "EQUIVALENT and NON_DOMINATED are distinct semantic outcomes; INSUFFICIENT_EVIDENCE is a Judge conclusion and remains distinct from provider or transport unavailability.",
       "Stable preference on synthetic contrasts does not establish general tutoring validity.",
       "No learner outcome, learning gain, or realized transfer claim is supported.",
     ],

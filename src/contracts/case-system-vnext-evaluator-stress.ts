@@ -14,10 +14,10 @@ import type {
   CaseSystemVNextTeachingObjectiveSelection,
 } from "./case-system-vnext-teaching-objective.js";
 
-export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_SCHEMA_VERSION = 2 as const;
+export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_SCHEMA_VERSION = 3 as const;
 export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_ID =
   "case-system-vnext-evaluator-stress" as const;
-export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION = "0.2.0" as const;
+export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION = "0.3.0" as const;
 
 export const CASE_SYSTEM_VNEXT_STRESS_CONTRASTS = [
   "human_efficiency",
@@ -27,6 +27,8 @@ export const CASE_SYSTEM_VNEXT_STRESS_CONTRASTS = [
   "equivalent_strategies",
   "domain_strategy_alignment",
   "objective_alignment",
+  "pareto_tradeoff",
+  "evidence_sufficiency",
 ] as const;
 export type CaseSystemVNextStressContrast =
   (typeof CASE_SYSTEM_VNEXT_STRESS_CONTRASTS)[number];
@@ -34,7 +36,9 @@ export type CaseSystemVNextStressContrast =
 export type CaseSystemVNextStressRawOutcome =
   | "A_BETTER"
   | "B_BETTER"
-  | "TIE";
+  | "EQUIVALENT"
+  | "NON_DOMINATED"
+  | "INSUFFICIENT_EVIDENCE";
 
 export type CaseSystemVNextStressEvidenceStatus =
   | "ok"
@@ -47,8 +51,12 @@ export interface CaseSystemVNextStressCandidate {
 }
 
 export interface CaseSystemVNextStressExpectedOutcome {
-  readonly kind: "preference" | "tie";
-  /** Operator-only expectation. Never copied into a Judge-facing packet. */
+  readonly kind:
+    | "preference"
+    | "equivalent"
+    | "non_dominated"
+    | "insufficient_evidence";
+  /** Operator-only expectation. Present only for preference expectations. */
   readonly candidateId?: string;
 }
 
@@ -164,12 +172,16 @@ export interface CaseSystemVNextStressPresentationJudgment {
 
 export type CaseSystemVNextStressCanonicalOutcome =
   | { readonly kind: "preference"; readonly candidateId: string }
-  | { readonly kind: "tie" }
+  | { readonly kind: "equivalent" }
+  | { readonly kind: "non_dominated" }
+  | { readonly kind: "insufficient_evidence" }
   | { readonly kind: "incomparable" };
 
 export type CaseSystemVNextStressConsistency =
   | "stable_preference"
-  | "stable_tie"
+  | "stable_equivalent"
+  | "stable_non_dominated"
+  | "stable_insufficient_evidence"
   | "order_sensitive"
   | "inconsistent"
   | "incomplete_evidence";
@@ -191,8 +203,16 @@ export interface CaseSystemVNextStressFixtureResult {
   readonly comparableCount: number;
   readonly expectedMatchShare: number | null;
   readonly orderSensitiveCount: number;
+  readonly equivalentCount: number;
+  readonly nonDominatedCount: number;
+  readonly insufficientEvidenceCount: number;
   readonly incompleteCount: number;
-  readonly modalOutcome: "preference" | "tie" | "incomparable";
+  readonly modalOutcome:
+    | "preference"
+    | "equivalent"
+    | "non_dominated"
+    | "insufficient_evidence"
+    | "incomparable";
   readonly modalCandidateId?: string;
   readonly modalCount: number;
   readonly modalShare: number;
@@ -203,6 +223,9 @@ export interface CaseSystemVNextStressAggregate {
   readonly comparableCount: number;
   readonly expectedMatchShare: number | null;
   readonly orderSensitiveCount: number;
+  readonly equivalentCount: number;
+  readonly nonDominatedCount: number;
+  readonly insufficientEvidenceCount: number;
   readonly incompleteCount: number;
 }
 

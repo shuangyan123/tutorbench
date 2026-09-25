@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "id": "case-system-vnext-evaluator-stress-fixtures",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "title": "Case System vNext evaluator stress fixtures",
-  "description": "Developer-authored diagnostic contrasts bound to exact audit-seeded domains, task-specific strategy profiles, and explicit teaching objectives. Fixtures distinguish learning-oriented from exam-oriented tutoring without weakening shared correctness or domain rules.",
+  "description": "Developer-authored diagnostic contrasts with explicit preference, equivalent, non-dominated, and insufficient-evidence outcomes. Semantic insufficiency is distinct from provider/transport unavailability.",
   "fixtures": [
     {
       "id": "math-human-efficiency",
@@ -152,9 +152,9 @@
         }
       ],
       "expected": {
-        "kind": "tie"
+        "kind": "equivalent"
       },
-      "rationale": "Both are acceptable authored synthesis strategies; the evaluator should not impose a single preferred writing style.",
+      "rationale": "Both are materially equivalent for the authored synthesis target; the evaluator should not impose a style preference.",
       "strategyProfileId": "writing-d5-conflicting-source-synthesis",
       "teachingObjective": {
         "mode": "learning_oriented"
@@ -357,6 +357,56 @@
         "candidateId": "concise-structural"
       },
       "rationale": "Both responses are correct and legal, but under an answer-only one-minute assessment with a near-mastery learner, the concise structural route better matches the explicit exam objective without using a brittle or prohibited shortcut."
+    },
+    {
+      "id": "chemistry-pareto-tradeoff",
+      "archetypeId": "science-d5-investigation",
+      "contrast": "pareto_tradeoff",
+      "strategyProfileId": "chemistry-d5-kinetics-discrimination",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      },
+      "teachingTarget": "Compare two valid kinetics investigation strategies when one improves experimental economy and the other improves interpretability for this learner.",
+      "learnerState": "near_mastery",
+      "candidates": [
+        {
+          "id": "compact-factorial",
+          "responseText": "Use a small factorial design with two temperature levels and two concentration levels, replicate each condition, and estimate the separate rate effects plus whether they interact."
+        },
+        {
+          "id": "sequential-controlled-series",
+          "responseText": "First hold concentration fixed and measure a replicated temperature series; then hold temperature fixed and measure a replicated concentration series. This is easier to interpret step by step, though it uses more conditions overall."
+        }
+      ],
+      "expected": {
+        "kind": "non_dominated"
+      },
+      "rationale": "Both designs are valid under the profile. The factorial design is more compact and can expose interaction; the sequential series is more transparent for isolating each factor. The authored context does not justify one overall winner."
+    },
+    {
+      "id": "history-insufficient-evidence",
+      "archetypeId": "history-d5-conflicting-sources",
+      "contrast": "evidence_sufficiency",
+      "strategyProfileId": "history-d5-source-corroboration",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      },
+      "teachingTarget": "Judge which response better evaluates two conflicting sources only when the packet supplies enough source evidence to support that comparison.",
+      "learnerState": "partial_understanding",
+      "candidates": [
+        {
+          "id": "source-a-preference",
+          "responseText": "Source A is more convincing because its account is more detailed and internally consistent."
+        },
+        {
+          "id": "source-b-preference",
+          "responseText": "Source B is more convincing because it was written closer to the event and therefore deserves more weight."
+        }
+      ],
+      "expected": {
+        "kind": "insufficient_evidence"
+      },
+      "rationale": "Neither candidate can be preferred from these statements alone because the packet does not supply the underlying source texts, provenance details, or corroborating evidence needed by the history profile."
     }
   ]
 }

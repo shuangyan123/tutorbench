@@ -53,8 +53,8 @@ test("stress plan builds swapped blind presentations and hides operator expectat
   const { pilot, suite, registry } = await loadInputs();
   const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, registry, 3);
 
-  assert.equal(plan.fixtures.length, 13);
-  assert.equal(plan.plannedJudgmentCount, 13 * 3 * 2);
+  assert.equal(plan.fixtures.length, 15);
+  assert.equal(plan.plannedJudgmentCount, 15 * 3 * 2);
 
   for (const fixture of plan.fixtures) {
     assert.equal(fixture.repetitions.length, 3);
@@ -125,8 +125,14 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
       const fixtureId = packet.presentationId.replace(/-r\d+-p[12]$/, "");
       const fixture = fixtureById.get(fixtureId);
       assert.ok(fixture);
-      if (fixture.expected.kind === "tie") {
-        return { status: "ok", outcome: "TIE" };
+      if (fixture.expected.kind === "equivalent") {
+        return { status: "ok", outcome: "EQUIVALENT" };
+      }
+      if (fixture.expected.kind === "non_dominated") {
+        return { status: "ok", outcome: "NON_DOMINATED" };
+      }
+      if (fixture.expected.kind === "insufficient_evidence") {
+        return { status: "ok", outcome: "INSUFFICIENT_EVIDENCE" };
       }
       const preferred = fixture.candidates.find(
         (candidate) => candidate.id === fixture.expected.candidateId,
@@ -140,8 +146,8 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   );
 
   assert.equal(report.observedJudgmentCount, report.plannedJudgmentCount);
-  assert.equal(report.overall.comparableCount, 13 * 2);
-  assert.equal(report.overall.expectedMatchCount, 13 * 2);
+  assert.equal(report.overall.comparableCount, 15 * 2);
+  assert.equal(report.overall.expectedMatchCount, 15 * 2);
   assert.equal(report.overall.expectedMatchShare, 1);
   assert.equal(report.overall.orderSensitiveCount, 0);
   assert.equal(report.overall.incompleteCount, 0);
@@ -155,9 +161,14 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   assert.equal(report.byContrast.equivalent_strategies.expectedMatchShare, 1);
   assert.equal(report.byContrast.domain_strategy_alignment.expectedMatchShare, 1);
   assert.equal(report.byContrast.objective_alignment.expectedMatchShare, 1);
+  assert.equal(report.byContrast.pareto_tradeoff.expectedMatchShare, 1);
+  assert.equal(report.byContrast.evidence_sufficiency.expectedMatchShare, 1);
+  assert.equal(report.overall.equivalentCount, 2);
+  assert.equal(report.overall.nonDominatedCount, 2);
+  assert.equal(report.overall.insufficientEvidenceCount, 2);
 });
 
-test("position-following judgments are classified as order-sensitive, not as a tie", async () => {
+test("position-following judgments are classified as order-sensitive, not as equivalence", async () => {
   const { pilot, suite, registry } = await loadInputs();
   const singleFixtureSuite: CaseSystemVNextStressFixtureSuite = {
     ...suite,
@@ -210,16 +221,18 @@ test("unavailable evaluator evidence stays incomplete rather than becoming seman
   assert.equal(report.fixtures[0]?.expectedMatchShare, null);
 });
 
-test("equivalent-strategy fixtures require ties and stay inside authored task profiles", async () => {
+test("equivalent-strategy fixtures require semantic equivalence and stay inside authored task profiles", async () => {
   const { pilot, suite, registry } = await loadInputs();
-  const ties = suite.fixtures.filter(
+  const equivalents = suite.fixtures.filter(
     (fixture) => fixture.contrast === "equivalent_strategies",
   );
 
-  assert.ok(ties.length >= 1);
-  assert.ok(ties.every((fixture) => fixture.expected.kind === "tie"));
+  assert.ok(equivalents.length >= 1);
+  assert.ok(
+    equivalents.every((fixture) => fixture.expected.kind === "equivalent"),
+  );
 
-  for (const fixture of ties) {
+  for (const fixture of equivalents) {
     const archetype = pilot.archetypes.find(
       (candidate) => candidate.id === fixture.archetypeId,
     );
@@ -408,12 +421,87 @@ test("exam-oriented fixtures require explicit assessment context", async () => {
   );
 });
 
+test("semantic no-winner outcomes remain distinct from transport unavailability", async () => {
+  const { pilot, suite, registry } = await loadInputs();
+
+  const selected = suite.fixtures.filter((fixture) =>
+    ["writing-equivalent-strategies", "chemistry-pareto-tradeoff", "history-insufficient-evidence"]
+      .includes(fixture.id),
+  );
+  const plan = buildCaseSystemVNextEvaluatorStressPlan(
+    pilot,
+    { ...suite, fixtures: selected },
+    registry,
+    1,
+  );
+
+  const outcomeByFixture = new Map<
+    string,
+    "EQUIVALENT" | "NON_DOMINATED" | "INSUFFICIENT_EVIDENCE"
+  >([
+    ["writing-equivalent-strategies", "EQUIVALENT"],
+    ["chemistry-pareto-tradeoff", "NON_DOMINATED"],
+    ["history-insufficient-evidence", "INSUFFICIENT_EVIDENCE"],
+  ]);
+
+  const report = await runCaseSystemVNextEvaluatorStress(
+    plan,
+    async (packet) => {
+      const fixtureId = packet.presentationId.replace(/-r\d+-p[12]$/, "");
+      const outcome = outcomeByFixture.get(fixtureId);
+      assert.ok(outcome);
+      return { status: "ok", outcome };
+    },
+  );
+
+  assert.equal(report.fixtures[0]?.modalOutcome, "equivalent");
+  assert.equal(report.fixtures[1]?.modalOutcome, "non_dominated");
+  assert.equal(report.fixtures[2]?.modalOutcome, "insufficient_evidence");
+  assert.equal(report.overall.equivalentCount, 1);
+  assert.equal(report.overall.nonDominatedCount, 1);
+  assert.equal(report.overall.insufficientEvidenceCount, 1);
+  assert.equal(report.overall.incompleteCount, 0);
+});
+
+test("Pareto tradeoff and insufficient-evidence contrasts require their own expected semantics", async () => {
+  const { pilot, suite, registry } = await loadInputs();
+
+  const pareto = structuredClone(suite) as CaseSystemVNextStressFixtureSuite;
+  const paretoFixture = pareto.fixtures.find(
+    (fixture) => fixture.contrast === "pareto_tradeoff",
+  );
+  assert.ok(paretoFixture);
+  (paretoFixture as { expected: { kind: string; candidateId?: string } }).expected = {
+    kind: "equivalent",
+  };
+  assert.throws(
+    () => buildCaseSystemVNextEvaluatorStressPlan(pilot, pareto, registry, 1),
+    /Case System vNext evaluator stress data is invalid/,
+  );
+
+  const insufficient = structuredClone(suite) as CaseSystemVNextStressFixtureSuite;
+  const insufficientFixture = insufficient.fixtures.find(
+    (fixture) => fixture.contrast === "evidence_sufficiency",
+  );
+  assert.ok(insufficientFixture);
+  (insufficientFixture as { expected: { kind: string; candidateId?: string } }).expected = {
+    kind: "non_dominated",
+  };
+  assert.throws(
+    () => buildCaseSystemVNextEvaluatorStressPlan(pilot, insufficient, registry, 1),
+    /Case System vNext evaluator stress data is invalid/,
+  );
+});
+
 test("stress plan rejects a fabricated preference for equivalent strategies", async () => {
   const { pilot, suite, registry } = await loadInputs();
   const mutated = structuredClone(suite) as unknown as {
     fixtures: Array<{
       contrast: string;
-      expected: { kind: "preference" | "tie"; candidateId?: string };
+      expected: {
+        kind: "preference" | "equivalent" | "non_dominated" | "insufficient_evidence";
+        candidateId?: string;
+      };
       candidates: Array<{ id: string }>;
     }>;
   };
