@@ -21,6 +21,7 @@ export {
   parseCaseSystemVNextPilot,
   parseCaseSystemVNextStrategyProfileRegistry,
   parseCaseSystemVNextDomainTaxonomy,
+  parseCaseSystemVNextTeachingObjectiveSelection,
   toTutorTurnInput,
 } from "./contracts/index.js";
 export { runTutorBenchmark, runTutorEval } from "./runner/index.js";
@@ -59,6 +60,12 @@ export type {
   CaseSystemVNextDomainProfile,
   CaseSystemVNextDomainTaxonomy,
 } from "./contracts/case-system-vnext-domain-taxonomy.js";
+export type {
+  CaseSystemVNextAssessmentContext,
+  CaseSystemVNextTeachingObjectiveMode,
+  CaseSystemVNextTeachingObjectiveProfile,
+  CaseSystemVNextTeachingObjectiveSelection,
+} from "./contracts/case-system-vnext-teaching-objective.js";
 export type {
   CaseSystemVNextStrategyProfile,
   CaseSystemVNextStrategyProfileRegistry,
