@@ -1,6 +1,5 @@
 import type {
   CaseSystemVNextArchetype,
-  CaseSystemVNextDiscipline,
   CaseSystemVNextPrerequisiteBoundary,
   CaseSystemVNextReferenceReasoning,
   CaseSystemVNextTransferReference,
@@ -82,7 +81,9 @@ export interface CaseSystemVNextStressBlindPacket {
   readonly protocolVersion: typeof CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION;
   readonly presentationId: string;
   readonly archetypeId: string;
-  readonly discipline: CaseSystemVNextDiscipline;
+  readonly domainId: CaseSystemVNextArchetype["domainId"];
+  readonly subdomain: string;
+  readonly practice: string;
   readonly topic: string;
   readonly learnerLevel: string;
   readonly contentDepth: CaseSystemVNextArchetype["contentDepth"];
