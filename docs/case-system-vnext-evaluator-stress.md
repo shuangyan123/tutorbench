@@ -40,13 +40,17 @@ The registry uses shared base evaluation rules plus increasingly precise
 subject/specialization rules. A broad family never supplies the final strategy
 policy.
 
-Current pilot profiles are scoped to concrete contexts:
+Current pilot profiles are anchored to audit-seeded domains and then narrowed:
 
-- formal sciences -> mathematics -> algebra -> proof/generalization;
-- computing -> computer science -> algorithms -> pair-sum algorithm design;
-- natural sciences -> empirical-science methodology -> experimental design -> model discrimination;
-- language arts -> argumentation -> source synthesis;
-- humanities/social sciences -> history -> source analysis -> corroboration.
+- Mathematics -> algebra -> proof/generalization;
+- Computer science -> algorithms -> pair-sum algorithm design;
+- Writing / rhetoric -> argumentation -> source synthesis;
+- History -> source analysis -> corroboration.
+
+The earlier generic `science` stress fixture was removed rather than pretending
+that one experimental-design strategy represents Physics, Chemistry, Biology,
+or Earth / environmental science. Those domains require separately authored
+profiles and fixtures.
 
 This is only a pilot. The intended expansion is more precise still. For
 example, programming instruction may need separate Python debugging, Java OOP,
