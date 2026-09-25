@@ -40,6 +40,7 @@
 - [x] Implement a versioned vNext pilot-archetype schema after methodology review
 - [x] Author the first 15 D1/D3/D5 pilot archetypes; independent methodology/content review remains pending
 - [x] Add provider-neutral evaluator stress harness for efficiency, opacity, generalization, prerequisite compatibility, and equivalent-strategy ties
+- [x] Add precise Physics, Chemistry, Biology, and Python-debugging strategy profiles with domain-specific stress fixtures
 - [ ] Run repeated live-Judge stress tests and independently review fixture expectations
 - [ ] Decide whether Reasoning & Transfer becomes a Tutor Health dimension or remains a separate profile/reporting area
 
