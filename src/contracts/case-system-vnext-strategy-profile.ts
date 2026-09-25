@@ -1,10 +1,60 @@
 export const CASE_SYSTEM_VNEXT_STRATEGY_PROFILE_SCHEMA_VERSION = 1 as const;
 
+export const CASE_SYSTEM_VNEXT_BASE_EVALUATION_CRITERIA = [
+  {
+    id: "task-fidelity",
+    label: "Task fidelity",
+    description:
+      "The response addresses the authored learner task and respects explicit task constraints.",
+  },
+  {
+    id: "epistemic-integrity",
+    label: "Epistemic integrity",
+    description:
+      "Claims, calculations, evidence, code behavior, or source use are not knowingly unsupported or fabricated.",
+  },
+  {
+    id: "learner-alignment",
+    label: "Learner alignment",
+    description:
+      "The response respects the authored learner state and prerequisite boundary rather than assuming unavailable knowledge.",
+  },
+  {
+    id: "teaching-target-alignment",
+    label: "Teaching-target alignment",
+    description:
+      "The response supports the authored learning or teaching target instead of optimizing an unrelated objective.",
+  },
+  {
+    id: "valid-alternative-fairness",
+    label: "Valid-alternative fairness",
+    description:
+      "A defensible alternative strategy is not penalized unless the precise subject/task profile supplies a reason to prefer another strategy.",
+  },
+] as const;
+
 export type CaseSystemVNextStrategyEvaluationMode =
   | "ordered_preference"
   | "pareto_tradeoff"
   | "acceptable_strategy_set"
   | "no_strategy_ranking";
+
+export interface CaseSystemVNextAcademicContext {
+  /** Broad organization family. Never sufficient by itself for strategy judgment. */
+  readonly disciplineFamily: string;
+  /** Concrete academic subject, e.g. physics, chemistry, biology, mathematics, computer_science, history. */
+  readonly subject: string;
+  /**
+   * Narrower domain when relevant: algebra, mechanics, organic_chemistry,
+   * genetics, algorithms, python, java, rust, etc.
+   */
+  readonly specialization?: string;
+  /**
+   * Cross-cutting practice such as writing, debugging, proof, experimental_design,
+   * source_analysis, or code_implementation.
+   */
+  readonly practice?: string;
+}
 
 export interface CaseSystemVNextStrategyCriterion {
   readonly id: string;
@@ -18,12 +68,16 @@ export interface CaseSystemVNextStrategyProfile {
   readonly version: string;
   /** Exact archetype this pilot profile is authored for. */
   readonly archetypeId: string;
-  /** Specific subject/domain scope, narrower than the broad coverage discipline. */
-  readonly domainScope: string;
-  /** Specific task family inside that domain. */
+  /** Academic placement of this strategy policy. */
+  readonly academicContext: CaseSystemVNextAcademicContext;
+  /** Specific task family inside the subject/specialization. */
   readonly taskFamily: string;
   readonly strategyScope: string;
   readonly evaluationMode: CaseSystemVNextStrategyEvaluationMode;
+  /**
+   * Precise criteria layered on top of CASE_SYSTEM_VNEXT_BASE_EVALUATION_CRITERIA.
+   * These are not assumed to apply to neighboring subjects or task families.
+   */
   readonly criteria: readonly CaseSystemVNextStrategyCriterion[];
   readonly constraints: readonly string[];
   readonly nonGoals: readonly string[];
