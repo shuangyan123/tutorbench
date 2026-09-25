@@ -9,11 +9,15 @@ import type {
   CaseSystemVNextStrategyProfile,
   CaseSystemVNextStrategyProfileRegistry,
 } from "./case-system-vnext-strategy-profile.js";
+import type {
+  CaseSystemVNextTeachingObjectiveProfile,
+  CaseSystemVNextTeachingObjectiveSelection,
+} from "./case-system-vnext-teaching-objective.js";
 
-export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_SCHEMA_VERSION = 1 as const;
+export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_SCHEMA_VERSION = 2 as const;
 export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_ID =
   "case-system-vnext-evaluator-stress" as const;
-export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION = "0.1.0" as const;
+export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION = "0.2.0" as const;
 
 export const CASE_SYSTEM_VNEXT_STRESS_CONTRASTS = [
   "human_efficiency",
@@ -22,6 +26,7 @@ export const CASE_SYSTEM_VNEXT_STRESS_CONTRASTS = [
   "prerequisite_compatibility",
   "equivalent_strategies",
   "domain_strategy_alignment",
+  "objective_alignment",
 ] as const;
 export type CaseSystemVNextStressContrast =
   (typeof CASE_SYSTEM_VNEXT_STRESS_CONTRASTS)[number];
@@ -52,6 +57,7 @@ export interface CaseSystemVNextStressFixture {
   readonly archetypeId: string;
   readonly contrast: CaseSystemVNextStressContrast;
   readonly strategyProfileId: string;
+  readonly teachingObjective: CaseSystemVNextTeachingObjectiveSelection;
   readonly teachingTarget: string;
   readonly learnerState: string;
   readonly candidates: readonly [
@@ -94,6 +100,8 @@ export interface CaseSystemVNextStressBlindPacket {
   readonly learnerState: string;
   readonly teachingTarget: string;
   readonly contrastUnderTest: CaseSystemVNextStressContrast;
+  readonly teachingObjective: CaseSystemVNextTeachingObjectiveSelection;
+  readonly teachingObjectiveProfile: CaseSystemVNextTeachingObjectiveProfile;
   readonly sharedBaseCriteria: readonly CaseSystemVNextStrategyCriterion[];
   readonly strategyProfile: CaseSystemVNextStrategyProfile;
   readonly prerequisiteBoundary: CaseSystemVNextPrerequisiteBoundary;
