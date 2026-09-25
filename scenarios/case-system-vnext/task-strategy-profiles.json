@@ -3,7 +3,7 @@
   "id": "case-system-vnext-strategy-profiles",
   "version": "0.1.0",
   "title": "Case System vNext task-specific strategy profiles",
-  "description": "Pilot strategy profiles bound to exact archetypes and task families. Broad disciplines do not define one universal strategy policy.",
+  "description": "Pilot strategy profiles layered over shared base evaluation rules. Profiles are bound to concrete subjects/specializations/practices; broad discipline families alone never define strategy preference.",
   "profiles": [
     {
       "schemaVersion": 1,
@@ -44,7 +44,12 @@
         "No claim that the shortest symbolic derivation is always pedagogically best."
       ],
       "status": "pilot",
-      "domainScope": "mathematics.algebra.symbolic-structure"
+      "academicContext": {
+        "disciplineFamily": "formal_sciences",
+        "subject": "mathematics",
+        "specialization": "algebra",
+        "practice": "proof_and_generalization"
+      }
     },
     {
       "schemaVersion": 1,
@@ -85,7 +90,12 @@
         "No transfer of this profile to debugging, refactoring, systems design, or testing."
       ],
       "status": "pilot",
-      "domainScope": "computer-science.algorithms.array-search"
+      "academicContext": {
+        "disciplineFamily": "computing",
+        "subject": "computer_science",
+        "specialization": "algorithms",
+        "practice": "code_implementation"
+      }
     },
     {
       "schemaVersion": 1,
@@ -126,7 +136,12 @@
         "No assumption that one experimental design dominates when trade-offs remain non-dominated."
       ],
       "status": "pilot",
-      "domainScope": "empirical-science.experimental-design.model-discrimination"
+      "academicContext": {
+        "disciplineFamily": "natural_sciences",
+        "subject": "empirical_science_methodology",
+        "specialization": "experimental_design",
+        "practice": "model_discrimination"
+      }
     },
     {
       "schemaVersion": 1,
@@ -167,7 +182,12 @@
         "No preference for claim-centered over tension-centered synthesis absent an authored task constraint."
       ],
       "status": "pilot",
-      "domainScope": "academic-writing.argumentative-source-synthesis"
+      "academicContext": {
+        "disciplineFamily": "cross_disciplinary_practice",
+        "subject": "language_arts",
+        "specialization": "argumentation",
+        "practice": "source_synthesis"
+      }
     },
     {
       "schemaVersion": 1,
@@ -208,7 +228,12 @@
         "No claim that one source type is categorically superior."
       ],
       "status": "pilot",
-      "domainScope": "history.source-analysis.corroboration"
+      "academicContext": {
+        "disciplineFamily": "humanities_social_sciences",
+        "subject": "history",
+        "specialization": "source_analysis",
+        "practice": "corroboration"
+      }
     }
   ]
 }
