@@ -229,3 +229,28 @@ evidence, or `status: invalid`, which represents malformed evaluator evidence.
 This distinction is required before live-Judge stress runs because
 `acceptable_strategy_set` and `pareto_tradeoff` profiles cannot be safely
 compressed into one generic tie label.
+
+
+## Live DeepSeek V4.1 Flash diagnostic
+
+The repository includes an explicit live/paid CLI path for the current
+DeepSeek V4.1 Flash API route:
+
+```text
+DEEPSEEK_API_KEY=...
+DEEPSEEK_JUDGE_MODEL=deepseek-flash
+tutorbench case-system-vnext-stress --judge-deepseek --runs 1
+```
+
+The default live smoke uses one repetition per fixture: 15 fixtures × two
+presentation orders = 30 Judge calls. A repeated stress run with
+`--runs 3` makes 90 Judge calls.
+
+The command records the provider/model descriptor and the full uncalibrated
+stress report. It never sends fixture expectations, rationale, or candidate
+identities to the Judge. Provider/transport failures remain distinct from the
+semantic `INSUFFICIENT_EVIDENCE` outcome.
+
+This is diagnostic evidence only. Developer-authored expected outcomes are not
+human gold, so expected-match share must not be reported as model accuracy or
+used to rank Judge providers.

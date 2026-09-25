@@ -291,6 +291,28 @@ function toGenericConfigurationError(error: unknown): never {
   throw error;
 }
 
+function resolveEffectiveDeepSeekRequestOptions(
+  options: DeepSeekJudgeRequestOptions,
+  environmentConfig: DeepSeekJudgeEnvironmentConfig,
+): DeepSeekJudgeRequestOptions {
+  const thinkingMode = options.thinkingMode ?? environmentConfig.thinkingMode;
+  const reasoningEffort = options.reasoningEffort ??
+    (thinkingMode === "enabled" ? environmentConfig.reasoningEffort : undefined);
+  const temperature = options.temperature ??
+    (thinkingMode === "disabled" ? environmentConfig.temperature : undefined);
+
+  return {
+    model: options.model,
+    prompt: options.prompt,
+    promptId: options.promptId,
+    promptVersion: options.promptVersion,
+    thinkingMode,
+    ...(reasoningEffort === undefined ? {} : { reasoningEffort }),
+    maxOutputTokens: options.maxOutputTokens ?? environmentConfig.maxOutputTokens,
+    ...(temperature === undefined ? {} : { temperature }),
+  };
+}
+
 export function buildDeepSeekJudgeRequest(
   input: TutorEvalJudgeInput,
   options: DeepSeekJudgeRequestOptions,
@@ -324,28 +346,10 @@ export function createDeepSeekJudge(options: DeepSeekJudgeOptions): DeepSeekJudg
   const apiKey = options.apiKey === undefined
     ? nonEmptyEnvironmentValue(environment.DEEPSEEK_API_KEY)
     : nonEmptyEnvironmentValue(options.apiKey);
-  const effectiveOptions: DeepSeekJudgeRequestOptions = {
-    model: options.model,
-    prompt: options.prompt,
-    promptId: options.promptId,
-    promptVersion: options.promptVersion,
-    thinkingMode: options.thinkingMode === undefined
-      ? environmentConfig.thinkingMode
-      : options.thinkingMode,
-    ...(options.reasoningEffort === undefined
-      ? environmentConfig.reasoningEffort === undefined
-        ? {}
-        : { reasoningEffort: environmentConfig.reasoningEffort }
-      : { reasoningEffort: options.reasoningEffort }),
-    maxOutputTokens: options.maxOutputTokens === undefined
-      ? environmentConfig.maxOutputTokens
-      : options.maxOutputTokens,
-    ...(options.temperature === undefined
-      ? environmentConfig.temperature === undefined
-        ? {}
-        : { temperature: environmentConfig.temperature }
-      : { temperature: options.temperature }),
-  };
+  const effectiveOptions = resolveEffectiveDeepSeekRequestOptions(
+    options,
+    environmentConfig,
+  );
   const generation = resolveDeepSeekJudgeGeneration(effectiveOptions);
   try {
     return createChatCompletionsJudge({
@@ -390,28 +394,10 @@ export function createDeepSeekJudgeExecutor<TInput, TResult>(
   const apiKey = options.apiKey === undefined
     ? nonEmptyEnvironmentValue(environment.DEEPSEEK_API_KEY)
     : nonEmptyEnvironmentValue(options.apiKey);
-  const effectiveOptions: DeepSeekJudgeRequestOptions = {
-    model: options.model,
-    prompt: options.prompt,
-    promptId: options.promptId,
-    promptVersion: options.promptVersion,
-    thinkingMode: options.thinkingMode === undefined
-      ? environmentConfig.thinkingMode
-      : options.thinkingMode,
-    ...(options.reasoningEffort === undefined
-      ? environmentConfig.reasoningEffort === undefined
-        ? {}
-        : { reasoningEffort: environmentConfig.reasoningEffort }
-      : { reasoningEffort: options.reasoningEffort }),
-    maxOutputTokens: options.maxOutputTokens === undefined
-      ? environmentConfig.maxOutputTokens
-      : options.maxOutputTokens,
-    ...(options.temperature === undefined
-      ? environmentConfig.temperature === undefined
-        ? {}
-        : { temperature: environmentConfig.temperature }
-      : { temperature: options.temperature }),
-  };
+  const effectiveOptions = resolveEffectiveDeepSeekRequestOptions(
+    options,
+    environmentConfig,
+  );
   const generation = resolveDeepSeekJudgeGeneration(effectiveOptions);
   try {
     return createChatCompletionsExecutor({
