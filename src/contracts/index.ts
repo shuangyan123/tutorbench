@@ -7,6 +7,8 @@ export * from "./material-requirement-validation.js";
 export * from "./result.js";
 export * from "./rubric.js";
 export * from "./scenario.js";
+export * from "./case-system-vnext.js";
+export * from "./case-system-vnext-validation.js";
 export * from "./tutor-scenario-vnext.js";
 export * from "./tutor-scenario-vnext-validation.js";
 export * from "./tutor-health.js";
