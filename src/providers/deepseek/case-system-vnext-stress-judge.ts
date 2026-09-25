@@ -10,10 +10,8 @@ import {
   type TutorEvalJudgeMetrics,
   type TutorEvalJudgeDescriptor,
 } from "../../contracts/index.js";
-import {
-  createDeepSeekJudgeExecutor,
-  type ChatCompletionsFetch,
-} from "./tutor-eval-judge.js";
+import { createDeepSeekJudgeExecutor } from "./tutor-eval-judge.js";
+import type { ChatCompletionsFetch } from "../chat-completions/index.js";
 
 export const CASE_SYSTEM_VNEXT_STRESS_JUDGE_PROMPT_ID =
   "case-system-vnext-evaluator-stress-judge" as const;
