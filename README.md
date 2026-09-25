@@ -157,9 +157,10 @@ public `scenarios/` tree.
 ## Case System vNext design
 
 A next-generation case-authoring specification is being developed separately
-from the frozen TutorEval corpus. It defines discipline-specific depth ladders,
-multi-axis difficulty, prerequisite-bounded human-optimal reasoning, and
-transfer-supporting case design without changing current benchmark semantics.
+from the frozen TutorEval corpus. It defines an audit-seeded 23-domain authoring taxonomy, domain- and
+task-specific strategy profiles, multi-axis difficulty, prerequisite-bounded
+human-optimal reasoning where defensible, and transfer-supporting case design
+without changing current benchmark semantics.
 
 See [Case System vNext](docs/case-system-vnext.md) and the
 [Core Coverage Matrix](docs/case-system-vnext-coverage-matrix.md). These are
