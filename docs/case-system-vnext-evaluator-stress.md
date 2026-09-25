@@ -36,22 +36,28 @@ A/B swap. If the evaluator follows presentation position, the result is
 
 ## Task-specific strategy profiles
 
-The initial registry deliberately avoids one strategy for an entire broad
-discipline. Current examples are scoped to:
+The registry uses shared base evaluation rules plus increasingly precise
+subject/specialization rules. A broad family never supplies the final strategy
+policy.
 
-- `mathematics.algebra.symbolic-structure` / algebraic structural generalization;
-- `computer-science.algorithms.array-search` / pair-sum algorithm design;
-- `empirical-science.experimental-design.model-discrimination` / discriminating investigations;
-- `academic-writing.argumentative-source-synthesis` / conflicting-source synthesis;
-- `history.source-analysis.corroboration` / historical source corroboration.
+Current pilot profiles are scoped to concrete contexts:
 
-These profiles have different evaluation modes and criteria. Programming
-algorithm design therefore cannot silently supply the strategy policy for
-debugging or systems design; experimental design cannot stand in for all of
-science; source synthesis cannot stand in for all writing.
+- formal sciences -> mathematics -> algebra -> proof/generalization;
+- computing -> computer science -> algorithms -> pair-sum algorithm design;
+- natural sciences -> empirical-science methodology -> experimental design -> model discrimination;
+- language arts -> argumentation -> source synthesis;
+- humanities/social sciences -> history -> source analysis -> corroboration.
 
-New task families require their own profile or must explicitly declare that no
-strategy ranking is supported.
+This is only a pilot. The intended expansion is more precise still. For
+example, programming instruction may need separate Python debugging, Java OOP,
+Rust ownership/borrowing, SQL query reasoning, and systems-design profiles.
+Natural science should split into physics, chemistry, biology, earth science,
+and further branches where strategy criteria differ. "Writing" is treated as a
+practice/task family that can occur inside language arts, history, science,
+and other subjects rather than as one universal discipline.
+
+New subjects, language specializations, or task families require their own
+profile or must explicitly declare that no strategy ranking is supported.
 
 ## Five initial contrasts
 
