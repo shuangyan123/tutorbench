@@ -87,8 +87,15 @@ test("public governance files, package metadata, and issue entry points are expl
   const packageJson = JSON.parse(await readRepositoryFile("package.json")) as {
     readonly license?: unknown;
     readonly files?: readonly unknown[];
+    readonly description?: unknown;
+    readonly homepage?: unknown;
   };
   assert.equal(packageJson.license, "SEE LICENSE IN LICENSES.md");
+  assert.equal(
+    packageJson.description,
+    "Teachometry's provider-neutral real-world evaluation and regression engine for AI tutoring systems.",
+  );
+  assert.equal(packageJson.homepage, "https://teachometry.com");
   const packageFiles = new Set(
     (packageJson.files ?? []).map((value) => String(value)),
   );
@@ -119,6 +126,9 @@ test("public governance files, package metadata, and issue entry points are expl
   assert.match(await readRepositoryFile(".github/workflows/release.yml"), /npm run test:governance/);
 
   const readme = await readRepositoryFile("README.md");
+  assert.match(readme, /# Teachometry TutorBench/);
+  assert.match(readme, /not affiliated with Scale AI's separately named/);
+  assert.match(readme, /Teachometry is the public-facing product and project identity/);
   for (const link of [
     "(LICENSE)",
     "(docs/licensing.md)",
@@ -131,6 +141,7 @@ test("public governance files, package metadata, and issue entry points are expl
   }
 
   const citation = await readRepositoryFile("CITATION.cff");
+  assert.match(citation, /title: "Teachometry TutorBench"/);
   assert.match(citation, /version: "0\.1\.0"/);
   assert.match(citation, /license: "other"/);
   assert.match(citation, /LICENSES\.md/);
