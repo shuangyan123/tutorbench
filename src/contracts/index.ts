@@ -9,6 +9,7 @@ export * from "./rubric.js";
 export * from "./scenario.js";
 export * from "./case-system-vnext.js";
 export * from "./case-system-vnext-validation.js";
+export * from "./case-system-vnext-evaluator-stress.js";
 export * from "./tutor-scenario-vnext.js";
 export * from "./tutor-scenario-vnext-validation.js";
 export * from "./tutor-health.js";
