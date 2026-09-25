@@ -10,7 +10,10 @@ import {
   type TutorEvalJudgeMetrics,
   type TutorEvalJudgeDescriptor,
 } from "../../contracts/index.js";
-import { createDeepSeekJudgeExecutor } from "./tutor-eval-judge.js";
+import {
+  createDeepSeekJudgeExecutor,
+  type ChatCompletionsFetch,
+} from "./tutor-eval-judge.js";
 
 export const CASE_SYSTEM_VNEXT_STRESS_JUDGE_PROMPT_ID =
   "case-system-vnext-evaluator-stress-judge" as const;
@@ -90,6 +93,7 @@ export function createDeepSeekCaseSystemVNextStressJudge(options: {
   readonly maxOutputTokens?: number;
   readonly temperature?: number;
   readonly requireReasoningSeparation?: boolean;
+  readonly fetch?: ChatCompletionsFetch;
 }): DeepSeekCaseSystemVNextStressJudge {
   const executor = createDeepSeekJudgeExecutor({
     model: options.model,
@@ -105,6 +109,7 @@ export function createDeepSeekCaseSystemVNextStressJudge(options: {
     ...(options.maxOutputTokens === undefined ? {} : { maxOutputTokens: options.maxOutputTokens }),
     ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
     requireReasoningSeparation: options.requireReasoningSeparation ?? true,
+    ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
     serializeInput,
     parseResult,
   });
