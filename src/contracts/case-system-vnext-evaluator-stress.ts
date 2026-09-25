@@ -177,6 +177,15 @@ export type CaseSystemVNextStressCanonicalOutcome =
   | { readonly kind: "insufficient_evidence" }
   | { readonly kind: "incomparable" };
 
+export interface CaseSystemVNextStressPresentationResult {
+  readonly presentationId: string;
+  readonly aCandidateId: string;
+  readonly bCandidateId: string;
+  readonly status: CaseSystemVNextStressEvidenceStatus;
+  readonly outcome?: CaseSystemVNextStressRawOutcome;
+  readonly reason?: string;
+}
+
 export type CaseSystemVNextStressConsistency =
   | "stable_preference"
   | "stable_equivalent"
@@ -188,6 +197,10 @@ export type CaseSystemVNextStressConsistency =
 
 export interface CaseSystemVNextStressRepetitionResult {
   readonly repetition: number;
+  readonly presentations: readonly [
+    CaseSystemVNextStressPresentationResult,
+    CaseSystemVNextStressPresentationResult,
+  ];
   readonly outcome: CaseSystemVNextStressCanonicalOutcome;
   readonly consistency: CaseSystemVNextStressConsistency;
   readonly expectedMatch: boolean | null;
@@ -207,6 +220,10 @@ export interface CaseSystemVNextStressFixtureResult {
   readonly nonDominatedCount: number;
   readonly insufficientEvidenceCount: number;
   readonly incompleteCount: number;
+  readonly inconsistentCount: number;
+  readonly okJudgmentCount: number;
+  readonly unavailableJudgmentCount: number;
+  readonly invalidJudgmentCount: number;
   readonly modalOutcome:
     | "preference"
     | "equivalent"
@@ -227,6 +244,10 @@ export interface CaseSystemVNextStressAggregate {
   readonly nonDominatedCount: number;
   readonly insufficientEvidenceCount: number;
   readonly incompleteCount: number;
+  readonly inconsistentCount: number;
+  readonly okJudgmentCount: number;
+  readonly unavailableJudgmentCount: number;
+  readonly invalidJudgmentCount: number;
 }
 
 export interface CaseSystemVNextEvaluatorStressReport {
