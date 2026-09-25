@@ -19,6 +19,7 @@ export {
   DEFAULT_TUTOR_CASE_LOCALE,
   parseTutorScenarioSuiteVNext,
   parseCaseSystemVNextPilot,
+  parseCaseSystemVNextStrategyProfileRegistry,
   toTutorTurnInput,
 } from "./contracts/index.js";
 export { runTutorBenchmark, runTutorEval } from "./runner/index.js";
@@ -52,6 +53,11 @@ export type {
   TutorEvalCase,
   TutorEvalDataset,
 } from "./contracts/tutor-eval.js";
+export type {
+  CaseSystemVNextStrategyProfile,
+  CaseSystemVNextStrategyProfileRegistry,
+  CaseSystemVNextStrategyCriterion,
+} from "./contracts/case-system-vnext-strategy-profile.js";
 export type {
   CaseSystemVNextEvaluatorStressReport,
   CaseSystemVNextStressBlindPacket,
