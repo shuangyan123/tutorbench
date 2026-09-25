@@ -11,6 +11,7 @@ import {
 } from "../src/index.js";
 import {
   parseCaseSystemVNextPilot,
+  parseCaseSystemVNextStrategyProfileRegistry,
 } from "../src/contracts/index.js";
 
 async function loadJson(path: string): Promise<unknown> {
@@ -26,7 +27,10 @@ async function loadInputs() {
   const suite = await loadJson(
     "scenarios/case-system-vnext/evaluator-stress-fixtures.json",
   ) as CaseSystemVNextStressFixtureSuite;
-  return { pilot, suite };
+  const registry = parseCaseSystemVNextStrategyProfileRegistry(
+    await loadJson("scenarios/case-system-vnext/task-strategy-profiles.json"),
+  );
+  return { pilot, suite, registry };
 }
 
 function candidateLabelForText(
@@ -42,8 +46,8 @@ function candidateLabelForText(
 }
 
 test("stress plan builds swapped blind presentations and hides operator expectations", async () => {
-  const { pilot, suite } = await loadInputs();
-  const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, 3);
+  const { pilot, suite, registry } = await loadInputs();
+  const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, registry, 3);
 
   assert.equal(plan.fixtures.length, 8);
   assert.equal(plan.plannedJudgmentCount, 8 * 3 * 2);
@@ -68,14 +72,20 @@ test("stress plan builds swapped blind presentations and hides operator expectat
           presentation.packet.referenceReasoning.machineSearchCost,
           "out_of_scope",
         );
+        assert.equal(
+          presentation.packet.strategyProfile.archetypeId,
+          presentation.packet.archetypeId,
+        );
+        assert.ok(presentation.packet.strategyProfile.taskFamily.length > 0);
+        assert.ok(presentation.packet.strategyProfile.criteria.length > 0);
       }
     }
   }
 });
 
 test("stable synthetic judgments produce exact expected-match diagnostics", async () => {
-  const { pilot, suite } = await loadInputs();
-  const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, 2);
+  const { pilot, suite, registry } = await loadInputs();
+  const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, registry, 2);
   const fixtureById = new Map(suite.fixtures.map((fixture) => [fixture.id, fixture]));
 
   const report = await runCaseSystemVNextEvaluatorStress(
@@ -115,7 +125,7 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
 });
 
 test("position-following judgments are classified as order-sensitive, not as a tie", async () => {
-  const { pilot, suite } = await loadInputs();
+  const { pilot, suite, registry } = await loadInputs();
   const singleFixtureSuite: CaseSystemVNextStressFixtureSuite = {
     ...suite,
     fixtures: [suite.fixtures[0]!],
@@ -123,6 +133,7 @@ test("position-following judgments are classified as order-sensitive, not as a t
   const plan = buildCaseSystemVNextEvaluatorStressPlan(
     pilot,
     singleFixtureSuite,
+    registry,
     2,
   );
 
@@ -138,7 +149,7 @@ test("position-following judgments are classified as order-sensitive, not as a t
 });
 
 test("unavailable evaluator evidence stays incomplete rather than becoming semantic disagreement", async () => {
-  const { pilot, suite } = await loadInputs();
+  const { pilot, suite, registry } = await loadInputs();
   const singleFixtureSuite: CaseSystemVNextStressFixtureSuite = {
     ...suite,
     fixtures: [suite.fixtures[0]!],
@@ -146,6 +157,7 @@ test("unavailable evaluator evidence stays incomplete rather than becoming seman
   const plan = buildCaseSystemVNextEvaluatorStressPlan(
     pilot,
     singleFixtureSuite,
+    registry,
     1,
   );
 
@@ -166,7 +178,7 @@ test("unavailable evaluator evidence stays incomplete rather than becoming seman
 });
 
 test("equivalent-strategy fixtures are explicitly tie expectations across open-ended disciplines", async () => {
-  const { pilot, suite } = await loadInputs();
+  const { pilot, suite, registry } = await loadInputs();
   const ties = suite.fixtures.filter(
     (fixture) => fixture.contrast === "equivalent_strategies",
   );
@@ -186,9 +198,45 @@ test("equivalent-strategy fixtures are explicitly tie expectations across open-e
   assert.ok(disciplines.has("language_writing"));
 });
 
+test("strategy profiles are specific to exact archetypes rather than broad disciplines", async () => {
+  const { pilot, registry } = await loadInputs();
+
+  assert.equal(registry.profiles.length, 5);
+  for (const profile of registry.profiles) {
+    const archetype = pilot.archetypes.find(
+      (candidate) => candidate.id === profile.archetypeId,
+    );
+    assert.ok(archetype);
+    assert.ok(profile.taskFamily.length > 0);
+    assert.ok(profile.strategyScope.length > 0);
+    assert.ok(profile.nonGoals.some((item) => /No universal/i.test(item)));
+  }
+
+  const programming = registry.profiles.find(
+    (profile) => profile.archetypeId === "programming-d5-algorithm",
+  );
+  assert.ok(programming);
+  assert.match(programming.taskFamily, /pair-sum/);
+  assert.ok(
+    programming.nonGoals.some((item) => /debugging|refactoring|systems design/i.test(item)),
+  );
+
+  const science = registry.profiles.find(
+    (profile) => profile.archetypeId === "science-d5-investigation",
+  );
+  assert.ok(science);
+  assert.equal(science.evaluationMode, "pareto_tradeoff");
+
+  const writing = registry.profiles.find(
+    (profile) => profile.archetypeId === "writing-d5-synthesis",
+  );
+  assert.ok(writing);
+  assert.equal(writing.evaluationMode, "acceptable_strategy_set");
+});
+
 test("stress plan rejects a fabricated preference for equivalent strategies", async () => {
-  const { pilot, suite } = await loadInputs();
-  const mutated = structuredClone(suite) as {
+  const { pilot, suite, registry } = await loadInputs();
+  const mutated = structuredClone(suite) as unknown as {
     fixtures: Array<{
       contrast: string;
       expected: { kind: "preference" | "tie"; candidateId?: string };
@@ -209,6 +257,7 @@ test("stress plan rejects a fabricated preference for equivalent strategies", as
       buildCaseSystemVNextEvaluatorStressPlan(
         pilot,
         mutated as unknown as CaseSystemVNextStressFixtureSuite,
+        registry,
         1,
       ),
     /Case System vNext evaluator stress data is invalid/,
