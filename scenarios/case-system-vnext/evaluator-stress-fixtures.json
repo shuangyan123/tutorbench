@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "case-system-vnext-evaluator-stress-fixtures",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Case System vNext evaluator stress fixtures",
-  "description": "Developer-authored diagnostic contrasts bound to exact audit-seeded domains and task-specific strategy profiles. Generic science is intentionally not used as a strategy scope; physics, chemistry, biology, and other concrete domains require separate authored fixtures.",
+  "description": "Developer-authored diagnostic contrasts bound to exact audit-seeded domains and task-specific strategy profiles. The suite includes explicit domain_strategy_alignment probes for Physics, Chemistry, Biology, and Python debugging; generic Science is not used as a strategy scope.",
   "fixtures": [
     {
       "id": "math-human-efficiency",
@@ -164,6 +164,98 @@
       },
       "rationale": "The second response makes the corroboration logic explicit and avoids the prohibited primary-source authority shortcut.",
       "strategyProfileId": "history-d5-source-corroboration"
+    },
+    {
+      "id": "physics-domain-strategy",
+      "archetypeId": "science-d1-graph",
+      "contrast": "domain_strategy_alignment",
+      "strategyProfileId": "physics-d1-position-time-graph",
+      "teachingTarget": "Interpret what the position-time graph directly supports and keep unsupported causal claims out of the explanation.",
+      "learnerState": "partial_understanding",
+      "candidates": [
+        {
+          "id": "causal-overreach",
+          "responseText": "The object speeds up here because a larger forward force is acting on it; the steeper part of the graph shows that force increasing."
+        },
+        {
+          "id": "graph-bounded",
+          "responseText": "The steeper position-time segment means position is changing faster with time, so the object's speed is greater on that interval. The graph alone does not tell us what force caused that change."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "graph-bounded"
+      },
+      "rationale": "The preferred response is faithful to the represented kinematics and explicitly controls the evidence scope instead of inferring a force from a position-time graph alone."
+    },
+    {
+      "id": "chemistry-domain-strategy",
+      "archetypeId": "science-d5-investigation",
+      "contrast": "domain_strategy_alignment",
+      "strategyProfileId": "chemistry-d5-kinetics-discrimination",
+      "teachingTarget": "Design an experiment that can distinguish temperature effects from concentration effects on reaction rate.",
+      "learnerState": "partial_understanding",
+      "candidates": [
+        {
+          "id": "confounded-design",
+          "responseText": "Raise the temperature and also double the concentration, then compare the reaction time with the original trial. If it is faster, that shows temperature caused the increase."
+        },
+        {
+          "id": "discriminating-design",
+          "responseText": "Run matched trials where concentration is held fixed while temperature changes, then a second controlled series where temperature is held fixed while concentration changes. Replicate the rate measurements so the two effects can be compared without confounding them."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "discriminating-design"
+      },
+      "rationale": "The preferred design identifies the two rate factors separately, preserves chemical controls, and produces interpretable rate evidence."
+    },
+    {
+      "id": "biology-domain-strategy",
+      "archetypeId": "science-d3-causal",
+      "contrast": "domain_strategy_alignment",
+      "strategyProfileId": "biology-d3-causal-control",
+      "teachingTarget": "Repair the learner's causal explanation by separating observed growth association from mechanism and relevant controls.",
+      "learnerState": "false_confidence",
+      "candidates": [
+        {
+          "id": "single-cause-certainty",
+          "responseText": "The fertilizer made the plants grow taller because fertilizer's purpose is to help plants grow, so the taller plants prove the fertilizer caused the difference."
+        },
+        {
+          "id": "mechanism-control",
+          "responseText": "The taller plants are consistent with a fertilizer effect, but that result alone does not establish the mechanism. Check whether light, water, starting size, and other conditions were controlled, then connect the growth pattern to a plausible nutrient mechanism only to the extent the evidence supports it."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "mechanism-control"
+      },
+      "rationale": "The preferred response links mechanism to evidence, preserves alternative explanations, and avoids teleological reasoning."
+    },
+    {
+      "id": "python-debugging-domain-strategy",
+      "archetypeId": "programming-d3-debug",
+      "contrast": "domain_strategy_alignment",
+      "strategyProfileId": "computer-science-python-d3-debugging",
+      "teachingTarget": "Help the learner localize a Python mutable-state defect and make the smallest evidence-backed repair.",
+      "learnerState": "repeated_failure",
+      "candidates": [
+        {
+          "id": "rewrite-whole-function",
+          "responseText": "The safest fix is to rewrite the whole function with a new loop and different data structure. That should avoid the state bug."
+        },
+        {
+          "id": "first-bad-state",
+          "responseText": "Trace the list after each mutation and stop at the first state that breaks the intended invariant. If two variables alias the same list, confirm that with a tiny targeted test, then copy or change only the mutation that creates the unintended shared state and rerun the failing case."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "first-bad-state"
+      },
+      "rationale": "The preferred response uses Python-relevant state semantics, evidence-backed localization, and a minimal repair rather than speculative wholesale rewriting."
     }
   ]
 }

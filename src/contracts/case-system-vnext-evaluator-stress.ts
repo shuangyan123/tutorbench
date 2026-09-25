@@ -21,6 +21,7 @@ export const CASE_SYSTEM_VNEXT_STRESS_CONTRASTS = [
   "generalization_target",
   "prerequisite_compatibility",
   "equivalent_strategies",
+  "domain_strategy_alignment",
 ] as const;
 export type CaseSystemVNextStressContrast =
   (typeof CASE_SYSTEM_VNEXT_STRESS_CONTRASTS)[number];

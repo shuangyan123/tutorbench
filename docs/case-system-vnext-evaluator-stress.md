@@ -77,6 +77,22 @@ profile or must explicitly declare that no strategy ranking is supported.
   permits without enough evidence to prefer one. These fixtures require a tie
   expectation and guard against benchmark style bias.
 
+## Subject-specific profile expansion
+
+The first precise expansion adds four task-scoped profiles rather than a
+generic Science/Programming rule:
+
+| Domain | Scope | Evaluation emphasis |
+| --- | --- | --- |
+| Physics | kinematics / position-time graph interpretation | representation fidelity, kinematic validity, scope control, units/intervals |
+| Chemistry | chemical kinetics / factor-discrimination experiment | factor identifiability, chemical control, valid rate measurement, information value, mechanism restraint |
+| Biology | experimental biology / causal explanation | mechanism-evidence link, control awareness, alternative hypotheses, biological-level consistency, teleology restraint |
+| Computer science | Python / mutable-state debugging | fault localization, Python semantics, evidence-backed diagnosis, patch minimality, regression awareness |
+
+Each profile has a paired `domain_strategy_alignment` stress fixture. These
+fixtures ask whether the evaluator can apply the exact subject/task criteria,
+not merely generic preferences such as brevity or explanation length.
+
 ## Initial fixture set
 
 The first fixture set spans:
