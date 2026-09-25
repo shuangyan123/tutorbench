@@ -1,7 +1,12 @@
-# TutorBench brand assets
+# TutorBench engine brand assets
 
-Public-facing brand: **TutorBench**
-Chinese descriptor: **AI Tutor 评测基准**
+Public-facing product/project brand: **Teachometry**
+Open-source evaluation engine: **TutorBench**
+
+On first external mention, prefer **Teachometry TutorBench** or
+**Teachometry's TutorBench**. The TutorBench name remains the technical engine,
+repository, CLI, and contract identity; these assets are retained for that
+engine identity and provenance.
 
 This directory contains the approved T1 trajectory mark from
 `source/tutorbench_final_brand_assets.zip` (SHA-256:

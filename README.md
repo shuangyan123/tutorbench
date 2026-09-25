@@ -2,15 +2,28 @@
   <img src="assets/brand/tutorbench/web/tutorbench-mark.svg" alt="TutorBench T1 trajectory mark" width="128">
 </p>
 
-# TutorBench
+# Teachometry TutorBench
 
-Real-world evaluation and regression infrastructure for AI tutoring systems.
+**Open-source real-world evaluation and regression engine for AI tutoring
+systems, developed by [Teachometry](https://teachometry.com).**
 
 TutorBench tests how an AI tutor behaves in authored learning situations,
 diagnoses concrete pedagogical failures, and preserves the evidence needed to
 fix and retest them. The canonical TutorEval benchmark remains the measurement
 foundation; Tutor Health adds scenario-based, finding-first evaluation for
 product-facing workflows.
+
+> **Naming note:** this repository is Teachometry's independent TutorBench
+> project. It is not affiliated with Scale AI's separately named
+> [TutorBench dataset](https://huggingface.co/datasets/ScaleAI/TutorBench).
+
+## Project identity
+
+**Teachometry** is the public-facing product and project identity.
+**TutorBench** is Teachometry's open-source evaluation engine, repository, CLI,
+and technical contract surface. On first external mention, prefer
+**Teachometry TutorBench** or **Teachometry's TutorBench**; technical
+documentation may use **TutorBench** after that context is established.
 
 ## Why TutorBench exists
 
