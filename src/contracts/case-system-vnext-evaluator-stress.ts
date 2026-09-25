@@ -5,6 +5,10 @@ import type {
   CaseSystemVNextReferenceReasoning,
   CaseSystemVNextTransferReference,
 } from "./case-system-vnext.js";
+import type {
+  CaseSystemVNextStrategyProfile,
+  CaseSystemVNextStrategyProfileRegistry,
+} from "./case-system-vnext-strategy-profile.js";
 
 export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_SCHEMA_VERSION = 1 as const;
 export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_ID =
@@ -46,6 +50,7 @@ export interface CaseSystemVNextStressFixture {
   readonly id: string;
   readonly archetypeId: string;
   readonly contrast: CaseSystemVNextStressContrast;
+  readonly strategyProfileId: string;
   readonly teachingTarget: string;
   readonly learnerState: string;
   readonly candidates: readonly [
@@ -86,6 +91,7 @@ export interface CaseSystemVNextStressBlindPacket {
   readonly learnerState: string;
   readonly teachingTarget: string;
   readonly contrastUnderTest: CaseSystemVNextStressContrast;
+  readonly strategyProfile: CaseSystemVNextStrategyProfile;
   readonly prerequisiteBoundary: CaseSystemVNextPrerequisiteBoundary;
   readonly referenceReasoning: CaseSystemVNextReferenceReasoning;
   readonly transfer: CaseSystemVNextTransferReference;
@@ -128,6 +134,8 @@ export interface CaseSystemVNextStressPlan {
   readonly protocolVersion: typeof CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION;
   readonly suiteId: string;
   readonly suiteVersion: string;
+  readonly strategyRegistryId: string;
+  readonly strategyRegistryVersion: string;
   readonly pilotId: string;
   readonly pilotVersion: string;
   readonly runsPerFixture: number;
@@ -193,6 +201,8 @@ export interface CaseSystemVNextEvaluatorStressReport {
   readonly calibrationStatus: "uncalibrated";
   readonly suiteId: string;
   readonly suiteVersion: string;
+  readonly strategyRegistryId: string;
+  readonly strategyRegistryVersion: string;
   readonly pilotId: string;
   readonly pilotVersion: string;
   readonly runsPerFixture: number;
@@ -206,6 +216,9 @@ export interface CaseSystemVNextEvaluatorStressReport {
   readonly interpretationBoundary: readonly string[];
   readonly selectionStatement: "No evaluator-quality winner or calibration claim is inferred.";
 }
+
+export type CaseSystemVNextStressStrategyRegistry =
+  CaseSystemVNextStrategyProfileRegistry;
 
 export type CaseSystemVNextStressJudge = (
   packet: CaseSystemVNextStressBlindPacket,
