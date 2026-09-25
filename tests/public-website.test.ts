@@ -589,6 +589,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /src="\/assets\/site\.js"/);
     assert.match(homeHtml, /src="\/assets\/brand\/tutorbench\/web\/tutorbench-mark-small\.svg"/);
     assert.match(homeHtml, /TutorBench/);
+    assert.match(homeHtml, /Real-world evaluation for AI tutoring/);
     assert.match(homeHtml, /Measurement infrastructure/);
     assert.match(homeHtml, /rel="icon" href="\/assets\/brand\/tutorbench\/raster\/favicon\.ico"/);
     assert.match(homeHtml, /rel="icon" type="image\/png" sizes="32x32" href="\/assets\/brand\/tutorbench\/raster\/favicon-32\.png"/);
@@ -803,6 +804,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(aboutHtml, /Answers <span>≠<\/span> Teaching\./);
     assert.match(aboutHtml, /We measure tutors\.<br>We don’t build the tutor\./);
     assert.match(aboutHtml, /TutorUnderTest/);
+    assert.match(aboutHtml, /Teachometry's TutorBench engine evaluates/);
     assert.match(aboutHtml, /tutor-benchmark@0\.1\.0 published/);
     assert.match(aboutHtml, /tutor-eval-v0\.2a@0\.2a\.6/);
     assert.match(aboutHtml, /48 synthetic cases/);
