@@ -12,6 +12,7 @@ import {
 import {
   parseCaseSystemVNextPilot,
   parseCaseSystemVNextStrategyProfileRegistry,
+  parseCaseSystemVNextDomainTaxonomy,
 } from "../src/contracts/index.js";
 
 async function loadJson(path: string): Promise<unknown> {
@@ -30,7 +31,10 @@ async function loadInputs() {
   const registry = parseCaseSystemVNextStrategyProfileRegistry(
     await loadJson("scenarios/case-system-vnext/task-strategy-profiles.json"),
   );
-  return { pilot, suite, registry };
+  const taxonomy = parseCaseSystemVNextDomainTaxonomy(
+    await loadJson("scenarios/case-system-vnext/domain-taxonomy.json"),
+  );
+  return { pilot, suite, registry, taxonomy };
 }
 
 function candidateLabelForText(
@@ -49,8 +53,8 @@ test("stress plan builds swapped blind presentations and hides operator expectat
   const { pilot, suite, registry } = await loadInputs();
   const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, registry, 3);
 
-  assert.equal(plan.fixtures.length, 8);
-  assert.equal(plan.plannedJudgmentCount, 8 * 3 * 2);
+  assert.equal(plan.fixtures.length, 7);
+  assert.equal(plan.plannedJudgmentCount, 7 * 3 * 2);
 
   for (const fixture of plan.fixtures) {
     assert.equal(fixture.repetitions.length, 3);
@@ -117,8 +121,8 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   );
 
   assert.equal(report.observedJudgmentCount, report.plannedJudgmentCount);
-  assert.equal(report.overall.comparableCount, 8 * 2);
-  assert.equal(report.overall.expectedMatchCount, 8 * 2);
+  assert.equal(report.overall.comparableCount, 7 * 2);
+  assert.equal(report.overall.expectedMatchCount, 7 * 2);
   assert.equal(report.overall.expectedMatchShare, 1);
   assert.equal(report.overall.orderSensitiveCount, 0);
   assert.equal(report.overall.incompleteCount, 0);
@@ -185,38 +189,70 @@ test("unavailable evaluator evidence stays incomplete rather than becoming seman
   assert.equal(report.fixtures[0]?.expectedMatchShare, null);
 });
 
-test("equivalent-strategy fixtures are explicitly tie expectations across open-ended disciplines", async () => {
-  const { pilot, suite } = await loadInputs();
+test("equivalent-strategy fixtures require ties and stay inside authored task profiles", async () => {
+  const { pilot, suite, registry } = await loadInputs();
   const ties = suite.fixtures.filter(
     (fixture) => fixture.contrast === "equivalent_strategies",
   );
 
-  assert.ok(ties.length >= 2);
-  assert.ok(
-    ties.every((fixture) => fixture.expected.kind === "tie"),
-  );
-  const disciplines = new Set(
-    ties.map((fixture) =>
-      pilot.archetypes.find(
-        (archetype) => archetype.id === fixture.archetypeId,
-      )?.discipline,
-    ),
-  );
-  assert.ok(disciplines.has("science"));
-  assert.ok(disciplines.has("language_writing"));
+  assert.ok(ties.length >= 1);
+  assert.ok(ties.every((fixture) => fixture.expected.kind === "tie"));
+
+  for (const fixture of ties) {
+    const archetype = pilot.archetypes.find(
+      (candidate) => candidate.id === fixture.archetypeId,
+    );
+    const profile = registry.profiles.find(
+      (candidate) => candidate.id === fixture.strategyProfileId,
+    );
+    assert.ok(archetype);
+    assert.ok(profile);
+    assert.equal(profile.archetypeId, archetype.id);
+    assert.equal(profile.evaluationMode, "acceptable_strategy_set");
+  }
 });
 
-test("strategy profiles are specific to exact archetypes rather than broad disciplines", async () => {
+test("audit-seeded taxonomy preserves all 23 research domains and profile references", async () => {
+  const { taxonomy, registry } = await loadInputs();
+
+  assert.equal(taxonomy.domains.length, 23);
+  assert.equal(taxonomy.source.section, "5.2");
+  assert.equal(
+    taxonomy.source.disposition,
+    "design_preference_pending_expert_validation",
+  );
+
+  const ids = new Set(taxonomy.domains.map((domain) => domain.id));
+  for (const required of [
+    "mathematics",
+    "statistics",
+    "physics",
+    "chemistry",
+    "biology",
+    "computer_science",
+    "history",
+    "writing_rhetoric",
+  ] as const) {
+    assert.ok(ids.has(required));
+  }
+
+  for (const profile of registry.profiles) {
+    assert.ok(ids.has(profile.academicContext.domainId));
+  }
+});
+
+test("strategy profiles are layered below audit domains and exact archetypes", async () => {
   const { pilot, registry } = await loadInputs();
 
-  assert.equal(registry.profiles.length, 5);
+  assert.equal(registry.profiles.length, 4);
   for (const profile of registry.profiles) {
     const archetype = pilot.archetypes.find(
       (candidate) => candidate.id === profile.archetypeId,
     );
     assert.ok(archetype);
-    assert.ok(profile.academicContext.disciplineFamily.length > 0);
-    assert.ok(profile.academicContext.subject.length > 0);
+    assert.ok(profile.academicContext.domainId.length > 0);
+    assert.ok((profile.academicContext.disciplineFamily ?? "").length > 0);
+    assert.ok((profile.academicContext.subject ?? "").length > 0);
     assert.ok(profile.taskFamily.length > 0);
     assert.ok(profile.strategyScope.length > 0);
     assert.ok(profile.nonGoals.some((item) => /No universal/i.test(item)));
@@ -226,18 +262,13 @@ test("strategy profiles are specific to exact archetypes rather than broad disci
     (profile) => profile.archetypeId === "programming-d5-algorithm",
   );
   assert.ok(programming);
+  assert.equal(programming.academicContext.domainId, "computer_science");
   assert.equal(programming.academicContext.subject, "computer_science");
   assert.equal(programming.academicContext.specialization, "algorithms");
   assert.match(programming.taskFamily, /pair-sum/);
   assert.ok(
     programming.nonGoals.some((item) => /debugging|refactoring|systems design/i.test(item)),
   );
-
-  const science = registry.profiles.find(
-    (profile) => profile.archetypeId === "science-d5-investigation",
-  );
-  assert.ok(science);
-  assert.equal(science.evaluationMode, "pareto_tradeoff");
 
   const writing = registry.profiles.find(
     (profile) => profile.archetypeId === "writing-d5-synthesis",
