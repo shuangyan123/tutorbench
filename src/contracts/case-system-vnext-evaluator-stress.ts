@@ -6,6 +6,7 @@ import type {
   CaseSystemVNextTransferReference,
 } from "./case-system-vnext.js";
 import type {
+  CaseSystemVNextStrategyCriterion,
   CaseSystemVNextStrategyProfile,
   CaseSystemVNextStrategyProfileRegistry,
 } from "./case-system-vnext-strategy-profile.js";
@@ -91,6 +92,7 @@ export interface CaseSystemVNextStressBlindPacket {
   readonly learnerState: string;
   readonly teachingTarget: string;
   readonly contrastUnderTest: CaseSystemVNextStressContrast;
+  readonly sharedBaseCriteria: readonly CaseSystemVNextStrategyCriterion[];
   readonly strategyProfile: CaseSystemVNextStrategyProfile;
   readonly prerequisiteBoundary: CaseSystemVNextPrerequisiteBoundary;
   readonly referenceReasoning: CaseSystemVNextReferenceReasoning;
