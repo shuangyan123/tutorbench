@@ -147,9 +147,18 @@ The report separates:
 - comparable repetitions;
 - expected diagnostic matches among comparable repetitions;
 - order-sensitive repetitions;
+- inconsistent semantic repetitions;
 - incomplete evidence;
+- `ok`, `unavailable`, and `invalid` presentation-judgment counts;
 - modal fixture outcome and modal share;
 - aggregate diagnostics by contrast.
+
+Each repetition also retains a bounded presentation-level diagnostic sidecar:
+presentation ID, operator-only A/B candidate assignment, evidence status,
+bounded outcome when present, and typed failure reason when present. It does
+not persist provider payloads, hidden reasoning, or chain-of-thought. This
+allows an operator to distinguish, for example, a `NON_DOMINATED`/preference
+swap disagreement from an unavailable or malformed Judge result.
 
 An unavailable Judge call remains incomplete evidence. It is not converted
 into semantic disagreement or failure.
