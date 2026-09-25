@@ -24,6 +24,11 @@ export {
 export { runTutorBenchmark, runTutorEval } from "./runner/index.js";
 export { runTutorHealthEvaluation } from "./runner/index.js";
 export {
+  buildCaseSystemVNextEvaluatorStressPlan,
+  runCaseSystemVNextEvaluatorStress,
+  CaseSystemVNextEvaluatorStressError,
+} from "./case-system-vnext/index.js";
+export {
   buildTutorHealthReport,
   formatTutorHealthReport,
   writeTutorHealthReport,
@@ -47,6 +52,13 @@ export type {
   TutorEvalCase,
   TutorEvalDataset,
 } from "./contracts/tutor-eval.js";
+export type {
+  CaseSystemVNextEvaluatorStressReport,
+  CaseSystemVNextStressBlindPacket,
+  CaseSystemVNextStressFixtureSuite,
+  CaseSystemVNextStressJudge,
+  CaseSystemVNextStressPlan,
+} from "./contracts/case-system-vnext-evaluator-stress.js";
 export type {
   CaseSystemVNextArchetype,
   CaseSystemVNextPilot,
