@@ -37,8 +37,8 @@
 - [x] Define a 25-cell five-discipline × five-depth coverage matrix
 - [x] Define a 15-archetype D1/D3/D5 pilot before full matrix expansion
 - [x] Preserve frozen `tutor-eval-v0.2a` semantics and current Tutor Health behavior
-- [ ] Implement a versioned vNext schema only after methodology review
-- [ ] Author and review the first 15 pilot archetypes
+- [x] Implement a versioned vNext pilot-archetype schema after methodology review
+- [x] Author the first 15 D1/D3/D5 pilot archetypes; independent methodology/content review remains pending
 - [ ] Validate evaluator distinctions for efficient, opaque, brute-force, and non-generalizable reasoning
 - [ ] Decide whether Reasoning & Transfer becomes a Tutor Health dimension or remains a separate profile/reporting area
 
