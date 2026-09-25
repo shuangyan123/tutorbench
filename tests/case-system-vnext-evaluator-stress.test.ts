@@ -53,8 +53,8 @@ test("stress plan builds swapped blind presentations and hides operator expectat
   const { pilot, suite, registry } = await loadInputs();
   const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, registry, 3);
 
-  assert.equal(plan.fixtures.length, 11);
-  assert.equal(plan.plannedJudgmentCount, 11 * 3 * 2);
+  assert.equal(plan.fixtures.length, 13);
+  assert.equal(plan.plannedJudgmentCount, 13 * 3 * 2);
 
   for (const fixture of plan.fixtures) {
     assert.equal(fixture.repetitions.length, 3);
@@ -87,6 +87,15 @@ test("stress plan builds swapped blind presentations and hides operator expectat
         assert.ok(presentation.packet.subdomain.length > 0);
         assert.ok(presentation.packet.practice.length > 0);
         assert.ok(presentation.packet.sharedBaseCriteria.length >= 5);
+        assert.equal(
+          presentation.packet.teachingObjectiveProfile.mode,
+          presentation.packet.teachingObjective.mode,
+        );
+        if (presentation.packet.teachingObjective.mode === "exam_oriented") {
+          assert.ok(presentation.packet.teachingObjective.assessmentContext);
+        } else {
+          assert.equal(presentation.packet.teachingObjective.assessmentContext, undefined);
+        }
         assert.ok(
           presentation.packet.sharedBaseCriteria.some(
             (criterion) => criterion.id === "learner-alignment",
@@ -131,8 +140,8 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   );
 
   assert.equal(report.observedJudgmentCount, report.plannedJudgmentCount);
-  assert.equal(report.overall.comparableCount, 11 * 2);
-  assert.equal(report.overall.expectedMatchCount, 11 * 2);
+  assert.equal(report.overall.comparableCount, 13 * 2);
+  assert.equal(report.overall.expectedMatchCount, 13 * 2);
   assert.equal(report.overall.expectedMatchShare, 1);
   assert.equal(report.overall.orderSensitiveCount, 0);
   assert.equal(report.overall.incompleteCount, 0);
@@ -145,6 +154,7 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   assert.equal(report.byContrast.prerequisite_compatibility.expectedMatchShare, 1);
   assert.equal(report.byContrast.equivalent_strategies.expectedMatchShare, 1);
   assert.equal(report.byContrast.domain_strategy_alignment.expectedMatchShare, 1);
+  assert.equal(report.byContrast.objective_alignment.expectedMatchShare, 1);
 });
 
 test("position-following judgments are classified as order-sensitive, not as a tie", async () => {
@@ -340,6 +350,62 @@ test("domain-specific stress fixtures cover physics chemistry biology and Python
   for (const fixture of domainFixtures) {
     assert.equal(fixture.expected.kind, "preference");
   }
+});
+
+test("learning and exam objectives can reverse the preferred strategy on the same task", async () => {
+  const { suite } = await loadInputs();
+  const learning = suite.fixtures.find(
+    (fixture) => fixture.id === "objective-learning-math-generalization",
+  );
+  const exam = suite.fixtures.find(
+    (fixture) => fixture.id === "objective-exam-math-speed",
+  );
+
+  assert.ok(learning);
+  assert.ok(exam);
+  assert.equal(learning.archetypeId, exam.archetypeId);
+  assert.deepEqual(learning.candidates, exam.candidates);
+  assert.equal(learning.teachingObjective.mode, "learning_oriented");
+  assert.equal(exam.teachingObjective.mode, "exam_oriented");
+  assert.ok(exam.teachingObjective.assessmentContext);
+  assert.equal(learning.expected.kind, "preference");
+  assert.equal(exam.expected.kind, "preference");
+  assert.notEqual(
+    learning.expected.candidateId,
+    exam.expected.candidateId,
+  );
+});
+
+test("exam-oriented fixtures require explicit assessment context", async () => {
+  const { pilot, suite, registry } = await loadInputs();
+  const exam = suite.fixtures.find(
+    (fixture) => fixture.id === "objective-exam-math-speed",
+  );
+  assert.ok(exam);
+
+  const mutated = structuredClone(suite) as unknown as {
+    fixtures: Array<{
+      id: string;
+      teachingObjective: {
+        mode: string;
+        assessmentContext?: unknown;
+      };
+    }>;
+  };
+  const target = mutated.fixtures.find((fixture) => fixture.id === exam.id);
+  assert.ok(target);
+  delete target.teachingObjective.assessmentContext;
+
+  assert.throws(
+    () =>
+      buildCaseSystemVNextEvaluatorStressPlan(
+        pilot,
+        mutated as unknown as CaseSystemVNextStressFixtureSuite,
+        registry,
+        1,
+      ),
+    /Case System vNext evaluator stress data is invalid/,
+  );
 });
 
 test("stress plan rejects a fabricated preference for equivalent strategies", async () => {
