@@ -3,7 +3,7 @@
   "id": "case-system-vnext-evaluator-stress-fixtures",
   "version": "0.1.0",
   "title": "Case System vNext evaluator stress fixtures",
-  "description": "Developer-authored diagnostic contrasts for testing whether a pairwise evaluator can distinguish human efficiency, opacity, generalization target, prerequisite compatibility, and equally defensible strategies. Expectations are not human calibration gold.",
+  "description": "Developer-authored diagnostic contrasts bound to exact audit-seeded domains and task-specific strategy profiles. Generic science is intentionally not used as a strategy scope; physics, chemistry, biology, and other concrete domains require separate authored fixtures.",
   "fixtures": [
     {
       "id": "math-human-efficiency",
@@ -119,28 +119,6 @@
       },
       "rationale": "The one-pass response exposes the key human-understandable insight that removes the nested search.",
       "strategyProfileId": "programming-d5-pair-sum-algorithm"
-    },
-    {
-      "id": "science-equivalent-strategies",
-      "archetypeId": "science-d5-investigation",
-      "contrast": "equivalent_strategies",
-      "teachingTarget": "Design an investigation that can discriminate between the competing explanations while acknowledging measurement limits.",
-      "learnerState": "near_mastery",
-      "candidates": [
-        {
-          "id": "controlled-factor",
-          "responseText": "Change the factor on which the two explanations predict different outcomes, keep the major confounds fixed, repeat the measurement, and compare the predicted pattern."
-        },
-        {
-          "id": "triangulated",
-          "responseText": "Use two complementary measurements that respond differently under the competing explanations, repeat both under controlled conditions, and compare whether the evidence converges."
-        }
-      ],
-      "expected": {
-        "kind": "tie"
-      },
-      "rationale": "Both strategies are explicitly acceptable in the archetype and neither should win without additional authored constraints.",
-      "strategyProfileId": "science-d5-discriminating-investigation"
     },
     {
       "id": "writing-equivalent-strategies",
