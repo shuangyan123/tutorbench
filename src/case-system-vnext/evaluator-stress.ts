@@ -12,6 +12,7 @@ import {
   type CaseSystemVNextStressFixtureSuite,
   type CaseSystemVNextStressJudge,
   type CaseSystemVNextStressPlan,
+  type CaseSystemVNextStressStrategyRegistry,
   type CaseSystemVNextStressPresentationJudgment,
   type CaseSystemVNextStressPresentationPlan,
   type CaseSystemVNextStressRepetitionResult,
@@ -51,6 +52,7 @@ function archetypeFor(pilot: CaseSystemVNextPilot, id: string): CaseSystemVNextA
 function buildPresentation(
   fixture: CaseSystemVNextStressFixture,
   archetype: CaseSystemVNextArchetype,
+  strategyProfile: CaseSystemVNextStressStrategyRegistry["profiles"][number],
   repetition: number,
   ordinal: 1 | 2,
 ): CaseSystemVNextStressPresentationPlan {
@@ -77,6 +79,7 @@ function buildPresentation(
       learnerState: fixture.learnerState,
       teachingTarget: fixture.teachingTarget,
       contrastUnderTest: fixture.contrast,
+      strategyProfile,
       prerequisiteBoundary: archetype.prerequisiteBoundary,
       referenceReasoning: archetype.referenceReasoning,
       transfer: archetype.transfer,
@@ -97,10 +100,19 @@ function buildPresentation(
 function validateFixture(
   fixture: CaseSystemVNextStressFixture,
   pilot: CaseSystemVNextPilot,
+  registry: CaseSystemVNextStressStrategyRegistry,
 ): void {
   const archetype = archetypeFor(pilot, fixture.archetypeId);
+  const strategyProfile = registry.profiles.find(
+    (profile) => profile.id === fixture.strategyProfileId,
+  );
+  if (
+    strategyProfile === undefined ||
+    strategyProfile.archetypeId !== fixture.archetypeId
+  ) invalid();
   if (
     fixture.id.trim().length === 0 ||
+    fixture.strategyProfileId.trim().length === 0 ||
     !CASE_SYSTEM_VNEXT_STRESS_CONTRASTS.includes(fixture.contrast) ||
     fixture.teachingTarget.trim().length === 0 ||
     fixture.learnerState.trim().length === 0 ||
@@ -140,12 +152,15 @@ function validateFixture(
 export function buildCaseSystemVNextEvaluatorStressPlan(
   pilot: CaseSystemVNextPilot,
   suite: CaseSystemVNextStressFixtureSuite,
+  registry: CaseSystemVNextStressStrategyRegistry,
   runsPerFixture = 3,
 ): CaseSystemVNextStressPlan {
   if (
     suite.schemaVersion !== CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_SCHEMA_VERSION ||
     suite.id.trim().length === 0 ||
     suite.version.trim().length === 0 ||
+    registry.id.trim().length === 0 ||
+    registry.version.trim().length === 0 ||
     suite.fixtures.length === 0 ||
     !Number.isInteger(runsPerFixture) ||
     runsPerFixture < 1 ||
@@ -156,11 +171,15 @@ export function buildCaseSystemVNextEvaluatorStressPlan(
   for (const fixture of suite.fixtures) {
     if (ids.has(fixture.id)) invalid();
     ids.add(fixture.id);
-    validateFixture(fixture, pilot);
+    validateFixture(fixture, pilot, registry);
   }
 
   const fixtures: CaseSystemVNextStressFixturePlan[] = suite.fixtures.map((fixture) => {
     const archetype = archetypeFor(pilot, fixture.archetypeId);
+    const strategyProfile = registry.profiles.find(
+      (profile) => profile.id === fixture.strategyProfileId,
+    );
+    if (strategyProfile === undefined) invalid();
     return {
       fixtureId: fixture.id,
       archetypeId: fixture.archetypeId,
@@ -171,8 +190,8 @@ export function buildCaseSystemVNextEvaluatorStressPlan(
         return {
           repetition,
           presentations: [
-            buildPresentation(fixture, archetype, repetition, 1),
-            buildPresentation(fixture, archetype, repetition, 2),
+            buildPresentation(fixture, archetype, strategyProfile, repetition, 1),
+            buildPresentation(fixture, archetype, strategyProfile, repetition, 2),
           ],
         };
       }),
@@ -185,6 +204,8 @@ export function buildCaseSystemVNextEvaluatorStressPlan(
     protocolVersion: CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION,
     suiteId: suite.id,
     suiteVersion: suite.version,
+    strategyRegistryId: registry.id,
+    strategyRegistryVersion: registry.version,
     pilotId: pilot.id,
     pilotVersion: pilot.version,
     runsPerFixture,
@@ -243,24 +264,25 @@ function normalizeRepetition(
     consistency = "incomplete_evidence";
   } else {
     const [first, second] = normalized;
-    const firstTie = first?.rawOutcome === "TIE";
-    const secondTie = second?.rawOutcome === "TIE";
+    if (first === undefined || second === undefined) invalid();
+    const firstTie = first.rawOutcome === "TIE";
+    const secondTie = second.rawOutcome === "TIE";
     if (firstTie && secondTie) {
       consistency = "stable_tie";
       outcome = { kind: "tie" };
     } else if (firstTie || secondTie) {
       consistency = "inconsistent";
     } else if (
-      first?.winnerCandidateId !== null &&
-      second?.winnerCandidateId !== null &&
-      first?.winnerCandidateId === second?.winnerCandidateId
+      first.winnerCandidateId !== null &&
+      second.winnerCandidateId !== null &&
+      first.winnerCandidateId === second.winnerCandidateId
     ) {
       consistency = "stable_preference";
       outcome = { kind: "preference", candidateId: first.winnerCandidateId };
     } else if (
-      first?.winnerCandidateId !== null &&
-      second?.winnerCandidateId !== null &&
-      first?.winnerCandidateId !== second?.winnerCandidateId
+      first.winnerCandidateId !== null &&
+      second.winnerCandidateId !== null &&
+      first.winnerCandidateId !== second.winnerCandidateId
     ) {
       consistency = "order_sensitive";
     } else {
@@ -402,6 +424,8 @@ export async function runCaseSystemVNextEvaluatorStress(
     calibrationStatus: "uncalibrated",
     suiteId: plan.suiteId,
     suiteVersion: plan.suiteVersion,
+    strategyRegistryId: plan.strategyRegistryId,
+    strategyRegistryVersion: plan.strategyRegistryVersion,
     pilotId: plan.pilotId,
     pilotVersion: plan.pilotVersion,
     runsPerFixture: plan.runsPerFixture,
