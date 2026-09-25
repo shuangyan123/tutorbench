@@ -21,6 +21,7 @@ import type {
   CaseSystemVNextArchetype,
   CaseSystemVNextPilot,
 } from "../contracts/case-system-vnext.js";
+import { CASE_SYSTEM_VNEXT_BASE_EVALUATION_CRITERIA } from "../contracts/case-system-vnext-strategy-profile.js";
 
 export class CaseSystemVNextEvaluatorStressError extends Error {
   readonly code = "case_system_vnext_evaluator_stress_invalid" as const;
@@ -37,7 +38,7 @@ function invalid(): never {
 
 const comparisonInstruction = [
   "Compare only the two candidate Tutor responses against the authored Case System vNext evidence in this packet.",
-  "Judge the contrastUnderTest under the stated learner prerequisites and teaching target.",
+  "Apply the shared base criteria first, then the exact task-specific strategy profile for the authored subject, specialization, practice, and task family.",
   "Do not reward response length, stylistic polish, hidden model computation, inference speed, token count, tool use, or brute-force search.",
   "A_BETTER means candidate A is substantively better for the authored contrast; B_BETTER means candidate B is substantively better; TIE means no substantive difference is supported.",
   "Do not invent a unique optimal strategy when the referenceReasoning says bounded_strategy_set or not_applicable.",
@@ -79,6 +80,7 @@ function buildPresentation(
       learnerState: fixture.learnerState,
       teachingTarget: fixture.teachingTarget,
       contrastUnderTest: fixture.contrast,
+      sharedBaseCriteria: CASE_SYSTEM_VNEXT_BASE_EVALUATION_CRITERIA,
       strategyProfile,
       prerequisiteBoundary: archetype.prerequisiteBoundary,
       referenceReasoning: archetype.referenceReasoning,
