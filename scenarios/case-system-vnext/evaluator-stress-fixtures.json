@@ -25,7 +25,8 @@
         "kind": "preference",
         "candidateId": "structural"
       },
-      "rationale": "Both are correct, but the structural route uses an accessible pattern and avoids unnecessary mechanical expansion."
+      "rationale": "Both are correct, but the structural route uses an accessible pattern and avoids unnecessary mechanical expansion.",
+      "strategyProfileId": "math-d5-structural-generalization"
     },
     {
       "id": "math-opacity",
@@ -47,7 +48,8 @@
         "kind": "preference",
         "candidateId": "explained"
       },
-      "rationale": "A shorter opaque assertion should not beat a prerequisite-compatible explanation of the same efficient structure."
+      "rationale": "A shorter opaque assertion should not beat a prerequisite-compatible explanation of the same efficient structure.",
+      "strategyProfileId": "math-d5-structural-generalization"
     },
     {
       "id": "math-generalization",
@@ -69,7 +71,8 @@
         "kind": "preference",
         "candidateId": "generalizes"
       },
-      "rationale": "The teaching target explicitly calls for generalization, so surfacing and justifying the reusable structure should matter."
+      "rationale": "The teaching target explicitly calls for generalization, so surfacing and justifying the reusable structure should matter.",
+      "strategyProfileId": "math-d5-structural-generalization"
     },
     {
       "id": "programming-prerequisite",
@@ -91,7 +94,8 @@
         "kind": "preference",
         "candidateId": "accessible-hash"
       },
-      "rationale": "The hash-set method is inside the authored prerequisites and explains the inverse-query insight; the advanced shortcut is outside them."
+      "rationale": "The hash-set method is inside the authored prerequisites and explains the inverse-query insight; the advanced shortcut is outside them.",
+      "strategyProfileId": "programming-d5-pair-sum-algorithm"
     },
     {
       "id": "programming-human-efficiency",
@@ -113,7 +117,8 @@
         "kind": "preference",
         "candidateId": "one-pass"
       },
-      "rationale": "The one-pass response exposes the key human-understandable insight that removes the nested search."
+      "rationale": "The one-pass response exposes the key human-understandable insight that removes the nested search.",
+      "strategyProfileId": "programming-d5-pair-sum-algorithm"
     },
     {
       "id": "science-equivalent-strategies",
@@ -134,7 +139,8 @@
       "expected": {
         "kind": "tie"
       },
-      "rationale": "Both strategies are explicitly acceptable in the archetype and neither should win without additional authored constraints."
+      "rationale": "Both strategies are explicitly acceptable in the archetype and neither should win without additional authored constraints.",
+      "strategyProfileId": "science-d5-discriminating-investigation"
     },
     {
       "id": "writing-equivalent-strategies",
@@ -155,7 +161,8 @@
       "expected": {
         "kind": "tie"
       },
-      "rationale": "Both are acceptable authored synthesis strategies; the evaluator should not impose a single preferred writing style."
+      "rationale": "Both are acceptable authored synthesis strategies; the evaluator should not impose a single preferred writing style.",
+      "strategyProfileId": "writing-d5-conflicting-source-synthesis"
     },
     {
       "id": "history-opacity",
@@ -177,7 +184,8 @@
         "kind": "preference",
         "candidateId": "corroborates"
       },
-      "rationale": "The second response makes the corroboration logic explicit and avoids the prohibited primary-source authority shortcut."
+      "rationale": "The second response makes the corroboration logic explicit and avoids the prohibited primary-source authority shortcut.",
+      "strategyProfileId": "history-d5-source-corroboration"
     }
   ]
 }
