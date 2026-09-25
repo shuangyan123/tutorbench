@@ -1,3 +1,5 @@
+import type { CaseSystemVNextDomainId } from "./case-system-vnext-domain-taxonomy.js";
+
 export const CASE_SYSTEM_VNEXT_STRATEGY_PROFILE_SCHEMA_VERSION = 1 as const;
 
 export const CASE_SYSTEM_VNEXT_BASE_EVALUATION_CRITERIA = [
@@ -40,10 +42,12 @@ export type CaseSystemVNextStrategyEvaluationMode =
   | "no_strategy_ranking";
 
 export interface CaseSystemVNextAcademicContext {
-  /** Broad organization family. Never sufficient by itself for strategy judgment. */
-  readonly disciplineFamily: string;
-  /** Concrete academic subject, e.g. physics, chemistry, biology, mathematics, computer_science, history. */
-  readonly subject: string;
+  /** Audit-seeded domain from the 23-domain research matrix. */
+  readonly domainId: CaseSystemVNextDomainId;
+  /** Optional higher-level organization family. Never sufficient by itself for strategy judgment. */
+  readonly disciplineFamily?: string;
+  /** Concrete subject or curricular area inside the domain when useful. */
+  readonly subject?: string;
   /**
    * Narrower domain when relevant: algebra, mechanics, organic_chemistry,
    * genetics, algorithms, python, java, rust, etc.
