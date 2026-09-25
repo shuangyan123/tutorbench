@@ -307,7 +307,9 @@ function normalizeRepetition(
     return normalizeOne(presentation, judgment);
   });
 
-  const presentations = repetition.presentations.map((presentation) => {
+  const presentationResult = (
+    presentation: CaseSystemVNextStressPresentationPlan,
+  ): CaseSystemVNextStressRepetitionResult["presentations"][number] => {
     const judgment = byId.get(presentation.packet.presentationId);
     if (judgment === undefined) invalid();
     return {
@@ -318,7 +320,12 @@ function normalizeRepetition(
       ...(judgment.outcome === undefined ? {} : { outcome: judgment.outcome }),
       ...(judgment.reason === undefined ? {} : { reason: judgment.reason }),
     };
-  }) as CaseSystemVNextStressRepetitionResult["presentations"];
+  };
+
+  const presentations: CaseSystemVNextStressRepetitionResult["presentations"] = [
+    presentationResult(repetition.presentations[0]),
+    presentationResult(repetition.presentations[1]),
+  ];
 
   let outcome: CaseSystemVNextStressCanonicalOutcome = { kind: "incomparable" };
   let consistency: CaseSystemVNextStressRepetitionResult["consistency"];
