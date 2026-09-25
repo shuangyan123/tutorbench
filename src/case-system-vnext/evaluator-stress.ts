@@ -70,7 +70,9 @@ function buildPresentation(
       protocolVersion: CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION,
       presentationId,
       archetypeId: archetype.id,
-      discipline: archetype.discipline,
+      domainId: archetype.domainId,
+      subdomain: archetype.subdomain,
+      practice: archetype.practice,
       topic: archetype.topic,
       learnerLevel: archetype.learnerLevel,
       contentDepth: archetype.contentDepth,
@@ -110,7 +112,8 @@ function validateFixture(
   );
   if (
     strategyProfile === undefined ||
-    strategyProfile.archetypeId !== fixture.archetypeId
+    strategyProfile.archetypeId !== fixture.archetypeId ||
+    strategyProfile.academicContext.domainId !== archetype.domainId
   ) invalid();
   if (
     fixture.id.trim().length === 0 ||
