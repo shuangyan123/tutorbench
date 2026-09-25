@@ -115,19 +115,41 @@ writing, or other open-ended domains.
 
 ## 1.1 Strategy adaptation is task-specific
 
-The broad discipline field is a coverage and organization label. It does **not**
-define one universal strategy policy for all mathematics, science, programming,
-writing, or history tasks.
+The broad discipline-family field is a coverage and organization label. It does
+**not** define one universal strategy policy.
 
-Strategy evaluation must bind to a narrower, versioned profile:
+Case System vNext uses layered rules:
 
 ```text
-broad discipline
-  -> concrete domain / subdiscipline
-     -> task family
-        -> archetype
-           -> task-specific strategy profile
+shared base evaluation rules
+  -> discipline family
+     -> concrete subject
+        -> specialization / language / branch
+           -> practice or task family
+              -> archetype
+                 -> task-specific strategy profile
 ```
+
+Examples:
+
+```text
+natural_sciences -> physics -> mechanics -> quantitative_problem_solving
+natural_sciences -> chemistry -> organic_chemistry -> mechanism_explanation
+natural_sciences -> biology -> genetics -> causal_modeling
+
+computing -> computer_science -> python -> debugging
+computing -> computer_science -> java -> object_oriented_design
+computing -> computer_science -> rust -> ownership_and_borrowing
+
+humanities_social_sciences -> history -> source_analysis -> corroboration
+language_arts -> composition -> argumentative_writing -> source_synthesis
+```
+
+"Writing" is therefore treated primarily as a cross-cutting practice/task
+family rather than as one academic discipline. Likewise, "science" is a family:
+physics, chemistry, biology, earth science, and other subjects require their
+own subject-level profiles. Programming-language-specific instruction may also
+require Python-, Java-, Rust-, JavaScript-, or other language-specific profiles.
 
 For example, `programming` must not imply one programming-wide notion of an
 optimal strategy. An algorithm-design profile may care about correctness,
