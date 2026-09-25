@@ -150,7 +150,11 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   assert.equal(report.overall.expectedMatchCount, 15 * 2);
   assert.equal(report.overall.expectedMatchShare, 1);
   assert.equal(report.overall.orderSensitiveCount, 0);
+  assert.equal(report.overall.inconsistentCount, 0);
   assert.equal(report.overall.incompleteCount, 0);
+  assert.equal(report.overall.okJudgmentCount, report.plannedJudgmentCount);
+  assert.equal(report.overall.unavailableJudgmentCount, 0);
+  assert.equal(report.overall.invalidJudgmentCount, 0);
   assert.equal(report.calibrationStatus, "uncalibrated");
   assert.match(report.selectionStatement, /No evaluator-quality winner/);
 
@@ -187,6 +191,8 @@ test("position-following judgments are classified as order-sensitive, not as equ
   );
 
   assert.equal(report.fixtures[0]?.orderSensitiveCount, 2);
+  assert.equal(report.fixtures[0]?.inconsistentCount, 0);
+  assert.equal(report.fixtures[0]?.okJudgmentCount, 4);
   assert.equal(report.fixtures[0]?.comparableCount, 0);
   assert.equal(report.fixtures[0]?.expectedMatchShare, null);
   assert.equal(report.overall.orderSensitiveCount, 2);
@@ -216,9 +222,61 @@ test("unavailable evaluator evidence stays incomplete rather than becoming seman
     },
   );
 
-  assert.equal(report.fixtures[0]?.incompleteCount, 1);
-  assert.equal(report.fixtures[0]?.comparableCount, 0);
-  assert.equal(report.fixtures[0]?.expectedMatchShare, null);
+  const result = report.fixtures[0];
+  assert.ok(result);
+  assert.equal(result.incompleteCount, 1);
+  assert.equal(result.inconsistentCount, 0);
+  assert.equal(result.okJudgmentCount, 1);
+  assert.equal(result.unavailableJudgmentCount, 1);
+  assert.equal(result.invalidJudgmentCount, 0);
+  assert.equal(result.comparableCount, 0);
+  assert.equal(result.expectedMatchShare, null);
+  const repetition = result.repetitions[0];
+  assert.ok(repetition);
+  assert.equal(repetition.presentations[0].status, "ok");
+  assert.equal(repetition.presentations[0].outcome, "A_BETTER");
+  assert.equal(repetition.presentations[1].status, "unavailable");
+  assert.equal(
+    repetition.presentations[1].reason,
+    "synthetic_transport_failure",
+  );
+  assert.equal(repetition.presentations[0].aCandidateId, "mechanical");
+  assert.equal(repetition.presentations[1].aCandidateId, "structural");
+});
+
+test("mixed semantic outcomes retain both presentations and count inconsistency", async () => {
+  const { pilot, suite, registry } = await loadInputs();
+  const pareto = suite.fixtures.find(
+    (fixture) => fixture.id === "chemistry-pareto-tradeoff",
+  );
+  assert.ok(pareto);
+  const plan = buildCaseSystemVNextEvaluatorStressPlan(
+    pilot,
+    { ...suite, fixtures: [pareto] },
+    registry,
+    1,
+  );
+
+  let call = 0;
+  const report = await runCaseSystemVNextEvaluatorStress(
+    plan,
+    async () => {
+      call += 1;
+      return {
+        status: "ok",
+        outcome: call === 1 ? "NON_DOMINATED" : "A_BETTER",
+      };
+    },
+  );
+
+  const result = report.fixtures[0];
+  assert.ok(result);
+  assert.equal(result.inconsistentCount, 1);
+  assert.equal(result.orderSensitiveCount, 0);
+  assert.equal(result.comparableCount, 0);
+  assert.equal(result.okJudgmentCount, 2);
+  assert.equal(result.repetitions[0]?.presentations[0].outcome, "NON_DOMINATED");
+  assert.equal(result.repetitions[0]?.presentations[1].outcome, "A_BETTER");
 });
 
 test("equivalent-strategy fixtures require semantic equivalence and stay inside authored task profiles", async () => {
