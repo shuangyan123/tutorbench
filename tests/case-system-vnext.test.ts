@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import test from "node:test";
 
 import {
@@ -10,11 +10,13 @@ import {
 } from "../src/contracts/index.js";
 
 async function loadPilot() {
-  const path = new URL(
-    "../scenarios/case-system-vnext/pilot-archetypes.json",
-    import.meta.url,
+  const path = resolve(
+    process.cwd(),
+    "scenarios",
+    "case-system-vnext",
+    "pilot-archetypes.json",
   );
-  const raw = await readFile(fileURLToPath(path), "utf8");
+  const raw = await readFile(path, "utf8");
   return parseCaseSystemVNextPilot(JSON.parse(raw) as unknown);
 }
 
