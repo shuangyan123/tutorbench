@@ -76,6 +76,12 @@ test("stress plan builds swapped blind presentations and hides operator expectat
           presentation.packet.strategyProfile.archetypeId,
           presentation.packet.archetypeId,
         );
+        assert.ok(presentation.packet.sharedBaseCriteria.length >= 5);
+        assert.ok(
+          presentation.packet.sharedBaseCriteria.some(
+            (criterion) => criterion.id === "learner-alignment",
+          ),
+        );
         assert.ok(presentation.packet.strategyProfile.academicContext.disciplineFamily.length > 0);
         assert.ok(presentation.packet.strategyProfile.academicContext.subject.length > 0);
         assert.ok(presentation.packet.strategyProfile.taskFamily.length > 0);
