@@ -33,7 +33,7 @@ function isProfile(value: unknown): value is CaseSystemVNextStrategyProfile {
   if (
     record === null ||
     !hasOnlyKeys(record, [
-      "schemaVersion","id","version","archetypeId","taskFamily","strategyScope",
+      "schemaVersion","id","version","archetypeId","domainScope","taskFamily","strategyScope",
       "evaluationMode","criteria","constraints","nonGoals","status",
     ]) ||
     record.schemaVersion !== CASE_SYSTEM_VNEXT_STRATEGY_PROFILE_SCHEMA_VERSION ||
@@ -41,6 +41,7 @@ function isProfile(value: unknown): value is CaseSystemVNextStrategyProfile {
     !/^[a-z][a-z0-9-]*$/.test(record.id) ||
     !isText(record.version, 50) ||
     !isText(record.archetypeId, 120) ||
+    !isText(record.domainScope, 200) ||
     !isText(record.taskFamily, 160) ||
     !isText(record.strategyScope, 2_000) ||
     !["ordered_preference","pareto_tradeoff","acceptable_strategy_set","no_strategy_ranking"].includes(String(record.evaluationMode)) ||
