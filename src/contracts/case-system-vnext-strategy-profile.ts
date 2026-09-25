@@ -18,7 +18,9 @@ export interface CaseSystemVNextStrategyProfile {
   readonly version: string;
   /** Exact archetype this pilot profile is authored for. */
   readonly archetypeId: string;
-  /** Specific task family, not a broad discipline label. */
+  /** Specific subject/domain scope, narrower than the broad coverage discipline. */
+  readonly domainScope: string;
+  /** Specific task family inside that domain. */
   readonly taskFamily: string;
   readonly strategyScope: string;
   readonly evaluationMode: CaseSystemVNextStrategyEvaluationMode;
