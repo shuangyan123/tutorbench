@@ -52,7 +52,7 @@ Case System vNext does **not**:
 
 ```text
 Case Archetype
-├── Discipline Profile
+├── Audit-seeded Domain Profile
 ├── Content Depth
 ├── Pedagogical Difficulty
 ├── Interaction Horizon
@@ -86,7 +86,7 @@ Case Archetype
     └── far-transfer target
 ```
 
-Not every field is required for every discipline. A `DisciplineProfile`
+Not every field is required for every discipline. A `DomainProfile`
 determines which reference fields are meaningful.
 
 ## 0.1 Domain taxonomy source
@@ -114,29 +114,27 @@ The source disposition remains **design preference / pending expert
 validation**. TutorBench must not describe the 23-domain matrix as a validated
 educational taxonomy or calibrated scale.
 
-## 1. Discipline Profile
+## 1. Domain Profile
 
-A discipline profile captures the evidence and reasoning norms of a domain.
-The first proposed profiles are:
-
-- mathematics;
-- science;
-- programming;
-- language / writing;
-- history / social science.
+A domain profile captures first-level evidence and reasoning norms. The initial
+domain vocabulary is the audit-seeded 23-domain matrix above rather than a
+five-bucket `science / programming / language-writing / social-science`
+shortcut.
 
 A profile may define:
 
-- what counts as a valid solution or response;
-- what kinds of evidence are required;
+- what counts as valid evidence or a valid response;
+- what kinds of reasoning are material in that domain;
 - whether a unique answer is expected;
 - whether algorithmic / procedural efficiency is meaningful;
-- acceptable forms of explanation;
+- acceptable forms of explanation or representation;
 - domain-specific reliability checks;
+- domain-specific teaching risks;
 - domain-specific transfer expectations.
 
-This prevents a mathematics-style answer model from being imposed on history,
-writing, or other open-ended domains.
+The domain layer is still not the final strategy layer. Physics, Chemistry,
+Biology, Computer Science, History, Writing/Rhetoric, and other domains may
+require further specialization before a strategy preference is justified.
 
 ## 1.1 Strategy adaptation is task-specific
 
@@ -451,7 +449,7 @@ Possible observable criteria include:
 - generalization support;
 - distinction between a special case and a general rule;
 - near-transfer support;
-- far-transfer support where the discipline profile makes that meaningful.
+- far-transfer support where the domain profile makes that meaningful.
 
 Candidate Findings include:
 
