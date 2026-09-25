@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "case-system-vnext-evaluator-stress-fixtures",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "title": "Case System vNext evaluator stress fixtures",
-  "description": "Developer-authored diagnostic contrasts bound to exact audit-seeded domains and task-specific strategy profiles. The suite includes explicit domain_strategy_alignment probes for Physics, Chemistry, Biology, and Python debugging; generic Science is not used as a strategy scope.",
+  "description": "Developer-authored diagnostic contrasts bound to exact audit-seeded domains, task-specific strategy profiles, and explicit teaching objectives. Fixtures distinguish learning-oriented from exam-oriented tutoring without weakening shared correctness or domain rules.",
   "fixtures": [
     {
       "id": "math-human-efficiency",
@@ -26,7 +26,10 @@
         "candidateId": "structural"
       },
       "rationale": "Both are correct, but the structural route uses an accessible pattern and avoids unnecessary mechanical expansion.",
-      "strategyProfileId": "math-d5-structural-generalization"
+      "strategyProfileId": "math-d5-structural-generalization",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "math-opacity",
@@ -49,7 +52,10 @@
         "candidateId": "explained"
       },
       "rationale": "A shorter opaque assertion should not beat a prerequisite-compatible explanation of the same efficient structure.",
-      "strategyProfileId": "math-d5-structural-generalization"
+      "strategyProfileId": "math-d5-structural-generalization",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "math-generalization",
@@ -72,7 +78,10 @@
         "candidateId": "generalizes"
       },
       "rationale": "The teaching target explicitly calls for generalization, so surfacing and justifying the reusable structure should matter.",
-      "strategyProfileId": "math-d5-structural-generalization"
+      "strategyProfileId": "math-d5-structural-generalization",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "programming-prerequisite",
@@ -95,7 +104,10 @@
         "candidateId": "accessible-hash"
       },
       "rationale": "The hash-set method is inside the authored prerequisites and explains the inverse-query insight; the advanced shortcut is outside them.",
-      "strategyProfileId": "programming-d5-pair-sum-algorithm"
+      "strategyProfileId": "programming-d5-pair-sum-algorithm",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "programming-human-efficiency",
@@ -118,7 +130,10 @@
         "candidateId": "one-pass"
       },
       "rationale": "The one-pass response exposes the key human-understandable insight that removes the nested search.",
-      "strategyProfileId": "programming-d5-pair-sum-algorithm"
+      "strategyProfileId": "programming-d5-pair-sum-algorithm",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "writing-equivalent-strategies",
@@ -140,7 +155,10 @@
         "kind": "tie"
       },
       "rationale": "Both are acceptable authored synthesis strategies; the evaluator should not impose a single preferred writing style.",
-      "strategyProfileId": "writing-d5-conflicting-source-synthesis"
+      "strategyProfileId": "writing-d5-conflicting-source-synthesis",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "history-opacity",
@@ -163,7 +181,10 @@
         "candidateId": "corroborates"
       },
       "rationale": "The second response makes the corroboration logic explicit and avoids the prohibited primary-source authority shortcut.",
-      "strategyProfileId": "history-d5-source-corroboration"
+      "strategyProfileId": "history-d5-source-corroboration",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "physics-domain-strategy",
@@ -186,7 +207,10 @@
         "kind": "preference",
         "candidateId": "graph-bounded"
       },
-      "rationale": "The preferred response is faithful to the represented kinematics and explicitly controls the evidence scope instead of inferring a force from a position-time graph alone."
+      "rationale": "The preferred response is faithful to the represented kinematics and explicitly controls the evidence scope instead of inferring a force from a position-time graph alone.",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "chemistry-domain-strategy",
@@ -209,7 +233,10 @@
         "kind": "preference",
         "candidateId": "discriminating-design"
       },
-      "rationale": "The preferred design identifies the two rate factors separately, preserves chemical controls, and produces interpretable rate evidence."
+      "rationale": "The preferred design identifies the two rate factors separately, preserves chemical controls, and produces interpretable rate evidence.",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "biology-domain-strategy",
@@ -232,7 +259,10 @@
         "kind": "preference",
         "candidateId": "mechanism-control"
       },
-      "rationale": "The preferred response links mechanism to evidence, preserves alternative explanations, and avoids teleological reasoning."
+      "rationale": "The preferred response links mechanism to evidence, preserves alternative explanations, and avoids teleological reasoning.",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
     },
     {
       "id": "python-debugging-domain-strategy",
@@ -255,7 +285,78 @@
         "kind": "preference",
         "candidateId": "first-bad-state"
       },
-      "rationale": "The preferred response uses Python-relevant state semantics, evidence-backed localization, and a minimal repair rather than speculative wholesale rewriting."
+      "rationale": "The preferred response uses Python-relevant state semantics, evidence-backed localization, and a minimal repair rather than speculative wholesale rewriting.",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
+    },
+    {
+      "id": "objective-learning-math-generalization",
+      "archetypeId": "math-d5-generalization",
+      "contrast": "objective_alignment",
+      "strategyProfileId": "math-d5-structural-generalization",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      },
+      "teachingTarget": "Help the learner understand why the structural shortcut works and be able to reuse it on a changed problem.",
+      "learnerState": "partial_understanding",
+      "candidates": [
+        {
+          "id": "concise-structural",
+          "responseText": "48 × 52 = (50 - 2)(50 + 2) = 50² - 2² = 2496."
+        },
+        {
+          "id": "derive-and-generalize",
+          "responseText": "The factors are equally spaced around 50, so write them as (50 - 2)(50 + 2). Expanding (a-d)(a+d) gives a²-d² because the middle terms cancel. Therefore 48 × 52 = 50² - 2² = 2496, and the same structure works for any conjugate pair."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "derive-and-generalize"
+      },
+      "rationale": "With durable understanding and transfer as the explicit objective, the justified generalization provides learning value that the concise application does not."
+    },
+    {
+      "id": "objective-exam-math-speed",
+      "archetypeId": "math-d5-generalization",
+      "contrast": "objective_alignment",
+      "strategyProfileId": "math-d5-structural-generalization",
+      "teachingObjective": {
+        "mode": "exam_oriented",
+        "assessmentContext": {
+          "examFamily": "timed secondary mathematics mock exam",
+          "questionType": "short-answer numerical calculation",
+          "scoringPolicy": "One mark for the correct numerical answer; no separate proof or derivation mark.",
+          "timePressure": "high",
+          "timeBudgetMinutes": 1,
+          "allowedTools": [
+            "paper and pencil"
+          ],
+          "syllabusBoundary": [
+            "difference of squares",
+            "basic arithmetic",
+            "algebraic identities"
+          ],
+          "requiredWork": []
+        }
+      },
+      "teachingTarget": "Help the learner produce the correct answer reliably within about one minute using an assessment-legal method.",
+      "learnerState": "near_mastery",
+      "candidates": [
+        {
+          "id": "concise-structural",
+          "responseText": "48 × 52 = (50 - 2)(50 + 2) = 50² - 2² = 2496."
+        },
+        {
+          "id": "derive-and-generalize",
+          "responseText": "The factors are equally spaced around 50, so write them as (50 - 2)(50 + 2). Expanding (a-d)(a+d) gives a²-d² because the middle terms cancel. Therefore 48 × 52 = 50² - 2² = 2496, and the same structure works for any conjugate pair."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "concise-structural"
+      },
+      "rationale": "Both responses are correct and legal, but under an answer-only one-minute assessment with a near-mastery learner, the concise structural route better matches the explicit exam objective without using a brittle or prohibited shortcut."
     }
   ]
 }

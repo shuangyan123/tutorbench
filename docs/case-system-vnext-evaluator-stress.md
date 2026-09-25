@@ -77,6 +77,33 @@ profile or must explicitly declare that no strategy ranking is supported.
   permits without enough evidence to prefer one. These fixtures require a tie
   expectation and guard against benchmark style bias.
 
+## Teaching-objective stress layer
+
+Stress packets now carry an explicit teaching objective in addition to the
+shared base rules and task-specific strategy profile.
+
+Two objective profiles are currently defined:
+
+- **Learning-oriented** — conceptual understanding, transparent reasoning,
+  misconception repair, transfer support, and learner independence.
+- **Exam-oriented** — assessment-rule compliance, score reliability, time
+  efficiency, marking-point alignment, error resistance, and efficient
+  verification.
+
+Exam-oriented fixtures must include the assessment context rather than relying
+on a generic "test prep" label.
+
+The first objective counterfactual holds the mathematics task and candidate
+responses fixed while changing only the objective:
+
+- learning-oriented: prefer the response that derives and generalizes the
+  difference-of-squares structure;
+- exam-oriented: in an answer-only, one-minute, paper-and-pencil short-answer
+  context, prefer the concise correct structural route.
+
+This is a diagnostic expectation, not evidence that one objective is generally
+better or that one response would improve real exam outcomes.
+
 ## Subject-specific profile expansion
 
 The first precise expansion adds four task-scoped profiles rather than a

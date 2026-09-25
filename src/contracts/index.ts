@@ -14,6 +14,8 @@ export * from "./case-system-vnext-strategy-profile.js";
 export * from "./case-system-vnext-strategy-profile-validation.js";
 export * from "./case-system-vnext-domain-taxonomy.js";
 export * from "./case-system-vnext-domain-taxonomy-validation.js";
+export * from "./case-system-vnext-teaching-objective.js";
+export * from "./case-system-vnext-teaching-objective-validation.js";
 export * from "./tutor-scenario-vnext.js";
 export * from "./tutor-scenario-vnext-validation.js";
 export * from "./tutor-health.js";
