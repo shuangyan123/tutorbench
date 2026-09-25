@@ -117,9 +117,14 @@ function validateFixture(
   registry: CaseSystemVNextStressStrategyRegistry,
 ): void {
   const archetype = archetypeFor(pilot, fixture.archetypeId);
-  const teachingObjective = parseCaseSystemVNextTeachingObjectiveSelection(
-    fixture.teachingObjective,
-  );
+  let teachingObjective;
+  try {
+    teachingObjective = parseCaseSystemVNextTeachingObjectiveSelection(
+      fixture.teachingObjective,
+    );
+  } catch {
+    invalid();
+  }
   const strategyProfile = registry.profiles.find(
     (profile) => profile.id === fixture.strategyProfileId,
   );
