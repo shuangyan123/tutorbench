@@ -1,14 +1,14 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "case-system-vnext-pilot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Case System vNext D1/D3/D5 Pilot Archetypes",
   "description": "Fifteen non-canonical archetypes spanning seven audit-seeded domains at selected D1/D3/D5 depths. These records define authoring structure only; they are not executable TutorEval cases, calibrated measures, representative domain coverage, or learner-outcome evidence.",
   "archetypes": [
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "math-d1-equivalence",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Mathematics D1 — Equivalent representations",
       "topic": "equivalent numerical representations",
       "learnerLevel": "upper-primary",
@@ -76,9 +76,9 @@
       "practice": "equivalence_reasoning"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "math-d3-algebra-diagnosis",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Mathematics D3 — Multi-step algebra diagnosis",
       "topic": "multi-step linear equations",
       "learnerLevel": "early-algebra",
@@ -148,9 +148,9 @@
       "practice": "error_diagnosis"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "math-d5-generalization",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Mathematics D5 — From instance insight to general method",
       "topic": "algebraic structure and generalization",
       "learnerLevel": "secondary",
@@ -222,9 +222,9 @@
       "practice": "proof_and_generalization"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "science-d1-graph",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Physics D1 — Interpret a position–time graph",
       "topic": "position–time graph interpretation",
       "learnerLevel": "middle-school",
@@ -278,9 +278,9 @@
       "practice": "graph_interpretation"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "science-d3-causal",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Biology D3 — Repair a causal explanation from an experiment",
       "topic": "biological causal explanation and controls",
       "learnerLevel": "secondary",
@@ -342,9 +342,9 @@
       "practice": "causal_explanation"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "science-d5-investigation",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Chemistry D5 — Design a discriminating kinetics experiment",
       "topic": "chemical kinetics experimental design",
       "learnerLevel": "secondary",
@@ -410,9 +410,9 @@
       "practice": "experimental_design"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "programming-d1-trace",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Computer Science D1 — Trace Python state",
       "topic": "Python program tracing",
       "learnerLevel": "introductory",
@@ -483,9 +483,9 @@
       "practice": "program_tracing"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "programming-d3-debug",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Computer Science D3 — Debug Python mutable state",
       "topic": "Python debugging of interacting mutable state",
       "learnerLevel": "intermediate",
@@ -558,9 +558,9 @@
       "practice": "debugging"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "programming-d5-algorithm",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Computer Science D5 — Derive a reusable pair-sum algorithm",
       "topic": "pair-sum algorithm design and complexity",
       "learnerLevel": "advanced-secondary",
@@ -632,9 +632,9 @@
       "practice": "algorithm_design"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "writing-d1-local-revision",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Writing / Rhetoric D1 — Local revision",
       "topic": "sentence-level clarity",
       "learnerLevel": "secondary",
@@ -686,9 +686,9 @@
       "practice": "local_revision"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "writing-d3-argument",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Writing / Rhetoric D3 — Repair argument coherence",
       "topic": "claim-evidence-warrant coherence",
       "learnerLevel": "secondary",
@@ -749,9 +749,9 @@
       "practice": "argument_revision"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "writing-d5-synthesis",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "Writing / Rhetoric D5 — Multi-source synthesis",
       "topic": "source synthesis and original argument",
       "learnerLevel": "advanced-secondary",
@@ -814,9 +814,9 @@
       "practice": "argumentative_synthesis"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "history-d1-source",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "History D1 — Explicit source interpretation",
       "topic": "source reading and chronology",
       "learnerLevel": "secondary",
@@ -868,9 +868,9 @@
       "practice": "sourcing"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "history-d3-multicausal",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "History D3 — Multi-cause explanation",
       "topic": "historical causal explanation",
       "learnerLevel": "secondary",
@@ -931,9 +931,9 @@
       "practice": "historical_reasoning"
     },
     {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "id": "history-d5-conflicting-sources",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "History D5 — Conflicting-source synthesis",
       "topic": "corroboration and competing interpretations",
       "learnerLevel": "advanced-secondary",
