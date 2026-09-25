@@ -20,6 +20,7 @@ export {
   parseTutorScenarioSuiteVNext,
   parseCaseSystemVNextPilot,
   parseCaseSystemVNextStrategyProfileRegistry,
+  parseCaseSystemVNextDomainTaxonomy,
   toTutorTurnInput,
 } from "./contracts/index.js";
 export { runTutorBenchmark, runTutorEval } from "./runner/index.js";
@@ -53,6 +54,11 @@ export type {
   TutorEvalCase,
   TutorEvalDataset,
 } from "./contracts/tutor-eval.js";
+export type {
+  CaseSystemVNextDomainId,
+  CaseSystemVNextDomainProfile,
+  CaseSystemVNextDomainTaxonomy,
+} from "./contracts/case-system-vnext-domain-taxonomy.js";
 export type {
   CaseSystemVNextStrategyProfile,
   CaseSystemVNextStrategyProfileRegistry,
