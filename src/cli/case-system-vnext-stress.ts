@@ -202,10 +202,14 @@ export async function runCaseSystemVNextStressCli(
       ? "n/a"
       : report.overall.expectedMatchShare.toFixed(3)}`,
     `Order-sensitive: ${report.overall.orderSensitiveCount}`,
+    `Inconsistent: ${report.overall.inconsistentCount}`,
     `Equivalent: ${report.overall.equivalentCount}`,
     `Non-dominated: ${report.overall.nonDominatedCount}`,
     `Insufficient evidence: ${report.overall.insufficientEvidenceCount}`,
     `Incomplete evidence: ${report.overall.incompleteCount}`,
+    `OK judgments: ${report.overall.okJudgmentCount}`,
+    `Unavailable judgments: ${report.overall.unavailableJudgmentCount}`,
+    `Invalid judgments: ${report.overall.invalidJudgmentCount}`,
     "No evaluator-quality winner or calibration claim is inferred.",
     `JSON report: ${outputPath}`,
   ].join("\n"));
