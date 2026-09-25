@@ -154,6 +154,18 @@ with `parseTutorScenarioSuiteVNext` and passed directly to
 `runTutorHealthEvaluation`; they do not need to be registered under the
 public `scenarios/` tree.
 
+## Case System vNext design
+
+A next-generation case-authoring specification is being developed separately
+from the frozen TutorEval corpus. It defines discipline-specific depth ladders,
+multi-axis difficulty, prerequisite-bounded human-optimal reasoning, and
+transfer-supporting case design without changing current benchmark semantics.
+
+See [Case System vNext](docs/case-system-vnext.md) and the
+[Core Coverage Matrix](docs/case-system-vnext-coverage-matrix.md). These are
+design specifications, not yet canonical benchmark cases or validated general
+tutoring measures.
+
 ## Run the canonical TutorEval benchmark
 
 The canonical full benchmark remains a separate foundational path:

@@ -30,6 +30,21 @@
 - [ ] Independent human critical-failure review using real reviewers
 - [ ] Adjudication and human reference generation using real reviewer data
 
+## Case System vNext — DESIGN SPECIFICATION
+
+- [x] Define multi-axis authoring model: discipline profile, D1-D5 content depth, P1-P5 pedagogical difficulty, and H1-H3 interaction horizon
+- [x] Define prerequisite-bounded human-optimal instance and general reasoning concepts
+- [x] Define a 25-cell five-discipline × five-depth coverage matrix
+- [x] Define a 15-archetype D1/D3/D5 pilot before full matrix expansion
+- [x] Preserve frozen `tutor-eval-v0.2a` semantics and current Tutor Health behavior
+- [ ] Implement a versioned vNext schema only after methodology review
+- [ ] Author and review the first 15 pilot archetypes
+- [ ] Validate evaluator distinctions for efficient, opaque, brute-force, and non-generalizable reasoning
+- [ ] Decide whether Reasoning & Transfer becomes a Tutor Health dimension or remains a separate profile/reporting area
+
+See [Case System vNext](case-system-vnext.md) and the
+[Core Coverage Matrix](case-system-vnext-coverage-matrix.md).
+
 ## 0.3 LLM-as-Judge Calibration — PARTIAL: 0.3A hybrid + 0.3B OpenAI provider
 
 - [x] Versioned v0.1 judge system prompt retained for compatibility
