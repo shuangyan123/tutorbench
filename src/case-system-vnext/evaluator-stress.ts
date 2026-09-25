@@ -22,6 +22,12 @@ import type {
   CaseSystemVNextPilot,
 } from "../contracts/case-system-vnext.js";
 import { CASE_SYSTEM_VNEXT_BASE_EVALUATION_CRITERIA } from "../contracts/case-system-vnext-strategy-profile.js";
+import {
+  getCaseSystemVNextTeachingObjectiveProfile,
+} from "../contracts/case-system-vnext-teaching-objective.js";
+import {
+  parseCaseSystemVNextTeachingObjectiveSelection,
+} from "../contracts/case-system-vnext-teaching-objective-validation.js";
 
 export class CaseSystemVNextEvaluatorStressError extends Error {
   readonly code = "case_system_vnext_evaluator_stress_invalid" as const;
@@ -38,7 +44,7 @@ function invalid(): never {
 
 const comparisonInstruction = [
   "Compare only the two candidate Tutor responses against the authored Case System vNext evidence in this packet.",
-  "Apply the shared base criteria first, then the exact task-specific strategy profile for the authored subject, specialization, practice, and task family.",
+  "Apply the shared base criteria first, then the exact task-specific strategy profile, then the teaching-objective profile for this learning-oriented or exam-oriented context.",
   "Do not reward response length, stylistic polish, hidden model computation, inference speed, token count, tool use, or brute-force search.",
   "A_BETTER means candidate A is substantively better for the authored contrast; B_BETTER means candidate B is substantively better; TIE means no substantive difference is supported.",
   "Do not invent a unique optimal strategy when the referenceReasoning says bounded_strategy_set or not_applicable.",
@@ -82,6 +88,10 @@ function buildPresentation(
       learnerState: fixture.learnerState,
       teachingTarget: fixture.teachingTarget,
       contrastUnderTest: fixture.contrast,
+      teachingObjective: fixture.teachingObjective,
+      teachingObjectiveProfile: getCaseSystemVNextTeachingObjectiveProfile(
+        fixture.teachingObjective.mode,
+      ),
       sharedBaseCriteria: CASE_SYSTEM_VNEXT_BASE_EVALUATION_CRITERIA,
       strategyProfile,
       prerequisiteBoundary: archetype.prerequisiteBoundary,
@@ -107,6 +117,9 @@ function validateFixture(
   registry: CaseSystemVNextStressStrategyRegistry,
 ): void {
   const archetype = archetypeFor(pilot, fixture.archetypeId);
+  const teachingObjective = parseCaseSystemVNextTeachingObjectiveSelection(
+    fixture.teachingObjective,
+  );
   const strategyProfile = registry.profiles.find(
     (profile) => profile.id === fixture.strategyProfileId,
   );
@@ -118,6 +131,7 @@ function validateFixture(
   if (
     fixture.id.trim().length === 0 ||
     fixture.strategyProfileId.trim().length === 0 ||
+    teachingObjective.mode !== fixture.teachingObjective.mode ||
     !CASE_SYSTEM_VNEXT_STRESS_CONTRASTS.includes(fixture.contrast) ||
     fixture.teachingTarget.trim().length === 0 ||
     fixture.learnerState.trim().length === 0 ||
