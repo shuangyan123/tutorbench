@@ -1,6 +1,6 @@
 import type { CaseSystemVNextDomainId } from "./case-system-vnext-domain-taxonomy.js";
 
-export const CASE_SYSTEM_VNEXT_SCHEMA_VERSION = 1 as const;
+export const CASE_SYSTEM_VNEXT_SCHEMA_VERSION = 2 as const;
 
 export const CASE_SYSTEM_VNEXT_CONTENT_DEPTHS = [1, 2, 3, 4, 5] as const;
 export type CaseSystemVNextContentDepth =
