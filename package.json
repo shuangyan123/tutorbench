@@ -1,19 +1,23 @@
 {
   "name": "tutor-benchmark",
   "version": "0.1.0",
-  "description": "Provider-neutral real-world evaluation and regression infrastructure for AI tutoring systems.",
+  "description": "Teachometry's provider-neutral real-world evaluation and regression engine for AI tutoring systems.",
   "license": "SEE LICENSE IN LICENSES.md",
   "keywords": [
     "ai tutoring",
+    "ai tutor evaluation",
     "benchmark",
     "evaluation",
+    "regression testing",
+    "teachometry",
+    "tutor health",
     "tutoreval"
   ],
   "repository": {
     "type": "git",
     "url": "https://github.com/shuangyan123/tutorbench.git"
   },
-  "homepage": "https://github.com/shuangyan123/tutorbench#readme",
+  "homepage": "https://teachometry.com",
   "bugs": {
     "url": "https://github.com/shuangyan123/tutorbench/issues"
   },
