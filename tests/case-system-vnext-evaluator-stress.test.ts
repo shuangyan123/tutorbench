@@ -435,11 +435,14 @@ test("semantic no-winner outcomes remain distinct from transport unavailability"
     1,
   );
 
-  const outcomeByFixture = new Map([
+  const outcomeByFixture = new Map<
+    string,
+    "EQUIVALENT" | "NON_DOMINATED" | "INSUFFICIENT_EVIDENCE"
+  >([
     ["writing-equivalent-strategies", "EQUIVALENT"],
     ["chemistry-pareto-tradeoff", "NON_DOMINATED"],
     ["history-insufficient-evidence", "INSUFFICIENT_EVIDENCE"],
-  ] as const);
+  ]);
 
   const report = await runCaseSystemVNextEvaluatorStress(
     plan,
