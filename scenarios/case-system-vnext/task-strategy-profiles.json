@@ -43,7 +43,8 @@
         "No universal mathematics strategy ranking.",
         "No claim that the shortest symbolic derivation is always pedagogically best."
       ],
-      "status": "pilot"
+      "status": "pilot",
+      "domainScope": "mathematics.algebra.symbolic-structure"
     },
     {
       "schemaVersion": 1,
@@ -83,7 +84,8 @@
         "No universal programming strategy ranking.",
         "No transfer of this profile to debugging, refactoring, systems design, or testing."
       ],
-      "status": "pilot"
+      "status": "pilot",
+      "domainScope": "computer-science.algorithms.array-search"
     },
     {
       "schemaVersion": 1,
@@ -123,7 +125,8 @@
         "No universal science strategy ranking.",
         "No assumption that one experimental design dominates when trade-offs remain non-dominated."
       ],
-      "status": "pilot"
+      "status": "pilot",
+      "domainScope": "empirical-science.experimental-design.model-discrimination"
     },
     {
       "schemaVersion": 1,
@@ -163,7 +166,8 @@
         "No universal writing style ranking.",
         "No preference for claim-centered over tension-centered synthesis absent an authored task constraint."
       ],
-      "status": "pilot"
+      "status": "pilot",
+      "domainScope": "academic-writing.argumentative-source-synthesis"
     },
     {
       "schemaVersion": 1,
@@ -203,7 +207,8 @@
         "No universal history strategy ranking.",
         "No claim that one source type is categorically superior."
       ],
-      "status": "pilot"
+      "status": "pilot",
+      "domainScope": "history.source-analysis.corroboration"
     }
   ]
 }
