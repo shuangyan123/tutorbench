@@ -113,6 +113,48 @@ A profile may define:
 This prevents a mathematics-style answer model from being imposed on history,
 writing, or other open-ended domains.
 
+## 1.1 Strategy adaptation is task-specific
+
+The broad discipline field is a coverage and organization label. It does **not**
+define one universal strategy policy for all mathematics, science, programming,
+writing, or history tasks.
+
+Strategy evaluation must bind to a narrower, versioned profile:
+
+```text
+broad discipline
+  -> concrete domain / subdiscipline
+     -> task family
+        -> archetype
+           -> task-specific strategy profile
+```
+
+For example, `programming` must not imply one programming-wide notion of an
+optimal strategy. An algorithm-design profile may care about correctness,
+complexity, and reusable algorithmic insight, while a debugging profile may
+instead care about fault localization, evidence, patch minimality, and
+regression risk. Those profiles must be authored separately.
+
+Likewise, an experimental-design profile in empirical science, a quantitative
+physics problem, a chemistry mechanism explanation, and a biological causal
+model should not inherit one generic `science` strategy ranking.
+
+The same rule applies to writing and the humanities: argumentative source
+synthesis, sentence revision, literary interpretation, historical
+corroboration, and policy analysis require different strategy references.
+
+A task-specific profile may use one of several evaluation modes:
+
+- ordered preference when the authored constraints support a defensible
+  ordering;
+- Pareto trade-off when strategies optimize competing dimensions;
+- acceptable strategy set when multiple approaches are defensible;
+- no strategy ranking when ranking itself is not meaningful.
+
+This keeps "human-optimal instance/general strategy" as a valid construct for
+tasks where it is defensible, rather than a universal cross-disciplinary
+assumption.
+
 ## 2. Content Depth: D1–D5
 
 Content depth describes the intellectual depth of the task itself. It is
