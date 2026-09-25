@@ -128,7 +128,7 @@ test("public governance files, package metadata, and issue entry points are expl
   const readme = await readRepositoryFile("README.md");
   assert.match(readme, /# Teachometry TutorBench/);
   assert.match(readme, /not affiliated with Scale AI's separately named/);
-  assert.match(readme, /Teachometry is the public-facing product and project identity/);
+  assert.match(readme, /\*\*Teachometry\*\* is the public-facing product and project identity/);
   for (const link of [
     "(LICENSE)",
     "(docs/licensing.md)",
