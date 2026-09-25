@@ -89,6 +89,31 @@ Case Archetype
 Not every field is required for every discipline. A `DisciplineProfile`
 determines which reference fields are meaningful.
 
+## 0.1 Domain taxonomy source
+
+The first-level domain taxonomy is seeded from section 5.2 of the external
+**TutorBench Evaluation Framework / Pedagogy Taxonomy Research Audit**
+(2026-09-11), which proposed a 23-domain coverage matrix. That matrix is used
+as a research-backed design seed, not as a validated measurement ontology.
+
+The 23 domain seeds are:
+
+Mathematics; Statistics; Physics; Chemistry; Biology; Earth / environmental
+science; Computer science; Engineering; Medicine / health sciences;
+Psychology; Economics; Sociology; Political science / civics; History; Law;
+Philosophy; Languages / second-language learning; Literature; Writing /
+rhetoric; Business / finance / accounting; Arts / music / design; Vocational /
+procedural education; Interdisciplinary / emerging fields.
+
+These domains define the first subject-level evidence norms. They are then
+refined into specializations, practices, task families, and exact archetype
+strategy profiles. A broad family such as "science" is not a final strategy
+scope.
+
+The source disposition remains **design preference / pending expert
+validation**. TutorBench must not describe the 23-domain matrix as a validated
+educational taxonomy or calibrated scale.
+
 ## 1. Discipline Profile
 
 A discipline profile captures the evidence and reasoning norms of a domain.
