@@ -1,14 +1,6 @@
-export const CASE_SYSTEM_VNEXT_SCHEMA_VERSION = 1 as const;
+import type { CaseSystemVNextDomainId } from "./case-system-vnext-domain-taxonomy.js";
 
-export const CASE_SYSTEM_VNEXT_DISCIPLINES = [
-  "mathematics",
-  "science",
-  "programming",
-  "language_writing",
-  "history_social_science",
-] as const;
-export type CaseSystemVNextDiscipline =
-  (typeof CASE_SYSTEM_VNEXT_DISCIPLINES)[number];
+export const CASE_SYSTEM_VNEXT_SCHEMA_VERSION = 1 as const;
 
 export const CASE_SYSTEM_VNEXT_CONTENT_DEPTHS = [1, 2, 3, 4, 5] as const;
 export type CaseSystemVNextContentDepth =
@@ -76,7 +68,12 @@ export interface CaseSystemVNextArchetype {
   readonly id: string;
   readonly version: string;
   readonly title: string;
-  readonly discipline: CaseSystemVNextDiscipline;
+  /** Audit-seeded subject/domain. Broad labels such as "science" are not valid here. */
+  readonly domainId: CaseSystemVNextDomainId;
+  /** Narrower curricular or technical branch, e.g. algebra, mechanics, python, source_analysis. */
+  readonly subdomain: string;
+  /** Concrete practice/task family, e.g. debugging, proof, causal_explanation, source_synthesis. */
+  readonly practice: string;
   readonly topic: string;
   readonly learnerLevel: string;
   readonly contentDepth: CaseSystemVNextContentDepth;
