@@ -200,6 +200,42 @@ This keeps "human-optimal instance/general strategy" as a valid construct for
 tasks where it is defensible, rather than a universal cross-disciplinary
 assumption.
 
+## 1.2 Teaching objective profiles
+
+Domain/task strategy and teaching objective are separate axes.
+
+Case System vNext starts with two explicit objective modes:
+
+- `learning_oriented`: optimize for durable understanding, misconception
+  repair, learner independence, justified generalization, and transfer support;
+- `exam_oriented`: optimize for reliable, assessment-legal score production
+  under explicit time, scoring, tool, syllabus, and required-work constraints.
+
+Both modes remain subject to the shared base criteria and the exact domain/task
+strategy profile. Exam orientation therefore never licenses false explanations,
+out-of-syllabus tricks, prohibited tools, leaked-answer heuristics, or evidence
+claims that the domain profile would reject.
+
+`exam_oriented` must carry an explicit assessment context:
+
+```text
+exam family
+question type
+scoring policy
+time pressure / optional time budget
+allowed tools
+syllabus boundary
+required work
+```
+
+This prevents TutorBench from guessing what "exam strategy" means. A method can
+be suitable for an answer-only timed item but unsuitable for a proof question
+that awards process marks.
+
+The same task may be authored as a counterfactual pair in which only the
+teaching objective changes. A preference reversal is legitimate when it is
+explained by the objective context rather than by response length or style.
+
 ## 2. Content Depth: D1–D5
 
 Content depth describes the intellectual depth of the task itself. It is
