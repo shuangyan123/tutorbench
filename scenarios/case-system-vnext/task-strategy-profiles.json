@@ -3,7 +3,7 @@
   "id": "case-system-vnext-strategy-profiles",
   "version": "0.1.0",
   "title": "Case System vNext task-specific strategy profiles",
-  "description": "Pilot strategy profiles layered over shared base evaluation rules. Profiles are bound to concrete subjects/specializations/practices; broad discipline families alone never define strategy preference.",
+  "description": "Pilot task-specific strategy profiles layered over shared base rules and anchored to the audit-seeded 23-domain taxonomy. Broad domain membership never defines the final task strategy.",
   "profiles": [
     {
       "schemaVersion": 1,
@@ -48,7 +48,8 @@
         "disciplineFamily": "formal_sciences",
         "subject": "mathematics",
         "specialization": "algebra",
-        "practice": "proof_and_generalization"
+        "practice": "proof_and_generalization",
+        "domainId": "mathematics"
       }
     },
     {
@@ -94,53 +95,8 @@
         "disciplineFamily": "computing",
         "subject": "computer_science",
         "specialization": "algorithms",
-        "practice": "code_implementation"
-      }
-    },
-    {
-      "schemaVersion": 1,
-      "id": "science-d5-discriminating-investigation",
-      "version": "0.1.0",
-      "archetypeId": "science-d5-investigation",
-      "taskFamily": "experimental-design-and-model-discrimination",
-      "strategyScope": "Designing an investigation that distinguishes competing explanations under measurement uncertainty.",
-      "evaluationMode": "pareto_tradeoff",
-      "criteria": [
-        {
-          "id": "discriminative-power",
-          "label": "Discriminative power",
-          "description": "The design creates observations on which competing explanations make meaningfully different predictions."
-        },
-        {
-          "id": "confound-control",
-          "label": "Confound control",
-          "description": "Major alternative explanations are controlled or explicitly bounded."
-        },
-        {
-          "id": "measurement-validity",
-          "label": "Measurement validity",
-          "description": "Measurements are appropriate to the construct and their limitations are acknowledged."
-        },
-        {
-          "id": "resource-efficiency",
-          "label": "Resource efficiency",
-          "description": "Added measurements or repetitions contribute useful evidence rather than procedural volume."
-        }
-      ],
-      "constraints": [
-        "Uncertainty must remain explicit.",
-        "More experimental steps are not automatically better or worse."
-      ],
-      "nonGoals": [
-        "No universal science strategy ranking.",
-        "No assumption that one experimental design dominates when trade-offs remain non-dominated."
-      ],
-      "status": "pilot",
-      "academicContext": {
-        "disciplineFamily": "natural_sciences",
-        "subject": "empirical_science_methodology",
-        "specialization": "experimental_design",
-        "practice": "model_discrimination"
+        "practice": "code_implementation",
+        "domainId": "computer_science"
       }
     },
     {
@@ -183,10 +139,11 @@
       ],
       "status": "pilot",
       "academicContext": {
-        "disciplineFamily": "cross_disciplinary_practice",
-        "subject": "language_arts",
+        "disciplineFamily": "humanities",
+        "subject": "composition_rhetoric",
         "specialization": "argumentation",
-        "practice": "source_synthesis"
+        "practice": "source_synthesis",
+        "domainId": "writing_rhetoric"
       }
     },
     {
@@ -232,7 +189,8 @@
         "disciplineFamily": "humanities_social_sciences",
         "subject": "history",
         "specialization": "source_analysis",
-        "practice": "corroboration"
+        "practice": "corroboration",
+        "domainId": "history"
       }
     }
   ]
