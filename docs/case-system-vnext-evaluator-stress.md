@@ -26,7 +26,7 @@ presentation 1: A = response X, B = response Y
 presentation 2: A = response Y, B = response X
 ```
 
-The evaluator returns only `A_BETTER`, `B_BETTER`, or `TIE` for the
+The evaluator returns only `A_BETTER`, `B_BETTER`, or `EQUIVALENT` for the
 authored contrast. The harness maps those labels back through an operator-only
 assignment sidecar.
 
@@ -207,3 +207,25 @@ See also:
 - [Case System vNext](case-system-vnext.md)
 - [Core Coverage Matrix](case-system-vnext-coverage-matrix.md)
 - [Judge Candidate Comparison](judge-candidate-comparison.md)
+
+## Outcome semantics
+
+The stress protocol distinguishes four semantic conclusions from provider or
+transport failure:
+
+- `A_BETTER` / `B_BETTER`: the authored criteria justify an overall
+  preference;
+- `EQUIVALENT`: the candidates are materially equivalent under the authored
+  criteria;
+- `NON_DOMINATED`: each candidate has defensible advantages and the authored
+  criteria do not justify collapsing those trade-offs into one winner;
+- `INSUFFICIENT_EVIDENCE`: the packet itself does not contain enough
+  information to support preference, equivalence, or non-dominance.
+
+`INSUFFICIENT_EVIDENCE` is a substantive evaluator conclusion. It is not the
+same as `status: unavailable`, which represents missing evaluator/provider
+evidence, or `status: invalid`, which represents malformed evaluator evidence.
+
+This distinction is required before live-Judge stress runs because
+`acceptable_strategy_set` and `pareto_tradeoff` profiles cannot be safely
+compressed into one generic tie label.
