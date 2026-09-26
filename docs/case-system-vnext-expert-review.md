@@ -158,7 +158,32 @@ node dist/src/cli/tutorbench.js case-system-vnext-expert-review-import `
   --output artifacts/case-system-vnext-expert-review/evidence.json
 ```
 
+For real review, prefer domain-scoped cohorts so reviewers see only tasks
+within their expertise. Example:
+
+```powershell
+node dist/src/cli/tutorbench.js case-system-vnext-expert-review-export `
+  --reviewer math-reviewer-a `
+  --reviewer math-reviewer-b `
+  --domain mathematics `
+  --output-dir artifacts/case-system-vnext-expert-review/mathematics
+```
+
+The current v0.5.0 suite yields these domain workloads:
+
+- mathematics: 5 tasks;
+- computer_science: 4 tasks;
+- biology: 2 tasks;
+- chemistry: 2 tasks;
+- history: 2 tasks;
+- physics: 1 task;
+- writing_rhetoric: 1 task.
+
+A multi-domain cohort is allowed only when both reviewers are genuinely
+qualified for every selected domain. The unfiltered 17-task export remains
+useful for local smoke testing, not as the default real-review assignment.
+
 Real reviewer recruitment and completed review data remain outside the current
-repository state until they actually occur. The immediate next step is to run
-the exporter, inspect the generated reviewer-facing material, and recruit
-domain-appropriate reviewers without exposing the operator manifest.
+repository state until they actually occur. The immediate next step is to
+generate domain-scoped reviewer packages and recruit domain-appropriate
+reviewers without exposing the operator manifest.
