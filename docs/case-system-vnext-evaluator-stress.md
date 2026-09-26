@@ -86,8 +86,9 @@ Two objective profiles are currently defined:
 
 - **Learning-oriented** — conceptual understanding, transparent reasoning,
   misconception repair, transfer support, and learner independence.
-- **Exam-oriented** — assessment-rule compliance, score reliability, time
-  efficiency, marking-point alignment, error resistance, and efficient
+- **Exam-oriented** — concept/method mastery, problem-family mastery,
+  legitimate-variant robustness, assessment-rule compliance, score reliability,
+  time efficiency, marking-point alignment, error resistance, and efficient
   verification.
 
 Exam-oriented fixtures must include the assessment context rather than relying
