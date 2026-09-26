@@ -114,6 +114,23 @@ test("stress plan builds swapped blind presentations and hides operator expectat
   }
 });
 
+test("math human-efficiency fixture uses a genuinely mechanical partial-product contrast", async () => {
+  const { suite } = await loadInputs();
+  const fixture = suite.fixtures.find(
+    (candidate) => candidate.id === "math-human-efficiency",
+  );
+  assert.ok(fixture);
+  const mechanical = fixture.candidates.find((candidate) => candidate.id === "mechanical");
+  assert.ok(mechanical);
+  assert.match(
+    mechanical.responseText,
+    /40 × 50.*40 × 2.*8 × 50.*8 × 2/,
+  );
+  assert.equal(fixture.expected.kind, "preference");
+  assert.equal(fixture.expected.candidateId, "structural");
+  assert.match(fixture.rationale, /four separate partial products/);
+});
+
 test("stable synthetic judgments produce exact expected-match diagnostics", async () => {
   const { pilot, suite, registry } = await loadInputs();
   const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, registry, 2);
