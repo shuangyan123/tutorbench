@@ -30,7 +30,7 @@
 - [ ] Independent human critical-failure review using real reviewers
 - [ ] Adjudication and human reference generation using real reviewer data
 
-## Case System vNext — DESIGN SPECIFICATION
+## Case System vNext — EXPERIMENTAL / NON-CANONICAL
 
 - [x] Define multi-axis authoring model: discipline profile, D1-D5 content depth, P1-P5 pedagogical difficulty, and H1-H3 interaction horizon
 - [x] Define prerequisite-bounded human-optimal instance and general reasoning concepts
