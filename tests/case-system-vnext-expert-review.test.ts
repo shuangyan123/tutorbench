@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { spawn } from "node:child_process";
+import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import test from "node:test";
 
 import {
@@ -17,6 +19,34 @@ import {
 
 async function loadJson(path: string): Promise<unknown> {
   return JSON.parse(await readFile(resolve(process.cwd(), path), "utf8")) as unknown;
+}
+
+interface CliResult {
+  readonly exitCode: number | null;
+  readonly stdout: string;
+  readonly stderr: string;
+}
+
+function runCli(args: readonly string[]): Promise<CliResult> {
+  const cliPath = resolve(process.cwd(), "dist", "src", "cli", "tutorbench.js");
+  return new Promise((resolveResult, reject) => {
+    const child = spawn(process.execPath, [cliPath, ...args], {
+      cwd: process.cwd(),
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk: Buffer | string) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on("data", (chunk: Buffer | string) => {
+      stderr += chunk.toString();
+    });
+    child.once("error", reject);
+    child.once("close", (exitCode) => {
+      resolveResult({ exitCode, stdout, stderr });
+    });
+  });
 }
 
 async function buildExport() {
@@ -199,4 +229,126 @@ test("expert review submission parser rejects extra fields and incomplete task c
     ),
     /expert review data is invalid/,
   );
+});
+
+
+test("expert review CLI writes reviewer-ready packages and imports completed counterbalanced submissions", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "tutorbench-vnext-expert-review-"));
+  try {
+    const exportResult = await runCli([
+      "case-system-vnext-expert-review-export",
+      "--reviewer",
+      "reviewer-a",
+      "--reviewer",
+      "reviewer-b",
+      "--output-dir",
+      directory,
+    ]);
+    assert.equal(exportResult.exitCode, 0, exportResult.stderr);
+    assert.match(exportResult.stdout, /Tasks per reviewer: 17/u);
+    assert.match(exportResult.stdout, /Human review data present: false/u);
+    assert.deepEqual((await readdir(directory)).sort(), [
+      "operator-manifest.json",
+      "reviewer-1",
+      "reviewer-2",
+    ]);
+
+    for (const reviewerDirectory of ["reviewer-1", "reviewer-2"]) {
+      assert.deepEqual(
+        (await readdir(join(directory, reviewerDirectory))).sort(),
+        ["REVIEW_INSTRUCTIONS.md", "packet.json", "submission-template.json"],
+      );
+    }
+
+    const packetA = JSON.parse(
+      await readFile(join(directory, "reviewer-1", "packet.json"), "utf8"),
+    ) as {
+      readonly schemaVersion: 1;
+      readonly protocolId: string;
+      readonly protocolVersion: string;
+      readonly reviewerId: string;
+      readonly taskSetFingerprint: string;
+      readonly packetFingerprint: string;
+      readonly tasks: readonly { readonly reviewTaskId: string }[];
+    };
+    const packetB = JSON.parse(
+      await readFile(join(directory, "reviewer-2", "packet.json"), "utf8"),
+    ) as typeof packetA;
+    const templateA = JSON.parse(
+      await readFile(join(directory, "reviewer-1", "submission-template.json"), "utf8"),
+    ) as { readonly reviews: readonly { readonly outcome: string; readonly sufficientlyClear: string }[] };
+    const instructionsA = await readFile(
+      join(directory, "reviewer-1", "REVIEW_INSTRUCTIONS.md"),
+      "utf8",
+    );
+
+    assert.equal(packetA.tasks.length, 17);
+    assert.equal(packetB.tasks.length, 17);
+    assert.equal(packetA.reviewerId, "reviewer-a");
+    assert.equal(packetB.reviewerId, "reviewer-b");
+    assert.ok(templateA.reviews.every((review) =>
+      review.outcome === "" && review.sufficientlyClear === ""
+    ));
+    assert.match(instructionsA, /A_BETTER/u);
+    assert.match(instructionsA, /INSUFFICIENT_EVIDENCE/u);
+
+    const submissionFor = (
+      packet: typeof packetA,
+      outcome: "A_BETTER" | "B_BETTER",
+    ) => ({
+      schemaVersion: packet.schemaVersion,
+      protocolId: packet.protocolId,
+      protocolVersion: packet.protocolVersion,
+      reviewerId: packet.reviewerId,
+      taskSetFingerprint: packet.taskSetFingerprint,
+      packetFingerprint: packet.packetFingerprint,
+      reviews: packet.tasks.map((task) => ({
+        reviewTaskId: task.reviewTaskId,
+        outcome,
+        sufficientlyClear: true,
+      })),
+    });
+
+    const submissionAPath = join(directory, "reviewer-a.completed.json");
+    const submissionBPath = join(directory, "reviewer-b.completed.json");
+    await writeFile(
+      submissionAPath,
+      `${JSON.stringify(submissionFor(packetA, "A_BETTER"), null, 2)}\n`,
+      "utf8",
+    );
+    await writeFile(
+      submissionBPath,
+      `${JSON.stringify(submissionFor(packetB, "B_BETTER"), null, 2)}\n`,
+      "utf8",
+    );
+
+    const outputPath = join(directory, "expert-review-evidence.json");
+    const importResult = await runCli([
+      "case-system-vnext-expert-review-import",
+      "--packet-dir",
+      directory,
+      "--submission",
+      submissionAPath,
+      "--submission",
+      submissionBPath,
+      "--output",
+      outputPath,
+    ]);
+    assert.equal(importResult.exitCode, 0, importResult.stderr);
+    assert.match(importResult.stdout, /Agreements: 17/u);
+    assert.match(importResult.stdout, /No automatic reference-label promotion/u);
+
+    const evidence = JSON.parse(await readFile(outputPath, "utf8")) as {
+      readonly agreementCount: number;
+      readonly disagreementCount: number;
+      readonly packetAmbiguityCount: number;
+      readonly reviews: readonly unknown[];
+    };
+    assert.equal(evidence.agreementCount, 17);
+    assert.equal(evidence.disagreementCount, 0);
+    assert.equal(evidence.packetAmbiguityCount, 0);
+    assert.equal(evidence.reviews.length, 17);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
