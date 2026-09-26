@@ -26,9 +26,9 @@ presentation 1: A = response X, B = response Y
 presentation 2: A = response Y, B = response X
 ```
 
-The evaluator returns only `A_BETTER`, `B_BETTER`, or `EQUIVALENT` for the
-authored contrast. The harness maps those labels back through an operator-only
-assignment sidecar.
+The evaluator returns one bounded semantic outcome: `A_BETTER`, `B_BETTER`,
+`EQUIVALENT`, `NON_DOMINATED`, or `INSUFFICIENT_EVIDENCE`. The harness maps
+those labels back through an operator-only assignment sidecar.
 
 A stable preference requires the same underlying response to win after the
 A/B swap. If the evaluator follows presentation position, the result is
@@ -253,12 +253,41 @@ tutorbench case-system-vnext-stress --judge-deepseek --runs 1
 
 The default live smoke uses one repetition per fixture: 15 fixtures × two
 presentation orders = 30 Judge calls. A repeated stress run with
-`--runs 3` makes 90 Judge calls.
+`--runs 3` makes 90 Judge calls. Targeted follow-up diagnostics can select one
+or more fixtures without rerunning the entire paid suite:
+
+```text
+tutorbench case-system-vnext-stress --judge-deepseek --runs 3 \\
+  --fixture math-human-efficiency \\
+  --fixture objective-exam-math-speed \\
+  --output artifacts/case-system-vnext-targeted-stress.json
+```
+
+Each selected fixture still runs both A/B orders for every repetition.
 
 The command records the provider/model descriptor and the full uncalibrated
 stress report. It never sends fixture expectations, rationale, or candidate
 identities to the Judge. Provider/transport failures remain distinct from the
 semantic `INSUFFICIENT_EVIDENCE` outcome.
+
+An initial repeated live run on 2026-09-25 executed 90/90 planned calls with
+42 comparable repetitions, zero order-sensitive repetitions, zero inconsistent
+repetitions, 85 `ok` judgments, zero unavailable judgments, and five invalid
+judgments. The five invalid judgments were all provider-confirmed output-length
+truncations on `math-human-efficiency`. The no-winner probes were stable across
+all three repetitions: writing `EQUIVALENT`, chemistry `NON_DOMINATED`, and
+history `INSUFFICIENT_EVIDENCE`. The exam-oriented mathematics counterfactual
+also exposed a stable diagnostic disagreement: all three comparable
+repetitions preferred the derive-and-generalize response despite the authored
+one-minute, answer-only expectation favoring the concise structural response.
+
+That disagreement motivated protocol/prompt v0.4/v0.2 clarification: the
+immediate `teachingTarget` and `teachingObjective` control the presentation,
+while broader archetype reference reasoning and transfer fields remain
+background context rather than automatic requirements. This is a stress-test
+contract clarification, not a claim that the developer-authored expectation is
+human gold. Independent review remains required before using the expectation as
+reference evidence.
 
 This is diagnostic evidence only. Developer-authored expected outcomes are not
 human gold, so expected-match share must not be reported as model accuracy or
