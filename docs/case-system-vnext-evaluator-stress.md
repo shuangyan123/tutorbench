@@ -265,6 +265,12 @@ tutorbench case-system-vnext-stress --judge-deepseek --runs 3 \\
 
 Each selected fixture still runs both A/B orders for every repetition.
 
+The live vNext stress CLI uses a stress-specific default Judge output budget of
+32768 tokens because repeated DeepSeek V4.1 Flash thinking-mode diagnostics
+showed that the shared 8192-token default could truncate otherwise valid stress
+judgments. Operators can still set `DEEPSEEK_JUDGE_MAX_TOKENS` explicitly to
+override this default. The shared DeepSeek Judge default is unchanged.
+
 The command records the provider/model descriptor and the full uncalibrated
 stress report. It never sends fixture expectations, rationale, or candidate
 identities to the Judge. Provider/transport failures remain distinct from the
@@ -288,6 +294,23 @@ background context rather than automatic requirements. This is a stress-test
 contract clarification, not a claim that the developer-authored expectation is
 human gold. Independent review remains required before using the expectation as
 reference evidence.
+
+A targeted 2026-09-26 follow-up compared the same two fixtures under the new
+prompt/protocol behavior. With the inherited 8192-token Judge budget, 3 of 12
+presentations were invalid because of `judge_output_truncated`. Raising only
+the output budget to 32768 eliminated those truncations: 11 of 12 judgments
+were valid, with the remaining presentation unavailable because of
+`judge_timeout`. The exam-oriented mathematics fixture then produced three
+stable expected preferences across all repetitions.
+
+The same follow-up also showed that the original `math-human-efficiency`
+contrast was under-controlled: its so-called mechanical candidate used a short,
+reasonable distributive decomposition, so a stable preference for that
+candidate was not sufficient evidence of evaluator failure. Fixture suite
+v0.4.1 replaces that response with an explicitly longer four-partial-product
+expansion while keeping both candidates correct and prerequisite-compatible.
+This change narrows the intended `human_efficiency` contrast rather than
+changing the Judge prompt.
 
 This is diagnostic evidence only. Developer-authored expected outcomes are not
 human gold, so expected-match share must not be reported as model accuracy or
