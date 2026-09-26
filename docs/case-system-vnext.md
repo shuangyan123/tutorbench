@@ -208,8 +208,10 @@ Case System vNext starts with two explicit objective modes:
 
 - `learning_oriented`: optimize for durable understanding, misconception
   repair, learner independence, justified generalization, and transfer support;
-- `exam_oriented`: optimize for reliable, assessment-legal score production
-  under explicit time, scoring, tool, syllabus, and required-work constraints.
+- `exam_oriented`: optimize for reliable, assessment-legal score-relevant
+  performance by building enough concept/method mastery, problem-family
+  mastery, and variant robustness to convert learning into marks under explicit
+  time, scoring, tool, syllabus, and required-work constraints.
 
 Both modes remain subject to the shared base criteria and the exact domain/task
 strategy profile. Exam orientation therefore never licenses false explanations,
@@ -504,6 +506,11 @@ concept / method mastery
            -> score-relevant performance
 ```
 
+Here, deeper understanding is valuable when it improves recognition, method
+selection, error control, variant handling, or other score-relevant execution.
+It is not rewarded merely for being deeper when the authored exam objective
+does not benefit from that extra depth.
+
 The final node is intentionally **score-relevant performance**, not claimed
 score gain. TutorBench can evaluate observable proxies such as strategy
 selection, syllabus legality, marking-point alignment, error resistance,
@@ -520,7 +527,8 @@ integrity.
 Candidate observable criteria include:
 
 - concept and method mastery support;
-- problem-family recognition;
+- problem-family mastery: recognition, method selection, common variants, and
+  common traps;
 - prerequisite compatibility;
 - structural insight where it improves robustness;
 - strategy appropriateness;
