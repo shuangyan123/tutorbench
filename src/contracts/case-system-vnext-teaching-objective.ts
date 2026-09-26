@@ -102,12 +102,24 @@ export const CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_PROFILES = [
   },
   {
     schemaVersion: CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_SCHEMA_VERSION,
-    id: "exam-oriented-v0.1",
+    id: "exam-oriented-v0.2",
     mode: "exam_oriented",
     label: "Exam-oriented",
     description:
-      "Optimize tutoring for reliable, legal score production under an explicit assessment context while preserving correctness, domain validity, and learner-appropriate reasoning.",
+      "Optimize tutoring for reliable, legal score production under an explicit assessment context by building score-relevant concept and problem-family mastery, supporting transfer to legitimate variants, and preserving correctness, domain validity, and learner-appropriate reasoning.",
     criteria: [
+      {
+        id: "concept-method-mastery",
+        label: "Concept and method mastery",
+        description:
+          "The response helps the learner reliably recognize and execute the concept or method needed for the assessed problem family rather than memorizing one surface form.",
+      },
+      {
+        id: "problem-family-transfer",
+        label: "Problem-family transfer",
+        description:
+          "The response prepares the learner to handle legitimate variants of the assessed problem type when the scoring objective depends on recognizing the same underlying structure under changed surface details.",
+      },
       {
         id: "assessment-rule-compliance",
         label: "Assessment-rule compliance",
@@ -153,7 +165,7 @@ export const CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_PROFILES = [
     nonGoals: [
       "No reward for brittle test gaming, leaked answer patterns, or memorized dataset artifacts.",
       "No assumption that the shortest method maximizes expected score.",
-      "No claim that exam-oriented tutoring demonstrates durable conceptual mastery or transfer.",
+      "No claim that these response-level proxies demonstrate durable mastery, causal learning gain, or actual score improvement without longitudinal learner and assessment evidence.",
     ],
   },
 ] as const satisfies readonly CaseSystemVNextTeachingObjectiveProfile[];

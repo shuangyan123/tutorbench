@@ -93,6 +93,25 @@ test("stress plan builds swapped blind presentations and hides operator expectat
         );
         if (presentation.packet.teachingObjective.mode === "exam_oriented") {
           assert.ok(presentation.packet.teachingObjective.assessmentContext);
+          assert.equal(
+            presentation.packet.teachingObjectiveProfile.id,
+            "exam-oriented-v0.2",
+          );
+          assert.ok(
+            presentation.packet.teachingObjectiveProfile.criteria.some(
+              (criterion) => criterion.id === "concept-method-mastery",
+            ),
+          );
+          assert.ok(
+            presentation.packet.teachingObjectiveProfile.criteria.some(
+              (criterion) => criterion.id === "problem-family-transfer",
+            ),
+          );
+          assert.ok(
+            presentation.packet.teachingObjectiveProfile.nonGoals.some(
+              (nonGoal) => nonGoal.includes("actual score improvement"),
+            ),
+          );
         } else {
           assert.equal(presentation.packet.teachingObjective.assessmentContext, undefined);
         }
