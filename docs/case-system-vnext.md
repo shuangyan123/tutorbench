@@ -551,6 +551,8 @@ Candidate Findings include:
 
 These remain evaluator candidates pending independent human review and later
 outcome validation.
+
+See [Mastery & Transfer Positioning](case-system-vnext-mastery-transfer.md) for the decision boundary, score-proxy limitation, and validation path.
 ## 12. Transfer
 
 Transfer is represented as an authored opportunity, not as an observed
