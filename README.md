@@ -412,11 +412,15 @@ The package root is the stable local-evaluation surface:
 - `runTutorEval` for explicit TutorEval dataset and runner control
 - `loadTutorEvalDataset` for the checked-in public TutorEval datasets
 - `createHttpTutor` for a provider-neutral HTTP Tutor adapter
-- typed TutorEval, Scenario vNext, Finding, and Tutor Health contracts
+- provider-independent Community Review protocol contracts and helpers,
+  including deterministic fingerprinting and validation utilities
+- typed TutorEval, Scenario vNext, Finding, Tutor Health, and public Community
+  Review protocol contracts
 
-Corpus/replay, generation packets, calibration, site generation, and provider
-implementations remain explicit advanced modules. They are not prerequisites
-for the first local run and are not re-exported from the package root.
+Corpus/replay, generation packets, calibration, site generation, provider
+implementations, and the private Community Review service runtime remain
+explicit advanced modules. They are not prerequisites for the first local run
+and are not re-exported from the package root.
 
 ## Dataset and privacy boundary
 
