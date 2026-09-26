@@ -35,7 +35,7 @@ body:
     attributes:
       label: Versions
       description: Include package/project version, dataset/evaluator identity when relevant, and commit or tag.
-      placeholder: "0.1.0; tutor-eval-v0.2a@0.2a.5; evaluator 0.3a.4"
+      placeholder: "0.1.0; tutor-eval-v0.2a@0.2a.6; evaluator 0.3a.4"
     validations:
       required: true
   - type: textarea

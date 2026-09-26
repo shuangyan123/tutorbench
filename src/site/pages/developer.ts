@@ -452,8 +452,8 @@ function renderMethodologyStatus(artifacts: PublicBenchmarkArtifacts): string {
     ],
     [
       "Community Review infrastructure",
-      "Deployment-ready",
-      "Public reviewer intake remains closed; the real Community Review campaign has not started.",
+      "Private staging ready",
+      "Public launch remains blocked; reviewer intake remains closed, and the real Community Review campaign has not started.",
       "available",
     ],
     [

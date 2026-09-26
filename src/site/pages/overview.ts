@@ -146,7 +146,7 @@ function renderResultsReadiness(benchmark: PublicBenchmarkArtifact): string {
   return `<ol class="results-readiness-list">
     ${renderReadinessRow("Evaluation infrastructure", infrastructureAvailable ? "Available" : "Not available", "Benchmark, evaluators, and scoring pipeline are available.", infrastructureAvailable ? "available" : "pending")}
     ${renderReadinessRow("Calibration infrastructure", infrastructureAvailable ? "Available" : "Not available", "Tools and workflows for calibration are in place.", infrastructureAvailable ? "available" : "pending")}
-    ${renderReadinessRow("Community Review infrastructure", "Deployment-ready", "Public reviewer intake remains closed, and the real Community Review campaign has not started.", "ready")}
+    ${renderReadinessRow("Community Review infrastructure", "Private staging ready", "Public launch remains blocked; reviewer intake remains closed, and the real Community Review campaign has not started.", "ready")}
     ${renderReadinessRow("Human calibration (P5)", humanCalibrationStarted ? "In progress" : "Not started", "No real human calibration data is available yet.", humanCalibrationStarted ? "ready" : "pending")}
     ${renderReadinessRow("Judge-vs-human validation", judgeValidationCompleted ? "Completed" : "Not completed", "A Judge result is not presented as human-reference validation.", judgeValidationCompleted ? "ready" : "pending")}
     ${renderReadinessRow("Statistical validation", statisticalValidationCompleted ? "Completed" : "Not completed", "No statistical validation claim is made for the current benchmark.", statisticalValidationCompleted ? "ready" : "pending")}

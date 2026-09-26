@@ -34,7 +34,7 @@ English/Chinese equivalence, or leaderboard eligibility.
 
 ## Version boundary
 
-The current authored dataset is `tutor-eval-v0.2a@0.2a.5`; the historical
+The current authored dataset is `tutor-eval-v0.2a@0.2a.6`; the historical
 baseline audited here remains bound to `tutor-eval-v0.2a@0.2a.3` and
 `tutor-eval-pedagogy-judge-system@0.3`. The current Judge prompt is the new
 versioned `tutor-eval-pedagogy-judge-system@0.9`; v0.3 through v0.8 remain

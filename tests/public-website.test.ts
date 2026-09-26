@@ -729,8 +729,9 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(methodologyHtml, /Tutor-visible input ends at the response boundary/);
     assert.match(methodologyHtml, /Evaluator-only annotations stay on the evaluator side/);
     assert.match(methodologyHtml, /Community Review infrastructure/);
-    assert.match(methodologyHtml, /Deployment-ready/);
-    assert.match(methodologyHtml, /Public reviewer intake remains closed/);
+    assert.match(methodologyHtml, /Private staging ready/);
+    assert.match(methodologyHtml, /Public launch remains blocked/);
+    assert.match(methodologyHtml, /reviewer intake remains closed/);
     assert.match(methodologyHtml, /real Community Review campaign has not started/);
     assert.match(methodologyHtml, /Human calibration \(P5\)/);
     assert.match(methodologyHtml, /Judge-vs-human validation/);
