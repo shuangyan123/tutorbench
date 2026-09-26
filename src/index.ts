@@ -1,7 +1,9 @@
 /**
- * Stable package entry point for local and custom Tutor evaluation.
- * Advanced corpus, calibration, generation, and provider modules stay behind
- * their explicit internal paths so the default import surface stays small.
+ * Stable package entry point for local/custom Tutor evaluation plus the
+ * provider-independent Community Review protocol contracts. Advanced corpus,
+ * calibration, generation, site, provider, and private service-runtime modules
+ * stay behind explicit internal paths so the default import surface stays
+ * bounded.
  */
 export { loadTutorEvalDataset, loadTutorScenarioSuiteVNext } from "./datasets/index.js";
 export {
