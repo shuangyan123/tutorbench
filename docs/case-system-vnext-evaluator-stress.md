@@ -265,11 +265,13 @@ tutorbench case-system-vnext-stress --judge-deepseek --runs 3 \\
 
 Each selected fixture still runs both A/B orders for every repetition.
 
-The live vNext stress CLI uses a stress-specific default Judge output budget of
-32768 tokens because repeated DeepSeek V4.1 Flash thinking-mode diagnostics
-showed that the shared 8192-token default could truncate otherwise valid stress
-judgments. Operators can still set `DEEPSEEK_JUDGE_MAX_TOKENS` explicitly to
-override this default. The shared DeepSeek Judge default is unchanged.
+The live vNext stress CLI uses stress-specific defaults of a 32768-token Judge
+output budget and a 120-second timeout. Repeated DeepSeek V4.1 Flash
+thinking-mode diagnostics showed that the shared 8192-token / 60-second defaults
+could truncate or time out otherwise usable stress judgments. Operators can
+still set `DEEPSEEK_JUDGE_MAX_TOKENS` and `DEEPSEEK_JUDGE_TIMEOUT_MS`
+explicitly to override these values. The shared DeepSeek Judge defaults are
+unchanged.
 
 The command records the provider/model descriptor and the full uncalibrated
 stress report. It never sends fixture expectations, rationale, or candidate
@@ -307,10 +309,20 @@ The same follow-up also showed that the original `math-human-efficiency`
 contrast was under-controlled: its so-called mechanical candidate used a short,
 reasonable distributive decomposition, so a stable preference for that
 candidate was not sufficient evidence of evaluator failure. Fixture suite
-v0.4.1 replaces that response with an explicitly longer four-partial-product
-expansion while keeping both candidates correct and prerequisite-compatible.
-This change narrows the intended `human_efficiency` contrast rather than
-changing the Judge prompt.
+v0.4.1 replaced that response with an explicitly longer four-partial-product
+expansion.
+
+A second targeted run of that revised fixture produced one stable expected
+preference, one mixed `NON_DOMINATED` / structural-preference repetition, and
+one `judge_timeout`. The result exposed a remaining confound: the structural
+candidate used the difference-of-squares identity without locally explaining
+why the cross terms cancel, while the task profile explicitly evaluates
+reasoning transparency. Fixture suite v0.4.2 therefore adds that local
+justification so both candidates are correct, prerequisite-compatible, and
+transparent enough that the intended controlled difference is human reasoning
+efficiency. The repeated 60-second timeout also motivates the stress-specific
+120-second timeout. Neither change alters Judge prompt v0.2 or the shared
+DeepSeek defaults.
 
 This is diagnostic evidence only. Developer-authored expected outcomes are not
 human gold, so expected-match share must not be reported as model accuracy or
