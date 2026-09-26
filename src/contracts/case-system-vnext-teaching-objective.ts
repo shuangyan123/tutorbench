@@ -102,23 +102,29 @@ export const CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_PROFILES = [
   },
   {
     schemaVersion: CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_SCHEMA_VERSION,
-    id: "exam-oriented-v0.2",
+    id: "exam-oriented-v0.3",
     mode: "exam_oriented",
     label: "Exam-oriented",
     description:
-      "Optimize tutoring for reliable, legal score production under an explicit assessment context by building score-relevant concept and problem-family mastery, supporting transfer to legitimate variants, and preserving correctness, domain validity, and learner-appropriate reasoning.",
+      "Optimize tutoring for reliable, legal score-relevant performance under an explicit assessment context. Concept mastery, problem-family mastery, and transfer to legitimate variants are instrumental capabilities for producing marks reliably, efficiently, and within the authored scoring rules.",
     criteria: [
       {
         id: "concept-method-mastery",
         label: "Concept and method mastery",
         description:
-          "The response helps the learner reliably recognize and execute the concept or method needed for the assessed problem family rather than memorizing one surface form.",
+          "The response builds enough understanding of the assessed concept or method for reliable execution, error checking, and reuse under the stated exam constraints rather than treating conceptual depth as an end in itself.",
+      },
+      {
+        id: "problem-family-mastery",
+        label: "Problem-family mastery",
+        description:
+          "The response helps the learner recognize the assessed problem family, select the appropriate method, distinguish common variants or traps, and reproduce the required solution pattern reliably.",
       },
       {
         id: "problem-family-transfer",
         label: "Problem-family transfer",
         description:
-          "The response prepares the learner to handle legitimate variants of the assessed problem type when the scoring objective depends on recognizing the same underlying structure under changed surface details.",
+          "The response prepares the learner to preserve correct method selection and execution across legitimate variants of the assessed problem family when surface details change.",
       },
       {
         id: "assessment-rule-compliance",
@@ -130,7 +136,7 @@ export const CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_PROFILES = [
         id: "score-reliability",
         label: "Score reliability",
         description:
-          "The response favors methods that are robust under the stated scoring policy rather than merely short or clever.",
+          "The response favors methods that convert knowledge into marks reliably under the stated scoring policy rather than methods that are merely short, clever, or impressive in isolation.",
       },
       {
         id: "time-efficiency",
@@ -161,10 +167,12 @@ export const CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_PROFILES = [
       "Shared base criteria and domain/task strategy constraints remain binding.",
       "Exam orientation never licenses a false explanation, an out-of-syllabus method, prohibited tools, or fabricated evidence.",
       "Test-taking shortcuts are acceptable only when they are legal in the stated assessment context and do not contradict the task's required reasoning.",
+      "Conceptual explanation, problem-family abstraction, and transfer are required only to the extent that they materially support reliable score-relevant performance for the authored assessment objective.",
     ],
     nonGoals: [
       "No reward for brittle test gaming, leaked answer patterns, or memorized dataset artifacts.",
       "No assumption that the shortest method maximizes expected score.",
+      "No reward for additional conceptual depth, far transfer, or generalization when it does not improve the authored score-relevant objective.",
       "No claim that these response-level proxies demonstrate durable mastery, causal learning gain, or actual score improvement without longitudinal learner and assessment evidence.",
     ],
   },
