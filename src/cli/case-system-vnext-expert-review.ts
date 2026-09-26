@@ -2,8 +2,10 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import {
+  CASE_SYSTEM_VNEXT_DOMAIN_IDS,
   parseCaseSystemVNextPilot,
   parseCaseSystemVNextStrategyProfileRegistry,
+  type CaseSystemVNextDomainId,
   type CaseSystemVNextStressFixtureSuite,
 } from "../contracts/index.js";
 import {
@@ -27,6 +29,7 @@ export type CaseSystemVNextExpertReviewCliOptions =
       readonly help: false;
       readonly mode: "export";
       readonly reviewerIds: readonly [string, string];
+      readonly domainIds: readonly CaseSystemVNextDomainId[];
       readonly outputDirectory: string;
     }
   | {
@@ -50,6 +53,7 @@ export function parseCaseSystemVNextExpertReviewExportArgs(
   args: readonly string[],
 ): CaseSystemVNextExpertReviewCliOptions {
   const reviewerIds: string[] = [];
+  const domainIds: CaseSystemVNextDomainId[] = [];
   let outputDirectory: string | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index] ?? "";
@@ -69,6 +73,27 @@ export function parseCaseSystemVNextExpertReviewExportArgs(
       reviewerIds.push(opaqueId(reviewerValue, "--reviewer"));
       continue;
     }
+    if (argument === "--domain") {
+      const value = nextTutorbenchValue(args, index, "--domain");
+      if (!CASE_SYSTEM_VNEXT_DOMAIN_IDS.includes(value as CaseSystemVNextDomainId)) {
+        throw new TutorbenchCliUsageError(
+          `--domain must be a Case System vNext domain ID; received: ${value}`,
+        );
+      }
+      domainIds.push(value as CaseSystemVNextDomainId);
+      index += 1;
+      continue;
+    }
+    const domainValue = tutorbenchOptionValue(argument, "--domain");
+    if (domainValue !== undefined) {
+      if (!CASE_SYSTEM_VNEXT_DOMAIN_IDS.includes(domainValue as CaseSystemVNextDomainId)) {
+        throw new TutorbenchCliUsageError(
+          `--domain must be a Case System vNext domain ID; received: ${domainValue}`,
+        );
+      }
+      domainIds.push(domainValue as CaseSystemVNextDomainId);
+      continue;
+    }
     if (argument === "--output-dir") {
       outputDirectory = resolve(nextTutorbenchValue(args, index, "--output-dir"));
       index += 1;
@@ -86,10 +111,14 @@ export function parseCaseSystemVNextExpertReviewExportArgs(
       "Exactly two distinct --reviewer opaque IDs are required.",
     );
   }
+  if (new Set(domainIds).size !== domainIds.length) {
+    throw new TutorbenchCliUsageError("--domain values must be unique.");
+  }
   return {
     help: false,
     mode: "export",
     reviewerIds: [reviewerIds[0]!, reviewerIds[1]!],
+    domainIds,
     outputDirectory: outputDirectory ?? resolve(
       process.cwd(),
       "artifacts",
@@ -164,7 +193,13 @@ export function printCaseSystemVNextExpertReviewHelp(
 
 Usage:
   tutorbench case-system-vnext-expert-review-export \\
-    --reviewer <opaque-id> --reviewer <opaque-id> [--output-dir <path>]
+    --reviewer <opaque-id> --reviewer <opaque-id> [--domain <domain-id>]... \
+    [--output-dir <path>]
+
+Options:
+  --domain <id>          Optional repeatable domain filter. Use one domain per
+                         real expert cohort unless reviewers are qualified for
+                         every selected domain.
 
 Exports two counterbalanced blind packets plus editable submission templates.
 Reviewer packets omit developer expectations, rationale, fixture IDs, live-Judge
@@ -197,6 +232,28 @@ async function loadInputs() {
     "scenarios/case-system-vnext/evaluator-stress-fixtures.json",
   ) as CaseSystemVNextStressFixtureSuite;
   return { pilot, registry, suite };
+}
+
+export function selectCaseSystemVNextExpertReviewSuite(
+  pilot: ReturnType<typeof parseCaseSystemVNextPilot>,
+  suite: CaseSystemVNextStressFixtureSuite,
+  domainIds: readonly CaseSystemVNextDomainId[],
+): CaseSystemVNextStressFixtureSuite {
+  if (domainIds.length === 0) return suite;
+  const selectedDomains = new Set(domainIds);
+  const archetypeDomain = new Map(
+    pilot.archetypes.map((archetype) => [archetype.id, archetype.domainId]),
+  );
+  const fixtures = suite.fixtures.filter((fixture) => {
+    const domainId = archetypeDomain.get(fixture.archetypeId);
+    return domainId !== undefined && selectedDomains.has(domainId);
+  });
+  if (fixtures.length === 0) {
+    throw new TutorbenchCliUsageError(
+      `No evaluator-stress fixtures match --domain ${domainIds.join(", ")}.`,
+    );
+  }
+  return { ...suite, fixtures };
 }
 
 async function writeText(path: string, content: string): Promise<void> {
@@ -251,9 +308,14 @@ export async function runCaseSystemVNextExpertReviewExport(
   options: Extract<CaseSystemVNextExpertReviewCliOptions, { readonly help: false; readonly mode: "export" }>,
 ): Promise<void> {
   const { pilot, registry, suite } = await loadInputs();
-  const exported = buildCaseSystemVNextExpertReviewExport(
+  const selectedSuite = selectCaseSystemVNextExpertReviewSuite(
     pilot,
     suite,
+    options.domainIds,
+  );
+  const exported = buildCaseSystemVNextExpertReviewExport(
+    pilot,
+    selectedSuite,
     registry,
     options.reviewerIds,
   );
@@ -272,6 +334,7 @@ export async function runCaseSystemVNextExpertReviewExport(
     "Case System vNext expert-review export",
     `  Suite: ${exported.manifest.suiteId}@${exported.manifest.suiteVersion}`,
     `  Reviewers: ${exported.manifest.reviewerIds.join(", ")}`,
+    `  Domains: ${options.domainIds.length === 0 ? "all" : options.domainIds.join(", ")}`,
     `  Tasks per reviewer: ${exported.manifest.tasks.length}`,
     `  Output directory: ${options.outputDirectory}`,
     "  Human review data present: false",
