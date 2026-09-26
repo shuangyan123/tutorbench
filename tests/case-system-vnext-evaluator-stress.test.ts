@@ -126,8 +126,12 @@ test("math human-efficiency fixture uses a genuinely mechanical partial-product 
     mechanical.responseText,
     /40 × 50.*40 × 2.*8 × 50.*8 × 2/,
   );
+  const structural = fixture.candidates.find((candidate) => candidate.id === "structural");
+  assert.ok(structural);
+  assert.match(structural.responseText, /\+ad and -ad terms cancel/);
   assert.equal(fixture.expected.kind, "preference");
   assert.equal(fixture.expected.candidateId, "structural");
+  assert.match(fixture.rationale, /locally justified/);
   assert.match(fixture.rationale, /four separate partial products/);
 });
 
