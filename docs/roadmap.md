@@ -51,7 +51,8 @@
 - [x] Position Mastery & Transfer as an objective-sensitive reporting area outside the Tutor Health aggregate score
 
 See [Case System vNext](case-system-vnext.md), the
-[Core Coverage Matrix](case-system-vnext-coverage-matrix.md), and the
+[Core Coverage Matrix](case-system-vnext-coverage-matrix.md), the
+[Mastery & Transfer Positioning](case-system-vnext-mastery-transfer.md), and the
 [Evaluator Stress Test](case-system-vnext-evaluator-stress.md).
 
 ## 0.3 LLM-as-Judge Calibration — PARTIAL: 0.3A hybrid + 0.3B OpenAI provider
