@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
   "id": "case-system-vnext-evaluator-stress-fixtures",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "title": "Case System vNext evaluator stress fixtures",
   "description": "Developer-authored diagnostic contrasts with explicit preference, equivalent, non-dominated, and insufficient-evidence outcomes. Semantic insufficiency is distinct from provider/transport unavailability.",
   "fixtures": [
@@ -286,6 +286,57 @@
         "candidateId": "first-bad-state"
       },
       "rationale": "The preferred response uses Python-relevant state semantics, evidence-backed localization, and a minimal repair rather than speculative wholesale rewriting.",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
+    },
+    {
+      "id": "biology-d3-equivalent-causal-strategies",
+      "archetypeId": "science-d3-causal",
+      "contrast": "equivalent_strategies",
+      "teachingTarget": "Help the learner repair a plant-growth explanation so it distinguishes association from mechanism and preserves plausible alternatives until controlled evidence can discriminate them.",
+      "learnerState": "partial_progress",
+      "candidates": [
+        {
+          "id": "mechanism-first",
+          "responseText": "The taller plants are consistent with a fertilizer effect, but that does not establish how it worked. First verify that light, water, and starting size were controlled; then treat improved nutrient availability as a mechanism hypothesis that still needs supporting evidence."
+        },
+        {
+          "id": "alternatives-first",
+          "responseText": "Do not treat taller plants as proof of a fertilizer mechanism. Keep improved nutrient availability and uncontrolled light or water as competing explanations, then use matched controls or another discriminating observation to decide which explanation the evidence supports."
+        }
+      ],
+      "expected": {
+        "kind": "equivalent"
+      },
+      "rationale": "Both responses preserve causal uncertainty, identify relevant controls, and connect mechanism claims to discriminating evidence; they differ mainly in whether mechanism or competing hypotheses are introduced first.",
+      "strategyProfileId": "biology-d3-causal-control",
+      "teachingObjective": {
+        "mode": "learning_oriented"
+      }
+    },
+    {
+      "id": "python-d3-human-efficiency",
+      "archetypeId": "programming-d3-debug",
+      "contrast": "human_efficiency",
+      "teachingTarget": "Localize a reproducible Python mutable-state bug with the least diagnostic work needed to identify the first bad state and make a minimal evidence-backed repair.",
+      "learnerState": "repeated_failure",
+      "candidates": [
+        {
+          "id": "exhaustive-logging",
+          "responseText": "Print both containers and their object identities after every statement and inside every loop iteration, rerun the whole program, inspect the complete log, and then look for the first point where the states stop matching what you expected."
+        },
+        {
+          "id": "invariant-checkpoint",
+          "responseText": "State the invariant that should hold, check the two containers immediately before and after the first suspicious mutation, and test whether they alias the same object. Once that first bad transition is confirmed, change only the assignment or mutation that creates the unintended sharing, then rerun the failing case and one unaffected case."
+        }
+      ],
+      "expected": {
+        "kind": "preference",
+        "candidateId": "invariant-checkpoint"
+      },
+      "rationale": "Both approaches can expose the defect, but the invariant-driven route localizes the first bad transition with less diagnostic work and leads directly to a minimal repair and regression check.",
+      "strategyProfileId": "computer-science-python-d3-debugging",
       "teachingObjective": {
         "mode": "learning_oriented"
       }
