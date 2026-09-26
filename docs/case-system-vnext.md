@@ -1,10 +1,13 @@
 # Case System vNext — Methodology Specification
 
-Status: **design specification / not yet an implemented schema**
+Status: **experimental implemented authoring/evaluation infrastructure; non-canonical and pending independent validation**
 
-This document defines the next authoring model for TutorBench cases. It does
-not change the frozen `tutor-eval-v0.2a` corpus, current evaluator semantics,
-Tutor Health scoring, release gates, or public claims.
+This document defines the Case System vNext authoring model now represented by
+versioned runtime contracts, pilot archetypes, task-strategy profiles,
+evaluator-stress fixtures, teaching-objective profiles, and blind expert-review
+export/import tooling. Those implemented research surfaces remain
+**non-canonical**: they do not change the frozen `tutor-eval-v0.2a` corpus,
+current Tutor Health scoring, release gates, or public validation claims.
 
 The purpose of Case System vNext is to move from a small collection of
 mechanism-validation cases toward a deliberately structured tutoring case space
