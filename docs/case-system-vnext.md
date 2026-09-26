@@ -471,38 +471,86 @@ A teaching reference should define the decision boundary instead:
 The evaluator should prefer an acceptable strategy set over one gold-response
 string.
 
-## 11. Reasoning & Transfer evaluation candidate
+## 11. Mastery & Transfer reporting area
 
-Case System vNext proposes a future reporting area tentatively called
-**Reasoning & Transfer**. It is not yet an eighth Tutor Health dimension.
+Case System vNext treats **Mastery & Transfer** as an objective-sensitive
+reporting area, not as an eighth Tutor Health dimension and not as an
+objective-independent score.
 
-Possible observable criteria include:
+The distinction is deliberate:
 
-- human-efficient reasoning;
-- structural insight;
+- Tutor Health asks whether the Tutor's observable intervention is correct,
+  diagnostic, adaptive, instructionally sound, interactionally appropriate,
+  and reliable under the authored scenario.
+- Mastery & Transfer asks what capability the intervention is trying to build
+  and how that capability is expected to convert into the authored objective.
+
+For `learning_oriented` cases, the capability path is approximately:
+
+```text
+conceptual understanding
+  -> reusable structure
+     -> independent application
+        -> justified transfer
+```
+
+For `exam_oriented` cases, the capability path is approximately:
+
+```text
+concept / method mastery
+  -> problem-family mastery
+     -> robustness to legitimate variants
+        -> reliable and efficient exam execution
+           -> score-relevant performance
+```
+
+The final node is intentionally **score-relevant performance**, not claimed
+score gain. TutorBench can evaluate observable proxies such as strategy
+selection, syllabus legality, marking-point alignment, error resistance,
+time efficiency, and handling of authored variants. It cannot infer that a
+learner's real examination score will improve without longitudinal learner
+evidence and actual assessment outcomes.
+
+This area therefore remains outside the Tutor Health aggregate score. Folding
+it into the seven Health dimensions would mix intervention quality with an
+objective-dependent outcome mechanism and could double-count constructs already
+represented by correctness, intervention strategy, adaptation, and learning
+integrity.
+
+Candidate observable criteria include:
+
+- concept and method mastery support;
+- problem-family recognition;
 - prerequisite compatibility;
+- structural insight where it improves robustness;
 - strategy appropriateness;
-- generalization support;
-- distinction between a special case and a general rule;
-- near-transfer support;
-- far-transfer support where the domain profile makes that meaningful.
+- near-transfer / variant robustness;
+- generalization support when it serves the objective;
+- time-efficient execution under exam constraints;
+- marking-point and scoring-policy alignment;
+- error resistance and verification efficiency.
 
 Candidate Findings include:
 
-- **Missed human-efficient strategy** — a materially simpler accessible
-  reasoning path was available.
-- **Brute-force explanation** — the visible method relies on exhaustive or
-  unnecessarily mechanical work despite an accessible structural method.
+- **Missed accessible structure** — a materially more reliable or efficient
+  prerequisite-compatible route was available.
+- **Brute-force explanation** — the visible method creates avoidable work that
+  harms learning or exam execution under the authored objective.
 - **Opaque shortcut** — the method is compressed but not justified at the
   learner's prerequisite level.
-- **Generalization opportunity missed** — the instance is solved efficiently
-  but the reusable structure is not exposed when the teaching policy calls for it.
-- **Special case presented as a general rule** — a local trick is overgeneralized.
-- **Efficient method introduced too early** — the method is valid but exceeds
-  the learner's current prerequisite boundary.
+- **Problem-family recognition missed** — the response solves the current item
+  without exposing the reusable structure needed for legitimate variants when
+  that transfer is part of the objective.
+- **Special case presented as a general rule** — a local trick is
+  overgeneralized.
+- **Exam conversion mismatch** — the method is educationally valid but poorly
+  aligned with explicit time, scoring, required-work, or syllabus constraints.
+- **Brittle score shortcut** — the response optimizes the current item using a
+  fragile or non-transferable trick that is unlikely to survive ordinary
+  assessment variation.
 
-These Findings require evaluator validation before production use.
-
+These remain evaluator candidates pending independent human review and later
+outcome validation.
 ## 12. Transfer
 
 Transfer is represented as an authored opportunity, not as an observed
