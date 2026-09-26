@@ -95,11 +95,16 @@ test("stress plan builds swapped blind presentations and hides operator expectat
           assert.ok(presentation.packet.teachingObjective.assessmentContext);
           assert.equal(
             presentation.packet.teachingObjectiveProfile.id,
-            "exam-oriented-v0.2",
+            "exam-oriented-v0.3",
           );
           assert.ok(
             presentation.packet.teachingObjectiveProfile.criteria.some(
               (criterion) => criterion.id === "concept-method-mastery",
+            ),
+          );
+          assert.ok(
+            presentation.packet.teachingObjectiveProfile.criteria.some(
+              (criterion) => criterion.id === "problem-family-mastery",
             ),
           );
           assert.ok(
@@ -110,6 +115,11 @@ test("stress plan builds swapped blind presentations and hides operator expectat
           assert.ok(
             presentation.packet.teachingObjectiveProfile.nonGoals.some(
               (nonGoal) => nonGoal.includes("actual score improvement"),
+            ),
+          );
+          assert.ok(
+            presentation.packet.teachingObjectiveProfile.constraints.some(
+              (constraint) => constraint.includes("score-relevant performance"),
             ),
           );
         } else {
