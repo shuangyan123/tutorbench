@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
   "id": "case-system-vnext-evaluator-stress-fixtures",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "title": "Case System vNext evaluator stress fixtures",
   "description": "Developer-authored diagnostic contrasts with explicit preference, equivalent, non-dominated, and insufficient-evidence outcomes. Semantic insufficiency is distinct from provider/transport unavailability.",
   "fixtures": [
@@ -14,7 +14,7 @@
       "candidates": [
         {
           "id": "mechanical",
-          "responseText": "48 × 52 = 48 × 50 + 48 × 2 = 2400 + 96 = 2496."
+          "responseText": "48 × 52 = (40 + 8)(50 + 2) = 40 × 50 + 40 × 2 + 8 × 50 + 8 × 2 = 2000 + 80 + 400 + 16 = 2496."
         },
         {
           "id": "structural",
@@ -25,7 +25,7 @@
         "kind": "preference",
         "candidateId": "structural"
       },
-      "rationale": "Both are correct, but the structural route uses an accessible pattern and avoids unnecessary mechanical expansion.",
+      "rationale": "Both are correct and prerequisite-compatible, but the structural route recognizes the symmetric factors directly and avoids four separate partial products.",
       "strategyProfileId": "math-d5-structural-generalization",
       "teachingObjective": {
         "mode": "learning_oriented"
