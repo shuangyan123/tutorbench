@@ -188,9 +188,14 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   assert.equal(report.byContrast.objective_alignment.expectedMatchShare, 1);
   assert.equal(report.byContrast.pareto_tradeoff.expectedMatchShare, 1);
   assert.equal(report.byContrast.evidence_sufficiency.expectedMatchShare, 1);
-  assert.equal(report.overall.equivalentCount, 2);
-  assert.equal(report.overall.nonDominatedCount, 2);
-  assert.equal(report.overall.insufficientEvidenceCount, 2);
+  const expectedByKind = (kind: CaseSystemVNextStressFixtureSuite["fixtures"][number]["expected"]["kind"]) =>
+    suite.fixtures.filter((fixture) => fixture.expected.kind === kind).length * 2;
+  assert.equal(report.overall.equivalentCount, expectedByKind("equivalent"));
+  assert.equal(report.overall.nonDominatedCount, expectedByKind("non_dominated"));
+  assert.equal(
+    report.overall.insufficientEvidenceCount,
+    expectedByKind("insufficient_evidence"),
+  );
 });
 
 test("position-following judgments are classified as order-sensitive, not as equivalence", async () => {
