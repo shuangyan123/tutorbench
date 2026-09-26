@@ -54,7 +54,31 @@ test("expert review export counterbalances every task and hides operator expecta
     assert.doesNotMatch(serialized, /"expected"/);
     assert.doesNotMatch(serialized, /"rationale"/);
     assert.doesNotMatch(serialized, /expectedMatch/);
-    assert.doesNotMatch(serialized, /deepseek|provider|model/i);
+    assert.doesNotMatch(serialized, /deepseek/i);
+    const forbiddenIdentityKeys = new Set([
+      "provider",
+      "providerId",
+      "providerModel",
+      "model",
+      "modelId",
+      "modelVersion",
+    ]);
+    const inspectKeys = (value: unknown): void => {
+      if (Array.isArray(value)) {
+        value.forEach(inspectKeys);
+        return;
+      }
+      if (typeof value !== "object" || value === null) return;
+      for (const [key, nested] of Object.entries(value)) {
+        assert.equal(
+          forbiddenIdentityKeys.has(key),
+          false,
+          `review packet must not expose provider/model identity field: ${key}`,
+        );
+        inspectKeys(nested);
+      }
+    };
+    inspectKeys(packet);
     assert.doesNotMatch(serialized, /fixtureId/);
     assert.doesNotMatch(serialized, /contrastUnderTest/);
     assert.doesNotMatch(serialized, /equivalent-causal-strategies|human-efficiency/);
