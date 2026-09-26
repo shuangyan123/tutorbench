@@ -12,6 +12,10 @@ import {
   type CaseSystemVNextExpertReviewSubmission,
 } from "../src/case-system-vnext/expert-review.js";
 import {
+  parseCaseSystemVNextExpertReviewExportArgs,
+  selectCaseSystemVNextExpertReviewSuite,
+} from "../src/cli/case-system-vnext-expert-review.js";
+import {
   parseCaseSystemVNextPilot,
   parseCaseSystemVNextStrategyProfileRegistry,
   type CaseSystemVNextStressFixtureSuite,
@@ -351,4 +355,63 @@ test("expert review CLI writes reviewer-ready packages and imports completed cou
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+
+test("expert review export supports domain-scoped cohorts", async () => {
+  const pilot = parseCaseSystemVNextPilot(
+    await loadJson("scenarios/case-system-vnext/pilot-archetypes.json"),
+  );
+  const suite = await loadJson(
+    "scenarios/case-system-vnext/evaluator-stress-fixtures.json",
+  ) as CaseSystemVNextStressFixtureSuite;
+
+  const mathematics = selectCaseSystemVNextExpertReviewSuite(
+    pilot,
+    suite,
+    ["mathematics"],
+  );
+  assert.equal(mathematics.fixtures.length, 5);
+
+  const computerScience = selectCaseSystemVNextExpertReviewSuite(
+    pilot,
+    suite,
+    ["computer_science"],
+  );
+  assert.equal(computerScience.fixtures.length, 4);
+
+  const combined = selectCaseSystemVNextExpertReviewSuite(
+    pilot,
+    suite,
+    ["biology", "chemistry"],
+  );
+  assert.equal(combined.fixtures.length, 4);
+});
+
+test("expert review export CLI parses repeatable domain filters", () => {
+  const parsed = parseCaseSystemVNextExpertReviewExportArgs([
+    "--reviewer",
+    "reviewer-a",
+    "--reviewer",
+    "reviewer-b",
+    "--domain",
+    "mathematics",
+    "--domain=computer_science",
+    "--output-dir",
+    "artifacts/review",
+  ]);
+  assert.equal(parsed.help, false);
+  if (parsed.help || parsed.mode !== "export") return;
+  assert.deepEqual(parsed.domainIds, ["mathematics", "computer_science"]);
+  assert.throws(
+    () => parseCaseSystemVNextExpertReviewExportArgs([
+      "--reviewer",
+      "reviewer-a",
+      "--reviewer",
+      "reviewer-b",
+      "--domain",
+      "not-a-domain",
+    ]),
+    /Case System vNext domain ID/u,
+  );
 });
