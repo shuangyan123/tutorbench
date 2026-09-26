@@ -23,6 +23,27 @@ import {
 } from "./tutorbench-common.js";
 import { writeTutorCliJson } from "./tutor-case-common.js";
 
+export const DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_MAX_OUTPUT_TOKENS = 32_768;
+export const DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_TIMEOUT_MS = 120_000;
+
+export function resolveCaseSystemVNextStressJudgeMaxOutputTokens(
+  environment: NodeJS.ProcessEnv,
+  parsedMaxOutputTokens: number,
+): number {
+  return environment.DEEPSEEK_JUDGE_MAX_TOKENS === undefined
+    ? DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_MAX_OUTPUT_TOKENS
+    : parsedMaxOutputTokens;
+}
+
+export function resolveCaseSystemVNextStressJudgeTimeoutMs(
+  environment: NodeJS.ProcessEnv,
+  parsedTimeoutMs: number,
+): number {
+  return environment.DEEPSEEK_JUDGE_TIMEOUT_MS === undefined
+    ? DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_TIMEOUT_MS
+    : parsedTimeoutMs;
+}
+
 export interface CaseSystemVNextStressCliOptions {
   readonly judgeDeepSeek: boolean;
   readonly runsPerFixture: number;
@@ -113,6 +134,10 @@ For DeepSeek V4.1 Flash, set:
   DEEPSEEK_JUDGE_MODEL=deepseek-flash
   DEEPSEEK_API_KEY=<key>
 
+The live vNext stress path defaults to a 32768-token Judge output budget and
+a 120-second timeout. Set DEEPSEEK_JUDGE_MAX_TOKENS or
+DEEPSEEK_JUDGE_TIMEOUT_MS to override them explicitly.
+
 Options:
   --judge-deepseek      Required explicit live/paid opt-in
   --runs <n>            Repetitions per fixture (default: 1; use 3 for repeated stress)
@@ -136,6 +161,14 @@ export async function runCaseSystemVNextStressCli(
   }
 
   const environment = readDeepSeekJudgeEnvironment();
+  const maxOutputTokens = resolveCaseSystemVNextStressJudgeMaxOutputTokens(
+    process.env,
+    environment.maxOutputTokens,
+  );
+  const timeoutMs = resolveCaseSystemVNextStressJudgeTimeoutMs(
+    process.env,
+    environment.timeoutMs,
+  );
   if (!environment.apiKeyConfigured) {
     throw new TutorbenchCliUsageError(
       "DEEPSEEK_API_KEY is required for live Case System vNext stress.",
@@ -188,11 +221,11 @@ export async function runCaseSystemVNextStressCli(
     ...(environment.reasoningEffort === undefined
       ? {}
       : { reasoningEffort: environment.reasoningEffort }),
-    maxOutputTokens: environment.maxOutputTokens,
+    maxOutputTokens,
     ...(environment.temperature === undefined
       ? {}
       : { temperature: environment.temperature }),
-    timeoutMs: environment.timeoutMs,
+    timeoutMs,
     maxAttempts: environment.maxAttempts,
     requireReasoningSeparation: true,
   });
