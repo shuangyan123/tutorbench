@@ -124,6 +124,9 @@ For DeepSeek V4.1 Flash, set:
   DEEPSEEK_JUDGE_MODEL=deepseek-flash
   DEEPSEEK_API_KEY=<key>
 
+The live vNext stress path defaults to a 32768-token Judge output budget.
+Set DEEPSEEK_JUDGE_MAX_TOKENS to override it explicitly.
+
 Options:
   --judge-deepseek      Required explicit live/paid opt-in
   --runs <n>            Repetitions per fixture (default: 1; use 3 for repeated stress)
