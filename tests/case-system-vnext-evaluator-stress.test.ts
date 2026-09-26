@@ -53,8 +53,8 @@ test("stress plan builds swapped blind presentations and hides operator expectat
   const { pilot, suite, registry } = await loadInputs();
   const plan = buildCaseSystemVNextEvaluatorStressPlan(pilot, suite, registry, 3);
 
-  assert.equal(plan.fixtures.length, 15);
-  assert.equal(plan.plannedJudgmentCount, 15 * 3 * 2);
+  assert.equal(plan.fixtures.length, 17);
+  assert.equal(plan.plannedJudgmentCount, 17 * 3 * 2);
 
   for (const fixture of plan.fixtures) {
     assert.equal(fixture.repetitions.length, 3);
@@ -167,8 +167,8 @@ test("stable synthetic judgments produce exact expected-match diagnostics", asyn
   );
 
   assert.equal(report.observedJudgmentCount, report.plannedJudgmentCount);
-  assert.equal(report.overall.comparableCount, 15 * 2);
-  assert.equal(report.overall.expectedMatchCount, 15 * 2);
+  assert.equal(report.overall.comparableCount, 17 * 2);
+  assert.equal(report.overall.expectedMatchCount, 17 * 2);
   assert.equal(report.overall.expectedMatchShare, 1);
   assert.equal(report.overall.orderSensitiveCount, 0);
   assert.equal(report.overall.inconsistentCount, 0);
@@ -442,6 +442,33 @@ test("domain-specific stress fixtures cover physics chemistry biology and Python
   for (const fixture of domainFixtures) {
     assert.equal(fixture.expected.kind, "preference");
   }
+});
+
+test("D3 stress coverage includes controlled contrasts beyond domain-strategy alignment", async () => {
+  const { pilot, suite } = await loadInputs();
+  const archetypeById = new Map(pilot.archetypes.map((archetype) => [archetype.id, archetype]));
+  const d3Fixtures = suite.fixtures.filter(
+    (fixture) => archetypeById.get(fixture.archetypeId)?.contentDepth === 3,
+  );
+
+  assert.ok(d3Fixtures.length >= 4);
+  assert.ok(
+    d3Fixtures.some(
+      (fixture) =>
+        fixture.id === "biology-d3-equivalent-causal-strategies" &&
+        fixture.contrast === "equivalent_strategies" &&
+        fixture.expected.kind === "equivalent",
+    ),
+  );
+  assert.ok(
+    d3Fixtures.some(
+      (fixture) =>
+        fixture.id === "python-d3-human-efficiency" &&
+        fixture.contrast === "human_efficiency" &&
+        fixture.expected.kind === "preference" &&
+        fixture.expected.candidateId === "invariant-checkpoint",
+    ),
+  );
 });
 
 test("learning and exam objectives can reverse the preferred strategy on the same task", async () => {
