@@ -35,6 +35,8 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm test
+      - name: Test worktree cleanup tooling
+        run: npm run test:worktree
       - name: Test Community Review service foundation
         run: npm run test:community-review-service
       - name: Build
