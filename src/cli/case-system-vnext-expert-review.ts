@@ -281,8 +281,9 @@ export async function runCaseSystemVNextExpertReviewExport(
 export async function runCaseSystemVNextExpertReviewImport(
   options: Extract<CaseSystemVNextExpertReviewCliOptions, { readonly help: false; readonly mode: "import" }>,
 ): Promise<void> {
-  const manifest = await loadJson(resolve(options.packetDirectory, "operator-manifest.json"))
-    as CaseSystemVNextExpertReviewExport["manifest"];
+  const manifest = (
+    await loadJson(resolve(options.packetDirectory, "operator-manifest.json"))
+  ) as CaseSystemVNextExpertReviewExport["manifest"];
   const packets = await Promise.all([
     loadJson(resolve(options.packetDirectory, "reviewer-1", "packet.json")),
     loadJson(resolve(options.packetDirectory, "reviewer-2", "packet.json")),
