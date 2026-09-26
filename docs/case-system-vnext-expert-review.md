@@ -45,7 +45,7 @@ At minimum, the initial review set should include expertise covering:
 
 The reviewer packet may contain:
 
-- fixture identifier or an opaque review identifier;
+- an opaque review identifier;
 - domain, subdomain, practice, learner level, depth/difficulty/horizon;
 - learner state;
 - immediate teaching target;
@@ -137,6 +137,28 @@ The repository currently has:
 - live-Judge diagnostic evidence;
 - no independent expert labels for these stress fixtures.
 
-The next implementation step is a deterministic blind export/import boundary
-that follows this protocol. Real reviewer recruitment and completed review data
-remain outside this repository state until they actually occur.
+The deterministic blind export/import boundary is implemented. From a built
+repository clone, generate the two reviewer packages with:
+
+```powershell
+node dist/src/cli/tutorbench.js case-system-vnext-expert-review-export `
+  --reviewer reviewer-a `
+  --reviewer reviewer-b `
+  --output-dir artifacts/case-system-vnext-expert-review
+```
+
+After each reviewer independently completes their own
+`submission-template.json`, import the two completed files with:
+
+```powershell
+node dist/src/cli/tutorbench.js case-system-vnext-expert-review-import `
+  --packet-dir artifacts/case-system-vnext-expert-review `
+  --submission <reviewer-a.completed.json> `
+  --submission <reviewer-b.completed.json> `
+  --output artifacts/case-system-vnext-expert-review/evidence.json
+```
+
+Real reviewer recruitment and completed review data remain outside the current
+repository state until they actually occur. The immediate next step is to run
+the exporter, inspect the generated reviewer-facing material, and recruit
+domain-appropriate reviewers without exposing the operator manifest.
