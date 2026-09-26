@@ -80,7 +80,7 @@ test("DeepSeek vNext stress adapter sends only the blind packet and parses the e
       readonly payload: Record<string, unknown>;
     };
     assert.equal(user.kind, "CaseSystemVNextStressBlindPacket");
-    assert.equal(user.protocolVersion, "0.3.0");
+    assert.equal(user.protocolVersion, "0.4.0");
     assert.equal(user.payload.presentationId, packet.presentationId);
     const serialized = JSON.stringify(user);
     assert.doesNotMatch(serialized, /"expected"|"rationale"|candidateId/);

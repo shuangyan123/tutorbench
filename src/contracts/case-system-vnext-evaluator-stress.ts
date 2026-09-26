@@ -17,7 +17,7 @@ import type {
 export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_SCHEMA_VERSION = 3 as const;
 export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_ID =
   "case-system-vnext-evaluator-stress" as const;
-export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION = "0.3.0" as const;
+export const CASE_SYSTEM_VNEXT_EVALUATOR_STRESS_PROTOCOL_VERSION = "0.4.0" as const;
 
 export const CASE_SYSTEM_VNEXT_STRESS_CONTRASTS = [
   "human_efficiency",

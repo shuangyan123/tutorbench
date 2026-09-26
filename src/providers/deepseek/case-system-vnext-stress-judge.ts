@@ -15,9 +15,9 @@ import type { ChatCompletionsFetch } from "../chat-completions/index.js";
 
 export const CASE_SYSTEM_VNEXT_STRESS_JUDGE_PROMPT_ID =
   "case-system-vnext-evaluator-stress-judge" as const;
-export const CASE_SYSTEM_VNEXT_STRESS_JUDGE_PROMPT_VERSION = "0.1" as const;
+export const CASE_SYSTEM_VNEXT_STRESS_JUDGE_PROMPT_VERSION = "0.2" as const;
 export const CASE_SYSTEM_VNEXT_STRESS_JUDGE_PROMPT_ASSET =
-  "prompts/case-system-vnext-evaluator-stress-judge-v0.1.md" as const;
+  "prompts/case-system-vnext-evaluator-stress-judge-v0.2.md" as const;
 
 export const CASE_SYSTEM_VNEXT_STRESS_JUDGE_RESULT_SCHEMA_VERSION = 1 as const;
 

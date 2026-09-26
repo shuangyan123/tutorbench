@@ -45,6 +45,7 @@ function invalid(): never {
 const comparisonInstruction = [
   "Compare only the two candidate Tutor responses against the authored Case System vNext evidence in this packet.",
   "Apply the shared base criteria first, then the exact task-specific strategy profile, then the teaching-objective profile for this learning-oriented or exam-oriented context.",
+  "The immediate teachingTarget and teachingObjective, including assessmentContext when present, control what this presentation requires. Treat coreTask, referenceReasoning, and transfer as background capability context; do not turn a background generalization or transfer opportunity into a requirement when the immediate target and objective do not call for it.",
   "Do not reward response length, stylistic polish, hidden model computation, inference speed, token count, tool use, or brute-force search.",
   "A_BETTER and B_BETTER mean one candidate is substantively better for the authored contrast. EQUIVALENT means the candidates are materially equivalent under the authored criteria. NON_DOMINATED means each has defensible advantages and the authored criteria do not justify an overall ordering. INSUFFICIENT_EVIDENCE means the packet does not contain enough evidence to support any of those judgments.",
   "Do not invent a unique optimal strategy when the referenceReasoning says bounded_strategy_set or not_applicable.",

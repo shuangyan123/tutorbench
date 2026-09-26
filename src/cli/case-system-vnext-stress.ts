@@ -26,6 +26,7 @@ import { writeTutorCliJson } from "./tutor-case-common.js";
 export interface CaseSystemVNextStressCliOptions {
   readonly judgeDeepSeek: boolean;
   readonly runsPerFixture: number;
+  readonly fixtureIds: readonly string[];
   readonly outputPath?: string;
   readonly help: boolean;
 }
@@ -35,12 +36,13 @@ export function parseCaseSystemVNextStressArgs(
 ): CaseSystemVNextStressCliOptions {
   let judgeDeepSeek = false;
   let runsPerFixture = 1;
+  const fixtureIds: string[] = [];
   let outputPath: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index] ?? "";
     if (argument === "--help" || argument === "-h") {
-      return { judgeDeepSeek: false, runsPerFixture, help: true };
+      return { judgeDeepSeek: false, runsPerFixture, fixtureIds, help: true };
     }
     if (argument === "--judge-deepseek") {
       judgeDeepSeek = true;
@@ -57,6 +59,16 @@ export function parseCaseSystemVNextStressArgs(
     const runsValue = tutorbenchOptionValue(argument, "--runs");
     if (runsValue !== undefined) {
       runsPerFixture = positiveTutorbenchInteger(runsValue, "--runs");
+      continue;
+    }
+    if (argument === "--fixture") {
+      fixtureIds.push(nextTutorbenchValue(args, index, "--fixture"));
+      index += 1;
+      continue;
+    }
+    const fixtureValue = tutorbenchOptionValue(argument, "--fixture");
+    if (fixtureValue !== undefined) {
+      fixtureIds.push(fixtureValue);
       continue;
     }
     if (argument === "--output") {
@@ -84,6 +96,7 @@ export function parseCaseSystemVNextStressArgs(
   return {
     judgeDeepSeek,
     runsPerFixture,
+    fixtureIds,
     ...(outputPath === undefined ? {} : { outputPath }),
     help: false,
   };
@@ -103,6 +116,7 @@ For DeepSeek V4.1 Flash, set:
 Options:
   --judge-deepseek      Required explicit live/paid opt-in
   --runs <n>            Repetitions per fixture (default: 1; use 3 for repeated stress)
+  --fixture <id>        Run only this fixture; repeat to select multiple fixtures
   --output <path>       Write JSON artifact
   --help                Show this help
 `);
@@ -143,9 +157,26 @@ export async function runCaseSystemVNextStressCli(
     "scenarios/case-system-vnext/evaluator-stress-fixtures.json",
   ) as CaseSystemVNextStressFixtureSuite;
 
+  const selectedFixtureIds = new Set(options.fixtureIds);
+  const selectedSuite = options.fixtureIds.length === 0
+    ? suite
+    : {
+        ...suite,
+        fixtures: suite.fixtures.filter((fixture) => selectedFixtureIds.has(fixture.id)),
+      };
+  if (
+    options.fixtureIds.length > 0 &&
+    (selectedSuite.fixtures.length !== selectedFixtureIds.size ||
+      new Set(options.fixtureIds).size !== options.fixtureIds.length)
+  ) {
+    throw new TutorbenchCliUsageError(
+      "--fixture must name distinct fixture IDs from evaluator-stress-fixtures.json.",
+    );
+  }
+
   const plan = buildCaseSystemVNextEvaluatorStressPlan(
     pilot,
-    suite,
+    selectedSuite,
     registry,
     options.runsPerFixture,
   );
