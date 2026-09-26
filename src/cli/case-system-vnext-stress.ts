@@ -24,6 +24,7 @@ import {
 import { writeTutorCliJson } from "./tutor-case-common.js";
 
 export const DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_MAX_OUTPUT_TOKENS = 32_768;
+export const DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_TIMEOUT_MS = 120_000;
 
 export function resolveCaseSystemVNextStressJudgeMaxOutputTokens(
   environment: NodeJS.ProcessEnv,
@@ -32,6 +33,15 @@ export function resolveCaseSystemVNextStressJudgeMaxOutputTokens(
   return environment.DEEPSEEK_JUDGE_MAX_TOKENS === undefined
     ? DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_MAX_OUTPUT_TOKENS
     : parsedMaxOutputTokens;
+}
+
+export function resolveCaseSystemVNextStressJudgeTimeoutMs(
+  environment: NodeJS.ProcessEnv,
+  parsedTimeoutMs: number,
+): number {
+  return environment.DEEPSEEK_JUDGE_TIMEOUT_MS === undefined
+    ? DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_TIMEOUT_MS
+    : parsedTimeoutMs;
 }
 
 export interface CaseSystemVNextStressCliOptions {
@@ -124,8 +134,9 @@ For DeepSeek V4.1 Flash, set:
   DEEPSEEK_JUDGE_MODEL=deepseek-flash
   DEEPSEEK_API_KEY=<key>
 
-The live vNext stress path defaults to a 32768-token Judge output budget.
-Set DEEPSEEK_JUDGE_MAX_TOKENS to override it explicitly.
+The live vNext stress path defaults to a 32768-token Judge output budget and
+a 120-second timeout. Set DEEPSEEK_JUDGE_MAX_TOKENS or
+DEEPSEEK_JUDGE_TIMEOUT_MS to override them explicitly.
 
 Options:
   --judge-deepseek      Required explicit live/paid opt-in
@@ -153,6 +164,10 @@ export async function runCaseSystemVNextStressCli(
   const maxOutputTokens = resolveCaseSystemVNextStressJudgeMaxOutputTokens(
     process.env,
     environment.maxOutputTokens,
+  );
+  const timeoutMs = resolveCaseSystemVNextStressJudgeTimeoutMs(
+    process.env,
+    environment.timeoutMs,
   );
   if (!environment.apiKeyConfigured) {
     throw new TutorbenchCliUsageError(
@@ -210,7 +225,7 @@ export async function runCaseSystemVNextStressCli(
     ...(environment.temperature === undefined
       ? {}
       : { temperature: environment.temperature }),
-    timeoutMs: environment.timeoutMs,
+    timeoutMs,
     maxAttempts: environment.maxAttempts,
     requireReasoningSeparation: true,
   });
