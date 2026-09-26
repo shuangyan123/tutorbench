@@ -4,8 +4,10 @@ import { test } from "node:test";
 
 import {
   DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_MAX_OUTPUT_TOKENS,
+  DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_TIMEOUT_MS,
   parseCaseSystemVNextStressArgs,
   resolveCaseSystemVNextStressJudgeMaxOutputTokens,
+  resolveCaseSystemVNextStressJudgeTimeoutMs,
 } from "../src/cli/case-system-vnext-stress.js";
 
 test("vNext stress CLI parses targeted fixtures without expanding the live call budget", () => {
@@ -59,5 +61,18 @@ test("vNext stress defaults to a 32K Judge output budget while preserving explic
       16_384,
     ),
     16_384,
+  );
+});
+
+
+test("vNext stress defaults to a 120-second timeout while preserving explicit overrides", () => {
+  assert.equal(DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_TIMEOUT_MS, 120_000);
+  assert.equal(resolveCaseSystemVNextStressJudgeTimeoutMs({}, 60_000), 120_000);
+  assert.equal(
+    resolveCaseSystemVNextStressJudgeTimeoutMs(
+      { DEEPSEEK_JUDGE_TIMEOUT_MS: "90000" },
+      90_000,
+    ),
+    90_000,
   );
 });
