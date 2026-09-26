@@ -211,8 +211,14 @@ Before converting the 15 pilot archetypes into executable Tutor scenarios:
 4. inspect order sensitivity and false preferences on equivalent-strategy ties;
 5. revise authoring guidance or Judge criteria where a construct is unstable.
 
+The fixture suite now also includes D3 controlled probes for Biology causal
+reasoning and Python debugging, so evaluator stress is no longer concentrated
+only at D5. These additions expand diagnostic coverage; they do not replace
+independent expert review.
+
 See also:
 
+- [Independent Expert Review Protocol](case-system-vnext-expert-review.md)
 - [Case System vNext](case-system-vnext.md)
 - [Core Coverage Matrix](case-system-vnext-coverage-matrix.md)
 - [Judge Candidate Comparison](judge-candidate-comparison.md)
