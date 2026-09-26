@@ -46,7 +46,7 @@
 - [x] Add explicit live DeepSeek V4.1 Flash stress CLI and strict blind-result adapter
 - [x] Run initial repeated live-Judge stress diagnostics with presentation-level failure evidence
 - [x] Add controlled D3 evaluator-stress probes and define the independent expert-review protocol
-- [ ] Implement deterministic blind expert-review export/import packages
+- [x] Implement deterministic blind expert-review export/import packages
 - [ ] Independently review stress-fixture expectations with subject/assessment expertise
 - [ ] Decide whether Reasoning & Transfer becomes a Tutor Health dimension or remains a separate profile/reporting area
 
