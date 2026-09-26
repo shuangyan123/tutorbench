@@ -23,6 +23,17 @@ import {
 } from "./tutorbench-common.js";
 import { writeTutorCliJson } from "./tutor-case-common.js";
 
+export const DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_MAX_OUTPUT_TOKENS = 32_768;
+
+export function resolveCaseSystemVNextStressJudgeMaxOutputTokens(
+  environment: NodeJS.ProcessEnv,
+  parsedMaxOutputTokens: number,
+): number {
+  return environment.DEEPSEEK_JUDGE_MAX_TOKENS === undefined
+    ? DEFAULT_CASE_SYSTEM_VNEXT_STRESS_JUDGE_MAX_OUTPUT_TOKENS
+    : parsedMaxOutputTokens;
+}
+
 export interface CaseSystemVNextStressCliOptions {
   readonly judgeDeepSeek: boolean;
   readonly runsPerFixture: number;
@@ -136,6 +147,10 @@ export async function runCaseSystemVNextStressCli(
   }
 
   const environment = readDeepSeekJudgeEnvironment();
+  const maxOutputTokens = resolveCaseSystemVNextStressJudgeMaxOutputTokens(
+    process.env,
+    environment.maxOutputTokens,
+  );
   if (!environment.apiKeyConfigured) {
     throw new TutorbenchCliUsageError(
       "DEEPSEEK_API_KEY is required for live Case System vNext stress.",
@@ -188,7 +203,7 @@ export async function runCaseSystemVNextStressCli(
     ...(environment.reasoningEffort === undefined
       ? {}
       : { reasoningEffort: environment.reasoningEffort }),
-    maxOutputTokens: environment.maxOutputTokens,
+    maxOutputTokens,
     ...(environment.temperature === undefined
       ? {}
       : { temperature: environment.temperature }),
