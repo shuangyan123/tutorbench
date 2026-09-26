@@ -324,6 +324,14 @@ efficiency. The repeated 60-second timeout also motivates the stress-specific
 120-second timeout. Neither change alters Judge prompt v0.2 or the shared
 DeepSeek defaults.
 
+A final targeted v0.4.2 run executed six presentations. Five returned valid
+judgments and one presentation was unavailable because of `judge_timeout`.
+The two complete repetitions both produced stable preference for the authored
+`structural` candidate, with no order-sensitive or inconsistent repetitions
+and no invalid judgments. The remaining timeout is treated as provider
+availability evidence, not as a semantic evaluator failure; no further paid
+rerun was required for this fixture follow-up.
+
 This is diagnostic evidence only. Developer-authored expected outcomes are not
 human gold, so expected-match share must not be reported as model accuracy or
 used to rank Judge providers.
