@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
   "id": "case-system-vnext-evaluator-stress-fixtures",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "title": "Case System vNext evaluator stress fixtures",
   "description": "Developer-authored diagnostic contrasts with explicit preference, equivalent, non-dominated, and insufficient-evidence outcomes. Semantic insufficiency is distinct from provider/transport unavailability.",
   "fixtures": [
@@ -18,14 +18,14 @@
         },
         {
           "id": "structural",
-          "responseText": "48 × 52 = (50 - 2)(50 + 2) = 50² - 2² = 2496. The useful observation is that the factors are equally far from 50."
+          "responseText": "48 × 52 = (50 - 2)(50 + 2) = 50² - 2² = 2496, because in (a-d)(a+d) the +ad and -ad terms cancel."
         }
       ],
       "expected": {
         "kind": "preference",
         "candidateId": "structural"
       },
-      "rationale": "Both are correct and prerequisite-compatible, but the structural route recognizes the symmetric factors directly and avoids four separate partial products.",
+      "rationale": "Both are correct, prerequisite-compatible, and locally justified, but the structural route recognizes the symmetric factors directly and avoids four separate partial products.",
       "strategyProfileId": "math-d5-structural-generalization",
       "teachingObjective": {
         "mode": "learning_oriented"
