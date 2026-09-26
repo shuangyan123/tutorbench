@@ -81,7 +81,15 @@ test("expert review export counterbalances every task and hides operator expecta
     inspectKeys(packet);
     assert.doesNotMatch(serialized, /fixtureId/);
     assert.doesNotMatch(serialized, /contrastUnderTest/);
-    assert.doesNotMatch(serialized, /equivalent-causal-strategies|human-efficiency/);
+    assert.equal(
+      packet.tasks.some((task) =>
+        task.strategyProfile.criteria.some(
+          (criterion) => criterion.id === "human-efficiency",
+        ),
+      ),
+      true,
+      "reviewer-visible strategy criteria must remain available even when their names overlap stress contrast terminology",
+    );
   }
 });
 
