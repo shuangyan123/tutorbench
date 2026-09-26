@@ -54,6 +54,8 @@ Current public surfaces include:
 - the canonical 48-case TutorEval dataset (24 English + 24 zh-CN) across five
   subjects and five historical TutorEval scoring categories;
 - deterministic evaluators plus optional semantic Judge providers.
+- experimental, non-canonical Case System vNext authoring, evaluator-stress,
+  Mastery & Transfer, and independent expert-review infrastructure.
 
 The current Tutor Health suite is an authored synthetic design artifact. It
 assesses 5/7 health dimensions and reports that partial coverage explicitly; it
@@ -154,18 +156,48 @@ with `parseTutorScenarioSuiteVNext` and passed directly to
 `runTutorHealthEvaluation`; they do not need to be registered under the
 public `scenarios/` tree.
 
-## Case System vNext design
+## Case System vNext — experimental infrastructure
 
-A next-generation case-authoring specification is being developed separately
-from the frozen TutorEval corpus. It defines an audit-seeded 23-domain authoring taxonomy, domain- and
-task-specific strategy profiles, multi-axis difficulty, prerequisite-bounded
-human-optimal reasoning where defensible, and transfer-supporting case design
-without changing current benchmark semantics.
+Case System vNext is implemented as **experimental, non-canonical authoring and
+evaluation infrastructure** alongside the frozen TutorEval corpus. It currently
+includes:
 
-See [Case System vNext](docs/case-system-vnext.md) and the
-[Core Coverage Matrix](docs/case-system-vnext-coverage-matrix.md). These are
-design specifications, not yet canonical benchmark cases or validated general
-tutoring measures.
+- an audit-seeded 23-domain taxonomy and a versioned 15-archetype D1/D3/D5
+  pilot;
+- task-specific strategy profiles and explicit learning-oriented vs
+  exam-oriented objectives;
+- a 17-fixture provider-neutral evaluator-stress suite with bounded preference,
+  equivalence, non-dominance, and insufficient-evidence semantics;
+- deterministic blind expert-review export/import with domain-scoped reviewer
+  cohorts;
+- an objective-sensitive **Mastery & Transfer** reporting area that remains
+  outside the seven-dimension Tutor Health aggregate score.
+
+For exam-oriented cases, the authored capability path is:
+
+```text
+concept / method mastery
+  -> problem-family mastery
+     -> robustness to legitimate variants
+        -> reliable and efficient exam execution
+           -> score-relevant performance
+```
+
+These are response- and scenario-level score-relevant proxies. TutorBench does
+**not** claim that a Tutor raises real examination scores, causes durable
+mastery, or produces observed learner transfer without longitudinal learner
+data and actual assessment outcomes.
+
+The expert-review workflow is reviewer-ready and can generate counterbalanced
+domain-scoped packets, but **no independent expert labels are available yet**.
+Developer-authored stress expectations therefore remain diagnostic rather than
+human reference evidence.
+
+See [Case System vNext](docs/case-system-vnext.md), the
+[Core Coverage Matrix](docs/case-system-vnext-coverage-matrix.md),
+[Mastery & Transfer Positioning](docs/case-system-vnext-mastery-transfer.md),
+[Evaluator Stress Test](docs/case-system-vnext-evaluator-stress.md), and the
+[Independent Expert Review Protocol](docs/case-system-vnext-expert-review.md).
 
 ## Run the canonical TutorEval benchmark
 
@@ -327,12 +359,13 @@ isolation boundary, provider contract, and stale-translation behavior.
 future independent human review: qualification receipt envelopes, sealed blind
 packets, exact atomic submissions, close/freeze semantics, descriptive
 human-human agreement, and explicit-policy public evidence. The protocol is
-implemented. The isolated P4 service and private staging launch gate are now
-deployment-ready, but no public reviewer intake is open and no real
-qualification or review campaign is running. The separate
-`community-review-application@0.1.0` contract and its hard closed-to-open
-launch gate are defined for future intake work; this phase collects no
-applications. See the [Community Review service guide](docs/community-review-service.md)
+implemented. The isolated P4 service is **deployment-ready at the private
+staging boundary**, but that does not mean public launch is ready. Public
+application/reviewer intake remains closed, the real campaign has not started,
+and the current roadmap keeps public exposure blocked until the approved
+external edge/CDN abuse-control requirement is configured and verified. The
+separate `community-review-application@0.1.0` contract defines the
+closed-to-open intake gate; no public applications are being collected. See the [Community Review service guide](docs/community-review-service.md)
 and [participation application gate](docs/community-review-application-gate.md)
 for the explicit authority, privacy, and non-intake boundaries.
 
@@ -443,10 +476,10 @@ configured DeepSeek V4-Flash and MiniMax candidates across repeated runs,
 reports stability and sanitized token/latency measurements, and never infers
 an automatic winner. See
 [`docs/judge-candidate-comparison.md`](docs/judge-candidate-comparison.md).
-The repository keeps `openai@7.20.0` as a development dependency and exposes it
-as an optional peer so stable package-root and HTTP usage do not install or
-load OpenAI. Consumers explicitly using the OpenAI provider must install that
-optional peer.
+The OpenAI SDK is a development dependency and optional peer rather than a
+requirement for stable package-root or HTTP usage. Consumers explicitly using
+the OpenAI provider must install the compatible optional peer version declared
+by the current package metadata.
 
 ### Real-model evidence
 
@@ -524,15 +557,15 @@ Judge provenance, separately from each call's observed
 `judgeMetrics.latencyMs` and `attempts`; a timeout remains a `judge_timeout`
 error and is never retried. Transient HTTP retry behavior is unchanged.
 
-This profile follows repository evidence from a historical 23-case DeepSeek Judge run
-that had 14 passes, 7 failures, and 2 `judge_timeout` errors at about 30
-seconds. Replaying those same two frozen responses with a 60000ms timeout
-produced 0 errors, 2 failures, and 34084ms observed Judge latency. That
-diagnostic supports the default but does not guarantee that every future
-request will finish within it. That historical profile evidence used evaluator
-version `0.3a.2`; the disclosure/diagnosis audit later used `0.3a.3`, while
-current runs use `0.3a.4` for the separate case pass-eligibility semantics.
-The execution configuration itself is unchanged by this PR.
+The timeout and retry defaults are repository-owned execution settings rather
+than model-quality claims. Historical diagnostic runs that motivated those
+defaults, including timeout observations and evaluator-version provenance, are
+kept in the dedicated real-model and evaluator-stress documentation instead of
+being treated as stable README facts. See
+[real-model baselines](docs/real-model-baselines.md) and
+[Case System vNext evaluator stress](docs/case-system-vnext-evaluator-stress.md).
+
+
 
 ```powershell
 node dist/src/cli/tutorbench.js evaluate `
@@ -558,14 +591,12 @@ results fail closed. When Chat Completions explicitly returns
 `finish_reason: "length"`, the run reports `judge_output_truncated` instead of
 folding provider-confirmed output truncation into `judge_result_invalid`.
 
-The 8192-token default is a reliability margin for thinking-enabled Judge
-execution, not a scoring or model-quality adjustment. In one 23-case run over
-the preliminary frozen corpus, `programming-test-failure-001` was the only
-error, with `outputTokens` exactly `4096` and `judge_result_invalid`. A
-diagnostic rerun at 8192 had 0 errors, while a subsequent rerun restored to
-4096 also had 0 errors. This supports stochastic long-tail truncation risk;
-it does not show that the case deterministically requires more than 4096
-tokens.
+The output-token default is a reliability margin for thinking-enabled Judge
+execution, not a scoring or model-quality adjustment. Provider-confirmed
+truncation is reported explicitly rather than interpreted as a semantic Judge
+failure; detailed diagnostic history belongs in the versioned evidence docs.
+
+
 
 Both paths are sequential, have no automatic retry, preserve successful
 responses on partial failure, and validate the same `TutorResponseCorpus`
