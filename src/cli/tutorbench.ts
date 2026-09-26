@@ -70,6 +70,14 @@ import {
   type CaseSystemVNextStressCliOptions,
 } from "./case-system-vnext-stress.js";
 import {
+  parseCaseSystemVNextExpertReviewExportArgs,
+  parseCaseSystemVNextExpertReviewImportArgs,
+  printCaseSystemVNextExpertReviewHelp,
+  runCaseSystemVNextExpertReviewExport,
+  runCaseSystemVNextExpertReviewImport,
+  type CaseSystemVNextExpertReviewCliOptions,
+} from "./case-system-vnext-expert-review.js";
+import {
   parseHumanReferenceCalibrationArgs,
   printHumanReferenceCalibrationHelp,
   runHumanReferenceCalibration,
@@ -142,7 +150,7 @@ export interface TutorbenchRunOptions {
 }
 
 export type TutorbenchCliOptions =
-  | { readonly help: true; readonly helpCommand?: "quickstart" | "collect" | "collect-model" | "evaluate" | "health" | "review-translate" | "judge-word-context-discrimination" | "judge-candidate-comparison" | "judge-material-requirement-discrimination" | "case-system-vnext-stress" | "human-reference-calibration" | "human-reference-pilot-export" | "human-reference-pilot-import" | "human-reference-judge-comparison" | "human-reference-semantic-audit-export" | "human-reference-semantic-audit-import" | "human-reference-semantic-audit" | "human-reference-semantic-audit-qualification-export" | "human-reference-semantic-audit-qualification-import" | "human-reference-semantic-audit-localized-export" | "human-reference-semantic-audit-localized-import" | "human-reference-semantic-audit-localized" }
+  | { readonly help: true; readonly helpCommand?: "quickstart" | "collect" | "collect-model" | "evaluate" | "health" | "review-translate" | "judge-word-context-discrimination" | "judge-candidate-comparison" | "judge-material-requirement-discrimination" | "case-system-vnext-stress" | "case-system-vnext-expert-review-export" | "case-system-vnext-expert-review-import" | "human-reference-calibration" | "human-reference-pilot-export" | "human-reference-pilot-import" | "human-reference-judge-comparison" | "human-reference-semantic-audit-export" | "human-reference-semantic-audit-import" | "human-reference-semantic-audit" | "human-reference-semantic-audit-qualification-export" | "human-reference-semantic-audit-qualification-import" | "human-reference-semantic-audit-localized-export" | "human-reference-semantic-audit-localized-import" | "human-reference-semantic-audit-localized" }
   | { readonly help: false; readonly quickstart: TutorbenchQuickstartCliOptions }
   | { readonly help: false; readonly run: TutorbenchRunOptions }
   | { readonly help: false; readonly collect: TutorbenchCollectCliOptions }
@@ -157,6 +165,7 @@ export type TutorbenchCliOptions =
   | { readonly help: false; readonly judgeCandidateComparison: JudgeCandidateComparisonCliOptions }
   | { readonly help: false; readonly judgeMaterialRequirement: JudgeMaterialRequirementCliOptions }
   | { readonly help: false; readonly caseSystemVNextStress: CaseSystemVNextStressCliOptions }
+  | { readonly help: false; readonly caseSystemVNextExpertReview: CaseSystemVNextExpertReviewCliOptions }
   | { readonly help: false; readonly humanReferenceCalibration: HumanReferenceCalibrationCliOptions }
   | { readonly help: false; readonly humanReferencePilotExport: Extract<HumanReferencePilotCliOptions, { readonly mode: "export" }> }
   | { readonly help: false; readonly humanReferencePilotImport: Extract<HumanReferencePilotCliOptions, { readonly mode: "import" }> }
@@ -223,6 +232,18 @@ export function parseTutorbenchArgs(
     return stress.help
       ? { help: true, helpCommand: "case-system-vnext-stress" }
       : { help: false, caseSystemVNextStress: stress };
+  }
+  if (args[0] === "case-system-vnext-expert-review-export") {
+    const review = parseCaseSystemVNextExpertReviewExportArgs(args.slice(1));
+    return review.help
+      ? { help: true, helpCommand: "case-system-vnext-expert-review-export" }
+      : { help: false, caseSystemVNextExpertReview: review };
+  }
+  if (args[0] === "case-system-vnext-expert-review-import") {
+    const review = parseCaseSystemVNextExpertReviewImportArgs(args.slice(1));
+    return review.help
+      ? { help: true, helpCommand: "case-system-vnext-expert-review-import" }
+      : { help: false, caseSystemVNextExpertReview: review };
   }
   if (args[0] === "human-reference-calibration") {
     const calibration = parseHumanReferenceCalibrationArgs(args.slice(1));
@@ -455,6 +476,8 @@ Usage:
   tutorbench judge-candidate-comparison [options]
   tutorbench judge-material-requirement-discrimination [options]
   tutorbench case-system-vnext-stress --judge-deepseek [options]
+  tutorbench case-system-vnext-expert-review-export [options]
+  tutorbench case-system-vnext-expert-review-import [options]
   tutorbench human-reference-calibration --annotations <path> [options]
   tutorbench human-reference-pilot-export [options]
   tutorbench human-reference-pilot-import [options]
@@ -484,6 +507,10 @@ Commands:
                          Run structured requirement fixtures (provider-free by default)
   case-system-vnext-stress
                          Run live Case System vNext blind evaluator stress
+  case-system-vnext-expert-review-export
+                         Export two counterbalanced blind expert-review packets
+  case-system-vnext-expert-review-import
+                         Strictly import two completed expert-review submissions
   human-reference-calibration
                          Ingest strict human-reference JSON and report deterministic calibration evidence
   human-reference-pilot-export
@@ -620,6 +647,10 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
       printJudgeMaterialRequirementHelp();
     } else if (options.helpCommand === "case-system-vnext-stress") {
       printCaseSystemVNextStressHelp();
+    } else if (options.helpCommand === "case-system-vnext-expert-review-export") {
+      printCaseSystemVNextExpertReviewHelp("export");
+    } else if (options.helpCommand === "case-system-vnext-expert-review-import") {
+      printCaseSystemVNextExpertReviewHelp("import");
     } else if (options.helpCommand === "human-reference-calibration") {
       printHumanReferenceCalibrationHelp();
     } else if (options.helpCommand === "human-reference-pilot-export") {
@@ -695,6 +726,15 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
       return;
     }
     await runCaseSystemVNextStressCli(options.caseSystemVNextStress);
+  } else if ("caseSystemVNextExpertReview" in options) {
+    if (options.caseSystemVNextExpertReview.help) {
+      return;
+    }
+    if (options.caseSystemVNextExpertReview.mode === "export") {
+      await runCaseSystemVNextExpertReviewExport(options.caseSystemVNextExpertReview);
+    } else {
+      await runCaseSystemVNextExpertReviewImport(options.caseSystemVNextExpertReview);
+    }
   } else if ("humanReferenceCalibration" in options) {
     if (options.humanReferenceCalibration.help) {
       printHumanReferenceCalibrationHelp();
