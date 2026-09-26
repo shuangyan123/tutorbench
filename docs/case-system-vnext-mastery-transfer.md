@@ -40,16 +40,25 @@ concept / method mastery
            -> score-relevant performance
 ```
 
-For exam-oriented tutoring, mastery is instrumental rather than ceremonial:
-the learner needs enough understanding and pattern recognition to convert the
-method into reliable performance across ordinary assessment variation.
+The endpoint is intentionally the observable assessment result that learners,
+teachers, and families can understand: marks or score-relevant performance.
+TutorBench currently evaluates only the response-level mechanisms that may
+support that endpoint; it does not infer an actual mark gain.
+
+For exam-oriented tutoring, mastery is instrumental rather than ceremonial.
+The learner needs enough conceptual understanding to recognize when and why a
+method applies, enough problem-family mastery to identify the recurring task
+structure and common variants, and enough transfer robustness to preserve that
+performance when surface details change. The authored endpoint is reliable,
+efficient, score-relevant performance under the stated assessment rules.
 
 ## What TutorBench may currently evaluate
 
 Response- and scenario-level evidence may support bounded judgments about:
 
 - concept / method mastery support;
-- recognition of the assessed problem family;
+- problem-family recognition and method selection;
+- recognition of common variants or traps inside the assessed problem family;
 - handling of legitimate near variants;
 - prerequisite compatibility;
 - assessment-rule compliance;
