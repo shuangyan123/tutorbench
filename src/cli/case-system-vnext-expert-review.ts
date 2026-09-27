@@ -9,6 +9,7 @@ import {
   type CaseSystemVNextStressFixtureSuite,
 } from "../contracts/index.js";
 import {
+  buildCaseSystemVNextExpertReviewAnalysis,
   buildCaseSystemVNextExpertReviewExport,
   mergeCaseSystemVNextExpertReviewSubmissions,
   parseCaseSystemVNextExpertReviewSubmission,
@@ -38,6 +39,7 @@ export type CaseSystemVNextExpertReviewCliOptions =
       readonly packetDirectory: string;
       readonly submissionPaths: readonly [string, string];
       readonly outputPath: string;
+      readonly analysisOutputPath: string;
     };
 
 function opaqueId(value: string, option: string): string {
@@ -132,6 +134,7 @@ export function parseCaseSystemVNextExpertReviewImportArgs(
 ): CaseSystemVNextExpertReviewCliOptions {
   let packetDirectory: string | undefined;
   let outputPath: string | undefined;
+  let analysisOutputPath: string | undefined;
   const submissionPaths: string[] = [];
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index] ?? "";
@@ -168,6 +171,18 @@ export function parseCaseSystemVNextExpertReviewImportArgs(
       outputPath = resolve(outputValue);
       continue;
     }
+    if (argument === "--analysis-output") {
+      analysisOutputPath = resolve(
+        nextTutorbenchValue(args, index, "--analysis-output"),
+      );
+      index += 1;
+      continue;
+    }
+    const analysisOutputValue = tutorbenchOptionValue(argument, "--analysis-output");
+    if (analysisOutputValue !== undefined) {
+      analysisOutputPath = resolve(analysisOutputValue);
+      continue;
+    }
     throw new TutorbenchCliUsageError(`Unknown option: ${argument}`);
   }
   if (packetDirectory === undefined) {
@@ -182,6 +197,8 @@ export function parseCaseSystemVNextExpertReviewImportArgs(
     packetDirectory,
     submissionPaths: [submissionPaths[0]!, submissionPaths[1]!],
     outputPath: outputPath ?? resolve(packetDirectory, "expert-review-evidence.json"),
+    analysisOutputPath: analysisOutputPath ??
+      resolve(packetDirectory, "expert-review-analysis.json"),
   };
 }
 
@@ -210,11 +227,14 @@ results, provider identities, and expected-match diagnostics.`);
 
 Usage:
   tutorbench case-system-vnext-expert-review-import \\
-    --packet-dir <path> --submission <path> --submission <path> [--output <path>]
+    --packet-dir <path> --submission <path> --submission <path> [--output <path>] \
+    [--analysis-output <path>]
 
 Imports exactly two completed submissions, validates packet identity and exact
 task coverage, normalizes counterbalanced A/B labels back to underlying
-candidates, and preserves disagreement or packet ambiguity explicitly.`);
+candidates, preserves disagreement or packet ambiguity explicitly, and writes a
+separate analysis artifact with descriptive agreement statistics and an
+adjudication queue.`);
 }
 
 async function loadJson(path: string): Promise<unknown> {
@@ -365,13 +385,19 @@ export async function runCaseSystemVNextExpertReviewImport(
     return parseCaseSystemVNextExpertReviewSubmission(raw, packet);
   }) as unknown as readonly [CaseSystemVNextExpertReviewSubmission, CaseSystemVNextExpertReviewSubmission];
   const evidence = mergeCaseSystemVNextExpertReviewSubmissions(exported, parsed);
-  await writeTutorCliJson(evidence, options.outputPath);
+  const analysis = buildCaseSystemVNextExpertReviewAnalysis(evidence);
+  await Promise.all([
+    writeTutorCliJson(evidence, options.outputPath),
+    writeTutorCliJson(analysis, options.analysisOutputPath),
+  ]);
   console.log([
     "Case System vNext expert-review import",
     `  Agreements: ${evidence.agreementCount}`,
     `  Disagreements: ${evidence.disagreementCount}`,
     `  Packet ambiguities: ${evidence.packetAmbiguityCount}`,
-    `  Output: ${options.outputPath}`,
+    `  Adjudication queue: ${analysis.summary.adjudicationCount}`,
+    `  Evidence output: ${options.outputPath}`,
+    `  Analysis output: ${options.analysisOutputPath}`,
     "  No automatic reference-label promotion is performed.",
   ].join("\n"));
 }
