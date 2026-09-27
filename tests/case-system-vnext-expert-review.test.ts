@@ -17,6 +17,10 @@ import {
   parseCaseSystemVNextExpertReviewAdjudicationSubmission,
 } from "../src/case-system-vnext/expert-review-adjudication.js";
 import {
+  buildCaseSystemVNextExpertReviewReferenceCandidate,
+  parseCaseSystemVNextExpertReviewResolution,
+} from "../src/case-system-vnext/expert-review-reference.js";
+import {
   parseCaseSystemVNextExpertReviewExportArgs,
   selectCaseSystemVNextExpertReviewSuite,
 } from "../src/cli/case-system-vnext-expert-review.js";
@@ -875,6 +879,211 @@ test("expert review adjudication parser rejects incomplete coverage and unclear 
       adjudication.packet,
     ),
     /adjudication data is invalid/u,
+  );
+});
+
+test("expert review reference candidate blocks unresolved and insufficient-evidence tasks", async () => {
+  const exported = await buildExport();
+  const submissions = exported.packets.map((packet, reviewerIndex) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task, taskIndex) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: taskIndex === 0
+        ? (reviewerIndex === 0 ? "A_BETTER" as const : "A_BETTER" as const)
+        : taskIndex === 1
+          ? "INSUFFICIENT_EVIDENCE" as const
+          : "EQUIVALENT" as const,
+      sufficientlyClear: taskIndex !== 0 || reviewerIndex === 0,
+      ...(taskIndex === 0 && reviewerIndex === 1
+        ? { notes: "Synthetic ambiguity for reference gate coverage." }
+        : {}),
+    })),
+  })) as unknown as readonly [
+    CaseSystemVNextExpertReviewSubmission,
+    CaseSystemVNextExpertReviewSubmission,
+  ];
+  const evidence = mergeCaseSystemVNextExpertReviewSubmissions(exported, submissions);
+  const adjudication = buildCaseSystemVNextExpertReviewAdjudicationExport(
+    exported,
+    evidence,
+    "adjudicator-c",
+  );
+  const rawSubmission = {
+    schemaVersion: adjudication.packet.schemaVersion,
+    protocolId: adjudication.packet.protocolId,
+    protocolVersion: adjudication.packet.protocolVersion,
+    adjudicatorId: adjudication.packet.adjudicatorId,
+    taskSetFingerprint: adjudication.packet.taskSetFingerprint,
+    sourceEvidenceFingerprint: adjudication.packet.sourceEvidenceFingerprint,
+    adjudicationSetFingerprint: adjudication.packet.adjudicationSetFingerprint,
+    packetFingerprint: adjudication.packet.packetFingerprint,
+    adjudications: adjudication.packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: "INSUFFICIENT_EVIDENCE" as const,
+      sufficientlyClear: false,
+      notes: "Synthetic adjudicator cannot resolve the ambiguous packet.",
+    })),
+  };
+  const resolution = buildCaseSystemVNextExpertReviewResolution(
+    exported,
+    evidence,
+    adjudication,
+    parseCaseSystemVNextExpertReviewAdjudicationSubmission(
+      rawSubmission,
+      adjudication.packet,
+    ),
+  );
+  const parsedResolution = parseCaseSystemVNextExpertReviewResolution(resolution);
+  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
+    parsedResolution,
+  );
+
+  assert.equal(candidate.summary.totalTaskCount, 17);
+  assert.equal(candidate.summary.unresolvedCount, 1);
+  assert.equal(candidate.summary.insufficientEvidenceCount, 1);
+  assert.equal(candidate.summary.blockedCount, 2);
+  assert.equal(candidate.summary.candidateReadyCount, 15);
+  assert.equal(candidate.promotionGate.status, "blocked");
+  assert.equal(candidate.promotionGate.automaticPromotionAllowed, false);
+  assert.equal(candidate.promotionGate.operatorApprovalRequired, true);
+  assert.deepEqual(
+    candidate.promotionGate.blockers.map((blocker) => blocker.reason).sort(),
+    ["insufficient_evidence", "unresolved"],
+  );
+});
+
+test("expert review reference candidate becomes eligible only after all tasks have substantive resolutions", async () => {
+  const exported = await buildExport();
+  const submissions = exported.packets.map((packet, reviewerIndex) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task, taskIndex) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: taskIndex === 0
+        ? (reviewerIndex === 0 ? "A_BETTER" as const : "A_BETTER" as const)
+        : "EQUIVALENT" as const,
+      sufficientlyClear: true,
+    })),
+  })) as unknown as readonly [
+    CaseSystemVNextExpertReviewSubmission,
+    CaseSystemVNextExpertReviewSubmission,
+  ];
+  const evidence = mergeCaseSystemVNextExpertReviewSubmissions(exported, submissions);
+  const adjudication = buildCaseSystemVNextExpertReviewAdjudicationExport(
+    exported,
+    evidence,
+    "adjudicator-c",
+  );
+  const rawSubmission = {
+    schemaVersion: adjudication.packet.schemaVersion,
+    protocolId: adjudication.packet.protocolId,
+    protocolVersion: adjudication.packet.protocolVersion,
+    adjudicatorId: adjudication.packet.adjudicatorId,
+    taskSetFingerprint: adjudication.packet.taskSetFingerprint,
+    sourceEvidenceFingerprint: adjudication.packet.sourceEvidenceFingerprint,
+    adjudicationSetFingerprint: adjudication.packet.adjudicationSetFingerprint,
+    packetFingerprint: adjudication.packet.packetFingerprint,
+    adjudications: adjudication.packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: "A_BETTER" as const,
+      sufficientlyClear: true,
+    })),
+  };
+  const resolution = buildCaseSystemVNextExpertReviewResolution(
+    exported,
+    evidence,
+    adjudication,
+    parseCaseSystemVNextExpertReviewAdjudicationSubmission(
+      rawSubmission,
+      adjudication.packet,
+    ),
+  );
+  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(resolution);
+
+  assert.equal(candidate.summary.blockedCount, 0);
+  assert.equal(candidate.summary.candidateReadyCount, 17);
+  assert.equal(
+    candidate.promotionGate.status,
+    "eligible_for_manual_promotion",
+  );
+  assert.equal(candidate.promotionGate.automaticPromotionAllowed, false);
+  assert.equal(candidate.promotionGate.operatorApprovalRequired, true);
+  assert.deepEqual(candidate.promotionGate.blockers, []);
+  assert.ok(
+    candidate.tasks.every((task) =>
+      task.candidateStatus === "candidate_ready" &&
+      task.provenance !== undefined &&
+      task.outcome !== undefined
+    ),
+  );
+  assert.match(candidate.candidateFingerprint, /^sha256:[0-9a-f]{64}$/u);
+});
+
+test("expert review resolution parser rejects fingerprint tampering", async () => {
+  const exported = await buildExport();
+  const submissions = exported.packets.map((packet, reviewerIndex) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task, taskIndex) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: taskIndex === 0
+        ? (reviewerIndex === 0 ? "A_BETTER" as const : "A_BETTER" as const)
+        : "EQUIVALENT" as const,
+      sufficientlyClear: true,
+    })),
+  })) as unknown as readonly [
+    CaseSystemVNextExpertReviewSubmission,
+    CaseSystemVNextExpertReviewSubmission,
+  ];
+  const evidence = mergeCaseSystemVNextExpertReviewSubmissions(exported, submissions);
+  const adjudication = buildCaseSystemVNextExpertReviewAdjudicationExport(
+    exported,
+    evidence,
+    "adjudicator-c",
+  );
+  const submission = parseCaseSystemVNextExpertReviewAdjudicationSubmission(
+    {
+      schemaVersion: adjudication.packet.schemaVersion,
+      protocolId: adjudication.packet.protocolId,
+      protocolVersion: adjudication.packet.protocolVersion,
+      adjudicatorId: adjudication.packet.adjudicatorId,
+      taskSetFingerprint: adjudication.packet.taskSetFingerprint,
+      sourceEvidenceFingerprint: adjudication.packet.sourceEvidenceFingerprint,
+      adjudicationSetFingerprint: adjudication.packet.adjudicationSetFingerprint,
+      packetFingerprint: adjudication.packet.packetFingerprint,
+      adjudications: adjudication.packet.tasks.map((task) => ({
+        reviewTaskId: task.reviewTaskId,
+        outcome: "A_BETTER",
+        sufficientlyClear: true,
+      })),
+    },
+    adjudication.packet,
+  );
+  const resolution = buildCaseSystemVNextExpertReviewResolution(
+    exported,
+    evidence,
+    adjudication,
+    submission,
+  );
+  assert.throws(
+    () => parseCaseSystemVNextExpertReviewResolution({
+      ...resolution,
+      resolutionFingerprint: "sha256:" + "0".repeat(64),
+    }),
+    /resolution data is invalid/u,
   );
 });
 
