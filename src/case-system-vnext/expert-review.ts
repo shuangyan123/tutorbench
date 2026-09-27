@@ -181,6 +181,58 @@ export interface CaseSystemVNextExpertReviewEvidence {
   readonly interpretationBoundary: readonly string[];
 }
 
+export interface CaseSystemVNextExpertReviewAnalysisReviewerResult {
+  readonly reviewerId: string;
+  readonly rawOutcome: CaseSystemVNextStressRawOutcome;
+  readonly normalizedOutcome: CaseSystemVNextExpertReviewCanonicalOutcome;
+  readonly sufficientlyClear: boolean;
+  readonly notes?: string;
+}
+
+export interface CaseSystemVNextExpertReviewAnalysisTask {
+  readonly reviewTaskId: string;
+  readonly fixtureId: string;
+  readonly agreement: "agreement" | "disagreement" | "packet_ambiguity";
+  readonly reviewerResults: readonly [
+    CaseSystemVNextExpertReviewAnalysisReviewerResult,
+    CaseSystemVNextExpertReviewAnalysisReviewerResult,
+  ];
+  readonly requiresAdjudication: boolean;
+  readonly adjudicationReason?: "reviewer_disagreement" | "packet_ambiguity";
+}
+
+export interface CaseSystemVNextExpertReviewAnalysis {
+  readonly schemaVersion: typeof CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION;
+  readonly protocolId: typeof CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_ID;
+  readonly protocolVersion: typeof CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_VERSION;
+  readonly suiteId: string;
+  readonly suiteVersion: string;
+  readonly strategyRegistryId: string;
+  readonly strategyRegistryVersion: string;
+  readonly pilotId: string;
+  readonly pilotVersion: string;
+  readonly taskSetFingerprint: string;
+  readonly reviewerIds: readonly [string, string];
+  readonly summary: {
+    readonly totalTaskCount: number;
+    readonly agreementCount: number;
+    readonly disagreementCount: number;
+    readonly packetAmbiguityCount: number;
+    readonly adjudicationCount: number;
+    readonly agreementRate: number | null;
+    readonly clearPacketTaskCount: number;
+    readonly clearPacketAgreementRate: number | null;
+  };
+  readonly tasks: readonly CaseSystemVNextExpertReviewAnalysisTask[];
+  readonly adjudicationQueue: readonly {
+    readonly reviewTaskId: string;
+    readonly fixtureId: string;
+    readonly reason: "reviewer_disagreement" | "packet_ambiguity";
+  }[];
+  readonly interpretationBoundary: readonly string[];
+  readonly limitations: readonly string[];
+}
+
 export interface CaseSystemVNextExpertReviewExport {
   readonly manifest: CaseSystemVNextExpertReviewManifest;
   readonly packets: readonly [
@@ -601,6 +653,85 @@ export function mergeCaseSystemVNextExpertReviewSubmissions(
       "Disagreement and packet ambiguity remain explicit and are not majority-voted away.",
       "No Judge/model quality ranking or learner-outcome claim is inferred.",
       "Developer-authored expectations are not included in reviewer packets or this merged evidence.",
+    ],
+  };
+}
+
+
+export function buildCaseSystemVNextExpertReviewAnalysis(
+  evidence: CaseSystemVNextExpertReviewEvidence,
+): CaseSystemVNextExpertReviewAnalysis {
+  const tasks = evidence.reviews.map((review) => {
+    const reviewerResults = review.reviewerResults.map((result) => ({
+      reviewerId: result.reviewerId,
+      rawOutcome: result.outcome,
+      normalizedOutcome: result.normalizedOutcome,
+      sufficientlyClear: result.sufficientlyClear,
+      ...(result.notes === undefined ? {} : { notes: result.notes }),
+    })) as unknown as CaseSystemVNextExpertReviewAnalysisTask["reviewerResults"];
+
+    const adjudicationReason = review.agreement === "disagreement"
+      ? "reviewer_disagreement" as const
+      : review.agreement === "packet_ambiguity"
+        ? "packet_ambiguity" as const
+        : undefined;
+
+    return {
+      reviewTaskId: review.reviewTaskId,
+      fixtureId: review.fixtureId,
+      agreement: review.agreement,
+      reviewerResults,
+      requiresAdjudication: adjudicationReason !== undefined,
+      ...(adjudicationReason === undefined ? {} : { adjudicationReason }),
+    };
+  });
+
+  const totalTaskCount = tasks.length;
+  const clearPacketTaskCount = totalTaskCount - evidence.packetAmbiguityCount;
+  const adjudicationQueue = tasks.flatMap((task) =>
+    task.adjudicationReason === undefined
+      ? []
+      : [{
+          reviewTaskId: task.reviewTaskId,
+          fixtureId: task.fixtureId,
+          reason: task.adjudicationReason,
+        }],
+  );
+
+  return {
+    schemaVersion: evidence.schemaVersion,
+    protocolId: evidence.protocolId,
+    protocolVersion: evidence.protocolVersion,
+    suiteId: evidence.suiteId,
+    suiteVersion: evidence.suiteVersion,
+    strategyRegistryId: evidence.strategyRegistryId,
+    strategyRegistryVersion: evidence.strategyRegistryVersion,
+    pilotId: evidence.pilotId,
+    pilotVersion: evidence.pilotVersion,
+    taskSetFingerprint: evidence.taskSetFingerprint,
+    reviewerIds: evidence.reviewerIds,
+    summary: {
+      totalTaskCount,
+      agreementCount: evidence.agreementCount,
+      disagreementCount: evidence.disagreementCount,
+      packetAmbiguityCount: evidence.packetAmbiguityCount,
+      adjudicationCount: adjudicationQueue.length,
+      agreementRate: totalTaskCount === 0
+        ? null
+        : evidence.agreementCount / totalTaskCount,
+      clearPacketTaskCount,
+      clearPacketAgreementRate: clearPacketTaskCount === 0
+        ? null
+        : evidence.agreementCount / clearPacketTaskCount,
+    },
+    tasks,
+    adjudicationQueue,
+    interpretationBoundary: evidence.interpretationBoundary,
+    limitations: [
+      "Agreement rates are descriptive for this reviewed task set and these two reviewers; they are not population estimates.",
+      "No chance-corrected inter-rater reliability statistic is computed by this analysis artifact.",
+      "The clear-packet agreement rate excludes packet_ambiguity tasks from its denominator.",
+      "Adjudication is required for reviewer disagreement or packet ambiguity before any downstream reference-label decision.",
     ],
   };
 }

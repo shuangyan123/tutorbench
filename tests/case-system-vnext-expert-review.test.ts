@@ -358,7 +358,25 @@ test("expert review CLI writes reviewer-ready packages and imports completed cou
     ]);
     assert.equal(importResult.exitCode, 0, importResult.stderr);
     assert.match(importResult.stdout, /Agreements: 17/u);
+    assert.match(importResult.stdout, /Adjudication queue: 0/u);
     assert.match(importResult.stdout, /No automatic reference-label promotion/u);
+
+    const analysis = JSON.parse(
+      await readFile(join(directory, "expert-review-analysis.json"), "utf8"),
+    ) as {
+      readonly summary: {
+        readonly totalTaskCount: number;
+        readonly agreementCount: number;
+        readonly adjudicationCount: number;
+        readonly agreementRate: number | null;
+      };
+      readonly adjudicationQueue: readonly unknown[];
+    };
+    assert.equal(analysis.summary.totalTaskCount, 17);
+    assert.equal(analysis.summary.agreementCount, 17);
+    assert.equal(analysis.summary.adjudicationCount, 0);
+    assert.equal(analysis.summary.agreementRate, 1);
+    assert.deepEqual(analysis.adjudicationQueue, []);
 
     const evidence = JSON.parse(await readFile(outputPath, "utf8")) as {
       readonly agreementCount: number;
@@ -515,7 +533,77 @@ test("mathematics expert review dry run preserves all human-evidence states", as
     assert.match(importResult.stdout, /Agreements: 3/u);
     assert.match(importResult.stdout, /Disagreements: 1/u);
     assert.match(importResult.stdout, /Packet ambiguities: 1/u);
+    assert.match(importResult.stdout, /Adjudication queue: 2/u);
     assert.match(importResult.stdout, /No automatic reference-label promotion/u);
+
+    const analysisPath = join(directory, "expert-review-analysis.json");
+    const analysis = JSON.parse(await readFile(analysisPath, "utf8")) as {
+      readonly summary: {
+        readonly totalTaskCount: number;
+        readonly agreementCount: number;
+        readonly disagreementCount: number;
+        readonly packetAmbiguityCount: number;
+        readonly adjudicationCount: number;
+        readonly agreementRate: number | null;
+        readonly clearPacketTaskCount: number;
+        readonly clearPacketAgreementRate: number | null;
+      };
+      readonly tasks: readonly {
+        readonly reviewTaskId: string;
+        readonly fixtureId: string;
+        readonly agreement: "agreement" | "disagreement" | "packet_ambiguity";
+        readonly requiresAdjudication: boolean;
+        readonly adjudicationReason?: "reviewer_disagreement" | "packet_ambiguity";
+        readonly reviewerResults: readonly {
+          readonly reviewerId: string;
+          readonly rawOutcome: string;
+          readonly sufficientlyClear: boolean;
+          readonly notes?: string;
+          readonly normalizedOutcome:
+            | { readonly kind: "preference"; readonly candidateId: string }
+            | { readonly kind: "equivalent" }
+            | { readonly kind: "non_dominated" }
+            | { readonly kind: "insufficient_evidence" };
+        }[];
+      }[];
+      readonly adjudicationQueue: readonly {
+        readonly reviewTaskId: string;
+        readonly fixtureId: string;
+        readonly reason: "reviewer_disagreement" | "packet_ambiguity";
+      }[];
+      readonly limitations: readonly string[];
+    };
+
+    assert.deepEqual(analysis.summary, {
+      totalTaskCount: 5,
+      agreementCount: 3,
+      disagreementCount: 1,
+      packetAmbiguityCount: 1,
+      adjudicationCount: 2,
+      agreementRate: 0.6,
+      clearPacketTaskCount: 4,
+      clearPacketAgreementRate: 0.75,
+    });
+    assert.equal(analysis.tasks.length, 5);
+    assert.equal(analysis.tasks[3]!.requiresAdjudication, true);
+    assert.equal(
+      analysis.tasks[3]!.adjudicationReason,
+      "reviewer_disagreement",
+    );
+    assert.equal(analysis.tasks[4]!.requiresAdjudication, true);
+    assert.equal(analysis.tasks[4]!.adjudicationReason, "packet_ambiguity");
+    assert.equal(analysis.tasks[4]!.reviewerResults[1]!.sufficientlyClear, false);
+    assert.match(
+      analysis.tasks[4]!.reviewerResults[1]!.notes ?? "",
+      /intentionally marked false/u,
+    );
+    assert.deepEqual(
+      analysis.adjudicationQueue.map((item) => item.reason),
+      ["reviewer_disagreement", "packet_ambiguity"],
+    );
+    assert.ok(
+      analysis.limitations.some((item) => /not population estimates/u.test(item)),
+    );
 
     const evidence = JSON.parse(await readFile(outputPath, "utf8")) as {
       readonly agreementCount: number;
