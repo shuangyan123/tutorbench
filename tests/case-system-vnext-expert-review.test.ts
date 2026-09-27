@@ -309,7 +309,10 @@ test("expert review CLI writes reviewer-ready packages and imports completed cou
       instructionsA,
       /INSUFFICIENT_EVIDENCE: the packet does not contain enough evidence/u,
     );
-    assert.doesNotMatch(instructionsA, /[^\x00-\x7F]/u);
+    assert.equal(
+      [...instructionsA].every((character) => (character.codePointAt(0) ?? 0) <= 0x7f),
+      true,
+    );
 
     const submissionFor = (
       packet: typeof packetA,
