@@ -6,9 +6,14 @@ or methodology.
 
 ## Report privately
 
-Do not put credentials, tokens, cookies, private artifacts, or exploit details
-in a public GitHub issue. Report privately when a private maintainer channel is
-provided, especially for:
+Use GitHub Private Vulnerability Reporting for security issues:
+
+https://github.com/shuangyan123/tutorbench/security/advisories/new
+
+Do not put credentials, tokens, cookies, private artifacts, exploit details,
+or other sensitive security evidence in a public GitHub issue.
+
+Private reports are especially appropriate for:
 
 - Credential leaks or secret exposure.
 - Unsafe external endpoint or URL handling.
@@ -17,17 +22,9 @@ provided, especially for:
 - Code execution, path traversal, injection, authentication, authorization,
   or other security bugs.
 
-GitHub Private Vulnerability Reporting is not enabled for this repository at
-the time of this policy. This document does not create a private reporting
-channel or invent a security email address. If no private maintainer channel
-is available, open a minimal issue titled `Private security contact request`
-with no sensitive details and request a private route. Do not include the
-secret, token, cookie, exploit payload, private path, or confidential artifact
-in that issue.
-
 If a secret may already be exposed, revoke or rotate it first when possible,
-then request private coordination without repeating the secret. Include only
-the minimum public reference needed for the maintainer to locate the issue.
+then report the issue privately without repeating the secret unnecessarily.
+Include only the minimum evidence needed to reproduce and assess the issue.
 
 ## What is not a security vulnerability
 
