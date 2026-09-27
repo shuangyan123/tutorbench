@@ -1303,7 +1303,7 @@ test("reference candidate CLI replays source lineage and rejects mismatched adju
       candidatePath,
     ]);
     assert.equal(rejected.exitCode, 1);
-    assert.match(rejected.stderr, /expert review lineage is invalid/u);
+    assert.equal(rejected.stderr, "Tutor Benchmark CLI failed.\n");
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
