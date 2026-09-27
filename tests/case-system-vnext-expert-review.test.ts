@@ -293,8 +293,22 @@ test("expert review CLI writes reviewer-ready packages and imports completed cou
     assert.ok(templateA.reviews.every((review) =>
       review.outcome === "" && review.sufficientlyClear === ""
     ));
-    assert.match(instructionsA, /A_BETTER/u);
-    assert.match(instructionsA, /INSUFFICIENT_EVIDENCE/u);
+    assert.match(
+      instructionsA,
+      /A_BETTER — candidate A is substantively better/u,
+    );
+    assert.match(
+      instructionsA,
+      /EQUIVALENT — the candidates are materially equivalent/u,
+    );
+    assert.match(
+      instructionsA,
+      /NON_DOMINATED — each candidate has defensible advantages/u,
+    );
+    assert.match(
+      instructionsA,
+      /INSUFFICIENT_EVIDENCE — the packet does not contain enough evidence/u,
+    );
 
     const submissionFor = (
       packet: typeof packetA,
