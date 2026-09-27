@@ -268,11 +268,11 @@ Reviewer ID: ${reviewerId}
 
 For every task, choose exactly one outcome:
 
-- A_BETTER
-- B_BETTER
-- EQUIVALENT
-- NON_DOMINATED
-- INSUFFICIENT_EVIDENCE
+- A_BETTER — candidate A is substantively better for the authored task and criteria.
+- B_BETTER — candidate B is substantively better for the authored task and criteria.
+- EQUIVALENT — the candidates are materially equivalent under the authored criteria.
+- NON_DOMINATED — each candidate has defensible advantages and the authored criteria do not justify an overall ordering.
+- INSUFFICIENT_EVIDENCE — the packet does not contain enough evidence to support a preference, equivalence, or non-dominance judgment.
 
 Set sufficientlyClear to true only when the packet contains enough clear
 information to support your selected relationship. Optional notes should flag
