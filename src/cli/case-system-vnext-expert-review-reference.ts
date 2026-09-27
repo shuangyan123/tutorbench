@@ -2,8 +2,17 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import {
+  buildCaseSystemVNextExpertReviewAdjudicationExport,
+  buildCaseSystemVNextExpertReviewConsensusResolution,
   buildCaseSystemVNextExpertReviewReferenceCandidate,
-  parseCaseSystemVNextExpertReviewResolution,
+  buildCaseSystemVNextExpertReviewResolution,
+  parseCaseSystemVNextExpertReviewAdjudicationSubmission,
+  reconstructCaseSystemVNextExpertReviewExport,
+  type CaseSystemVNextExpertReviewAdjudicationExport,
+  type CaseSystemVNextExpertReviewAdjudicationPacket,
+  type CaseSystemVNextExpertReviewEvidence,
+  type CaseSystemVNextExpertReviewExport,
+  type CaseSystemVNextExpertReviewPacket,
 } from "../case-system-vnext/index.js";
 import {
   nextTutorbenchValue,
@@ -16,7 +25,10 @@ export type CaseSystemVNextExpertReviewReferenceCandidateCliOptions =
   | { readonly help: true }
   | {
       readonly help: false;
-      readonly resolutionPath: string;
+      readonly packetDirectory: string;
+      readonly evidencePath: string;
+      readonly adjudicationDirectory?: string;
+      readonly submissionPath?: string;
       readonly outputPath: string;
     };
 
@@ -24,45 +36,87 @@ async function loadJson(path: string): Promise<unknown> {
   return JSON.parse(await readFile(resolve(process.cwd(), path), "utf8")) as unknown;
 }
 
+async function loadSourceExport(
+  packetDirectory: string,
+): Promise<CaseSystemVNextExpertReviewExport> {
+  const manifest = await loadJson(
+    resolve(packetDirectory, "operator-manifest.json"),
+  ) as CaseSystemVNextExpertReviewExport["manifest"];
+  const packets = await Promise.all([
+    loadJson(resolve(packetDirectory, "reviewer-1", "packet.json")),
+    loadJson(resolve(packetDirectory, "reviewer-2", "packet.json")),
+  ]) as unknown as readonly [
+    CaseSystemVNextExpertReviewPacket,
+    CaseSystemVNextExpertReviewPacket,
+  ];
+  return reconstructCaseSystemVNextExpertReviewExport(manifest, packets);
+}
+
 export function parseCaseSystemVNextExpertReviewReferenceCandidateArgs(
   args: readonly string[],
 ): CaseSystemVNextExpertReviewReferenceCandidateCliOptions {
-  let resolutionPath: string | undefined;
+  let packetDirectory: string | undefined;
+  let evidencePath: string | undefined;
+  let adjudicationDirectory: string | undefined;
+  let submissionPath: string | undefined;
   let outputPath: string | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index] ?? "";
     if (argument === "--help" || argument === "-h") return { help: true };
-    if (argument === "--resolution") {
-      resolutionPath = resolve(nextTutorbenchValue(args, index, "--resolution"));
-      index += 1;
+    const take = (option: string): string | undefined => {
+      if (argument === option) {
+        index += 1;
+        return nextTutorbenchValue(args, index - 1, option);
+      }
+      return tutorbenchOptionValue(argument, option);
+    };
+    const packet = take("--packet-dir");
+    if (packet !== undefined) {
+      packetDirectory = resolve(packet);
       continue;
     }
-    const resolutionValue = tutorbenchOptionValue(argument, "--resolution");
-    if (resolutionValue !== undefined) {
-      resolutionPath = resolve(resolutionValue);
+    const evidence = take("--evidence");
+    if (evidence !== undefined) {
+      evidencePath = resolve(evidence);
       continue;
     }
-    if (argument === "--output") {
-      outputPath = resolve(nextTutorbenchValue(args, index, "--output"));
-      index += 1;
+    const adjudication = take("--adjudication-dir");
+    if (adjudication !== undefined) {
+      adjudicationDirectory = resolve(adjudication);
       continue;
     }
-    const outputValue = tutorbenchOptionValue(argument, "--output");
-    if (outputValue !== undefined) {
-      outputPath = resolve(outputValue);
+    const submission = take("--submission");
+    if (submission !== undefined) {
+      submissionPath = resolve(submission);
+      continue;
+    }
+    const output = take("--output");
+    if (output !== undefined) {
+      outputPath = resolve(output);
       continue;
     }
     throw new TutorbenchCliUsageError(`Unknown option: ${argument}`);
   }
-  if (resolutionPath === undefined) {
-    throw new TutorbenchCliUsageError("--resolution is required.");
+  if (packetDirectory === undefined) {
+    throw new TutorbenchCliUsageError("--packet-dir is required.");
+  }
+  if (evidencePath === undefined) {
+    throw new TutorbenchCliUsageError("--evidence is required.");
+  }
+  if ((adjudicationDirectory === undefined) !== (submissionPath === undefined)) {
+    throw new TutorbenchCliUsageError(
+      "--adjudication-dir and --submission must be supplied together.",
+    );
   }
   return {
     help: false,
-    resolutionPath,
+    packetDirectory,
+    evidencePath,
+    ...(adjudicationDirectory === undefined
+      ? {}
+      : { adjudicationDirectory, submissionPath: submissionPath! }),
     outputPath: outputPath ?? resolve(
-      resolutionPath,
-      "..",
+      packetDirectory,
       "expert-review-reference-candidate.json",
     ),
   };
@@ -73,12 +127,15 @@ export function printCaseSystemVNextExpertReviewReferenceCandidateHelp(): void {
 
 Usage:
   tutorbench case-system-vnext-expert-review-reference-candidate \\
-    --resolution <path> [--output <path>]
+    --packet-dir <path> --evidence <path> \\
+    [--adjudication-dir <path> --submission <path>] [--output <path>]
 
-Validates the resolution artifact, derives reference candidates, and evaluates
-the promotion gate. Unresolved or insufficient-evidence tasks block the set.
-Eligibility means manual promotion may be reviewed; this command never promotes
-or rewrites a formal reference set.`);
+Replays source packet/evidence lineage before deriving reference candidates.
+For all-consensus evidence, no adjudication inputs are required. If disagreement
+or packet ambiguity exists, both adjudication inputs are required. Unresolved
+or insufficient-evidence tasks block promotion. Eligibility means manual
+promotion may be reviewed; this command never promotes or rewrites a formal
+reference set.`);
 }
 
 export async function runCaseSystemVNextExpertReviewReferenceCandidate(
@@ -87,9 +144,69 @@ export async function runCaseSystemVNextExpertReviewReferenceCandidate(
     { readonly help: false }
   >,
 ): Promise<void> {
-  const resolution = parseCaseSystemVNextExpertReviewResolution(
-    await loadJson(options.resolutionPath),
-  );
+  const exported = await loadSourceExport(options.packetDirectory);
+  const evidence = await loadJson(options.evidencePath) as CaseSystemVNextExpertReviewEvidence;
+  const requiresAdjudication =
+    evidence.disagreementCount > 0 || evidence.packetAmbiguityCount > 0;
+
+  let resolution;
+  if (!requiresAdjudication) {
+    if (
+      options.adjudicationDirectory !== undefined ||
+      options.submissionPath !== undefined
+    ) {
+      throw new Error("Case System vNext expert review lineage is invalid.");
+    }
+    resolution = buildCaseSystemVNextExpertReviewConsensusResolution(
+      exported,
+      evidence,
+    );
+  } else {
+    if (
+      options.adjudicationDirectory === undefined ||
+      options.submissionPath === undefined
+    ) {
+      throw new TutorbenchCliUsageError(
+        "Adjudication inputs are required when source evidence contains queued tasks.",
+      );
+    }
+    const manifest = await loadJson(
+      resolve(options.adjudicationDirectory, "operator-manifest.json"),
+    ) as CaseSystemVNextExpertReviewAdjudicationExport["manifest"];
+    const packet = await loadJson(
+      resolve(options.adjudicationDirectory, "packet.json"),
+    ) as CaseSystemVNextExpertReviewAdjudicationPacket;
+    const template = await loadJson(
+      resolve(options.adjudicationDirectory, "submission-template.json"),
+    ) as CaseSystemVNextExpertReviewAdjudicationExport["template"];
+    const adjudicationExport: CaseSystemVNextExpertReviewAdjudicationExport = {
+      manifest,
+      packet,
+      template,
+    };
+    const expected = buildCaseSystemVNextExpertReviewAdjudicationExport(
+      exported,
+      evidence,
+      manifest.adjudicatorId,
+    );
+    if (
+      JSON.stringify(expected.manifest) !== JSON.stringify(manifest) ||
+      JSON.stringify(expected.packet) !== JSON.stringify(packet)
+    ) {
+      throw new Error("Case System vNext expert review lineage is invalid.");
+    }
+    const submission = parseCaseSystemVNextExpertReviewAdjudicationSubmission(
+      await loadJson(options.submissionPath),
+      packet,
+    );
+    resolution = buildCaseSystemVNextExpertReviewResolution(
+      exported,
+      evidence,
+      adjudicationExport,
+      submission,
+    );
+  }
+
   const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(resolution);
   await writeTutorCliJson(candidate, options.outputPath);
   console.log([
@@ -99,6 +216,7 @@ export async function runCaseSystemVNextExpertReviewReferenceCandidate(
     `  Unresolved: ${candidate.summary.unresolvedCount}`,
     `  Insufficient evidence: ${candidate.summary.insufficientEvidenceCount}`,
     `  Promotion gate: ${candidate.promotionGate.status}`,
+    `  Source lineage replayed: true`,
     `  Output: ${options.outputPath}`,
     "  Automatic promotion allowed: false",
   ].join("\n"));
