@@ -255,10 +255,12 @@ function parseResolutionTask(
     CaseSystemVNextExpertReviewResolutionTask["sourceAgreement"];
   const resolutionStatus = record.resolutionStatus as
     CaseSystemVNextExpertReviewResolutionTask["resolutionStatus"];
-  const parsedResolution = record.resolution === undefined
-    ? undefined
-    : canonicalOutcome(record.resolution);
-  if (record.resolution !== undefined && parsedResolution === null) invalid();
+  let parsedResolution: CaseSystemVNextExpertReviewCanonicalOutcome | undefined;
+  if (record.resolution !== undefined) {
+    const parsed = canonicalOutcome(record.resolution);
+    if (parsed === null) invalid();
+    parsedResolution = parsed;
+  }
 
   if (resolutionStatus === "reviewer_consensus") {
     if (
@@ -373,10 +375,14 @@ export function parseCaseSystemVNextExpertReviewResolution(
     reviewerIds[0] === reviewerIds[1] ||
     !opaqueId(record.adjudicatorId) ||
     reviewerIds.includes(record.adjudicatorId) ||
-    !fingerprintPattern.test(String(record.taskSetFingerprint)) ||
-    !fingerprintPattern.test(String(record.sourceEvidenceFingerprint)) ||
-    !fingerprintPattern.test(String(record.adjudicationSetFingerprint)) ||
-    !fingerprintPattern.test(String(record.resolutionFingerprint)) ||
+    typeof record.taskSetFingerprint !== "string" ||
+    !fingerprintPattern.test(record.taskSetFingerprint) ||
+    typeof record.sourceEvidenceFingerprint !== "string" ||
+    !fingerprintPattern.test(record.sourceEvidenceFingerprint) ||
+    typeof record.adjudicationSetFingerprint !== "string" ||
+    !fingerprintPattern.test(record.adjudicationSetFingerprint) ||
+    typeof record.resolutionFingerprint !== "string" ||
+    !fingerprintPattern.test(record.resolutionFingerprint) ||
     !Array.isArray(record.tasks) ||
     record.tasks.length === 0 ||
     !Array.isArray(record.interpretationBoundary) ||
@@ -458,12 +464,6 @@ export function buildCaseSystemVNextExpertReviewReferenceCandidate(
 ): CaseSystemVNextExpertReviewReferenceCandidate {
   const resolution = parseCaseSystemVNextExpertReviewResolution(resolutionInput);
   const tasks = resolution.tasks.map((task): CaseSystemVNextExpertReviewReferenceCandidateTask => {
-    const provenance = task.resolutionStatus === "reviewer_consensus"
-      ? "human_consensus" as const
-      : task.resolutionStatus === "adjudicated"
-        ? "human_adjudicated" as const
-        : undefined;
-
     if (task.resolutionStatus === "unresolved" || task.resolution === undefined) {
       return {
         reviewTaskId: task.reviewTaskId,
@@ -473,6 +473,10 @@ export function buildCaseSystemVNextExpertReviewReferenceCandidate(
         blocker: "unresolved",
       };
     }
+    const provenance = task.resolutionStatus === "reviewer_consensus"
+      ? "human_consensus" as const
+      : "human_adjudicated" as const;
+
     if (task.resolution.kind === "insufficient_evidence") {
       return {
         reviewTaskId: task.reviewTaskId,
