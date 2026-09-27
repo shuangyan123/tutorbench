@@ -13,6 +13,7 @@ import {
 } from "../src/case-system-vnext/expert-review.js";
 import {
   buildCaseSystemVNextExpertReviewAdjudicationExport,
+  buildCaseSystemVNextExpertReviewConsensusResolution,
   buildCaseSystemVNextExpertReviewResolution,
   parseCaseSystemVNextExpertReviewAdjudicationSubmission,
 } from "../src/case-system-vnext/expert-review-adjudication.js";
@@ -1085,5 +1086,226 @@ test("expert review resolution parser rejects fingerprint tampering", async () =
     }),
     /resolution data is invalid/u,
   );
+});
+
+test("expert review consensus resolution reaches the reference gate without adjudication", async () => {
+  const exported = await buildExport();
+  const submissions = exported.packets.map((packet, reviewerIndex) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: reviewerIndex === 0 ? "A_BETTER" as const : "B_BETTER" as const,
+      sufficientlyClear: true,
+    })),
+  })) as unknown as readonly [
+    CaseSystemVNextExpertReviewSubmission,
+    CaseSystemVNextExpertReviewSubmission,
+  ];
+  const evidence = mergeCaseSystemVNextExpertReviewSubmissions(exported, submissions);
+  assert.equal(evidence.agreementCount, 17);
+  assert.equal(evidence.disagreementCount, 0);
+  assert.equal(evidence.packetAmbiguityCount, 0);
+
+  const resolution = buildCaseSystemVNextExpertReviewConsensusResolution(
+    exported,
+    evidence,
+  );
+  assert.equal(resolution.adjudicatorId, undefined);
+  assert.equal(resolution.adjudicationSetFingerprint, undefined);
+  assert.equal(resolution.summary.reviewerConsensusCount, 17);
+  assert.equal(resolution.summary.adjudicatedCount, 0);
+  assert.equal(resolution.summary.unresolvedCount, 0);
+
+  const parsed = parseCaseSystemVNextExpertReviewResolution(resolution);
+  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(parsed);
+  assert.equal(candidate.adjudicatorId, undefined);
+  assert.equal(candidate.adjudicationSetFingerprint, undefined);
+  assert.equal(candidate.summary.candidateReadyCount, 17);
+  assert.equal(candidate.summary.blockedCount, 0);
+  assert.equal(candidate.promotionGate.status, "eligible_for_manual_promotion");
+});
+
+test("reference candidate CLI replays source lineage and rejects mismatched adjudication material", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "tutorbench-vnext-reference-lineage-"));
+  try {
+    const exportResult = await runCli([
+      "case-system-vnext-expert-review-export",
+      "--reviewer",
+      "reviewer-a",
+      "--reviewer",
+      "reviewer-b",
+      "--domain",
+      "mathematics",
+      "--output-dir",
+      directory,
+    ]);
+    assert.equal(exportResult.exitCode, 0, exportResult.stderr);
+
+    const packetA = JSON.parse(
+      await readFile(join(directory, "reviewer-1", "packet.json"), "utf8"),
+    ) as {
+      readonly schemaVersion: 1;
+      readonly protocolId: string;
+      readonly protocolVersion: string;
+      readonly reviewerId: string;
+      readonly taskSetFingerprint: string;
+      readonly packetFingerprint: string;
+      readonly tasks: readonly { readonly reviewTaskId: string }[];
+    };
+    const packetB = JSON.parse(
+      await readFile(join(directory, "reviewer-2", "packet.json"), "utf8"),
+    ) as typeof packetA;
+
+    const submissionFor = (
+      packet: typeof packetA,
+      reviewerIndex: 0 | 1,
+    ) => ({
+      schemaVersion: packet.schemaVersion,
+      protocolId: packet.protocolId,
+      protocolVersion: packet.protocolVersion,
+      reviewerId: packet.reviewerId,
+      taskSetFingerprint: packet.taskSetFingerprint,
+      packetFingerprint: packet.packetFingerprint,
+      reviews: packet.tasks.map((task, taskIndex) => ({
+        reviewTaskId: task.reviewTaskId,
+        outcome: taskIndex === 0
+          ? (reviewerIndex === 0 ? "A_BETTER" : "A_BETTER")
+          : "EQUIVALENT",
+        sufficientlyClear: true,
+      })),
+    });
+
+    const submissionAPath = join(directory, "reviewer-a.completed.json");
+    const submissionBPath = join(directory, "reviewer-b.completed.json");
+    await writeFile(
+      submissionAPath,
+      JSON.stringify(submissionFor(packetA, 0), null, 2),
+      "utf8",
+    );
+    await writeFile(
+      submissionBPath,
+      JSON.stringify(submissionFor(packetB, 1), null, 2),
+      "utf8",
+    );
+
+    const evidencePath = join(directory, "expert-review-evidence.json");
+    const importResult = await runCli([
+      "case-system-vnext-expert-review-import",
+      "--packet-dir",
+      directory,
+      "--submission",
+      submissionAPath,
+      "--submission",
+      submissionBPath,
+      "--output",
+      evidencePath,
+    ]);
+    assert.equal(importResult.exitCode, 0, importResult.stderr);
+
+    const adjudicationDirectory = join(directory, "adjudication");
+    const adjudicationExportResult = await runCli([
+      "case-system-vnext-expert-review-adjudication-export",
+      "--packet-dir",
+      directory,
+      "--evidence",
+      evidencePath,
+      "--adjudicator",
+      "adjudicator-c",
+      "--output-dir",
+      adjudicationDirectory,
+    ]);
+    assert.equal(adjudicationExportResult.exitCode, 0, adjudicationExportResult.stderr);
+
+    const adjudicationPacket = JSON.parse(
+      await readFile(join(adjudicationDirectory, "packet.json"), "utf8"),
+    ) as {
+      readonly schemaVersion: 1;
+      readonly protocolId: string;
+      readonly protocolVersion: string;
+      readonly adjudicatorId: string;
+      readonly taskSetFingerprint: string;
+      readonly sourceEvidenceFingerprint: string;
+      readonly adjudicationSetFingerprint: string;
+      readonly packetFingerprint: string;
+      readonly tasks: readonly { readonly reviewTaskId: string }[];
+    };
+    const adjudicationSubmissionPath = join(
+      directory,
+      "adjudicator-c.completed.json",
+    );
+    await writeFile(
+      adjudicationSubmissionPath,
+      JSON.stringify({
+        schemaVersion: adjudicationPacket.schemaVersion,
+        protocolId: adjudicationPacket.protocolId,
+        protocolVersion: adjudicationPacket.protocolVersion,
+        adjudicatorId: adjudicationPacket.adjudicatorId,
+        taskSetFingerprint: adjudicationPacket.taskSetFingerprint,
+        sourceEvidenceFingerprint: adjudicationPacket.sourceEvidenceFingerprint,
+        adjudicationSetFingerprint: adjudicationPacket.adjudicationSetFingerprint,
+        packetFingerprint: adjudicationPacket.packetFingerprint,
+        adjudications: adjudicationPacket.tasks.map((task) => ({
+          reviewTaskId: task.reviewTaskId,
+          outcome: "A_BETTER",
+          sufficientlyClear: true,
+        })),
+      }, null, 2),
+      "utf8",
+    );
+
+    const candidatePath = join(directory, "reference-candidate.json");
+    const candidateResult = await runCli([
+      "case-system-vnext-expert-review-reference-candidate",
+      "--packet-dir",
+      directory,
+      "--evidence",
+      evidencePath,
+      "--adjudication-dir",
+      adjudicationDirectory,
+      "--submission",
+      adjudicationSubmissionPath,
+      "--output",
+      candidatePath,
+    ]);
+    assert.equal(candidateResult.exitCode, 0, candidateResult.stderr);
+    assert.match(candidateResult.stdout, /Source lineage replayed: true/u);
+
+    const tamperedManifestPath = join(adjudicationDirectory, "operator-manifest.json");
+    const tamperedManifest = JSON.parse(
+      await readFile(tamperedManifestPath, "utf8"),
+    ) as {
+      adjudicationSetFingerprint: string;
+      [key: string]: unknown;
+    };
+    tamperedManifest.adjudicationSetFingerprint = "sha256:" + "0".repeat(64);
+    await writeFile(
+      tamperedManifestPath,
+      JSON.stringify(tamperedManifest, null, 2),
+      "utf8",
+    );
+
+    const rejected = await runCli([
+      "case-system-vnext-expert-review-reference-candidate",
+      "--packet-dir",
+      directory,
+      "--evidence",
+      evidencePath,
+      "--adjudication-dir",
+      adjudicationDirectory,
+      "--submission",
+      adjudicationSubmissionPath,
+      "--output",
+      candidatePath,
+    ]);
+    assert.equal(rejected.exitCode, 1);
+    assert.match(rejected.stderr, /expert review lineage is invalid/u);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
