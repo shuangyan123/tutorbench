@@ -295,19 +295,23 @@ test("expert review CLI writes reviewer-ready packages and imports completed cou
     ));
     assert.match(
       instructionsA,
-      /A_BETTER — candidate A is substantively better/u,
+      /A_BETTER: candidate A is substantively better/u,
     );
     assert.match(
       instructionsA,
-      /EQUIVALENT — the candidates are materially equivalent/u,
+      /EQUIVALENT: the candidates are materially equivalent/u,
     );
     assert.match(
       instructionsA,
-      /NON_DOMINATED — each candidate has defensible advantages/u,
+      /NON_DOMINATED: each candidate has defensible advantages/u,
     );
     assert.match(
       instructionsA,
-      /INSUFFICIENT_EVIDENCE — the packet does not contain enough evidence/u,
+      /INSUFFICIENT_EVIDENCE: the packet does not contain enough evidence/u,
+    );
+    assert.equal(
+      [...instructionsA].every((character) => (character.codePointAt(0) ?? 0) <= 0x7f),
+      true,
     );
 
     const submissionFor = (
