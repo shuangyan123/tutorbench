@@ -51,10 +51,10 @@ export interface CaseSystemVNextExpertReviewReferenceCandidate {
   readonly pilotId: string;
   readonly pilotVersion: string;
   readonly reviewerIds: readonly [string, string];
-  readonly adjudicatorId: string;
+  readonly adjudicatorId?: string;
   readonly taskSetFingerprint: string;
   readonly sourceEvidenceFingerprint: string;
-  readonly adjudicationSetFingerprint: string;
+  readonly adjudicationSetFingerprint?: string;
   readonly sourceResolutionFingerprint: string;
   readonly summary: {
     readonly totalTaskCount: number;
@@ -218,7 +218,7 @@ function adjudicatorResult(
 function parseResolutionTask(
   value: unknown,
   reviewerIds: readonly [string, string],
-  adjudicatorId: string,
+  adjudicatorId: string | undefined,
 ): CaseSystemVNextExpertReviewResolutionTask {
   const record = asRecord(value);
   if (
@@ -288,6 +288,7 @@ function parseResolutionTask(
     : sourceAgreement === "packet_ambiguity"
       ? "packet_ambiguity"
       : null;
+  if (adjudicatorId === undefined) invalid();
   const parsedAdjudicatorResult = adjudicatorResult(
     record.adjudicatorResult,
     adjudicatorId,
@@ -373,14 +374,18 @@ export function parseCaseSystemVNextExpertReviewResolution(
     !opaqueId(reviewerIds[0]) ||
     !opaqueId(reviewerIds[1]) ||
     reviewerIds[0] === reviewerIds[1] ||
-    !opaqueId(record.adjudicatorId) ||
-    reviewerIds.includes(record.adjudicatorId) ||
+    (record.adjudicatorId !== undefined && (
+      !opaqueId(record.adjudicatorId) ||
+      reviewerIds.includes(record.adjudicatorId)
+    )) ||
+    (record.adjudicationSetFingerprint !== undefined && (
+      typeof record.adjudicationSetFingerprint !== "string" ||
+      !fingerprintPattern.test(record.adjudicationSetFingerprint)
+    )) ||
     typeof record.taskSetFingerprint !== "string" ||
     !fingerprintPattern.test(record.taskSetFingerprint) ||
     typeof record.sourceEvidenceFingerprint !== "string" ||
     !fingerprintPattern.test(record.sourceEvidenceFingerprint) ||
-    typeof record.adjudicationSetFingerprint !== "string" ||
-    !fingerprintPattern.test(record.adjudicationSetFingerprint) ||
     typeof record.resolutionFingerprint !== "string" ||
     !fingerprintPattern.test(record.resolutionFingerprint) ||
     !Array.isArray(record.tasks) ||
@@ -391,7 +396,11 @@ export function parseCaseSystemVNextExpertReviewResolution(
 
   const reviewerTuple = [reviewerIds[0], reviewerIds[1]] as const;
   const tasks = record.tasks.map((task) =>
-    parseResolutionTask(task, reviewerTuple, record.adjudicatorId as string),
+    parseResolutionTask(
+      task,
+      reviewerTuple,
+      record.adjudicatorId as string | undefined,
+    ),
   );
   if (
     new Set(tasks.map((task) => task.reviewTaskId)).size !== tasks.length ||
@@ -407,7 +416,13 @@ export function parseCaseSystemVNextExpertReviewResolution(
     tasks.filter((task) => task.resolutionStatus === "unresolved").length;
   const resolvedCount = reviewerConsensusCount + adjudicatedCount;
   const resolvedShare = tasks.length === 0 ? null : resolvedCount / tasks.length;
+  const hasAdjudicationTasks = adjudicatedCount + unresolvedCount > 0;
   if (
+    hasAdjudicationTasks !==
+      (record.adjudicatorId !== undefined && record.adjudicationSetFingerprint !== undefined) ||
+    (!hasAdjudicationTasks &&
+      (record.adjudicatorId !== undefined || record.adjudicationSetFingerprint !== undefined)) ||
+
     summary === null ||
     !onlyKeys(summary, [
       "totalTaskCount",
@@ -436,10 +451,14 @@ export function parseCaseSystemVNextExpertReviewResolution(
     pilotId: record.pilotId,
     pilotVersion: record.pilotVersion,
     reviewerIds: reviewerTuple,
-    adjudicatorId: record.adjudicatorId,
+    ...(record.adjudicatorId === undefined
+      ? {}
+      : { adjudicatorId: record.adjudicatorId }),
     taskSetFingerprint: record.taskSetFingerprint,
     sourceEvidenceFingerprint: record.sourceEvidenceFingerprint,
-    adjudicationSetFingerprint: record.adjudicationSetFingerprint,
+    ...(record.adjudicationSetFingerprint === undefined
+      ? {}
+      : { adjudicationSetFingerprint: record.adjudicationSetFingerprint }),
     summary: {
       totalTaskCount: tasks.length,
       reviewerConsensusCount,
@@ -525,10 +544,14 @@ export function buildCaseSystemVNextExpertReviewReferenceCandidate(
     pilotId: resolution.pilotId,
     pilotVersion: resolution.pilotVersion,
     reviewerIds: resolution.reviewerIds,
-    adjudicatorId: resolution.adjudicatorId,
+    ...(resolution.adjudicatorId === undefined
+      ? {}
+      : { adjudicatorId: resolution.adjudicatorId }),
     taskSetFingerprint: resolution.taskSetFingerprint,
     sourceEvidenceFingerprint: resolution.sourceEvidenceFingerprint,
-    adjudicationSetFingerprint: resolution.adjudicationSetFingerprint,
+    ...(resolution.adjudicationSetFingerprint === undefined
+      ? {}
+      : { adjudicationSetFingerprint: resolution.adjudicationSetFingerprint }),
     sourceResolutionFingerprint: resolution.resolutionFingerprint,
     summary: {
       totalTaskCount: tasks.length,

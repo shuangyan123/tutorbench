@@ -245,6 +245,29 @@ export interface CaseSystemVNextExpertReviewExport {
   ];
 }
 
+export function reconstructCaseSystemVNextExpertReviewExport(
+  manifest: CaseSystemVNextExpertReviewManifest,
+  packets: readonly [
+    CaseSystemVNextExpertReviewPacket,
+    CaseSystemVNextExpertReviewPacket,
+  ],
+): CaseSystemVNextExpertReviewExport {
+  const templates = packets.map((packet) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: "" as const,
+      sufficientlyClear: "" as const,
+    })),
+  })) as unknown as CaseSystemVNextExpertReviewExport["templates"];
+  return { manifest, packets, templates };
+}
+
 const outcomes = new Set<CaseSystemVNextStressRawOutcome>([
   "A_BETTER",
   "B_BETTER",

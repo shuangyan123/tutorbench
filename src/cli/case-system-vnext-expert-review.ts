@@ -13,6 +13,7 @@ import {
   buildCaseSystemVNextExpertReviewExport,
   mergeCaseSystemVNextExpertReviewSubmissions,
   parseCaseSystemVNextExpertReviewSubmission,
+  reconstructCaseSystemVNextExpertReviewExport,
   type CaseSystemVNextExpertReviewExport,
   type CaseSystemVNextExpertReviewPacket,
   type CaseSystemVNextExpertReviewSubmission,
@@ -304,25 +305,6 @@ results. Complete only your own submission template.
 `;
 }
 
-function reconstructExport(
-  manifest: CaseSystemVNextExpertReviewExport["manifest"],
-  packets: readonly [CaseSystemVNextExpertReviewPacket, CaseSystemVNextExpertReviewPacket],
-): CaseSystemVNextExpertReviewExport {
-  const templates = packets.map((packet) => ({
-    schemaVersion: packet.schemaVersion,
-    protocolId: packet.protocolId,
-    protocolVersion: packet.protocolVersion,
-    reviewerId: packet.reviewerId,
-    taskSetFingerprint: packet.taskSetFingerprint,
-    packetFingerprint: packet.packetFingerprint,
-    reviews: packet.tasks.map((task) => ({
-      reviewTaskId: task.reviewTaskId,
-      outcome: "" as const,
-      sufficientlyClear: "" as const,
-    })),
-  })) as unknown as CaseSystemVNextExpertReviewExport["templates"];
-  return { manifest, packets, templates };
-}
 
 export async function runCaseSystemVNextExpertReviewExport(
   options: Extract<CaseSystemVNextExpertReviewCliOptions, { readonly help: false; readonly mode: "export" }>,
@@ -371,7 +353,7 @@ export async function runCaseSystemVNextExpertReviewImport(
     loadJson(resolve(options.packetDirectory, "reviewer-1", "packet.json")),
     loadJson(resolve(options.packetDirectory, "reviewer-2", "packet.json")),
   ]) as unknown as readonly [CaseSystemVNextExpertReviewPacket, CaseSystemVNextExpertReviewPacket];
-  const exported = reconstructExport(manifest, packets);
+  const exported = reconstructCaseSystemVNextExpertReviewExport(manifest, packets);
   const rawSubmissions = await Promise.all(options.submissionPaths.map(loadJson));
   const byReviewer = new Map(packets.map((packet) => [packet.reviewerId, packet]));
   const parsed = rawSubmissions.map((raw) => {
