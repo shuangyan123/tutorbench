@@ -43,10 +43,10 @@ export interface CaseSystemVNextExpertReviewAdjudicationManifest {
   readonly pilotId: string;
   readonly pilotVersion: string;
   readonly reviewerIds: readonly [string, string];
-  readonly adjudicatorId?: string;
+  readonly adjudicatorId: string;
   readonly taskSetFingerprint: string;
   readonly sourceEvidenceFingerprint: string;
-  readonly adjudicationSetFingerprint?: string;
+  readonly adjudicationSetFingerprint: string;
   readonly tasks: readonly CaseSystemVNextExpertReviewAdjudicationManifestTask[];
 }
 
@@ -138,10 +138,10 @@ export interface CaseSystemVNextExpertReviewResolution {
   readonly pilotId: string;
   readonly pilotVersion: string;
   readonly reviewerIds: readonly [string, string];
-  readonly adjudicatorId: string;
+  readonly adjudicatorId?: string;
   readonly taskSetFingerprint: string;
   readonly sourceEvidenceFingerprint: string;
-  readonly adjudicationSetFingerprint: string;
+  readonly adjudicationSetFingerprint?: string;
   readonly summary: {
     readonly totalTaskCount: number;
     readonly reviewerConsensusCount: number;
