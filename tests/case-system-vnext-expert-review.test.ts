@@ -376,6 +376,209 @@ test("expert review CLI writes reviewer-ready packages and imports completed cou
 });
 
 
+test("mathematics expert review dry run preserves all human-evidence states", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "tutorbench-vnext-math-review-dry-run-"));
+  try {
+    const exportResult = await runCli([
+      "case-system-vnext-expert-review-export",
+      "--reviewer",
+      "math-reviewer-a",
+      "--reviewer",
+      "math-reviewer-b",
+      "--domain",
+      "mathematics",
+      "--output-dir",
+      directory,
+    ]);
+    assert.equal(exportResult.exitCode, 0, exportResult.stderr);
+    assert.match(exportResult.stdout, /Tasks per reviewer: 5/u);
+
+    const manifest = JSON.parse(
+      await readFile(join(directory, "operator-manifest.json"), "utf8"),
+    ) as {
+      readonly tasks: readonly {
+        readonly reviewTaskId: string;
+        readonly assignments: readonly [
+          {
+            readonly aCandidateId: string;
+            readonly bCandidateId: string;
+          },
+          {
+            readonly aCandidateId: string;
+            readonly bCandidateId: string;
+          },
+        ];
+      }[];
+    };
+    const packetA = JSON.parse(
+      await readFile(join(directory, "reviewer-1", "packet.json"), "utf8"),
+    ) as {
+      readonly schemaVersion: 1;
+      readonly protocolId: string;
+      readonly protocolVersion: string;
+      readonly reviewerId: string;
+      readonly taskSetFingerprint: string;
+      readonly packetFingerprint: string;
+      readonly tasks: readonly { readonly reviewTaskId: string }[];
+    };
+    const packetB = JSON.parse(
+      await readFile(join(directory, "reviewer-2", "packet.json"), "utf8"),
+    ) as typeof packetA;
+
+    assert.equal(manifest.tasks.length, 5);
+    assert.equal(packetA.tasks.length, 5);
+    assert.equal(packetB.tasks.length, 5);
+
+    const sharedPreferredCandidate = manifest.tasks[0]!.assignments[0].aCandidateId;
+    assert.equal(
+      manifest.tasks[0]!.assignments[1].bCandidateId,
+      sharedPreferredCandidate,
+    );
+
+    const makeSubmission = (
+      packet: typeof packetA,
+      reviewerIndex: 0 | 1,
+    ) => ({
+      schemaVersion: packet.schemaVersion,
+      protocolId: packet.protocolId,
+      protocolVersion: packet.protocolVersion,
+      reviewerId: packet.reviewerId,
+      taskSetFingerprint: packet.taskSetFingerprint,
+      packetFingerprint: packet.packetFingerprint,
+      reviews: packet.tasks.map((task, taskIndex) => {
+        if (taskIndex === 0) {
+          return {
+            reviewTaskId: task.reviewTaskId,
+            outcome: reviewerIndex === 0 ? "A_BETTER" : "B_BETTER",
+            sufficientlyClear: true,
+          };
+        }
+        if (taskIndex === 1) {
+          return {
+            reviewTaskId: task.reviewTaskId,
+            outcome: "EQUIVALENT",
+            sufficientlyClear: true,
+          };
+        }
+        if (taskIndex === 2) {
+          return {
+            reviewTaskId: task.reviewTaskId,
+            outcome: "INSUFFICIENT_EVIDENCE",
+            sufficientlyClear: true,
+            notes: "Synthetic dry run: evidence is intentionally insufficient.",
+          };
+        }
+        if (taskIndex === 3) {
+          return {
+            reviewTaskId: task.reviewTaskId,
+            outcome: reviewerIndex === 0 ? "NON_DOMINATED" : "EQUIVALENT",
+            sufficientlyClear: true,
+          };
+        }
+        return {
+          reviewTaskId: task.reviewTaskId,
+          outcome: reviewerIndex === 0 ? "A_BETTER" : "B_BETTER",
+          sufficientlyClear: reviewerIndex === 0,
+          notes: reviewerIndex === 1
+            ? "Synthetic dry run: packet clarity intentionally marked false."
+            : "Synthetic dry run: counterpart marks packet unclear.",
+        };
+      }),
+    });
+
+    const submissionAPath = join(directory, "math-reviewer-a.synthetic.json");
+    const submissionBPath = join(directory, "math-reviewer-b.synthetic.json");
+    await writeFile(
+      submissionAPath,
+      `${JSON.stringify(makeSubmission(packetA, 0), null, 2)}\n`,
+      "utf8",
+    );
+    await writeFile(
+      submissionBPath,
+      `${JSON.stringify(makeSubmission(packetB, 1), null, 2)}\n`,
+      "utf8",
+    );
+
+    const outputPath = join(directory, "synthetic-expert-review-evidence.json");
+    const importResult = await runCli([
+      "case-system-vnext-expert-review-import",
+      "--packet-dir",
+      directory,
+      "--submission",
+      submissionAPath,
+      "--submission",
+      submissionBPath,
+      "--output",
+      outputPath,
+    ]);
+    assert.equal(importResult.exitCode, 0, importResult.stderr);
+    assert.match(importResult.stdout, /Agreements: 3/u);
+    assert.match(importResult.stdout, /Disagreements: 1/u);
+    assert.match(importResult.stdout, /Packet ambiguities: 1/u);
+    assert.match(importResult.stdout, /No automatic reference-label promotion/u);
+
+    const evidence = JSON.parse(await readFile(outputPath, "utf8")) as {
+      readonly agreementCount: number;
+      readonly disagreementCount: number;
+      readonly packetAmbiguityCount: number;
+      readonly reviews: readonly {
+        readonly agreement: "agreement" | "disagreement" | "packet_ambiguity";
+        readonly reviewerResults: readonly {
+          readonly sufficientlyClear: boolean;
+          readonly notes?: string;
+          readonly normalizedOutcome:
+            | { readonly kind: "preference"; readonly candidateId: string }
+            | { readonly kind: "equivalent" }
+            | { readonly kind: "non_dominated" }
+            | { readonly kind: "insufficient_evidence" };
+        }[];
+      }[];
+    };
+
+    assert.equal(evidence.agreementCount, 3);
+    assert.equal(evidence.disagreementCount, 1);
+    assert.equal(evidence.packetAmbiguityCount, 1);
+    assert.equal(evidence.reviews.length, 5);
+
+    const normalizedPreferenceA = evidence.reviews[0]!.reviewerResults[0]!
+      .normalizedOutcome;
+    const normalizedPreferenceB = evidence.reviews[0]!.reviewerResults[1]!
+      .normalizedOutcome;
+    assert.equal(normalizedPreferenceA.kind, "preference");
+    assert.equal(normalizedPreferenceB.kind, "preference");
+    if (
+      normalizedPreferenceA.kind !== "preference" ||
+      normalizedPreferenceB.kind !== "preference"
+    ) {
+      assert.fail("Expected normalized preference outcomes.");
+    }
+    assert.equal(normalizedPreferenceA.candidateId, sharedPreferredCandidate);
+    assert.equal(normalizedPreferenceB.candidateId, sharedPreferredCandidate);
+
+    assert.equal(
+      evidence.reviews[1]!.reviewerResults[0]!.normalizedOutcome.kind,
+      "equivalent",
+    );
+    assert.equal(
+      evidence.reviews[2]!.reviewerResults[0]!.normalizedOutcome.kind,
+      "insufficient_evidence",
+    );
+    assert.equal(evidence.reviews[3]!.agreement, "disagreement");
+    assert.equal(evidence.reviews[4]!.agreement, "packet_ambiguity");
+    assert.equal(
+      evidence.reviews[4]!.reviewerResults[1]!.sufficientlyClear,
+      false,
+    );
+    assert.match(
+      evidence.reviews[4]!.reviewerResults[1]!.notes ?? "",
+      /intentionally marked false/u,
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+
 test("expert review export supports domain-scoped cohorts", async () => {
   const pilot = parseCaseSystemVNextPilot(
     await loadJson("scenarios/case-system-vnext/pilot-archetypes.json"),
