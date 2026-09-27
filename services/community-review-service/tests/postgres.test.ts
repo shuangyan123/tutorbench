@@ -170,6 +170,7 @@ async function makeSetup(
   repository: CommunityReviewPersistence,
   suffix: string,
   reviewerIds: readonly string[] = [`reviewer-a-${suffix}`, `reviewer-b-${suffix}`],
+  batchPurpose: "interpretable" | "pilot" = "interpretable",
 ): Promise<Setup> {
   const reviewInstrument = instrument();
   const reviewEligibility = eligibility(suffix, reviewInstrument);
@@ -266,7 +267,7 @@ async function makeSetup(
     tasks,
     dataKind: "synthetic-fixture",
     fixture: syntheticFixture,
-    batchPurpose: "interpretable",
+    batchPurpose,
   });
   const sealedSourceReference = `synthetic://sealed-source/${suffix}`;
   materialStore.register({ manifest: sealed, sealedSourceReference, tasks });
@@ -470,7 +471,11 @@ const postgresSuite = describe("Community Review PostgreSQL adapter", { skip: !p
       attempts.service.assignReviewer({ batchId: attempts.batchId, reviewerId: attemptsReviewerId })));
     assert.equal(new Set(assignmentOutcomes.map((value) => value.assignment.assignmentId)).size, 1);
 
-    const submitClose = await makeSetup(activeRepository(), "pg-submit-close-race");
+    // This race tests transaction ordering, not interpretable-batch coverage.
+    // A pilot batch may close with incomplete coverage, so either serialized
+    // order remains valid: submit-before-close is accepted, while
+    // close-before-submit rejects only the later submission as batch_not_open.
+    const submitClose = await makeSetup(activeRepository(), "pg-submit-close-race", undefined, "pilot");
     await submitClose.service.submitReview({
       batchId: submitClose.batchId,
       assignmentId: submitClose.assignments[1]!.assignmentId,
@@ -489,6 +494,12 @@ const postgresSuite = describe("Community Review PostgreSQL adapter", { skip: !p
       submitClose.service.closeBatch(submitClose.batchId),
     ]);
     assert.equal(raceResults[1]!.status, "fulfilled");
+    if (raceResults[0]!.status === "rejected") {
+      assert.equal(raceResults[0]!.reason instanceof CommunityReviewServiceError, true);
+      assert.equal(raceResults[0]!.reason.code, "batch_not_open");
+    } else {
+      assert.equal(raceResults[0]!.value.submissionDisposition, "accepted-before-close");
+    }
     const raceState = await activeRepository().transaction((transaction) => ({
       batch: transaction.getBatch(submitClose.batchId),
       close: transaction.getBatchCloseRecord(submitClose.batchId),
