@@ -187,23 +187,7 @@ function inspectGithubBranch({ repository, branch, viewerLogin }) {
       ]),
       `GitHub PR history for ${branch}`,
     );
-    const openHead = parseJsonOutput(
-      runCommand("gh", [
-        "pr",
-        "list",
-        "--repo",
-        repository,
-        "--state",
-        "open",
-        "--head",
-        branch,
-        "--limit",
-        "100",
-        "--json",
-        fields,
-      ]),
-      `open GitHub PR heads for ${branch}`,
-    );
+    const openHead = mergedHistory.filter((pullRequest) => pullRequest.state === "OPEN");
     const openBase = parseJsonOutput(
       runCommand("gh", [
         "pr",
@@ -502,6 +486,7 @@ function inspectAllWorktrees(rootPath) {
     currentWorktreePath,
     defaultBranch,
     repository: repositoryContext.repository,
+    viewerLogin: repositoryContext.viewerLogin,
     records,
   };
 }
@@ -509,6 +494,7 @@ function inspectAllWorktrees(rootPath) {
 export function executeCleanup(records, {
   apply = false,
   removeWorktree = null,
+  revalidateWorktree = null,
   boundary = null,
 } = {}) {
   const candidates = records.filter(
@@ -527,8 +513,20 @@ export function executeCleanup(records, {
 
   const removed = [];
   for (const candidate of candidates) {
-    removeWorktree(candidate.path);
-    removed.push(candidate);
+    const verified = typeof revalidateWorktree === "function"
+      ? revalidateWorktree(candidate)
+      : candidate;
+    if (
+      !verified ||
+      !verified.safe ||
+      verified.branch !== candidate.branch ||
+      verified.head !== candidate.head ||
+      normalizedPath(verified.path) !== normalizedPath(candidate.path)
+    ) {
+      throw new Error(`Candidate changed or is no longer safe: ${candidate.path}`);
+    }
+    removeWorktree(verified.path);
+    removed.push(verified);
   }
   return { candidates, removed };
 }
@@ -593,14 +591,40 @@ function inspectApplyBoundary(rootPath) {
   };
 }
 
-function assertSafeRefresh(snapshot, candidate) {
-  const refreshed = snapshot.records.find(
+function inspectCandidateRefresh(rootPath, snapshot, candidate) {
+  const registered = parseWorktreePorcelain(
+    runCommand("git", ["worktree", "list", "--porcelain"], { cwd: rootPath }),
+  );
+  const worktree = registered.find(
     (record) => normalizedPath(record.path) === normalizedPath(candidate.path),
   );
-  if (!refreshed || !refreshed.safe || refreshed.branch !== candidate.branch || refreshed.head !== candidate.head) {
-    throw new Error(`Candidate changed or is no longer safe: ${candidate.path}`);
+  if (!worktree) {
+    return null;
   }
-  return refreshed;
+
+  const git = inspectGitState(worktree.path);
+  const github = worktree.branch && snapshot.repository
+    ? inspectGithubBranch({
+        repository: snapshot.repository,
+        branch: worktree.branch,
+        viewerLogin: snapshot.viewerLogin,
+      })
+    : {
+        viewerLogin: snapshot.viewerLogin,
+        mergedHistory: [],
+        openHead: [],
+        openBase: [],
+        error: "detached or bare worktree has no branch",
+      };
+  const record = classifyWorktree({
+    worktree,
+    currentWorktreePath: snapshot.currentWorktreePath,
+    defaultBranch: snapshot.defaultBranch,
+    status: git.status,
+    git,
+    github,
+  });
+  return { ...record, worktree, git, github };
 }
 
 export function parseArguments(argv) {
@@ -631,28 +655,23 @@ export function main(argv = process.argv.slice(2)) {
     return;
   }
 
-  const removed = [];
-  executeCleanup(initialSnapshot.records, {
+  const result = executeCleanup(initialSnapshot.records, {
     apply: true,
     boundary,
+    revalidateWorktree: (candidate) =>
+      inspectCandidateRefresh(repositoryRoot, initialSnapshot, candidate),
     removeWorktree: (worktreePath) => {
+      removeRegisteredWorktree(repositoryRoot, worktreePath);
+      if (hasRegisteredPath(repositoryRoot, worktreePath)) {
+        throw new Error(`Git still registers removed worktree: ${worktreePath}`);
+      }
       const candidate = candidates.find(
         (record) => normalizedPath(record.path) === normalizedPath(worktreePath),
       );
-      if (!candidate) {
-        throw new Error(`Candidate was not present in the initial safe set: ${worktreePath}`);
-      }
-      const refreshed = inspectAllWorktrees(repositoryRoot);
-      const verified = assertSafeRefresh(refreshed, candidate);
-      removeRegisteredWorktree(repositoryRoot, verified.path);
-      if (hasRegisteredPath(repositoryRoot, verified.path)) {
-        throw new Error(`Git still registers removed worktree: ${verified.path}`);
-      }
-      removed.push(verified);
-      console.log(`REMOVED | path=${verified.path} | branch=${verified.branch} | HEAD=${verified.head}`);
+      console.log(`REMOVED | path=${worktreePath} | branch=${candidate?.branch ?? "(unknown)"} | HEAD=${candidate?.head ?? "(unknown)"}`);
     },
   });
-  console.log(`Removed ${removed.length} SAFE_TO_REMOVE worktree(s). No branch deletion was attempted.`);
+  console.log(`Removed ${result.removed.length} SAFE_TO_REMOVE worktree(s). No branch deletion was attempted.`);
 }
 
 if (process.argv[1] && normalizedPath(process.argv[1]) === normalizedPath(fileURLToPath(import.meta.url))) {
