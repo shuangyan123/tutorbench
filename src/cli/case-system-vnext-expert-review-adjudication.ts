@@ -56,25 +56,6 @@ async function writeText(path: string, content: string): Promise<void> {
   await writeFile(path, content, "utf8");
 }
 
-function reconstructExport(
-  manifest: CaseSystemVNextExpertReviewExport["manifest"],
-  packets: readonly [CaseSystemVNextExpertReviewPacket, CaseSystemVNextExpertReviewPacket],
-): CaseSystemVNextExpertReviewExport {
-  const templates = packets.map((packet) => ({
-    schemaVersion: packet.schemaVersion,
-    protocolId: packet.protocolId,
-    protocolVersion: packet.protocolVersion,
-    reviewerId: packet.reviewerId,
-    taskSetFingerprint: packet.taskSetFingerprint,
-    packetFingerprint: packet.packetFingerprint,
-    reviews: packet.tasks.map((task) => ({
-      reviewTaskId: task.reviewTaskId,
-      outcome: "" as const,
-      sufficientlyClear: "" as const,
-    })),
-  })) as unknown as CaseSystemVNextExpertReviewExport["templates"];
-  return { manifest, packets, templates };
-}
 
 async function loadSourceExport(packetDirectory: string): Promise<CaseSystemVNextExpertReviewExport> {
   const manifest = await loadJson(
@@ -87,7 +68,7 @@ async function loadSourceExport(packetDirectory: string): Promise<CaseSystemVNex
     CaseSystemVNextExpertReviewPacket,
     CaseSystemVNextExpertReviewPacket,
   ];
-  return reconstructExport(manifest, packets);
+  return reconstructCaseSystemVNextExpertReviewExport(manifest, packets);
 }
 
 export function parseCaseSystemVNextExpertReviewAdjudicationExportArgs(
