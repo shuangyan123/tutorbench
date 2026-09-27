@@ -86,6 +86,12 @@ import {
   type CaseSystemVNextExpertReviewAdjudicationCliOptions,
 } from "./case-system-vnext-expert-review-adjudication.js";
 import {
+  parseCaseSystemVNextExpertReviewReferenceCandidateArgs,
+  printCaseSystemVNextExpertReviewReferenceCandidateHelp,
+  runCaseSystemVNextExpertReviewReferenceCandidate,
+  type CaseSystemVNextExpertReviewReferenceCandidateCliOptions,
+} from "./case-system-vnext-expert-review-reference.js";
+import {
   parseHumanReferenceCalibrationArgs,
   printHumanReferenceCalibrationHelp,
   runHumanReferenceCalibration,
@@ -158,7 +164,7 @@ export interface TutorbenchRunOptions {
 }
 
 export type TutorbenchCliOptions =
-  | { readonly help: true; readonly helpCommand?: "quickstart" | "collect" | "collect-model" | "evaluate" | "health" | "review-translate" | "judge-word-context-discrimination" | "judge-candidate-comparison" | "judge-material-requirement-discrimination" | "case-system-vnext-stress" | "case-system-vnext-expert-review-export" | "case-system-vnext-expert-review-import" | "case-system-vnext-expert-review-adjudication-export" | "case-system-vnext-expert-review-adjudication-import" | "human-reference-calibration" | "human-reference-pilot-export" | "human-reference-pilot-import" | "human-reference-judge-comparison" | "human-reference-semantic-audit-export" | "human-reference-semantic-audit-import" | "human-reference-semantic-audit" | "human-reference-semantic-audit-qualification-export" | "human-reference-semantic-audit-qualification-import" | "human-reference-semantic-audit-localized-export" | "human-reference-semantic-audit-localized-import" | "human-reference-semantic-audit-localized" }
+  | { readonly help: true; readonly helpCommand?: "quickstart" | "collect" | "collect-model" | "evaluate" | "health" | "review-translate" | "judge-word-context-discrimination" | "judge-candidate-comparison" | "judge-material-requirement-discrimination" | "case-system-vnext-stress" | "case-system-vnext-expert-review-export" | "case-system-vnext-expert-review-import" | "case-system-vnext-expert-review-adjudication-export" | "case-system-vnext-expert-review-adjudication-import" | "case-system-vnext-expert-review-reference-candidate" | "human-reference-calibration" | "human-reference-pilot-export" | "human-reference-pilot-import" | "human-reference-judge-comparison" | "human-reference-semantic-audit-export" | "human-reference-semantic-audit-import" | "human-reference-semantic-audit" | "human-reference-semantic-audit-qualification-export" | "human-reference-semantic-audit-qualification-import" | "human-reference-semantic-audit-localized-export" | "human-reference-semantic-audit-localized-import" | "human-reference-semantic-audit-localized" }
   | { readonly help: false; readonly quickstart: TutorbenchQuickstartCliOptions }
   | { readonly help: false; readonly run: TutorbenchRunOptions }
   | { readonly help: false; readonly collect: TutorbenchCollectCliOptions }
@@ -175,6 +181,7 @@ export type TutorbenchCliOptions =
   | { readonly help: false; readonly caseSystemVNextStress: CaseSystemVNextStressCliOptions }
   | { readonly help: false; readonly caseSystemVNextExpertReview: CaseSystemVNextExpertReviewCliOptions }
   | { readonly help: false; readonly caseSystemVNextExpertReviewAdjudication: CaseSystemVNextExpertReviewAdjudicationCliOptions }
+  | { readonly help: false; readonly caseSystemVNextExpertReviewReferenceCandidate: CaseSystemVNextExpertReviewReferenceCandidateCliOptions }
   | { readonly help: false; readonly humanReferenceCalibration: HumanReferenceCalibrationCliOptions }
   | { readonly help: false; readonly humanReferencePilotExport: Extract<HumanReferencePilotCliOptions, { readonly mode: "export" }> }
   | { readonly help: false; readonly humanReferencePilotImport: Extract<HumanReferencePilotCliOptions, { readonly mode: "import" }> }
@@ -265,6 +272,12 @@ export function parseTutorbenchArgs(
     return adjudication.help
       ? { help: true, helpCommand: "case-system-vnext-expert-review-adjudication-import" }
       : { help: false, caseSystemVNextExpertReviewAdjudication: adjudication };
+  }
+  if (args[0] === "case-system-vnext-expert-review-reference-candidate") {
+    const candidate = parseCaseSystemVNextExpertReviewReferenceCandidateArgs(args.slice(1));
+    return candidate.help
+      ? { help: true, helpCommand: "case-system-vnext-expert-review-reference-candidate" }
+      : { help: false, caseSystemVNextExpertReviewReferenceCandidate: candidate };
   }
   if (args[0] === "human-reference-calibration") {
     const calibration = parseHumanReferenceCalibrationArgs(args.slice(1));
@@ -536,6 +549,8 @@ Commands:
                          Export queued tasks for an independent adjudicator
   case-system-vnext-expert-review-adjudication-import
                          Strictly import adjudication and write resolution evidence
+  case-system-vnext-expert-review-reference-candidate
+                         Build a gated manual-promotion reference candidate
   human-reference-calibration
                          Ingest strict human-reference JSON and report deterministic calibration evidence
   human-reference-pilot-export
@@ -680,6 +695,8 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
       printCaseSystemVNextExpertReviewAdjudicationHelp("export");
     } else if (options.helpCommand === "case-system-vnext-expert-review-adjudication-import") {
       printCaseSystemVNextExpertReviewAdjudicationHelp("import");
+    } else if (options.helpCommand === "case-system-vnext-expert-review-reference-candidate") {
+      printCaseSystemVNextExpertReviewReferenceCandidateHelp();
     } else if (options.helpCommand === "human-reference-calibration") {
       printHumanReferenceCalibrationHelp();
     } else if (options.helpCommand === "human-reference-pilot-export") {
@@ -777,6 +794,13 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
         options.caseSystemVNextExpertReviewAdjudication,
       );
     }
+  } else if ("caseSystemVNextExpertReviewReferenceCandidate" in options) {
+    if (options.caseSystemVNextExpertReviewReferenceCandidate.help) {
+      return;
+    }
+    await runCaseSystemVNextExpertReviewReferenceCandidate(
+      options.caseSystemVNextExpertReviewReferenceCandidate,
+    );
   } else if ("humanReferenceCalibration" in options) {
     if (options.humanReferenceCalibration.help) {
       printHumanReferenceCalibrationHelp();
