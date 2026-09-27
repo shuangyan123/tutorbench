@@ -43,10 +43,10 @@ export interface CaseSystemVNextExpertReviewAdjudicationManifest {
   readonly pilotId: string;
   readonly pilotVersion: string;
   readonly reviewerIds: readonly [string, string];
-  readonly adjudicatorId: string;
+  readonly adjudicatorId?: string;
   readonly taskSetFingerprint: string;
   readonly sourceEvidenceFingerprint: string;
-  readonly adjudicationSetFingerprint: string;
+  readonly adjudicationSetFingerprint?: string;
   readonly tasks: readonly CaseSystemVNextExpertReviewAdjudicationManifestTask[];
 }
 
@@ -487,6 +487,86 @@ function sameJson(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+function finalizeResolution(
+  evidence: CaseSystemVNextExpertReviewEvidence,
+  tasks: readonly CaseSystemVNextExpertReviewResolutionTask[],
+  sourceEvidenceFingerprint: string,
+  adjudication?: {
+    readonly adjudicatorId: string;
+    readonly adjudicationSetFingerprint: string;
+  },
+): CaseSystemVNextExpertReviewResolution {
+  const reviewerConsensusCount =
+    tasks.filter((task) => task.resolutionStatus === "reviewer_consensus").length;
+  const adjudicatedCount =
+    tasks.filter((task) => task.resolutionStatus === "adjudicated").length;
+  const unresolvedCount =
+    tasks.filter((task) => task.resolutionStatus === "unresolved").length;
+  const resolvedCount = reviewerConsensusCount + adjudicatedCount;
+
+  const withoutFingerprint = {
+    schemaVersion: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION,
+    protocolId: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_ADJUDICATION_PROTOCOL_ID,
+    protocolVersion: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_ADJUDICATION_PROTOCOL_VERSION,
+    suiteId: evidence.suiteId,
+    suiteVersion: evidence.suiteVersion,
+    strategyRegistryId: evidence.strategyRegistryId,
+    strategyRegistryVersion: evidence.strategyRegistryVersion,
+    pilotId: evidence.pilotId,
+    pilotVersion: evidence.pilotVersion,
+    reviewerIds: evidence.reviewerIds,
+    ...(adjudication === undefined ? {} : { adjudicatorId: adjudication.adjudicatorId }),
+    taskSetFingerprint: evidence.taskSetFingerprint,
+    sourceEvidenceFingerprint,
+    ...(adjudication === undefined
+      ? {}
+      : { adjudicationSetFingerprint: adjudication.adjudicationSetFingerprint }),
+    summary: {
+      totalTaskCount: tasks.length,
+      reviewerConsensusCount,
+      adjudicatedCount,
+      unresolvedCount,
+      resolvedCount,
+      resolvedShare: tasks.length === 0 ? null : resolvedCount / tasks.length,
+    },
+    tasks,
+    interpretationBoundary: [
+      ...evidence.interpretationBoundary,
+      "Adjudication is a separate human record and never rewrites the two source reviewer submissions.",
+      "A task remains unresolved when the adjudicator marks the packet insufficiently clear.",
+      "Reviewer consensus or completed adjudication is resolution evidence, not infallible ground truth.",
+      "No automatic reference-label promotion, Judge ranking, or learner-outcome claim is performed.",
+    ],
+  } as const;
+
+  return {
+    ...withoutFingerprint,
+    resolutionFingerprint: fingerprint(withoutFingerprint),
+  };
+}
+
+export function buildCaseSystemVNextExpertReviewConsensusResolution(
+  exported: CaseSystemVNextExpertReviewExport,
+  evidence: CaseSystemVNextExpertReviewEvidence,
+): CaseSystemVNextExpertReviewResolution {
+  validateEvidenceAgainstExport(exported, evidence);
+  if (
+    evidence.disagreementCount !== 0 ||
+    evidence.packetAmbiguityCount !== 0 ||
+    evidence.reviews.some((review) => review.agreement !== "agreement")
+  ) invalid();
+
+  const tasks = evidence.reviews.map((review): CaseSystemVNextExpertReviewResolutionTask => ({
+    reviewTaskId: review.reviewTaskId,
+    fixtureId: review.fixtureId,
+    sourceAgreement: "agreement",
+    sourceReviewerResults: review.reviewerResults,
+    resolutionStatus: "reviewer_consensus",
+    resolution: review.reviewerResults[0].normalizedOutcome,
+  }));
+  return finalizeResolution(evidence, tasks, fingerprint(evidence));
+}
+
 export function buildCaseSystemVNextExpertReviewResolution(
   exported: CaseSystemVNextExpertReviewExport,
   evidence: CaseSystemVNextExpertReviewEvidence,
@@ -566,49 +646,13 @@ export function buildCaseSystemVNextExpertReviewResolution(
     };
   });
 
-  const reviewerConsensusCount =
-    tasks.filter((task) => task.resolutionStatus === "reviewer_consensus").length;
-  const adjudicatedCount =
-    tasks.filter((task) => task.resolutionStatus === "adjudicated").length;
-  const unresolvedCount =
-    tasks.filter((task) => task.resolutionStatus === "unresolved").length;
-  const resolvedCount = reviewerConsensusCount + adjudicatedCount;
-
-  const withoutFingerprint = {
-    schemaVersion: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION,
-    protocolId: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_ADJUDICATION_PROTOCOL_ID,
-    protocolVersion: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_ADJUDICATION_PROTOCOL_VERSION,
-    suiteId: evidence.suiteId,
-    suiteVersion: evidence.suiteVersion,
-    strategyRegistryId: evidence.strategyRegistryId,
-    strategyRegistryVersion: evidence.strategyRegistryVersion,
-    pilotId: evidence.pilotId,
-    pilotVersion: evidence.pilotVersion,
-    reviewerIds: evidence.reviewerIds,
-    adjudicatorId: submission.adjudicatorId,
-    taskSetFingerprint: evidence.taskSetFingerprint,
-    sourceEvidenceFingerprint: adjudicationExport.manifest.sourceEvidenceFingerprint,
-    adjudicationSetFingerprint: adjudicationExport.manifest.adjudicationSetFingerprint,
-    summary: {
-      totalTaskCount: tasks.length,
-      reviewerConsensusCount,
-      adjudicatedCount,
-      unresolvedCount,
-      resolvedCount,
-      resolvedShare: tasks.length === 0 ? null : resolvedCount / tasks.length,
-    },
+  return finalizeResolution(
+    evidence,
     tasks,
-    interpretationBoundary: [
-      ...evidence.interpretationBoundary,
-      "Adjudication is a separate human record and never rewrites the two source reviewer submissions.",
-      "A task remains unresolved when the adjudicator marks the packet insufficiently clear.",
-      "Reviewer consensus or completed adjudication is resolution evidence, not infallible ground truth.",
-      "No automatic reference-label promotion, Judge ranking, or learner-outcome claim is performed.",
-    ],
-  } as const;
-
-  return {
-    ...withoutFingerprint,
-    resolutionFingerprint: fingerprint(withoutFingerprint),
-  };
+    adjudicationExport.manifest.sourceEvidenceFingerprint,
+    {
+      adjudicatorId: submission.adjudicatorId,
+      adjudicationSetFingerprint: adjudicationExport.manifest.adjudicationSetFingerprint,
+    },
+  );
 }
