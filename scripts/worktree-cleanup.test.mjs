@@ -258,3 +258,51 @@ test("apply removes only safe candidates", () => {
   assert.deepEqual(calls, ["C:/repo/task-worktree"]);
   assert.deepEqual(result.removed.map((record) => record.path), ["C:/repo/task-worktree"]);
 });
+
+test("apply revalidates each safe candidate exactly once before removal", () => {
+  const first = classify();
+  const second = {
+    ...classify(),
+    path: "C:/repo/second-task-worktree",
+  };
+  const dirty = {
+    ...classify({ status: { dirty: true } }),
+    path: "C:/repo/dirty-worktree",
+  };
+  const revalidated = [];
+  const removed = [];
+
+  const result = executeCleanup(
+    [first, second, dirty],
+    {
+      apply: true,
+      boundary: applyBoundary(),
+      revalidateWorktree: (candidate) => {
+        revalidated.push(candidate.path);
+        return candidate;
+      },
+      removeWorktree: (path) => removed.push(path),
+    },
+  );
+
+  assert.deepEqual(revalidated, [first.path, second.path]);
+  assert.deepEqual(removed, [first.path, second.path]);
+  assert.equal(result.removed.length, 2);
+});
+
+test("apply stops when candidate-scoped revalidation no longer proves safety", () => {
+  const calls = [];
+  assert.throws(
+    () => executeCleanup(
+      [classify()],
+      {
+        apply: true,
+        boundary: applyBoundary(),
+        revalidateWorktree: (candidate) => ({ ...candidate, safe: false }),
+        removeWorktree: (path) => calls.push(path),
+      },
+    ),
+    /Candidate changed or is no longer safe/,
+  );
+  assert.deepEqual(calls, []);
+});
