@@ -1511,27 +1511,9 @@ test("expert review task-set fingerprint covers reviewer-visible judgment contex
         : fixture
     ),
   };
-  const changedCriteria: CaseSystemVNextStressFixtureSuite = {
-    ...suite,
-    fixtures: suite.fixtures.map((fixture, index) =>
-      index === 0
-        ? {
-            ...fixture,
-            sharedBaseCriteria: fixture.sharedBaseCriteria.map(
-              (criterion, criterionIndex) =>
-                criterionIndex === 0
-                  ? { ...criterion, description: criterion.description + " changed" }
-                  : criterion,
-            ),
-          }
-        : fixture
-    ),
-  };
-
   for (const changedSuite of [
     changedTeachingTarget,
     changedLearnerState,
-    changedCriteria,
   ]) {
     const changed = buildCaseSystemVNextExpertReviewExport(
       pilot,
@@ -1552,6 +1534,43 @@ test("expert review task-set fingerprint covers reviewer-visible judgment contex
       baseline.packets[1].packetFingerprint,
     );
   }
+
+  const changedRegistry = {
+    ...registry,
+    profiles: registry.profiles.map((profile, profileIndex) =>
+      profileIndex === 0
+        ? {
+            ...profile,
+            criteria: profile.criteria.map((criterion, criterionIndex) =>
+              criterionIndex === 0
+                ? {
+                    ...criterion,
+                    description: criterion.description + " changed",
+                  }
+                : criterion
+            ),
+          }
+        : profile
+    ),
+  };
+  const changedCriteria = buildCaseSystemVNextExpertReviewExport(
+    pilot,
+    suite,
+    changedRegistry,
+    ["reviewer-a", "reviewer-b"],
+  );
+  assert.notEqual(
+    changedCriteria.manifest.taskSetFingerprint,
+    baseline.manifest.taskSetFingerprint,
+  );
+  assert.notEqual(
+    changedCriteria.packets[0].packetFingerprint,
+    baseline.packets[0].packetFingerprint,
+  );
+  assert.notEqual(
+    changedCriteria.packets[1].packetFingerprint,
+    baseline.packets[1].packetFingerprint,
+  );
 });
 
 test("expert review evidence is bound to the exact source reviewer packets", async () => {
