@@ -9,6 +9,9 @@ import {
   type CaseSystemVNextExpertReviewExport,
   type CaseSystemVNextExpertReviewTask,
 } from "./expert-review.js";
+import {
+  sameCaseSystemVNextExpertReviewJson,
+} from "./expert-review-canonical.js";
 
 export const CASE_SYSTEM_VNEXT_EXPERT_REVIEW_ADJUDICATION_PROTOCOL_ID =
   "case-system-vnext-expert-review-adjudication" as const;
@@ -492,10 +495,6 @@ export function parseCaseSystemVNextExpertReviewAdjudicationSubmission(
   };
 }
 
-function sameJson(left: unknown, right: unknown): boolean {
-  return JSON.stringify(left) === JSON.stringify(right);
-}
-
 function finalizeResolution(
   evidence: CaseSystemVNextExpertReviewEvidence,
   tasks: readonly CaseSystemVNextExpertReviewResolutionTask[],
@@ -588,8 +587,8 @@ export function buildCaseSystemVNextExpertReviewResolution(
     adjudicationExport.manifest.adjudicatorId,
   );
   if (
-    !sameJson(expected.manifest, adjudicationExport.manifest) ||
-    !sameJson(expected.packet, adjudicationExport.packet)
+    !sameCaseSystemVNextExpertReviewJson(expected.manifest, adjudicationExport.manifest) ||
+    !sameCaseSystemVNextExpertReviewJson(expected.packet, adjudicationExport.packet)
   ) invalid();
 
   const submission = parseCaseSystemVNextExpertReviewAdjudicationSubmission(
