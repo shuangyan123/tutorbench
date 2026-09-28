@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { isDeepStrictEqual } from "node:util";
 
 import type {
   CaseSystemVNextPilot,
@@ -382,6 +383,116 @@ function packetFingerprintInput(
   return packet;
 }
 
+function taskSetFingerprintInputFromExport(
+  exported: CaseSystemVNextExpertReviewExport,
+): unknown {
+  return {
+    protocolId: exported.manifest.protocolId,
+    protocolVersion: exported.manifest.protocolVersion,
+    suiteId: exported.manifest.suiteId,
+    suiteVersion: exported.manifest.suiteVersion,
+    strategyRegistryId: exported.manifest.strategyRegistryId,
+    strategyRegistryVersion: exported.manifest.strategyRegistryVersion,
+    pilotId: exported.manifest.pilotId,
+    pilotVersion: exported.manifest.pilotVersion,
+    tasks: exported.manifest.tasks.map((task, index) => {
+      const firstTask = exported.packets[0].tasks[index];
+      const secondTask = exported.packets[1].tasks[index];
+      if (firstTask === undefined || secondTask === undefined) invalid();
+      return {
+        reviewTaskId: task.reviewTaskId,
+        fixtureId: task.fixtureId,
+        presentations: task.assignments.map((assignment, reviewerIndex) => ({
+          assignment: {
+            aCandidateId: assignment.aCandidateId,
+            bCandidateId: assignment.bCandidateId,
+          },
+          task: reviewerIndex === 0 ? firstTask : secondTask,
+        })),
+      };
+    }),
+  };
+}
+
+function expectedSubmissionTemplate(
+  packet: CaseSystemVNextExpertReviewPacket,
+): CaseSystemVNextExpertReviewSubmissionTemplate {
+  return {
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: "" as const,
+      sufficientlyClear: "" as const,
+    })),
+  };
+}
+
+export function assertValidCaseSystemVNextExpertReviewExport(
+  exported: CaseSystemVNextExpertReviewExport,
+): void {
+  const { manifest, packets, templates } = exported;
+  if (
+    manifest.schemaVersion !== CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION ||
+    manifest.protocolId !== CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_ID ||
+    manifest.protocolVersion !== CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_VERSION ||
+    manifest.reviewerIds[0] === manifest.reviewerIds[1] ||
+    !fingerprintPattern.test(manifest.taskSetFingerprint) ||
+    manifest.tasks.length === 0 ||
+    packets.length !== 2 ||
+    templates.length !== 2
+  ) invalid();
+
+  const seenTaskIds = new Set<string>();
+  for (const [packetIndex, packet] of packets.entries()) {
+    const reviewer = manifest.reviewerIds[packetIndex];
+    if (
+      reviewer === undefined ||
+      packet.schemaVersion !== manifest.schemaVersion ||
+      packet.protocolId !== manifest.protocolId ||
+      packet.protocolVersion !== manifest.protocolVersion ||
+      packet.suiteId !== manifest.suiteId ||
+      packet.suiteVersion !== manifest.suiteVersion ||
+      packet.strategyRegistryId !== manifest.strategyRegistryId ||
+      packet.strategyRegistryVersion !== manifest.strategyRegistryVersion ||
+      packet.pilotId !== manifest.pilotId ||
+      packet.pilotVersion !== manifest.pilotVersion ||
+      packet.reviewerId !== reviewer ||
+      packet.taskSetFingerprint !== manifest.taskSetFingerprint ||
+      packet.tasks.length !== manifest.tasks.length ||
+      !fingerprintPattern.test(packet.packetFingerprint)
+    ) invalid();
+
+    const { packetFingerprint, ...withoutFingerprint } = packet;
+    if (fingerprint(packetFingerprintInput(withoutFingerprint)) !== packetFingerprint) {
+      invalid();
+    }
+  }
+
+  for (const [index, task] of manifest.tasks.entries()) {
+    if (
+      seenTaskIds.has(task.reviewTaskId) ||
+      task.assignments.length !== 2 ||
+      task.assignments[0]?.reviewerId !== manifest.reviewerIds[0] ||
+      task.assignments[1]?.reviewerId !== manifest.reviewerIds[1] ||
+      packets[0].tasks[index]?.reviewTaskId !== task.reviewTaskId ||
+      packets[1].tasks[index]?.reviewTaskId !== task.reviewTaskId
+    ) invalid();
+    seenTaskIds.add(task.reviewTaskId);
+  }
+
+  if (
+    fingerprint(taskSetFingerprintInputFromExport(exported)) !==
+      manifest.taskSetFingerprint ||
+    !isDeepStrictEqual(templates[0], expectedSubmissionTemplate(packets[0])) ||
+    !isDeepStrictEqual(templates[1], expectedSubmissionTemplate(packets[1]))
+  ) invalid();
+}
+
 export function buildCaseSystemVNextExpertReviewExport(
   pilot: CaseSystemVNextPilot,
   suite: CaseSystemVNextStressFixtureSuite,
@@ -614,6 +725,7 @@ export function mergeCaseSystemVNextExpertReviewSubmissions(
     CaseSystemVNextExpertReviewSubmission,
   ],
 ): CaseSystemVNextExpertReviewEvidence {
+  assertValidCaseSystemVNextExpertReviewExport(exported);
   const submissionsByReviewer = new Map(
     submissionsInput.map((submission) => [submission.reviewerId, submission]),
   );
