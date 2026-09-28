@@ -2,9 +2,8 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("../", import.meta.url)));
 const npmCommand = process.platform === "win32" ? process.execPath : "npm";
