@@ -4,6 +4,7 @@ function compareStrings(left: string, right: string): number {
 
 export function canonicalCaseSystemVNextExpertReviewJson(value: unknown): string {
   if (value === null) return "null";
+  if (value === undefined) return "undefined";
   if (Array.isArray(value)) {
     return `[${value.map(canonicalCaseSystemVNextExpertReviewJson).join(",")}]`;
   }
@@ -15,7 +16,11 @@ export function canonicalCaseSystemVNextExpertReviewJson(value: unknown): string
       )
       .join(",")}}`;
   }
-  return JSON.stringify(value);
+  const serialized = JSON.stringify(value);
+  if (serialized === undefined) {
+    throw new Error("Case System vNext expert review JSON value is invalid.");
+  }
+  return serialized;
 }
 
 export function sameCaseSystemVNextExpertReviewJson(
