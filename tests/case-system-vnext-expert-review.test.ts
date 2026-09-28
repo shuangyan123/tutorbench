@@ -1107,6 +1107,54 @@ test("expert review resolution parser rejects fingerprint tampering", async () =
   );
 });
 
+test("expert review resolution parser rejects semantic reviewer contradictions", async () => {
+  const exported = await buildExport();
+  const submissions = exported.packets.map((packet, reviewerIndex) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: reviewerIndex === 0 ? "A_BETTER" as const : "B_BETTER" as const,
+      sufficientlyClear: true,
+    })),
+  })) as unknown as readonly [
+    CaseSystemVNextExpertReviewSubmission,
+    CaseSystemVNextExpertReviewSubmission,
+  ];
+  const evidence = mergeCaseSystemVNextExpertReviewSubmissions(exported, submissions);
+  const resolution = buildCaseSystemVNextExpertReviewConsensusResolution(
+    exported,
+    evidence,
+  );
+
+  const contradictoryRaw = structuredClone(resolution);
+  contradictoryRaw.tasks[0]!.sourceReviewerResults[0] = {
+    ...contradictoryRaw.tasks[0]!.sourceReviewerResults[0],
+    outcome: "INSUFFICIENT_EVIDENCE",
+  };
+  assert.throws(
+    () => parseCaseSystemVNextExpertReviewResolution({
+      ...contradictoryRaw,
+      resolutionFingerprint: resolution.resolutionFingerprint,
+    }),
+    /resolution data is invalid/u,
+  );
+
+  const contradictoryAgreement = structuredClone(resolution);
+  contradictoryAgreement.tasks[0]!.sourceAgreement = "disagreement";
+  assert.throws(
+    () => parseCaseSystemVNextExpertReviewResolution({
+      ...contradictoryAgreement,
+      resolutionFingerprint: resolution.resolutionFingerprint,
+    }),
+    /resolution data is invalid/u,
+  );
+});
+
 test("expert review consensus resolution reaches the reference gate without adjudication", async () => {
   const exported = await buildExport();
   const submissions = exported.packets.map((packet, reviewerIndex) => ({
