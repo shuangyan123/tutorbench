@@ -108,6 +108,8 @@ test("Case System vNext executable pilot runs through Tutor Health", async () =>
   assert.equal(evaluation.caseCount, 3);
   assert.equal(evaluation.caseRunCount, 3);
   assert.equal(report.sourceScenarioSuite.id, CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID);
+  assert.equal(report.scoringProfile.id, "case-system-vnext-executable-pilot");
+  assert.equal(report.scoringProfile.version, "0.1.0");
   assert.equal(report.unresolved.length, 0);
   assert.equal(report.findings.length, 0);
 });
