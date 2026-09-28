@@ -930,15 +930,6 @@ test("expert review reference candidate blocks unresolved and insufficient-evide
       notes: "Synthetic adjudicator cannot resolve the ambiguous packet.",
     })),
   };
-  const resolution = buildCaseSystemVNextExpertReviewResolution(
-    exported,
-    evidence,
-    adjudication,
-    parseCaseSystemVNextExpertReviewAdjudicationSubmission(
-      rawSubmission,
-      adjudication.packet,
-    ),
-  );
   const parsedResolution = parseCaseSystemVNextExpertReviewResolution(resolution);
   assert.equal(parsedResolution.resolutionFingerprint, resolution.resolutionFingerprint);
   const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
