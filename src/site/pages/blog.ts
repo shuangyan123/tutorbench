@@ -3,6 +3,7 @@ import { siteIcon as icon } from "../icons.js";
 import { renderEditorialBotanical } from "../illustrations.js";
 
 const BLOG_PUBLISHED_DATE = "September 17, 2026";
+const CLASSROOM_INTERFACE_PUBLISHED_DATE = "September 28, 2026";
 
 export interface BlogPostSummary {
   readonly category: "Perspective";
@@ -33,6 +34,120 @@ export interface BlogArticle extends BlogPostSummary {
   readonly pullQuote: string;
   readonly evidenceBoundary: string;
 }
+
+
+const CLASSROOM_INTERFACE_SECTIONS: readonly BlogArticleSection[] = [
+  {
+    heading: "One robot still scales like one teacher",
+    paragraphs: [
+      "Embodied AI makes it tempting to imagine the future classroom as a room with a robotic teacher at the front. But replacing a human teacher with one machine does not solve the underlying capacity problem. Thirty learners would still be sharing one public channel of attention.",
+      "If AI is going to make one-to-one teaching genuinely scalable, the important change is not that the teacher acquires a body. It is that every learner gains a private instructional channel while the classroom remains a shared social space.",
+    ],
+    callout: {
+      label: "Design question",
+      title: "Do not replicate the teacher. Redesign the learning interface.",
+      body: "The useful unit may be a private Tutor channel at every desk, not a single embodied system at the front of the room.",
+    },
+  },
+  {
+    heading: "Voice matters, but classrooms are shared acoustic spaces",
+    paragraphs: [
+      "Speech is an unusually efficient interface for tutoring. A learner can ask why a step is wrong, describe uncertainty, or answer a question much faster than by typing. Voice also preserves some of the immediacy of real tutoring.",
+      "But a classroom with thirty continuous voice conversations would be difficult to concentrate in. The practical answer is probably not voice-only tutoring. Writing and visual work should remain the default channel, with short, low-volume voice exchanges used when speech has a clear advantage.",
+      "A near-mouth microphone, push-to-talk interaction, and private audio output could make voice useful without turning every desk into an always-on call.",
+    ],
+  },
+  {
+    heading: "The learning surface should feel more like paper than a tablet",
+    paragraphs: [
+      "Many classroom tasks are not conversations. Students solve equations, sketch diagrams, annotate text, derive formulas, and work through practice sets. For those activities, handwriting is part of the thinking process.",
+      "A conventional screen can add friction through scrolling, zooming, small writing areas, glass-like pen feel, notifications, and application switching. A learning device should therefore be optimized for writing first: a large low-distraction surface, a passive stylus, minimal interface chrome, and as little reason as possible to think about the operating system.",
+      "The goal is not to make students feel that they are using a computer. The goal is to let them feel that they are doing exercises while the system quietly preserves the structure of the work.",
+    ],
+  },
+  {
+    heading: "Record events instead of asking AI to guess them",
+    paragraphs: [
+      "The most important architectural choice is to separate facts that the system can know directly from interpretations that require inference. A digital ink engine can know when the pen touched the surface, where it moved, how long a stroke lasted, which tool was active, and which strokes were later erased or undone.",
+      "Page and question identity should also be structural whenever possible. If the worksheet is already digital, each question can own a known region and identifier. The Tutor should not need a vision model to rediscover information the document system already possesses.",
+      "Likewise, the problem statement itself should be structured data. OCR and visual parsing are useful when importing legacy worksheets, but they should not be the permanent representation of a task once the material has entered the learning system.",
+    ],
+    progression: [
+      { label: "Ink events", text: "strokes, coordinates, timestamps, pressure, erase, undo, and redo." },
+      { label: "Document structure", text: "worksheet, page, question, learning objective, and response region." },
+      { label: "Semantic interpretation", text: "recognized expressions, diagrams, written language, and reasoning steps." },
+      { label: "Learning interpretation", text: "progress, repeated error, possible misconception, need for support, and mastery evidence." },
+    ],
+  },
+  {
+    heading: "A pause is an observation, not a diagnosis",
+    paragraphs: [
+      "Rich interaction data creates a new risk: over-interpreting behavior. Thirty seconds without a pen event is a fact. It does not automatically mean that the learner is stuck. The learner may be reading, checking, calculating mentally, or simply thinking.",
+      "The same distinction applies to erasing. What matters pedagogically is not that an eraser crossed the screen seven times, but that the learner replaced one mathematical claim with another. Raw events should be preserved, while higher-level interpretations remain revisable.",
+      "A stronger stuck signal might combine a long pause, repeated rewriting of the same expression, the same error appearing again, lack of forward progress, and an explicit help request. The system should be able to say what it observed separately from what it inferred.",
+    ],
+  },
+  {
+    heading: "Attempts need an explicit contract",
+    paragraphs: [
+      "Attempt count sounds objective until a learner edits the same solution repeatedly. One changed digit is not necessarily a new attempt, and a large rewrite may or may not represent a restart.",
+      "The cleanest first implementation may include a tiny explicit action such as Check or Submit. When the learner commits a solution, the system gets an auditable attempt boundary. More sophisticated segmentation can later infer candidate boundaries from major rewrites, but the raw event history should remain the source record.",
+      "This matters because two learners can end on the same correct answer while producing very different evidence. One may solve independently in thirty seconds. Another may erase two incorrect answers, request a hint, pause for a minute, and then succeed. Final-answer grading treats them as identical; a learning system should not.",
+    ],
+  },
+  {
+    heading: "Practice can become the input to the next lesson",
+    paragraphs: [
+      "Once classroom work is structured as a sequence of questions, attempts, revisions, hints, and outcomes, practice stops being only something to grade. It becomes evidence for planning what the learner should see next.",
+      "A score such as 12 out of 15 says relatively little about why three items failed. A richer record can distinguish a stable misconception from a one-off arithmetic slip, a standard form that the learner can solve from a transfer form that still breaks, or a skill that works only after prompting.",
+      "The next learning set can then be chosen from the actual evidence: a diagnostic example, a targeted representation, a near-transfer problem, an independent problem, and later a retrieval check. Today's exercise becomes part of tomorrow's curriculum.",
+    ],
+  },
+  {
+    heading: "Let homework be learning and move verification into class",
+    paragraphs: [
+      "Generative AI makes unsupervised homework a weaker source of evidence about independent mastery. Trying to prove that every piece of work completed at home was unaided may become increasingly unrealistic.",
+      "A more robust design is to separate learning from verification. Outside class, students may use AI, reference material, explanations, and extra practice freely. In class, short supervised checks can establish what the learner can do when those supports are removed.",
+    ],
+    callout: {
+      label: "Classroom loop",
+      title: "Check → learn → transfer → update.",
+      body: "A short independent check can establish the starting point; adaptive tutoring can respond to the evidence; a second independent transfer task can test whether the learning survives when the Tutor is removed.",
+    },
+  },
+  {
+    heading: "Assessment can become a daily loop instead of a distant event",
+    paragraphs: [
+      "Supervised verification does not require turning every lesson into a traditional exam. A lesson can begin with a short independent check, move into Tutor-supported learning, and end with a new independent transfer problem.",
+      "That structure creates a compact before-intervention-after sequence inside the normal school day. The important evidence is no longer that the student had a successful conversation with an AI. It is that the student can subsequently perform without the AI.",
+      "A school-managed device can make these boundaries explicit by switching between Learn, Practice, and Check modes. The student should not be responsible for deciding when outside assistance is allowed.",
+    ],
+  },
+  {
+    heading: "Teachers become orchestrators of parallel tutoring",
+    paragraphs: [
+      "None of this requires removing the teacher from the classroom. It changes where scarce human attention is spent. Instead of repeating the same explanation thirty times, the teacher can see where individual Tutors are succeeding, where learners remain stuck, and where a pattern has become a class-wide problem.",
+      "If eight students show the same misconception, the best intervention may be to pause the individualized flow and teach that idea to the room. AI provides parallel attention; the teacher decides when parallelism should stop.",
+      "The classroom therefore becomes a coordinated system: individual Tutor channels for continuous support, supervised evidence for trustworthy learner state, and human intervention for judgment, shared explanation, safety, motivation, and social coordination.",
+    ],
+  },
+  {
+    heading: "The product may be a digital exercise book, not another tablet",
+    paragraphs: [
+      "Putting these requirements together suggests a different hardware category: a school-managed digital exercise book or instrumented learning surface. It would prioritize a paper-like writing experience, structured worksheets, persistent ink history, short private voice exchanges, and explicit Tutor-enabled and Tutor-disabled modes.",
+      "It would not need an app store, social notifications, or an unrestricted browser. The most successful version might be a computer that deliberately hides the fact that it is a computer.",
+      "Underneath that simple surface, however, the system could preserve a chain from stroke to revision to attempt to evidence to intervention to independent verification. That chain is more interesting than the device itself because it connects tutoring decisions to observable learner progress.",
+    ],
+  },
+  {
+    heading: "The larger question is not how to put AI into school",
+    paragraphs: [
+      "If we preserve the old interface, old homework model, and old evidence model, a powerful AI Tutor can still collapse into a convenient answer machine. The deeper opportunity is to redesign the learning environment around individualized instruction and trustworthy evidence.",
+      "That means asking different questions: What should the Tutor do now? How much help is appropriate? When should it stop helping? What changed in the learner's work? Can the learner still perform when the Tutor is removed?",
+      "The future classroom may not need thirty robots. It may need thirty private learning channels, one coordinated classroom, and a much better account of what it means to have actually learned.",
+    ],
+  },
+];
 
 const WHY_TEACHING_SECTIONS: readonly BlogArticleSection[] = [
   {
@@ -140,6 +255,21 @@ const TEACHING_AND_SUPERVISION_SECTIONS: readonly BlogArticleSection[] = [
   },
 ];
 
+
+const CLASSROOM_DOES_NOT_NEED_ROBOTS: BlogArticle = {
+  category: "Perspective",
+  publishedDate: CLASSROOM_INTERFACE_PUBLISHED_DATE,
+  title: "The Classroom Does Not Need 30 Robots",
+  description: "Why one-to-one AI tutoring may need a new classroom interface: paper-like digital writing, private voice channels, supervised mastery checks, and evidence-rich practice.",
+  excerpt: "The future classroom may not need a robot teacher. It may need a private Tutor channel at every desk and a learning surface that can preserve how understanding develops.",
+  route: "/blog/the-classroom-does-not-need-30-robots/",
+  image: "home-blog-03.webp",
+  imageAlt: "A quiet study desk representing an individual learning surface",
+  sections: CLASSROOM_INTERFACE_SECTIONS,
+  pullQuote: "The future classroom may not need thirty robots. It may need thirty private learning channels.",
+  evidenceBoundary: "This essay is a product and classroom-design hypothesis, not a benchmark result. TutorBench does not currently measure handwriting dynamics, infer learner mastery from ink traces, validate this proposed classroom architecture, or establish learning gains from supervised check / Tutor / transfer loops. Those claims require separate prototype, classroom, usability, and learner-outcome evidence.",
+};
+
 const WHY_TEACHING_DOES_NOT_SCALE: BlogArticle = {
   category: "Perspective",
   publishedDate: BLOG_PUBLISHED_DATE,
@@ -170,6 +300,7 @@ const TEACHING_AND_SUPERVISION: BlogArticle = {
 
 /** Explicit editorial metadata is the source for the index and Home cards. */
 export const BLOG_POSTS = [
+  CLASSROOM_DOES_NOT_NEED_ROBOTS,
   WHY_TEACHING_DOES_NOT_SCALE,
   TEACHING_AND_SUPERVISION,
 ] as const;
@@ -302,6 +433,10 @@ export function renderBlogIndexPage(footer = ""): SitePage {
       ${footer}
     </div>`,
   );
+}
+
+export function renderClassroomDoesNotNeedRobotsPage(footer = ""): SitePage {
+  return renderBlogArticlePage(CLASSROOM_DOES_NOT_NEED_ROBOTS, footer);
 }
 
 export function renderWhyTeachingDoesNotScalePage(footer = ""): SitePage {
