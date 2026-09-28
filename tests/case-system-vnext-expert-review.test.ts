@@ -940,8 +940,17 @@ test("expert review reference candidate blocks unresolved and insufficient-evide
     ),
   );
   const parsedResolution = parseCaseSystemVNextExpertReviewResolution(resolution);
+  assert.equal(parsedResolution.resolutionFingerprint, resolution.resolutionFingerprint);
   const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
-    parsedResolution,
+    exported,
+    evidence,
+    {
+      adjudicationExport: adjudication,
+      submission: parseCaseSystemVNextExpertReviewAdjudicationSubmission(
+        rawSubmission,
+        adjudication.packet,
+      ),
+    },
   );
 
   assert.equal(candidate.summary.totalTaskCount, 17);
@@ -1008,7 +1017,17 @@ test("expert review reference candidate becomes eligible only after all tasks ha
       adjudication.packet,
     ),
   );
-  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(resolution);
+  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
+    exported,
+    evidence,
+    {
+      adjudicationExport: adjudication,
+      submission: parseCaseSystemVNextExpertReviewAdjudicationSubmission(
+        rawSubmission,
+        adjudication.packet,
+      ),
+    },
+  );
 
   assert.equal(candidate.summary.blockedCount, 0);
   assert.equal(candidate.summary.candidateReadyCount, 17);
@@ -1122,7 +1141,11 @@ test("expert review consensus resolution reaches the reference gate without adju
   assert.equal(resolution.summary.unresolvedCount, 0);
 
   const parsed = parseCaseSystemVNextExpertReviewResolution(resolution);
-  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(parsed);
+  assert.equal(parsed.resolutionFingerprint, resolution.resolutionFingerprint);
+  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
+    exported,
+    evidence,
+  );
   assert.equal(candidate.adjudicatorId, undefined);
   assert.equal(candidate.adjudicationSetFingerprint, undefined);
   assert.equal(candidate.summary.candidateReadyCount, 17);
