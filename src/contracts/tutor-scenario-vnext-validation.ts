@@ -199,6 +199,27 @@ function isEvaluationCriterion(value: unknown): value is TutorScenarioEvaluation
   }
 }
 
+function isCaseSystemSource(value: unknown): boolean {
+  const record = asRecord(value);
+  return (
+    record !== null &&
+    hasOnlyKeys(record, [
+      "pilotId",
+      "pilotVersion",
+      "archetypeId",
+      "archetypeVersion",
+      "strategyProfileId",
+      "strategyProfileVersion",
+    ]) &&
+    isText(record.pilotId, 120) &&
+    isText(record.pilotVersion, 80) &&
+    isText(record.archetypeId, 120) &&
+    isText(record.archetypeVersion, 80) &&
+    isText(record.strategyProfileId, 160) &&
+    isText(record.strategyProfileVersion, 80)
+  );
+}
+
 function isTutorVisibleContext(value: unknown): boolean {
   const record = asRecord(value);
   if (
@@ -432,6 +453,7 @@ function isScenario(
       "schemaVersion",
       "identity",
       "description",
+      "caseSystemSource",
       "learningContext",
       "tutorVisibleContext",
       "evaluatorReferenceState",
@@ -441,6 +463,8 @@ function isScenario(
     ]) ||
     record.schemaVersion !== TUTOR_SCENARIO_VNEXT_SCHEMA_VERSION ||
     !isText(record.description, 2_000) ||
+    (record.caseSystemSource !== undefined &&
+      !isCaseSystemSource(record.caseSystemSource)) ||
     !isTutorVisibleContext(record.tutorVisibleContext) ||
     !isTrajectory(record.trajectory) ||
     !Array.isArray(record.decisionPoints) ||
