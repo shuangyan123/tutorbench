@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const repositoryRoot = resolve(fileURLToPath(new URL("../", import.meta.url)));
 const npmCommand = process.platform === "win32" ? process.execPath : "npm";
@@ -206,6 +207,25 @@ async function main() {
     assertCondition(
       /TutorBench Brand Policy/.test(installedBrandPolicy),
       "Installed package did not expose the TutorBench Brand Policy.",
+    );
+
+    const installedJudgePromptModule = await import(
+      pathToFileURL(
+        join(
+          installedPackageRoot,
+          "dist",
+          "src",
+          "judge",
+          "tutor-eval-pedagogy-prompt.js",
+        ),
+      ).href
+    );
+    const installedJudgePrompt = await installedJudgePromptModule
+      .loadTutorEvalPedagogyJudgePrompt();
+    assertCondition(
+      typeof installedJudgePrompt === "string" &&
+        installedJudgePrompt.includes("TutorEval"),
+      "Installed package could not resolve its bundled Judge prompt outside the repository root.",
     );
 
     await writeFile(
