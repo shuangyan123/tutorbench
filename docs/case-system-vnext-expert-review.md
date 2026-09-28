@@ -126,6 +126,58 @@ only after:
 A reviewed label is still human reference evidence, not infallible ground
 truth and not a learner-outcome measurement.
 
+
+## Implemented lineage and promotion boundary
+
+The expert-review artifact protocol is currently version `0.2.0`. The
+implemented pipeline is:
+
+```text
+source export
+  -> two independent reviewer submissions
+  -> evidence
+  -> optional independent adjudication
+  -> resolution
+  -> reference candidate
+  -> manual promotion review
+```
+
+The source export is regenerated from the repository's frozen pilot, evaluator
+stress fixture suite, and strategy-profile registry before import or downstream
+replay. Operator manifests and reviewer packets loaded from disk are treated as
+untrusted input.
+
+The task-set identity binds reviewer-visible task context, including the
+counterbalanced candidate mapping. Merged evidence also records the exact
+source packet fingerprint for each reviewer. Evidence from one export must not
+be reused with a different reviewer-visible export, even when high-level suite
+or fixture identifiers remain unchanged.
+
+Reference-candidate eligibility is lineage-bound in the domain API. A standalone
+resolution artifact may be parsed for inspection, but it is not sufficient to
+produce an `eligible_for_manual_promotion` candidate. The candidate builder
+requires the source export and evidence, plus the adjudication export and
+submission when queued tasks exist.
+
+Artifact structural comparison is canonical with respect to JSON object key
+order: reordering object keys does not change artifact meaning, while array
+order remains significant. This canonical comparison is separate from the
+existing fingerprint algorithms; this change does not silently rewrite prior
+fingerprint versions.
+
+Fingerprints are deterministic integrity and identity checks, not digital
+signatures. They do not establish authorship or protect against an attacker who
+can replace both an artifact and every external trust anchor.
+
+The promotion boundary remains deliberately manual:
+
+- unresolved tasks block the candidate set;
+- `INSUFFICIENT_EVIDENCE` resolutions block the candidate set;
+- only preference, equivalence, and non-dominance resolutions can be candidate-ready;
+- `automaticPromotionAllowed` is always `false`;
+- an eligible candidate still requires explicit operator approval outside the
+  candidate builder.
+
 ## Current readiness boundary
 
 The repository currently has:
