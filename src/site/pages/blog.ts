@@ -420,7 +420,8 @@ function renderBlogArticlePage(article: BlogArticle, footer = ""): SitePage {
 }
 
 export function renderBlogIndexPage(footer = ""): SitePage {
-  const [featuredPost, ...latestPosts] = BLOG_POSTS;
+  const featuredPost: BlogArticle = BLOG_POSTS[0];
+  const latestPosts: readonly BlogArticle[] = BLOG_POSTS.slice(1);
   return page(
     "Blog — Teachometry",
     "Long-form notes on AI teaching, measurement, instructional autonomy, and the future structure of education.",
