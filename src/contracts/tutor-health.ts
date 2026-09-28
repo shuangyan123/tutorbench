@@ -193,6 +193,26 @@ export const DEFAULT_TUTOR_HEALTH_SCORING_PROFILE: TutorHealthScoringProfile = {
   },
 };
 
+/**
+ * Experimental profile identity for the first executable Case System vNext
+ * slice. The equal weights intentionally preserve current Tutor Health scoring
+ * mechanics while keeping suite provenance distinct.
+ */
+export const CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SCORING_PROFILE: TutorHealthScoringProfile = {
+  schemaVersion: TUTOR_HEALTH_PROFILE_SCHEMA_VERSION,
+  id: "case-system-vnext-executable-pilot",
+  version: "0.1.0",
+  dimensionWeights: {
+    content_correctness: 1,
+    learner_diagnosis: 1,
+    intervention_strategy: 1,
+    adaptation: 1,
+    learning_integrity: 1,
+    interaction_quality: 1,
+    reliability_policy: 1,
+  },
+};
+
 export type TutorReleaseGate = "PASS" | "FAIL" | "UNRESOLVED";
 
 export interface TutorHealthDimensionScore {
