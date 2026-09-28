@@ -128,8 +128,10 @@ function isTeachBack(value: unknown): boolean {
     return false;
   }
 
+  const transcript = record.transcript;
+  const processEvidence = record.processEvidence;
   const seen = new Set<string>();
-  const valid = record.processEvidence.every((item) => {
+  const valid = processEvidence.every((item) => {
     const evidence = asRecord(item);
     if (
       evidence === null ||
@@ -148,7 +150,7 @@ function isTeachBack(value: unknown): boolean {
         typeof index === "number" &&
         Number.isInteger(index) &&
         index >= 1 &&
-        index <= record.transcript.length
+        index <= transcript.length
       ) ||
       new Set(evidence.evidenceTurnIndexes).size !== evidence.evidenceTurnIndexes.length ||
       (evidence.rationale !== undefined && !isText(evidence.rationale, 1_000))
