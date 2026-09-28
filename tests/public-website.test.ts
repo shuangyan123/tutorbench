@@ -92,12 +92,14 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const html = renderPage(renderHomePage(artifacts));
   assert.match(html, /<script type="speculationrules">/);
-  assert.match(html, /#primary-navigation a\[href\]/);
+  assert.match(html, /a\[href\^='\/'\]/);
   const chromeStyles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
   assert.doesNotMatch(chromeStyles, /teach-page-enter/);
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
-  assert.match(siteScript, /prefetchRoute/);
+  assert.match(siteScript, /HTMLScriptElement\.supports\("speculationrules"\)/);
+  assert.match(siteScript, /a\[href\^="\/"\]/);
   assert.match(siteScript, /prefetch\.rel = "prefetch"/);
+  assert.doesNotMatch(siteScript, /prefetch\.as = "document"/);
 });
 
 test("shared public header is consistent, localized, and exposes language controls", async () => {
