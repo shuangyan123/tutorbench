@@ -92,7 +92,7 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const html = renderPage(renderHomePage(artifacts));
   assert.match(html, /<script type="speculationrules">/);
-  assert.match(html, /a\[href\^=\\\"\/\\\"\]/);
+  assert.match(html, /a\[href\^='\/'\]/);
   const chromeStyles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
   assert.doesNotMatch(chromeStyles, /teach-page-enter/);
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
