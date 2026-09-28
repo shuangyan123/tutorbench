@@ -37,6 +37,7 @@ export type BenchmarkErrorCode =
   | "tutor_health_report_invalid"
   | "tutor_health_report_case_run_duplicate"
   | "tutor_health_report_source_mismatch"
+  | "learner_outcome_evidence_invalid"
   | "adapter_failed"
   | "evaluation_failed"
   | "runner_failed";
@@ -91,6 +92,7 @@ const stableMessages: Record<BenchmarkErrorCode, string> = {
   tutor_health_report_invalid: "Tutor Health report is invalid.",
   tutor_health_report_case_run_duplicate: "Tutor Health source evaluation has duplicate case runs.",
   tutor_health_report_source_mismatch: "Tutor Health source evaluation does not match its scenario suite.",
+  learner_outcome_evidence_invalid: "Learner outcome evidence is invalid.",
   adapter_failed: "Tutor adapter failed for this scenario.",
   evaluation_failed: "Evaluator failed for this scenario.",
   runner_failed: "Benchmark runner failed.",
@@ -176,7 +178,8 @@ export class BenchmarkConfigurationError extends Error {
       | "tutor_health_scoring_profile_invalid"
       | "tutor_health_report_invalid"
       | "tutor_health_report_case_run_duplicate"
-      | "tutor_health_report_source_mismatch",
+      | "tutor_health_report_source_mismatch"
+      | "learner_outcome_evidence_invalid",
   ) {
     super(stableMessages[code]);
     this.name = "BenchmarkConfigurationError";
