@@ -166,7 +166,13 @@ test("home reconstruction uses real blog routes and cases reuse the Teachometry 
   assert.match(home, /September 28, 2026/);
   assert.match(home, /September 17, 2026/);
   assert.doesNotMatch(home, /Sep 10, 2024|Why Observable Behavior Matters in AI Tutoring/);
-  for (const image of PUBLIC_SITE_RASTER_ASSETS.filter((asset) => asset !== "foliage.png" && asset !== "foliage-right-mid.webp" && asset !== "home-hero-bg.webp" && asset !== "home-open-data-bg.webp").map((asset) => asset.replace(/\.webp$/, ""))) {
+  for (const image of PUBLIC_SITE_RASTER_ASSETS.filter((asset) =>
+    asset !== "foliage.png" &&
+    asset !== "foliage-right-mid.webp" &&
+    asset !== "home-hero-bg.webp" &&
+    asset !== "home-open-data-bg.webp" &&
+    asset !== "home-blog-02.webp"
+  ).map((asset) => asset.replace(/\.webp$/, ""))) {
     assert.ok(home.includes(`src="/preview/assets/${image}.webp"`));
   }
   assert.ok(home.indexOf('class="home-data"') < home.indexOf('class="home-blog"'));
