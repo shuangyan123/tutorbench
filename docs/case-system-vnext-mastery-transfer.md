@@ -52,6 +52,57 @@ structure and common variants, and enough transfer robustness to preserve that
 performance when surface details change. The authored endpoint is reliable,
 efficient, score-relevant performance under the stated assessment rules.
 
+## Complementary learner-outcome evidence: teach-back
+
+TutorBench now has an experimental `Teach-back Outcome Evidence v0.1`
+contract for recording a complementary post-Tutor learning signal.
+
+The construct is deliberately narrower than "teaching skill." It asks whether a
+learner can reconstruct what they learned for another recipient, diagnose that
+recipient's missing prerequisite or misconception, adapt the explanation, and
+whether the recipient can then perform independently.
+
+The evidence path is:
+
+```text
+Tutor exposure
+  -> learner-teacher
+     -> recipient baseline
+        -> teach-back interaction
+           -> recipient immediate assessment
+              -> near transfer
+                 -> optional far transfer
+```
+
+This complements, rather than replaces, conventional learner assessment:
+
+- the learner's own test/task performance asks whether they can perform;
+- independent transfer asks whether their knowledge survives a changed task;
+- teach-back asks whether their knowledge is sufficiently structured to be
+  reconstructed and adapted for another learner;
+- recipient outcomes provide an observable downstream signal that the
+  explanation supported usable understanding.
+
+The v0.1 process evidence covers three required dimensions:
+
+- `knowledge_reconstruction`;
+- `learner_diagnosis`;
+- `adaptive_explanation`.
+
+Recipient profiles explicitly distinguish a peer from a learner with lower
+prerequisite readiness. This matters because successfully teaching a weaker
+recipient requires prerequisite modeling and adaptation in addition to subject
+knowledge.
+
+Synthetic recipients are **proxy evidence only**. Human observations are
+stronger external evidence, but a single before/after teach-back episode still
+does not establish that the original Tutor caused the observed change.
+Accordingly every v0.1 artifact fixes its claim boundary to
+`observational_or_proxy_only`.
+
+This evidence remains outside the seven Tutor Health dimensions and outside the
+Tutor Health aggregate score.
+
 ## What TutorBench may currently evaluate
 
 Response- and scenario-level evidence may support bounded judgments about:
