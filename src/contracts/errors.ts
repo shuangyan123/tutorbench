@@ -137,7 +137,8 @@ export class BenchmarkConfigurationError extends Error {
     | "tutor_health_scoring_profile_invalid"
     | "tutor_health_report_invalid"
     | "tutor_health_report_case_run_duplicate"
-    | "tutor_health_report_source_mismatch";
+    | "tutor_health_report_source_mismatch"
+    | "learner_outcome_evidence_invalid";
 
   constructor(
     code:
