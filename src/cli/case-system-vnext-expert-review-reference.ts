@@ -2,10 +2,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import {
-  buildCaseSystemVNextExpertReviewAdjudicationExport,
-  buildCaseSystemVNextExpertReviewConsensusResolution,
   buildCaseSystemVNextExpertReviewReferenceCandidate,
-  buildCaseSystemVNextExpertReviewResolution,
   parseCaseSystemVNextExpertReviewAdjudicationSubmission,
   type CaseSystemVNextExpertReviewAdjudicationExport,
   type CaseSystemVNextExpertReviewAdjudicationPacket,
@@ -133,7 +130,7 @@ export async function runCaseSystemVNextExpertReviewReferenceCandidate(
   const requiresAdjudication =
     evidence.disagreementCount > 0 || evidence.packetAmbiguityCount > 0;
 
-  let resolution;
+  let candidate;
   if (!requiresAdjudication) {
     if (
       options.adjudicationDirectory !== undefined ||
@@ -141,7 +138,7 @@ export async function runCaseSystemVNextExpertReviewReferenceCandidate(
     ) {
       throw new Error("Case System vNext expert review lineage is invalid.");
     }
-    resolution = buildCaseSystemVNextExpertReviewConsensusResolution(
+    candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
       exported,
       evidence,
     );
@@ -168,30 +165,17 @@ export async function runCaseSystemVNextExpertReviewReferenceCandidate(
       packet,
       template,
     };
-    const expected = buildCaseSystemVNextExpertReviewAdjudicationExport(
-      exported,
-      evidence,
-      manifest.adjudicatorId,
-    );
-    if (
-      JSON.stringify(expected.manifest) !== JSON.stringify(manifest) ||
-      JSON.stringify(expected.packet) !== JSON.stringify(packet)
-    ) {
-      throw new Error("Case System vNext expert review lineage is invalid.");
-    }
     const submission = parseCaseSystemVNextExpertReviewAdjudicationSubmission(
       await loadJson(options.submissionPath),
       packet,
     );
-    resolution = buildCaseSystemVNextExpertReviewResolution(
+    candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
       exported,
       evidence,
-      adjudicationExport,
-      submission,
+      { adjudicationExport, submission },
     );
   }
 
-  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(resolution);
   await writeTutorCliJson(candidate, options.outputPath);
   console.log([
     "Case System vNext expert-review reference candidate",
