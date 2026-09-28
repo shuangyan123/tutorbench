@@ -5,7 +5,14 @@
  * stay behind explicit internal paths so the default import surface stays
  * bounded.
  */
-export { loadTutorEvalDataset, loadTutorScenarioSuiteVNext } from "./datasets/index.js";
+export {
+  CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID,
+  CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_VERSION,
+  PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID,
+  PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_VERSION,
+  loadTutorEvalDataset,
+  loadTutorScenarioSuiteVNext,
+} from "./datasets/index.js";
 export {
   TUTOR_EVAL_DATASET_ID,
   TUTOR_EVAL_DATASET_VERSION,
@@ -90,6 +97,7 @@ export type {
   TutorScenarioSuiteVNext,
   TutorScenarioVNext,
   TutorScenarioDecisionPoint,
+  TutorScenarioCaseSystemSource,
 } from "./contracts/tutor-scenario-vnext.js";
 export type {
   TutorEvidenceRef,
