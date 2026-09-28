@@ -170,9 +170,9 @@ includes:
   equivalence, non-dominance, and insufficient-evidence semantics;
 - deterministic blind expert-review export/import with domain-scoped reviewer
   cohorts;
-- a first three-scenario executable pilot spanning Physics D1, Python debugging
-  D3, and Mathematics generalization D5 through the existing Scenario vNext ->
-  TutorEval -> Tutor Health path;
+- a six-scenario executable pilot spanning Physics D1, Biology D3, Chemistry
+  D5, Python debugging D3, Mathematics generalization D5, and History D5
+  through the existing Scenario vNext -> TutorEval -> Tutor Health path;
 - an objective-sensitive **Mastery & Transfer** reporting area that remains
   outside the seven-dimension Tutor Health aggregate score.
 
@@ -208,9 +208,9 @@ tutorbench health \
   --prompt-version v1
 ```
 
-This currently covers only three authored checkpoints and does not imply that
-all 15 Case System vNext archetypes have been converted or independently
-validated.
+This currently covers six authored checkpoints across six domains and does not
+imply that all 15 Case System vNext archetypes have been converted or
+independently validated.
 
 See [Case System vNext](docs/case-system-vnext.md), the
 [Core Coverage Matrix](docs/case-system-vnext-coverage-matrix.md),
