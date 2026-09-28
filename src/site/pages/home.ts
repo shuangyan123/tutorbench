@@ -121,7 +121,7 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts): SitePage {
 
 // 第三栏是明确标注的索引，不虚构第三篇文章；文章卡片使用集中维护的真实元数据。
 function renderHomeBlog(): string {
-  const posts = BLOG_POSTS;
+  const posts = BLOG_POSTS.slice(0, 2);
   return `<section class="home-blog" aria-labelledby="home-blog-title">${renderFoliage(["left-mid", "right-near"])}<div class="shell">
     <div class="home-blog-heading"><div><h2 id="home-blog-title">Latest from the Blog</h2><p>Updates, insights, and research perspectives from Teachometry.</p></div><a href="/blog/">View all posts ${icon("arrow")}</a></div>
     <div class="home-blog-grid">${posts.map((post) => `<article class="home-blog-card"><a href="${e(post.route)}"><img src="/assets/${e(post.image)}" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">${e(post.category)} · ${e(post.publishedDate)}</p><h3>${e(post.title)}</h3><p>${e(post.excerpt)}</p></div></a></article>`).join("")}
