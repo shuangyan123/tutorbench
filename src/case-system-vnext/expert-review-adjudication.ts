@@ -238,6 +238,13 @@ function validateEvidenceAgainstExport(
     evidence.pilotId !== exported.manifest.pilotId ||
     evidence.pilotVersion !== exported.manifest.pilotVersion ||
     !sameStringTuple(evidence.reviewerIds, exported.manifest.reviewerIds) ||
+    evidence.sourcePacketFingerprints.length !== 2 ||
+    evidence.sourcePacketFingerprints[0]?.reviewerId !== exported.manifest.reviewerIds[0] ||
+    evidence.sourcePacketFingerprints[0]?.packetFingerprint !==
+      exported.packets[0].packetFingerprint ||
+    evidence.sourcePacketFingerprints[1]?.reviewerId !== exported.manifest.reviewerIds[1] ||
+    evidence.sourcePacketFingerprints[1]?.packetFingerprint !==
+      exported.packets[1].packetFingerprint ||
     evidence.reviews.length !== exported.manifest.tasks.length ||
     evidence.agreementCount + evidence.disagreementCount +
       evidence.packetAmbiguityCount !== evidence.reviews.length

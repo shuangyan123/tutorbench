@@ -1478,3 +1478,232 @@ test("expert review source loader rejects manifest and packet tampering before i
   }
 });
 
+test("expert review task-set fingerprint covers reviewer-visible judgment context", async () => {
+  const pilot = parseCaseSystemVNextPilot(
+    await loadJson("scenarios/case-system-vnext/pilot-archetypes.json"),
+  );
+  const registry = parseCaseSystemVNextStrategyProfileRegistry(
+    await loadJson("scenarios/case-system-vnext/task-strategy-profiles.json"),
+  );
+  const suite = await loadJson(
+    "scenarios/case-system-vnext/evaluator-stress-fixtures.json",
+  ) as CaseSystemVNextStressFixtureSuite;
+  const baseline = buildCaseSystemVNextExpertReviewExport(
+    pilot,
+    suite,
+    registry,
+    ["reviewer-a", "reviewer-b"],
+  );
+
+  const changedTeachingTarget: CaseSystemVNextStressFixtureSuite = {
+    ...suite,
+    fixtures: suite.fixtures.map((fixture, index) =>
+      index === 0
+        ? { ...fixture, teachingTarget: fixture.teachingTarget + " changed" }
+        : fixture
+    ),
+  };
+  const changedLearnerState: CaseSystemVNextStressFixtureSuite = {
+    ...suite,
+    fixtures: suite.fixtures.map((fixture, index) =>
+      index === 0
+        ? { ...fixture, learnerState: fixture.learnerState + " changed" }
+        : fixture
+    ),
+  };
+  for (const changedSuite of [
+    changedTeachingTarget,
+    changedLearnerState,
+  ]) {
+    const changed = buildCaseSystemVNextExpertReviewExport(
+      pilot,
+      changedSuite,
+      registry,
+      ["reviewer-a", "reviewer-b"],
+    );
+    assert.notEqual(
+      changed.manifest.taskSetFingerprint,
+      baseline.manifest.taskSetFingerprint,
+    );
+    assert.notEqual(
+      changed.packets[0].packetFingerprint,
+      baseline.packets[0].packetFingerprint,
+    );
+    assert.notEqual(
+      changed.packets[1].packetFingerprint,
+      baseline.packets[1].packetFingerprint,
+    );
+  }
+
+  const changedRegistry = {
+    ...registry,
+    profiles: registry.profiles.map((profile, profileIndex) =>
+      profileIndex === 0
+        ? {
+            ...profile,
+            criteria: profile.criteria.map((criterion, criterionIndex) =>
+              criterionIndex === 0
+                ? {
+                    ...criterion,
+                    description: criterion.description + " changed",
+                  }
+                : criterion
+            ),
+          }
+        : profile
+    ),
+  };
+  const changedCriteria = buildCaseSystemVNextExpertReviewExport(
+    pilot,
+    suite,
+    changedRegistry,
+    ["reviewer-a", "reviewer-b"],
+  );
+  assert.notEqual(
+    changedCriteria.manifest.taskSetFingerprint,
+    baseline.manifest.taskSetFingerprint,
+  );
+  assert.notEqual(
+    changedCriteria.packets[0].packetFingerprint,
+    baseline.packets[0].packetFingerprint,
+  );
+  assert.notEqual(
+    changedCriteria.packets[1].packetFingerprint,
+    baseline.packets[1].packetFingerprint,
+  );
+});
+
+test("expert review evidence is bound to the exact source reviewer packets", async () => {
+  const pilot = parseCaseSystemVNextPilot(
+    await loadJson("scenarios/case-system-vnext/pilot-archetypes.json"),
+  );
+  const registry = parseCaseSystemVNextStrategyProfileRegistry(
+    await loadJson("scenarios/case-system-vnext/task-strategy-profiles.json"),
+  );
+  const suite = await loadJson(
+    "scenarios/case-system-vnext/evaluator-stress-fixtures.json",
+  ) as CaseSystemVNextStressFixtureSuite;
+
+  const exportedA = buildCaseSystemVNextExpertReviewExport(
+    pilot,
+    suite,
+    registry,
+    ["reviewer-a", "reviewer-b"],
+  );
+  const submissions = exportedA.packets.map((packet) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: "EQUIVALENT" as const,
+      sufficientlyClear: true,
+    })),
+  })) as unknown as readonly [
+    CaseSystemVNextExpertReviewSubmission,
+    CaseSystemVNextExpertReviewSubmission,
+  ];
+  const evidenceA = mergeCaseSystemVNextExpertReviewSubmissions(
+    exportedA,
+    submissions,
+  );
+
+  assert.deepEqual(evidenceA.sourcePacketFingerprints, [
+    {
+      reviewerId: exportedA.packets[0].reviewerId,
+      packetFingerprint: exportedA.packets[0].packetFingerprint,
+    },
+    {
+      reviewerId: exportedA.packets[1].reviewerId,
+      packetFingerprint: exportedA.packets[1].packetFingerprint,
+    },
+  ]);
+
+  const changedSuite: CaseSystemVNextStressFixtureSuite = {
+    ...suite,
+    fixtures: suite.fixtures.map((fixture, index) =>
+      index === 0
+        ? { ...fixture, teachingTarget: fixture.teachingTarget + " changed" }
+        : fixture
+    ),
+  };
+  const exportedB = buildCaseSystemVNextExpertReviewExport(
+    pilot,
+    changedSuite,
+    registry,
+    ["reviewer-a", "reviewer-b"],
+  );
+
+  assert.throws(
+    () => buildCaseSystemVNextExpertReviewConsensusResolution(
+      exportedB,
+      evidenceA,
+    ),
+    /adjudication data is invalid/u,
+  );
+
+  const disagreementSubmissions = exportedA.packets.map((packet, reviewerIndex) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task, taskIndex) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: taskIndex === 0
+        ? (reviewerIndex === 0 ? "A_BETTER" as const : "A_BETTER" as const)
+        : "EQUIVALENT" as const,
+      sufficientlyClear: true,
+    })),
+  })) as unknown as readonly [
+    CaseSystemVNextExpertReviewSubmission,
+    CaseSystemVNextExpertReviewSubmission,
+  ];
+  const disagreementEvidenceA = mergeCaseSystemVNextExpertReviewSubmissions(
+    exportedA,
+    disagreementSubmissions,
+  );
+
+  assert.throws(
+    () => buildCaseSystemVNextExpertReviewAdjudicationExport(
+      exportedB,
+      disagreementEvidenceA,
+      "adjudicator-c",
+    ),
+    /adjudication data is invalid/u,
+  );
+});
+
+test("legacy expert review protocol artifacts fail closed under v0.2 lineage rules", async () => {
+  const exported = await buildExport();
+  assert.equal(exported.manifest.protocolVersion, "0.2.0");
+
+  const legacyPacket = {
+    ...exported.packets[0],
+    protocolVersion: "0.1.0",
+  };
+  assert.throws(
+    () => parseCaseSystemVNextExpertReviewSubmission(
+      {
+        schemaVersion: legacyPacket.schemaVersion,
+        protocolId: legacyPacket.protocolId,
+        protocolVersion: legacyPacket.protocolVersion,
+        reviewerId: legacyPacket.reviewerId,
+        taskSetFingerprint: legacyPacket.taskSetFingerprint,
+        packetFingerprint: legacyPacket.packetFingerprint,
+        reviews: legacyPacket.tasks.map((task) => ({
+          reviewTaskId: task.reviewTaskId,
+          outcome: "EQUIVALENT",
+          sufficientlyClear: true,
+        })),
+      },
+      exported.packets[0],
+    ),
+    /expert review data is invalid/u,
+  );
+});
+
