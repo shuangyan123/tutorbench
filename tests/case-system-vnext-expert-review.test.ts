@@ -930,18 +930,16 @@ test("expert review reference candidate blocks unresolved and insufficient-evide
       notes: "Synthetic adjudicator cannot resolve the ambiguous packet.",
     })),
   };
-  const resolution = buildCaseSystemVNextExpertReviewResolution(
+  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
     exported,
     evidence,
-    adjudication,
-    parseCaseSystemVNextExpertReviewAdjudicationSubmission(
-      rawSubmission,
-      adjudication.packet,
-    ),
-  );
-  const parsedResolution = parseCaseSystemVNextExpertReviewResolution(resolution);
-  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
-    parsedResolution,
+    {
+      adjudicationExport: adjudication,
+      submission: parseCaseSystemVNextExpertReviewAdjudicationSubmission(
+        rawSubmission,
+        adjudication.packet,
+      ),
+    },
   );
 
   assert.equal(candidate.summary.totalTaskCount, 17);
@@ -999,16 +997,17 @@ test("expert review reference candidate becomes eligible only after all tasks ha
       sufficientlyClear: true,
     })),
   };
-  const resolution = buildCaseSystemVNextExpertReviewResolution(
+  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
     exported,
     evidence,
-    adjudication,
-    parseCaseSystemVNextExpertReviewAdjudicationSubmission(
-      rawSubmission,
-      adjudication.packet,
-    ),
+    {
+      adjudicationExport: adjudication,
+      submission: parseCaseSystemVNextExpertReviewAdjudicationSubmission(
+        rawSubmission,
+        adjudication.packet,
+      ),
+    },
   );
-  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(resolution);
 
   assert.equal(candidate.summary.blockedCount, 0);
   assert.equal(candidate.summary.candidateReadyCount, 17);
@@ -1088,6 +1087,67 @@ test("expert review resolution parser rejects fingerprint tampering", async () =
   );
 });
 
+test("expert review resolution parser rejects semantic reviewer contradictions", async () => {
+  const exported = await buildExport();
+  const submissions = exported.packets.map((packet, reviewerIndex) => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: reviewerIndex === 0 ? "A_BETTER" as const : "B_BETTER" as const,
+      sufficientlyClear: true,
+    })),
+  })) as unknown as readonly [
+    CaseSystemVNextExpertReviewSubmission,
+    CaseSystemVNextExpertReviewSubmission,
+  ];
+  const evidence = mergeCaseSystemVNextExpertReviewSubmissions(exported, submissions);
+  const resolution = buildCaseSystemVNextExpertReviewConsensusResolution(
+    exported,
+    evidence,
+  );
+
+  const firstTask = resolution.tasks[0]!;
+  const contradictoryRaw = {
+    ...resolution,
+    tasks: resolution.tasks.map((task, index) =>
+      index === 0
+        ? {
+            ...task,
+            sourceReviewerResults: [
+              {
+                ...firstTask.sourceReviewerResults[0],
+                outcome: "INSUFFICIENT_EVIDENCE" as const,
+              },
+              firstTask.sourceReviewerResults[1],
+            ],
+          }
+        : task
+    ),
+  };
+  assert.throws(
+    () => parseCaseSystemVNextExpertReviewResolution(contradictoryRaw),
+    /resolution data is invalid/u,
+  );
+
+  const contradictoryAgreement = {
+    ...resolution,
+    tasks: resolution.tasks.map((task, index) =>
+      index === 0
+        ? { ...task, sourceAgreement: "disagreement" as const }
+        : task
+    ),
+  };
+  assert.throws(
+    () => parseCaseSystemVNextExpertReviewResolution(contradictoryAgreement),
+    /resolution data is invalid/u,
+  );
+});
+
 test("expert review consensus resolution reaches the reference gate without adjudication", async () => {
   const exported = await buildExport();
   const submissions = exported.packets.map((packet, reviewerIndex) => ({
@@ -1122,7 +1182,11 @@ test("expert review consensus resolution reaches the reference gate without adju
   assert.equal(resolution.summary.unresolvedCount, 0);
 
   const parsed = parseCaseSystemVNextExpertReviewResolution(resolution);
-  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(parsed);
+  assert.equal(parsed.resolutionFingerprint, resolution.resolutionFingerprint);
+  const candidate = buildCaseSystemVNextExpertReviewReferenceCandidate(
+    exported,
+    evidence,
+  );
   assert.equal(candidate.adjudicatorId, undefined);
   assert.equal(candidate.adjudicationSetFingerprint, undefined);
   assert.equal(candidate.summary.candidateReadyCount, 17);
