@@ -129,7 +129,7 @@ function isTeachBack(value: unknown): boolean {
   }
 
   const seen = new Set<string>();
-  return record.processEvidence.every((item) => {
+  const valid = record.processEvidence.every((item) => {
     const evidence = asRecord(item);
     if (
       evidence === null ||
@@ -158,6 +158,7 @@ function isTeachBack(value: unknown): boolean {
     seen.add(String(evidence.dimension));
     return true;
   });
+  return valid && seen.size === dimensions.size;
 }
 
 export function isTeachBackLearnerOutcomeEvidence(
@@ -194,6 +195,16 @@ export function isTeachBackLearnerOutcomeEvidence(
     !isAssessment(record.baseline, "baseline") ||
     !isTeachBack(record.teachBack) ||
     record.claimBoundary !== "observational_or_proxy_only"
+  ) {
+    return false;
+  }
+
+  const recipient = record.recipient as UnknownRecord;
+  if (
+    (record.evidenceSource === "synthetic_protocol_fixture" &&
+      recipient.kind !== "synthetic") ||
+    (record.evidenceSource === "human_observation" &&
+      recipient.kind !== "human")
   ) {
     return false;
   }
