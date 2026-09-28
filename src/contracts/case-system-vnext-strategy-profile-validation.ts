@@ -44,7 +44,7 @@ function isProfile(value: unknown): value is CaseSystemVNextStrategyProfile {
     !isText(record.archetypeId, 120) ||
     !isText(record.taskFamily, 160) ||
     !isText(record.strategyScope, 2_000) ||
-    !["ordered_preference","pareto_tradeoff","acceptable_strategy_set","no_strategy_ranking"].includes(String(record.evaluationMode)) ||
+    (typeof record.evaluationMode !== "string" || !["ordered_preference","pareto_tradeoff","acceptable_strategy_set","no_strategy_ranking"].includes(record.evaluationMode)) ||
     !Array.isArray(record.criteria) ||
     record.criteria.length === 0 ||
     record.criteria.length > 20 ||
