@@ -6,6 +6,10 @@ import { parseTutorEvalDataset } from "../contracts/tutor-eval-validation.js";
 import {
   parseTutorScenarioSuiteVNext,
 } from "../contracts/tutor-scenario-vnext-validation.js";
+import {
+  parseCaseSystemVNextPilot,
+  parseCaseSystemVNextStrategyProfileRegistry,
+} from "../contracts/index.js";
 import type { TutorEvalDataset } from "../contracts/tutor-eval.js";
 import type {
   TutorScenarioDecisionPoint,
@@ -16,21 +20,90 @@ import type {
 export const PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID =
   "productive-struggle-intervention-v0.1" as const;
 export const PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_VERSION = "0.2.0" as const;
+export const CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID =
+  "case-system-vnext-executable-pilot-v0.1" as const;
+export const CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_VERSION = "0.1.0" as const;
+
+export type RegisteredTutorScenarioSuiteId =
+  | typeof PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID
+  | typeof CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID;
 
 const scenarioSuitePath = new URL(
   "../../../scenarios/real-world/productive-struggle-intervention-v0.1/suite.json",
   import.meta.url,
 );
+const caseSystemExecutablePilotSuitePath = new URL(
+  "../../../scenarios/real-world/case-system-vnext-executable-pilot-v0.1/suite.json",
+  import.meta.url,
+);
+const caseSystemPilotPath = new URL(
+  "../../../scenarios/case-system-vnext/pilot-archetypes.json",
+  import.meta.url,
+);
+const caseSystemStrategyRegistryPath = new URL(
+  "../../../scenarios/case-system-vnext/task-strategy-profiles.json",
+  import.meta.url,
+);
+
+async function validateRegisteredCaseSystemProvenance(
+  suite: TutorScenarioSuiteVNext,
+): Promise<void> {
+  const sourced = suite.scenarios.filter(
+    (scenario) => scenario.caseSystemSource !== undefined,
+  );
+  if (sourced.length === 0) return;
+
+  const [pilotJson, registryJson] = await Promise.all([
+    readFile(fileURLToPath(caseSystemPilotPath), "utf8"),
+    readFile(fileURLToPath(caseSystemStrategyRegistryPath), "utf8"),
+  ]);
+  const pilot = parseCaseSystemVNextPilot(JSON.parse(pilotJson) as unknown);
+  const registry = parseCaseSystemVNextStrategyProfileRegistry(
+    JSON.parse(registryJson) as unknown,
+  );
+
+  for (const scenario of sourced) {
+    const source = scenario.caseSystemSource;
+    if (source === undefined) continue;
+    const archetype = pilot.archetypes.find(
+      (candidate) => candidate.id === source.archetypeId,
+    );
+    const profile = registry.profiles.find(
+      (candidate) => candidate.id === source.strategyProfileId,
+    );
+    if (
+      source.pilotId !== pilot.id ||
+      source.pilotVersion !== pilot.version ||
+      archetype === undefined ||
+      archetype.version !== source.archetypeVersion ||
+      profile === undefined ||
+      profile.version !== source.strategyProfileVersion ||
+      profile.archetypeId !== archetype.id
+    ) {
+      throw new BenchmarkConfigurationError("tutor_scenario_vnext_invalid");
+    }
+  }
+}
 
 export async function loadTutorScenarioSuiteVNext(
-  suiteId = PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID,
+  suiteId: RegisteredTutorScenarioSuiteId =
+    PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID,
 ): Promise<TutorScenarioSuiteVNext> {
-  if (suiteId !== PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID) {
+  const path = suiteId === PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID
+    ? scenarioSuitePath
+    : suiteId === CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID
+      ? caseSystemExecutablePilotSuitePath
+      : null;
+  if (path === null) {
     throw new BenchmarkConfigurationError("tutor_scenario_suite_not_found");
   }
   try {
-    const json = await readFile(fileURLToPath(scenarioSuitePath), "utf8");
-    return parseTutorScenarioSuiteVNext(JSON.parse(json) as unknown);
+    const json = await readFile(fileURLToPath(path), "utf8");
+    const suite = parseTutorScenarioSuiteVNext(JSON.parse(json) as unknown);
+    if (suiteId === CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID) {
+      await validateRegisteredCaseSystemProvenance(suite);
+    }
+    return suite;
   } catch (error) {
     if (error instanceof BenchmarkConfigurationError) {
       throw error;
