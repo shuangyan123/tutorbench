@@ -22,7 +22,7 @@ export const PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID =
 export const PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_VERSION = "0.2.0" as const;
 export const CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID =
   "case-system-vnext-executable-pilot-v0.1" as const;
-export const CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_VERSION = "0.1.0" as const;
+export const CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_VERSION = "0.2.0" as const;
 
 export type RegisteredTutorScenarioSuiteId =
   | typeof PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID
