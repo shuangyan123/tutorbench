@@ -334,6 +334,7 @@ export function parseTutorResponseCorpusEvaluationResult(
   const validEvaluationSelection = evaluationSelection as
     | TutorResponseCorpusEvaluationSelection
     | undefined;
+  const validScoring = scoring as TutorResponseCorpusEvaluationScoring | undefined;
   const validSemanticReplay = semanticReplay as TutorResponseCorpusSemanticReplay | undefined;
   return {
     schemaVersion: TUTOR_RESPONSE_CORPUS_RESULT_SCHEMA_VERSION,
@@ -348,7 +349,7 @@ export function parseTutorResponseCorpusEvaluationResult(
     ...(validEvaluationSelection === undefined
       ? {}
       : { evaluationSelection: validEvaluationSelection }),
-    ...(scoring === undefined ? {} : { scoring }),
+    ...(validScoring === undefined ? {} : { scoring: validScoring }),
     ...(validSemanticReplay === undefined ? {} : { semanticReplay: validSemanticReplay }),
     ...(generationSpec === undefined ? {} : { generationSpec }),
     tutor,
