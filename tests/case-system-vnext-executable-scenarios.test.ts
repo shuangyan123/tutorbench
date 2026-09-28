@@ -17,11 +17,18 @@ test("Case System vNext executable pilot loads with bound D1/D3/D5 provenance", 
   );
   assert.equal(suite.id, CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID);
   assert.equal(suite.version, CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_VERSION);
-  assert.equal(suite.scenarios.length, 3);
+  assert.equal(suite.scenarios.length, 6);
 
   assert.deepEqual(
     suite.scenarios.map((scenario) => scenario.caseSystemSource?.archetypeId),
-    ["science-d1-graph", "programming-d3-debug", "math-d5-generalization"],
+    [
+      "science-d1-graph",
+      "programming-d3-debug",
+      "math-d5-generalization",
+      "science-d3-causal",
+      "science-d5-investigation",
+      "history-d5-conflicting-sources",
+    ],
   );
   assert.deepEqual(
     suite.scenarios.map((scenario) => scenario.caseSystemSource?.strategyProfileId),
@@ -29,6 +36,9 @@ test("Case System vNext executable pilot loads with bound D1/D3/D5 provenance", 
       "physics-d1-position-time-graph",
       "computer-science-python-d3-debugging",
       "math-d5-structural-generalization",
+      "biology-d3-causal-control",
+      "chemistry-d5-kinetics-discrimination",
+      "history-d5-source-corroboration",
     ],
   );
 });
@@ -40,7 +50,7 @@ test("Case System vNext executable pilot compiles without leaking authoring prov
   const dataset = tutorScenarioSuiteToTutorEvalDataset(suite);
   assert.equal(dataset.id, CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID);
   assert.equal(dataset.version, CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_VERSION);
-  assert.equal(dataset.cases.length, 3);
+  assert.equal(dataset.cases.length, 6);
 
   for (const caseValue of dataset.cases) {
     const tutorInput = toTutorTurnInput(caseValue);
@@ -105,8 +115,8 @@ test("Case System vNext executable pilot runs through Tutor Health", async () =>
     runId: "case-system-vnext-executable-pilot-test",
   });
 
-  assert.equal(evaluation.caseCount, 3);
-  assert.equal(evaluation.caseRunCount, 3);
+  assert.equal(evaluation.caseCount, 6);
+  assert.equal(evaluation.caseRunCount, 6);
   assert.equal(report.sourceScenarioSuite.id, CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID);
   assert.equal(report.scoringProfile.id, "case-system-vnext-executable-pilot");
   assert.equal(report.scoringProfile.version, "0.1.0");

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
   "id": "case-system-vnext-executable-pilot-v0.1",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Case System vNext Executable Pilot",
-  "description": "Three non-canonical executable Tutor scenarios materialized from the Case System vNext pilot across D1, D3, and D5. They exercise the existing Scenario vNext -> TutorEval -> Tutor Health path and remain experimental authoring evidence, not calibrated benchmark cases.",
+  "description": "Six non-canonical executable Tutor scenarios materialized from the Case System vNext pilot across Physics, Computer Science, Mathematics, Biology, Chemistry, and History at selected D1/D3/D5 depths. They exercise the existing Scenario vNext -> TutorEval -> Tutor Health path and remain experimental authoring evidence, not calibrated benchmark cases.",
   "healthTaxonomyVersion": "0.1.0",
   "scenarios": [
     {
@@ -423,6 +423,487 @@
                 ],
                 "regressionTargets": [
                   "csvnext-math-d5-generalization/derive-then-generalize"
+                ],
+                "confidence": 0.7
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "csvnext-biology-d3-causal",
+        "version": "0.1.0",
+        "title": "Biology D3 — Repair causal inference from plant growth evidence",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1"
+      },
+      "description": "The learner treats taller plants in a fertilizer group as proof of a single biological mechanism despite a relevant environmental difference between groups.",
+      "caseSystemSource": {
+        "pilotId": "case-system-vnext-pilot",
+        "pilotVersion": "0.2.0",
+        "archetypeId": "science-d3-causal",
+        "archetypeVersion": "0.2.0",
+        "strategyProfileId": "biology-d3-causal-control",
+        "strategyProfileVersion": "0.1.0"
+      },
+      "learningContext": {
+        "subject": "biology",
+        "topic": "biological causal explanation and controls",
+        "learningObjective": "Use controlled evidence to distinguish an observed growth association from a supported biological mechanism and preserve plausible alternative explanations when controls differ.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "independent and dependent variables",
+          "basic experimental controls",
+          "correlation does not by itself establish mechanism"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "treats greater plant growth in the fertilizer group as proof that fertilizer alone caused the difference and established the mechanism",
+            "evidenceLearnerTurns": [
+              1,
+              2
+            ]
+          }
+        ],
+        "confidence": 0.8,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 2,
+        "failedAttempts": 2,
+        "priorHints": [
+          "Check whether the two groups differed in anything besides fertilizer."
+        ],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "The fertilized plants were taller after two weeks, so that proves the fertilizer caused the extra growth by giving the plants more nutrients."
+          },
+          {
+            "role": "assistant",
+            "content": "Check whether the two groups differed in anything besides fertilizer."
+          },
+          {
+            "role": "user",
+            "content": "They got the same amount of water, but the fertilized group was closer to the window and probably got more light. I still think the taller plants prove the fertilizer mechanism though."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only",
+        "intervention": {
+          "firstHintAfterFailedAttempts": 1,
+          "escalateAfterFailedAttempts": 3
+        },
+        "productiveStruggle": {
+          "minimumMeaningfulAttempts": 1
+        }
+      },
+      "decisionPoints": [
+        {
+          "id": "separate-association-mechanism-and-control",
+          "evaluationCaseId": "csvnext-biology-d3-causal",
+          "turnIndex": 2,
+          "expectedDecision": "probe_understanding",
+          "expectedBehavior": "Use the unequal light exposure as a concrete confound, separate the observed association from a mechanism claim, and keep fertilizer and light as competing explanations until a controlled comparison can discriminate them.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "csvnext-biology-d3-causal-scope",
+              "category": "diagnosis",
+              "dimension": "learner_diagnosis",
+              "criterion": "Identify that the learner is treating an observed association as proof of one mechanism despite a material uncontrolled light difference, and preserve causal uncertainty.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "biology_causal_overclaim_not_repaired",
+                "title": "Causal overclaim was not repaired",
+                "severity": "major",
+                "observedBehavior": "The response accepts or restates fertilizer as the established cause or mechanism without addressing the unequal light exposure.",
+                "diagnosis": "The intervention does not distinguish observed growth association from mechanism and does not use the available control information.",
+                "impact": "The learner may generalize that a correlated biological outcome establishes a single cause even when competing explanations remain viable.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may be privileging a plausible biological story over the experimental control structure.",
+                    "confidence": 0.5
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response explicitly names the unequal light exposure as a competing explanation."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Require causal explanations from experiments to state which controls support or limit the inference before asserting a mechanism."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-biology-d3-causal/separate-association-mechanism-and-control"
+                ],
+                "confidence": 0.8
+              }
+            },
+            {
+              "rubricId": "csvnext-biology-d3-discriminating-next-step",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Guide the learner toward a controlled comparison or other discriminating observation that could separate fertilizer and light effects instead of merely listing possible confounds.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "biology_control_reasoning_not_actionable",
+                "title": "Control reasoning did not lead to a discriminating next step",
+                "severity": "minor",
+                "observedBehavior": "The response mentions uncertainty or confounds but does not connect them to a controlled comparison that could distinguish the competing explanations.",
+                "diagnosis": "The guidance stops at caution rather than turning causal uncertainty into an interpretable experimental next step.",
+                "impact": "The learner may know that the conclusion is uncertain without learning how experimental design can reduce that uncertainty.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may treat control variables as a checklist instead of as tools for discriminating hypotheses.",
+                    "confidence": 0.45
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response proposes holding light constant while comparing fertilizer conditions or an equivalent discriminating design."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Tie each material confound to a concrete control or measurement that would change the causal conclusion."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-biology-d3-causal/separate-association-mechanism-and-control"
+                ],
+                "confidence": 0.7
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "csvnext-chemistry-d5-kinetics",
+        "version": "0.1.0",
+        "title": "Chemistry D5 — Design a discriminating kinetics experiment",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1"
+      },
+      "description": "The learner proposes changing temperature and concentration together and needs to redesign the investigation so the two rate effects can be identified separately.",
+      "caseSystemSource": {
+        "pilotId": "case-system-vnext-pilot",
+        "pilotVersion": "0.2.0",
+        "archetypeId": "science-d5-investigation",
+        "archetypeVersion": "0.2.0",
+        "strategyProfileId": "chemistry-d5-kinetics-discrimination",
+        "strategyProfileVersion": "0.1.0"
+      },
+      "learningContext": {
+        "subject": "chemistry",
+        "topic": "chemical kinetics experimental design",
+        "learningObjective": "Design interpretable reaction-rate comparisons that distinguish temperature effects from concentration effects while controlling other reaction conditions and measurement uncertainty.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "reaction rate",
+          "concentration",
+          "temperature effects",
+          "controlled experiments",
+          "measurement uncertainty"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "changes temperature and concentration together and attributes any faster rate specifically to temperature",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "high",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 2,
+        "failedAttempts": 1,
+        "priorHints": [
+          "Ask whether your design lets you tell which changed factor produced the rate difference."
+        ],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "To test why the reaction got faster, I would heat the mixture by 10 °C and double the reactant concentration, then compare the reaction time with the original trial. If it is faster, I can say temperature caused it."
+          },
+          {
+            "role": "assistant",
+            "content": "Ask whether your design lets you tell which changed factor produced the rate difference."
+          },
+          {
+            "role": "user",
+            "content": "I see that both temperature and concentration changed. How can I redesign it so I can tell what each factor is doing without running a huge number of trials?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed",
+        "intervention": {
+          "firstHintAfterFailedAttempts": 1
+        },
+        "productiveStruggle": {
+          "minimumMeaningfulAttempts": 1
+        }
+      },
+      "decisionPoints": [
+        {
+          "id": "separate-rate-factors",
+          "evaluationCaseId": "csvnext-chemistry-d5-kinetics",
+          "turnIndex": 2,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Propose a compact controlled design in which one factor changes while the other is fixed, include replicated rate measurement, and explain why this makes the separate effects interpretable without claiming a detailed mechanism.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "csvnext-chemistry-d5-identifiability",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "The proposed design makes temperature and concentration effects separately identifiable by holding one fixed while varying the other or by an equivalently interpretable design.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "chemistry_kinetics_design_confounded",
+                "title": "Kinetics design remained confounded",
+                "severity": "major",
+                "observedBehavior": "The response still varies temperature and concentration together without a design that separates their contributions.",
+                "diagnosis": "The experimental design cannot support the factor-specific conclusion the learner wants to make.",
+                "impact": "The learner may attribute a rate difference to one factor even though the observation is compatible with multiple changed conditions.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may be optimizing for fewer trials without preserving factor identifiability.",
+                    "confidence": 0.5
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether every comparison used for a factor claim changes only that factor or otherwise estimates its separate contribution."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Require explicit identification of controlled and varied factors before accepting a causal rate comparison."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-chemistry-d5-kinetics/separate-rate-factors"
+                ],
+                "confidence": 0.85
+              }
+            },
+            {
+              "rubricId": "csvnext-chemistry-d5-measurement",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Include an interpretable reaction-rate observable and enough replication or repeated measurement to avoid treating one noisy observation as decisive.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "chemistry_rate_measurement_underpowered",
+                "title": "Rate comparison lacked interpretable measurement support",
+                "severity": "minor",
+                "observedBehavior": "The response proposes a factor comparison without a clear rate observable, replication, or acknowledgement that one noisy trial is insufficient.",
+                "diagnosis": "The design separates variables incompletely because its measurement plan does not support a reliable rate comparison.",
+                "impact": "The learner may construct a nominally controlled experiment whose evidence is still too weak to distinguish meaningful rate effects from noise.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may focus on variable control while neglecting measurement validity and replication.",
+                    "confidence": 0.45
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response defines what will be measured as reaction rate and how repeated trials will be compared."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Pair factor-control guidance with a minimal replication and uncertainty check appropriate to the learner level."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-chemistry-d5-kinetics/separate-rate-factors"
+                ],
+                "confidence": 0.7
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "csvnext-history-d5-corroboration",
+        "version": "0.1.0",
+        "title": "History D5 — Weigh conflicting sources without authority shortcuts",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1"
+      },
+      "description": "The learner initially assumes a primary source is automatically more reliable, then receives provenance information that requires weighing incentives and independent corroboration.",
+      "caseSystemSource": {
+        "pilotId": "case-system-vnext-pilot",
+        "pilotVersion": "0.2.0",
+        "archetypeId": "history-d5-conflicting-sources",
+        "archetypeVersion": "0.2.0",
+        "strategyProfileId": "history-d5-source-corroboration",
+        "strategyProfileVersion": "0.1.0"
+      },
+      "learningContext": {
+        "subject": "history",
+        "topic": "corroboration and competing interpretations",
+        "learningObjective": "Weigh conflicting historical claims using provenance and independent corroboration, then state a bounded conclusion that preserves unresolved uncertainty.",
+        "learnerLevel": "advanced-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "primary vs secondary sources",
+          "provenance",
+          "corroboration"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "treats primary-source status as sufficient reason to prefer a source regardless of incentives or corroborating evidence",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.75,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 2,
+        "failedAttempts": 1,
+        "priorHints": [
+          "Compare who produced each account, why they produced it, and what independent evidence each claim has."
+        ],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "Source A was written during the event by an official, while Source B is a historian writing much later. I think Source A must be more reliable because it is primary."
+          },
+          {
+            "role": "assistant",
+            "content": "Compare who produced each account, why they produced it, and what independent evidence each claim has."
+          },
+          {
+            "role": "user",
+            "content": "Source A was an official report defending the policy. Source B compares tax records and several private letters that disagree with parts of the report. Does that mean I should just trust Source B instead?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed",
+        "intervention": {
+          "firstHintAfterFailedAttempts": 1
+        },
+        "productiveStruggle": {
+          "minimumMeaningfulAttempts": 1
+        }
+      },
+      "decisionPoints": [
+        {
+          "id": "weigh-provenance-and-corroboration",
+          "evaluationCaseId": "csvnext-history-d5-corroboration",
+          "turnIndex": 2,
+          "expectedDecision": "probe_understanding",
+          "expectedBehavior": "Reject both automatic primary-source authority and automatic reversal toward Source B; weigh Source A's incentives against the independent records and letters, distinguish which disputed claims are corroborated, and state a bounded conclusion with remaining uncertainty.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "csvnext-history-d5-provenance",
+              "category": "diagnosis",
+              "dimension": "learner_diagnosis",
+              "criterion": "Correct the learner's source-authority shortcut by using provenance as evidence rather than treating primary or secondary status as automatic reliability.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "history_source_authority_shortcut",
+                "title": "Source status was treated as automatic authority",
+                "severity": "major",
+                "observedBehavior": "The response tells the learner to trust a source mainly because it is primary, secondary, contemporary, or later without weighing the source's purpose and evidentiary support.",
+                "diagnosis": "The intervention substitutes source category for provenance reasoning.",
+                "impact": "The learner may rank sources by label rather than learning to evaluate claims, incentives, and corroboration.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may be using a simplistic primary-versus-secondary hierarchy instead of claim-level source evaluation.",
+                    "confidence": 0.5
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response explains how the official report's purpose affects the weight of specific claims rather than dismissing it categorically."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Make source evaluation claim-specific and require provenance plus corroboration before preferring one account."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-history-d5-corroboration/weigh-provenance-and-corroboration"
+                ],
+                "confidence": 0.8
+              }
+            },
+            {
+              "rubricId": "csvnext-history-d5-bounded-conclusion",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Use independent records and letters to identify which claims receive stronger support while keeping unresolved disagreements explicit instead of replacing one blanket source preference with another.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "history_corroboration_not_synthesized",
+                "title": "Conflicting evidence was not synthesized into a bounded conclusion",
+                "severity": "minor",
+                "observedBehavior": "The response lists provenance facts or switches allegiance to Source B without explaining what the independent evidence corroborates and what remains uncertain.",
+                "diagnosis": "The guidance does not turn source comparison into claim-level evidentiary weighting.",
+                "impact": "The learner may recognize bias cues but still lack a method for reaching appropriately qualified historical conclusions.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may treat corroboration as source counting rather than matching independent evidence to disputed claims.",
+                    "confidence": 0.45
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response distinguishes corroborated claims from claims that remain disputed or unsupported."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Structure source-synthesis guidance around claim, provenance, independent support, and residual uncertainty."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-history-d5-corroboration/weigh-provenance-and-corroboration"
                 ],
                 "confidence": 0.7
               }
