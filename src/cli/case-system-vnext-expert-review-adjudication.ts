@@ -5,12 +5,9 @@ import {
   buildCaseSystemVNextExpertReviewAdjudicationExport,
   buildCaseSystemVNextExpertReviewResolution,
   parseCaseSystemVNextExpertReviewAdjudicationSubmission,
-  reconstructCaseSystemVNextExpertReviewExport,
   type CaseSystemVNextExpertReviewAdjudicationExport,
   type CaseSystemVNextExpertReviewAdjudicationPacket,
   type CaseSystemVNextExpertReviewEvidence,
-  type CaseSystemVNextExpertReviewExport,
-  type CaseSystemVNextExpertReviewPacket,
 } from "../case-system-vnext/index.js";
 import {
   nextTutorbenchValue,
@@ -18,6 +15,9 @@ import {
   TutorbenchCliUsageError,
 } from "./tutorbench-common.js";
 import { writeTutorCliJson } from "./tutor-case-common.js";
+import {
+  loadCaseSystemVNextExpertReviewSourceExport,
+} from "./case-system-vnext-expert-review-source.js";
 
 export type CaseSystemVNextExpertReviewAdjudicationCliOptions =
   | { readonly help: true; readonly mode: "export" | "import" }
@@ -57,20 +57,6 @@ async function writeText(path: string, content: string): Promise<void> {
   await writeFile(path, content, "utf8");
 }
 
-
-async function loadSourceExport(packetDirectory: string): Promise<CaseSystemVNextExpertReviewExport> {
-  const manifest = await loadJson(
-    resolve(packetDirectory, "operator-manifest.json"),
-  ) as CaseSystemVNextExpertReviewExport["manifest"];
-  const packets = await Promise.all([
-    loadJson(resolve(packetDirectory, "reviewer-1", "packet.json")),
-    loadJson(resolve(packetDirectory, "reviewer-2", "packet.json")),
-  ]) as unknown as readonly [
-    CaseSystemVNextExpertReviewPacket,
-    CaseSystemVNextExpertReviewPacket,
-  ];
-  return reconstructCaseSystemVNextExpertReviewExport(manifest, packets);
-}
 
 export function parseCaseSystemVNextExpertReviewAdjudicationExportArgs(
   args: readonly string[],
@@ -242,7 +228,7 @@ export async function runCaseSystemVNextExpertReviewAdjudicationExport(
     { readonly help: false; readonly mode: "export" }
   >,
 ): Promise<void> {
-  const exported = await loadSourceExport(options.packetDirectory);
+  const exported = await loadCaseSystemVNextExpertReviewSourceExport(options.packetDirectory);
   const evidence = await loadJson(options.evidencePath) as CaseSystemVNextExpertReviewEvidence;
   const adjudication = buildCaseSystemVNextExpertReviewAdjudicationExport(
     exported,
@@ -282,7 +268,7 @@ export async function runCaseSystemVNextExpertReviewAdjudicationImport(
     { readonly help: false; readonly mode: "import" }
   >,
 ): Promise<void> {
-  const exported = await loadSourceExport(options.packetDirectory);
+  const exported = await loadCaseSystemVNextExpertReviewSourceExport(options.packetDirectory);
   const evidence = await loadJson(options.evidencePath) as CaseSystemVNextExpertReviewEvidence;
   const manifest = await loadJson(
     resolve(options.adjudicationDirectory, "operator-manifest.json"),

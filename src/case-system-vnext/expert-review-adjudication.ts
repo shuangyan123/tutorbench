@@ -228,6 +228,8 @@ function validateEvidenceAgainstExport(
 ): void {
   if (
     evidence.schemaVersion !== exported.manifest.schemaVersion ||
+    evidence.protocolId !== exported.manifest.protocolId ||
+    evidence.protocolVersion !== exported.manifest.protocolVersion ||
     evidence.taskSetFingerprint !== exported.manifest.taskSetFingerprint ||
     evidence.suiteId !== exported.manifest.suiteId ||
     evidence.suiteVersion !== exported.manifest.suiteVersion ||
