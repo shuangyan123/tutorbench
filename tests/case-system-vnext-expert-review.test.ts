@@ -1131,26 +1131,39 @@ test("expert review resolution parser rejects semantic reviewer contradictions",
     evidence,
   );
 
-  const contradictoryRaw = structuredClone(resolution);
-  contradictoryRaw.tasks[0]!.sourceReviewerResults[0] = {
-    ...contradictoryRaw.tasks[0]!.sourceReviewerResults[0],
-    outcome: "INSUFFICIENT_EVIDENCE",
+  const firstTask = resolution.tasks[0]!;
+  const contradictoryRaw = {
+    ...resolution,
+    tasks: resolution.tasks.map((task, index) =>
+      index === 0
+        ? {
+            ...task,
+            sourceReviewerResults: [
+              {
+                ...firstTask.sourceReviewerResults[0],
+                outcome: "INSUFFICIENT_EVIDENCE" as const,
+              },
+              firstTask.sourceReviewerResults[1],
+            ],
+          }
+        : task
+    ),
   };
   assert.throws(
-    () => parseCaseSystemVNextExpertReviewResolution({
-      ...contradictoryRaw,
-      resolutionFingerprint: resolution.resolutionFingerprint,
-    }),
+    () => parseCaseSystemVNextExpertReviewResolution(contradictoryRaw),
     /resolution data is invalid/u,
   );
 
-  const contradictoryAgreement = structuredClone(resolution);
-  contradictoryAgreement.tasks[0]!.sourceAgreement = "disagreement";
+  const contradictoryAgreement = {
+    ...resolution,
+    tasks: resolution.tasks.map((task, index) =>
+      index === 0
+        ? { ...task, sourceAgreement: "disagreement" as const }
+        : task
+    ),
+  };
   assert.throws(
-    () => parseCaseSystemVNextExpertReviewResolution({
-      ...contradictoryAgreement,
-      resolutionFingerprint: resolution.resolutionFingerprint,
-    }),
+    () => parseCaseSystemVNextExpertReviewResolution(contradictoryAgreement),
     /resolution data is invalid/u,
   );
 });
