@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
   "id": "case-system-vnext-executable-pilot-v0.1",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "title": "Case System vNext Executable Pilot",
   "description": "Six non-canonical executable Tutor scenarios materialized from the Case System vNext pilot across Physics, Computer Science, Mathematics, Biology, Chemistry, and History at selected D1/D3/D5 depths. They exercise the existing Scenario vNext -> TutorEval -> Tutor Health path and remain experimental authoring evidence, not calibrated benchmark cases.",
   "healthTaxonomyVersion": "0.1.0",
@@ -757,7 +757,7 @@
       "schemaVersion": 3,
       "identity": {
         "id": "csvnext-history-d5-corroboration",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "title": "History D5 — Weigh conflicting sources without authority shortcuts",
         "suiteId": "case-system-vnext-executable-pilot-v0.1"
       },
@@ -813,7 +813,7 @@
           },
           {
             "role": "user",
-            "content": "Source A was an official report defending the policy. Source B compares tax records and several private letters that disagree with parts of the report. Does that mean I should just trust Source B instead?"
+            "content": "Source A was an official report defending the policy. It claims that tax collections stayed stable after the policy and that there were no local petitions against it. Source B cites district tax records showing collections fell in three of four sampled districts, plus two private letters from local officials describing petitions and food shortages in their districts. The records and letters do not cover every district in the region. Does that mean I should just trust Source B instead?"
           }
         ]
       },
@@ -832,7 +832,7 @@
           "evaluationCaseId": "csvnext-history-d5-corroboration",
           "turnIndex": 2,
           "expectedDecision": "probe_understanding",
-          "expectedBehavior": "Reject both automatic primary-source authority and automatic reversal toward Source B; weigh Source A's incentives against the independent records and letters, distinguish which disputed claims are corroborated, and state a bounded conclusion with remaining uncertainty.",
+          "expectedBehavior": "Reject both automatic primary-source authority and automatic reversal toward Source B; explain that the sampled tax records weaken Source A's stable-collections claim and the two private letters weaken its no-petitions claim, while keeping the region-wide conclusion bounded because the independent evidence does not cover every district.",
           "evaluationCriteria": [
             {
               "rubricId": "csvnext-history-d5-provenance",
@@ -875,7 +875,7 @@
               "rubricId": "csvnext-history-d5-bounded-conclusion",
               "category": "guidance",
               "dimension": "intervention_strategy",
-              "criterion": "Use independent records and letters to identify which claims receive stronger support while keeping unresolved disagreements explicit instead of replacing one blanket source preference with another.",
+              "criterion": "Use the sampled tax records to weigh Source A's stable-collections claim and the private letters to weigh its no-petitions claim, while keeping the region-wide conclusion bounded because the independent evidence does not cover every district.",
               "weight": 1,
               "evaluationType": "judge",
               "behavior": "required",
