@@ -23,6 +23,7 @@ import {
   toTutorResponseCorpusSemanticReplay,
   type TutorResponseCorpusReplayPlan,
 } from "../corpus/replay.js";
+import type { TutorEvalScoringConfig } from "../scoring/index.js";
 import type { TutorEvalJudgeRunOptions } from "./tutor-eval-runner.js";
 
 const CASE_RUN_SEPARATOR = "\u0000";
@@ -33,6 +34,7 @@ export interface PrepareTutorResponseCorpusResumeOptions {
   readonly dataset: TutorEvalDataset;
   readonly selectedCases: readonly TutorEvalCase[];
   readonly selection: TutorResponseCorpusEvaluationSelection;
+  readonly scoring: TutorEvalScoringConfig;
   readonly semanticReplay?: TutorResponseCorpusReplayPlan;
   readonly judge?: TutorEvalJudgeRunOptions;
 }
@@ -147,6 +149,30 @@ function semanticJudgeIdentity(
       ? {}
       : { maxOutputTokens: descriptor.maxOutputTokens }),
     ...(descriptor.seed === undefined ? {} : { seed: descriptor.seed }),
+  });
+}
+
+function scoringIdentity(
+  scoring: TutorEvalScoringConfig,
+): string {
+  return JSON.stringify({
+    criterionScores: {
+      PASS: scoring.criterionScores.PASS,
+      PARTIAL: scoring.criterionScores.PARTIAL,
+      FAIL: scoring.criterionScores.FAIL,
+    },
+    categoryWeights: {
+      correctness: scoring.categoryWeights.correctness,
+      diagnosis: scoring.categoryWeights.diagnosis,
+      guidance: scoring.categoryWeights.guidance,
+      adaptation: scoring.categoryWeights.adaptation,
+      actionability: scoring.categoryWeights.actionability,
+    },
+    casePassThreshold: scoring.casePassThreshold,
+    qualityGate: {
+      failureTypes: [...scoring.qualityGate.failureTypes],
+      minimumSeverity: scoring.qualityGate.minimumSeverity,
+    },
   });
 }
 
@@ -430,6 +456,8 @@ function validateIdentity(
     previous.evaluation.datasetVersion !== options.dataset.version ||
     previous.evaluation.evaluatorVersion !== TUTOR_EVAL_EVALUATOR_VERSION ||
     previous.evaluation.runsPerCase !== options.corpus.runsPerCase ||
+    previous.scoring === undefined ||
+    scoringIdentity(previous.scoring) !== scoringIdentity(options.scoring) ||
     semanticJudgeIdentity(previous.evaluation.judge) !==
       semanticJudgeIdentity(judgeDescriptor(options.judge))
   ) {
