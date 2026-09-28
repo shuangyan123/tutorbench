@@ -3,19 +3,13 @@ import { resolve } from "node:path";
 
 import {
   CASE_SYSTEM_VNEXT_DOMAIN_IDS,
-  parseCaseSystemVNextPilot,
-  parseCaseSystemVNextStrategyProfileRegistry,
   type CaseSystemVNextDomainId,
-  type CaseSystemVNextStressFixtureSuite,
 } from "../contracts/index.js";
 import {
   buildCaseSystemVNextExpertReviewAnalysis,
   buildCaseSystemVNextExpertReviewExport,
   mergeCaseSystemVNextExpertReviewSubmissions,
   parseCaseSystemVNextExpertReviewSubmission,
-  reconstructCaseSystemVNextExpertReviewExport,
-  type CaseSystemVNextExpertReviewExport,
-  type CaseSystemVNextExpertReviewPacket,
   type CaseSystemVNextExpertReviewSubmission,
 } from "../case-system-vnext/index.js";
 import {
@@ -24,6 +18,13 @@ import {
   TutorbenchCliUsageError,
 } from "./tutorbench-common.js";
 import { writeTutorCliJson } from "./tutor-case-common.js";
+import {
+  loadCaseSystemVNextExpertReviewInputs,
+  loadCaseSystemVNextExpertReviewSourceExport,
+  selectCaseSystemVNextExpertReviewSuite,
+} from "./case-system-vnext-expert-review-source.js";
+
+export { selectCaseSystemVNextExpertReviewSuite } from "./case-system-vnext-expert-review-source.js";
 
 export type CaseSystemVNextExpertReviewCliOptions =
   | { readonly help: true; readonly mode: "export" | "import" }
@@ -242,41 +243,6 @@ async function loadJson(path: string): Promise<unknown> {
   return JSON.parse(await readFile(resolve(process.cwd(), path), "utf8")) as unknown;
 }
 
-async function loadInputs() {
-  const pilot = parseCaseSystemVNextPilot(
-    await loadJson("scenarios/case-system-vnext/pilot-archetypes.json"),
-  );
-  const registry = parseCaseSystemVNextStrategyProfileRegistry(
-    await loadJson("scenarios/case-system-vnext/task-strategy-profiles.json"),
-  );
-  const suite = await loadJson(
-    "scenarios/case-system-vnext/evaluator-stress-fixtures.json",
-  ) as CaseSystemVNextStressFixtureSuite;
-  return { pilot, registry, suite };
-}
-
-export function selectCaseSystemVNextExpertReviewSuite(
-  pilot: ReturnType<typeof parseCaseSystemVNextPilot>,
-  suite: CaseSystemVNextStressFixtureSuite,
-  domainIds: readonly CaseSystemVNextDomainId[],
-): CaseSystemVNextStressFixtureSuite {
-  if (domainIds.length === 0) return suite;
-  const selectedDomains = new Set(domainIds);
-  const archetypeDomain = new Map(
-    pilot.archetypes.map((archetype) => [archetype.id, archetype.domainId]),
-  );
-  const fixtures = suite.fixtures.filter((fixture) => {
-    const domainId = archetypeDomain.get(fixture.archetypeId);
-    return domainId !== undefined && selectedDomains.has(domainId);
-  });
-  if (fixtures.length === 0) {
-    throw new TutorbenchCliUsageError(
-      `No evaluator-stress fixtures match --domain ${domainIds.join(", ")}.`,
-    );
-  }
-  return { ...suite, fixtures };
-}
-
 async function writeText(path: string, content: string): Promise<void> {
   await mkdir(resolve(path, ".."), { recursive: true });
   await writeFile(path, content, "utf8");
@@ -309,7 +275,7 @@ results. Complete only your own submission template.
 export async function runCaseSystemVNextExpertReviewExport(
   options: Extract<CaseSystemVNextExpertReviewCliOptions, { readonly help: false; readonly mode: "export" }>,
 ): Promise<void> {
-  const { pilot, registry, suite } = await loadInputs();
+  const { pilot, registry, suite } = await loadCaseSystemVNextExpertReviewInputs();
   const selectedSuite = selectCaseSystemVNextExpertReviewSuite(
     pilot,
     suite,
@@ -346,14 +312,10 @@ export async function runCaseSystemVNextExpertReviewExport(
 export async function runCaseSystemVNextExpertReviewImport(
   options: Extract<CaseSystemVNextExpertReviewCliOptions, { readonly help: false; readonly mode: "import" }>,
 ): Promise<void> {
-  const manifest = (
-    await loadJson(resolve(options.packetDirectory, "operator-manifest.json"))
-  ) as CaseSystemVNextExpertReviewExport["manifest"];
-  const packets = await Promise.all([
-    loadJson(resolve(options.packetDirectory, "reviewer-1", "packet.json")),
-    loadJson(resolve(options.packetDirectory, "reviewer-2", "packet.json")),
-  ]) as unknown as readonly [CaseSystemVNextExpertReviewPacket, CaseSystemVNextExpertReviewPacket];
-  const exported = reconstructCaseSystemVNextExpertReviewExport(manifest, packets);
+  const exported = await loadCaseSystemVNextExpertReviewSourceExport(
+    options.packetDirectory,
+  );
+  const packets = exported.packets;
   const rawSubmissions = await Promise.all(options.submissionPaths.map(loadJson));
   const byReviewer = new Map(packets.map((packet) => [packet.reviewerId, packet]));
   const parsed = rawSubmissions.map((raw) => {
