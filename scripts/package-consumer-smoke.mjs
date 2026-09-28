@@ -140,6 +140,7 @@ async function main() {
       "scenarios/tutor-eval-v0.2a/cases.zh-CN.json",
       "scenarios/tutor-eval-v0.1/cases.json",
       "scenarios/real-world/productive-struggle-intervention-v0.1/suite.json",
+      "scenarios/learner-outcome/teach-back-v0.1/synthetic-math-d5.json",
       "prompts/tutor-baseline-system-v0.1.md",
       "assets/brand/tutorbench/web/tutorbench-mark.svg",
       "assets/brand/tutorbench/raster/favicon-32.png",
@@ -215,6 +216,7 @@ async function main() {
   formatTutorHealthReport,
   loadTutorEvalDataset,
   loadTutorScenarioSuiteVNext,
+  parseTeachBackLearnerOutcomeEvidence,
   parseTutorScenarioSuiteVNext,
   runTutorHealthEvaluation,
   runTutorBenchmark,
@@ -255,6 +257,72 @@ if (suite.scenarios.length !== 13) {
 const parsedPrivateSuite = parseTutorScenarioSuiteVNext(structuredClone(suite));
 if (parsedPrivateSuite.id !== suite.id || parsedPrivateSuite.version !== suite.version) {
   throw new Error("Installed package did not expose Scenario vNext runtime validation.");
+}
+
+const teachBackEvidence = parseTeachBackLearnerOutcomeEvidence({
+  schemaVersion: 1,
+  evidenceKind: "teach_back",
+  protocolId: "tutorbench.teach-back-outcome",
+  protocolVersion: "0.1.0",
+  evidenceId: "package-smoke-teach-back",
+  evidenceSource: "synthetic_protocol_fixture",
+  learnerId: "learner-smoke",
+  sourceTutorExposure: {
+    learningObjective: "Explain and transfer a learned structure.",
+    tutor: {
+      provider: "package-smoke",
+      model: "fixture",
+      promptVersion: "v1",
+    },
+  },
+  recipient: {
+    recipientId: "recipient-smoke",
+    kind: "synthetic",
+    relativeLevel: "peer",
+    knownConcepts: ["prerequisite"],
+    prerequisiteGaps: [],
+  },
+  baseline: {
+    stage: "baseline",
+    taskId: "baseline",
+    result: "incorrect",
+    independentlyCompleted: true,
+  },
+  teachBack: {
+    transcript: [
+      { speaker: "learner_teacher", content: "Here is the structure and why it works." },
+      { speaker: "recipient", content: "I think I understand the missing step now." },
+    ],
+    processEvidence: [
+      {
+        dimension: "knowledge_reconstruction",
+        rating: "pass",
+        evidenceTurnIndexes: [1],
+      },
+      {
+        dimension: "learner_diagnosis",
+        rating: "partial",
+        evidenceTurnIndexes: [1, 2],
+      },
+      {
+        dimension: "adaptive_explanation",
+        rating: "partial",
+        evidenceTurnIndexes: [1, 2],
+      },
+    ],
+  },
+  recipientOutcomes: {
+    immediate: {
+      stage: "immediate",
+      taskId: "immediate",
+      result: "correct",
+      independentlyCompleted: true,
+    },
+  },
+  claimBoundary: "observational_or_proxy_only",
+});
+if (teachBackEvidence.claimBoundary !== "observational_or_proxy_only") {
+  throw new Error("Installed package did not expose Teach-back Outcome Evidence validation.");
 }
 const healthRun = await runTutorHealthEvaluation({
   tutor: {

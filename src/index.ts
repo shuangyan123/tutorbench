@@ -26,6 +26,10 @@ export {
   TUTOR_EVAL_LEGACY_DATASET_VERSION,
   TUTOR_CASE_LOCALES,
   DEFAULT_TUTOR_CASE_LOCALE,
+  LEARNER_OUTCOME_EVIDENCE_SCHEMA_VERSION,
+  TEACH_BACK_OUTCOME_PROTOCOL_ID,
+  TEACH_BACK_OUTCOME_PROTOCOL_VERSION,
+  parseTeachBackLearnerOutcomeEvidence,
   parseTutorScenarioSuiteVNext,
   parseCaseSystemVNextPilot,
   parseCaseSystemVNextStrategyProfileRegistry,
@@ -99,6 +103,21 @@ export type {
   TutorScenarioDecisionPoint,
   TutorScenarioCaseSystemSource,
 } from "./contracts/tutor-scenario-vnext.js";
+export type {
+  LearnerOutcomeEvidenceSource,
+  TeachBackAssessmentResult,
+  TeachBackAssessmentStage,
+  TeachBackLearnerOutcomeEvidence,
+  TeachBackProcessDimension,
+  TeachBackProcessEvidence,
+  TeachBackProcessRating,
+  TeachBackRecipientAssessment,
+  TeachBackRecipientKind,
+  TeachBackRecipientProfile,
+  TeachBackRecipientRelativeLevel,
+  TeachBackTranscriptTurn,
+  TeachBackTutorExposureRef,
+} from "./contracts/learner-outcome-evidence.js";
 export type {
   TutorEvidenceRef,
   TutorFinding,

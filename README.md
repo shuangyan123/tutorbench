@@ -212,6 +212,16 @@ This currently covers six authored checkpoints across six domains and does not
 imply that all 15 Case System vNext archetypes have been converted or
 independently validated.
 
+TutorBench also includes an experimental `Teach-back Outcome Evidence v0.1`
+contract for complementary post-Tutor learner evidence. It records whether a
+learner can reconstruct knowledge for a peer or lower-prerequisite recipient,
+diagnose that recipient's gap, adapt an explanation, and whether the recipient
+can then perform independently on immediate and transfer tasks. Synthetic
+recipient runs remain proxy evidence, and all v0.1 artifacts are explicitly
+bounded to observational/proxy claims rather than causal learning-gain claims.
+Teach-back evidence is not an eighth Tutor Health dimension and is not included
+in the Tutor Health aggregate score.
+
 See [Case System vNext](docs/case-system-vnext.md), the
 [Core Coverage Matrix](docs/case-system-vnext-coverage-matrix.md),
 [Mastery & Transfer Positioning](docs/case-system-vnext-mastery-transfer.md),

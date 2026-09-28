@@ -20,6 +20,8 @@ export * from "./tutor-scenario-vnext.js";
 export * from "./tutor-scenario-vnext-validation.js";
 export * from "./tutor-health.js";
 export * from "./tutor-health-validation.js";
+export * from "./learner-outcome-evidence.js";
+export * from "./learner-outcome-evidence-validation.js";
 export * from "./tutor.js";
 export * from "./tutor-eval.js";
 export * from "./tutor-eval-disclosure.js";

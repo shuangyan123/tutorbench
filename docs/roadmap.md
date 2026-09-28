@@ -49,6 +49,7 @@
 - [x] Implement deterministic blind expert-review export/import packages
 - [ ] Independently review stress-fixture expectations with subject/assessment expertise
 - [x] Position Mastery & Transfer as an objective-sensitive reporting area outside the Tutor Health aggregate score
+- [x] Add experimental Teach-back Outcome Evidence v0.1 as a complementary post-Tutor learner-outcome evidence contract, outside Tutor Health scoring
 - [x] Materialize the first executable Case System vNext pilot slice through Scenario vNext, TutorEval, and Tutor Health
 - [x] Expand the executable pilot to six checkpoints across Physics, Biology, Chemistry, Computer Science, Mathematics, and History
 
