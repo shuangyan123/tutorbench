@@ -175,7 +175,7 @@ Credentials and private endpoint details remain in local environment variables
 or the partner's existing secret store. They do not belong in suite JSON,
 report artifacts, source control, or issue/PR text.
 
-## Baseline -> change -> rerun
+For customer-facing reporting, use the [Design Partner Report Data Map](design-partner-report-data-map.md) to keep report fields traceable to the private suite, TutorEval evaluation artifact, and Tutor Health report without creating a second reporting truth.\n\n## Baseline -> change -> rerun
 
 The minimum useful pilot is not a one-time score.
 
