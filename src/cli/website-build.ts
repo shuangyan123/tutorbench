@@ -61,6 +61,7 @@ import { renderTeachometryFooter } from "../site/pages/home.js";
 import { renderNotFoundPage } from "../site/pages/not-found.js";
 import {
   renderBlogIndexPage,
+  renderClassroomDoesNotNeedRobotsPage,
   renderTeachingAndSupervisionPage,
   renderWhyTeachingDoesNotScalePage,
 } from "../site/pages/blog.js";
@@ -313,6 +314,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
 
   const blogPages = [
     renderBlogIndexPage(renderTeachometryFooter(artifacts)),
+    renderClassroomDoesNotNeedRobotsPage(renderTeachometryFooter(artifacts)),
     renderWhyTeachingDoesNotScalePage(renderTeachometryFooter(artifacts)),
     renderTeachingAndSupervisionPage(renderTeachometryFooter(artifacts)),
   ];
