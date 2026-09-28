@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import type { CaseSystemVNextStressRawOutcome } from "../contracts/case-system-vnext-evaluator-stress.js";
 import {
   CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION,
+  assertValidCaseSystemVNextExpertReviewExport,
   type CaseSystemVNextExpertReviewCanonicalOutcome,
   type CaseSystemVNextExpertReviewEvidence,
   type CaseSystemVNextExpertReviewEvidenceItem,
@@ -229,6 +230,7 @@ function validateEvidenceAgainstExport(
   exported: CaseSystemVNextExpertReviewExport,
   evidence: CaseSystemVNextExpertReviewEvidence,
 ): void {
+  assertValidCaseSystemVNextExpertReviewExport(exported);
   if (
     evidence.schemaVersion !== exported.manifest.schemaVersion ||
     evidence.protocolId !== exported.manifest.protocolId ||

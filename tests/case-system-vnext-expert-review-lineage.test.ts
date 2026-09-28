@@ -419,6 +419,59 @@ test("expert review source loader rejects manifest and packet tampering before i
   }
 });
 
+test("direct expert-review APIs reject truncated manifests and stale packet content", async () => {
+  const exported = await buildExport();
+
+  const submissionFor = (
+    packet: typeof exported.packets[number],
+  ): CaseSystemVNextExpertReviewSubmission => ({
+    schemaVersion: packet.schemaVersion,
+    protocolId: packet.protocolId,
+    protocolVersion: packet.protocolVersion,
+    reviewerId: packet.reviewerId,
+    taskSetFingerprint: packet.taskSetFingerprint,
+    packetFingerprint: packet.packetFingerprint,
+    reviews: packet.tasks.map((task) => ({
+      reviewTaskId: task.reviewTaskId,
+      outcome: "EQUIVALENT",
+      sufficientlyClear: true,
+    })),
+  });
+
+  const submissions = [
+    submissionFor(exported.packets[0]),
+    submissionFor(exported.packets[1]),
+  ] as const;
+  const evidence = mergeCaseSystemVNextExpertReviewSubmissions(
+    exported,
+    submissions,
+  );
+
+  const truncated = structuredClone(exported) as typeof exported;
+  (truncated.manifest.tasks as unknown as Array<unknown>).splice(0, 1);
+  assert.throws(
+    () => mergeCaseSystemVNextExpertReviewSubmissions(truncated, submissions),
+    /expert review data is invalid/u,
+  );
+
+  const stalePacket = structuredClone(exported) as typeof exported;
+  const firstTask = stalePacket.packets[0].tasks[0];
+  assert.ok(firstTask);
+  const firstCandidate = firstTask.candidates[0] as {
+    label: "A" | "B";
+    responseText: string;
+  };
+  firstCandidate.responseText += " tampered";
+  assert.throws(
+    () => mergeCaseSystemVNextExpertReviewSubmissions(stalePacket, submissions),
+    /expert review data is invalid/u,
+  );
+  assert.throws(
+    () => buildCaseSystemVNextExpertReviewConsensusResolution(stalePacket, evidence),
+    /expert review data is invalid/u,
+  );
+});
+
 test("expert review task-set fingerprint covers reviewer-visible judgment context", async () => {
   const pilot = parseCaseSystemVNextPilot(
     await loadJson("scenarios/case-system-vnext/pilot-archetypes.json"),
