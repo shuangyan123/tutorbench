@@ -300,6 +300,78 @@ test("changed execution timeout and max attempts do not invalidate completed Jud
   assert.equal(resumed.evaluation.errorCount, 0);
 });
 
+test("changed scoring configuration fails closed before any Judge call", async () => {
+  const fixture = await makeFixture(false);
+  const previous = await runTutorResponseCorpus({
+    corpus: fixture.corpus,
+    dataset: fixture.dataset,
+    judge: makeJudge({ count: 0 }),
+  });
+  const calls = { count: 0 };
+  await assert.rejects(
+    () => runTutorResponseCorpus({
+      corpus: fixture.corpus,
+      dataset: fixture.dataset,
+      resumeEvaluation: previous,
+      judge: makeJudge(calls),
+      scoring: {
+        criterionScores: { PASS: 1, PARTIAL: 0.8, FAIL: 0 },
+        categoryWeights: {
+          correctness: 1,
+          diagnosis: 1,
+          guidance: 1,
+          adaptation: 1,
+          actionability: 1,
+        },
+        casePassThreshold: 0.75,
+        qualityGate: {
+          failureTypes: [
+            "severe_factual_error",
+            "misconception_reinforcement",
+            "incorrect_diagnosis",
+            "answer_leakage",
+            "student_task_takeover",
+            "critical_misconception_ignored",
+            "instruction_violation",
+          ],
+          minimumSeverity: "major",
+        },
+      },
+    }),
+    (error: unknown) =>
+      error instanceof BenchmarkConfigurationError &&
+      error.code === "tutor_eval_result_invalid",
+  );
+  assert.equal(calls.count, 0);
+});
+
+test("legacy evaluation artifacts without scoring provenance cannot be resumed", async () => {
+  const fixture = await makeFixture(false);
+  const previous = await runTutorResponseCorpus({
+    corpus: fixture.corpus,
+    dataset: fixture.dataset,
+    judge: makeJudge({ count: 0 }),
+  });
+  const legacy = clone(previous) as {
+    scoring?: unknown;
+  };
+  delete legacy.scoring;
+
+  const calls = { count: 0 };
+  await assert.rejects(
+    () => runTutorResponseCorpus({
+      corpus: fixture.corpus,
+      dataset: fixture.dataset,
+      resumeEvaluation: legacy as TutorResponseCorpusEvaluationResult,
+      judge: makeJudge(calls),
+    }),
+    (error: unknown) =>
+      error instanceof BenchmarkConfigurationError &&
+      error.code === "tutor_eval_result_invalid",
+  );
+  assert.equal(calls.count, 0);
+});
+
 test("changed Judge semantic identity fails closed before any call", async () => {
   const fixture = await makeFixture(false);
   const previous = await runTutorResponseCorpus({

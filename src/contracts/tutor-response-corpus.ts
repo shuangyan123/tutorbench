@@ -1,5 +1,8 @@
 import type {
+  TutorCriticalFailure,
+  TutorCriticalFailureSeverity,
   TutorEvalCase,
+  TutorEvalCategory,
   TutorEvalDataset,
 } from "./tutor-eval.js";
 import {
@@ -111,6 +114,16 @@ export interface TutorResponseCorpusEvaluationSelection {
   readonly selectedResponseCount: number;
 }
 
+export interface TutorResponseCorpusEvaluationScoring {
+  readonly criterionScores: Readonly<Record<"PASS" | "PARTIAL" | "FAIL", number>>;
+  readonly categoryWeights: Readonly<Record<TutorEvalCategory, number>>;
+  readonly casePassThreshold: number;
+  readonly qualityGate: {
+    readonly failureTypes: readonly TutorCriticalFailure[];
+    readonly minimumSeverity: TutorCriticalFailureSeverity;
+  };
+}
+
 export interface TutorResponseCorpusEvaluationResult {
   readonly schemaVersion: typeof TUTOR_RESPONSE_CORPUS_RESULT_SCHEMA_VERSION;
   readonly corpusId: string;
@@ -123,6 +136,11 @@ export interface TutorResponseCorpusEvaluationResult {
   readonly missingCaseCount: number;
   /** Optional for v1 compatibility; present on new subset-aware evaluations. */
   readonly evaluationSelection?: TutorResponseCorpusEvaluationSelection;
+  /**
+   * Effective scoring semantics used to derive case scores and gates.
+   * Optional only for legacy v1 parsing; new evaluations always persist it.
+   */
+  readonly scoring?: TutorResponseCorpusEvaluationScoring;
   /** Present only when an explicitly audited semantic replay was used. */
   readonly semanticReplay?: TutorResponseCorpusSemanticReplay;
   readonly generationSpec?: TutorGenerationSpec;

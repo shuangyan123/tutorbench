@@ -19,6 +19,9 @@ import {
   type TutorResponseCorpusReplayPlan,
 } from "../corpus/replay.js";
 import {
+  DEFAULT_TUTOR_EVAL_SCORING_CONFIG,
+} from "../scoring/index.js";
+import {
   runTutorEval,
   type RunTutorEvalOptions,
   type TutorEvalJudgeRunOptions,
@@ -149,6 +152,7 @@ function tutorDescriptor(corpus: TutorResponseCorpus): TutorEvalTutorOptions {
 export async function runTutorResponseCorpus(
   options: RunTutorResponseCorpusOptions,
 ): Promise<TutorResponseCorpusEvaluationResult> {
+  const scoring = options.scoring ?? DEFAULT_TUTOR_EVAL_SCORING_CONFIG;
   const semanticReplay = options.semanticReplay === undefined
     ? undefined
     : resolveTutorResponseCorpusReplay(options.corpus, options.dataset);
@@ -185,6 +189,7 @@ export async function runTutorResponseCorpus(
         dataset: options.dataset,
         selectedCases: selected.cases,
         selection: resolvedSelection.selection,
+        scoring,
         ...(semanticReplay === undefined ? {} : { semanticReplay }),
         ...(options.judge === undefined ? {} : { judge: options.judge }),
       });
@@ -198,7 +203,7 @@ export async function runTutorResponseCorpus(
     runsPerCase: options.corpus.runsPerCase,
     runId: options.runId ?? `tutor-corpus-${options.corpus.corpusId}`,
     ...(options.now === undefined ? {} : { now: options.now }),
-    ...(options.scoring === undefined ? {} : { scoring: options.scoring }),
+    scoring,
     ...(options.judge === undefined ? {} : { judge: options.judge }),
     ...(resumePlan === undefined ? {} : { reusedCaseResults: resumePlan.reusableCaseResults }),
     ...(options.onJudgeCall === undefined ? {} : { onJudgeCall: options.onJudgeCall }),
@@ -215,6 +220,7 @@ export async function runTutorResponseCorpus(
     availableResponseCount: options.corpus.responses.length,
     missingCaseCount,
     evaluationSelection: resolvedSelection.selection,
+    scoring,
     ...(semanticReplay === undefined
       ? {}
       : { semanticReplay: toTutorResponseCorpusSemanticReplay(semanticReplay) }),

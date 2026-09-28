@@ -12,6 +12,7 @@ import {
   TUTOR_RESPONSE_CORPUS_RESULT_SCHEMA_VERSION,
   type TutorResponseCorpusCoverage,
   type TutorResponseCorpusEvaluationResult,
+  type TutorResponseCorpusEvaluationScoring,
   type TutorResponseCorpusEvaluationSelection,
   type TutorResponseCorpusEvaluationSelectionMode,
 } from "./tutor-response-corpus.js";
@@ -182,6 +183,68 @@ function parseSemanticReplay(value: unknown): TutorResponseCorpusSemanticReplay 
   };
 }
 
+function parseScoring(
+  value: unknown,
+): TutorResponseCorpusEvaluationScoring | null {
+  const record = asRecord(value);
+  const criterionScores = asRecord(record?.criterionScores);
+  const categoryWeights = asRecord(record?.categoryWeights);
+  const qualityGate = asRecord(record?.qualityGate);
+  if (
+    record === null ||
+    !hasOnlyKeys(record, [
+      "criterionScores",
+      "categoryWeights",
+      "casePassThreshold",
+      "qualityGate",
+    ]) ||
+    criterionScores === null ||
+    !hasOnlyKeys(criterionScores, ["PASS", "PARTIAL", "FAIL"]) ||
+    !["PASS", "PARTIAL", "FAIL"].every((key) => {
+      const score = criterionScores[key];
+      return typeof score === "number" && Number.isFinite(score) && score >= 0 && score <= 1;
+    }) ||
+    categoryWeights === null ||
+    !hasOnlyKeys(categoryWeights, [
+      "correctness",
+      "diagnosis",
+      "guidance",
+      "adaptation",
+      "actionability",
+    ]) ||
+    !["correctness", "diagnosis", "guidance", "adaptation", "actionability"].every((key) => {
+      const weight = categoryWeights[key];
+      return typeof weight === "number" && Number.isFinite(weight) && weight >= 0;
+    }) ||
+    typeof record.casePassThreshold !== "number" ||
+    !Number.isFinite(record.casePassThreshold) ||
+    record.casePassThreshold < 0 ||
+    record.casePassThreshold > 1 ||
+    qualityGate === null ||
+    !hasOnlyKeys(qualityGate, ["failureTypes", "minimumSeverity"]) ||
+    !Array.isArray(qualityGate.failureTypes) ||
+    !qualityGate.failureTypes.every((item) =>
+      typeof item === "string" &&
+      [
+        "severe_factual_error",
+        "misconception_reinforcement",
+        "incorrect_diagnosis",
+        "answer_leakage",
+        "student_task_takeover",
+        "critical_misconception_ignored",
+        "instruction_violation",
+      ].includes(item)
+    ) ||
+    new Set(qualityGate.failureTypes).size !== qualityGate.failureTypes.length ||
+    (qualityGate.minimumSeverity !== "minor" &&
+      qualityGate.minimumSeverity !== "major" &&
+      qualityGate.minimumSeverity !== "critical")
+  ) {
+    return null;
+  }
+  return value as TutorResponseCorpusEvaluationScoring;
+}
+
 function parseArtifactMetadata(value: unknown): boolean {
   const record = asRecord(value);
   return (
@@ -215,6 +278,9 @@ export function parseTutorResponseCorpusEvaluationResult(
   const semanticReplay = record?.semanticReplay === undefined
     ? undefined
     : parseSemanticReplay(record.semanticReplay);
+  const scoring = record?.scoring === undefined
+    ? undefined
+    : parseScoring(record.scoring);
   let generationSpec: TutorGenerationSpec | undefined;
   if (record?.generationSpec !== undefined) {
     try {
@@ -241,6 +307,7 @@ export function parseTutorResponseCorpusEvaluationResult(
       "availableResponseCount",
       "missingCaseCount",
       "evaluationSelection",
+      "scoring",
       "semanticReplay",
       "generationSpec",
       "tutor",
@@ -258,6 +325,7 @@ export function parseTutorResponseCorpusEvaluationResult(
     !isNonNegativeInteger(record.missingCaseCount) ||
     tutor === null ||
     (record.evaluationSelection !== undefined && evaluationSelection === null) ||
+    (record.scoring !== undefined && scoring === null) ||
     (record.semanticReplay !== undefined && semanticReplay === null) ||
     (record.artifactMetadata !== undefined && !parseArtifactMetadata(record.artifactMetadata))
   ) {
@@ -266,6 +334,7 @@ export function parseTutorResponseCorpusEvaluationResult(
   const validEvaluationSelection = evaluationSelection as
     | TutorResponseCorpusEvaluationSelection
     | undefined;
+  const validScoring = scoring as TutorResponseCorpusEvaluationScoring | undefined;
   const validSemanticReplay = semanticReplay as TutorResponseCorpusSemanticReplay | undefined;
   return {
     schemaVersion: TUTOR_RESPONSE_CORPUS_RESULT_SCHEMA_VERSION,
@@ -280,6 +349,7 @@ export function parseTutorResponseCorpusEvaluationResult(
     ...(validEvaluationSelection === undefined
       ? {}
       : { evaluationSelection: validEvaluationSelection }),
+    ...(validScoring === undefined ? {} : { scoring: validScoring }),
     ...(validSemanticReplay === undefined ? {} : { semanticReplay: validSemanticReplay }),
     ...(generationSpec === undefined ? {} : { generationSpec }),
     tutor,
