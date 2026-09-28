@@ -275,14 +275,12 @@ function parseResolutionTask(
     record.reviewTaskId.length === 0 ||
     typeof record.fixtureId !== "string" ||
     record.fixtureId.length === 0 ||
-    !["agreement", "disagreement", "packet_ambiguity"].includes(
-      String(record.sourceAgreement),
-    ) ||
+    (typeof record.sourceAgreement !== "string" ||
+      !["agreement", "disagreement", "packet_ambiguity"].includes(record.sourceAgreement)) ||
     !Array.isArray(record.sourceReviewerResults) ||
     record.sourceReviewerResults.length !== 2 ||
-    !["reviewer_consensus", "adjudicated", "unresolved"].includes(
-      String(record.resolutionStatus),
-    )
+    (typeof record.resolutionStatus !== "string" ||
+      !["reviewer_consensus", "adjudicated", "unresolved"].includes(record.resolutionStatus))
   ) invalid();
 
   const first = reviewerResult(record.sourceReviewerResults[0], reviewerIds[0]);

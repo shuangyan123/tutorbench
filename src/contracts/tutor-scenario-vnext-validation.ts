@@ -93,7 +93,7 @@ function isRecommendation(value: unknown): boolean {
   return (
     record !== null &&
     hasOnlyKeys(record, ["kind", "text"]) &&
-    recommendationKinds.has(String(record.kind)) &&
+    typeof record.kind === "string" && recommendationKinds.has(record.kind) &&
     isText(record.text, 1_000)
   );
 }
@@ -117,7 +117,7 @@ function isFindingTemplate(value: unknown): value is TutorFindingTemplate {
     !isText(record.type, 100) ||
     !/^[a-z][a-z0-9_.-]*$/.test(record.type) ||
     !isText(record.title, 200) ||
-    !findingSeverities.has(String(record.severity)) ||
+    (typeof record.severity !== "string" || !findingSeverities.has(record.severity)) ||
     !isText(record.observedBehavior, 1_000) ||
     !isText(record.diagnosis, 1_000) ||
     !isText(record.impact, 1_000) ||

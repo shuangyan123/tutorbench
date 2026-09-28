@@ -90,10 +90,10 @@ function isAssessment(value: unknown, requiredStage?: string): boolean {
       "independentlyCompleted",
       "notes",
     ]) &&
-    stages.has(String(record.stage)) &&
+    typeof record.stage === "string" && stages.has(record.stage) &&
     (requiredStage === undefined || record.stage === requiredStage) &&
     isText(record.taskId, 160) &&
-    results.has(String(record.result)) &&
+    typeof record.result === "string" && results.has(record.result) &&
     typeof record.independentlyCompleted === "boolean" &&
     (record.notes === undefined || isText(record.notes, 1_000))
   );
@@ -141,9 +141,9 @@ function isTeachBack(value: unknown): boolean {
         "evidenceTurnIndexes",
         "rationale",
       ]) ||
-      !dimensions.has(String(evidence.dimension)) ||
-      seen.has(String(evidence.dimension)) ||
-      !ratings.has(String(evidence.rating)) ||
+      (typeof evidence.dimension !== "string" || !dimensions.has(evidence.dimension)) ||
+      seen.has(evidence.dimension) ||
+      (typeof evidence.rating !== "string" || !ratings.has(evidence.rating)) ||
       !Array.isArray(evidence.evidenceTurnIndexes) ||
       evidence.evidenceTurnIndexes.length === 0 ||
       !evidence.evidenceTurnIndexes.every((index) =>
@@ -157,7 +157,7 @@ function isTeachBack(value: unknown): boolean {
     ) {
       return false;
     }
-    seen.add(String(evidence.dimension));
+    seen.add(evidence.dimension);
     return true;
   });
   return valid && seen.size === dimensions.size;

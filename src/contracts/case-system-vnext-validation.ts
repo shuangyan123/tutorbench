@@ -62,7 +62,7 @@ function isReferenceReasoning(value: unknown): boolean {
       "avoidableDetours",
       "machineSearchCost",
     ]) ||
-    !["human_optimal", "bounded_strategy_set", "not_applicable"].includes(String(record.optimalityMode)) ||
+    (typeof record.optimalityMode !== "string" || !["human_optimal", "bounded_strategy_set", "not_applicable"].includes(record.optimalityMode)) ||
     record.machineSearchCost !== "out_of_scope"
   ) return false;
 

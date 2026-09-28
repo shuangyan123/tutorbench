@@ -244,6 +244,47 @@ test("vNext validation rejects impossible reference-state and intervention-polic
   );
 });
 
+test("runtime validation rejects array-coerced Tutor Health enum values", async () => {
+  const suite = await loadTutorScenarioSuiteVNext();
+  const malformedSuite = structuredClone(suite) as unknown as {
+    scenarios: Array<{
+      decisionPoints: Array<{
+        evaluationCriteria: Array<{
+          failureFinding: { severity: unknown };
+        }>;
+      }>;
+    }>;
+  };
+  malformedSuite.scenarios[0]!.decisionPoints[0]!.evaluationCriteria[0]!
+    .failureFinding.severity = ["critical"];
+
+  assertErrorCode(
+    () => parseTutorScenarioSuiteVNext(malformedSuite),
+    "tutor_scenario_vnext_invalid",
+  );
+
+  const validFinding = buildTutorHealthReport({
+    suite,
+    evaluation: await runTutorEval({
+      dataset: tutorScenarioSuiteToTutorEvalDataset(suite),
+      tutor: fixtureTutor(),
+      judge: fixtureJudge(() => ({ result: "FAIL" })),
+      runId: "enum-validation-fixture",
+    }),
+    scoringProfile: DEFAULT_TUTOR_HEALTH_SCORING_PROFILE,
+  }).findings[0];
+  assert.ok(validFinding);
+
+  const malformedFinding = structuredClone(validFinding) as unknown as {
+    severity: unknown;
+  };
+  malformedFinding.severity = ["critical"];
+  assertErrorCode(
+    () => parseTutorFinding(malformedFinding),
+    "tutor_finding_invalid",
+  );
+});
+
 test("the same tutor response is interpreted against different authored learner states", async () => {
   const suite = await loadTutorScenarioSuiteVNext();
   const { evaluation, report } = await runTutorHealthEvaluation({

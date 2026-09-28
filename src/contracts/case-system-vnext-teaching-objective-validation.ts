@@ -44,7 +44,7 @@ function isAssessmentContext(value: unknown): value is CaseSystemVNextAssessment
     isText(record.examFamily, 200) &&
     isText(record.questionType, 200) &&
     isText(record.scoringPolicy, 1_000) &&
-    ["low", "moderate", "high"].includes(String(record.timePressure)) &&
+    typeof record.timePressure === "string" && ["low", "moderate", "high"].includes(record.timePressure) &&
     (record.timeBudgetMinutes === undefined ||
       (typeof record.timeBudgetMinutes === "number" &&
         Number.isFinite(record.timeBudgetMinutes) &&

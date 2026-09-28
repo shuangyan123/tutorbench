@@ -121,6 +121,20 @@ test("pilot validation rejects incomplete domain coverage and invalid optimality
   );
 });
 
+test("Case System validation rejects array-coerced optimality modes", async () => {
+  const pilot = await loadPilot();
+  const invalid = structuredClone(pilot) as unknown as {
+    archetypes: Array<{ referenceReasoning: { optimalityMode: unknown } }>;
+  };
+  invalid.archetypes[0]!.referenceReasoning.optimalityMode = ["human_optimal"];
+  assert.throws(
+    () => parseCaseSystemVNextPilot(invalid),
+    (error: unknown) =>
+      error instanceof BenchmarkConfigurationError &&
+      error.code === "case_system_vnext_invalid",
+  );
+});
+
 test("pilot covers multi-turn and episode authoring targets without claiming executable H3 behavior", async () => {
   const pilot = await loadPilot();
   const horizons = new Set(pilot.archetypes.map((archetype) => archetype.interactionHorizon));
