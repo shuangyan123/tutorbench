@@ -93,7 +93,7 @@ export function isTutorEvidenceRef(value: unknown): value is TutorEvidenceRef {
         isBoundedInteger(record.turnIndex, 1, 10_000) &&
         isText(record.rubricId, 120) &&
         (record.evaluator === "deterministic_evaluator" || record.evaluator === "judge") &&
-        rubricStatuses.has(String(record.result))
+        typeof record.result === "string" && rubricStatuses.has(record.result)
       );
     case "critical_failure":
       return (
@@ -150,7 +150,7 @@ export function isTutorObservation(value: unknown): value is TutorObservation {
     !isText(record.scenarioId, 120) ||
     !isBoundedInteger(record.runIndex, 1, 10_000) ||
     !isBoundedInteger(record.turnIndex, 1, 10_000) ||
-    !evaluatorOwners.has(String(record.evaluatorOwner)) ||
+    (typeof record.evaluatorOwner !== "string" || !evaluatorOwners.has(record.evaluatorOwner)) ||
     !Array.isArray(record.evidence) ||
     record.evidence.length === 0 ||
     record.evidence.length > 16 ||
@@ -159,7 +159,7 @@ export function isTutorObservation(value: unknown): value is TutorObservation {
     return false;
   }
   if (record.type === "rubric_result") {
-    return rubricStatuses.has(String(record.result));
+    return typeof record.result === "string" && rubricStatuses.has(record.result);
   }
   return record.result === undefined;
 }
@@ -218,7 +218,7 @@ export function isTutorFinding(value: unknown): value is TutorFinding {
     isText(record.type, 100) &&
     /^[a-z][a-z0-9_.-]*$/.test(String(record.type)) &&
     isText(record.title, 200) &&
-    findingSeverities.has(String(record.severity)) &&
+    typeof record.severity === "string" && findingSeverities.has(record.severity) &&
     TUTOR_HEALTH_DIMENSIONS.includes(
       record.dimension as (typeof TUTOR_HEALTH_DIMENSIONS)[number],
     ) &&
