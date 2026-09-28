@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "evidenceKind": "teach_back",
+  "protocolId": "tutorbench.teach-back-outcome",
+  "protocolVersion": "0.1.0",
+  "evidenceId": "teachback-math-d5-synthetic-001",
+  "evidenceSource": "synthetic_protocol_fixture",
+  "learnerId": "learner-teacher-001",
+  "sourceTutorExposure": {
+    "learningObjective": "Justify the difference-of-squares structure in a symmetric product and articulate when the same reasoning can be reused.",
+    "tutor": {
+      "provider": "synthetic",
+      "model": "fixture-tutor",
+      "promptVersion": "teachback-prototype-1"
+    },
+    "sourceScenarioSuiteId": "case-system-vnext-executable-pilot-v0.1",
+    "sourceScenarioSuiteVersion": "0.2.0",
+    "sourceScenarioId": "csvnext-math-d5-generalization",
+    "sourceEvaluationRunId": "synthetic-source-run-001"
+  },
+  "recipient": {
+    "recipientId": "synthetic-recipient-lower-prerequisite-001",
+    "kind": "synthetic",
+    "relativeLevel": "lower_prerequisite",
+    "knownConcepts": [
+      "distributive property",
+      "squares"
+    ],
+    "prerequisiteGaps": [
+      "does not yet recognize conjugate factors as a reusable structure"
+    ]
+  },
+  "baseline": {
+    "stage": "baseline",
+    "taskId": "baseline-48x52-explain",
+    "result": "incorrect",
+    "independentlyCompleted": true,
+    "notes": "Recipient can multiply mechanically but cannot explain why (50-2)(50+2) becomes 50²-2²."
+  },
+  "teachBack": {
+    "transcript": [
+      {
+        "speaker": "learner_teacher",
+        "content": "Start from something you already know: distribute (a-d)(a+d). What four terms do you get?"
+      },
+      {
+        "speaker": "recipient",
+        "content": "a² + ad - ad - d²."
+      },
+      {
+        "speaker": "learner_teacher",
+        "content": "Right. The +ad and -ad cancel, so the product is a²-d². The useful pattern is two factors equally spaced around the same center."
+      },
+      {
+        "speaker": "recipient",
+        "content": "So 48 and 52 are both 2 away from 50, which is why it works there?"
+      },
+      {
+        "speaker": "learner_teacher",
+        "content": "Exactly. Try 97×103 without long multiplication. First identify the center and distance, then use the same structure."
+      },
+      {
+        "speaker": "recipient",
+        "content": "The center is 100 and the distance is 3, so 97×103 = 100²-3² = 9991."
+      }
+    ],
+    "processEvidence": [
+      {
+        "dimension": "knowledge_reconstruction",
+        "rating": "pass",
+        "evidenceTurnIndexes": [
+          1,
+          3
+        ],
+        "rationale": "The learner-teacher reconstructs the identity from distributive reasoning rather than naming a memorized formula."
+      },
+      {
+        "dimension": "learner_diagnosis",
+        "rating": "pass",
+        "evidenceTurnIndexes": [
+          1,
+          2,
+          3
+        ],
+        "rationale": "The explanation starts from the recipient's known distributive property and targets the missing structural recognition."
+      },
+      {
+        "dimension": "adaptive_explanation",
+        "rating": "pass",
+        "evidenceTurnIndexes": [
+          3,
+          4,
+          5
+        ],
+        "rationale": "The learner-teacher moves from symbolic derivation to the recipient's own description of center/distance, then gives a changed example."
+      }
+    ]
+  },
+  "recipientOutcomes": {
+    "immediate": {
+      "stage": "immediate",
+      "taskId": "immediate-97x103",
+      "result": "correct",
+      "independentlyCompleted": true,
+      "notes": "Recipient identifies center 100 and distance 3 and computes 9991."
+    },
+    "nearTransfer": {
+      "stage": "near_transfer",
+      "taskId": "near-transfer-38x42",
+      "result": "correct",
+      "independentlyCompleted": true,
+      "notes": "Recipient independently uses 40²-2² on a new symmetric pair."
+    },
+    "farTransfer": {
+      "stage": "far_transfer",
+      "taskId": "far-transfer-factor-x2-49",
+      "result": "partial",
+      "independentlyCompleted": true,
+      "notes": "Recipient recognizes a²-d² structure but needs help connecting it to factoring x²-49."
+    }
+  },
+  "claimBoundary": "observational_or_proxy_only"
+}
