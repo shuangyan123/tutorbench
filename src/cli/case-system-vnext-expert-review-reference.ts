@@ -17,6 +17,9 @@ import { writeTutorCliJson } from "./tutor-case-common.js";
 import {
   loadCaseSystemVNextExpertReviewSourceExport,
 } from "./case-system-vnext-expert-review-source.js";
+import {
+  sameCaseSystemVNextExpertReviewJson,
+} from "../case-system-vnext/expert-review-canonical.js";
 
 export type CaseSystemVNextExpertReviewReferenceCandidateCliOptions =
   | { readonly help: true }
