@@ -71,6 +71,15 @@ export interface TutorScenarioDecisionPoint {
   readonly evaluationCriteria: readonly TutorScenarioEvaluationCriterion[];
 }
 
+export interface TutorScenarioCaseSystemSource {
+  readonly pilotId: string;
+  readonly pilotVersion: string;
+  readonly archetypeId: string;
+  readonly archetypeVersion: string;
+  readonly strategyProfileId: string;
+  readonly strategyProfileVersion: string;
+}
+
 export interface TutorScenarioVNext {
   readonly schemaVersion: typeof TUTOR_SCENARIO_VNEXT_SCHEMA_VERSION;
   readonly identity: {
@@ -80,6 +89,8 @@ export interface TutorScenarioVNext {
     readonly suiteId: string;
   };
   readonly description: string;
+  /** Optional authoring provenance for scenarios materialized from Case System vNext. */
+  readonly caseSystemSource?: TutorScenarioCaseSystemSource;
   readonly learningContext: {
     readonly subject: string;
     readonly topic: string;

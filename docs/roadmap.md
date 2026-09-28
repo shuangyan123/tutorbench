@@ -49,6 +49,7 @@
 - [x] Implement deterministic blind expert-review export/import packages
 - [ ] Independently review stress-fixture expectations with subject/assessment expertise
 - [x] Position Mastery & Transfer as an objective-sensitive reporting area outside the Tutor Health aggregate score
+- [x] Materialize the first executable Case System vNext pilot slice (Physics D1, Python D3, Mathematics D5) through Scenario vNext -> TutorEval -> Tutor Health
 
 See [Case System vNext](case-system-vnext.md), the
 [Core Coverage Matrix](case-system-vnext-coverage-matrix.md), the

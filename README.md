@@ -170,6 +170,9 @@ includes:
   equivalence, non-dominance, and insufficient-evidence semantics;
 - deterministic blind expert-review export/import with domain-scoped reviewer
   cohorts;
+- a first three-scenario executable pilot spanning Physics D1, Python debugging
+  D3, and Mathematics generalization D5 through the existing Scenario vNext ->
+  TutorEval -> Tutor Health path;
 - an objective-sensitive **Mastery & Transfer** reporting area that remains
   outside the seven-dimension Tutor Health aggregate score.
 
@@ -192,6 +195,22 @@ The expert-review workflow is reviewer-ready and can generate counterbalanced
 domain-scoped packets, but **no independent expert labels are available yet**.
 Developer-authored stress expectations therefore remain diagnostic rather than
 human reference evidence.
+
+The executable pilot is also non-canonical. It can be exercised with the same
+external-Tutor health command by selecting:
+
+```bash
+tutorbench health \
+  --http https://partner.example.com/respond \
+  --suite case-system-vnext-executable-pilot-v0.1 \
+  --tutor-provider partner \
+  --tutor-model production \
+  --prompt-version v1
+```
+
+This currently covers only three authored checkpoints and does not imply that
+all 15 Case System vNext archetypes have been converted or independently
+validated.
 
 See [Case System vNext](docs/case-system-vnext.md), the
 [Core Coverage Matrix](docs/case-system-vnext-coverage-matrix.md),

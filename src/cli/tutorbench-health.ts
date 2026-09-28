@@ -3,8 +3,10 @@ import { join, resolve } from "node:path";
 
 import { createHttpTutor, DEFAULT_HTTP_TUTOR_TIMEOUT_MS } from "../adapters/http-tutor.js";
 import {
+  CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID,
   loadTutorScenarioSuiteVNext,
   PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID,
+  type RegisteredTutorScenarioSuiteId,
 } from "../datasets/real-world.js";
 import {
   formatTutorHealthReport,
@@ -26,7 +28,7 @@ export type TutorHealthCliOptions =
   | {
       readonly help: false;
       readonly endpoint: string;
-      readonly suiteId: typeof PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID;
+      readonly suiteId: RegisteredTutorScenarioSuiteId;
       readonly runsPerCase: number;
       readonly timeoutMs: number;
       readonly outputDirectory: string;
@@ -52,7 +54,7 @@ export function parseTutorHealthCliOptions(
   args: readonly string[],
 ): TutorHealthCliOptions {
   let endpoint: string | undefined;
-  let suiteId: typeof PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID =
+  let suiteId: RegisteredTutorScenarioSuiteId =
     PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID;
   let runsPerCase = 1;
   let timeoutMs: number = DEFAULT_HTTP_TUTOR_TIMEOUT_MS;
@@ -98,9 +100,12 @@ export function parseTutorHealthCliOptions(
     }
     const suiteValue = readOption("--suite");
     if (suiteValue !== undefined) {
-      if (suiteValue !== PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID) {
+      if (
+        suiteValue !== PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID &&
+        suiteValue !== CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID
+      ) {
         throw new TutorbenchCliUsageError(
-          `Unsupported --suite: ${suiteValue}. Supported suite: ${PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID}.`,
+          `Unsupported --suite: ${suiteValue}. Supported suites: ${PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID}, ${CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID}.`,
         );
       }
       suiteId = suiteValue;
@@ -181,6 +186,7 @@ Evaluate an external HTTP Tutor with the registered Scenario vNext suite.
 Options:
   --http <url>             POST TutorTurnInput JSON to this http(s) endpoint (required)
   --suite <id>             Scenario suite (default: ${PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID})
+                           Experimental vNext: ${CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID}
   --runs <n>               Run each evaluation case n times (default: 1)
   --timeout-ms <n>         HTTP Tutor request timeout in milliseconds (default: ${DEFAULT_HTTP_TUTOR_TIMEOUT_MS})
   --output <directory>     Write evaluation.json and Health Report artifacts here
