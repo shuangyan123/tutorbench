@@ -91,3 +91,28 @@ test("teach-back evidence cannot elevate its own causal claim boundary", async (
     /Learner outcome evidence is invalid/u,
   );
 });
+
+test("teach-back validation rejects array-coerced enum values", async () => {
+  const base = await loadFixture() as {
+    baseline: { stage: unknown; result: unknown };
+    teachBack: {
+      processEvidence: Array<{ dimension: unknown; rating: unknown }>;
+    };
+  };
+
+  for (const mutate of [
+    (value: typeof base) => { value.baseline.stage = ["baseline"]; },
+    (value: typeof base) => { value.baseline.result = ["incorrect"]; },
+    (value: typeof base) => {
+      value.teachBack.processEvidence[0]!.dimension = ["knowledge_reconstruction"];
+    },
+    (value: typeof base) => { value.teachBack.processEvidence[0]!.rating = ["pass"]; },
+  ]) {
+    const invalid = structuredClone(base);
+    mutate(invalid);
+    assert.throws(
+      () => parseTeachBackLearnerOutcomeEvidence(invalid),
+      /Learner outcome evidence is invalid/u,
+    );
+  }
+});
