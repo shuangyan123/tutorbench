@@ -16,7 +16,7 @@ import {
 export const CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION = 1 as const;
 export const CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_ID =
   "case-system-vnext-expert-review" as const;
-export const CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_VERSION = "0.1.0" as const;
+export const CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_VERSION = "0.2.0" as const;
 
 export interface CaseSystemVNextExpertReviewCandidate {
   readonly label: "A" | "B";
@@ -174,6 +174,10 @@ export interface CaseSystemVNextExpertReviewEvidence {
   readonly pilotVersion: string;
   readonly taskSetFingerprint: string;
   readonly reviewerIds: readonly [string, string];
+  readonly sourcePacketFingerprints: readonly [
+    { readonly reviewerId: string; readonly packetFingerprint: string },
+    { readonly reviewerId: string; readonly packetFingerprint: string },
+  ];
   readonly reviews: readonly CaseSystemVNextExpertReviewEvidenceItem[];
   readonly agreementCount: number;
   readonly disagreementCount: number;
@@ -213,6 +217,7 @@ export interface CaseSystemVNextExpertReviewAnalysis {
   readonly pilotVersion: string;
   readonly taskSetFingerprint: string;
   readonly reviewerIds: readonly [string, string];
+  readonly sourcePacketFingerprints: CaseSystemVNextExpertReviewEvidence["sourcePacketFingerprints"];
   readonly summary: {
     readonly totalTaskCount: number;
     readonly agreementCount: number;
@@ -337,6 +342,11 @@ function commonFingerprintInput(
   pilot: CaseSystemVNextPilot,
   suite: CaseSystemVNextStressFixtureSuite,
   registry: CaseSystemVNextStressStrategyRegistry,
+  tasksByReviewer: readonly [
+    readonly CaseSystemVNextExpertReviewTask[],
+    readonly CaseSystemVNextExpertReviewTask[],
+  ],
+  manifestTasks: readonly CaseSystemVNextExpertReviewManifestTask[],
 ): unknown {
   return {
     protocolId: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_ID,
@@ -347,17 +357,22 @@ function commonFingerprintInput(
     strategyRegistryVersion: registry.version,
     pilotId: pilot.id,
     pilotVersion: pilot.version,
-    fixtures: [...suite.fixtures]
-      .sort((left, right) => left.id.localeCompare(right.id))
-      .map((fixture) => ({
-        fixtureId: fixture.id,
-        candidates: [...fixture.candidates]
-          .map((candidate) => ({
-            candidateId: candidate.id,
-            responseText: candidate.responseText,
-          }))
-          .sort((left, right) => left.candidateId.localeCompare(right.candidateId)),
-      })),
+    tasks: manifestTasks.map((task, index) => {
+      const firstTask = tasksByReviewer[0][index];
+      const secondTask = tasksByReviewer[1][index];
+      if (firstTask === undefined || secondTask === undefined) invalid();
+      return {
+        reviewTaskId: task.reviewTaskId,
+        fixtureId: task.fixtureId,
+        presentations: task.assignments.map((assignment, reviewerIndex) => ({
+          assignment: {
+            aCandidateId: assignment.aCandidateId,
+            bCandidateId: assignment.bCandidateId,
+          },
+          task: reviewerIndex === 0 ? firstTask : secondTask,
+        })),
+      };
+    }),
   };
 }
 
@@ -389,10 +404,6 @@ export function buildCaseSystemVNextExpertReviewExport(
     registry,
     1,
   );
-  const taskSetFingerprint = fingerprint(
-    commonFingerprintInput(pilot, orderedSuite, registry),
-  );
-
   const tasksByReviewer: [CaseSystemVNextExpertReviewTask[], CaseSystemVNextExpertReviewTask[]] =
     [[], []];
   const manifestTasks: CaseSystemVNextExpertReviewManifestTask[] = [];
@@ -422,6 +433,16 @@ export function buildCaseSystemVNextExpertReviewExport(
       ],
     });
   });
+
+  const taskSetFingerprint = fingerprint(
+    commonFingerprintInput(
+      pilot,
+      orderedSuite,
+      registry,
+      tasksByReviewer,
+      manifestTasks,
+    ),
+  );
 
   const packetFor = (
     index: 0 | 1,
@@ -666,6 +687,14 @@ export function mergeCaseSystemVNextExpertReviewSubmissions(
     pilotVersion: exported.manifest.pilotVersion,
     taskSetFingerprint: exported.manifest.taskSetFingerprint,
     reviewerIds: exported.manifest.reviewerIds,
+    sourcePacketFingerprints: exported.manifest.reviewerIds.map((id) => {
+      const packet = packetByReviewer.get(id);
+      if (packet === undefined) invalid();
+      return {
+        reviewerId: id,
+        packetFingerprint: packet.packetFingerprint,
+      };
+    }) as unknown as CaseSystemVNextExpertReviewEvidence["sourcePacketFingerprints"],
     reviews,
     agreementCount: reviews.filter((review) => review.agreement === "agreement").length,
     disagreementCount: reviews.filter((review) => review.agreement === "disagreement").length,
@@ -733,6 +762,7 @@ export function buildCaseSystemVNextExpertReviewAnalysis(
     pilotVersion: evidence.pilotVersion,
     taskSetFingerprint: evidence.taskSetFingerprint,
     reviewerIds: evidence.reviewerIds,
+    sourcePacketFingerprints: evidence.sourcePacketFingerprints,
     summary: {
       totalTaskCount,
       agreementCount: evidence.agreementCount,
