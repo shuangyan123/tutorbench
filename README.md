@@ -43,6 +43,30 @@ Tutor failed, and make the result reproducible enough to retest after a product
 change. It is designed to support better AI tutoring systems—not merely produce
 a leaderboard.
 
+## How TutorBench fits together
+
+TutorBench has four complementary layers:
+
+- **Tutor Health** — measures how well a Tutor teaches in concrete learner
+  scenarios.
+- **Case System vNext** — designs what tutoring situations and capabilities
+  should be tested.
+- **Evaluator Stress / Expert Review** — checks whether TutorBench's own
+  evaluators and reference expectations are trustworthy.
+- **Mastery / Transfer / Teach-back** — explores whether learners actually
+  develop usable, transferable understanding after tutoring.
+
+In short:
+
+**evaluate the Tutor → design better tests → validate the measurement → study
+learner outcomes**
+
+These layers have different evidence boundaries. Tutor Health is the core
+evaluation product. Case System vNext improves the quality and coverage of the
+cases it runs. Evaluator Stress and Expert Review validate TutorBench's own
+measurement machinery. Mastery, Transfer, and Teach-back remain experimental
+learner-outcome work and do not currently imply causal learning gains.
+
 The approved T1 trajectory mark and its usage rules are documented in
 [`assets/brand/tutorbench/README.md`](assets/brand/tutorbench/README.md).
 
