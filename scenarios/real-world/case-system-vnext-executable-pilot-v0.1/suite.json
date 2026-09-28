@@ -1,0 +1,435 @@
+{
+  "schemaVersion": 3,
+  "id": "case-system-vnext-executable-pilot-v0.1",
+  "version": "0.1.0",
+  "title": "Case System vNext Executable Pilot",
+  "description": "Three non-canonical executable Tutor scenarios materialized from the Case System vNext pilot across D1, D3, and D5. They exercise the existing Scenario vNext -> TutorEval -> Tutor Health path and remain experimental authoring evidence, not calibrated benchmark cases.",
+  "healthTaxonomyVersion": "0.1.0",
+  "scenarios": [
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "csvnext-physics-d1-graph",
+        "version": "0.1.0",
+        "title": "Physics D1 — Bound interpretation to graph evidence",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1"
+      },
+      "description": "The learner interprets a steeper position-time segment as evidence of a stronger force. The Tutor should separate directly represented kinematics from unsupported causal claims.",
+      "caseSystemSource": {
+        "pilotId": "case-system-vnext-pilot",
+        "pilotVersion": "0.2.0",
+        "archetypeId": "science-d1-graph",
+        "archetypeVersion": "0.2.0",
+        "strategyProfileId": "physics-d1-position-time-graph",
+        "strategyProfileVersion": "0.1.0"
+      },
+      "learningContext": {
+        "subject": "physics",
+        "topic": "position-time graph interpretation",
+        "learningObjective": "Interpret the motion information supported by a position-time graph while distinguishing it from unsupported claims about force or mechanism.",
+        "learnerLevel": "middle-school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "graph axes and units",
+          "position and time",
+          "increasing, decreasing, and constant trends"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "treats a steeper position-time segment as direct evidence of a stronger force",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.7,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "On a position-time graph, the line gets much steeper from 4 s to 6 s. I think that proves a stronger forward force started acting then. Is that the right way to read it?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed",
+        "intervention": {
+          "firstHintAfterFailedAttempts": 1
+        },
+        "productiveStruggle": {
+          "minimumMeaningfulAttempts": 1
+        }
+      },
+      "decisionPoints": [
+        {
+          "id": "separate-kinematics-from-cause",
+          "evaluationCaseId": "csvnext-physics-d1-graph",
+          "turnIndex": 1,
+          "expectedDecision": "protect_learning_integrity",
+          "expectedBehavior": "Explain that the steeper position-time segment supports a greater rate of position change on that interval, while explicitly withholding any force claim that the graph alone cannot establish.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "csvnext-physics-d1-evidence-scope",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Correctly interpret the steeper position-time segment as faster position change and explicitly distinguish that kinematic claim from unsupported inference about force or cause.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "physics_graph_scope_overreach",
+                "title": "Graph interpretation exceeded the available evidence",
+                "severity": "major",
+                "observedBehavior": "The response treats a position-time graph as direct evidence for a force or causal mechanism, or fails to correct that inference.",
+                "diagnosis": "The response does not maintain representation fidelity and evidence-scope control for the authored kinematics task.",
+                "impact": "The learner may conflate what a graph directly represents with a causal explanation that requires additional physical evidence.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response policy may be mapping visual steepness directly to a plausible force story instead of first identifying the graphed quantities.",
+                    "confidence": 0.5
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response names the graph axes and the supported interval claim before introducing any physical cause."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Require an explicit evidence-scope check before inferring forces or mechanisms from kinematic representations."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-physics-d1-graph/separate-kinematics-from-cause"
+                ],
+                "confidence": 0.75
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "csvnext-python-d3-aliasing",
+        "version": "0.1.0",
+        "title": "Python D3 — Localize a mutable-state aliasing defect",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1"
+      },
+      "description": "The learner expects assignment to copy a list and observes unexpected shared mutation. The Tutor should localize the first bad state and propose a minimal evidence-backed repair.",
+      "caseSystemSource": {
+        "pilotId": "case-system-vnext-pilot",
+        "pilotVersion": "0.2.0",
+        "archetypeId": "programming-d3-debug",
+        "archetypeVersion": "0.2.0",
+        "strategyProfileId": "computer-science-python-d3-debugging",
+        "strategyProfileVersion": "0.1.0"
+      },
+      "learningContext": {
+        "subject": "computer_science",
+        "topic": "Python mutable-state debugging",
+        "learningObjective": "Use a small state trace or targeted test to identify unintended list aliasing and make the smallest repair that restores the intended invariant.",
+        "learnerLevel": "intermediate"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "Python functions",
+          "loops",
+          "mutable lists",
+          "references and aliasing at an introductory level"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "assumes assigning one list variable to another creates an independent copy",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.45,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 2,
+        "failedAttempts": 2,
+        "priorHints": [
+          "Compare the two lists immediately before and after append."
+        ],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I have `items = ['a']`, then `backup = items`, then `items.append('b')`. I expected `backup` to stay `['a']`, but it also becomes `['a', 'b']`. I thought `backup = items` made a copy."
+          },
+          {
+            "role": "assistant",
+            "content": "Compare the two lists immediately before and after append."
+          },
+          {
+            "role": "user",
+            "content": "They match before and after the append, so I still do not know where the first bad state is. Should I rewrite the whole function?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "partial_solution",
+        "intervention": {
+          "firstHintAfterFailedAttempts": 1,
+          "escalateAfterFailedAttempts": 3
+        },
+        "productiveStruggle": {
+          "minimumMeaningfulAttempts": 1
+        }
+      },
+      "decisionPoints": [
+        {
+          "id": "localize-alias-before-rewrite",
+          "evaluationCaseId": "csvnext-python-d3-aliasing",
+          "turnIndex": 2,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Identify assignment-time aliasing as the first state transition to test, suggest a targeted identity or mutation check, and guide a minimal copy/assignment repair without rewriting unrelated logic.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "csvnext-python-d3-localization",
+              "category": "diagnosis",
+              "dimension": "learner_diagnosis",
+              "criterion": "Localize the defect to shared list identity created by assignment and support that diagnosis with a targeted state/identity check rather than a speculative rewrite.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "python_aliasing_fault_not_localized",
+                "title": "Mutable-state defect was not localized",
+                "severity": "major",
+                "observedBehavior": "The response recommends broad rewriting or generic logging without identifying the assignment-created alias as the first relevant bad state.",
+                "diagnosis": "The debugging intervention does not use Python mutable-object semantics and the available execution evidence to narrow the defect.",
+                "impact": "The learner may change unrelated code while retaining the same aliasing misconception and lose a reusable debugging method.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may be optimizing for code replacement rather than invariant-driven fault localization.",
+                    "confidence": 0.5
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response identifies object identity or aliasing before proposing a patch."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Prefer the smallest targeted state check that can confirm the first violated invariant before suggesting code changes."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-python-d3-aliasing/localize-alias-before-rewrite"
+                ],
+                "confidence": 0.8
+              }
+            },
+            {
+              "rubricId": "csvnext-python-d3-minimal-repair",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Guide the learner toward the smallest repair that separates the intended list states and preserve unrelated behavior for a follow-up regression check.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "python_aliasing_repair_overbroad",
+                "title": "Debugging guidance replaced too much code",
+                "severity": "minor",
+                "observedBehavior": "The response proposes a wholesale rewrite instead of a minimal repair tied to the localized aliasing defect.",
+                "diagnosis": "The intervention does not preserve patch minimality after the defect has been localized.",
+                "impact": "Broad changes make the causal link between diagnosis and repair harder to learn and increase regression risk.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not distinguish fault localization from refactoring.",
+                    "confidence": 0.45
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the proposed code changes with the single state transition identified as defective."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Constrain debugging guidance to one evidence-backed repair followed by a targeted failing-case and unaffected-case check."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-python-d3-aliasing/localize-alias-before-rewrite"
+                ],
+                "confidence": 0.7
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "csvnext-math-d5-generalization",
+        "version": "0.1.0",
+        "title": "Mathematics D5 — Justify and generalize a structural shortcut",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1"
+      },
+      "description": "The learner recognizes a difference-of-squares shortcut for one symmetric product but cannot yet justify or generalize it.",
+      "caseSystemSource": {
+        "pilotId": "case-system-vnext-pilot",
+        "pilotVersion": "0.2.0",
+        "archetypeId": "math-d5-generalization",
+        "archetypeVersion": "0.2.0",
+        "strategyProfileId": "math-d5-structural-generalization",
+        "strategyProfileVersion": "0.1.0"
+      },
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "algebraic structure and generalization",
+        "learningObjective": "Justify the difference-of-squares structure in a symmetric product and articulate when the same reasoning can be reused.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "distributive property",
+          "squares",
+          "basic symbolic manipulation"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [],
+        "confidence": 0.65,
+        "engagement": "high",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 2,
+        "failedAttempts": 0,
+        "priorHints": [
+          "Write 48 and 52 as numbers equally spaced around 50."
+        ],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "For 48 × 52 I rewrote it as (50 - 2)(50 + 2). I remember that this becomes 50² - 2², but I cannot explain why that shortcut works or when I am allowed to use it."
+          },
+          {
+            "role": "assistant",
+            "content": "Write the two factors as (a-d) and (a+d). What happens if you distribute?"
+          },
+          {
+            "role": "user",
+            "content": "I get a² + ad - ad - d², so the middle terms cancel. How should I say the general rule without just memorizing another formula?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed",
+        "intervention": {
+          "firstHintAfterFailedAttempts": 1
+        },
+        "productiveStruggle": {
+          "minimumMeaningfulAttempts": 1
+        }
+      },
+      "decisionPoints": [
+        {
+          "id": "derive-then-generalize",
+          "evaluationCaseId": "csvnext-math-d5-generalization",
+          "turnIndex": 2,
+          "expectedDecision": "probe_understanding",
+          "expectedBehavior": "Build from the learner's expansion, make the cancellation explicit, state the reusable (a-d)(a+d)=a²-d² structure, and ask for or supply a changed symmetric example that tests the applicability condition.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "csvnext-math-d5-transparency",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Use the learner's expansion to justify the cancellation of the middle terms rather than presenting the identity as an unexplained memorized shortcut.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "math_structural_shortcut_left_opaque",
+                "title": "Structural shortcut was left unexplained",
+                "severity": "major",
+                "observedBehavior": "The response states or applies the difference-of-squares identity without connecting it to the learner's distributive expansion.",
+                "diagnosis": "The intervention does not make the key structural cancellation inspectable at the learner's prerequisite level.",
+                "impact": "The learner may reproduce the formula without understanding why it works or when its structure applies.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may be optimizing for symbolic brevity rather than reasoning transparency.",
+                    "confidence": 0.5
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response explicitly accounts for the +ad and -ad cancellation."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Anchor the identity to one learner-visible distributive derivation before naming the general formula."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-math-d5-generalization/derive-then-generalize"
+                ],
+                "confidence": 0.8
+              }
+            },
+            {
+              "rubricId": "csvnext-math-d5-generalization",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Generalize the identity with its symmetric-factor applicability condition and connect it to a changed example rather than treating the current numbers as an isolated trick.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "math_generalization_target_missed",
+                "title": "The reusable structure was not generalized",
+                "severity": "minor",
+                "observedBehavior": "The response solves or explains only 48 × 52 without articulating the conjugate-factor structure that transfers to changed instances.",
+                "diagnosis": "The response does not match the authored D5 generalization target despite the learner already reaching the key cancellation step.",
+                "impact": "The learner may understand the current calculation but remain unable to recognize the same structure in a new problem.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may be stopping at local correctness instead of adapting to the learner's near-generalization state.",
+                    "confidence": 0.45
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Check whether the response states the condition that the factors are equally spaced around the same center."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "After the derivation, add one changed symmetric pair or factoring example to test transfer of the structure."
+                  }
+                ],
+                "regressionTargets": [
+                  "csvnext-math-d5-generalization/derive-then-generalize"
+                ],
+                "confidence": 0.7
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
