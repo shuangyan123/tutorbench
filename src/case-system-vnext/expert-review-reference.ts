@@ -4,10 +4,16 @@ import type { CaseSystemVNextStressRawOutcome } from "../contracts/case-system-v
 import {
   CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION,
   type CaseSystemVNextExpertReviewCanonicalOutcome,
+  type CaseSystemVNextExpertReviewEvidence,
+  type CaseSystemVNextExpertReviewExport,
 } from "./expert-review.js";
 import {
   CASE_SYSTEM_VNEXT_EXPERT_REVIEW_ADJUDICATION_PROTOCOL_ID,
   CASE_SYSTEM_VNEXT_EXPERT_REVIEW_ADJUDICATION_PROTOCOL_VERSION,
+  buildCaseSystemVNextExpertReviewConsensusResolution,
+  buildCaseSystemVNextExpertReviewResolution,
+  type CaseSystemVNextExpertReviewAdjudicationExport,
+  type CaseSystemVNextExpertReviewAdjudicationSubmission,
   type CaseSystemVNextExpertReviewResolution,
   type CaseSystemVNextExpertReviewResolutionTask,
 } from "./expert-review-adjudication.js";
@@ -146,6 +152,30 @@ function sameOutcome(
       (right.kind === "preference" && left.candidateId === right.candidateId));
 }
 
+function rawOutcomeMatchesCanonicalKind(
+  raw: CaseSystemVNextStressRawOutcome,
+  normalized: CaseSystemVNextExpertReviewCanonicalOutcome,
+): boolean {
+  if (raw === "A_BETTER" || raw === "B_BETTER") {
+    return normalized.kind === "preference";
+  }
+  if (raw === "EQUIVALENT") return normalized.kind === "equivalent";
+  if (raw === "NON_DOMINATED") return normalized.kind === "non_dominated";
+  return normalized.kind === "insufficient_evidence";
+}
+
+function expectedSourceAgreement(
+  first: CaseSystemVNextExpertReviewResolutionTask["sourceReviewerResults"][number],
+  second: CaseSystemVNextExpertReviewResolutionTask["sourceReviewerResults"][number],
+): CaseSystemVNextExpertReviewResolutionTask["sourceAgreement"] {
+  if (!first.sufficientlyClear || !second.sufficientlyClear) {
+    return "packet_ambiguity";
+  }
+  return sameOutcome(first.normalizedOutcome, second.normalizedOutcome)
+    ? "agreement"
+    : "disagreement";
+}
+
 function reviewerResult(
   value: unknown,
   reviewerId: string,
@@ -166,6 +196,10 @@ function reviewerResult(
     typeof record.outcome !== "string" ||
     !rawOutcomes.has(record.outcome as CaseSystemVNextStressRawOutcome) ||
     normalized === null ||
+    !rawOutcomeMatchesCanonicalKind(
+      record.outcome as CaseSystemVNextStressRawOutcome,
+      normalized,
+    ) ||
     (record.notes !== undefined &&
       (typeof record.notes !== "string" ||
         record.notes.trim().length === 0 ||
@@ -199,6 +233,10 @@ function adjudicatorResult(
     typeof record.outcome !== "string" ||
     !rawOutcomes.has(record.outcome as CaseSystemVNextStressRawOutcome) ||
     normalized === null ||
+    !rawOutcomeMatchesCanonicalKind(
+      record.outcome as CaseSystemVNextStressRawOutcome,
+      normalized,
+    ) ||
     typeof record.sufficientlyClear !== "boolean" ||
     (record.notes !== undefined &&
       (typeof record.notes !== "string" ||
@@ -253,6 +291,7 @@ function parseResolutionTask(
 
   const sourceAgreement = record.sourceAgreement as
     CaseSystemVNextExpertReviewResolutionTask["sourceAgreement"];
+  if (sourceAgreement !== expectedSourceAgreement(first, second)) invalid();
   const resolutionStatus = record.resolutionStatus as
     CaseSystemVNextExpertReviewResolutionTask["resolutionStatus"];
   let parsedResolution: CaseSystemVNextExpertReviewCanonicalOutcome | undefined;
@@ -478,7 +517,7 @@ export function parseCaseSystemVNextExpertReviewResolution(
   };
 }
 
-export function buildCaseSystemVNextExpertReviewReferenceCandidate(
+function projectCaseSystemVNextExpertReviewReferenceCandidate(
   resolutionInput: CaseSystemVNextExpertReviewResolution,
 ): CaseSystemVNextExpertReviewReferenceCandidate {
   const resolution = parseCaseSystemVNextExpertReviewResolution(resolutionInput);
@@ -582,4 +621,32 @@ export function buildCaseSystemVNextExpertReviewReferenceCandidate(
     ...withoutFingerprint,
     candidateFingerprint: fingerprint(withoutFingerprint),
   };
+}
+
+
+export interface CaseSystemVNextExpertReviewReferenceCandidateAdjudicationInput {
+  readonly adjudicationExport: CaseSystemVNextExpertReviewAdjudicationExport;
+  readonly submission: CaseSystemVNextExpertReviewAdjudicationSubmission;
+}
+
+export function buildCaseSystemVNextExpertReviewReferenceCandidate(
+  exported: CaseSystemVNextExpertReviewExport,
+  evidence: CaseSystemVNextExpertReviewEvidence,
+  adjudication?: CaseSystemVNextExpertReviewReferenceCandidateAdjudicationInput,
+): CaseSystemVNextExpertReviewReferenceCandidate {
+  const requiresAdjudication =
+    evidence.disagreementCount > 0 || evidence.packetAmbiguityCount > 0;
+
+  if (requiresAdjudication !== (adjudication !== undefined)) invalid();
+
+  const resolution = adjudication === undefined
+    ? buildCaseSystemVNextExpertReviewConsensusResolution(exported, evidence)
+    : buildCaseSystemVNextExpertReviewResolution(
+        exported,
+        evidence,
+        adjudication.adjudicationExport,
+        adjudication.submission,
+      );
+
+  return projectCaseSystemVNextExpertReviewReferenceCandidate(resolution);
 }
