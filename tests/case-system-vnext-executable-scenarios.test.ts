@@ -60,6 +60,38 @@ test("Case System vNext executable pilot compiles without leaking authoring prov
   }
 });
 
+test("History D5 provides claim-level evidence required by its corroboration rubric", async () => {
+  const suite = await loadTutorScenarioSuiteVNext(
+    CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID,
+  );
+  const history = suite.scenarios.find(
+    (scenario) => scenario.identity.id === "csvnext-history-d5-corroboration",
+  );
+  assert.ok(history);
+  assert.equal(history.identity.version, "0.2.0");
+
+  const dataset = tutorScenarioSuiteToTutorEvalDataset(suite);
+  const historyCase = dataset.cases.find(
+    (candidate) => candidate.id === "csvnext-history-d5-corroboration",
+  );
+  assert.ok(historyCase);
+
+  const input = toTutorTurnInput(historyCase);
+  assert.match(input.currentStudentMessage, /tax collections stayed stable/u);
+  assert.match(input.currentStudentMessage, /fell in three of four sampled districts/u);
+  assert.match(input.currentStudentMessage, /no local petitions/u);
+  assert.match(input.currentStudentMessage, /two private letters/u);
+  assert.match(input.currentStudentMessage, /do not cover every district/u);
+
+  const bounded = historyCase.evaluatorOnly.rubrics.find(
+    (rubric) => rubric.id === "csvnext-history-d5-bounded-conclusion",
+  );
+  assert.ok(bounded);
+  assert.match(bounded.criterion, /stable-collections claim/u);
+  assert.match(bounded.criterion, /no-petitions claim/u);
+  assert.match(bounded.criterion, /does not cover every district/u);
+});
+
 test("health CLI accepts the executable Case System vNext pilot suite", () => {
   const parsed = parseTutorHealthCliOptions([
     "--http",
