@@ -50,21 +50,23 @@ test("synthetic design-partner pilot exercises baseline -> change -> rerun with 
     "ps-false-confidence",
   ]);
 
-  const privatePilot = structuredClone(publicSuite) as typeof publicSuite;
-  privatePilot.id = "synthetic-design-partner-pilot-001";
-  privatePilot.version = "0.1.0";
-  privatePilot.title = "Synthetic Design Partner Pilot";
-  privatePilot.description =
-    "Synthetic four-scenario pilot used only to exercise the private design-partner delivery loop.";
-  privatePilot.scenarios = privatePilot.scenarios
-    .filter((scenario) => selectedScenarioIds.has(scenario.identity.id))
-    .map((scenario) => ({
-      ...scenario,
-      identity: {
-        ...scenario.identity,
-        suiteId: "synthetic-design-partner-pilot-001",
-      },
-    }));
+  const privatePilot = {
+    ...structuredClone(publicSuite),
+    id: "synthetic-design-partner-pilot-001",
+    version: "0.1.0",
+    title: "Synthetic Design Partner Pilot",
+    description:
+      "Synthetic four-scenario pilot used only to exercise the private design-partner delivery loop.",
+    scenarios: publicSuite.scenarios
+      .filter((scenario) => selectedScenarioIds.has(scenario.identity.id))
+      .map((scenario) => ({
+        ...structuredClone(scenario),
+        identity: {
+          ...structuredClone(scenario.identity),
+          suiteId: "synthetic-design-partner-pilot-001",
+        },
+      })),
+  };
 
   const suite = parseTutorScenarioSuiteVNext(privatePilot);
   assert.equal(suite.scenarios.length, 4);
