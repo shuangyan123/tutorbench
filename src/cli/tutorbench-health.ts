@@ -1,19 +1,16 @@
-import { writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 import { createHttpTutor, DEFAULT_HTTP_TUTOR_TIMEOUT_MS } from "../adapters/http-tutor.js";
+import { parseTutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext-validation.js";
 import {
   CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID,
   loadTutorScenarioSuiteVNext,
   PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID,
   type RegisteredTutorScenarioSuiteId,
 } from "../datasets/real-world.js";
-import {
-  formatTutorHealthReport,
-  writeTutorHealthReport,
-} from "../reporting/index.js";
 import { runTutorHealthEvaluation } from "../runner/tutor-health-runner.js";
-import { writeTutorCliJson } from "./tutor-case-common.js";
+import { prepareTutorHealthOutput, writeTutorHealthArtifacts } from "./tutorbench-health-artifacts.js";
 import { createJudgeIfRequested } from "./tutorbench-evaluate.js";
 import {
   assertSingleJudgeProviderSelection,
@@ -25,10 +22,9 @@ import {
 
 export type TutorHealthCliOptions =
   | { readonly help: true }
-  | {
+  | ({
       readonly help: false;
       readonly endpoint: string;
-      readonly suiteId: RegisteredTutorScenarioSuiteId;
       readonly runsPerCase: number;
       readonly timeoutMs: number;
       readonly outputDirectory: string;
@@ -38,7 +34,10 @@ export type TutorHealthCliOptions =
       readonly openAIJudge: boolean;
       readonly deepSeekJudge: boolean;
       readonly chatCompletionsJudge: boolean;
-    };
+    } & (
+      | { readonly suiteId: RegisteredTutorScenarioSuiteId; readonly suiteFile?: never }
+      | { readonly suiteId?: never; readonly suiteFile: string }
+    ));
 
 function requiredTutorbenchValue(
   value: string | undefined,
@@ -47,6 +46,9 @@ function requiredTutorbenchValue(
   if (value === undefined || value.trim().length === 0) {
     throw new TutorbenchCliUsageError(`${option} requires a value.`);
   }
+  if (value.trim().length > 300) {
+    throw new TutorbenchCliUsageError(`${option} must be a provenance label of at most 300 characters.`);
+  }
   return value.trim();
 }
 
@@ -54,8 +56,8 @@ export function parseTutorHealthCliOptions(
   args: readonly string[],
 ): TutorHealthCliOptions {
   let endpoint: string | undefined;
-  let suiteId: RegisteredTutorScenarioSuiteId =
-    PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID;
+  let suiteId: RegisteredTutorScenarioSuiteId | undefined;
+  let suiteFile: string | undefined;
   let runsPerCase = 1;
   let timeoutMs: number = DEFAULT_HTTP_TUTOR_TIMEOUT_MS;
   let outputDirectory = resolve(process.cwd(), "artifacts", "tutor-health");
@@ -111,6 +113,12 @@ export function parseTutorHealthCliOptions(
       suiteId = suiteValue;
       continue;
     }
+    const suiteFileValue = readOption("--suite-file");
+    if (suiteFileValue !== undefined) {
+      if (suiteFile !== undefined) throw new TutorbenchCliUsageError("--suite-file must be supplied once.");
+      suiteFile = resolve(suiteFileValue);
+      continue;
+    }
     const runsValue = readOption("--runs");
     if (runsValue !== undefined) {
       runsPerCase = positiveTutorbenchInteger(runsValue, "--runs");
@@ -144,6 +152,9 @@ export function parseTutorHealthCliOptions(
     throw new TutorbenchCliUsageError(`Unknown option: ${argument ?? ""}`);
   }
 
+  if (suiteId !== undefined && suiteFile !== undefined) {
+    throw new TutorbenchCliUsageError("--suite and --suite-file are mutually exclusive.");
+  }
   if (endpoint === undefined) {
     throw new TutorbenchCliUsageError("--http requires a value.");
   }
@@ -165,7 +176,9 @@ export function parseTutorHealthCliOptions(
   return {
     help: false,
     endpoint,
-    suiteId,
+    ...(suiteFile === undefined
+      ? { suiteId: suiteId ?? PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID }
+      : { suiteFile }),
     runsPerCase,
     timeoutMs,
     outputDirectory,
@@ -181,15 +194,17 @@ export function parseTutorHealthCliOptions(
 export function printTutorHealthHelp(): void {
   console.log(`Usage: tutorbench health --http <url> --tutor-provider <id> --tutor-model <id> --prompt-version <id> [options]
 
-Evaluate an external HTTP Tutor with the registered Scenario vNext suite.
+Evaluate an external HTTP Tutor with a registered or private Scenario vNext suite.
 
 Options:
   --http <url>             POST TutorTurnInput JSON to this http(s) endpoint (required)
   --suite <id>             Scenario suite (default: ${PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID})
                            Experimental vNext: ${CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID}
+  --suite-file <path>      Local private Scenario vNext JSON; mutually exclusive with --suite
   --runs <n>               Run each evaluation case n times (default: 1)
   --timeout-ms <n>         HTTP Tutor request timeout in milliseconds (default: ${DEFAULT_HTTP_TUTOR_TIMEOUT_MS})
-  --output <directory>     Write evaluation.json and Health Report artifacts here
+  --output <directory>     Write evaluation, Health Report, and pilot-run-manifest.json
+                           Existing health artifact files are never overwritten
   --tutor-provider <id>    Tutor provider provenance (required)
   --tutor-model <id>       Tutor model provenance (required)
   --prompt-version <id>    Tutor prompt/version provenance (required)
@@ -204,7 +219,10 @@ Without a Judge, Judge-owned checks remain unresolved and the command marks the 
 export async function runTutorHealthCli(
   options: Extract<TutorHealthCliOptions, { readonly help: false }>,
 ): Promise<number> {
-  const suite = await loadTutorScenarioSuiteVNext(options.suiteId);
+  const suite = options.suiteFile === undefined
+    ? await loadTutorScenarioSuiteVNext(options.suiteId)
+    : await readPrivateSuite(options.suiteFile);
+  await prepareTutorHealthOutput(options.outputDirectory);
   const tutor = createHttpTutor({
     id: "http-tutor",
     endpoint: options.endpoint,
@@ -230,10 +248,7 @@ export async function runTutorHealthCli(
   const evaluationPath = join(options.outputDirectory, "evaluation.json");
   const reportJsonPath = join(options.outputDirectory, "health-report.json");
   const reportTextPath = join(options.outputDirectory, "health-report.txt");
-  const reportText = formatTutorHealthReport(report);
-  await writeTutorCliJson(evaluation, evaluationPath);
-  await writeTutorHealthReport(report, reportJsonPath);
-  await writeFile(reportTextPath, `${reportText}\n`, "utf8");
+  const reportText = await writeTutorHealthArtifacts({ directory: options.outputDirectory, suite, evaluation, report });
 
   console.log(reportText);
   if (judge === undefined) {
@@ -246,6 +261,7 @@ export async function runTutorHealthCli(
   console.log(`\nTutorEval result: ${evaluationPath}`);
   console.log(`Health Report: ${reportJsonPath}`);
   console.log(`Health Report text: ${reportTextPath}`);
+  console.log(`Local run manifest: ${join(options.outputDirectory, "pilot-run-manifest.json")}`);
 
   const tutorFailed = evaluation.caseResults.some((caseResult) =>
     caseResult.diagnostics.some((diagnostic) => diagnostic.code === "adapter_failed"),
@@ -257,4 +273,13 @@ export async function runTutorHealthCli(
     return 2;
   }
   return 0;
+}
+
+async function readPrivateSuite(path: string) {
+  try {
+    return parseTutorScenarioSuiteVNext(JSON.parse(await readFile(path, "utf8")));
+  } catch {
+    // 不回显文件路径、私有 JSON 片段或解析器异常。
+    throw new TutorbenchCliUsageError("Unable to read --suite-file; expected a local JSON file containing a valid Scenario vNext suite.");
+  }
 }

@@ -152,3 +152,6 @@ export type {
 export * from "./contracts/tutor-health-comparison.js";
 export { isTutorHealthComparison, parseTutorHealthComparison, assertValidTutorHealthComparison } from "./contracts/tutor-health-comparison-validation.js";
 export { compareTutorHealthRuns, formatTutorHealthComparison, writeTutorHealthComparison, type TutorHealthComparisonInput } from "./reporting/tutor-health-comparison.js";
+export * from "./contracts/tutor-health-run-manifest.js";
+export { isTutorHealthRunManifest, parseTutorHealthRunManifest, assertValidTutorHealthRunManifest } from "./contracts/tutor-health-run-manifest-validation.js";
+export { buildTutorHealthRunManifest, formatTutorHealthRunManifest, verifyTutorHealthRunManifest, type TutorHealthRunManifestInput } from "./reporting/tutor-health-run-manifest.js";

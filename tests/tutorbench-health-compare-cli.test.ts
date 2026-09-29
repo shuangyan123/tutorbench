@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { parseTutorbenchArgs } from "../src/cli/tutorbench.js";
 import { compareTutorHealthRuns, parseTutorHealthComparison, runTutorHealthEvaluation, type TutorHealthComparisonInput } from "../src/index.js";
 import { syntheticDesignPartnerPilot } from "./helpers/design-partner-pilot.js";
+import { writeTutorHealthArtifacts } from "../src/cli/tutorbench-health-artifacts.js";
 
 function cli(args: readonly string[]) {
   return spawnSync(process.execPath, [resolve("dist/src/cli/tutorbench.js"), "health-compare", ...args], { encoding: "utf8" });
@@ -20,6 +21,52 @@ test("health-compare routes help and validates required/unknown/duplicate option
   for (const args of [[], ["--unknown"], ["--baseline"], ["--baseline="], ["--baseline", "x", "--baseline", "y"]]) {
     assert.throws(() => parseTutorbenchArgs(["health-compare", ...args]));
     assert.equal(cli(args).status, 1);
+  }
+});
+
+test("health-compare verifies optional manifests without changing Finding semantics or source files", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "health-compare-manifests-"));
+  try {
+    const { suite, baseline, candidate } = await syntheticDesignPartnerPilot();
+    for (const [role, source] of [["baseline", baseline], ["candidate", candidate]] as const) {
+      await writeTutorHealthArtifacts({ directory: join(directory, role), ...source });
+    }
+    const suitePath = join(directory, "suite.json");
+    await writeFile(suitePath, JSON.stringify(suite));
+    const args = ["--baseline", join(directory, "baseline"), "--candidate", join(directory, "candidate"),
+      "--baseline-suite", suitePath, "--candidate-suite", suitePath];
+    const paths = [suitePath, ...["baseline", "candidate"].flatMap((role) =>
+      ["evaluation.json", "health-report.json", "health-report.txt", "pilot-run-manifest.json"].map((file) => join(directory, role, file)))];
+    const before = await Promise.all(paths.map((path) => readFile(path, "utf8")));
+    const output = join(directory, "comparison.json");
+    const result = cli([...args, "--output", output]);
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /resolved 1, persistent 1, new 1, unresolved 0/);
+    assert.deepEqual(parseTutorHealthComparison(JSON.parse(await readFile(output, "utf8"))), compareTutorHealthRuns({ baseline, candidate }));
+    assert.deepEqual(await Promise.all(paths.map((path) => readFile(path, "utf8"))), before);
+
+    const manifestPath = join(directory, "candidate", "pilot-run-manifest.json");
+    const manifestBytes = await readFile(manifestPath, "utf8");
+    const reportPath = join(directory, "candidate", "health-report.json");
+    const reportBytes = await readFile(reportPath, "utf8");
+    for (const [path, changed] of [
+      [suitePath, JSON.stringify({ ...suite, description: "private-content-sentinel" })],
+      [reportPath, `${reportBytes}\n`],
+      [manifestPath, '{"private-content-sentinel":'],
+      [manifestPath, JSON.stringify({ ...JSON.parse(manifestBytes), private: "private-content-sentinel" })],
+    ]) {
+      const original = await readFile(path!, "utf8");
+      await writeFile(path!, changed!);
+      const rejectedOutput = join(directory, "rejected.json");
+      const rejected = cli([...args, "--output", rejectedOutput]);
+      assert.equal(rejected.status, 1);
+      assert.match(rejected.stderr, /manifest/i);
+      assert.doesNotMatch(rejected.stderr, /private-content-sentinel/);
+      await assert.rejects(access(rejectedOutput));
+      await writeFile(path!, original);
+    }
+  } finally {
+    await rm(directory, { recursive: true, force: true });
   }
 });
 

@@ -472,6 +472,17 @@ console.log("consumer API smoke passed");
       "Package Tutor Health smoke server did not bind a TCP port.",
     );
     const healthOutputDirectory = join(consumerRoot, "health-output");
+    const installedHealthApi = await import(pathToFileURL(join(installedPackageRoot, "dist/src/index.js")).href);
+    const publicHealthSuite = await installedHealthApi.loadTutorScenarioSuiteVNext();
+    const privateHealthSuite = installedHealthApi.parseTutorScenarioSuiteVNext({
+      ...publicHealthSuite,
+      id: "synthetic-package-private-suite",
+      scenarios: publicHealthSuite.scenarios.slice(0, 1).map((scenario) => ({
+        ...scenario, identity: { ...scenario.identity, suiteId: "synthetic-package-private-suite" },
+      })),
+    });
+    const privateSuitePath = join(consumerRoot, "private-suite.json");
+    await writeFile(privateSuitePath, JSON.stringify(privateHealthSuite));
     try {
       const health = await run(
         executable,
@@ -480,8 +491,8 @@ console.log("consumer API smoke passed");
           "health",
           "--http",
           `http://127.0.0.1:${healthAddress.port}/respond`,
-          "--suite",
-          "productive-struggle-intervention-v0.1",
+          "--suite-file",
+          privateSuitePath,
           "--output",
           healthOutputDirectory,
           "--tutor-provider",
@@ -512,6 +523,15 @@ console.log("consumer API smoke passed");
       for (const artifact of ["health-report.json", "health-report.txt"]) {
         await readFile(join(healthOutputDirectory, artifact));
       }
+      const manifest = installedHealthApi.parseTutorHealthRunManifest(
+        JSON.parse(await readFile(join(healthOutputDirectory, "pilot-run-manifest.json"), "utf8")),
+      );
+      installedHealthApi.verifyTutorHealthRunManifest(manifest, {
+        suite: privateHealthSuite,
+        evaluationJson: await readFile(join(healthOutputDirectory, "evaluation.json"), "utf8"),
+        reportJson: await readFile(join(healthOutputDirectory, "health-report.json"), "utf8"),
+      });
+      assertCondition(manifest.suite.id === privateHealthSuite.id, "Installed CLI did not run the private suite.");
     } finally {
       await new Promise((resolveClose, reject) => {
         healthServer.close((error) => (error === undefined ? resolveClose() : reject(error)));

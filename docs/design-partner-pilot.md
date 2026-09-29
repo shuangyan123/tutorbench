@@ -126,51 +126,51 @@ Before a scenario is accepted into a private pilot suite, confirm:
 
 ## Running a private suite
 
-The public `tutorbench health --suite` CLI currently selects registered public
-suites. A private partner suite should therefore stay in a private harness and
-use the stable package API rather than being copied into the public
-`scenarios/` tree.
+Freeze the private Pilot Spec, complete each Scenario Intake, and preserve the
+resulting Scenario vNext `suite.json` in private storage. The CLI reads local
+JSON and validates it with `parseTutorScenarioSuiteVNext` before Tutor execution:
 
-The package root exposes runtime validation for this purpose:
-
-```ts
-import { readFile, writeFile } from "node:fs/promises";
-import {
-  createHttpTutor,
-  formatTutorHealthReport,
-  parseTutorScenarioSuiteVNext,
-  runTutorHealthEvaluation,
-  writeTutorHealthReport,
-} from "tutor-benchmark";
-
-const suite = parseTutorScenarioSuiteVNext(
-  JSON.parse(await readFile(process.env.PRIVATE_SUITE_PATH!, "utf8")),
-);
-
-const { evaluation, report } = await runTutorHealthEvaluation({
-  suite,
-  tutor: createHttpTutor({
-    id: "partner-production",
-    endpoint: process.env.PARTNER_TUTOR_ENDPOINT!,
-  }),
-  tutorDescriptor: {
-    provider: "partner-alias",
-    model: "production",
-    promptVersion: "v17",
-  },
-  judge,
-});
-
-await writeFile(
-  "artifacts/design-partners/partner-alias/baseline/evaluation.json",
-  JSON.stringify(evaluation, null, 2) + "\n",
-);
-await writeTutorHealthReport(
-  report,
-  "artifacts/design-partners/partner-alias/baseline/health-report.json",
-);
-console.log(formatTutorHealthReport(report));
+```sh
+tutorbench health \
+  --http "$PARTNER_TUTOR_ENDPOINT" \
+  --suite-file data/private/design-partners/partner-alias/suites/suite.json \
+  --tutor-provider partner-alias \
+  --tutor-model production \
+  --prompt-version v17 \
+  --output artifacts/design-partners/partner-alias/baseline
 ```
+
+`--suite-file` and `--suite` are mutually exclusive; both `--flag value` and
+`--flag=value` work. Omitting both retains the default registered public suite.
+The private file is never registered, copied into `scenarios/`, or uploaded.
+Tutor-visible context is still sent to the selected HTTP Tutor, and selecting
+a Judge still sends the existing Judge input through that provider boundary.
+Private file read/JSON/schema errors do not echo file contents or paths.
+
+The required `--tutor-provider`, `--tutor-model`, and `--prompt-version` values
+are short provenance labels (at most 300 characters), never secrets or prompt
+bodies. Add one existing Judge flag (`--judge-openai`, `--judge-deepseek`, or
+`--judge-chat-completions`) when configured and authorized. Without a Judge,
+Judge-owned checks remain unresolved and the command exits `2` unless an
+existing gate/HTTP failure requires `1`. A Judge-backed gate pass exits `0`.
+Writing a manifest does not make incomplete evidence complete.
+
+Each completed artifact write produces `evaluation.json`, `health-report.json`,
+`health-report.txt`, and `pilot-run-manifest.json`, including runs that report
+failure or unresolved evidence. The three existing artifact formats are unchanged.
+The suite snapshot itself remains caller-owned; preserve it separately.
+The package APIs remain available for custom private harnesses.
+
+Use a different output directory for baseline and candidate. Following the
+comparison writer's exclusive-create convention, `health` refuses any existing
+file, directory, or symlink at one of the four artifact names before provider
+execution. Other files in the directory remain untouched. It serializes and
+validates all output before writing, uses exclusive creates, and writes the
+manifest last. On a caught write failure it removes only files created by that
+attempt; cleanup failure is reported. This is not a filesystem transaction:
+process termination can leave a partial set, and completed Tutor/Judge calls
+cannot be undone. Inspect incomplete output before retrying; retrying may call
+providers again. A new directory avoids overwriting earlier private evidence.
 
 Credentials and private endpoint details remain in local environment variables
 or the partner's existing secret store. They do not belong in suite JSON,
@@ -185,17 +185,20 @@ The minimum useful pilot is not a one-time score.
 The target loop is:
 
 ```text
-Partner teaching policy
-  -> private authored scenarios
-  -> baseline Tutor Health run
-  -> evidence-backed Findings
-  -> partner confirms which Findings are actionable
-  -> partner changes prompt / policy / orchestration
-  -> candidate rerun
-  -> record resolved, persistent, and new Findings
+private Pilot Spec
+  -> per-scenario Intake
+  -> private suite.json
+  -> tutorbench health --suite-file ...
+  -> baseline artifacts + run manifest + evidence-backed Findings
+  -> partner changes Tutor
+  -> candidate run with the frozen suite and a new output directory
+  -> tutorbench health-compare
+  -> resolved / persistent / new / unresolved
 ```
 
-Keep the frozen suite and both source evaluation/Health report artifacts. After
+Keep the frozen suite and both runs' source artifacts and manifests. Rerun the
+health command with the candidate's declared prompt/configuration version and
+`--output artifacts/design-partners/partner-alias/candidate`. After
 the rerun, create the canonical, versioned comparison without calling either
 provider or modifying the source artifacts:
 
@@ -203,14 +206,18 @@ provider or modifying the source artifacts:
 tutorbench health-compare \
   --baseline artifacts/design-partners/partner-alias/baseline \
   --candidate artifacts/design-partners/partner-alias/candidate \
-  --baseline-suite data/private/design-partners/partner-alias/suites/frozen.json \
-  --candidate-suite data/private/design-partners/partner-alias/suites/frozen.json \
+  --baseline-suite data/private/design-partners/partner-alias/suites/suite.json \
+  --candidate-suite data/private/design-partners/partner-alias/suites/suite.json \
   --output artifacts/design-partners/partner-alias/comparison.json
 ```
 
 Each run directory contains `evaluation.json` and `health-report.json`. Use each
 run's preserved suite path if they were stored separately. Output must be a new
 file. The command prints a concise summary and writes deterministic JSON.
+When a source directory contains `pilot-run-manifest.json`, it verifies the
+manifest against that suite and the exact evaluation/report bytes before
+comparison. Invalid or mismatched manifests fail closed. Historical directories
+without a manifest retain the existing comparison behavior.
 Exit `0` means comparable evidence (even if Findings are new or persistent),
 `2` means unresolved evidence, and `1` means invalid/non-comparable sources or
 an I/O error. This is not an automatic regression threshold or release gate.
@@ -244,6 +251,19 @@ the Tutor configuration without relying on filenames:
 
 Do not place API keys, private prompt bodies, raw provider responses, or
 confidential endpoint URLs into provenance.
+
+`pilot-run-manifest.json` uses `kind: "tutor-health-run-manifest"`,
+`schemaVersion: 1`, and `provenance: "local_execution_only"`. It binds suite
+ID/version and canonical SHA-256, evaluation run/evaluator identity and byte
+SHA-256, report schema version and byte SHA-256, bounded Tutor/Judge descriptors,
+and runs per case. See the [manifest data map](design-partner-report-data-map.md#local-run-manifest)
+for exact hashing and validation semantics.
+
+This is local execution provenance, not cryptographic attestation of the
+external Tutor's actual model, prompt, deployment, or configuration. A caller
+can rewrite both source artifacts and manifest; preserve originals in controlled
+private storage. It does not grant publication permission or establish real
+design-partner validation. That real evidence loop remains pending.
 
 ## Publication boundary
 
