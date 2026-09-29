@@ -289,6 +289,8 @@ See the [comparison contract](design-partner-report-data-map.md#before--after-tr
       artifact output, Judge-provider reuse, and fail-closed no-Judge semantics
 - [x] Private design-partner pilot boundary, Scenario Intake template, and
       stable runtime validation for caller-owned private Scenario vNext suites
+- [x] Direct private-suite CLI execution (`health --suite-file`), deterministic
+      local run manifests, and optional manifest verification in `health-compare`
 - [ ] First real design-partner baseline -> product change -> rerun evidence loop
 - [x] Baseline/candidate regression comparison with new/resolved/persistent
       Findings, unresolved evidence, and fail-closed comparability checks;

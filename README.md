@@ -142,7 +142,8 @@ existing TutorEval evaluator boundary and writes:
 artifacts/partner-pilot/
 ├── evaluation.json
 ├── health-report.json
-└── health-report.txt
+├── health-report.txt
+└── pilot-run-manifest.json
 ```
 
 `evaluation.json` preserves the underlying `TutorEvalRunResult`; the Health
@@ -150,6 +151,11 @@ Report adds the summary score, explicit coverage, Release Gate, Findings,
 evidence references, and regression targets. Tutor provider, model/config, and
 prompt version are recorded in the evaluation artifact so baseline and candidate
 runs can be distinguished without relying on filenames.
+
+The deterministic run manifest binds the validated suite snapshot and the exact
+evaluation/report JSON bytes. It records local execution provenance, not
+attestation of the remote Tutor's actual model or prompt. Use a separate output
+directory for each run: existing health artifact files are never overwritten.
 
 Judge providers are opt-in:
 
@@ -176,11 +182,20 @@ Use the [Design Partner Pilot Boundary](docs/design-partner-pilot.md), the
 [Pilot Spec Template](docs/design-partner-pilot-spec-template.md), and the
 [Scenario Intake Template](docs/design-partner-scenario-intake-template.md) to
 freeze the project-level scope first and then turn each accepted teaching-policy
-boundary into a small private Scenario vNext suite. Private suites can be
-runtime-validated through the stable package API with
-`parseTutorScenarioSuiteVNext` and passed directly to
-`runTutorHealthEvaluation`; they do not need to be registered under the
-public `scenarios/` tree.
+boundary into a small private Scenario vNext suite. Run it directly with
+`tutorbench health --http <url> --suite-file <private-suite.json>
+--tutor-provider <alias> --tutor-model <configuration> --prompt-version <version>
+--output <new-run-directory>` (one command). `--suite-file` reads and validates
+local JSON and is mutually exclusive with `--suite`; omitting both keeps the
+default registered suite. It does not register, copy, or upload the suite file.
+The existing Tutor-visible request and opt-in Judge boundaries still apply.
+The package API (`parseTutorScenarioSuiteVNext`, `runTutorHealthEvaluation`)
+also remains available.
+
+Preserve the private suite and each run's artifacts and manifest, then use
+`tutorbench health-compare` after the partner changes its Tutor. Publication
+permission remains separate. Only synthetic dry runs have been verified; a
+real design-partner validation loop remains pending.
 
 ## Case System vNext — experimental infrastructure
 

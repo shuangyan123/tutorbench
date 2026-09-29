@@ -60,3 +60,5 @@ export * from "./validation.js";
 
 export * from "./tutor-health-comparison.js";
 export { isTutorHealthComparison, parseTutorHealthComparison, assertValidTutorHealthComparison } from "./tutor-health-comparison-validation.js";
+export * from "./tutor-health-run-manifest.js";
+export * from "./tutor-health-run-manifest-validation.js";

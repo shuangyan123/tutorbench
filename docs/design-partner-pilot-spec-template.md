@@ -178,9 +178,18 @@ Freeze the baseline suite only when all applicable items are confirmed.
 **Scoring profile ID / version:**  
 **Judge provider / model, if used:**  
 **Artifact storage location:**  
+**Frozen private suite file location:**
 
-Preserve the source evaluation artifact and Tutor Health report. Do not rely on
-filenames alone for run identity.
+**Suite SHA-256 from `pilot-run-manifest.json`:**
+
+**Baseline manifest location:**
+
+Run `tutorbench health --suite-file <private-suite.json>` with the required Tutor
+provenance labels and a new output directory; see the [private-suite command](design-partner-pilot.md#running-a-private-suite).
+Preserve the exact suite snapshot, evaluation artifact, Tutor Health report,
+and run manifest. Do not rely on filenames alone for run identity. The manifest
+binds local source artifacts; it does not attest the remote provider's actual
+configuration or authorize publication.
 
 ## 8. Baseline deliverables
 
@@ -216,6 +225,8 @@ suite and evaluation criteria whenever the purpose is before/after comparison.
 **Candidate product/configuration version:**  
 **Candidate run ID:**  
 **Candidate run date:**  
+**Candidate manifest location:**
+
 **Baseline frozen suite location:**
 
 **Candidate frozen suite location:**

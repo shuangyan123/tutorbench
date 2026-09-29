@@ -22,6 +22,9 @@ actual Tutor output and execution provenance. `TutorHealthReport` remains the
 source of Tutor Health scoring, coverage, Findings, evidence references,
 recommendations, and regression targets.
 
+CLI runs also produce a small local run manifest binding these inputs; it is
+provenance, not an additional source of scores or findings.
+
 ## Field map
 
 | Report field | Authoritative source | Notes |
@@ -55,6 +58,60 @@ recommendations, and regression targets.
 | Unresolved evidence | `TutorHealthReport.unresolved` | Must remain explicit; missing evidence is not a pass. |
 | Judge identity | `TutorEvalRunResult.judge` | Include only provider/model/version metadata when useful; never raw hidden reasoning. |
 
+## Local run manifest
+
+Every artifact-writing `tutorbench health` run adds `pilot-run-manifest.json`.
+The runtime-validated contract is `TutorHealthRunManifest`:
+
+| Field | Meaning |
+| --- | --- |
+| `kind` / `schemaVersion` | `"tutor-health-run-manifest"` / `1`. |
+| `provenance` | Always `"local_execution_only"`. |
+| `suite.id`, `.version`, `.sha256` | Identity and canonical SHA-256 of the complete validated suite snapshot used in memory for this run. |
+| `evaluation.runId`, `.evaluatorVersion`, `.sha256` | Existing execution identity and SHA-256 of the exact written `evaluation.json` UTF-8 bytes. |
+| `report.schemaVersion`, `.sha256` | Health report schema `2` and SHA-256 of the exact written `health-report.json` UTF-8 bytes. |
+| `tutor` | Required provider/model/promptVersion; optional existing modelVersion, promptId, temperature, reasoningEffort, seed. |
+| `judge` | `null` when absent; otherwise the same bounded provenance fields plus existing thinkingMode, maxOutputTokens, timeoutMs, maxAttempts. |
+| `runsPerCase` | Positive safe integer from the evaluation. |
+
+Digests are lowercase 64-character SHA-256 hex strings. Suite canonicalization
+reuses the comparison's sorted-key compact JSON: undefined object properties
+are omitted, array order is retained, and no trailing newline is hashed. Object
+key order and JSON whitespace do not affect the suite hash. Changes to authored
+criteria, policy, conversation, array order, or even descriptive suite text do.
+The complete suite is hashed; none of its hidden criteria or conversation is
+copied into the manifest.
+
+Evaluation and report digests bind file bytes, including two-space formatting
+and the final newline. Each artifact is serialized once, then that same string
+is hashed and written. Reformatting either file changes its manifest hash even
+if the parsed JSON is equivalent. These byte digests intentionally differ from
+the canonical evaluation/report digests in `comparison.json`. The manifest
+itself uses sorted-key, two-space JSON plus one newline. It adds no timestamp or
+random ID; the same preserved inputs and serialized source strings produce
+identical manifest bytes. `health-report.txt` is a presentation, not a hashed
+source in this version.
+
+`parseTutorHealthRunManifest`, `isTutorHealthRunManifest`, and
+`assertValidTutorHealthRunManifest` reject unsupported versions, missing or
+malformed identity, invalid hashes, unknown fields, and unbounded descriptors.
+`buildTutorHealthRunManifest({ suite, evaluationJson, reportJson })` validates
+the source schemas and cross-checks suite/run/evaluator identity;
+`formatTutorHealthRunManifest` emits deterministic JSON, and
+`verifyTutorHealthRunManifest` recomputes the complete manifest from the supplied
+suite and exact source strings. The manifest parser alone does not verify source
+files or scoring semantics. Legacy evaluation/report parsers are unchanged.
+
+This manifest does not contain endpoints, credentials, prompt bodies, raw Tutor
+responses, raw Judge results, hidden reasoning, or conversation history. Use
+non-secret labels in all declared provenance fields. It remains private by
+default along with the suite and source artifacts, which can contain sensitive
+evidence. It is not provider attestation: declared Tutor/Judge metadata does
+not prove the remote system used that model, prompt, deployment, or configuration.
+It is unsigned and cannot detect coordinated replacement of sources and their
+manifest. Publication permission remains separate, and a real design-partner
+validation loop has not yet been completed.
+
 ## Before / after tracking
 
 Baseline and candidate runs already preserve the identities needed for a
@@ -75,6 +132,12 @@ before/after report:
 Each side supplies the preserved `{ suite, evaluation, report }`. No source is
 modified, and no Tutor or Judge is executed. The existing evaluation and Health
 report contracts and score semantics remain unchanged.
+
+The CLI also verifies `pilot-run-manifest.json` when present in either source
+directory. A malformed/mismatched manifest prevents comparison with exit `1`.
+It does not require manifests for historical artifacts or change the comparison
+contract. Removing a manifest opts that directory back into historical source
+validation, so this compatibility path is not an anti-tampering guarantee.
 
 The comparison matches the exact authored identity tuple:
 
@@ -165,7 +228,8 @@ required to verify the digests and full provenance; parsing a comparison alone
 does not authenticate its sources. The suite and descriptor identities are
 caller-supplied records, not cryptographic proof of the provider's actual
 configuration. Preserve the suite snapshot used at execution; the historical
-evaluation format does not itself bind a suite-content digest.
+evaluation format does not itself bind a suite-content digest. New CLI runs bind
+it through the separate local run manifest described above.
 
 Only bounded evidence references and provenance are copied. Conversation text,
 authored hidden criteria, raw Tutor/Judge payloads, and hidden reasoning are not
