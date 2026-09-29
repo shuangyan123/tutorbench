@@ -172,11 +172,13 @@ Real partner scenarios and artifacts are private by default. Do not copy raw
 production chats, private prompts, credentials, identifiable learner data, or
 partner-confidential policy material into this public repository.
 
-Use the [Design Partner Pilot Boundary](docs/design-partner-pilot.md) and the
+Use the [Design Partner Pilot Boundary](docs/design-partner-pilot.md), the
+[Pilot Spec Template](docs/design-partner-pilot-spec-template.md), and the
 [Scenario Intake Template](docs/design-partner-scenario-intake-template.md) to
-turn a partner teaching-policy boundary into a small private Scenario vNext
-suite. Private suites can be runtime-validated through the stable package API
-with `parseTutorScenarioSuiteVNext` and passed directly to
+freeze the project-level scope first and then turn each accepted teaching-policy
+boundary into a small private Scenario vNext suite. Private suites can be
+runtime-validated through the stable package API with
+`parseTutorScenarioSuiteVNext` and passed directly to
 `runTutorHealthEvaluation`; they do not need to be registered under the
 public `scenarios/` tree.
 
