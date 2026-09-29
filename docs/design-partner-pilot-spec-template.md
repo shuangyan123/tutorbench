@@ -216,6 +216,13 @@ suite and evaluation criteria whenever the purpose is before/after comparison.
 **Candidate product/configuration version:**  
 **Candidate run ID:**  
 **Candidate run date:**  
+**Baseline frozen suite location:**
+
+**Candidate frozen suite location:**
+
+**Canonical comparison artifact location (`comparison.json`):**
+
+**Comparison status / rejection reason:**
 
 **Comparison record:**
 
@@ -224,6 +231,15 @@ suite and evaluation criteria whenever the purpose is before/after comparison.
 - new Findings;
 - criteria or evidence that became unresolved;
 - partner interpretation.
+
+Generate the comparison using `tutorbench health-compare` or
+`compareTutorHealthRuns`; see the [pilot command](design-partner-pilot.md#baseline---change---rerun)
+and [comparison semantics](design-partner-report-data-map.md#before--after-tracking).
+Preserve all source artifacts. Match by scenario ID, decision-point ID, and
+Finding type, never the run-specific Finding ID. Missing, partial, or failed
+execution evidence remains unresolved. Incompatible suite, scoring profile,
+evaluator, Judge configuration, or repetition identity blocks comparison.
+Record partner interpretation separately from the canonical artifact.
 
 A request requires new scope when it materially changes the evaluation contract,
 for example:

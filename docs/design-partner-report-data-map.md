@@ -69,13 +69,14 @@ before/after report:
 - Judge provider/model identity when used;
 - Finding scenario/type and regression targets.
 
-The current repository does **not** yet define a canonical automated
-baseline/candidate comparison artifact. Until that roadmap item is implemented,
-resolved, persistent, and newly observed Findings must be derived explicitly
-from the two preserved source artifacts and recorded as a report-level
-comparison, without mutating either run.
+`TutorHealthComparison` is the canonical automated comparison artifact:
+`kind: "tutor-health-comparison"`, `schemaVersion: 1`. Build it with
+`compareTutorHealthRuns({ baseline, candidate })` or `tutorbench health-compare`.
+Each side supplies the preserved `{ suite, evaluation, report }`. No source is
+modified, and no Tutor or Judge is executed. The existing evaluation and Health
+report contracts and score semantics remain unchanged.
 
-For a stable comparison key, prefer the authored decision identity:
+The comparison matches the exact authored identity tuple:
 
 ```text
 scenarioId + decisionPointId + finding type
@@ -83,6 +84,92 @@ scenarioId + decisionPointId + finding type
 
 rather than the generated `TutorFinding.id`, because Finding IDs intentionally
 include run-specific identity.
+
+### Comparability gate
+
+Before constructing a comparison, the builder validates each input and rebuilds
+the Health report from its suite, evaluation, and scoring profile solely to
+check that the preserved report agrees. It rejects detached/modified reports,
+unknown cases, changed case versions, unknown or changed rubric metadata,
+out-of-range/duplicate case runs, and inconsistent execution counts.
+
+Both sources must have:
+
+- equal suite ID/version, health taxonomy, and SHA-256 of the complete supplied
+  suite, including authored criteria, decision points, and policy;
+- equal scoring profile ID/version and all dimension weights;
+- the same explicitly recorded TutorEval evaluator version; building a new
+  comparison currently requires the evaluator version supported by this build;
+- equal Judge descriptors, including provider/model/version, prompt ID/version,
+  temperature, reasoning effort, thinking mode, output cap, timeout, attempts,
+  and seed when recorded; absence versus presence also differs;
+- equal requested runs per case, the frozen case identities/versions, and
+  explicit case locales agreeing with the compiled suite;
+- distinct run IDs.
+
+Tutor provider/model/prompt/configuration may change: that is the candidate
+under test. These descriptors remain recorded on both sides. Missing evaluator
+identity or case locale is rejected even though legacy evaluations remain valid
+under the existing evaluation parser. A null Judge on both sides can be compared,
+but Judge-owned decisions remain unresolved. Unknown descriptor fields are
+rejected rather than copied into the comparison.
+
+Incompatible sources throw `TutorHealthComparisonError` with a bounded reason;
+the CLI exits `1` and creates no comparison. Invalid source schemas also fail
+closed. A mismatched evaluation contract never becomes an improvement claim.
+
+### Finding classifications
+
+Counts refer to unique authored identity tuples, not individual repetitions.
+All source Finding IDs, repetition indices, and evidence references are retained
+under each row's `baseline` and `candidate` sides. Each side also contains an
+assessment for every expected repetition, including case identity, evidence,
+and unresolved reason codes. This retains the candidate evidence for a resolved
+Finding and the baseline evidence for a new Finding even when that side has no
+Finding ID.
+
+| Classification | Meaning |
+| --- | --- |
+| `resolved` | Present in at least one baseline repetition, absent from all candidate repetitions; both decisions have complete scored PASS/FAIL evidence. |
+| `persistent` | Present in at least one repetition on each side, with complete evidence on both sides. This makes no frequency or severity-change claim. |
+| `new` | Absent from all baseline repetitions, present in at least one candidate repetition; both decisions have complete evidence. |
+| `unresolved` | Any repetition at that decision has a missing/duplicate rubric, missing case, evaluation error, missing required Judge result, or PARTIAL evidence. This takes precedence over presence/absence. |
+
+The unresolved rule is deliberately conservative across all criteria at a
+decision point. It also emits authored Finding types for unresolved decisions
+where neither source has a Finding, so absence of evidence is not silently
+omitted. Fully assessed identities absent on both sides are omitted. Findings
+from critical failures are included using the same identity rule.
+
+Top-level `status` is `comparable` or `partially_comparable`, depending on whether
+any rows remain unresolved. PARTIAL is not changed into a FAIL or a PASS in the
+source report. Comparison does not calculate score deltas, compare aggregate
+thresholds/release gates, or establish statistical significance. Existing
+TutorEval aggregate scoring options do not define this Finding-presence test.
+
+### Provenance and deterministic output
+
+`baseline` and `candidate` each preserve suite identity, evaluation run/date,
+dataset/evaluator identity, Tutor and Judge descriptors, full scoring profile,
+repetition count, and SHA-256 digests of the supplied suite, evaluation, and
+report. Digests use sorted JSON object keys, omit undefined object properties,
+and preserve array order. The writer emits sorted-key, two-space JSON plus one
+newline; the same preserved inputs produce the same bytes, with no new timestamp
+or random ID. Array order and even non-semantic suite edits conservatively
+change the suite digest.
+
+Runtime validation checks allowed fields, versions, evidence references,
+repetition coverage, unique identities, classification consistency, counts,
+and source compatibility. Re-running the builder with the preserved sources is
+required to verify the digests and full provenance; parsing a comparison alone
+does not authenticate its sources. The suite and descriptor identities are
+caller-supplied records, not cryptographic proof of the provider's actual
+configuration. Preserve the suite snapshot used at execution; the historical
+evaluation format does not itself bind a suite-content digest.
+
+Only bounded evidence references and provenance are copied. Conversation text,
+authored hidden criteria, raw Tutor/Judge payloads, and hidden reasoning are not
+copied. Comparison artifacts still belong in private storage by default.
 
 ## Evidence excerpt resolution
 
@@ -130,7 +217,8 @@ specification and reviewed alongside the source artifact versions.
 
 This mapping intentionally stops before PDF, Excel, or dashboard implementation.
 
-The next export layer should consume the same three authoritative inputs and
+The next export layer should consume the same three authoritative inputs (and
+the canonical comparison artifact for a before/after view) and
 must not introduce a second mutable source of truth. A PDF, spreadsheet, or
 dashboard is a presentation of the preserved artifacts, not a replacement for
 them.

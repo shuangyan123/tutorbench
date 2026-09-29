@@ -22,6 +22,12 @@ import {
   type BenchmarkCorpusCliOptions,
 } from "./tutorbench-evaluate.js";
 import {
+  parseTutorHealthCompareArgs,
+  printTutorHealthCompareHelp,
+  runTutorHealthCompareCli,
+  type TutorHealthCompareCliOptions,
+} from "./tutorbench-health-compare.js";
+import {
   parseTutorHealthCliOptions,
   printTutorHealthHelp,
   runTutorHealthCli,
@@ -164,7 +170,7 @@ export interface TutorbenchRunOptions {
 }
 
 export type TutorbenchCliOptions =
-  | { readonly help: true; readonly helpCommand?: "quickstart" | "collect" | "collect-model" | "evaluate" | "health" | "review-translate" | "judge-word-context-discrimination" | "judge-candidate-comparison" | "judge-material-requirement-discrimination" | "case-system-vnext-stress" | "case-system-vnext-expert-review-export" | "case-system-vnext-expert-review-import" | "case-system-vnext-expert-review-adjudication-export" | "case-system-vnext-expert-review-adjudication-import" | "case-system-vnext-expert-review-reference-candidate" | "human-reference-calibration" | "human-reference-pilot-export" | "human-reference-pilot-import" | "human-reference-judge-comparison" | "human-reference-semantic-audit-export" | "human-reference-semantic-audit-import" | "human-reference-semantic-audit" | "human-reference-semantic-audit-qualification-export" | "human-reference-semantic-audit-qualification-import" | "human-reference-semantic-audit-localized-export" | "human-reference-semantic-audit-localized-import" | "human-reference-semantic-audit-localized" }
+  | { readonly help: true; readonly helpCommand?: "quickstart" | "collect" | "collect-model" | "evaluate" | "health" | "health-compare" | "review-translate" | "judge-word-context-discrimination" | "judge-candidate-comparison" | "judge-material-requirement-discrimination" | "case-system-vnext-stress" | "case-system-vnext-expert-review-export" | "case-system-vnext-expert-review-import" | "case-system-vnext-expert-review-adjudication-export" | "case-system-vnext-expert-review-adjudication-import" | "case-system-vnext-expert-review-reference-candidate" | "human-reference-calibration" | "human-reference-pilot-export" | "human-reference-pilot-import" | "human-reference-judge-comparison" | "human-reference-semantic-audit-export" | "human-reference-semantic-audit-import" | "human-reference-semantic-audit" | "human-reference-semantic-audit-qualification-export" | "human-reference-semantic-audit-qualification-import" | "human-reference-semantic-audit-localized-export" | "human-reference-semantic-audit-localized-import" | "human-reference-semantic-audit-localized" }
   | { readonly help: false; readonly quickstart: TutorbenchQuickstartCliOptions }
   | { readonly help: false; readonly run: TutorbenchRunOptions }
   | { readonly help: false; readonly collect: TutorbenchCollectCliOptions }
@@ -174,6 +180,7 @@ export type TutorbenchCliOptions =
       readonly help: false;
       readonly health: Extract<TutorHealthCliOptions, { readonly help: false }>;
     }
+  | { readonly help: false; readonly healthCompare: Extract<TutorHealthCompareCliOptions, { readonly help: false }> }
   | { readonly help: false; readonly reviewTranslate: ReviewTranslateCliOptions }
   | { readonly help: false; readonly judgeWordContextDiscrimination: JudgeWordContextDiscriminationCliOptions }
   | { readonly help: false; readonly judgeCandidateComparison: JudgeCandidateComparisonCliOptions }
@@ -212,6 +219,10 @@ export function parseTutorbenchArgs(
     return evaluate.help
       ? { help: true, helpCommand: "evaluate" }
       : { help: false, evaluate };
+  }
+  if (args[0] === "health-compare") {
+    const healthCompare = parseTutorHealthCompareArgs(args.slice(1));
+    return healthCompare.help ? { help: true, helpCommand: "health-compare" } : { help: false, healthCompare };
   }
   if (args[0] === "health") {
     const health = parseTutorHealthCliOptions(args.slice(1));
@@ -505,6 +516,7 @@ Usage:
   tutorbench collect-model --http <url> --provider <id> --model <id> [options]
   tutorbench evaluate --corpus <path> [options]
   tutorbench health --http <url> --tutor-provider <id> --tutor-model <id> --prompt-version <id> [options]
+  tutorbench health-compare --baseline <dir> --candidate <dir> --baseline-suite <file> --candidate-suite <file> --output <file>
   tutorbench review-translate --evaluation <path> --output <path> [options]
   tutorbench judge-word-context-discrimination --judge-deepseek [options]
   tutorbench judge-candidate-comparison [options]
@@ -531,6 +543,7 @@ Commands:
   collect               Freeze Product Tutor responses from TutorTurnInput
   collect-model         Freeze canonical model responses from ExecutionPacket
   evaluate              Offline corpus replay and preliminary evaluation
+  health-compare        Compare preserved baseline/candidate Tutor Health Findings
   health                Run finding-first Tutor Health against an external HTTP Tutor
   review-translate      Build an isolated, review-only translation sidecar
   judge-word-context-discrimination
@@ -675,6 +688,8 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
       printTutorbenchCollectModelHelp();
     } else if (options.helpCommand === "evaluate") {
       printBenchmarkCorpusHelp();
+    } else if (options.helpCommand === "health-compare") {
+      printTutorHealthCompareHelp();
     } else if (options.helpCommand === "health") {
       printTutorHealthHelp();
     } else if (options.helpCommand === "review-translate") {
@@ -839,6 +854,8 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
   } else if ("humanReferenceSemanticAuditV2" in options) {
     if (options.humanReferenceSemanticAuditV2.help) return;
     await runHumanReferenceSemanticAuditV2(options.humanReferenceSemanticAuditV2);
+  } else if ("healthCompare" in options) {
+    process.exitCode = await runTutorHealthCompareCli(options.healthCompare);
   } else if ("health" in options) {
     process.exitCode = await runTutorHealthCli(options.health);
   } else {
