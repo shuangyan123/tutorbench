@@ -256,11 +256,16 @@ the real Community Review campaign.
 - Variance and confidence intervals
 - Significance analysis
 
-## 0.6 Regression Gate — NOT STARTED
+## 0.6 Regression Gate — PARTIAL: Tutor Health Finding comparison
 
-- Baseline comparison
-- Thresholds
-- CI artifacts
+- [x] Canonical versioned baseline/candidate Tutor Health Finding comparison,
+      with source validation, deterministic JSON, and offline CLI
+- [ ] Regression thresholds / automated release gate
+- [ ] CI regression-artifact integration
+
+The comparison is scoped to frozen Scenario vNext pilot suites. It does not
+add score-delta semantics, statistical improvement claims, or a release gate.
+See the [comparison contract](design-partner-report-data-map.md#before--after-tracking).
 
 ## 0.7 Human Evaluation — NOT STARTED
 
@@ -285,7 +290,9 @@ the real Community Review campaign.
 - [x] Private design-partner pilot boundary, Scenario Intake template, and
       stable runtime validation for caller-owned private Scenario vNext suites
 - [ ] First real design-partner baseline -> product change -> rerun evidence loop
-- [ ] Baseline/candidate regression comparison with new/resolved/persistent Findings
+- [x] Baseline/candidate regression comparison with new/resolved/persistent
+      Findings, unresolved evidence, and fail-closed comparability checks;
+      synthetic design-partner dry run verified
 - [ ] Independent content review and human reliability evidence for the suite
 - [ ] Calibrated confidence interpretation or validated weighting profiles
 - [ ] Stateful multi-turn Tutor episode execution

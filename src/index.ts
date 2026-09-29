@@ -148,3 +148,7 @@ export type {
   RunTutorHealthEvaluationOptions,
   TutorHealthEvaluationRun,
 } from "./runner/tutor-health-runner.js";
+
+export * from "./contracts/tutor-health-comparison.js";
+export { isTutorHealthComparison, parseTutorHealthComparison, assertValidTutorHealthComparison } from "./contracts/tutor-health-comparison-validation.js";
+export { compareTutorHealthRuns, formatTutorHealthComparison, writeTutorHealthComparison, type TutorHealthComparisonInput } from "./reporting/tutor-health-comparison.js";

@@ -57,3 +57,6 @@ export * from "./tutor-response-replay.js";
 export * from "./tutor-generation.js";
 export * from "./tutor-execution.js";
 export * from "./validation.js";
+
+export * from "./tutor-health-comparison.js";
+export { isTutorHealthComparison, parseTutorHealthComparison, assertValidTutorHealthComparison } from "./tutor-health-comparison-validation.js";

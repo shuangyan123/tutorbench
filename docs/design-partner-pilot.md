@@ -50,7 +50,8 @@ data/private/design-partners/<partner-alias>/
 
 artifacts/design-partners/<partner-alias>/
 ├── baseline/
-└── candidate/
+├── candidate/
+└── comparison.json
 ```
 
 Both `data/private/` and `artifacts/` are ignored by the repository.
@@ -194,8 +195,32 @@ Partner teaching policy
   -> record resolved, persistent, and new Findings
 ```
 
-Until an automated baseline/candidate comparison artifact exists, record the
-comparison manually and keep both source evaluation artifacts.
+Keep the frozen suite and both source evaluation/Health report artifacts. After
+the rerun, create the canonical, versioned comparison without calling either
+provider or modifying the source artifacts:
+
+```sh
+tutorbench health-compare \
+  --baseline artifacts/design-partners/partner-alias/baseline \
+  --candidate artifacts/design-partners/partner-alias/candidate \
+  --baseline-suite data/private/design-partners/partner-alias/suites/frozen.json \
+  --candidate-suite data/private/design-partners/partner-alias/suites/frozen.json \
+  --output artifacts/design-partners/partner-alias/comparison.json
+```
+
+Each run directory contains `evaluation.json` and `health-report.json`. Use each
+run's preserved suite path if they were stored separately. Output must be a new
+file. The command prints a concise summary and writes deterministic JSON.
+Exit `0` means comparable evidence (even if Findings are new or persistent),
+`2` means unresolved evidence, and `1` means invalid/non-comparable sources or
+an I/O error. This is not an automatic regression threshold or release gate.
+
+The package API exposes `compareTutorHealthRuns({ baseline, candidate })`, where
+each input contains `{ suite, evaluation, report }`, plus
+`parseTutorHealthComparison`, `isTutorHealthComparison`,
+`assertValidTutorHealthComparison`, `formatTutorHealthComparison`, and
+`writeTutorHealthComparison`. The writer also refuses to overwrite any existing
+file. See the [comparison contract and evidence rules](design-partner-report-data-map.md#before--after-tracking).
 
 A successful pilot signal is not "the score looks good." It is that at least
 one Finding is credible enough to change the Tutor or its policy, and the same

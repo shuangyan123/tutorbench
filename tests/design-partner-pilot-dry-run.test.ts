@@ -1,106 +1,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { compareTutorHealthRuns, formatTutorHealthComparison, parseTutorHealthComparison, type TutorFinding } from "../src/index.js";
+import { syntheticDesignPartnerPilot } from "./helpers/design-partner-pilot.js";
 
-import {
-  parseTutorScenarioSuiteVNext,
-  type TutorEvalJudgeInput,
-} from "../src/contracts/index.js";
-import { loadTutorScenarioSuiteVNext } from "../src/datasets/real-world.js";
-import { runTutorHealthEvaluation } from "../src/runner/tutor-health-runner.js";
-
-function fixtureTutor(id: string, text: string) {
-  return {
-    id,
-    respond: async () => ({ text }),
-  };
+function findingKey(finding: TutorFinding): string {
+  return `${finding.scenarioId}::${finding.location.decisionPointId}::${finding.type}`;
 }
 
-function fixtureJudge(failingCaseIds: ReadonlySet<string>) {
-  return {
-    provider: "synthetic-pilot",
-    model: "authored-fixture",
-    promptVersion: "dry-run-1",
-    evaluate: async (input: TutorEvalJudgeInput) => ({
-      schemaVersion: 1 as const,
-      caseId: input.caseId,
-      rubricResults: input.rubrics.map((rubric) => ({
-        rubricId: rubric.id,
-        result: failingCaseIds.has(input.caseId) ? ("FAIL" as const) : ("PASS" as const),
-      })),
-      criticalFailures: [],
-      factualErrors: [],
-      insufficientInformation: false,
-    }),
-  };
-}
-
-function findingKey(finding: {
-  readonly scenarioId: string;
-  readonly type: string;
-}): string {
-  return `${finding.scenarioId}::${finding.type}`;
-}
-
-test("synthetic design-partner pilot exercises baseline -> change -> rerun with resolved, persistent, and new Findings", async () => {
-  const publicSuite = await loadTutorScenarioSuiteVNext();
-  const selectedScenarioIds = new Set([
-    "ps-first-mistake",
-    "ps-repeated-mistake",
-    "ps-partial-progress",
-    "ps-false-confidence",
-  ]);
-
-  const privatePilot = {
-    ...structuredClone(publicSuite),
-    id: "synthetic-design-partner-pilot-001",
-    version: "0.1.0",
-    title: "Synthetic Design Partner Pilot",
-    description:
-      "Synthetic four-scenario pilot used only to exercise the private design-partner delivery loop.",
-    scenarios: publicSuite.scenarios
-      .filter((scenario) => selectedScenarioIds.has(scenario.identity.id))
-      .map((scenario) => ({
-        ...structuredClone(scenario),
-        identity: {
-          ...structuredClone(scenario.identity),
-          suiteId: "synthetic-design-partner-pilot-001",
-        },
-      })),
-  };
-
-  const suite = parseTutorScenarioSuiteVNext(privatePilot);
+test("synthetic design-partner pilot exercises canonical resolved, persistent, and new Findings", async () => {
+  const { suite, baseline, candidate } = await syntheticDesignPartnerPilot();
   assert.equal(suite.scenarios.length, 4);
-
-  const baseline = await runTutorHealthEvaluation({
-    suite,
-    tutor: fixtureTutor(
-      "synthetic-partner-baseline",
-      "Try the same approach again and tell me what you notice.",
-    ),
-    tutorDescriptor: {
-      provider: "synthetic-partner",
-      model: "pilot-tutor",
-      promptVersion: "baseline-v1",
-    },
-    judge: fixtureJudge(new Set(["ps-first-mistake", "ps-repeated-mistake"])),
-    runId: "synthetic-partner-baseline-001",
-  });
-
-  const candidate = await runTutorHealthEvaluation({
-    suite,
-    tutor: fixtureTutor(
-      "synthetic-partner-candidate",
-      "Use what you have already established, and check the next decision carefully.",
-    ),
-    tutorDescriptor: {
-      provider: "synthetic-partner",
-      model: "pilot-tutor",
-      promptVersion: "candidate-v2",
-    },
-    judge: fixtureJudge(new Set(["ps-repeated-mistake", "ps-partial-progress"])),
-    runId: "synthetic-partner-candidate-001",
-  });
-
   assert.deepEqual(baseline.report.sourceScenarioSuite, candidate.report.sourceScenarioSuite);
   assert.equal(baseline.report.sourceScenarioSuite.id, "synthetic-design-partner-pilot-001");
   assert.equal(baseline.report.sourceScenarioSuite.version, "0.1.0");
@@ -109,16 +18,36 @@ test("synthetic design-partner pilot exercises baseline -> change -> rerun with 
   assert.equal(baseline.evaluation.tutor.promptVersion, "baseline-v1");
   assert.equal(candidate.evaluation.tutor.promptVersion, "candidate-v2");
 
-  const baselineKeys = new Set(baseline.report.findings.map(findingKey));
-  const candidateKeys = new Set(candidate.report.findings.map(findingKey));
-
-  const resolved = [...baselineKeys].filter((key) => !candidateKeys.has(key)).sort();
-  const persistent = [...baselineKeys].filter((key) => candidateKeys.has(key)).sort();
-  const newlyObserved = [...candidateKeys].filter((key) => !baselineKeys.has(key)).sort();
-
-  assert.deepEqual(resolved, ["ps-first-mistake::premature_intervention"]);
-  assert.deepEqual(persistent, ["ps-repeated-mistake::missed_repeated_misconception"]);
-  assert.deepEqual(newlyObserved, ["ps-partial-progress::partial_progress_not_used"]);
+  const before = JSON.stringify({ baseline, candidate });
+  const comparison = compareTutorHealthRuns({ baseline, candidate });
+  assert.equal(JSON.stringify({ baseline, candidate }), before);
+  assert.equal(comparison.status, "comparable");
+  assert.deepEqual(comparison.counts, { resolved: 1, persistent: 1, new: 1, unresolved: 0 });
+  const keys = (classification: string) => comparison.findings
+    .filter((item) => item.classification === classification)
+    .map((item) => `${item.identity.scenarioId}::${item.identity.decisionPointId}::${item.identity.type}`);
+  const resolved = keys("resolved");
+  const persistent = keys("persistent");
+  const newlyObserved = keys("new");
+  assert.deepEqual(resolved, ["ps-first-mistake::preserve-first-attempt::premature_intervention"]);
+  assert.deepEqual(persistent, ["ps-repeated-mistake::target-second-attempt::missed_repeated_misconception"]);
+  assert.deepEqual(newlyObserved, ["ps-partial-progress::reinforce-correct-step::partial_progress_not_used"]);
+  for (const row of comparison.findings) {
+    for (const role of ["baseline", "candidate"] as const) {
+      assert.equal(comparison[role].evaluation.runId, ({ baseline, candidate })[role].evaluation.runId);
+      assert.match(comparison[role].evaluation.sha256, /^[a-f0-9]{64}$/);
+      for (const reference of row[role].findings) {
+        const finding = ({ baseline, candidate })[role].report.findings.find((item) => item.id === reference.findingId);
+        assert.ok(finding);
+        assert.deepEqual(reference.evidence, finding.evidence);
+      }
+      assert.ok(row[role].assessments[0]!.evidence.length > 0);
+    }
+  }
+  const stillPresent = comparison.findings.find((item) => item.classification === "persistent")!;
+  assert.notEqual(stillPresent.baseline.findings[0]!.findingId, stillPresent.candidate.findings[0]!.findingId);
+  assert.deepEqual(parseTutorHealthComparison(JSON.parse(JSON.stringify(comparison))), comparison);
+  assert.match(formatTutorHealthComparison(comparison), /resolved 1, persistent 1, new 1, unresolved 0/);
 
   assert.ok(
     baseline.report.findings

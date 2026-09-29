@@ -36,6 +36,8 @@ export type BenchmarkErrorCode =
   | "tutor_health_scoring_profile_invalid"
   | "tutor_health_report_invalid"
   | "tutor_health_report_case_run_duplicate"
+  | "tutor_health_comparison_invalid"
+  | "tutor_health_comparison_incompatible"
   | "tutor_health_report_source_mismatch"
   | "learner_outcome_evidence_invalid"
   | "adapter_failed"
@@ -91,6 +93,8 @@ const stableMessages: Record<BenchmarkErrorCode, string> = {
   tutor_health_scoring_profile_invalid: "Tutor Health scoring profile is invalid.",
   tutor_health_report_invalid: "Tutor Health report is invalid.",
   tutor_health_report_case_run_duplicate: "Tutor Health source evaluation has duplicate case runs.",
+  tutor_health_comparison_invalid: "Tutor Health comparison is invalid.",
+  tutor_health_comparison_incompatible: "Tutor Health sources are not comparable.",
   tutor_health_report_source_mismatch: "Tutor Health source evaluation does not match its scenario suite.",
   learner_outcome_evidence_invalid: "Learner outcome evidence is invalid.",
   adapter_failed: "Tutor adapter failed for this scenario.",
@@ -137,6 +141,8 @@ export class BenchmarkConfigurationError extends Error {
     | "tutor_health_scoring_profile_invalid"
     | "tutor_health_report_invalid"
     | "tutor_health_report_case_run_duplicate"
+    | "tutor_health_comparison_invalid"
+    | "tutor_health_comparison_incompatible"
     | "tutor_health_report_source_mismatch"
     | "learner_outcome_evidence_invalid";
 
@@ -179,6 +185,8 @@ export class BenchmarkConfigurationError extends Error {
       | "tutor_health_scoring_profile_invalid"
       | "tutor_health_report_invalid"
       | "tutor_health_report_case_run_duplicate"
+      | "tutor_health_comparison_invalid"
+      | "tutor_health_comparison_incompatible"
       | "tutor_health_report_source_mismatch"
       | "learner_outcome_evidence_invalid",
   ) {
