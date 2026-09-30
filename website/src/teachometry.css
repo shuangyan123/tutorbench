@@ -50,6 +50,9 @@
   --teach-button-height: 40px;
   --teach-button-radius: 5px;
   --teach-locale-control-width: 112px;
+  --teach-chrome-left-rail: 220px;
+  --teach-chrome-right-rail: 410px;
+  --teach-chrome-column-gap: 24px;
 }
 
 body:is(
@@ -2010,39 +2013,8 @@ body:is(
   .docs-page
 ) .home-footer-main {
   display: grid;
-  grid-template-columns: minmax(250px, .9fr) minmax(280px, 1.15fr) auto;
   align-items: center;
-  gap: 24px;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer-identity,
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer-actions {
-  display: flex;
-  align-items: center;
+  gap: var(--teach-chrome-column-gap);
 }
 
 body:is(
@@ -2058,8 +2030,44 @@ body:is(
   .run-page,
   .docs-page
 ) .home-footer-identity {
-  gap: 14px;
+  display: grid;
   min-width: 0;
+  align-items: start;
+  justify-items: start;
+  gap: 2px;
+}
+
+body:is(
+  .home-page,
+  .methodology-page,
+  .results-page,
+  .cases-page,
+  .case-detail-page,
+  .about-page,
+  .blog-page,
+  .models-page,
+  .model-detail-page,
+  .run-page,
+  .docs-page
+) .home-footer-identity .footer-descriptor {
+  padding-left: 34px;
+}
+
+body:is(
+  .home-page,
+  .methodology-page,
+  .results-page,
+  .cases-page,
+  .case-detail-page,
+  .about-page,
+  .blog-page,
+  .models-page,
+  .model-detail-page,
+  .run-page,
+  .docs-page
+) .home-footer-actions {
+  display: flex;
+  align-items: center;
 }
 
 body:is(
@@ -2112,6 +2120,142 @@ body:is(
   .docs-page
 ) .home-footer-actions .github-link {
   margin: 0;
+}
+
+
+@media (min-width: 1024px) {
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .header-inner,
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-footer-main {
+    display: grid;
+    grid-template-columns:
+      var(--teach-chrome-left-rail)
+      minmax(0, 1fr)
+      var(--teach-chrome-right-rail);
+    column-gap: var(--teach-chrome-column-gap);
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .wordmark,
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-footer-identity {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-links,
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-footer .footer-resource-nav {
+    grid-column: 2;
+    min-width: 0;
+    justify-self: center;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header-tools,
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-footer-actions {
+    grid-column: 3;
+    justify-self: end;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1100px) {
+  :root {
+    --teach-chrome-left-rail: 210px;
+    --teach-chrome-right-rail: 360px;
+    --teach-chrome-column-gap: 16px;
+  }
 }
 
 @media (width < 1024px) {
@@ -2262,7 +2406,22 @@ body:is(
     .docs-page
   ) .home-footer-identity {
     grid-row: 1;
-    flex-wrap: wrap;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-footer-identity .footer-descriptor {
+    padding-left: 34px;
   }
 
   body:is(
