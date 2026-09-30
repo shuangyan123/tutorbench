@@ -38,11 +38,20 @@ export interface SiteRenderContext {
   readonly benchmark?: SiteFooterBenchmark;
 }
 
+export interface SitePageSeo {
+  readonly type?: "website" | "article";
+  readonly image?: string;
+  /** ISO-8601 date for article metadata. */
+  readonly publishedDate?: string;
+  readonly noIndex?: boolean;
+}
+
 export interface SitePage {
   readonly title: string;
   readonly description: string;
   readonly route: string;
   readonly content: string;
+  readonly seo?: SitePageSeo;
 }
 
 /**
@@ -74,6 +83,133 @@ function sitePath(basePath: string, route: string): string {
 
 function brandAssetPath(basePath: string, assetPath: string): string {
   return sitePath(basePath, `${TUTORBENCH_BRAND_ASSET_BASE_PATH}/${assetPath}`);
+}
+
+function absoluteSiteUrl(siteUrl: string, path: string): string {
+  return `${siteUrl}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+function jsonLd(value: unknown): string {
+  return JSON.stringify(value).replaceAll("<", "\\u003c");
+}
+
+function breadcrumbName(segment: string, page: SitePage, isLast: boolean): string {
+  if (isLast) {
+    return page.title.replace(/\s+[—-]\s+Teachometry(?: Blog)?$/u, "");
+  }
+  const names: Readonly<Record<string, string>> = {
+    data: "Benchmark",
+    cases: "Cases",
+    trials: "Trials",
+    models: "Models",
+    methodology: "Methodology",
+    leaderboard: "Results",
+    about: "About",
+    community: "Community",
+    run: "Run",
+    docs: "Documentation",
+    blog: "Blog",
+  };
+  return names[segment] ?? humanize(decodeURIComponent(segment));
+}
+
+function structuredDataForPage(
+  page: SitePage,
+  siteUrl: string | undefined,
+  benchmark: SiteFooterBenchmark | undefined,
+): readonly Record<string, unknown>[] {
+  if (siteUrl === undefined || page.route === "/404.html" || page.route.includes("[")) {
+    return [];
+  }
+  const canonicalUrl = absoluteSiteUrl(siteUrl, page.route);
+  const graph: Record<string, unknown>[] = [];
+  if (page.route === "/") {
+    graph.push(
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Teachometry",
+        alternateName: "TutorBench",
+        url: canonicalUrl,
+        description: page.description,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Teachometry",
+        url: canonicalUrl,
+        sameAs: [SITE_GITHUB_URL],
+        description: "Open measurement infrastructure for observable AI tutoring behavior.",
+      },
+    );
+  }
+  if (page.route === "/data/" && benchmark !== undefined) {
+    graph.push({
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      name: `TutorEval ${benchmark.dataset.id}@${benchmark.dataset.version}`,
+      description: page.description,
+      url: canonicalUrl,
+      version: benchmark.dataset.version,
+      creator: {
+        "@type": "Organization",
+        name: "Teachometry",
+        url: absoluteSiteUrl(siteUrl, "/"),
+      },
+      license: "https://creativecommons.org/licenses/by/4.0/",
+      isAccessibleForFree: true,
+      keywords: ["AI tutoring", "AI tutor evaluation", "education benchmark", "observable tutoring behavior"],
+      distribution: [
+        {
+          "@type": "DataDownload",
+          encodingFormat: "application/json",
+          contentUrl: absoluteSiteUrl(siteUrl, "/public-data/cases.json"),
+        },
+        {
+          "@type": "DataDownload",
+          encodingFormat: "application/json",
+          contentUrl: absoluteSiteUrl(siteUrl, "/public-data/benchmark.json"),
+        },
+      ],
+      sameAs: [SITE_GITHUB_URL],
+    });
+  }
+  if (page.seo?.type === "article") {
+    graph.push({
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: page.title.replace(/\s+[—-]\s+Teachometry Blog$/u, ""),
+      description: page.description,
+      url: canonicalUrl,
+      mainEntityOfPage: canonicalUrl,
+      ...(page.seo.publishedDate === undefined ? {} : { datePublished: page.seo.publishedDate }),
+      ...(page.seo.image === undefined ? {} : { image: absoluteSiteUrl(siteUrl, page.seo.image) }),
+      author: {
+        "@type": "Organization",
+        name: "Teachometry",
+        url: absoluteSiteUrl(siteUrl, "/"),
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "Teachometry",
+        url: absoluteSiteUrl(siteUrl, "/"),
+      },
+    });
+  }
+  if (page.route !== "/") {
+    const segments = page.route.split("/").filter(Boolean);
+    graph.push({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: segments.map((segment, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: breadcrumbName(segment, page, index === segments.length - 1),
+        item: absoluteSiteUrl(siteUrl, `/${segments.slice(0, index + 1).join("/")}/`),
+      })),
+    });
+  }
+  return graph;
 }
 
 /** Prefixes generated internal href/src attributes without touching external URLs or code text. */
@@ -294,6 +430,12 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const locale = resolveSiteLocale(context.locale);
   const siteUrl = context.siteUrl?.replace(/\/$/, "");
   const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${page.route}`;
+  const isPlaceholderRoute = page.route.includes("[");
+  const shouldNoIndex = page.seo?.noIndex === true || page.route === "/404.html" || page.route.startsWith("/audit/") || isPlaceholderRoute;
+  const socialImageUrl = siteUrl === undefined || page.seo?.image === undefined
+    ? undefined
+    : absoluteSiteUrl(siteUrl, page.seo.image);
+  const structuredData = structuredDataForPage(page, siteUrl, context.benchmark);
   const isCaseDetailRoute = page.route.startsWith("/data/cases/") && page.route !== "/data/cases/";
   const isBlogIndex = page.route === "/blog/";
   const isBlogPage = page.route.startsWith("/blog/");
@@ -349,10 +491,20 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${escapeHtml(page.title)}</title>
     <meta name="description" content="${escapeHtml(page.description)}">
-    <meta property="og:type" content="website">
+    <meta name="robots" content="${shouldNoIndex ? "noindex,follow" : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"}">
+    <meta property="og:type" content="${page.seo?.type === "article" ? "article" : "website"}">
+    <meta property="og:site_name" content="Teachometry">
     <meta property="og:title" content="${escapeHtml(page.title)}">
     <meta property="og:description" content="${escapeHtml(page.description)}">
+    <meta property="og:locale" content="${locale === "zh-CN" ? "zh_CN" : "en_US"}">
     ${canonicalUrl === undefined ? "" : `<meta property="og:url" content="${escapeHtml(canonicalUrl)}"><link rel="canonical" href="${escapeHtml(canonicalUrl)}">`}
+    ${socialImageUrl === undefined ? "" : `<meta property="og:image" content="${escapeHtml(socialImageUrl)}">`}
+    ${page.seo?.publishedDate === undefined ? "" : `<meta property="article:published_time" content="${escapeHtml(page.seo.publishedDate)}">`}
+    <meta name="twitter:card" content="${socialImageUrl === undefined ? "summary" : "summary_large_image"}">
+    <meta name="twitter:title" content="${escapeHtml(page.title)}">
+    <meta name="twitter:description" content="${escapeHtml(page.description)}">
+    ${socialImageUrl === undefined ? "" : `<meta name="twitter:image" content="${escapeHtml(socialImageUrl)}">`}
+    ${structuredData.map((entry) => `<script type="application/ld+json">${jsonLd(entry)}</script>`).join("\n    ")}
     <link rel="icon" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon.ico"))}" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-32.png"))}">
     <link rel="icon" type="image/png" sizes="16x16" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-16.png"))}">

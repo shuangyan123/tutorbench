@@ -517,8 +517,19 @@ function renderArticleTransition(): string {
   </div></section>`;
 }
 
+function articlePublishedIso(article: BlogArticle): string {
+  const isoByDate: Readonly<Record<string, string>> = {
+    "September 17, 2026": "2026-09-17",
+    "September 28, 2026": "2026-09-28",
+    "September 30, 2026": "2026-09-30",
+  };
+  const value = isoByDate[article.publishedDate];
+  if (value === undefined) throw new Error(`Missing ISO publication date for ${article.publishedDate}`);
+  return value;
+}
+
 function renderBlogArticlePage(article: BlogArticle, footer = ""): SitePage {
-  return page(
+  const rendered = page(
     `${article.title} — Teachometry Blog`,
     article.description,
     article.route,
@@ -537,6 +548,14 @@ function renderBlogArticlePage(article: BlogArticle, footer = ""): SitePage {
     ${renderArticleTransition()}
     ${footer}`,
   );
+  return {
+    ...rendered,
+    seo: {
+      type: "article",
+      image: `/assets/${article.image}`,
+      publishedDate: articlePublishedIso(article),
+    },
+  };
 }
 
 export function renderBlogIndexPage(footer = ""): SitePage {

@@ -130,8 +130,12 @@ function renderHomeBlog(): string {
 }
 
 export function renderTeachometryFooter({ benchmark, models }: PublicBenchmarkArtifacts): string {
-  return `<footer class="home-footer"><div class="shell"><div class="home-footer-main"><a class="home-footer-brand" href="/"><img src="/assets/brand/tutorbench/web/tutorbench-mark-small.svg" width="26" height="26" alt="">Teachometry</a><span class="footer-descriptor">Open source for better learning.</span><nav aria-label="Footer navigation">${[["Home", "/"], ["Benchmark", "/data/"], ["Method", "/methodology/"], ["Results", "/leaderboard/"], ["Cases", "/data/cases/"], ["About", "/about/"], ["Blog", "/blog/"]].map(([label, route]) => `<a href="${route}">${label}</a>`).join("")}</nav><a class="github-link" href="${SITE_GITHUB_URL}" aria-label="GitHub repository" title="GitHub repository">${icon("github")}</a><a class="button button-primary" href="/community/">Join the community ${icon("arrow")}</a></div>
-      <div class="home-footer-bottom"><span>Teachometry · ${e(benchmark.statusLabel)}</span><a href="/docs/">Documentation</a><a href="${SITE_GITHUB_URL}/issues">Project support</a></div>
+  return `<footer class="home-footer"><div class="shell"><div class="home-footer-main">
+      <div class="home-footer-identity"><a class="home-footer-brand" href="/"><img src="/assets/brand/tutorbench/web/tutorbench-mark-small.svg" width="26" height="26" alt="">Teachometry</a><span class="footer-descriptor">Open source for better learning.</span></div>
+      <nav class="footer-resource-nav" aria-label="Footer resources"><a href="/docs/">Documentation</a><a href="/models/">Models</a><a href="/run/">Run</a></nav>
+      <div class="home-footer-actions"><a class="github-link" href="${SITE_GITHUB_URL}" aria-label="GitHub repository" title="GitHub repository">${icon("github")}</a><a class="button button-primary" href="/community/">Join the community ${icon("arrow")}</a></div>
+    </div>
+      <div class="home-footer-bottom"><span>Teachometry · ${e(benchmark.statusLabel)}</span><a href="${SITE_GITHUB_URL}/issues">Project support</a></div>
       <details class="home-evidence"><summary>Evidence &amp; limitations</summary><p>${e(models.notice)} ${e(benchmark.notice)} Calibration infrastructure exists, but real Community Review and human calibration have not started. Judge-vs-human validation and statistical validation are not completed. TutorBench measures observable tutoring behavior in specified benchmark scenarios, not long-term learning, retention, transfer, satisfaction, or classroom outcomes.</p></details>
     </div></footer>`;
 }
