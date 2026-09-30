@@ -63,6 +63,7 @@ import {
   renderBlogIndexPage,
   renderClassroomDoesNotNeedRobotsPage,
   renderTeachingAndSupervisionPage,
+  renderWhenLearningStartsToFeelLikeFailurePage,
   renderWhyTeachingDoesNotScalePage,
 } from "../site/pages/blog.js";
 
@@ -314,6 +315,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
 
   const blogPages = [
     renderBlogIndexPage(renderTeachometryFooter(artifacts)),
+    renderWhenLearningStartsToFeelLikeFailurePage(renderTeachometryFooter(artifacts)),
     renderClassroomDoesNotNeedRobotsPage(renderTeachometryFooter(artifacts)),
     renderWhyTeachingDoesNotScalePage(renderTeachometryFooter(artifacts)),
     renderTeachingAndSupervisionPage(renderTeachometryFooter(artifacts)),

@@ -4,6 +4,7 @@ import { renderEditorialBotanical } from "../illustrations.js";
 
 const BLOG_PUBLISHED_DATE = "September 17, 2026";
 const CLASSROOM_INTERFACE_PUBLISHED_DATE = "September 28, 2026";
+const LEARNING_FAILURE_PUBLISHED_DATE = "September 30, 2026";
 
 export interface BlogPostSummary {
   readonly category: "Perspective";
@@ -22,11 +23,18 @@ export interface BlogCallout {
   readonly body: string;
 }
 
+export interface BlogArticleImage {
+  readonly src: string;
+  readonly alt: string;
+  readonly caption?: string;
+}
+
 export interface BlogArticleSection {
   readonly heading: string;
   readonly paragraphs: readonly string[];
   readonly progression?: readonly { readonly label: string; readonly text: string }[];
   readonly callout?: BlogCallout;
+  readonly image?: BlogArticleImage;
 }
 
 export interface BlogArticle extends BlogPostSummary {
@@ -35,6 +43,114 @@ export interface BlogArticle extends BlogPostSummary {
   readonly evidenceBoundary: string;
 }
 
+
+
+const LEARNING_FAILURE_SECTIONS: readonly BlogArticleSection[] = [
+  {
+    heading: "A classroom has to choose a starting point",
+    paragraphs: [
+      "A teacher can explain a new topic, sketch a framework on the board, demonstrate a formula, assign exercises, review the answers, and assign more exercises. None of those actions is inherently poor teaching. Direct explanation, worked examples, practice, and feedback all matter.",
+      "The constraint is that a classroom has to perform them for many learners at once. A lesson needs one starting point, one approximate pace, and one sequence even though students do not actually arrive at the same point.",
+      "One learner may understand every prerequisite. Another may be missing one concept. Another may have stopped understanding two chapters earlier. The class still moves forward, and a small gap can gradually become the learner's entire experience of the subject.",
+    ],
+  },
+  {
+    heading: "Asking for help has a social cost",
+    paragraphs: [
+      "In theory, a learner who does not understand can ask the teacher. In practice, asking is not free. Raising a hand can mean publicly admitting that everyone else seems to understand something that you do not. Approaching a teacher after class requires crossing a social boundary.",
+      "A learner may worry that the question is too basic, that the teacher is busy, that the explanation will start too far ahead again, or that asking for the fourth time will be embarrassing. Sometimes the learner cannot even describe what is missing.",
+      "A teacher responsible for an entire classroom may not have the time to reconstruct one student's knowledge from the beginning. That is not necessarily a failure of care. It is also a capacity constraint. So the learner stays quiet, and the lesson continues.",
+    ],
+  },
+  {
+    heading: "Repeated failure eventually changes the meaning of learning",
+    paragraphs: [
+      "At first, the problem may be academic: I do not understand this. After enough repetition, it can become personal: I am bad at this. Then broader: I am bad at learning.",
+      "A student who repeatedly listens without understanding, attempts problems without success, receives poor grades, or is mocked for falling behind is not experiencing learning as progress. Learning becomes associated with confusion, exposure, boredom, and failure.",
+      "From the outside, the eventual response may look like indifference. But disengagement can also be a protective response to repeated experiences in which effort does not appear to change the outcome. Saying I never cared anyway can be easier than saying I cared, tried, and still failed.",
+    ],
+    progression: [
+      { label: "Confusion", text: "a concept or prerequisite is not understood." },
+      { label: "Silence", text: "asking for help feels socially expensive or difficult to formulate." },
+      { label: "Accumulation", text: "new material is built on top of unresolved gaps." },
+      { label: "Failure", text: "practice increasingly produces evidence of being behind rather than evidence of progress." },
+      { label: "Withdrawal", text: "avoiding the task becomes easier than repeatedly testing a painful prediction." },
+    ],
+  },
+  {
+    heading: "Distant consequences are weak rewards",
+    paragraphs: [
+      "Education often responds with long-range incentives: study now to enter a better school, earn stronger qualifications, and find a better job. Those consequences can matter, but they are distant and abstract.",
+      "The learner's immediate experience is much closer: I am sitting here now. I do not understand this problem now. Everyone else seems ahead of me now. I am going to fail the next exercise now.",
+      "When learning itself produces almost no positive feedback, increasingly severe descriptions of the future may stop working. The learner needs evidence in the present that effort can produce change.",
+    ],
+  },
+  {
+    heading: "The strongest reward may be visible progress",
+    paragraphs: [
+      "Positive reinforcement in education does not have to mean badges, points, streaks, praise animations, or gamification. A more powerful reward can be simpler: I can do something now that I could not do twenty minutes ago.",
+      "Suppose a learner is failing quadratic-function problems. Instead of repeating the whole chapter, a tutor discovers that the real gap is an earlier understanding of how parameters change a graph. The tutor goes back, rebuilds that prerequisite, tries a near variation, asks the learner to explain it, and then returns to the original problem.",
+      "Something that previously looked impossible now has a path through it. The important change is not one correct answer. It is the learner's prediction about difficulty: I do not understand no longer has to mean I probably never will.",
+    ],
+    callout: {
+      label: "Learning signal",
+      title: "Progress should be perceptible to the learner.",
+      body: "A system can make small gains visible without pretending every attempt deserves praise. The useful signal is evidence that effort, diagnosis, and the right amount of support changed what the learner can do.",
+    },
+  },
+  {
+    heading: "“I do not understand” should be a valid input",
+    paragraphs: [
+      "This may be where AI tutoring has an unusually important advantage. A learner should be able to say: I have no idea. You started too far ahead. I do not understand what that symbol means. You already explained it three times and I still do not get it.",
+      "The system should not become impatient, interpret repeated questions as disrespect, or require the learner to perform confidence before receiving help. Instead, it can move backwards until it finds a stable starting point.",
+      "Personalization is therefore deeper than changing a mathematics problem so that it mentions a student's favourite sport. The important question is: where is this learner's actual starting point?",
+    ],
+    progression: [
+      { label: "Current problem", text: "locate the step where progress stopped." },
+      { label: "Prerequisite", text: "test the concept or skill that step depends on." },
+      { label: "Starting point", text: "move backward until the learner can work reliably." },
+      { label: "Rebuild", text: "advance again with small checks and fading support." },
+      { label: "Transfer", text: "verify that the learner can use the idea without the same scaffold." },
+    ],
+  },
+  {
+    heading: "A Tutor also shapes the emotional experience of learning",
+    paragraphs: [
+      "An educational AI that only knows how to provide explanations is incomplete. Sometimes the correct next action is not another explanation. A learner may arrive frustrated, ashamed, angry, anxious about an exam, or convinced that further effort is pointless.",
+      "Patience is instructional. Allowing mistakes is instructional. Reducing shame around not knowing is instructional. Helping someone turn I am stupid into we found the specific thing that is missing is instructional.",
+      "That does not mean an AI tutor should pretend to be a therapist. Ordinary learning frustration and emotional support are different from serious mental-health crises, abuse, severe bullying, or risk of self-harm. Those situations require clear safeguarding boundaries and appropriate human support. AI can be a low-friction first point of contact without becoming a closed final point of contact.",
+    ],
+  },
+  {
+    heading: "AI education may enter through the space outside school",
+    paragraphs: [
+      "AI education may not enter the classroom first. A classroom is an institutional environment, so introducing an AI Tutor immediately raises questions about teacher roles, school policy, devices, privacy, assessment, safety, classroom management, and responsibility.",
+      "Outside the classroom, the first proposition can be much simpler: here is somewhere you can ask the questions you were afraid to ask. Students can use it after school, families can observe whether it helps, and learners can become familiar with individualized tutoring before a school has to redesign the classroom around it.",
+      "A plausible adoption path is private learning support, then structured after-school tutoring, then teacher-visible support, then supervised school use, and only later deeper classroom integration. Acceptance can grow from repeated useful experience rather than from claims about transforming education.",
+    ],
+    image: {
+      src: "blog-learning-failure-triptych.webp",
+      alt: "Three-part scene moving from a student struggling in class to a private study space and independent problem solving",
+      caption: "A useful transition may be gradual: public difficulty, private help, then increasingly independent work.",
+    },
+  },
+  {
+    heading: "The goal is not dependence on the Tutor",
+    paragraphs: [
+      "There is an obvious danger. A system that always makes the learner feel better by doing difficult work for them can produce pleasant interactions without producing learning.",
+      "Support therefore has to preserve agency. The Tutor should help the learner re-enter the task, not permanently remove the task. The important progression is: I cannot do this; I can do this with help; I can do this with less help; I can do this alone; I can use it somewhere new.",
+      "The success condition is not that the student enjoys talking to the AI. It is that the student increasingly needs the AI less for things they have already learned.",
+    ],
+  },
+  {
+    heading: "Education should make progress perceptible",
+    paragraphs: [
+      "A scalable AI Tutor could eventually diagnose misconceptions, select exercises, adapt explanations, monitor practice, preserve evidence of mastery, and coordinate with teachers. But one of its earliest contributions may be simpler.",
+      "It can create a learning environment in which ignorance is not embarrassing, help is consistently available, starting points can differ, and progress is small enough to be noticed.",
+      "For a learner who has spent years experiencing education mainly as evidence of failure, that may be where learning begins again.",
+    ],
+  },
+];
 
 const CLASSROOM_INTERFACE_SECTIONS: readonly BlogArticleSection[] = [
   {
@@ -256,6 +372,21 @@ const TEACHING_AND_SUPERVISION_SECTIONS: readonly BlogArticleSection[] = [
 ];
 
 
+
+const WHEN_LEARNING_FEELS_LIKE_FAILURE: BlogArticle = {
+  category: "Perspective",
+  publishedDate: LEARNING_FAILURE_PUBLISHED_DATE,
+  title: "When Learning Starts to Feel Like Failure",
+  description: "Why students can fall from confusion into disengagement, why distant rewards often fail to restore motivation, and why an AI tutor may need to make learning psychologically safe before it can make it more efficient.",
+  excerpt: "Students do not always stop caring because they lack ambition. Sometimes learning has become a repeated experience of confusion, exposure, and failure.",
+  route: "/blog/when-learning-starts-to-feel-like-failure/",
+  image: "blog-learning-failure-hero.webp",
+  imageAlt: "A classroom desk with a heavily revised mathematics notebook in warm late-afternoon light",
+  sections: LEARNING_FAILURE_SECTIONS,
+  pullQuote: "The first promise of AI education may be a place where saying “I do not understand” carries almost no social cost.",
+  evidenceBoundary: "This essay presents a product and educational hypothesis, not a benchmark result or clinical claim. TutorBench does not currently establish that AI tutoring reduces school disengagement, improves student mental health, restores motivation, or produces long-term academic gains. Those questions require learner studies, longitudinal evidence, appropriate safeguarding, and human-subject research beyond current Tutor Health evaluation.",
+};
+
 const CLASSROOM_DOES_NOT_NEED_ROBOTS: BlogArticle = {
   category: "Perspective",
   publishedDate: CLASSROOM_INTERFACE_PUBLISHED_DATE,
@@ -300,6 +431,7 @@ const TEACHING_AND_SUPERVISION: BlogArticle = {
 
 /** Explicit editorial metadata is the source for the index and Home cards. */
 export const BLOG_POSTS = [
+  WHEN_LEARNING_FEELS_LIKE_FAILURE,
   CLASSROOM_DOES_NOT_NEED_ROBOTS,
   WHY_TEACHING_DOES_NOT_SCALE,
   TEACHING_AND_SUPERVISION,
@@ -357,11 +489,15 @@ function renderArticleSection(section: BlogArticleSection): string {
   const progression = section.progression === undefined
     ? ""
     : `<ul class="article-progression">${section.progression.map((item) => `<li><strong>${e(item.label)}:</strong><span>${e(item.text)}</span></li>`).join("")}</ul>`;
+  const image = section.image === undefined
+    ? ""
+    : `<figure class="article-section-media"><img src="/assets/${e(section.image.src)}" width="1672" height="941" loading="lazy" alt="${e(section.image.alt)}">${section.image.caption === undefined ? "" : `<figcaption>${e(section.image.caption)}</figcaption>`}</figure>`;
   return `<section class="article-section" aria-labelledby="${e(articleHeadingId(section.heading))}">
     <h2 id="${e(articleHeadingId(section.heading))}">${e(section.heading)}</h2>
     ${section.paragraphs.map((paragraph) => `<p>${e(paragraph)}</p>`).join("")}
     ${progression}
     ${section.callout === undefined ? "" : renderArticleCallout(section.callout)}
+    ${image}
   </section>`;
 }
 
@@ -434,6 +570,10 @@ export function renderBlogIndexPage(footer = ""): SitePage {
       ${footer}
     </div>`,
   );
+}
+
+export function renderWhenLearningStartsToFeelLikeFailurePage(footer = ""): SitePage {
+  return renderBlogArticlePage(WHEN_LEARNING_FEELS_LIKE_FAILURE, footer);
 }
 
 export function renderClassroomDoesNotNeedRobotsPage(footer = ""): SitePage {
