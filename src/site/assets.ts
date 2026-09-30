@@ -16,6 +16,8 @@ export const PUBLIC_SITE_RASTER_ASSETS = [
   "home-blog-01.webp",
   "home-blog-02.webp",
   "home-blog-03.webp",
+  "blog-learning-failure-hero.webp",
+  "blog-learning-failure-triptych.webp",
 ] as const;
 
 export type PublicSiteRasterAsset = (typeof PUBLIC_SITE_RASTER_ASSETS)[number];
