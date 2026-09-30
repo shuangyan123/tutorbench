@@ -11,6 +11,8 @@ import { PUBLIC_SITE_BOTANICAL_ASSETS } from "../assets.js";
 import { renderBotanicalSvg } from "../illustrations.js";
 import { renderTeachometryFooter } from "./home.js";
 import { renderMethodologyHeroArt } from "./methodology-hero.js";
+import { renderMethodologyBotanical } from "./methodology-botanicals.js";
+import { renderMethodologyLensArt } from "./methodology-dimensions.js";
 
 function page(
   title: string,
@@ -287,112 +289,6 @@ function renderMethodologyPipeline(): string {
   return `<ol class="method-pipeline-list" aria-label="Five-stage evaluation pipeline">${methodologyPipeline.map(([number, title, copy, glyph], index) => `<li class="method-pipeline-stage"><div class="method-stage-icon">${icon(glyph)}</div><div><p class="method-stage-number">${number}</p><h3>${title}</h3></div><p>${copy}</p>${index === methodologyPipeline.length - 1 ? "" : `<span class="method-pipeline-arrow" aria-hidden="true">${icon("arrow")}</span>`}</li>`).join("")}</ol>`;
 }
 
-function methodologyVisualKind(dimension: string): string {
-  return methodologyDimensionDetails[dimension] ? dimension : "general";
-}
-
-type MethodologyVisualLine = "main" | "secondary" | "reference" | "arrow" | "tick";
-type MethodologyVisualPoint = "default" | "step" | "target" | "split" | "focus";
-
-function methodologyVisualPath(kind: MethodologyVisualLine, d: string): string {
-  return '<path class="method-story-line method-story-line--' + kind + '" d="' + d + '"/>';
-}
-
-function methodologyVisualPoint(kind: MethodologyVisualPoint, x: number, y: number, radius: number): string {
-  const modifier = kind === "default" ? "" : " method-story-point--" + kind;
-  return '<circle class="method-story-point' + modifier + '" cx="' + x + '" cy="' + y + '" r="' + radius + '"/>';
-}
-
-function renderMethodologyVisualMotif(visualKind: string): string {
-  switch (visualKind) {
-    case "correctness":
-      return [
-        methodologyVisualPath("reference", "M70 210H408"),
-        methodologyVisualPath("main", "M76 116C151 116 177 172 248 181S351 211 410 210C442 209 458 227 458 252C458 278 477 286 486 299"),
-        methodologyVisualPath("secondary", "M76 292C149 292 177 238 248 232S354 210 410 210"),
-        methodologyVisualPath("tick", "M408 201V219"),
-        methodologyVisualPoint("default", 76, 292, 4),
-        methodologyVisualPoint("target", 410, 210, 8),
-        methodologyVisualPoint("focus", 285, 210, 3),
-      ].join("");
-    case "diagnosis":
-      return [
-        methodologyVisualPath("reference", "M72 254H538"),
-        methodologyVisualPath("main", "M72 254H185C219 254 230 222 249 194C269 166 293 133 319 150C340 164 337 193 315 194C293 194 286 169 300 153C317 134 347 143 350 170C354 205 327 222 324 251C319 281 354 305 360 336"),
-        methodologyVisualPath("tick", "M266 164H276M356 164H366M316 113V123M316 215V225"),
-        '<circle class="method-story-point method-story-point--inspection" cx="316" cy="169" r="39"/>',
-        methodologyVisualPoint("focus", 316, 169, 4),
-      ].join("");
-    case "guidance":
-      return [
-        methodologyVisualPath("main", "M76 416C127 406 154 373 188 365C223 356 236 374 262 348C288 322 282 299 320 284C355 271 376 278 396 248C413 224 422 200 452 183C472 171 490 168 510 174"),
-        methodologyVisualPath("secondary", "M510 174C568 212 554 281 526 344"),
-        methodologyVisualPoint("step", 188, 365, 6),
-        methodologyVisualPoint("step", 320, 284, 7),
-        methodologyVisualPoint("step", 396, 248, 5),
-        methodologyVisualPoint("target", 506, 173, 8),
-      ].join("");
-    case "adaptation":
-      return [
-        methodologyVisualPath("main", "M76 230H194C232 230 242 187 274 151C304 117 345 80 383 99C421 118 411 176 438 205C454 222 465 237 474 254C490 284 507 313 513 342"),
-        methodologyVisualPath("secondary", "M194 230C234 230 244 278 275 311C308 346 356 371 397 339C433 312 452 278 474 254"),
-        methodologyVisualPoint("split", 194, 230, 9),
-        methodologyVisualPoint("target", 383, 99, 8),
-        methodologyVisualPoint("default", 397, 339, 5),
-        methodologyVisualPoint("step", 474, 254, 7),
-      ].join("");
-    case "actionability":
-      return [
-        methodologyVisualPath("main", "M76 82C153 82 190 141 247 177C278 197 300 209 336 214"),
-        methodologyVisualPath("main", "M76 214C159 214 243 214 336 214"),
-        methodologyVisualPath("main", "M76 340C153 340 190 285 247 250C278 231 300 219 336 214"),
-        methodologyVisualPath("main", "M344 214H546"),
-        methodologyVisualPath("arrow", "M533 201L546 214L533 227"),
-        methodologyVisualPoint("default", 76, 214, 4),
-        methodologyVisualPoint("default", 76, 340, 4),
-        methodologyVisualPoint("target", 350, 214, 8),
-      ].join("");
-    default:
-      return [
-        methodologyVisualPath("main", "M76 220C160 220 192 208 264 220S358 260 398 288C435 315 462 333 492 343"),
-        methodologyVisualPoint("default", 76, 220, 5),
-        methodologyVisualPoint("target", 398, 288, 9),
-      ].join("");
-  }
-}
-
-function methodologyVisualIndexPosition(visualKind: string): readonly [number, number] {
-  switch (visualKind) {
-    case "diagnosis": return [72, 254];
-    case "guidance": return [76, 416];
-    case "adaptation": return [76, 230];
-    case "actionability": return [76, 82];
-    default: return [76, 116];
-  }
-}
-
-function methodologyVisualAnchor(visualKind: string): readonly [number, number] {
-  switch (visualKind) {
-    case "correctness": return [486, 365];
-    case "diagnosis": return [360, 402];
-    case "guidance": return [526, 410];
-    case "adaptation": return [535, 408];
-    case "actionability": return [520, 424];
-    default: return [492, 390];
-  }
-}
-
-function renderMethodologyVisual(dimension: string, index: number, number: string): string {
-  const visualKind = methodologyVisualKind(dimension);
-  const [indexX, indexY] = methodologyVisualIndexPosition(visualKind);
-  const [anchorX, anchorY] = methodologyVisualAnchor(visualKind);
-
-  return '<g class="method-story-visual" data-method-story-visual="' + index + '" data-method-visual-state="' + visualKind + '">' +
-    '<circle class="method-story-orbit" cx="' + anchorX + '" cy="' + anchorY + '" r="66"/>' +
-    '<g class="method-story-spoke" data-method-story-spoke="' + index + '">' + renderMethodologyVisualMotif(visualKind) + '</g>' +
-    '<g class="method-story-node" data-method-story-node="' + index + '"><circle cx="' + indexX + '" cy="' + indexY + '" r="19"></circle><text x="' + indexX + '" y="' + indexY + '">' + number + '</text></g></g>';
-}
-
 function renderMethodologyLens(scoreDimensions: readonly string[]): string {
   const dimensions = scoreDimensions.map((dimension, index) => {
     const details = methodologyDimension(dimension);
@@ -406,7 +302,7 @@ function renderMethodologyLens(scoreDimensions: readonly string[]): string {
     '<p class="method-story-description">' + escapeHtml(details.description) + '</p>' +
     '<p class="method-story-lens"><span>What we look for</span>' + escapeHtml(details.lens) + '</p></li>'
   ).join("");
-  const visualMarkup = dimensions.map(({ dimension, index, number }) => renderMethodologyVisual(dimension, index, number)).join("");
+  const visualMarkup = renderMethodologyLensArt(dimensions);
   const overviewNodes = dimensions.map(({ index, number }) => {
     const x = dimensions.length <= 1 ? 320 : 48 + (index * 482) / (dimensions.length - 1);
     return '<g class="method-story-overview-node"><circle cx="' + x.toFixed(2) + '" cy="42" r="14"></circle><text x="' + x.toFixed(2) + '" y="42">' + number + '</text></g>';
@@ -416,8 +312,7 @@ function renderMethodologyLens(scoreDimensions: readonly string[]): string {
     '<ol class="method-story-chapters" aria-label="' + escapeHtml(String(dimensions.length)) + ' benchmark score dimensions">' + chapterMarkup + '</ol>' +
     '<figure class="method-story-stage" data-method-story-stage>' +
     '<p class="method-story-stage-index" aria-hidden="true"><span data-method-story-current>01</span><span> / ' + total + '</span></p>' +
-    '<svg class="method-story-map" viewBox="0 0 640 520" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
-    '<g class="method-story-visuals">' + visualMarkup + '</g></svg>' +
+    visualMarkup +
     '<svg class="method-story-overview" viewBox="0 0 640 84" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
     '<path class="method-story-overview-track" d="M48 42H580"/><g class="method-story-overview-nodes">' + overviewNodes + '</g><circle class="method-story-overview-core" cx="592" cy="42" r="6"/></svg>' +
     '<figcaption class="method-story-center">Observable<br>tutoring<br>behavior</figcaption></figure></div>';
@@ -438,6 +333,7 @@ function renderMethodologyArchitecture(): string {
       <span class="method-flow-arrow" aria-hidden="true">${icon("arrow")}</span>
       <div class="method-flow-node method-flow-result"><span class="method-flow-icon">${icon("chart")}</span><strong>Benchmark result</strong><small>Structured,<br>comparable output</small></div>
     </div>
+    <svg class="method-architecture-guide" viewBox="0 0 900 36" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M38 3C38 26 140 30 450 30S862 26 862 3M34 9L38 3L43 8M857 8L862 3L866 9"/></svg>
     <figcaption>Transparent, reproducible, and auditable. A Judge is an evaluator boundary, not ground truth; unresolved Judge-required evidence remains unresolved and cannot silently become a valid score.</figcaption>
   </figure>`;
 }
@@ -479,28 +375,6 @@ function renderMethodologyStatus(artifacts: PublicBenchmarkArtifacts): string {
   return `<table class="method-status-table"><caption class="visually-hidden">Current methodology status</caption><thead><tr><th scope="col">Component</th><th scope="col">Status</th><th scope="col">Notes</th></tr></thead><tbody>${rows.map(([component, status, notes, tone]) => `<tr><th scope="row">${component}</th><td><span class="method-status-value method-status-${tone}"><span aria-hidden="true"></span>${status}</span></td><td>${notes}</td></tr>`).join("")}</tbody></table>`;
 }
 
-function renderMethodologyBotanical(className: string): string {
-  return `<svg class="method-botanical ${className}" viewBox="0 0 260 350" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
-    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M128 345C126 298 129 249 139 203C151 146 171 88 210 20" stroke-width="1.5"/>
-      <path d="M137 218C110 187 86 153 62 111M131 268C100 251 68 228 34 193M149 174C178 151 202 120 225 86M125 309C94 297 61 279 28 252M164 135C191 120 217 99 241 74M121 327C98 333 72 335 45 331" stroke-width="1.05"/>
-      <path d="M70 113C86 123 101 138 113 156M42 195C62 202 82 213 99 224M223 88C206 98 191 110 178 124M31 253C51 258 72 266 90 277M239 76C220 83 203 92 188 103M50 330C69 322 88 318 108 319" stroke-width=".8" opacity=".72"/>
-    </g>
-    <g fill="currentColor" fill-opacity=".065" stroke="currentColor" stroke-linejoin="round">
-      <path d="M62 111C45 91 35 68 40 48C62 56 78 76 80 99C74 105 69 109 62 111Z" stroke-width="1"/>
-      <path d="M34 193C21 174 16 151 24 131C45 141 58 162 55 181C49 187 42 191 34 193Z" stroke-width="1"/>
-      <path d="M225 86C224 65 231 43 248 28C255 49 249 73 233 89C230 89 227 88 225 86Z" stroke-width="1"/>
-      <path d="M28 252C21 233 24 213 39 198C54 216 54 237 42 253C37 254 32 254 28 252Z" stroke-width="1"/>
-      <path d="M241 74C241 54 248 36 263 26C268 45 262 65 250 77C246 78 243 77 241 74Z" stroke-width="1"/>
-      <path d="M210 20C213 43 209 65 197 84C185 74 181 57 187 40C193 31 201 23 210 20Z" stroke-width="1"/>
-      <path d="M45 331C31 322 23 309 25 294C43 299 56 312 59 326C55 329 50 331 45 331Z" stroke-width="1"/>
-    </g>
-    <g fill="none" stroke="currentColor" stroke-linecap="round" opacity=".42">
-      <path d="M53 54C59 69 62 85 62 108M31 137C37 152 38 166 35 189M247 35C241 51 235 66 226 83M40 206C36 221 31 236 29 249M260 33C253 47 247 60 242 72M192 43C200 55 203 67 197 81M31 299C38 309 43 318 45 328" stroke-width=".65"/>
-    </g>
-  </svg>`;
-}
-
 function renderAboutBotanical(className: string): string {
   return renderBotanicalSvg(`about-botanical ${className}`, PUBLIC_SITE_BOTANICAL_ASSETS.about);
 }
@@ -511,11 +385,11 @@ export function renderMethodologyPage(artifacts: PublicBenchmarkArtifacts): Site
     "Methodology — Teachometry",
     "How Teachometry evaluates observable tutoring behavior in structured authored benchmark cases using transparent and reproducible procedures.",
     "/methodology/",
-    `<section class="method-hero" aria-labelledby="method-title">${renderMethodologyBotanical("method-botanical-left")}<div class="shell method-hero-grid"><div class="method-hero-copy"><p class="eyebrow">Our methodology</p><h1 id="method-title">How do you<br>measure <em>teaching?</em></h1><p class="method-hero-lede">Teachometry evaluates observable tutoring behavior in structured authored benchmark cases using transparent and reproducible evaluation procedures.</p><div class="button-row"><a class="button button-primary" href="/data/">Explore the benchmark ${icon("arrow")}</a><a class="button button-secondary" href="#method-pipeline">${icon("book")} Read the methodology</a></div><div class="method-hero-principles"><span>${icon("diagnosis")} Transparent</span><span>${icon("guidance")} Research-grounded</span><span>${icon("document")} Openly documented</span></div></div>${renderMethodologyHeroArt()}</div></section>
+    `<section class="method-hero" aria-labelledby="method-title">${renderMethodologyBotanical("hero")}<div class="shell method-hero-grid"><div class="method-hero-copy"><p class="eyebrow">Our methodology</p><h1 id="method-title">How do you<br>measure <em>teaching?</em></h1><p class="method-hero-lede">Teachometry evaluates observable tutoring behavior in structured authored benchmark cases using transparent and reproducible evaluation procedures.</p><div class="button-row"><a class="button button-primary" href="/data/">Explore the benchmark ${icon("arrow")}</a><a class="button button-secondary" href="#method-pipeline">${icon("book")} Read the methodology</a></div><div class="method-hero-principles"><span>${icon("diagnosis")} Transparent</span><span>${icon("guidance")} Research-grounded</span><span>${icon("document")} Openly documented</span></div></div>${renderMethodologyHeroArt()}</div></section>
     <section class="method-pipeline" id="method-pipeline" aria-labelledby="pipeline-title"><div class="shell"><div class="method-section-bar"><p class="eyebrow" id="pipeline-title">The evaluation pipeline</p><p>From a structured case to a benchmark result.</p></div>${renderMethodologyPipeline()}</div></section>
     <section class="method-dimensions" id="method-dimensions" aria-labelledby="dimensions-title"><div class="shell method-dimensions-grid"><div class="method-dimensions-intro"><p class="eyebrow">Five evaluation dimensions</p><h2 id="dimensions-title">Five complementary<br>lenses on tutoring<br><em>behavior.</em></h2><p>We evaluate AI tutors across the five score dimensions in the public benchmark artifact, capturing complementary aspects of observable tutoring behavior in structured cases.</p><a class="text-link" href="/docs/">Learn more about the dimensions ${icon("arrow")}</a></div>${renderMethodologyLens(scoreDimensions)}<p class="method-dimensions-note">Different aspects.<br><em>A more complete<br>picture.</em></p></div></section>
     <section class="method-architecture" aria-labelledby="method-architecture-title"><div class="shell method-architecture-grid"><div class="method-architecture-intro"><p class="eyebrow">From response to result</p><h2 id="method-architecture-title">A transparent<br><em>evaluation architecture.</em></h2><p>Our evaluation framework combines atomic rubrics, explicit evidence boundaries, and multiple evaluators to support reproducible and auditable results.</p><p class="method-boundary-copy"><strong>Tutor-visible input ends at the response boundary.</strong> Evaluator-only annotations stay on the evaluator side.</p></div>${renderMethodologyArchitecture()}</div></section>
-    <section class="method-scope" aria-labelledby="method-scope-title"><div class="method-scope-measure"><div class="shell method-scope-inner"><p class="eyebrow">What we measure</p><h2 id="method-scope-title">Observable tutoring behavior.</h2><p>We focus on what the AI Tutor does and says in the interaction, evaluated through structured rubrics and observable evidence.</p><ul>${scoreDimensions.map((dimension) => { const details = methodologyDimension(dimension); return `<li><span class="method-scope-mark">${icon("check")}</span><span><strong>${escapeHtml(details.label)}</strong><small>${escapeHtml(details.lens)}</small></span></li>`; }).join("")}</ul><p class="method-scope-footnote">Case-conditioned evidence, not a claim of general teaching effectiveness.</p></div></div><div class="method-scope-not-measure">${renderMethodologyBotanical("method-scope-botanical")}<div class="shell method-scope-inner"><p class="eyebrow">What we do not measure</p><h2>Learning outcomes <em>(not yet).</em></h2><p>We currently do not measure long-term learning gains or real-world educational outcomes. These require longitudinal studies beyond the scope of this benchmark.</p><ul><li><span class="method-scope-mark">${icon("close")}</span><span>Actual long-term learning</span></li><li><span class="method-scope-mark">${icon("close")}</span><span>Knowledge retention over time</span></li><li><span class="method-scope-mark">${icon("close")}</span><span>Transfer to new contexts</span></li><li><span class="method-scope-mark">${icon("close")}</span><span>Student satisfaction</span></li><li><span class="method-scope-mark">${icon("close")}</span><span>Real classroom outcomes</span></li></ul></div></div></section>
+    <section class="method-scope" aria-labelledby="method-scope-title"><div class="method-scope-measure">${renderMethodologyBotanical("measure")}<div class="shell method-scope-inner"><p class="eyebrow">What we measure</p><h2 id="method-scope-title">Observable tutoring behavior.</h2><p>We focus on what the AI Tutor does and says in the interaction, evaluated through structured rubrics and observable evidence.</p><ul>${scoreDimensions.map((dimension) => { const details = methodologyDimension(dimension); return `<li><span class="method-scope-mark">${icon("check")}</span><span><strong>${escapeHtml(details.label)}</strong><small>${escapeHtml(details.lens)}</small></span></li>`; }).join("")}</ul><p class="method-scope-footnote">Case-conditioned evidence, not a claim of general teaching effectiveness.</p></div></div><div class="method-scope-not-measure">${renderMethodologyBotanical("not-measure")}<div class="shell method-scope-inner"><p class="eyebrow">What we do not measure</p><h2>Learning outcomes <em>(not yet).</em></h2><p>We currently do not measure long-term learning gains or real-world educational outcomes. These require longitudinal studies beyond the scope of this benchmark.</p><ul><li><span class="method-scope-mark">${icon("close")}</span><span>Actual long-term learning</span></li><li><span class="method-scope-mark">${icon("close")}</span><span>Knowledge retention over time</span></li><li><span class="method-scope-mark">${icon("close")}</span><span>Transfer to new contexts</span></li><li><span class="method-scope-mark">${icon("close")}</span><span>Student satisfaction</span></li><li><span class="method-scope-mark">${icon("close")}</span><span>Real classroom outcomes</span></li></ul></div></div></section>
     <section class="method-status" id="methodology-status" aria-labelledby="method-status-title"><div class="shell method-status-grid"><div class="method-status-intro"><p class="eyebrow">Methodology status</p><h2 id="method-status-title">A research effort<br><em>in progress.</em></h2><p>We are building a rigorous and open evaluation infrastructure. Some components are available now, while others will be developed through future work.</p><a class="text-link" href="${escapeHtml(SITE_GITHUB_URL)}/blob/main/docs/roadmap.md" rel="noreferrer">Read the roadmap ${icon("arrow")}</a></div><div class="method-status-ledger">${renderMethodologyStatus(artifacts)}</div></div></section>
     <section class="method-closing" aria-labelledby="method-closing-title"><div class="shell method-closing-grid"><div class="method-closing-title"><p class="eyebrow">Our commitment</p><h2 id="method-closing-title"><span class="method-closing-leaf">${icon("leaf")}</span>Transparent enough to challenge.<br>Structured enough to reproduce.</h2></div><p>Our methodology, rubrics, and benchmark data are openly available for inspection, feedback, and reuse. We invite the community to evaluate, critique, and build on this work.</p><div class="method-closing-actions"><a class="button button-primary" href="#method-pipeline">Read the methodology ${icon("arrow")}</a><a class="button button-secondary" href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">${icon("github")} View on GitHub</a></div></div></section>
     ${renderTeachometryFooter(artifacts)}`,
