@@ -487,96 +487,86 @@
 }
 
 .method-story-map {
-  display: block;
+  display: none;
   width: 100%;
   height: auto;
   max-height: 100%;
   overflow: visible;
 }
 
-.method-story-overview {
-  display: none;
-}
+.method-story[data-method-story-enhanced] .method-story-map { display: block; }
+.method-story-overview { display: block; width: 100%; height: auto; }
+.method-story[data-method-story-enhanced] .method-story-overview { display: none; }
 
-.method-story-halo {
-  fill: var(--accent-soft);
-  fill-opacity: .72;
-}
-
-.method-story-visual {
-  opacity: .12;
-  transition: opacity 320ms ease, transform 320ms ease;
-}
-
-.method-story:not([data-method-story-active-index]) .method-story-visual:first-child,
-.method-story-visual.is-active { opacity: 1; }
-
-.method-story-line {
+.method-story-map path,
+.method-story-inspection,
+.method-story-endpoint {
   fill: none;
   stroke: var(--accent);
+  stroke-width: 1.5;
   stroke-linecap: round;
-  stroke-width: 1;
+  stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
-.method-story-point { fill: var(--accent); }
-
-.method-story-node circle {
-  fill: var(--surface);
-  stroke: var(--accent);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-  transition: fill 320ms ease, stroke 320ms ease;
+/* 笔画按统一长度展开；不用时间过渡，快滚和倒滚都直接对应当前位置。 */
+.method-story-map .method-story-draw,
+.method-story-endpoint {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  visibility: hidden;
 }
 
-.method-story-node.is-active circle { fill: var(--accent-soft); }
-.method-story-node .site-icon { color: var(--accent-strong); }
+.method-story-map .method-story-reference path {
+  stroke: var(--accent-strong);
+  stroke-width: .8;
+}
 
-.method-story-labels { position: absolute; inset: 0; pointer-events: none; }
+.method-story-reference { opacity: .7; }
+.method-story-map .method-story-ticks { stroke-width: .65; }
+.method-story-map .method-story-deviation { stroke-dasharray: 2 4; stroke-width: 1; opacity: .6; }
+.method-story-map .method-story-trace { stroke-width: 2; }
+.method-story-map .method-story-evidence { stroke-width: 1; }
+.method-story-inspection { fill: var(--method-mint); fill-opacity: .45; opacity: 0; }
+.method-story-focus { fill: var(--accent-strong); }
+.method-story-map .method-story-guided,
+.method-story-map .method-story-resolve { stroke-width: 2.2; }
+.method-story-map .method-story-alternate { stroke: var(--accent-strong); stroke-width: 1.2; }
+.method-story-checkpoints circle,
+.method-story-decision { fill: var(--method-mint); stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; opacity: 0; }
+.method-story-endpoint { fill: var(--accent); fill-opacity: 0; stroke-width: 1.8; stroke-linecap: butt; }
+.method-story-map .method-story-complete { stroke: var(--method-mint); stroke-width: 1.6; }
+
+.method-story-labels { position: absolute; inset: 0; pointer-events: none; display: none; }
+.method-story[data-method-story-enhanced] .method-story-labels { display: block; }
 .method-story-label {
   position: absolute;
-  display: grid;
-  width: 20%;
-  gap: 5px;
-  color: var(--muted);
-  font: 11px/1.35 var(--teach-sans);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 320ms ease;
-}
-
-/* 桌面逐章节聚焦；标签与节点共用活动索引，静态回退仍由原断点控制。 */
-.method-story:not([data-method-story-active-index]) .method-story-label:first-child,
-.method-story-label.is-active {
-  opacity: 1;
-  visibility: visible;
-}
-.method-story-label--right { text-align: right; }
-.method-story-label strong {
+  width: 24%;
   color: var(--ink);
-  font-size: clamp(11px, 2.2cqi, 14px);
-  font-weight: 500;
+  font: 400 clamp(11px, 2.4cqi, 15px)/1.35 var(--teach-sans);
+  opacity: 0;
 }
-.method-story-label small { font-size: clamp(9px, 1.8cqi, 11px); }
+.method-story-label strong { font-weight: 500; }
 
 .method-story-center {
   position: absolute;
-  top: 51.923%;
-  left: 50%;
-  display: grid;
-  width: 25%;
-  aspect-ratio: 1;
-  place-content: center;
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--accent-soft) 74%, var(--method-mint));
+  bottom: 2%;
+  left: 0;
+  width: 100%;
   color: var(--accent-strong);
-  font: 400 clamp(16px, 3.1cqi, 21px)/1.08 var(--serif);
-  letter-spacing: -.035em;
+  font: 400 clamp(14px, 2.7cqi, 18px)/1.3 var(--serif);
+  letter-spacing: -.02em;
   text-align: center;
-  transform: translate(-50%, -50%);
 }
 
+/* 无脚本、平板及减弱动态模式共用静态概览。 */
+.method-story:not([data-method-story-enhanced]) .method-story-stage {
+  position: relative;
+  top: auto;
+  aspect-ratio: auto;
+}
+.method-story:not([data-method-story-enhanced]) .method-story-stage-index { display: none; }
+.method-story:not([data-method-story-enhanced]) .method-story-center { position: static; margin-top: 2px; }
 .method-story-overview-track {
   fill: none;
   stroke: var(--line-strong);
@@ -1524,9 +1514,23 @@
   .method-story-stage {
     position: relative;
     top: auto;
+    order: -1;
+    width: min(100%, 500px);
+    align-self: center;
     height: auto;
     min-height: 0;
     aspect-ratio: auto;
+  }
+
+  .method-story {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .method-story-chapter {
+    min-height: 0;
+    padding: 27px 0 30px;
   }
 
   .method-story-stage-index,
@@ -1555,14 +1559,4 @@
     transform: none;
   }
 
-  .method-story-visual,
-  .method-story-node,
-  .method-story-spoke {
-    opacity: 1;
-    transform: none;
-  }
-
-  .method-story-spoke path {
-    stroke-dasharray: none;
-  }
 }

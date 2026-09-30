@@ -315,7 +315,7 @@ function renderMethodologyLens(scoreDimensions: readonly string[]): string {
     visualMarkup +
     '<svg class="method-story-overview" viewBox="0 0 640 84" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
     '<path class="method-story-overview-track" d="M48 42H580"/><g class="method-story-overview-nodes">' + overviewNodes + '</g><circle class="method-story-overview-core" cx="592" cy="42" r="6"/></svg>' +
-    '<figcaption class="method-story-center">Observable<br>tutoring<br>behavior</figcaption></figure></div>';
+    '<figcaption class="method-story-center">Observable tutoring behavior</figcaption></figure></div>';
 }
 
 function renderMethodologyArchitecture(): string {
