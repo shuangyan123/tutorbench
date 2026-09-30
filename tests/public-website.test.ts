@@ -88,6 +88,22 @@ test("shared public header keeps one canonical language-control geometry", async
   }
 });
 
+test("Teachometry footer complements the fixed header and shares chrome alignment rails", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const html = renderPage(renderHomePage(artifacts));
+  const footer = html.match(/<footer class="home-footer">[\s\S]*?<\/footer>/u)?.[0];
+  assert.ok(footer);
+  for (const resource of ["/docs/", "/models/", "/run/"]) {
+    assert.match(footer, new RegExp(`href="${resource.replaceAll("/", "\\/")}"`));
+  }
+  for (const repeatedPrimary of [">Home<", ">Benchmark<", ">Method<", ">Results<", ">Cases<", ">About<", ">Blog<"]) {
+    assert.doesNotMatch(footer, new RegExp(repeatedPrimary));
+  }
+  const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
+  assert.match(styles, /\.home-footer-main \{[\s\S]*?grid-template-columns: minmax\(250px, \.9fr\) minmax\(280px, 1\.15fr\) auto;/u);
+  assert.match(styles, /\.home-footer \.footer-resource-nav \{[\s\S]*?justify-self: center;/u);
+});
+
 test("public navigation avoids an artificial page-entry delay and warms likely targets", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const html = renderPage(renderHomePage(artifacts));
@@ -520,6 +536,13 @@ test("static website build emits the public artifact files and route shell", asy
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
+    const dataHtml = await readFile(join(outputDirectory, "data", "index.html"), "utf8");
+    const blogArticleHtml = await readFile(
+      join(outputDirectory, "blog", "when-learning-starts-to-feel-like-failure", "index.html"),
+      "utf8",
+    );
+    const robots = await readFile(join(outputDirectory, "robots.txt"), "utf8");
+    const sitemap = await readFile(join(outputDirectory, "sitemap.xml"), "utf8");
     const notFoundHtml = await readFile(join(outputDirectory, "404.html"), "utf8");
     const aboutHtml = await readFile(join(outputDirectory, "about", "index.html"), "utf8");
     const communityHtml = await readFile(
@@ -931,6 +954,22 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(homeHtml, /src="\/tutorbench\/assets\/brand\/tutorbench\/web\/tutorbench-mark-small\.svg"/);
     assert.match(homeHtml, /href="\/tutorbench\/assets\/brand\/tutorbench\/raster\/favicon\.ico"/);
     assert.match(homeHtml, /<link rel="canonical" href="https:\/\/shuangyan123\.github\.io\/tutorbench\//);
+    assert.match(homeHtml, /<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">/);
+    assert.match(homeHtml, /"@type":"WebSite"/);
+    assert.match(homeHtml, /"@type":"Organization"/);
+    assert.match(dataHtml, /"@type":"Dataset"/);
+    assert.match(dataHtml, /"license":"https:\/\/creativecommons\.org\/licenses\/by\/4\.0\/"/);
+    assert.match(blogArticleHtml, /<meta property="og:type" content="article">/);
+    assert.match(blogArticleHtml, /<meta property="og:image" content="https:\/\/shuangyan123\.github\.io\/tutorbench\/assets\/blog-learning-failure-hero\.webp">/);
+    assert.match(blogArticleHtml, /<meta name="twitter:card" content="summary_large_image">/);
+    assert.match(blogArticleHtml, /"@type":"BlogPosting"/);
+    assert.match(blogArticleHtml, /"datePublished":"2026-09-30"/);
+    assert.match(robots, /User-agent: OAI-SearchBot\nAllow: \/\n/u);
+    assert.match(robots, /Sitemap: https:\/\/shuangyan123\.github\.io\/tutorbench\/sitemap\.xml/u);
+    assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/<\/loc>/u);
+    assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/blog\/when-learning-starts-to-feel-like-failure\/<\/loc>/u);
+    assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/data\/cases\/fraction-misconception-001\/<\/loc>/u);
+    assert.doesNotMatch(sitemap, /\[modelId\]|\[trialId\]|404\.html/u);
     assert.match(casesHtml, /href="\/tutorbench\/data\/cases\/fraction-misconception-001\//);
     assert.match(casesHtml, /data-case-filter="locale"/);
     assert.match(casesHtml, /data-case-locale="zh-CN"/);
