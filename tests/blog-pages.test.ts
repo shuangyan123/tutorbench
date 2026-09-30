@@ -48,9 +48,12 @@ test("Teachometry blog renderers keep hypotheses separate from benchmark claims"
   assert.match(teaching.content, /aria-label="On this page"/);
   assert.match(teaching.content, /id="the-scarce-resource-is-attention"/);
   assert.match(teaching.content, /id="why-teachometry-exists"/);
+  assert.match(learningFailure.content, /class="article-ideas"/);
+  assert.match(learningFailure.content, /Next article/);
+  assert.doesNotMatch(learningFailure.content, /Previous article/);
   assert.match(classroom.content, /class="article-ideas"/);
   assert.match(classroom.content, /Next article/);
-  assert.doesNotMatch(classroom.content, /Previous article/);
+  assert.match(classroom.content, /Previous article/);
   assert.match(teaching.content, /class="article-ideas"/);
   assert.match(teaching.content, /Next article/);
   assert.match(teaching.content, /Previous article/);
@@ -140,8 +143,10 @@ test("website build publishes the Teachometry blog index and essays", async () =
     );
     assert.match(classroomHtml, /Record events instead of asking AI to guess them/);
     assert.match(classroomHtml, /Let homework be learning and move verification into class/);
+    assert.match(learningFailureHtml, /Next article/);
+    assert.doesNotMatch(learningFailureHtml, /Previous article/);
     assert.match(classroomHtml, /Next article/);
-    assert.doesNotMatch(classroomHtml, /Previous article/);
+    assert.match(classroomHtml, /Previous article/);
     assert.match(
       teachingHtml,
       /<link rel="canonical" href="https:\/\/teachometry\.com\/blog\/why-teaching-does-not-scale\/">/,
