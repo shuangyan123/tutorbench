@@ -95,14 +95,6 @@
   transform: rotate(-9deg);
 }
 
-.method-botanical-right {
-  top: -5px;
-  right: -46px;
-  width: 420px;
-  height: 350px;
-  transform: rotate(8deg);
-}
-
 .method-scope-botanical {
   right: -55px;
   bottom: -148px;
@@ -176,7 +168,32 @@
 
 .method-hero-art {
   position: relative;
-  min-height: 305px;
+  container-type: inline-size;
+  width: 100%;
+  aspect-ratio: 640 / 390;
+  align-self: end;
+}
+
+.method-hero-illustration {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.method-hero-plant {
+  color: #73a79b;
+  opacity: .48;
+}
+
+.method-hero-leader {
+  color: var(--muted);
+  opacity: .75;
+}
+
+.methodology-page[data-theme="dark"] .method-hero-plant {
+  color: #9bd8c5;
+  opacity: .32;
 }
 
 .method-hero-note,
@@ -185,33 +202,28 @@
   z-index: 1;
   margin: 0;
   color: var(--muted);
-  font: italic 16px/1.3 var(--serif);
+  font-style: italic;
+  font-family: var(--serif);
+  white-space: nowrap;
 }
 
 .method-hero-note {
-  top: 26px;
-  right: 4%;
+  top: 6%;
+  left: 86%;
+  width: 22%;
+  font-family: "Segoe Print", "Bradley Hand", cursive;
+  font-style: normal;
+  font-size: clamp(10px, 2.3cqi, 15px);
+  line-height: 1.55;
   transform: rotate(-7deg);
 }
 
-.method-hero-note span {
-  display: block;
-  margin: 4px 0 0 18px;
-  color: var(--accent);
-  font: 28px/0.6 var(--serif);
-  transform: rotate(18deg);
-}
-
 .method-hero-aside {
-  right: 14%;
-  bottom: 45px;
-  color: var(--ink);
-  font-size: clamp(19px, 1.8vw, 27px);
-  line-height: 1.08;
-}
-
-.method-hero-aside em {
-  color: var(--accent);
+  top: 38%;
+  left: 74%;
+  width: 26%;
+  font-size: clamp(14px, 3.85cqi, 25px);
+  line-height: 1.2;
 }
 
 .method-pipeline {
@@ -1111,8 +1123,8 @@
     gap: 3%;
   }
 
-  .method-hero-aside {
-    right: 5%;
+  .method-hero-art {
+    align-self: center;
   }
 
   .method-story {
@@ -1161,18 +1173,13 @@
   }
 
   .method-hero-art {
-    min-height: 165px;
-    margin-top: -20px;
-  }
-
-  .method-hero-aside {
-    right: 14%;
-    bottom: 14px;
+    max-width: 560px;
+    justify-self: end;
+    margin-top: 16px;
   }
 
   .method-hero-note {
-    top: 5px;
-    right: 12%;
+    left: 78%;
   }
 
   .method-pipeline-list {
@@ -1318,14 +1325,6 @@
     opacity: .2;
   }
 
-  .method-botanical-right {
-    top: -8px;
-    right: -58px;
-    width: 285px;
-    height: 235px;
-    opacity: .25;
-  }
-
   .method-scope-botanical {
     right: -82px;
     bottom: -112px;
@@ -1354,22 +1353,6 @@
   .method-hero-principles {
     gap: 10px 13px;
     font-size: 9px;
-  }
-
-  .method-hero-art {
-    min-height: 135px;
-  }
-
-  .method-hero-aside {
-    right: 6%;
-    bottom: 5px;
-    font-size: 20px;
-  }
-
-  .method-hero-note {
-    top: 0;
-    right: 4%;
-    font-size: 13px;
   }
 
   .method-section-bar {
@@ -1533,6 +1516,17 @@
 
   .method-closing-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  .method-hero-note {
+    left: 74%;
+    font-size: 9px;
+  }
+
+  .method-hero-aside {
+    font-size: 12px;
   }
 }
 
