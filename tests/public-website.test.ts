@@ -536,13 +536,6 @@ test("static website build emits the public artifact files and route shell", asy
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
-    const dataHtml = await readFile(join(outputDirectory, "data", "index.html"), "utf8");
-    const blogArticleHtml = await readFile(
-      join(outputDirectory, "blog", "when-learning-starts-to-feel-like-failure", "index.html"),
-      "utf8",
-    );
-    const robots = await readFile(join(outputDirectory, "robots.txt"), "utf8");
-    const sitemap = await readFile(join(outputDirectory, "sitemap.xml"), "utf8");
     const notFoundHtml = await readFile(join(outputDirectory, "404.html"), "utf8");
     const aboutHtml = await readFile(join(outputDirectory, "about", "index.html"), "utf8");
     const communityHtml = await readFile(
@@ -946,6 +939,13 @@ test("static website build prefixes project-site paths without changing local de
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
+    const dataHtml = await readFile(join(outputDirectory, "data", "index.html"), "utf8");
+    const blogArticleHtml = await readFile(
+      join(outputDirectory, "blog", "when-learning-starts-to-feel-like-failure", "index.html"),
+      "utf8",
+    );
+    const robots = await readFile(join(outputDirectory, "robots.txt"), "utf8");
+    const sitemap = await readFile(join(outputDirectory, "sitemap.xml"), "utf8");
     const notFoundHtml = await readFile(join(outputDirectory, "404.html"), "utf8");
 
     assert.match(homeHtml, /href="\/tutorbench\/leaderboard\//);
