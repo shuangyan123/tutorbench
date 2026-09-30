@@ -1119,6 +1119,24 @@
   font-weight: 600;
 }
 
+.blog-article-page .article-section-media {
+  margin: 30px 0 0;
+}
+
+.blog-article-page .article-section-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1672 / 941;
+  object-fit: cover;
+  border: 1px solid var(--line-strong);
+}
+
+.blog-article-page .article-section-media figcaption {
+  margin-top: 9px;
+  color: var(--muted);
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
 .blog-article-page .article-nav-shell {
   padding-bottom: 55px;
 }
