@@ -100,8 +100,21 @@ test("Teachometry footer complements the fixed header and shares chrome alignmen
     assert.doesNotMatch(footer, new RegExp(repeatedPrimary));
   }
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
-  assert.match(styles, /\.home-footer-main \{[\s\S]*?grid-template-columns: minmax\(250px, \.9fr\) minmax\(280px, 1\.15fr\) auto;/u);
-  assert.match(styles, /\.home-footer \.footer-resource-nav \{[\s\S]*?justify-self: center;/u);
+  assert.match(styles, /--teach-chrome-left-rail: 220px;/u);
+  assert.match(styles, /--teach-chrome-right-rail: 410px;/u);
+  assert.match(styles, /--teach-chrome-column-gap: 24px;/u);
+  assert.match(
+    styles,
+    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.header-inner,[\s\S]*?\.home-footer-main \{[\s\S]*?grid-template-columns:[\s\S]*?var\(--teach-chrome-left-rail\)[\s\S]*?minmax\(0, 1fr\)[\s\S]*?var\(--teach-chrome-right-rail\);/u,
+  );
+  assert.match(
+    styles,
+    /\.home-header \.nav-links,[\s\S]*?\.home-footer \.footer-resource-nav \{[\s\S]*?grid-column: 2;[\s\S]*?justify-self: center;/u,
+  );
+  assert.match(
+    styles,
+    /\.home-header-tools,[\s\S]*?\.home-footer-actions \{[\s\S]*?grid-column: 3;[\s\S]*?justify-self: end;/u,
+  );
 });
 
 test("public navigation avoids an artificial page-entry delay and warms likely targets", async () => {
