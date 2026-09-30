@@ -160,20 +160,23 @@ test("home reconstruction uses real blog routes and cases reuse the Teachometry 
   const home = renderPage(page, { basePath: "/preview" });
   assert.match(home, /Teachometry/);
   assert.match(home, /href="\/preview\/assets\/home\.css"/);
+  assert.match(home, /href="\/preview\/blog\/when-learning-starts-to-feel-like-failure\/"/);
   assert.match(home, /href="\/preview\/blog\/the-classroom-does-not-need-30-robots\/"/);
-  assert.match(home, /href="\/preview\/blog\/why-teaching-does-not-scale\/"/);
+  assert.doesNotMatch(home, /href="\/preview\/blog\/why-teaching-does-not-scale\/"/);
   assert.doesNotMatch(home, /href="\/preview\/blog\/teaching-and-supervision-are-different-jobs\/"/);
   assert.match(home, /Explore the journal · Blog index/);
   assert.equal((home.match(/<article class="home-blog-card">/g) ?? []).length, 2);
+  assert.match(home, /September 30, 2026/);
   assert.match(home, /September 28, 2026/);
-  assert.match(home, /September 17, 2026/);
   assert.doesNotMatch(home, /Sep 10, 2024|Why Observable Behavior Matters in AI Tutoring/);
   for (const image of PUBLIC_SITE_RASTER_ASSETS.filter((asset) =>
     asset !== "foliage.png" &&
     asset !== "foliage-right-mid.webp" &&
     asset !== "home-hero-bg.webp" &&
     asset !== "home-open-data-bg.webp" &&
-    asset !== "home-blog-02.webp"
+    asset !== "home-blog-01.webp" &&
+    asset !== "home-blog-02.webp" &&
+    asset !== "blog-learning-failure-triptych.webp"
   ).map((asset) => asset.replace(/\.webp$/, ""))) {
     assert.ok(home.includes(`src="/preview/assets/${image}.webp"`));
   }
