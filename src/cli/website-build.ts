@@ -139,7 +139,7 @@ async function writeDiscoveryFiles(
   isPrivateBuild: boolean,
 ): Promise<void> {
   if (isPrivateBuild) {
-    await writeFile(outputDirectory + "/robots.txt", "User-agent: *\nDisallow: /\n", "utf8");
+    await writeFile(join(outputDirectory, "robots.txt"), "User-agent: *\nDisallow: /\n", "utf8");
     return;
   }
   const normalizedSiteUrl = siteUrl?.replace(/\/$/, "");
