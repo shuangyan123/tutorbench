@@ -23,18 +23,11 @@ export interface BlogCallout {
   readonly body: string;
 }
 
-export interface BlogArticleImage {
-  readonly src: string;
-  readonly alt: string;
-  readonly caption?: string;
-}
-
 export interface BlogArticleSection {
   readonly heading: string;
   readonly paragraphs: readonly string[];
   readonly progression?: readonly { readonly label: string; readonly text: string }[];
   readonly callout?: BlogCallout;
-  readonly image?: BlogArticleImage;
 }
 
 export interface BlogArticle extends BlogPostSummary {
@@ -128,11 +121,6 @@ const LEARNING_FAILURE_SECTIONS: readonly BlogArticleSection[] = [
       "Outside the classroom, the first proposition can be much simpler: here is somewhere you can ask the questions you were afraid to ask. Students can use it after school, families can observe whether it helps, and learners can become familiar with individualized tutoring before a school has to redesign the classroom around it.",
       "A plausible adoption path is private learning support, then structured after-school tutoring, then teacher-visible support, then supervised school use, and only later deeper classroom integration. Acceptance can grow from repeated useful experience rather than from claims about transforming education.",
     ],
-    image: {
-      src: "blog-learning-failure-triptych.webp",
-      alt: "Three-part scene moving from a student struggling in class to a private study space and independent problem solving",
-      caption: "A useful transition may be gradual: public difficulty, private help, then increasingly independent work.",
-    },
   },
   {
     heading: "The goal is not dependence on the Tutor",
@@ -489,15 +477,11 @@ function renderArticleSection(section: BlogArticleSection): string {
   const progression = section.progression === undefined
     ? ""
     : `<ul class="article-progression">${section.progression.map((item) => `<li><strong>${e(item.label)}:</strong><span>${e(item.text)}</span></li>`).join("")}</ul>`;
-  const image = section.image === undefined
-    ? ""
-    : `<figure class="article-section-media"><img src="/assets/${e(section.image.src)}" width="1672" height="941" loading="lazy" alt="${e(section.image.alt)}">${section.image.caption === undefined ? "" : `<figcaption>${e(section.image.caption)}</figcaption>`}</figure>`;
   return `<section class="article-section" aria-labelledby="${e(articleHeadingId(section.heading))}">
     <h2 id="${e(articleHeadingId(section.heading))}">${e(section.heading)}</h2>
     ${section.paragraphs.map((paragraph) => `<p>${e(paragraph)}</p>`).join("")}
     ${progression}
     ${section.callout === undefined ? "" : renderArticleCallout(section.callout)}
-    ${image}
   </section>`;
 }
 

@@ -35,15 +35,12 @@ PR #125 is not a dependency and no commits were cherry-picked from it.
 
 ## Blog editorial assets
 
-The September 30, 2026 essay **When Learning Starts to Feel Like Failure** adds two
-reviewed generated editorial images:
+The September 30, 2026 essay **When Learning Starts to Feel Like Failure** uses
+`blog-learning-failure-hero.webp` as its article hero, Blog feature card, and Home Blog
+card. The published asset keeps the source composition at 1672 × 941 rather than using
+the lower-resolution draft export.
 
-| File | Blog role |
-| --- | --- |
-| blog-learning-failure-hero.webp | Article hero, Blog feature card, and Home Blog card |
-| blog-learning-failure-triptych.webp | In-article visual for the classroom -> private support -> independent work transition |
-
-These images are generated editorial illustrations. They do not depict a real learner,
-partner, school, classroom study, or observed TutorBench outcome, and they must not be
-presented as evidence of learning effectiveness, motivation, psychological benefit, or
-real-world classroom use.
+The image is editorial artwork. It does not depict a real learner, partner, school,
+classroom study, or observed TutorBench outcome, and it must not be presented as
+evidence of learning effectiveness, motivation, psychological benefit, or real-world
+classroom use.

@@ -33,7 +33,6 @@ test("Teachometry blog renderers keep hypotheses separate from benchmark claims"
   assert.match(learningFailure.content, /A classroom has to choose a starting point/);
   assert.match(learningFailure.content, /“I do not understand” should be a valid input/);
   assert.match(learningFailure.content, /A Tutor also shapes the emotional experience of learning/);
-  assert.match(learningFailure.content, /blog-learning-failure-triptych\.webp/);
   assert.match(learningFailure.content, /This essay presents a product and educational hypothesis/);
   assert.match(classroom.content, /One robot still scales like one teacher/);
   assert.match(classroom.content, /A pause is an observation, not a diagnosis/);
@@ -135,7 +134,7 @@ test("website build publishes the Teachometry blog index and essays", async () =
       /<link rel="canonical" href="https:\/\/teachometry\.com\/blog\/when-learning-starts-to-feel-like-failure\/">/,
     );
     assert.match(learningFailureHtml, /blog-learning-failure-hero\.webp/);
-    assert.match(learningFailureHtml, /blog-learning-failure-triptych\.webp/);
+    assert.doesNotMatch(learningFailureHtml, /article-section-media|blog-learning-failure-triptych\.webp/);
     assert.match(learningFailureHtml, /The goal is not dependence on the Tutor/);
     assert.match(
       classroomHtml,
