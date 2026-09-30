@@ -31,3 +31,19 @@ technology. Each layer has independent 11–16 second CSS breeze timing, at most
 No new reveal, parallax, tilt, count-up, or broader motion system is introduced.
 Existing main-branch interactions and theme/locale behavior remain in place.
 PR #125 is not a dependency and no commits were cherry-picked from it.
+
+
+## Blog editorial assets
+
+The September 30, 2026 essay **When Learning Starts to Feel Like Failure** adds two
+reviewed generated editorial images:
+
+| File | Blog role |
+| --- | --- |
+| blog-learning-failure-hero.webp | Article hero, Blog feature card, and Home Blog card |
+| blog-learning-failure-triptych.webp | In-article visual for the classroom -> private support -> independent work transition |
+
+These images are generated editorial illustrations. They do not depict a real learner,
+partner, school, classroom study, or observed TutorBench outcome, and they must not be
+presented as evidence of learning effectiveness, motivation, psychological benefit, or
+real-world classroom use.
