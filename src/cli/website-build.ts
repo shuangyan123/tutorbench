@@ -112,6 +112,58 @@ async function writeJson(outputDirectory: string, filename: string, value: unkno
   await writeFile(outputPath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
+function xmlEscape(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+function publicIndexablePages(pages: readonly SitePage[]): readonly SitePage[] {
+  const seen = new Set<string>();
+  return pages.filter((page) => {
+    if (page.route === "/404.html" || page.route.includes("[") || page.seo?.noIndex === true || seen.has(page.route)) {
+      return false;
+    }
+    seen.add(page.route);
+    return true;
+  });
+}
+
+async function writeDiscoveryFiles(
+  outputDirectory: string,
+  pages: readonly SitePage[],
+  siteUrl: string | undefined,
+  isPrivateBuild: boolean,
+): Promise<void> {
+  if (isPrivateBuild) {
+    await writeFile(outputDirectory + "/robots.txt", "User-agent: *\nDisallow: /\n", "utf8");
+    return;
+  }
+  const normalizedSiteUrl = siteUrl?.replace(/\/$/, "");
+  const robots = [
+    "User-agent: *",
+    "Allow: /",
+    "",
+    "User-agent: OAI-SearchBot",
+    "Allow: /",
+    ...(normalizedSiteUrl === undefined ? [] : ["", `Sitemap: ${normalizedSiteUrl}/sitemap.xml`]),
+    "",
+  ].join("\n");
+  await writeFile(join(outputDirectory, "robots.txt"), robots, "utf8");
+  if (normalizedSiteUrl === undefined) return;
+  const urls = publicIndexablePages(pages)
+    .map((page) => `  <url><loc>${xmlEscape(`${normalizedSiteUrl}${page.route}`)}</loc></url>`)
+    .join("\n");
+  await writeFile(
+    join(outputDirectory, "sitemap.xml"),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+    "utf8",
+  );
+}
+
 async function writePage(
   outputDirectory: string,
   page: SitePage,
@@ -330,6 +382,13 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
       locale,
     );
   }
+
+  await writeDiscoveryFiles(
+    outputDirectory,
+    [...pages.map((entry) => entry.page), ...blogPages],
+    options.siteUrl,
+    options.evaluationPath !== undefined,
+  );
 
   await writeFile(
     join(outputDirectory, "404.html"),
