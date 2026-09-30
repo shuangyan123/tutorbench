@@ -175,8 +175,7 @@ test("home reconstruction uses real blog routes and cases reuse the Teachometry 
     asset !== "home-hero-bg.webp" &&
     asset !== "home-open-data-bg.webp" &&
     asset !== "home-blog-01.webp" &&
-    asset !== "home-blog-02.webp" &&
-    asset !== "blog-learning-failure-triptych.webp"
+    asset !== "home-blog-02.webp"
   ).map((asset) => asset.replace(/\.webp$/, ""))) {
     assert.ok(home.includes(`src="/preview/assets/${image}.webp"`));
   }
