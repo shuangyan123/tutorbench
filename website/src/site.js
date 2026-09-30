@@ -354,6 +354,7 @@
   const visuals = [...story.querySelectorAll('[data-method-story-visual]')];
   const nodes = [...story.querySelectorAll('[data-method-story-node]')];
   const spokes = [...story.querySelectorAll('[data-method-story-spoke]')];
+  const labels = [...story.querySelectorAll('[data-method-story-label]')];
   const currentIndex = story.querySelector('[data-method-story-current]');
   const desktop = window.matchMedia('(min-width: 901px)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -377,6 +378,9 @@
     });
     spokes.forEach((spoke) => {
       spoke.classList.toggle('is-active', spoke.getAttribute('data-method-story-spoke') === String(index));
+    });
+    labels.forEach((label) => {
+      label.classList.toggle('is-active', label.getAttribute('data-method-story-label') === String(index));
     });
     story.dataset.methodStoryActiveIndex = String(index);
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = String(index + 1).padStart(2, '0');
@@ -414,6 +418,7 @@
     chapters.forEach((chapter) => chapter.removeAttribute('aria-current'));
     nodes.forEach((node) => node.classList.remove('is-active'));
     spokes.forEach((spoke) => spoke.classList.remove('is-active'));
+    labels.forEach((label) => label.classList.remove('is-active'));
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = '';
   }
 

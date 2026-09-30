@@ -504,7 +504,7 @@
 }
 
 .method-story-visual {
-  opacity: .62;
+  opacity: .12;
   transition: opacity 320ms ease, transform 320ms ease;
 }
 
@@ -540,6 +540,16 @@
   gap: 5px;
   color: var(--muted);
   font: 11px/1.35 var(--teach-sans);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 320ms ease;
+}
+
+/* 桌面逐章节聚焦；标签与节点共用活动索引，静态回退仍由原断点控制。 */
+.method-story:not([data-method-story-active-index]) .method-story-label:first-child,
+.method-story-label.is-active {
+  opacity: 1;
+  visibility: visible;
 }
 .method-story-label--right { text-align: right; }
 .method-story-label strong {

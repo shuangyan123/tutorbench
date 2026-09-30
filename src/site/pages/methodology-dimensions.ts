@@ -51,6 +51,6 @@ export function renderMethodologyLensArt(dimensions: readonly LensDimension[]): 
       <g class="method-story-node" data-method-story-node="${index}"><circle cx="${x}" cy="${y}" r="26"/>${glyph}</g>
     </g>`;
   }).join("\n");
-  const labels = layout.map(({ details, labelX, labelY, align }) => `<span class="method-story-label method-story-label--${align}" style="left:${(labelX / 640 * 100).toFixed(3)}%;top:${(labelY / 520 * 100).toFixed(3)}%"><strong>${escapeHtml(details.label)}</strong><small>${escapeHtml(details.lens)}</small></span>`).join("");
+  const labels = layout.map(({ details, index, labelX, labelY, align }) => `<span class="method-story-label method-story-label--${align}" data-method-story-label="${index}" style="left:${(labelX / 640 * 100).toFixed(3)}%;top:${(labelY / 520 * 100).toFixed(3)}%"><strong>${escapeHtml(details.label)}</strong><small>${escapeHtml(details.lens)}</small></span>`).join("");
   return `<svg class="method-story-map" viewBox="0 0 640 520" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><circle class="method-story-halo" cx="320" cy="270" r="88"/><g class="method-story-visuals">${visuals}</g></svg><div class="method-story-labels" aria-hidden="true">${labels}</div>`;
 }
