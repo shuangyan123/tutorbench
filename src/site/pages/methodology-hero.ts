@@ -1,3 +1,5 @@
+import { renderMethodologyAnnotation } from "./methodology-annotation.js";
+
 export function renderMethodologyHeroArt(): string {
   // 植物、引线与 HTML 注记共用比例坐标，避免断点变化时枝叶穿过文字。
   return `<div class="method-hero-art" aria-hidden="true">
@@ -27,7 +29,7 @@ export function renderMethodologyHeroArt(): string {
       </g>
       <path class="method-hero-leader" d="M551 93C558 112 541 124 514 127Q483 133 451 134M460 128L451 134L461 139" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <p class="method-hero-note">From<br>cases to insights.</p>
+    <p class="method-hero-note"><span class="visually-hidden">From<br>cases to insights.</span>${renderMethodologyAnnotation()}</p>
     <p class="method-hero-aside">A transparent<br>approach to<br>evaluating<br>AI tutoring.</p>
   </div>`;
 }
