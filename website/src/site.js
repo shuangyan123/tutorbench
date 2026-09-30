@@ -1,4 +1,4 @@
-/* global HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, URL, URLSearchParams, document, history, navigator, window */
+/* global HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, IntersectionObserver, ResizeObserver, URL, URLSearchParams, document, history, navigator, window */
 
 (() => {
   const navToggle = document.querySelector(".nav-toggle");
@@ -351,9 +351,8 @@
   if (!(story instanceof HTMLElement)) return;
 
   const chapters = [...story.querySelectorAll('[data-method-story-chapter]')];
-  const visuals = [...story.querySelectorAll('[data-method-story-visual]')];
-  const nodes = [...story.querySelectorAll('[data-method-story-node]')];
-  const spokes = [...story.querySelectorAll('[data-method-story-spoke]')];
+  const anchors = chapters.map((chapter) => chapter.querySelector('h3') || chapter);
+  const parts = Object.fromEntries([...story.querySelectorAll('[data-method-part]')].map((part) => [part.dataset.methodPart, part]));
   const labels = [...story.querySelectorAll('[data-method-story-label]')];
   const currentIndex = story.querySelector('[data-method-story-current]');
   const desktop = window.matchMedia('(min-width: 901px)');
@@ -361,72 +360,142 @@
   let frame = 0;
   let activeIndex = -1;
   let tracking = false;
+  let inView = false;
+  let layoutDirty = true;
+  let positions = [];
+  let storyTop = 0;
+  let storyBottom = 0;
+
+  const clamp = (value) => Math.max(0, Math.min(1, value));
+  const reveal = (value, start, end) => {
+    const t = clamp((value - start) / (end - start));
+    return t * t * (3 - 2 * t);
+  };
+  const draw = (name, amount) => {
+    parts[name].style.strokeDashoffset = String(1 - amount);
+    parts[name].style.visibility = amount > 0 ? 'visible' : 'hidden';
+  };
 
   function setActive(index) {
     if (index === activeIndex) return;
     activeIndex = index;
-
     chapters.forEach((chapter, chapterIndex) => {
       if (chapterIndex === index) chapter.setAttribute('aria-current', 'step');
       else chapter.removeAttribute('aria-current');
-    });
-    visuals.forEach((visual) => {
-      visual.classList.toggle('is-active', visual.getAttribute('data-method-story-visual') === String(index));
-    });
-    nodes.forEach((node) => {
-      node.classList.toggle('is-active', node.getAttribute('data-method-story-node') === String(index));
-    });
-    spokes.forEach((spoke) => {
-      spoke.classList.toggle('is-active', spoke.getAttribute('data-method-story-spoke') === String(index));
-    });
-    labels.forEach((label) => {
-      label.classList.toggle('is-active', label.getAttribute('data-method-story-label') === String(index));
     });
     story.dataset.methodStoryActiveIndex = String(index);
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = String(index + 1).padStart(2, '0');
   }
 
+  function paint(progress) {
+    // 每帧由绝对进度重建，绝不累积状态；跳章与反向滚动经过同一条可逆轨迹。
+    const diagnosis = reveal(progress, 0, 1);
+    const guidance = reveal(progress, 1.1, 1.95);
+    const branches = reveal(progress, 2, 2.6);
+    const selection = reveal(progress, 2.6, 3);
+    const resolution = reveal(progress, 3.05, 3.8);
+    parts.inspection.setAttribute('r', String(4 + 38 * diagnosis));
+    parts.inspection.style.opacity = String(diagnosis * (1 - .65 * resolution));
+    parts.reference.style.opacity = String(.7 - .38 * diagnosis);
+    parts.trace.style.opacity = String(1 - .5 * diagnosis);
+    parts.deviation.style.opacity = String(.6 - .4 * diagnosis);
+    draw('evidence', reveal(progress, .3, .95));
+    parts.evidence.style.opacity = String(1 - .5 * resolution);
+    draw('guided', guidance);
+    parts['checkpoint-one'].style.opacity = String(reveal(progress, 1.48, 1.6));
+    parts['checkpoint-two'].style.opacity = String(reveal(progress, 1.78, 1.88));
+    parts.decision.style.opacity = String(reveal(progress, 1.88, 2));
+    draw('selected', branches);
+    parts.selected.style.strokeWidth = String(1.5 + 1.2 * selection);
+    draw('alternate', branches);
+    parts.alternate.style.opacity = String((1 - .55 * selection) * (1 - reveal(progress, 3.65, 3.95)));
+    // 分支共享起点；未选路线向固定的选定路线收拢，而不是淡出后换一幅图。
+    const branchY = (396 - 166 * resolution).toFixed(3);
+    parts.alternate.setAttribute('d', `M382 320C430 320 430 ${branchY} 478 ${branchY}`);
+    draw('resolve', reveal(progress, 3.2, 3.85));
+    draw('endpoint', reveal(progress, 3.65, 3.98));
+    parts.endpoint.style.fillOpacity = String(reveal(progress, 3.85, 4));
+    draw('complete', reveal(progress, 3.85, 4));
+    const labelProgress = {
+      correctness: 1,
+      diagnosis: reveal(progress, .55, 1),
+      guidance: reveal(progress, 1.65, 2),
+      adaptation: reveal(progress, 2.55, 3),
+      actionability: reveal(progress, 3.75, 4),
+    };
+    labels.forEach((label) => { label.style.opacity = String(labelProgress[label.dataset.methodStoryLabel] ?? 1); });
+    story.dataset.methodStoryProgress = (progress / Math.max(1, chapters.length - 1)).toFixed(4);
+    setActive(Math.min(chapters.length - 1, Math.floor(progress)));
+  }
+
+  function measure() {
+    // 所有布局读取先于 SVG 写入；滚动帧只使用缓存的文档坐标。
+    const scrollY = window.scrollY;
+    positions = anchors.map((anchor) => anchor.getBoundingClientRect().top + scrollY - window.innerHeight * .5);
+    const bounds = story.getBoundingClientRect();
+    storyTop = bounds.top + scrollY;
+    storyBottom = bounds.bottom + scrollY;
+    layoutDirty = false;
+  }
+
   function updateActiveChapter() {
     frame = 0;
-    const marker = Math.max(40, window.innerHeight * 0.5);
-    let nextIndex = 0;
-
-    chapters.forEach((chapter, index) => {
-      const heading = chapter.querySelector('h3');
-      const anchor = heading instanceof HTMLElement ? heading : chapter;
-      if (anchor.getBoundingClientRect().top <= marker) nextIndex = index;
-    });
-    setActive(nextIndex);
+    if (!tracking) return;
+    if (layoutDirty) measure();
+    const scrollY = window.scrollY;
+    if (storyBottom < scrollY || storyTop > scrollY + window.innerHeight) return;
+    let index = 0;
+    while (index < positions.length - 1 && scrollY >= positions[index + 1]) index += 1;
+    const local = index < positions.length - 1
+      ? clamp((scrollY - positions[index]) / Math.max(1, positions[index + 1] - positions[index])) : 0;
+    paint(index + local);
   }
 
   function scheduleUpdate() {
-    if (frame !== 0) return;
+    if (!tracking || (!inView && !layoutDirty) || frame !== 0) return;
     frame = window.requestAnimationFrame(updateActiveChapter);
   }
 
-  function stopTracking() {
-    if (tracking) {
-      window.removeEventListener('scroll', scheduleUpdate);
-      window.removeEventListener('resize', scheduleUpdate);
-      tracking = false;
+  function invalidateLayout() {
+    layoutDirty = true;
+    scheduleUpdate();
+  }
+
+  const visibility = new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    if (inView) scheduleUpdate();
+    else if (frame !== 0) {
+      window.cancelAnimationFrame(frame);
+      frame = 0;
     }
+  });
+  const layout = new ResizeObserver(invalidateLayout);
+
+  function stopTracking() {
+    tracking = false;
+    window.removeEventListener('scroll', scheduleUpdate);
+    window.removeEventListener('resize', invalidateLayout);
+    visibility.disconnect();
+    layout.disconnect();
     if (frame !== 0) window.cancelAnimationFrame(frame);
     frame = 0;
     activeIndex = -1;
+    delete story.dataset.methodStoryEnhanced;
     delete story.dataset.methodStoryActiveIndex;
-    visuals.forEach((visual) => visual.classList.remove('is-active'));
+    delete story.dataset.methodStoryProgress;
     chapters.forEach((chapter) => chapter.removeAttribute('aria-current'));
-    nodes.forEach((node) => node.classList.remove('is-active'));
-    spokes.forEach((spoke) => spoke.classList.remove('is-active'));
-    labels.forEach((label) => label.classList.remove('is-active'));
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = '';
   }
 
   function startTracking() {
-    if (tracking || !desktop.matches || reducedMotion.matches) return;
+    if (tracking || !desktop.matches || reducedMotion.matches || chapters.length === 0) return;
     tracking = true;
+    story.dataset.methodStoryEnhanced = 'true';
+    layoutDirty = true;
+    visibility.observe(story);
+    layout.observe(document.querySelector('main') || story);
     window.addEventListener('scroll', scheduleUpdate, { passive: true });
-    window.addEventListener('resize', scheduleUpdate);
+    window.addEventListener('resize', invalidateLayout);
     scheduleUpdate();
   }
 
@@ -435,6 +504,7 @@
     else stopTracking();
   }
 
+  document.fonts.ready.then(invalidateLayout);
   desktop.addEventListener('change', syncTracking);
   reducedMotion.addEventListener('change', syncTracking);
   syncTracking();
