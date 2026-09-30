@@ -158,6 +158,19 @@ function structuredDataForPage(
       },
       license: "https://creativecommons.org/licenses/by/4.0/",
       isAccessibleForFree: true,
+      keywords: ["AI tutoring", "AI tutor evaluation", "education benchmark", "observable tutoring behavior"],
+      distribution: [
+        {
+          "@type": "DataDownload",
+          encodingFormat: "application/json",
+          contentUrl: absoluteSiteUrl(siteUrl, "/public-data/cases.json"),
+        },
+        {
+          "@type": "DataDownload",
+          encodingFormat: "application/json",
+          contentUrl: absoluteSiteUrl(siteUrl, "/public-data/benchmark.json"),
+        },
+      ],
       sameAs: [SITE_GITHUB_URL],
     });
   }
@@ -418,7 +431,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const siteUrl = context.siteUrl?.replace(/\/$/, "");
   const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${page.route}`;
   const isPlaceholderRoute = page.route.includes("[");
-  const shouldNoIndex = page.seo?.noIndex === true || page.route === "/404.html" || isPlaceholderRoute;
+  const shouldNoIndex = page.seo?.noIndex === true || page.route === "/404.html" || page.route.startsWith("/audit/") || isPlaceholderRoute;
   const socialImageUrl = siteUrl === undefined || page.seo?.image === undefined
     ? undefined
     : absoluteSiteUrl(siteUrl, page.seo.image);
