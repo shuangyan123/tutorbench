@@ -1647,9 +1647,10 @@ body:is(
 ) .home-footer nav.footer-column {
   display: grid;
   align-content: start;
-  justify-items: start;
+  justify-items: center;
   gap: 10px;
   margin: 0;
+  text-align: center;
   font: 12px/1.5 var(--teach-sans);
 }
 
@@ -1750,10 +1751,54 @@ body:is(
   .run-page,
   .docs-page,
   .contact-page
+) .footer-social-link {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--ink);
+}
+
+body:is(
+  .home-page,
+  .methodology-page,
+  .results-page,
+  .cases-page,
+  .case-detail-page,
+  .about-page,
+  .blog-page,
+  .models-page,
+  .model-detail-page,
+  .run-page,
+  .docs-page,
+  .contact-page
+) .footer-social-link .site-icon {
+  width: 15px;
+  height: 15px;
+}
+
+body:is(
+  .home-page,
+  .methodology-page,
+  .results-page,
+  .cases-page,
+  .case-detail-page,
+  .about-page,
+  .blog-page,
+  .models-page,
+  .model-detail-page,
+  .run-page,
+  .docs-page,
+  .contact-page
 ) .home-footer-bottom {
   display: flex;
   align-items: center;
   gap: 24px;
+  min-height: 34px;
   padding-top: 18px;
   border-top: 1px solid var(--line);
   color: var(--muted);
