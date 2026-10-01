@@ -135,19 +135,34 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
   assert.doesNotMatch(siteScript, /prefetch\.as = "document"/);
 });
 
-test("site-wide locale switch ships a zh-CN copy catalog and runtime translator", async () => {
+test("site-wide locale switch renders static zh-CN pages with direct route targets", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
-  const html = renderPage(renderHomePage(artifacts), { locale: "en" });
-  assert.match(html, /<script src="\/assets\/locale-zh-cn\.js" defer><\/script>/u);
-  assert.doesNotMatch(html, /部署之前，先看证据/u);
+  const english = renderPage(renderHomePage(artifacts), {
+    locale: "en",
+    siteUrl: "https://teachometry.com",
+  });
+  const chinese = renderPage(renderHomePage(artifacts), {
+    locale: "zh-CN",
+    siteUrl: "https://teachometry.com",
+  });
+
+  assert.match(english, /Evidence before deployment/u);
+  assert.doesNotMatch(english, /部署之前，先看证据/u);
+  assert.match(chinese, /部署之前，先看证据/u);
+  assert.match(chinese, /href="\/zh-cn\/data\//u);
+  assert.match(chinese, /data-locale-en-url="\/" data-locale-zh-cn-url="\/zh-cn\//u);
+  assert.match(chinese, /<link rel="canonical" href="https:\/\/teachometry\.com\/zh-cn\//u);
+  assert.match(chinese, /hreflang="en" href="https:\/\/teachometry\.com\//u);
+  assert.match(chinese, /hreflang="zh-CN" href="https:\/\/teachometry\.com\/zh-cn\//u);
+  assert.doesNotMatch(chinese, /locale-zh-cn\.js/u);
 
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
-  assert.match(siteScript, /window\.__TEACHOMETRY_ZH_CN_COPY__/u);
-  assert.match(siteScript, /function applySiteCopyLocale\(locale, root = document\.body\)/u);
-  assert.match(siteScript, /document\.createTreeWalker\(root, NodeFilter\.SHOW_TEXT\)/u);
-  assert.match(siteScript, /\["placeholder", "aria-label", "title", "alt"\]/u);
-  assert.match(siteScript, /new MutationObserver\(scheduleLocaleRefresh\)/u);
-  assert.match(siteScript, /applySiteCopyLocale\(locale\)/u);
+  assert.match(siteScript, /data-locale-zh-cn-url/u);
+  assert.match(siteScript, /data-locale-en-url/u);
+  assert.match(siteScript, /window\.location\.assign\(targetUrl\.href\)/u);
+  assert.doesNotMatch(siteScript, /function applyLocale\(/u);
+  assert.doesNotMatch(siteScript, /__TEACHOMETRY_ZH_CN_COPY__/u);
+  assert.doesNotMatch(siteScript, /MutationObserver/u);
 
   const copyCatalog = await readFile(join(process.cwd(), "src", "site", "locale-copy.ts"), "utf8");
   for (const source of [
@@ -161,26 +176,20 @@ test("site-wide locale switch ships a zh-CN copy catalog and runtime translator"
   }
 });
 
-test("locale switching uses a layered blur-dissolve transition without the old header flash", async () => {
+test("locale switching avoids runtime DOM translation and obsolete transition layers", async () => {
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
-  assert.doesNotMatch(siteScript, /classList\.add\("locale-transition"\)/u);
-  assert.doesNotMatch(styles, /teach-locale-refresh/u);
-  assert.match(siteScript, /document\.startViewTransition/u);
-  assert.match(siteScript, /prefers-reduced-motion: reduce/u);
-  assert.match(siteScript, /activeLocaleTransition/u);
-  assert.match(siteScript, /skipTransition/u);
-  assert.match(styles, /view-transition-name: teach-locale-header/u);
-  assert.match(styles, /view-transition-name: teach-locale-main/u);
-  assert.match(styles, /view-transition-name: teach-locale-footer/u);
-  assert.match(styles, /::view-transition-old\(root\)[\s\S]*?animation: none;/u);
-  assert.match(styles, /teach-locale-focus-in 150ms/u);
-  assert.match(styles, /teach-locale-focus-in 180ms 24ms/u);
-  assert.match(styles, /teach-locale-focus-in 190ms 46ms/u);
-  assert.match(styles, /filter: blur\(2\.4px\)/u);
-  assert.match(styles, /@keyframes teach-locale-focus-in/u);
+  assert.match(siteScript, /targetUrl\.search = window\.location\.search/u);
+  assert.match(siteScript, /targetUrl\.hash = window\.location\.hash/u);
+  assert.match(siteScript, /window\.location\.assign/u);
+  assert.doesNotMatch(siteScript, /document\.startViewTransition/u);
+  assert.doesNotMatch(siteScript, /activeLocaleTransition/u);
+  assert.doesNotMatch(siteScript, /site-locale-change/u);
+  assert.doesNotMatch(siteScript, /applySiteCopyLocale/u);
+  assert.doesNotMatch(styles, /data-locale-transition/u);
+  assert.doesNotMatch(styles, /teach-locale-focus-in/u);
+  assert.doesNotMatch(styles, /view-transition-name: teach-locale/u);
 });
-
 
 test("zh-CN copy catalog covers every major public surface and all published essays", () => {
   const requiredCopy: Readonly<Record<string, string>> = {
@@ -226,19 +235,15 @@ test("zh-CN copy catalog covers every major public surface and all published ess
   }
 });
 
-test("runtime locale changes also refresh dynamic UI and social metadata", async () => {
+test("dynamic UI reads the locale from the static document after navigation", async () => {
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
-  assert.match(siteScript, /new CustomEvent\("site-locale-change"/u);
-  assert.match(siteScript, /document\.addEventListener\("site-locale-change", \(\) => update\(false\)\)/u);
-  assert.match(siteScript, /document\.addEventListener\('site-locale-change', update\)/u);
-  assert.match(siteScript, /document\.addEventListener\('site-locale-change', \(\) => selectCase\(active\)\)/u);
+  assert.match(siteScript, /document\.documentElement\.dataset\.uiLocale === "zh-CN"/u);
   assert.match(siteScript, /activeSiteLocale === "zh-CN"[\s\S]*?上一页/u);
   assert.match(siteScript, /activeSiteLocale === "zh-CN"[\s\S]*?案例 \$\{active \+ 1\}/u);
-  assert.match(siteScript, /meta\[property="og:title"\]/u);
-  assert.match(siteScript, /meta\[name="twitter:description"\]/u);
-  assert.match(siteScript, /ogLocale\.setAttribute\("content", "zh_CN"\)/u);
+  assert.doesNotMatch(siteScript, /new CustomEvent\("site-locale-change"/u);
+  assert.doesNotMatch(siteScript, /meta\[property="og:title"\]/u);
+  assert.doesNotMatch(siteScript, /ogLocale\.setAttribute/u);
 });
-
 
 test("shared public header is consistent, localized, and exposes language controls", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
@@ -281,6 +286,9 @@ test("shared public header is consistent, localized, and exposes language contro
     assert.match(html, /data-ui-aria-zh-cn="主导航"/);
     assert.match(html, /data-ui-title-zh-cn="GitHub 仓库"/);
     assert.match(html, /<html lang="zh-CN" data-ui-locale="zh-CN">/);
+    assert.match(html, /href="\/zh-cn\//);
+    assert.match(html, /data-locale-en-url="\//);
+    assert.match(html, /data-locale-zh-cn-url="\/zh-cn\//);
     assert.match(html, />首页</);
     assert.match(html, />开始使用</);
   }
@@ -686,8 +694,16 @@ test("static website build emits the public artifact files and route shell", asy
       join(outputDirectory, "community", "index.html"),
       "utf8",
     );
+    const zhHomeHtml = await readFile(join(outputDirectory, "zh-cn", "index.html"), "utf8");
+    const zhNotFoundHtml = await readFile(join(outputDirectory, "zh-cn", "404.html"), "utf8");
 
     assert.equal(routeCount, 63);
+    assert.match(zhHomeHtml, /<html lang="zh-CN" data-ui-locale="zh-CN">/);
+    assert.match(zhHomeHtml, /部署之前，先看证据/);
+    assert.match(zhHomeHtml, /href="\/zh-cn\/run\/">/);
+    assert.match(zhHomeHtml, /href="\/assets\/styles\.css"/);
+    assert.doesNotMatch(zhHomeHtml, /locale-zh-cn\.js/);
+    assert.match(zhNotFoundHtml, /这条路径没有通向公开产物。/);
     assert.match(contactHtml, /<title>Contact — Teachometry<\/title>/);
     assert.match(contactHtml, /<body class="about-page contact-page">/);
     assert.match(contactHtml, /href="\/assets\/contact\.css"/);
@@ -1043,12 +1059,12 @@ test("static website build emits the public artifact files and route shell", asy
   }
 });
 
-test("community page renders meaningful Chinese content and runtime locale data", async () => {
+test("community page is emitted as static Chinese content under /zh-cn", async () => {
   const outputDirectory = await mkdtemp(join(tmpdir(), "tutor-benchmark-community-zh-"));
   try {
     await buildWebsite({ outputDirectory, locale: "zh-CN" });
     const communityHtml = await readFile(
-      join(outputDirectory, "community", "index.html"),
+      join(outputDirectory, "zh-cn", "community", "index.html"),
       "utf8",
     );
 
@@ -1068,6 +1084,9 @@ test("community page renders meaningful Chinese content and runtime locale data"
     assert.match(communityHtml, /data-ui-text-en="A stronger evaluation system"/);
     assert.match(communityHtml, /data-ui-text-zh-cn="更强的评测系统"/);
     assert.match(communityHtml, /href="\/assets\/community\.css"/);
+    assert.match(communityHtml, /href="\/zh-cn\/methodology\//);
+    assert.match(communityHtml, /data-locale-en-url="\/community\//);
+    assert.match(communityHtml, /data-locale-zh-cn-url="\/zh-cn\/community\//);
     assert.doesNotMatch(communityHtml, /120\+|80\+|200\+|25\+ countries/i);
   } finally {
     await rm(outputDirectory, { recursive: true, force: true });
@@ -1083,6 +1102,7 @@ test("static website build prefixes project-site paths without changing local de
       siteUrl: "https://shuangyan123.github.io/tutorbench",
     });
     const homeHtml = await readFile(join(outputDirectory, "index.html"), "utf8");
+    const zhHomeHtml = await readFile(join(outputDirectory, "zh-cn", "index.html"), "utf8");
     const casesHtml = await readFile(
       join(outputDirectory, "data", "cases", "index.html"),
       "utf8",
@@ -1103,6 +1123,10 @@ test("static website build prefixes project-site paths without changing local de
     const notFoundHtml = await readFile(join(outputDirectory, "404.html"), "utf8");
 
     assert.match(homeHtml, /href="\/tutorbench\/leaderboard\//);
+    assert.match(zhHomeHtml, /href="\/tutorbench\/zh-cn\/leaderboard\//);
+    assert.match(zhHomeHtml, /href="\/tutorbench\/assets\/styles\.css"/);
+    assert.match(zhHomeHtml, /data-locale-en-url="\/tutorbench\//);
+    assert.match(zhHomeHtml, /data-locale-zh-cn-url="\/tutorbench\/zh-cn\//);
     assert.match(homeHtml, /href="\/tutorbench\/assets\/styles\.css"/);
     assert.match(homeHtml, /src="\/tutorbench\/assets\/site\.js"/);
     assert.match(homeHtml, /src="\/tutorbench\/assets\/brand\/tutorbench\/web\/tutorbench-mark-small\.svg"/);
@@ -1124,6 +1148,9 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(robots, /Sitemap: https:\/\/shuangyan123\.github\.io\/tutorbench\/sitemap\.xml/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/<\/loc>/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/blog\/when-learning-starts-to-feel-like-failure\/<\/loc>/u);
+    assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/zh-cn\/<\/loc>/u);
+    assert.match(sitemap, /hreflang="zh-CN" href="https:\/\/shuangyan123\.github\.io\/tutorbench\/zh-cn\/"/u);
+    assert.match(sitemap, /xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml"/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/data\/cases\/fraction-misconception-001\/<\/loc>/u);
     assert.doesNotMatch(sitemap, /\[modelId\]|\[trialId\]|404\.html/u);
     assert.match(casesHtml, /href="\/tutorbench\/data\/cases\/fraction-misconception-001\//);
