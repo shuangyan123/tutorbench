@@ -245,32 +245,4 @@ body.not-found-page::before {
     font-size: 15px;
   }
 
-  body.not-found-page .home-footer-main {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  body.not-found-page .home-footer-brand {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-
-  body.not-found-page .footer-descriptor {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    white-space: normal;
-  }
-
-  body.not-found-page .home-footer .github-link {
-    grid-column: 1;
-    grid-row: 3;
-  }
-
-  body.not-found-page .home-footer .button {
-    grid-column: 2;
-    grid-row: 3;
-  }
-
-  body.not-found-page .home-footer nav {
-    grid-row: 4;
-  }
 }
