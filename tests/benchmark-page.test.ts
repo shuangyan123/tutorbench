@@ -9,11 +9,11 @@ const load = async () => buildPublicBenchmarkArtifacts(await loadTutorEvalDatase
 
 test("benchmark derives counts, distributions and subject-locale cells from public artifacts", async () => {
   const a = await load();
-  const html = renderPage(renderDataIndexPage(a), { basePath: "/preview", locale: "zh-CN" });
+  const html = renderPage(renderDataIndexPage(a), { basePath: "/preview", locale: "en" });
   assert.match(html, /Benchmark — Teachometry/);
   assert.match(html, /href="\/preview\/assets\/benchmark.css"/);
   assert.match(html, /href="\/preview\/data\/" aria-current="page"/);
-  assert.match(html, /lang="zh-CN"/);
+  assert.match(html, /lang="en"/);
   assert.ok(html.includes(`${a.benchmark.coverage.rubricCount} rubrics`));
   assert.ok(html.includes(`View all ${Object.keys(a.benchmark.coverage.casesByCapabilityTag).length} capabilities`));
   assert.match(html, /Cases with each category; categories overlap/);
