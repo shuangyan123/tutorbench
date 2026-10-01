@@ -179,6 +179,10 @@ test("shared public header is consistent, localized, and exposes language contro
   assert.ok(compactHeaderStyles.includes('.home-header .nav-links[data-open="true"] ~ .home-header-tools { display: flex;'));
   assert.ok(compactHeaderStyles.includes("grid-template-columns: repeat(2, minmax(0, 1fr));"));
   assert.match(chromeStyles, /@media \(max-width: 1100px\) and \(min-width: 1024px\) \{[\s\S]*?\.home-header \.header-inner/);
+  assert.match(
+    chromeStyles,
+    /@media \(max-width: 1100px\) and \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: 440px;[\s\S]*?gap: 0;[\s\S]*?font-size: 11px;/u,
+  );
   assert.doesNotMatch(pageResponsiveStyles, /\.home-header(?:\s|[.#:{,]|$)/);
   assert.match(pageResponsiveStyles, /main \.shell/);
   assert.doesNotMatch(pageResponsiveStyles, /\.home-footer/);
