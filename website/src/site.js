@@ -122,27 +122,41 @@
     root.querySelectorAll("*").forEach((element) => localizeElementAttributes(element, locale));
     localizeElementAttributes(root, locale);
 
+    const localizedMetaSelectors = [
+      'meta[name="description"]',
+      'meta[property="og:title"]',
+      'meta[property="og:description"]',
+      'meta[name="twitter:title"]',
+      'meta[name="twitter:description"]',
+    ];
     if (locale === "zh-CN") {
       const translatedTitle = copyTranslation(document.title);
       if (translatedTitle !== null) {
         document.documentElement.dataset.sourceTitle ??= document.title;
         document.title = translatedTitle;
       }
-      const description = document.querySelector('meta[name="description"]');
-      const currentDescription = description?.getAttribute("content");
-      if (description instanceof HTMLMetaElement && currentDescription !== null) {
-        description.dataset.sourceContent ??= currentDescription;
-        const translatedDescription = copyTranslation(description.dataset.sourceContent);
-        if (translatedDescription !== null) description.setAttribute("content", translatedDescription);
-      }
+      localizedMetaSelectors.forEach((selector) => {
+        const meta = document.querySelector(selector);
+        const currentContent = meta?.getAttribute("content");
+        if (!(meta instanceof HTMLMetaElement) || currentContent === null) return;
+        meta.dataset.sourceContent ??= currentContent;
+        const translatedContent = copyTranslation(meta.dataset.sourceContent);
+        if (translatedContent !== null) meta.setAttribute("content", translatedContent);
+      });
+      const ogLocale = document.querySelector('meta[property="og:locale"]');
+      if (ogLocale instanceof HTMLMetaElement) ogLocale.setAttribute("content", "zh_CN");
     } else {
       if (document.documentElement.dataset.sourceTitle) {
         document.title = document.documentElement.dataset.sourceTitle;
       }
-      const description = document.querySelector('meta[name="description"]');
-      if (description instanceof HTMLMetaElement && description.dataset.sourceContent) {
-        description.setAttribute("content", description.dataset.sourceContent);
-      }
+      localizedMetaSelectors.forEach((selector) => {
+        const meta = document.querySelector(selector);
+        if (meta instanceof HTMLMetaElement && meta.dataset.sourceContent) {
+          meta.setAttribute("content", meta.dataset.sourceContent);
+        }
+      });
+      const ogLocale = document.querySelector('meta[property="og:locale"]');
+      if (ogLocale instanceof HTMLMetaElement) ogLocale.setAttribute("content", "en_US");
     }
   }
 
