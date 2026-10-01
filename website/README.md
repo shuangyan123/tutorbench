@@ -84,11 +84,12 @@ Case and dimension navigation support keyboard use; small screens retain all
 five nodes in a horizontally scrollable path. The shared Teachometry header is
 rendered consistently across public routes, including Run and Docs. Theme and
 interface-language choices are available from the same header on every public
-page and persist locally when storage is available. Shared navigation, controls,
-and accessibility labels switch between English and Simplified Chinese at
-runtime. Page-specific editorial copy remains translated only where the page
-already provides localized content; changing interface language does not invent
-translations for English-only research prose.
+page. The public build is bilingual at rest: English pages stay on their
+existing routes and Simplified Chinese pages are emitted under the matching
+`/zh-cn/...` route with the same English slugs. The language control navigates
+between those static counterparts instead of rewriting the live DOM, so the
+initial HTML, metadata, layout, and accessibility labels already match the
+selected language. Shared assets and public benchmark JSON remain unprefixed.
 
 Motion is intentionally restrained: header controls, active navigation, mobile
 menu disclosure, and page entry use short transforms/opacity transitions only
