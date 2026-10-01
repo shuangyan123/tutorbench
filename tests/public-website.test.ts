@@ -102,7 +102,7 @@ test("public footer is one informational system across page styles", async () =>
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
   assert.match(styles, /grid-template-columns: minmax\(250px, 1\.35fr\) repeat\(3, minmax\(140px, \.65fr\)\);/u);
   assert.match(styles, /\.footer-column-title/u);
-  assert.doesNotMatch(styles, /\.home-header \.nav-links,[\s\S]*?\.home-footer/u);
+  assert.doesNotMatch(styles, /--teach-chrome-(?:left|right|column)/u);
 
   for (const file of ["run.css", "docs.css", "results.css", "not-found.css", "case-detail.css"]) {
     const pageStyles = await readFile(join(process.cwd(), "website", "src", file), "utf8");
