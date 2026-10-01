@@ -848,10 +848,6 @@
 }
 
 @media (max-width: 600px) {
-  .case-detail-page .home-footer .button {
-    width: auto;
-  }
-
   .case-detail-breadcrumbs {
     align-items: flex-start;
     flex-direction: column;
