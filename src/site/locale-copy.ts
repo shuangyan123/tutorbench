@@ -1266,5 +1266,13 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "An audit ledger for future public Teachometry model trial evidence.": "面向未来公开 Teachometry 模型 trial 证据的审计 ledger。",
 
   "Helpful public routes": "常用公开页面"
+,
+  "N/A": "不适用",
+  "Not specified": "未指定",
+  "Model Trials": "模型 Trials",
+  "September 17, 2026": "2026年9月17日",
+  "September 28, 2026": "2026年9月28日",
+  "September 30, 2026": "2026年9月30日",
+  "The": "",
 
 };
