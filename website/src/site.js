@@ -243,6 +243,8 @@ let activeSiteLocale = "en";
 
   const initialLocale = storedLocale() ?? document.documentElement.dataset.uiLocale ?? "en";
   applyLocale(initialLocale);
+  let activeLocaleTransition = null;
+
   function applyLocaleWithTransition(locale) {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const startViewTransition = document.startViewTransition;
@@ -250,10 +252,19 @@ let activeSiteLocale = "en";
       applyLocale(locale);
       return;
     }
+
+    if (activeLocaleTransition && typeof activeLocaleTransition.skipTransition === "function") {
+      activeLocaleTransition.skipTransition();
+    }
+
     document.documentElement.dataset.localeTransition = "active";
     const transition = startViewTransition.call(document, () => applyLocale(locale));
+    activeLocaleTransition = transition;
     transition.finished.finally(() => {
-      delete document.documentElement.dataset.localeTransition;
+      if (activeLocaleTransition === transition) {
+        activeLocaleTransition = null;
+        delete document.documentElement.dataset.localeTransition;
+      }
     });
   }
 
