@@ -1,6 +1,7 @@
-/* global CustomEvent, HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLMetaElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, IntersectionObserver, MutationObserver, NodeFilter, ResizeObserver, URL, URLSearchParams, document, history, navigator, window */
+/* global HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, IntersectionObserver, ResizeObserver, URL, URLSearchParams, document, history, navigator, window */
 
-let activeSiteLocale = "en";
+let activeSiteLocale =
+  document.documentElement.dataset.uiLocale === "zh-CN" ? "zh-CN" : "en";
 
 (() => {
   const navToggle = document.querySelector(".nav-toggle");
@@ -44,242 +45,24 @@ let activeSiteLocale = "en";
   }
 
   const localeSwitcher = document.querySelector("[data-locale-switcher]");
-  const localeStorageKey = "tutor-benchmark-ui-locale";
-  const localeCopy = window.__TEACHOMETRY_ZH_CN_COPY__;
-  const siteZhCnCopy = localeCopy && typeof localeCopy === "object" && !Array.isArray(localeCopy)
-    ? localeCopy
-    : {};
-  const sourceText = new WeakMap();
-  const sourceAttributes = new WeakMap();
-  let localeMutationScheduled = false;
-
-  function copyTranslation(value) {
-    if (typeof value !== "string") return null;
-    return typeof siteZhCnCopy[value] === "string" ? siteZhCnCopy[value] : null;
-  }
-
-  function shouldSkipTextNode(node) {
-    const parent = node.parentElement;
-    return parent === null || parent.closest("script, style, code, pre, textarea, [data-ui-text], [data-ui-option-en]") !== null;
-  }
-
-  function localizeTextNode(node, locale) {
-    if (shouldSkipTextNode(node)) return;
-    const current = node.nodeValue ?? "";
-    if (locale === "en") {
-      const original = sourceText.get(node);
-      if (original !== undefined && node.nodeValue !== original) node.nodeValue = original;
-      return;
-    }
-    const original = sourceText.get(node) ?? current;
-    const trimmed = original.trim();
-    const translated = copyTranslation(trimmed);
-    if (translated === null) return;
-    if (!sourceText.has(node)) sourceText.set(node, original);
-    const leading = original.match(/^\s*/u)?.[0] ?? "";
-    const trailing = original.match(/\s*$/u)?.[0] ?? "";
-    const nextValue = `${leading}${translated}${trailing}`;
-    if (node.nodeValue !== nextValue) node.nodeValue = nextValue;
-  }
-
-  function localizeElementAttributes(element, locale) {
-    const attributes = ["placeholder", "aria-label", "title", "alt"];
-    let originals = sourceAttributes.get(element);
-    if (originals === undefined) {
-      originals = new Map();
-      sourceAttributes.set(element, originals);
-    }
-    attributes.forEach((name) => {
-      if (!element.hasAttribute(name)) return;
-      if (locale === "en") {
-        if (originals.has(name)) element.setAttribute(name, originals.get(name));
-        return;
-      }
-      const current = element.getAttribute(name);
-      if (current === null) return;
-      if (!originals.has(name)) originals.set(name, current);
-      const original = originals.get(name);
-      const translated = copyTranslation(original);
-      if (translated !== null) element.setAttribute(name, translated);
-    });
-  }
-
-  function applySiteCopyLocale(locale, root = document.body) {
-    if (root === null || root === undefined || typeof root.querySelectorAll !== "function") return;
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    let node = walker.nextNode();
-    while (node !== null) {
-      localizeTextNode(node, locale);
-      node = walker.nextNode();
-    }
-    root.querySelectorAll("*").forEach((element) => localizeElementAttributes(element, locale));
-    localizeElementAttributes(root, locale);
-
-    const localizedMetaSelectors = [
-      'meta[name="description"]',
-      'meta[property="og:title"]',
-      'meta[property="og:description"]',
-      'meta[name="twitter:title"]',
-      'meta[name="twitter:description"]',
-    ];
-    if (locale === "zh-CN") {
-      const translatedTitle = copyTranslation(document.title);
-      if (translatedTitle !== null) {
-        document.documentElement.dataset.sourceTitle ??= document.title;
-        document.title = translatedTitle;
-      }
-      localizedMetaSelectors.forEach((selector) => {
-        const meta = document.querySelector(selector);
-        const currentContent = meta?.getAttribute("content");
-        if (!(meta instanceof HTMLMetaElement) || currentContent === null) return;
-        meta.dataset.sourceContent ??= currentContent;
-        const translatedContent = copyTranslation(meta.dataset.sourceContent);
-        if (translatedContent !== null) meta.setAttribute("content", translatedContent);
-      });
-      const ogLocale = document.querySelector('meta[property="og:locale"]');
-      if (ogLocale instanceof HTMLMetaElement) ogLocale.setAttribute("content", "zh_CN");
-    } else {
-      if (document.documentElement.dataset.sourceTitle) {
-        document.title = document.documentElement.dataset.sourceTitle;
-      }
-      localizedMetaSelectors.forEach((selector) => {
-        const meta = document.querySelector(selector);
-        if (meta instanceof HTMLMetaElement && meta.dataset.sourceContent) {
-          meta.setAttribute("content", meta.dataset.sourceContent);
-        }
-      });
-      const ogLocale = document.querySelector('meta[property="og:locale"]');
-      if (ogLocale instanceof HTMLMetaElement) ogLocale.setAttribute("content", "en_US");
-    }
-  }
-
-  function scheduleLocaleRefresh() {
-    if (activeSiteLocale !== "zh-CN" || localeMutationScheduled) return;
-    localeMutationScheduled = true;
-    window.requestAnimationFrame(() => {
-      localeMutationScheduled = false;
-      applySiteCopyLocale(activeSiteLocale);
-    });
-  }
-
-  if ("MutationObserver" in window) {
-    new MutationObserver(scheduleLocaleRefresh).observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-  }
 
   function isSiteLocale(value) {
     return value === "en" || value === "zh-CN";
   }
 
-  function storedLocale() {
-    try {
-      const value = window.localStorage.getItem(localeStorageKey);
-      return isSiteLocale(value) ? value : null;
-    } catch {
-      return null;
-    }
-  }
-
-  function applyLocale(locale) {
-    if (!isSiteLocale(locale)) {
-      return;
-    }
-    activeSiteLocale = locale;
-    document.documentElement.lang = locale;
-    document.documentElement.dataset.uiLocale = locale;
-    document.querySelectorAll("[data-ui-text]").forEach((element) => {
-      const attribute = locale === "zh-CN" ? "data-ui-text-zh-cn" : "data-ui-text-en";
-      const translated = element.getAttribute(attribute);
-      if (translated !== null) {
-        element.textContent = translated;
-      }
-    });
-    document.querySelectorAll("[data-ui-option-en]").forEach((element) => {
-      const attribute = locale === "zh-CN" ? "data-ui-option-zh-cn" : "data-ui-option-en";
-      const translated = element.getAttribute(attribute);
-      if (translated !== null) {
-        element.textContent = translated;
-      }
-    });
-    document.querySelectorAll("[data-ui-aria-en]").forEach((element) => {
-      const attribute = locale === "zh-CN" ? "data-ui-aria-zh-cn" : "data-ui-aria-en";
-      const translated = element.getAttribute(attribute);
-      if (translated !== null) {
-        element.setAttribute("aria-label", translated);
-      }
-    });
-    document.querySelectorAll("[data-ui-title-en]").forEach((element) => {
-      const attribute = locale === "zh-CN" ? "data-ui-title-zh-cn" : "data-ui-title-en";
-      const translated = element.getAttribute(attribute);
-      if (translated !== null) {
-        element.setAttribute("title", translated);
-      }
-    });
-    document.querySelectorAll("[data-case-count-value]").forEach((element) => {
-      const templateAttribute = locale === "zh-CN"
-        ? "data-case-count-template-zh-cn"
-        : "data-case-count-template-en";
-      const template = element.getAttribute(templateAttribute) ?? "Showing {count} cases";
-      const count = element.getAttribute("data-case-count-value") ?? "0";
-      const start = element.getAttribute("data-case-count-start") ?? "0";
-      const end = element.getAttribute("data-case-count-end") ?? count;
-      element.textContent = template.replaceAll("{start}", start).replaceAll("{end}", end).replaceAll("{count}", count);
-    });
-    applySiteCopyLocale(locale);
-    if (typeof document.dispatchEvent === "function" && typeof CustomEvent !== "undefined") {
-      document.dispatchEvent(new CustomEvent("site-locale-change", { detail: { locale } }));
-    }
-    if (localeSwitcher instanceof HTMLSelectElement) {
-      localeSwitcher.value = locale;
-      const label = document.querySelector('[data-ui-text="selectLanguage"]');
-      if (label instanceof HTMLElement && label.textContent !== null) {
-        localeSwitcher.setAttribute("aria-label", label.textContent);
-      }
-    }
-  }
-
-  const initialLocale = storedLocale() ?? document.documentElement.dataset.uiLocale ?? "en";
-  applyLocale(initialLocale);
-  let activeLocaleTransition = null;
-
-  function applyLocaleWithTransition(locale) {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const startViewTransition = document.startViewTransition;
-    if (reduceMotion || typeof startViewTransition !== "function") {
-      applyLocale(locale);
-      return;
-    }
-
-    if (activeLocaleTransition && typeof activeLocaleTransition.skipTransition === "function") {
-      activeLocaleTransition.skipTransition();
-    }
-
-    document.documentElement.dataset.localeTransition = "active";
-    const transition = startViewTransition.call(document, () => applyLocale(locale));
-    activeLocaleTransition = transition;
-    transition.finished.finally(() => {
-      if (activeLocaleTransition === transition) {
-        activeLocaleTransition = null;
-        delete document.documentElement.dataset.localeTransition;
-      }
-    });
-  }
-
   if (localeSwitcher instanceof HTMLSelectElement) {
+    localeSwitcher.value = activeSiteLocale;
     localeSwitcher.addEventListener("change", () => {
       const locale = localeSwitcher.value;
-      if (!isSiteLocale(locale)) {
-        return;
-      }
-      try {
-        window.localStorage.setItem(localeStorageKey, locale);
-      } catch {
-        // A private browsing policy may deny storage; the current page still switches.
-      }
-      applyLocaleWithTransition(locale);
+      if (!isSiteLocale(locale)) return;
+      const target = localeSwitcher.getAttribute(
+        locale === "zh-CN" ? "data-locale-zh-cn-url" : "data-locale-en-url",
+      );
+      if (target === null) return;
+      const targetUrl = new URL(target, window.location.href);
+      targetUrl.search = window.location.search;
+      targetUrl.hash = window.location.hash;
+      window.location.assign(targetUrl.href);
     });
   }
 
@@ -502,7 +285,6 @@ let activeSiteLocale = "en";
     filterToggle.setAttribute("aria-expanded", String(!open));
   });
 
-  document.addEventListener("site-locale-change", () => update(false));
   sortCards();
   update(false);
 })();
@@ -709,7 +491,6 @@ let activeSiteLocale = "en";
           : `Case ${active + 1} of ${cases.length}: ${caseTitle}`;
       }
     }
-    document.addEventListener('site-locale-change', () => selectCase(active));
     walkthrough.querySelector('[data-case-prev]')?.addEventListener('click', () => selectCase(active - 1));
     walkthrough.querySelector('[data-case-next]')?.addEventListener('click', () => selectCase(active + 1));
     cases.forEach((item) => {
@@ -884,7 +665,6 @@ let activeSiteLocale = "en";
     update();
     searchField.focus();
   });
-  document.addEventListener('site-locale-change', update);
   update();
 })();
 
