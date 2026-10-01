@@ -181,6 +181,10 @@ test("shared public header is consistent, localized, and exposes language contro
   assert.match(chromeStyles, /@media \(max-width: 1100px\) and \(min-width: 1024px\) \{[\s\S]*?\.home-header \.header-inner/);
   assert.match(
     chromeStyles,
+    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: clamp\(440px, 32vw, 520px\);[\s\S]*?grid-template-columns: repeat\(7, minmax\(0, 1fr\)\);/u,
+  );
+  assert.match(
+    chromeStyles,
     /@media \(max-width: 1100px\) and \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: 440px;[\s\S]*?gap: 0;[\s\S]*?font-size: 11px;/u,
   );
   assert.doesNotMatch(pageResponsiveStyles, /\.home-header(?:\s|[.#:{,]|$)/);

@@ -971,7 +971,7 @@ body.case-detail-page main .shell {
   ) .home-header .nav-links {
     position: absolute;
     left: 50%;
-    width: clamp(500px, 42vw, 620px);
+    width: clamp(440px, 32vw, 520px);
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 0;
