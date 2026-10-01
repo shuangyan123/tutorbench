@@ -104,7 +104,7 @@ test("website build publishes the Teachometry blog index and essays", async () =
     });
 
     // Blog pages are editorial surfaces layered onto the current benchmark route count.
-    assert.equal(routeCount, 62);
+    assert.equal(routeCount, 63);
 
     const indexHtml = await readFile(join(outputDirectory, "blog", "index.html"), "utf8");
     const learningFailureHtml = await readFile(
