@@ -254,9 +254,7 @@ let activeSiteLocale = "en";
       } catch {
         // A private browsing policy may deny storage; the current page still switches.
       }
-      document.documentElement.classList.add("locale-transition");
       applyLocale(locale);
-      window.setTimeout(() => document.documentElement.classList.remove("locale-transition"), 180);
     });
   }
 
