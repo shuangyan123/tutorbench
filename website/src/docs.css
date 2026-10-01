@@ -1027,8 +1027,7 @@ body.docs-page[data-theme="dark"] .docs-callout-mark {
 @media (max-width: 900px) {
   .docs-hero-shell,
   .docs-shell,
-  body.docs-page main .shell,
-  body.docs-page .home-footer .shell {
+  body.docs-page main .shell {
     width: calc(100% - (var(--teach-gutter-mobile) * 2));
     max-width: none;
   }
@@ -1125,63 +1124,6 @@ body.docs-page[data-theme="dark"] .docs-callout-mark {
     margin-top: 24px;
   }
 
-  body.docs-page .home-footer {
-    padding: 28px 0 24px;
-  }
-
-  body.docs-page .home-footer-main {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    min-height: 0;
-    gap: 18px 12px;
-    padding-bottom: 26px;
-  }
-
-  body.docs-page .home-footer-brand {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  body.docs-page .footer-descriptor {
-    grid-column: 2;
-    grid-row: 1;
-    white-space: nowrap;
-  }
-
-  body.docs-page .home-footer .github-link {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: start;
-    margin: 0;
-  }
-
-  body.docs-page .home-footer .button {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: end;
-    white-space: nowrap;
-  }
-
-  body.docs-page .home-footer nav {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 16px;
-    margin: 0;
-    font-size: 11px;
-  }
-
-  body.docs-page .home-footer-bottom {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  body.docs-page .home-footer-bottom > span {
-    flex-basis: 100%;
-    margin-right: 0;
-  }
 }
 
 @media (max-width: 640px) {
