@@ -971,10 +971,11 @@ body.case-detail-page main .shell {
   ) .home-header .nav-links {
     position: absolute;
     left: 50%;
-    width: clamp(440px, 32vw, 520px);
+    width: clamp(500px, 36vw, 580px);
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 0;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 26px;
     transform: translateX(-50%);
   }
 
@@ -990,7 +991,57 @@ body.case-detail-page main .shell {
     .model-detail-page,
     .run-page,
     .docs-page
-  ) .home-header .nav-links a {
+  ) .home-header .nav-group {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-group-left {
+    justify-content: flex-end;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-group-right {
+    justify-content: flex-start;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-center {
     justify-self: center;
   }
 
@@ -1086,10 +1137,26 @@ body.case-detail-page main .shell {
     .run-page,
     .docs-page
   ) .home-header .nav-links {
-    width: 440px;
+    width: 470px;
     min-width: 0;
-    gap: 0;
+    column-gap: 20px;
     font-size: 11px;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-group {
+    gap: 18px;
   }
 
   body:is(
@@ -1225,8 +1292,24 @@ body.case-detail-page main .shell {
     .blog-page,
     .models-page,
     .model-detail-page,
-  .run-page,
-  .docs-page
+    .run-page,
+    .docs-page
+  ) .home-header .nav-group {
+    display: contents;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
   ) .home-header .nav-links {
     display: none;
     flex: 0 0 100%;
