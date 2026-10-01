@@ -1,4 +1,4 @@
-/* global HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, IntersectionObserver, ResizeObserver, URL, URLSearchParams, document, history, navigator, window */
+/* global CustomEvent, Element, HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLMetaElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, IntersectionObserver, MutationObserver, NodeFilter, ResizeObserver, URL, URLSearchParams, document, history, navigator, window */
 
 (() => {
   const navToggle = document.querySelector(".nav-toggle");
@@ -78,11 +78,11 @@
       if (original !== undefined && node.nodeValue !== original) node.nodeValue = original;
       return;
     }
-    if (!sourceText.has(node)) sourceText.set(node, current);
     const original = sourceText.get(node) ?? current;
     const trimmed = original.trim();
     const translated = copyTranslation(trimmed);
     if (translated === null) return;
+    if (!sourceText.has(node)) sourceText.set(node, original);
     const leading = original.match(/^\s*/u)?.[0] ?? "";
     const trailing = original.match(/\s*$/u)?.[0] ?? "";
     const nextValue = `${leading}${translated}${trailing}`;
@@ -236,6 +236,7 @@
       element.textContent = template.replaceAll("{start}", start).replaceAll("{end}", end).replaceAll("{count}", count);
     });
     applySiteCopyLocale(locale);
+    document.dispatchEvent(new CustomEvent("site-locale-change", { detail: { locale } }));
     if (localeSwitcher instanceof HTMLSelectElement) {
       localeSwitcher.value = locale;
       const label = document.querySelector('[data-ui-text="selectLanguage"]');
@@ -483,6 +484,7 @@
     filterToggle.setAttribute("aria-expanded", String(!open));
   });
 
+  document.addEventListener("site-locale-change", () => update(false));
   sortCards();
   update(false);
 })();
@@ -689,6 +691,7 @@
           : `Case ${active + 1} of ${cases.length}: ${caseTitle}`;
       }
     }
+    document.addEventListener('site-locale-change', () => selectCase(active));
     walkthrough.querySelector('[data-case-prev]')?.addEventListener('click', () => selectCase(active - 1));
     walkthrough.querySelector('[data-case-next]')?.addEventListener('click', () => selectCase(active + 1));
     cases.forEach((item) => {
@@ -863,6 +866,7 @@
     update();
     searchField.focus();
   });
+  document.addEventListener('site-locale-change', update);
   update();
 })();
 
