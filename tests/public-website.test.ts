@@ -134,6 +134,32 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
   assert.doesNotMatch(siteScript, /prefetch\.as = "document"/);
 });
 
+test("site-wide locale switch ships a zh-CN copy catalog and runtime translator", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const html = renderPage(renderHomePage(artifacts), { locale: "en" });
+  assert.match(html, /<script id="site-locale-copy" type="application\/json">/u);
+  assert.match(html, /部署之前，先看证据/u);
+  assert.match(html, /以开源推动更好的学习/u);
+
+  const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
+  assert.match(siteScript, /function applySiteCopyLocale\(locale, root = document\.body\)/u);
+  assert.match(siteScript, /document\.createTreeWalker\(root, NodeFilter\.SHOW_TEXT\)/u);
+  assert.match(siteScript, /\["placeholder", "aria-label", "title", "alt"\]/u);
+  assert.match(siteScript, /new MutationObserver\(scheduleLocaleRefresh\)/u);
+  assert.match(siteScript, /applySiteCopyLocale\(locale\)/u);
+
+  const copyCatalog = await readFile(join(process.cwd(), "src", "site", "locale-copy.ts"), "utf8");
+  for (const source of [
+    "Evidence before deployment",
+    "Teachometry turns authored learning situations into reproducible Tutor Health evaluations",
+    "The Teachometry benchmark",
+    "Questions, collaboration,",
+    "This trail doesn’t lead to a public artifact.",
+  ]) {
+    assert.ok(copyCatalog.includes(source), `missing zh-CN public copy for: ${source}`);
+  }
+});
+
 test("shared public header is consistent, localized, and exposes language controls", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const chromeStyles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
