@@ -133,9 +133,11 @@ export function renderTeachometryFooter({ benchmark, models }: PublicBenchmarkAr
   return `<footer class="home-footer"><div class="shell">
       <div class="home-footer-main">
         <div class="home-footer-identity"><a class="home-footer-brand" href="/"><img src="/assets/brand/tutorbench/web/tutorbench-mark-small.svg" width="26" height="26" alt="">Teachometry</a><span class="footer-descriptor">Open source for better learning.</span></div>
-        <nav class="footer-column" aria-label="Product"><span class="footer-column-title">Product</span><a href="/run/">Run</a><a href="/models/">Models</a></nav>
-        <nav class="footer-column" aria-label="Resources"><span class="footer-column-title">Resources</span><a href="/docs/">Documentation</a><a href="/community/">Community</a><a href="${SITE_GITHUB_URL}/issues">Project support</a></nav>
-        <nav class="footer-column" aria-label="Connect"><span class="footer-column-title">Connect</span><a href="/contact/">Contact</a><a class="footer-social-link" href="https://x.com/1Shuangyan36877" rel="noreferrer" aria-label="Teachometry on X" title="Teachometry on X">${icon("x")}</a></nav>
+        <div class="footer-nav-band">
+          <nav class="footer-column" aria-label="Product"><span class="footer-column-title">Product</span><a href="/run/">Run</a><a href="/models/">Models</a></nav>
+          <nav class="footer-column" aria-label="Resources"><span class="footer-column-title">Resources</span><a href="/docs/">Documentation</a><a href="/community/">Community</a><a href="${SITE_GITHUB_URL}/issues">Project support</a></nav>
+          <nav class="footer-column" aria-label="Connect"><span class="footer-column-title">Connect</span><a href="/contact/">Contact</a><a class="footer-social-link" href="https://x.com/1Shuangyan36877" rel="noreferrer" aria-label="Teachometry on X" title="Teachometry on X"><img class="footer-x-logo" src="https://about.x.com/content/dam/about-twitter/x/brand-toolkit/logo-black.png.twimg.1920.png" width="16" height="16" alt="" loading="lazy" referrerpolicy="no-referrer"></a></nav>
+        </div>
       </div>
       <div class="home-footer-bottom"><span>Teachometry · ${e(benchmark.statusLabel)}</span></div>
       <details class="home-evidence"><summary>Evidence &amp; limitations</summary><p>${e(models.notice)} ${e(benchmark.notice)} Calibration infrastructure exists, but real Community Review and human calibration have not started. Judge-vs-human validation and statistical validation are not completed. TutorBench measures observable tutoring behavior in specified benchmark scenarios, not long-term learning, retention, transfer, satisfaction, or classroom outcomes.</p></details>
