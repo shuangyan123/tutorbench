@@ -104,8 +104,9 @@ test("public footer aligns Resources beneath centered Results without duplicatin
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
   assert.match(
     styles,
-    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?left: 50%;[\s\S]*?grid-template-columns: repeat\(7, minmax\(0, 1fr\)\);[\s\S]*?transform: translateX\(-50%\);/u,
+    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?left: 50%;[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto minmax\(0, 1fr\);[\s\S]*?transform: translateX\(-50%\);/u,
   );
+  assert.match(styles, /\.home-header \.nav-center \{[\s\S]*?justify-self: center;/u);
   assert.match(
     styles,
     /@media \(min-width: 1024px\)[\s\S]*?\.footer-nav-band \{[\s\S]*?left: 50%;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?transform: translateX\(-50%\);/u,
@@ -165,6 +166,9 @@ test("shared public header is consistent, localized, and exposes language contro
     assert.match(html, /data-ui-text="casesNav"/);
     assert.match(html, /data-ui-text="aboutNav"/);
     assert.match(html, /data-ui-text="blogNav"/);
+    assert.match(html, /class="nav-group nav-group-left"/);
+    assert.match(html, /class="nav-center"[^>]*>[\s\S]*?data-ui-text="resultsNav"/u);
+    assert.match(html, /class="nav-group nav-group-right"/);
     assert.match(html, /data-ui-text="brandDescriptor"/);
     assert.match(html, /data-ui-text="getStarted"/);
     assert.match(html, /data-ui-aria-en="Primary navigation"/);
@@ -181,11 +185,21 @@ test("shared public header is consistent, localized, and exposes language contro
   assert.match(chromeStyles, /@media \(max-width: 1100px\) and \(min-width: 1024px\) \{[\s\S]*?\.home-header \.header-inner/);
   assert.match(
     chromeStyles,
-    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: clamp\(440px, 32vw, 520px\);[\s\S]*?grid-template-columns: repeat\(7, minmax\(0, 1fr\)\);/u,
+    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: clamp\(500px, 36vw, 580px\);[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto minmax\(0, 1fr\);[\s\S]*?column-gap: 26px;/u,
+  );
+  assert.match(chromeStyles, /\.home-header \.nav-group-left \{[\s\S]*?justify-content: flex-end;/u);
+  assert.match(chromeStyles, /\.home-header \.nav-group-right \{[\s\S]*?justify-content: flex-start;/u);
+  assert.match(
+    chromeStyles,
+    /@media \(max-width: 1100px\) and \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: 470px;[\s\S]*?column-gap: 20px;[\s\S]*?font-size: 11px;/u,
   );
   assert.match(
     chromeStyles,
-    /@media \(max-width: 1100px\) and \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: 440px;[\s\S]*?gap: 0;[\s\S]*?font-size: 11px;/u,
+    /@media \(max-width: 1100px\) and \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-group \{[\s\S]*?gap: 18px;/u,
+  );
+  assert.match(
+    chromeStyles,
+    /@media \(width < 1024px\)[\s\S]*?\.home-header \.nav-group \{[\s\S]*?display: contents;/u,
   );
   assert.doesNotMatch(pageResponsiveStyles, /\.home-header(?:\s|[.#:{,]|$)/);
   assert.match(pageResponsiveStyles, /main \.shell/);
