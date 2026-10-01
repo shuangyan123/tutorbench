@@ -161,6 +161,15 @@ test("site-wide locale switch ships a zh-CN copy catalog and runtime translator"
   }
 });
 
+test("locale switching does not animate or dim the header", async () => {
+  const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
+  const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
+  assert.doesNotMatch(siteScript, /locale-transition/u);
+  assert.doesNotMatch(styles, /locale-transition/u);
+  assert.doesNotMatch(styles, /teach-locale-refresh/u);
+});
+
+
 test("zh-CN copy catalog covers every major public surface and all published essays", () => {
   const requiredCopy: Readonly<Record<string, string>> = {
     "Evidence before deployment": "部署之前，先看证据",
