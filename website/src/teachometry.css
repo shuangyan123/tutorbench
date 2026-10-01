@@ -50,9 +50,6 @@
   --teach-button-height: 40px;
   --teach-button-radius: 5px;
   --teach-locale-control-width: 112px;
-  --teach-chrome-left-rail: 220px;
-  --teach-chrome-right-rail: 410px;
-  --teach-chrome-column-gap: 24px;
 }
 
 body:is(
