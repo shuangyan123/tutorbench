@@ -34,14 +34,14 @@ export function renderContactPage(artifacts: PublicBenchmarkArtifacts): SitePage
           </div>
           <div class="contact-grid">
             <article>
-              <span class="contact-icon">${icon("mail")}</span>
+              <span class="contact-icon">${icon("user")}</span>
               <p class="contact-label">Email</p>
               <h3>Project &amp; collaboration</h3>
               <p>For collaboration, research discussion, partnership questions, or longer-form project feedback.</p>
               <a href="mailto:${escapeHtml(SITE_CONTACT_EMAIL)}">${escapeHtml(SITE_CONTACT_EMAIL)} ${icon("arrow")}</a>
             </article>
             <article>
-              <span class="contact-icon">${icon("message")}</span>
+              <span class="contact-icon">${icon("link")}</span>
               <p class="contact-label">X</p>
               <h3>Updates &amp; short messages</h3>
               <p>Follow project updates or send a short public message on X.</p>
