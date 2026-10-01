@@ -161,12 +161,16 @@ test("site-wide locale switch ships a zh-CN copy catalog and runtime translator"
   }
 });
 
-test("locale switching does not animate or dim the header", async () => {
+test("locale switching uses a stable crossfade without the old header dim animation", async () => {
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
-  assert.doesNotMatch(siteScript, /locale-transition/u);
-  assert.doesNotMatch(styles, /locale-transition/u);
+  assert.doesNotMatch(siteScript, /classList\.add\("locale-transition"\)/u);
   assert.doesNotMatch(styles, /teach-locale-refresh/u);
+  assert.match(siteScript, /document\.startViewTransition/u);
+  assert.match(siteScript, /prefers-reduced-motion: reduce/u);
+  assert.match(styles, /::view-transition-old\(root\)[\s\S]*?animation: none;/u);
+  assert.match(styles, /::view-transition-new\(root\)[\s\S]*?teach-locale-crossfade-in 160ms/u);
+  assert.match(styles, /@keyframes teach-locale-crossfade-in/u);
 });
 
 
