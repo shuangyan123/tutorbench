@@ -427,8 +427,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "Open by design": "从设计上开放",
   "A shared resource": "面向 AI 教学社区的",
   "for the AI tutoring community.": "共享资源。",
-  "Teachometry is developed in the open, with separate boundaries for software, authored benchmark content, and the TutorBench name and brand assets.": "Teachometry 以开放方式开发，并为软件、人工编写的基准内容以及 TutorBench 名称和品牌资产分别划定边界。"
-,
+  "Teachometry is developed in the open, with separate boundaries for software, authored benchmark content, and the TutorBench name and brand assets.": "Teachometry 以开放方式开发，并为软件、人工编写的基准内容以及 TutorBench 名称和品牌资产分别划定边界。",
 
   "Results,": "结果，",
   "with the": "连同",
@@ -801,8 +800,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "Then make it measurable.": "再让它变得可测量。",
   "The Blog holds the hypotheses; Benchmark and Methodology hold the procedures and observable evidence. Keeping those surfaces distinct is part of the work.": "博客承载假设；Benchmark 和 Methodology 承载流程与可观察证据。保持这些页面职责分离，本身就是工作的一部分。",
   "Long-form notes on AI teaching, measurement, instructional autonomy, and the future structure of education.": "关于 AI 教学、测量、教学自主性与未来教育结构的长篇思考。",
-  "Editorial links": "编辑链接"
-,
+  "Editorial links": "编辑链接",
 
   "A classroom has to choose a starting point": "课堂必须选择一个共同起点",
   "A teacher can explain a new topic, sketch a framework on the board, demonstrate a formula, assign exercises, review the answers, and assign more exercises. None of those actions is inherently poor teaching. Direct explanation, worked examples, practice, and feedback all matter.": "老师可以讲解新主题，在黑板上勾勒框架，示范公式，布置练习，讲评答案，再继续布置练习。这些行为本身都不是糟糕的教学。直接讲解、例题、练习和反馈都很重要。",
@@ -866,8 +864,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "Education should make progress perceptible": "教育应该让进步变得可感知",
   "A scalable AI Tutor could eventually diagnose misconceptions, select exercises, adapt explanations, monitor practice, preserve evidence of mastery, and coordinate with teachers. But one of its earliest contributions may be simpler.": "一个可扩展的 AI Tutor 最终也许能够诊断错误概念、选择练习、调整解释、监控练习、保留掌握证据并与教师协同。但它最早带来的价值可能更简单。",
   "It can create a learning environment in which ignorance is not embarrassing, help is consistently available, starting points can differ, and progress is small enough to be noticed.": "它可以创造一种学习环境：不知道并不丢人，帮助随时可得，每个人可以从不同起点开始，而进步小到足以被自己看见。",
-  "For a learner who has spent years experiencing education mainly as evidence of failure, that may be where learning begins again.": "对于一个多年把教育主要体验成“失败证据”的学生来说，学习也许正是从这里重新开始。"
-,
+  "For a learner who has spent years experiencing education mainly as evidence of failure, that may be where learning begins again.": "对于一个多年把教育主要体验成“失败证据”的学生来说，学习也许正是从这里重新开始。",
 
   "One robot still scales like one teacher": "一个机器人仍然只能像一个老师那样扩展",
   "Embodied AI makes it tempting to imagine the future classroom as a room with a robotic teacher at the front. But replacing a human teacher with one machine does not solve the underlying capacity problem. Thirty learners would still be sharing one public channel of attention.": "具身 AI 很容易让人把未来课堂想象成：教室前面站着一个机器人老师。但把人类老师换成一台机器，并没有解决底层的容量问题。三十名学生依然共享同一条公开注意力通道。",
@@ -928,8 +925,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "The larger question is not how to put AI into school": "更大的问题不是如何把 AI 塞进学校",
   "If we preserve the old interface, old homework model, and old evidence model, a powerful AI Tutor can still collapse into a convenient answer machine. The deeper opportunity is to redesign the learning environment around individualized instruction and trustworthy evidence.": "如果我们保留旧界面、旧作业模式和旧证据模式，再强的 AI Tutor 也可能退化成一个方便的答案机器。更深层的机会，是围绕个性化教学和可信证据重新设计学习环境。",
   "That means asking different questions: What should the Tutor do now? How much help is appropriate? When should it stop helping? What changed in the learner's work? Can the learner still perform when the Tutor is removed?": "这意味着要问不同的问题：Tutor 现在该做什么？帮助到什么程度合适？什么时候应该停止帮助？学生的工作发生了什么变化？移除 Tutor 后，学生还能完成吗？",
-  "The future classroom may not need thirty robots. It may need thirty private learning channels, one coordinated classroom, and a much better account of what it means to have actually learned.": "未来课堂可能不需要三十个机器人，而需要三十条私人学习通道、一个被良好协调的课堂，以及一套更清楚的“真正学会了意味着什么”的证据体系。"
-,
+  "The future classroom may not need thirty robots. It may need thirty private learning channels, one coordinated classroom, and a much better account of what it means to have actually learned.": "未来课堂可能不需要三十个机器人，而需要三十条私人学习通道、一个被良好协调的课堂，以及一套更清楚的“真正学会了意味着什么”的证据体系。",
 
   "The scarce resource is attention": "稀缺资源是注意力",
   "One teacher can explain an idea to a room, but cannot continuously observe every learner, diagnose every misconception, choose a different explanation for each student, verify genuine understanding, and adjust the next task for everyone at once. That is a capacity constraint even when the teacher is excellent and conscientious.": "一名老师可以向全班讲解一个概念，但无法持续观察每个学生、诊断每个错误概念、为每个人选择不同解释、验证真实理解，并同时为所有人调整下一项任务。即使老师非常优秀且尽责，这仍然是容量约束。",
@@ -1054,8 +1050,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "When Learning Starts to Feel Like Failure — Teachometry Blog": "当学习开始像失败一样 — Teachometry 博客",
   "The Classroom Does Not Need 30 Robots — Teachometry Blog": "课堂不需要 30 个机器人 — Teachometry 博客",
   "Why Teaching Does Not Scale — Teachometry Blog": "为什么教学难以扩展 — Teachometry 博客",
-  "Teaching and Supervision Are Different Jobs — Teachometry Blog": "教学与监督是两份不同的工作 — Teachometry 博客"
-,
+  "Teaching and Supervision Are Different Jobs — Teachometry Blog": "教学与监督是两份不同的工作 — Teachometry 博客",
   "No calibrated public model runs yet.": "目前尚无校准后的公开模型运行。",
   "Public model results are unavailable. Human calibration (P5) has not started, and Judge-vs-human and statistical validation are not completed.": "公开模型结果目前不可用。人工校准（P5）尚未开始，Judge 与人工对照验证以及统计验证也尚未完成。",
   "Calibration infrastructure exists, but real Community Review and human calibration have not started.": "校准基础设施已经存在，但真实 Community Review 和人工校准尚未开始。",
@@ -1265,8 +1260,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "Read the methodology": "阅读方法论",
   "An audit ledger for future public Teachometry model trial evidence.": "面向未来公开 Teachometry 模型 trial 证据的审计 ledger。",
 
-  "Helpful public routes": "常用公开页面"
-,
+  "Helpful public routes": "常用公开页面",
   "N/A": "不适用",
   "Not specified": "未指定",
   "Model Trials": "模型 Trials",
@@ -1274,5 +1268,4 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "September 28, 2026": "2026年9月28日",
   "September 30, 2026": "2026年9月30日",
   "The": "",
-
 };
