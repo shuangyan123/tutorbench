@@ -13,6 +13,7 @@ import {
   type SiteLocale,
   type SiteUiTextKey,
 } from "./i18n.js";
+import { SITE_ZH_CN_COPY } from "./locale-copy.js";
 
 export const SITE_GITHUB_URL = "https://github.com/shuangyan123/tutorbench";
 export const SITE_CONTACT_EMAIL = "shuangyan12341234@gmail.com";
@@ -544,6 +545,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${isExplorerPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/explorers.css"))}">` : ""}
     ${isNotFoundPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/not-found.css"))}">` : ""}
     ${isTeachometryPage ? `<script type="speculationrules">{"prerender":[{"source":"document","where":{"selector_matches":"a[href^='/']"},"eagerness":"moderate"}]}</script>` : ""}
+    ${isTeachometryPage ? `<script id="site-locale-copy" type="application/json">${jsonLd(SITE_ZH_CN_COPY)}</script>` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
   <body${bodyClass}>
