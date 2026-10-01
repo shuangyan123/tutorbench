@@ -1055,5 +1055,11 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "The Classroom Does Not Need 30 Robots — Teachometry Blog": "课堂不需要 30 个机器人 — Teachometry 博客",
   "Why Teaching Does Not Scale — Teachometry Blog": "为什么教学难以扩展 — Teachometry 博客",
   "Teaching and Supervision Are Different Jobs — Teachometry Blog": "教学与监督是两份不同的工作 — Teachometry 博客"
+,
+  "No calibrated public model runs yet.": "目前尚无校准后的公开模型运行。",
+  "Public model results are unavailable. Human calibration (P5) has not started, and Judge-vs-human and statistical validation are not completed.": "公开模型结果目前不可用。人工校准（P5）尚未开始，Judge 与人工对照验证以及统计验证也尚未完成。",
+  "Calibration infrastructure exists, but real Community Review and human calibration have not started.": "校准基础设施已经存在，但真实 Community Review 和人工校准尚未开始。",
+  "Judge-vs-human validation and statistical validation are not completed.": "Judge 与人工对照验证以及统计验证尚未完成。",
+  "TutorBench measures observable tutoring behavior in specified benchmark scenarios, not long-term learning, retention, transfer, satisfaction, or classroom outcomes.": "TutorBench 测量指定基准情境中的可观察教学行为，而不是长期学习、知识留存、迁移、满意度或真实课堂结果。",
 
 };
