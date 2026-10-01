@@ -1661,6 +1661,19 @@ body.case-detail-page main .shell {
   to { opacity: 1; transform: scaleX(1); }
 }
 
+html[data-locale-transition="active"]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-locale-transition="active"]::view-transition-new(root) {
+  animation: teach-locale-crossfade-in 160ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes teach-locale-crossfade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-header *,
   .home-header *::before,
