@@ -1,5 +1,7 @@
 /* global CustomEvent, Element, HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLMetaElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, IntersectionObserver, MutationObserver, NodeFilter, ResizeObserver, URL, URLSearchParams, document, history, navigator, window */
 
+let activeSiteLocale = "en";
+
 (() => {
   const navToggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector("#primary-navigation");
@@ -57,7 +59,6 @@
   }
   const sourceText = new WeakMap();
   const sourceAttributes = new WeakMap();
-  let activeSiteLocale = "en";
   let localeMutationScheduled = false;
 
   function copyTranslation(value) {
