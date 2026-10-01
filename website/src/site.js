@@ -75,7 +75,7 @@
     const current = node.nodeValue ?? "";
     if (locale === "en") {
       const original = sourceText.get(node);
-      if (original !== undefined) node.nodeValue = original;
+      if (original !== undefined && node.nodeValue !== original) node.nodeValue = original;
       return;
     }
     if (!sourceText.has(node)) sourceText.set(node, current);
@@ -85,7 +85,8 @@
     if (translated === null) return;
     const leading = original.match(/^\s*/u)?.[0] ?? "";
     const trailing = original.match(/\s*$/u)?.[0] ?? "";
-    node.nodeValue = `${leading}${translated}${trailing}`;
+    const nextValue = `${leading}${translated}${trailing}`;
+    if (node.nodeValue !== nextValue) node.nodeValue = nextValue;
   }
 
   function localizeElementAttributes(element, locale) {
