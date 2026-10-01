@@ -105,7 +105,7 @@ let activeSiteLocale = "en";
   }
 
   function applySiteCopyLocale(locale, root = document.body) {
-    if (!(root instanceof Element)) return;
+    if (root === null || root === undefined || typeof root.querySelectorAll !== "function") return;
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     let node = walker.nextNode();
     while (node !== null) {
