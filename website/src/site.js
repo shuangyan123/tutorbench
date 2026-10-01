@@ -43,6 +43,124 @@
 
   const localeSwitcher = document.querySelector("[data-locale-switcher]");
   const localeStorageKey = "tutor-benchmark-ui-locale";
+  const localeCopyElement = document.querySelector("#site-locale-copy");
+  let siteZhCnCopy = {};
+  if (localeCopyElement instanceof HTMLScriptElement) {
+    try {
+      const parsed = JSON.parse(localeCopyElement.textContent ?? "{}");
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        siteZhCnCopy = parsed;
+      }
+    } catch {
+      siteZhCnCopy = {};
+    }
+  }
+  const sourceText = new WeakMap();
+  const sourceAttributes = new WeakMap();
+  let activeSiteLocale = "en";
+  let localeMutationScheduled = false;
+
+  function copyTranslation(value) {
+    if (typeof value !== "string") return null;
+    return typeof siteZhCnCopy[value] === "string" ? siteZhCnCopy[value] : null;
+  }
+
+  function shouldSkipTextNode(node) {
+    const parent = node.parentElement;
+    return parent === null || parent.closest("script, style, code, pre, textarea, [data-ui-text], [data-ui-option-en]") !== null;
+  }
+
+  function localizeTextNode(node, locale) {
+    if (shouldSkipTextNode(node)) return;
+    const current = node.nodeValue ?? "";
+    if (locale === "en") {
+      const original = sourceText.get(node);
+      if (original !== undefined) node.nodeValue = original;
+      return;
+    }
+    if (!sourceText.has(node)) sourceText.set(node, current);
+    const original = sourceText.get(node) ?? current;
+    const trimmed = original.trim();
+    const translated = copyTranslation(trimmed);
+    if (translated === null) return;
+    const leading = original.match(/^\s*/u)?.[0] ?? "";
+    const trailing = original.match(/\s*$/u)?.[0] ?? "";
+    node.nodeValue = `${leading}${translated}${trailing}`;
+  }
+
+  function localizeElementAttributes(element, locale) {
+    const attributes = ["placeholder", "aria-label", "title", "alt"];
+    let originals = sourceAttributes.get(element);
+    if (originals === undefined) {
+      originals = new Map();
+      sourceAttributes.set(element, originals);
+    }
+    attributes.forEach((name) => {
+      if (!element.hasAttribute(name)) return;
+      if (locale === "en") {
+        if (originals.has(name)) element.setAttribute(name, originals.get(name));
+        return;
+      }
+      const current = element.getAttribute(name);
+      if (current === null) return;
+      if (!originals.has(name)) originals.set(name, current);
+      const original = originals.get(name);
+      const translated = copyTranslation(original);
+      if (translated !== null) element.setAttribute(name, translated);
+    });
+  }
+
+  function applySiteCopyLocale(locale, root = document.body) {
+    if (!(root instanceof Element)) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node = walker.nextNode();
+    while (node !== null) {
+      localizeTextNode(node, locale);
+      node = walker.nextNode();
+    }
+    root.querySelectorAll("*").forEach((element) => localizeElementAttributes(element, locale));
+    localizeElementAttributes(root, locale);
+
+    if (locale === "zh-CN") {
+      const translatedTitle = copyTranslation(document.title);
+      if (translatedTitle !== null) {
+        document.documentElement.dataset.sourceTitle ??= document.title;
+        document.title = translatedTitle;
+      }
+      const description = document.querySelector('meta[name="description"]');
+      const currentDescription = description?.getAttribute("content");
+      if (description instanceof HTMLMetaElement && currentDescription !== null) {
+        description.dataset.sourceContent ??= currentDescription;
+        const translatedDescription = copyTranslation(description.dataset.sourceContent);
+        if (translatedDescription !== null) description.setAttribute("content", translatedDescription);
+      }
+    } else {
+      if (document.documentElement.dataset.sourceTitle) {
+        document.title = document.documentElement.dataset.sourceTitle;
+      }
+      const description = document.querySelector('meta[name="description"]');
+      if (description instanceof HTMLMetaElement && description.dataset.sourceContent) {
+        description.setAttribute("content", description.dataset.sourceContent);
+      }
+    }
+  }
+
+  function scheduleLocaleRefresh() {
+    if (activeSiteLocale !== "zh-CN" || localeMutationScheduled) return;
+    localeMutationScheduled = true;
+    window.requestAnimationFrame(() => {
+      localeMutationScheduled = false;
+      applySiteCopyLocale(activeSiteLocale);
+    });
+  }
+
+  if ("MutationObserver" in window) {
+    new MutationObserver(scheduleLocaleRefresh).observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
 
   function isSiteLocale(value) {
     return value === "en" || value === "zh-CN";
@@ -61,6 +179,7 @@
     if (!isSiteLocale(locale)) {
       return;
     }
+    activeSiteLocale = locale;
     document.documentElement.lang = locale;
     document.documentElement.dataset.uiLocale = locale;
     document.querySelectorAll("[data-ui-text]").forEach((element) => {
@@ -101,6 +220,7 @@
       const end = element.getAttribute("data-case-count-end") ?? count;
       element.textContent = template.replaceAll("{start}", start).replaceAll("{end}", end).replaceAll("{count}", count);
     });
+    applySiteCopyLocale(locale);
     if (localeSwitcher instanceof HTMLSelectElement) {
       localeSwitcher.value = locale;
       const label = document.querySelector('[data-ui-text="selectLanguage"]');
