@@ -645,6 +645,8 @@ test("static website build emits the public artifact files and route shell", asy
       .filter((name): name is string => typeof name === "string" && name.endsWith(".html"));
     for (const htmlFile of generatedHtmlFiles) {
       const html = await readFile(join(outputDirectory, htmlFile), "utf8");
+      assert.equal((html.match(/<footer class="home-footer">/g) ?? []).length, 1, `Public page must use the canonical footer: ${htmlFile}`);
+      assert.doesNotMatch(html, /<footer class="site-footer">/u, `Public page must not fall back to the legacy footer: ${htmlFile}`);
       for (const match of html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/gu)) {
         const source = match[1];
         assert.ok(source !== undefined);
