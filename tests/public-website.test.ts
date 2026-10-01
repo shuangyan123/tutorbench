@@ -161,16 +161,24 @@ test("site-wide locale switch ships a zh-CN copy catalog and runtime translator"
   }
 });
 
-test("locale switching uses a stable crossfade without the old header dim animation", async () => {
+test("locale switching uses a layered blur-dissolve transition without the old header flash", async () => {
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
   assert.doesNotMatch(siteScript, /classList\.add\("locale-transition"\)/u);
   assert.doesNotMatch(styles, /teach-locale-refresh/u);
   assert.match(siteScript, /document\.startViewTransition/u);
   assert.match(siteScript, /prefers-reduced-motion: reduce/u);
+  assert.match(siteScript, /activeLocaleTransition/u);
+  assert.match(siteScript, /skipTransition/u);
+  assert.match(styles, /view-transition-name: teach-locale-header/u);
+  assert.match(styles, /view-transition-name: teach-locale-main/u);
+  assert.match(styles, /view-transition-name: teach-locale-footer/u);
   assert.match(styles, /::view-transition-old\(root\)[\s\S]*?animation: none;/u);
-  assert.match(styles, /::view-transition-new\(root\)[\s\S]*?teach-locale-crossfade-in 160ms/u);
-  assert.match(styles, /@keyframes teach-locale-crossfade-in/u);
+  assert.match(styles, /teach-locale-focus-in 150ms/u);
+  assert.match(styles, /teach-locale-focus-in 180ms 24ms/u);
+  assert.match(styles, /teach-locale-focus-in 190ms 46ms/u);
+  assert.match(styles, /filter: blur\(2\.4px\)/u);
+  assert.match(styles, /@keyframes teach-locale-focus-in/u);
 });
 
 
