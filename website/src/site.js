@@ -45,18 +45,10 @@ let activeSiteLocale = "en";
 
   const localeSwitcher = document.querySelector("[data-locale-switcher]");
   const localeStorageKey = "tutor-benchmark-ui-locale";
-  const localeCopyElement = document.querySelector("#site-locale-copy");
-  let siteZhCnCopy = {};
-  if (localeCopyElement instanceof HTMLScriptElement) {
-    try {
-      const parsed = JSON.parse(localeCopyElement.textContent ?? "{}");
-      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-        siteZhCnCopy = parsed;
-      }
-    } catch {
-      siteZhCnCopy = {};
-    }
-  }
+  const localeCopy = window.__TEACHOMETRY_ZH_CN_COPY__;
+  const siteZhCnCopy = localeCopy && typeof localeCopy === "object" && !Array.isArray(localeCopy)
+    ? localeCopy
+    : {};
   const sourceText = new WeakMap();
   const sourceAttributes = new WeakMap();
   let localeMutationScheduled = false;
