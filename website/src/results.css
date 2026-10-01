@@ -29,19 +29,6 @@
 }
 
 
-/* Results keeps the approved compact footer navigation/mark metrics. */
-body.results-page .home-footer nav {
-  font: 10px/1.55 var(--teach-sans);
-}
-
-body.results-page .home-footer nav a {
-  font-size: 10px;
-}
-
-body.results-page .home-footer .github-link .site-icon {
-  width: 17px;
-  height: 17px;
-}
 
 .results-main {
   overflow: hidden;

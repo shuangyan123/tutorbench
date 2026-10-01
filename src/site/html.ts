@@ -15,6 +15,8 @@ import {
 } from "./i18n.js";
 
 export const SITE_GITHUB_URL = "https://github.com/shuangyan123/tutorbench";
+export const SITE_CONTACT_EMAIL = "shuangyan12341234@gmail.com";
+export const SITE_X_URL = "https://x.com/1Shuangyan36877";
 export const TUTORBENCH_BRAND_ASSET_BASE_PATH = "/assets/brand/tutorbench";
 export const TUTORBENCH_BRAND_ASSET_PATHS = [
   "web/tutorbench-mark.svg",
@@ -109,6 +111,7 @@ function breadcrumbName(segment: string, page: SitePage, isLast: boolean): strin
     run: "Run",
     docs: "Documentation",
     blog: "Blog",
+    contact: "Contact",
   };
   return names[segment] ?? humanize(decodeURIComponent(segment));
 }
@@ -138,7 +141,13 @@ function structuredDataForPage(
         "@type": "Organization",
         name: "Teachometry",
         url: canonicalUrl,
-        sameAs: [SITE_GITHUB_URL],
+        sameAs: [SITE_GITHUB_URL, SITE_X_URL],
+        email: SITE_CONTACT_EMAIL,
+        contactPoint: {
+          "@type": "ContactPoint",
+          email: SITE_CONTACT_EMAIL,
+          contactType: "project inquiries",
+        },
         description: "Open measurement infrastructure for observable AI tutoring behavior.",
       },
     );
@@ -330,6 +339,7 @@ function renderHeader(
     activeRoute === "/community/" ||
     activeRoute === "/run/" ||
     activeRoute === "/docs/" ||
+    activeRoute === "/contact/" ||
     activeRoute === "/404.html" ||
     isBlogPage ||
     isCaseSurface ||
@@ -446,9 +456,9 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const isTrialDetailRoute = page.route === "/data/trials/[trialId]/";
   const isExplorerPage = isHeatmapPage || isTrialsPage || isTrialDetailRoute;
   const isNotFoundPage = page.route === "/404.html";
-  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
-  const usesHomeStyles = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
-  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
+  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/contact/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
+  const usesHomeStyles = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/contact/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
+  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/contact/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
   const bodyClass = isNotFoundPage
     ? ' class="home-page not-found-page"'
     : page.route === "/"
@@ -463,6 +473,8 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
             ? ' class="about-page"'
             : page.route === "/community/"
               ? ' class="about-page community-page"'
+              : page.route === "/contact/"
+                ? ' class="about-page contact-page"'
               : page.route === "/run/"
                 ? ' class="run-page"'
                 : page.route === "/docs/"
@@ -521,6 +533,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${page.route === "/community/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/community.css"))}">` : ""}
     ${page.route === "/run/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/run.css"))}">` : ""}
     ${page.route === "/docs/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/docs.css"))}">` : ""}
+    ${page.route === "/contact/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/contact.css"))}">` : ""}
     ${isBlogPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     ${isExplorerPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/explorers.css"))}">` : ""}
     ${isNotFoundPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/not-found.css"))}">` : ""}

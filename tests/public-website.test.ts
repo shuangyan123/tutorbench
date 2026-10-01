@@ -88,33 +88,26 @@ test("shared public header keeps one canonical language-control geometry", async
   }
 });
 
-test("Teachometry footer complements the fixed header and shares chrome alignment rails", async () => {
+test("public footer is one informational system across page styles", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const html = renderPage(renderHomePage(artifacts));
   const footer = html.match(/<footer class="home-footer">[\s\S]*?<\/footer>/u)?.[0];
   assert.ok(footer);
-  for (const resource of ["/docs/", "/models/", "/run/"]) {
+  for (const resource of ["/run/", "/models/", "/docs/", "/community/", "/contact/"]) {
     assert.match(footer, new RegExp(`href="${resource.replaceAll("/", "\\/")}"`));
   }
-  for (const repeatedPrimary of [">Home<", ">Benchmark<", ">Method<", ">Results<", ">Cases<", ">About<", ">Blog<"]) {
-    assert.doesNotMatch(footer, new RegExp(repeatedPrimary));
-  }
+  assert.match(footer, /X \/ @1Shuangyan36877/u);
+  assert.doesNotMatch(footer, /class="github-link"|Join the community|>Home<|>Benchmark<|>Method<|>Results<|>Cases<|>About<|>Blog</u);
+
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
-  assert.match(styles, /--teach-chrome-left-rail: 220px;/u);
-  assert.match(styles, /--teach-chrome-right-rail: 410px;/u);
-  assert.match(styles, /--teach-chrome-column-gap: 24px;/u);
-  assert.match(
-    styles,
-    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.header-inner,[\s\S]*?\.home-footer-main \{[\s\S]*?grid-template-columns:[\s\S]*?var\(--teach-chrome-left-rail\)[\s\S]*?minmax\(0, 1fr\)[\s\S]*?var\(--teach-chrome-right-rail\);/u,
-  );
-  assert.match(
-    styles,
-    /\.home-header \.nav-links,[\s\S]*?\.home-footer \.footer-resource-nav \{[\s\S]*?grid-column: 2;[\s\S]*?justify-self: center;/u,
-  );
-  assert.match(
-    styles,
-    /\.home-header-tools,[\s\S]*?\.home-footer-actions \{[\s\S]*?grid-column: 3;[\s\S]*?justify-self: end;/u,
-  );
+  assert.match(styles, /grid-template-columns: minmax\(250px, 1\.35fr\) repeat\(3, minmax\(140px, \.65fr\)\);/u);
+  assert.match(styles, /\.footer-column-title/u);
+  assert.doesNotMatch(styles, /--teach-chrome-(?:left|right|column)/u);
+
+  for (const file of ["run.css", "docs.css", "results.css", "not-found.css", "case-detail.css"]) {
+    const pageStyles = await readFile(join(process.cwd(), "website", "src", file), "utf8");
+    assert.doesNotMatch(pageStyles, /\.home-footer/u, `${file} must not own shared footer layout`);
+  }
 });
 
 test("public navigation avoids an artificial page-entry delay and warms likely targets", async () => {
@@ -549,6 +542,7 @@ test("static website build emits the public artifact files and route shell", asy
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
+    const contactHtml = await readFile(join(outputDirectory, "contact", "index.html"), "utf8");
     const notFoundHtml = await readFile(join(outputDirectory, "404.html"), "utf8");
     const aboutHtml = await readFile(join(outputDirectory, "about", "index.html"), "utf8");
     const communityHtml = await readFile(
@@ -556,7 +550,13 @@ test("static website build emits the public artifact files and route shell", asy
       "utf8",
     );
 
-    assert.equal(routeCount, 62);
+    assert.equal(routeCount, 63);
+    assert.match(contactHtml, /<title>Contact — Teachometry<\/title>/);
+    assert.match(contactHtml, /<body class="about-page contact-page">/);
+    assert.match(contactHtml, /href="\/assets\/contact\.css"/);
+    assert.match(contactHtml, /mailto:shuangyan12341234@gmail\.com/u);
+    assert.match(contactHtml, /https:\/\/x\.com\/1Shuangyan36877/u);
+    assert.match(contactHtml, /class="home-footer"/);
     assert.match(notFoundHtml, /<title>Page not found — Teachometry<\/title>/);
     assert.match(notFoundHtml, /<body class="home-page not-found-page">/);
     assert.match(notFoundHtml, /<header class="site-header home-header">/);
@@ -645,6 +645,8 @@ test("static website build emits the public artifact files and route shell", asy
       .filter((name): name is string => typeof name === "string" && name.endsWith(".html"));
     for (const htmlFile of generatedHtmlFiles) {
       const html = await readFile(join(outputDirectory, htmlFile), "utf8");
+      assert.equal((html.match(/<footer class="home-footer">/g) ?? []).length, 1, `Public page must use the canonical footer: ${htmlFile}`);
+      assert.doesNotMatch(html, /<footer class="site-footer">/u, `Public page must not fall back to the legacy footer: ${htmlFile}`);
       for (const match of html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/gu)) {
         const source = match[1];
         assert.ok(source !== undefined);
@@ -952,6 +954,7 @@ test("static website build prefixes project-site paths without changing local de
       "utf8",
     );
     const docsHtml = await readFile(join(outputDirectory, "docs", "index.html"), "utf8");
+    const contactHtml = await readFile(join(outputDirectory, "contact", "index.html"), "utf8");
     const dataHtml = await readFile(join(outputDirectory, "data", "index.html"), "utf8");
     const blogArticleHtml = await readFile(
       join(outputDirectory, "blog", "when-learning-starts-to-feel-like-failure", "index.html"),
@@ -970,6 +973,8 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(homeHtml, /<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">/);
     assert.match(homeHtml, /"@type":"WebSite"/);
     assert.match(homeHtml, /"@type":"Organization"/);
+    assert.match(homeHtml, /"email":"shuangyan12341234@gmail\.com"/u);
+    assert.match(homeHtml, /"https:\/\/x\.com\/1Shuangyan36877"/u);
     assert.match(dataHtml, /"@type":"Dataset"/);
     assert.match(dataHtml, /"license":"https:\/\/creativecommons\.org\/licenses\/by\/4\.0\/"/);
     assert.match(blogArticleHtml, /<meta property="og:type" content="article">/);
@@ -995,6 +1000,9 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(docsHtml, /href="\/tutorbench\/methodology\//);
     assert.match(docsHtml, /href="\/tutorbench\/data\//);
     assert.match(docsHtml, /href="\/tutorbench\/models\//);
+    assert.match(contactHtml, /href="\/tutorbench\/assets\/contact\.css"/);
+    assert.match(contactHtml, /href="\/tutorbench\/contact\//);
+    assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/contact\/<\/loc>/u);
     assert.match(notFoundHtml, /href="\/tutorbench\/assets\/not-found\.css"/);
     assert.match(notFoundHtml, /href="\/tutorbench\/data\/">Explore the benchmark/);
     assert.match(notFoundHtml, /href="\/tutorbench\/docs\/">Read the documentation/);

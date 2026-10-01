@@ -57,6 +57,7 @@ import {
   renderRunPage,
 } from "../site/pages/developer.js";
 import { renderCommunityPage } from "../site/pages/community.js";
+import { renderContactPage } from "../site/pages/contact.js";
 import { renderTeachometryFooter } from "../site/pages/home.js";
 import { renderNotFoundPage } from "../site/pages/not-found.js";
 import {
@@ -227,6 +228,7 @@ function routePages(
     { outputRoute: "/docs/", page: renderDocsPage(artifacts) },
     { outputRoute: "/about/", page: renderAboutPage(artifacts, packageVersion) },
     { outputRoute: "/community/", page: renderCommunityPage(artifacts, locale) },
+    { outputRoute: "/contact/", page: renderContactPage(artifacts) },
   ];
   const routePages = [
     ...pages,
@@ -337,6 +339,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "explorers.css"), join(outputDirectory, "assets", "explorers.css"));
   await copyFile(join(websiteRoot, "src", "run.css"), join(outputDirectory, "assets", "run.css"));
   await copyFile(join(websiteRoot, "src", "docs.css"), join(outputDirectory, "assets", "docs.css"));
+  await copyFile(join(websiteRoot, "src", "contact.css"), join(outputDirectory, "assets", "contact.css"));
   await copyFile(join(websiteRoot, "src", "not-found.css"), join(outputDirectory, "assets", "not-found.css"));
   for (const asset of PUBLIC_SITE_RASTER_ASSETS) {
     const destination = join(outputDirectory, "assets", asset);
