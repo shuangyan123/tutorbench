@@ -114,6 +114,17 @@
   height: 18px;
 }
 
+.contact-icon-x img {
+  display: block;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.contact-page[data-theme="dark"] .contact-icon-x img {
+  filter: invert(1);
+}
+
 .contact-label {
   margin: 0 0 8px;
   color: var(--accent);

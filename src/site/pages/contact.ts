@@ -41,7 +41,7 @@ export function renderContactPage(artifacts: PublicBenchmarkArtifacts): SitePage
               <a href="mailto:${escapeHtml(SITE_CONTACT_EMAIL)}">${escapeHtml(SITE_CONTACT_EMAIL)} ${icon("arrow")}</a>
             </article>
             <article>
-              <span class="contact-icon">${icon("link")}</span>
+              <span class="contact-icon contact-icon-x"><img src="/assets/x-logo.svg" width="18" height="18" alt=""></span>
               <p class="contact-label">X</p>
               <h3>Updates &amp; short messages</h3>
               <p>Follow project updates or send a short public message on X.</p>
