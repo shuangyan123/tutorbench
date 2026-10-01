@@ -101,7 +101,10 @@ test("public footer is one informational system across page styles", async () =>
 
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
   assert.match(styles, /grid-template-columns: minmax\(250px, 1\.35fr\) repeat\(3, minmax\(140px, \.65fr\)\);/u);
-  assert.match(styles, /\.footer-column-title/u);
+  assert.match(styles, /\.home-footer nav\.footer-column \{[\s\S]*?display: grid;[\s\S]*?gap: 10px;/u);
+  assert.match(styles, /\.home-footer \.footer-column-title/u);
+  assert.doesNotMatch(styles, /\/\* One footer component across the redesigned surfaces\. \*\//u);
+  assert.doesNotMatch(styles, /\.home-footer nav \{[\s\S]*?display: flex;/u);
   assert.doesNotMatch(styles, /--teach-chrome-(?:left|right|column)/u);
 
   for (const file of ["run.css", "docs.css", "results.css", "not-found.css", "case-detail.css"]) {
@@ -172,7 +175,7 @@ test("shared public header is consistent, localized, and exposes language contro
   assert.match(chromeStyles, /@media \(max-width: 1100px\) and \(min-width: 1024px\) \{[\s\S]*?\.home-header \.header-inner/);
   assert.doesNotMatch(pageResponsiveStyles, /\.home-header(?:\s|[.#:{,]|$)/);
   assert.match(pageResponsiveStyles, /main \.shell/);
-  assert.match(pageResponsiveStyles, /\.home-footer/);
+  assert.doesNotMatch(pageResponsiveStyles, /\.home-footer/);
   assert.match(chromeStyles, /@media \(max-width: 640px\) \{[\s\S]*?\.home-header-tools > \.button-primary \{[\s\S]*?grid-column: 1 \/ -1;/);
 });
 

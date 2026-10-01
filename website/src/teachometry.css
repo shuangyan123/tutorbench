@@ -938,336 +938,6 @@ body.case-detail-page main .shell {
   max-width: var(--teach-shell-wide);
 }
 
-/* One footer component across the redesigned surfaces. */
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer {
-  display: block;
-  border-top: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--muted);
-  padding: 28px 0 20px;
-  font: 11px/1.55 var(--teach-sans);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer .shell {
-  width: min(calc(100% - (var(--teach-gutter-desktop) * 2)), var(--teach-shell-chrome));
-  max-width: var(--teach-shell-chrome);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer-main {
-  display: flex;
-  min-height: 62px;
-  align-items: center;
-  gap: 16px;
-  padding-bottom: 24px;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--accent);
-  font: 25px/1.2 var(--teach-serif);
-  letter-spacing: -0.045em;
-  white-space: nowrap;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer-brand img {
-  width: 26px;
-  height: 26px;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .footer-descriptor {
-  color: var(--muted);
-  font: 10px/1.4 var(--teach-sans);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer nav {
-  display: flex;
-  margin-right: auto;
-  margin-left: auto;
-  gap: 22px;
-  font: 10px/1.55 var(--teach-sans);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer nav a {
-  color: var(--muted);
-  text-decoration: none;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer nav a + a {
-  padding: 0;
-  border-left: 0;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer nav a:hover {
-  color: var(--ink);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer .github-link {
-  display: inline-flex;
-  width: var(--teach-control-size);
-  height: var(--teach-control-size);
-  align-items: center;
-  justify-content: center;
-  margin: 0 12px;
-  color: var(--ink);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer .github-link .site-icon {
-  width: var(--teach-icon-size);
-  height: var(--teach-icon-size);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer .button {
-  min-height: 38px;
-  border-radius: var(--teach-button-radius);
-  padding: 8px 16px;
-  font: 11px/1.4 var(--teach-sans);
-  gap: 10px;
-}
-
-/* These surfaces intentionally retain the approved narrow-screen CTA wrap;
- * the home/benchmark/method/results CTAs remain single-line. */
-body:is(
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer .button {
-  white-space: normal;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer .button-primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #ffffff;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-)[data-theme="dark"] .home-footer .button-primary {
-  color: #0b342f;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer-bottom {
-  display: flex;
-  gap: 25px;
-  padding-top: 21px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font: 10px/1.55 var(--teach-sans);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-footer-bottom > span {
-  margin-right: auto;
-}
-
 @media (max-width: 1100px) and (min-width: 1024px) {
   body:is(
     .home-page,
@@ -1642,191 +1312,11 @@ body:is(
     .blog-page,
     .models-page,
     .model-detail-page,
-  .run-page,
-  .docs-page
-  ) main .shell,
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer .shell {
+    .run-page,
+    .docs-page
+  ) main .shell {
     width: calc(100% - (var(--teach-gutter-mobile) * 2));
     max-width: none;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer {
-    padding: 28px 0 24px;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer-main {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    min-height: 0;
-    gap: 18px 12px;
-    padding-bottom: 26px;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer-brand {
-    grid-column: 1;
-    grid-row: 1;
-    font-size: 25px;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .footer-descriptor {
-    grid-column: 2;
-    grid-row: 1;
-    white-space: nowrap;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer .github-link {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: start;
-    margin: 0;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer .button {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: end;
-    white-space: nowrap;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer nav {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 16px;
-    margin: 0;
-    font-size: 11px;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer-bottom {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-footer-bottom > span {
-    flex-basis: 100%;
-    margin-right: 0;
   }
 }
 
@@ -2154,13 +1644,13 @@ body:is(
   .run-page,
   .docs-page,
   .contact-page
-) .footer-column {
+) .home-footer nav.footer-column {
   display: grid;
   align-content: start;
   justify-items: start;
-  gap: 9px;
+  gap: 10px;
   margin: 0;
-  font: 11px/1.45 var(--teach-sans);
+  font: 12px/1.5 var(--teach-sans);
 }
 
 body:is(
@@ -2176,11 +1666,11 @@ body:is(
   .run-page,
   .docs-page,
   .contact-page
-) .footer-column-title {
-  margin-bottom: 4px;
+) .home-footer .footer-column-title {
+  margin-bottom: 5px;
   color: var(--ink);
-  font: 600 9px/1.5 var(--teach-mono);
-  letter-spacing: .16em;
+  font: 600 10px/1.5 var(--teach-mono);
+  letter-spacing: .15em;
   text-transform: uppercase;
 }
 
@@ -2197,7 +1687,7 @@ body:is(
   .run-page,
   .docs-page,
   .contact-page
-) .footer-column a,
+) .home-footer nav.footer-column a,
 body:is(
   .home-page,
   .methodology-page,
@@ -2229,7 +1719,7 @@ body:is(
   .run-page,
   .docs-page,
   .contact-page
-) .footer-column a:hover,
+) .home-footer nav.footer-column a:hover,
 body:is(
   .home-page,
   .methodology-page,
