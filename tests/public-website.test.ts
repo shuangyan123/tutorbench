@@ -175,7 +175,7 @@ test("shared public header is consistent, localized, and exposes language contro
   assert.match(chromeStyles, /@media \(max-width: 1100px\) and \(min-width: 1024px\) \{[\s\S]*?\.home-header \.header-inner/);
   assert.doesNotMatch(pageResponsiveStyles, /\.home-header(?:\s|[.#:{,]|$)/);
   assert.match(pageResponsiveStyles, /main \.shell/);
-  assert.match(pageResponsiveStyles, /\.home-footer/);
+  assert.doesNotMatch(pageResponsiveStyles, /\.home-footer/);
   assert.match(chromeStyles, /@media \(max-width: 640px\) \{[\s\S]*?\.home-header-tools > \.button-primary \{[\s\S]*?grid-column: 1 \/ -1;/);
 });
 
