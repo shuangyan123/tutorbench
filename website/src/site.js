@@ -1,4 +1,4 @@
-/* global CustomEvent, Element, HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLMetaElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, IntersectionObserver, MutationObserver, NodeFilter, ResizeObserver, URL, URLSearchParams, document, history, navigator, window */
+/* global CustomEvent, HTMLAnchorElement, HTMLButtonElement, HTMLFormElement, HTMLInputElement, HTMLMetaElement, HTMLScriptElement, HTMLSelectElement, HTMLElement, IntersectionObserver, MutationObserver, NodeFilter, ResizeObserver, URL, URLSearchParams, document, history, navigator, window */
 
 let activeSiteLocale = "en";
 
