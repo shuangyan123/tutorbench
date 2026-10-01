@@ -1654,22 +1654,11 @@ body.case-detail-page main .shell {
     animation: teach-nav-indicator 180ms ease-out both;
   }
 
-  html.locale-transition .home-header .wordmark-descriptor,
-  html.locale-transition .home-header .nav-links,
-  html.locale-transition .home-header .button-primary {
-    animation: teach-locale-refresh 180ms ease-out both;
-  }
-
 }
 
 @keyframes teach-nav-indicator {
   from { opacity: 0; transform: scaleX(.35); }
   to { opacity: 1; transform: scaleX(1); }
-}
-
-@keyframes teach-locale-refresh {
-  from { opacity: .72; transform: translateY(1px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
