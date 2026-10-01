@@ -1083,11 +1083,12 @@ body.case-detail-page main .shell {
     .blog-page,
     .models-page,
     .model-detail-page,
-  .run-page,
-  .docs-page
+    .run-page,
+    .docs-page
   ) .home-header .nav-links {
+    width: 440px;
     min-width: 0;
-    gap: 12px;
+    gap: 0;
     font-size: 11px;
   }
 
