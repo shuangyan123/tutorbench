@@ -1654,12 +1654,6 @@ body.case-detail-page main .shell {
     animation: teach-nav-indicator 180ms ease-out both;
   }
 
-  html.locale-transition .home-header .wordmark-descriptor,
-  html.locale-transition .home-header .nav-links,
-  html.locale-transition .home-header .button-primary {
-    animation: teach-locale-refresh 180ms ease-out both;
-  }
-
 }
 
 @keyframes teach-nav-indicator {
@@ -1667,9 +1661,17 @@ body.case-detail-page main .shell {
   to { opacity: 1; transform: scaleX(1); }
 }
 
-@keyframes teach-locale-refresh {
-  from { opacity: .72; transform: translateY(1px); }
-  to { opacity: 1; transform: translateY(0); }
+html[data-locale-transition="active"]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-locale-transition="active"]::view-transition-new(root) {
+  animation: teach-locale-crossfade-in 160ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes teach-locale-crossfade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

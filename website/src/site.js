@@ -243,6 +243,20 @@ let activeSiteLocale = "en";
 
   const initialLocale = storedLocale() ?? document.documentElement.dataset.uiLocale ?? "en";
   applyLocale(initialLocale);
+  function applyLocaleWithTransition(locale) {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const startViewTransition = document.startViewTransition;
+    if (reduceMotion || typeof startViewTransition !== "function") {
+      applyLocale(locale);
+      return;
+    }
+    document.documentElement.dataset.localeTransition = "active";
+    const transition = startViewTransition.call(document, () => applyLocale(locale));
+    transition.finished.finally(() => {
+      delete document.documentElement.dataset.localeTransition;
+    });
+  }
+
   if (localeSwitcher instanceof HTMLSelectElement) {
     localeSwitcher.addEventListener("change", () => {
       const locale = localeSwitcher.value;
@@ -254,9 +268,7 @@ let activeSiteLocale = "en";
       } catch {
         // A private browsing policy may deny storage; the current page still switches.
       }
-      document.documentElement.classList.add("locale-transition");
-      applyLocale(locale);
-      window.setTimeout(() => document.documentElement.classList.remove("locale-transition"), 180);
+      applyLocaleWithTransition(locale);
     });
   }
 
