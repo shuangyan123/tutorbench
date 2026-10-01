@@ -50,9 +50,6 @@
   --teach-button-height: 40px;
   --teach-button-radius: 5px;
   --teach-locale-control-width: 112px;
-  --teach-chrome-brand-rail: clamp(210px, 18vw, 250px);
-  --teach-chrome-tools-rail: clamp(350px, 30vw, 410px);
-  --teach-chrome-rail-gap: 24px;
 }
 
 body:is(
@@ -955,29 +952,8 @@ body.case-detail-page main .shell {
     .run-page,
     .docs-page
   ) .home-header .header-inner {
-    display: grid;
-    grid-template-columns:
-      var(--teach-chrome-brand-rail)
-      minmax(0, 1fr)
-      var(--teach-chrome-tools-rail);
-    column-gap: var(--teach-chrome-rail-gap);
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-    .run-page,
-    .docs-page
-  ) .home-header .wordmark {
-    grid-column: 1;
-    justify-self: start;
+    position: relative;
+    display: flex;
   }
 
   body:is(
@@ -993,9 +969,29 @@ body.case-detail-page main .shell {
     .run-page,
     .docs-page
   ) .home-header .nav-links {
-    grid-column: 2;
-    min-width: 0;
-    justify-self: stretch;
+    position: absolute;
+    left: 50%;
+    width: clamp(500px, 42vw, 620px);
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0;
+    transform: translateX(-50%);
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .nav-links a {
+    justify-self: center;
   }
 
   body:is(
@@ -1011,8 +1007,50 @@ body.case-detail-page main .shell {
     .run-page,
     .docs-page
   ) .home-header-tools {
-    grid-column: 3;
-    justify-self: end;
+    margin-left: auto;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page,
+    .contact-page
+  ) .home-footer-main {
+    position: relative;
+    display: block;
+    min-height: 118px;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page,
+    .contact-page
+  ) .footer-nav-band {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: clamp(470px, 38vw, 580px);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    transform: translateX(-50%);
   }
 }
 
@@ -1619,12 +1657,8 @@ body:is(
   .contact-page
 ) .home-footer-main {
   display: grid;
-  grid-template-columns:
-    var(--teach-chrome-brand-rail)
-    minmax(0, 1fr)
-    var(--teach-chrome-tools-rail);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  column-gap: var(--teach-chrome-rail-gap);
   min-height: 0;
   padding-bottom: 34px;
 }
@@ -1644,7 +1678,6 @@ body:is(
   .contact-page
 ) .home-footer-identity {
   display: grid;
-  grid-column: 1;
   align-content: start;
   justify-items: start;
   gap: 7px;
@@ -1665,7 +1698,6 @@ body:is(
   .contact-page
 ) .footer-nav-band {
   display: grid;
-  grid-column: 2;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: start;
   gap: clamp(18px, 2.4vw, 34px);
@@ -1854,83 +1886,6 @@ body:is(
   .run-page,
   .docs-page,
   .contact-page
-) .footer-social-link {
-  display: inline-flex;
-  width: 30px;
-  height: 30px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1px;
-  opacity: .78;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page,
-  .contact-page
-) .footer-social-link:hover {
-  opacity: 1;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page,
-  .contact-page
-) .footer-x-logo {
-  display: block;
-  width: 16px;
-  height: 16px;
-  object-fit: contain;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page,
-  .contact-page
-)[data-theme="dark"] .footer-x-logo {
-  filter: invert(1);
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page,
-  .contact-page
 ) .home-footer-bottom {
   display: flex;
   align-items: center;
@@ -1960,6 +1915,25 @@ body:is(
 }
 
 @media (max-width: 1023px) {
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page,
+    .contact-page
+  ) .footer-nav-band {
+    position: static;
+    width: auto;
+    transform: none;
+  }
+
   body:is(
     .home-page,
     .methodology-page,
