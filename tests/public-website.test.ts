@@ -88,7 +88,7 @@ test("shared public header keeps one canonical language-control geometry", async
   }
 });
 
-test("public footer is one informational system across page styles", async () => {
+test("public footer aligns Resources beneath centered Results without duplicating contact channels", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const html = renderPage(renderHomePage(artifacts));
   const footer = html.match(/<footer class="home-footer">[\s\S]*?<\/footer>/u)?.[0];
@@ -96,21 +96,22 @@ test("public footer is one informational system across page styles", async () =>
   for (const resource of ["/run/", "/models/", "/docs/", "/community/", "/contact/"]) {
     assert.match(footer, new RegExp(`href="${resource.replaceAll("/", "\\/")}"`));
   }
-  assert.match(footer, /class="footer-social-link"[^>]*aria-label="Teachometry on X"/u);
-  assert.match(footer, /src="\/assets\/x-logo\.svg"/u);
+  assert.match(footer, /aria-label="Resources"[\s\S]*?>Documentation<[\s\S]*?>Community</u);
+  assert.match(footer, /aria-label="Connect"[\s\S]*?>Contact<[\s\S]*?Project support/u);
   assert.equal((footer.match(/href="\/contact\//g) ?? []).length, 1);
-  assert.doesNotMatch(footer, /@1Shuangyan36877|class="github-link"|Join the community|>Home<|>Benchmark<|>Method<|>Results<|>Cases<|>About<|>Blog</u);
+  assert.doesNotMatch(footer, /x\.com|footer-social-link|@1Shuangyan36877|class="github-link"|Join the community|>Home<|>Benchmark<|>Method<|>Results<|>Cases<|>About<|>Blog</u);
 
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
-  assert.match(styles, /grid-template-columns:[\s\S]*?var\(--teach-chrome-brand-rail\)[\s\S]*?minmax\(0, 1fr\)[\s\S]*?var\(--teach-chrome-tools-rail\);/u);
-  assert.match(styles, /\.home-footer nav\.footer-column \{[\s\S]*?display: grid;[\s\S]*?justify-items: center;[\s\S]*?text-align: center;/u);
-  assert.match(styles, /\.footer-nav-band \{[\s\S]*?grid-column: 2;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/u);
-  assert.match(styles, /\.home-header \.header-inner \{[\s\S]*?grid-template-columns:[\s\S]*?var\(--teach-chrome-brand-rail\)[\s\S]*?minmax\(0, 1fr\)[\s\S]*?var\(--teach-chrome-tools-rail\);/u);
-  assert.match(styles, /\.footer-x-logo \{[\s\S]*?width: 16px;[\s\S]*?object-fit: contain;/u);
-  assert.match(styles, /\.home-footer \.footer-column-title/u);
-  assert.doesNotMatch(styles, /\/\* One footer component across the redesigned surfaces\. \*\//u);
-  assert.doesNotMatch(styles, /\.home-footer nav \{[\s\S]*?display: flex;/u);
-  assert.doesNotMatch(styles, /--teach-chrome-(?:left|right|column)/u);
+  assert.match(
+    styles,
+    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?left: 50%;[\s\S]*?grid-template-columns: repeat\(7, minmax\(0, 1fr\)\);[\s\S]*?transform: translateX\(-50%\);/u,
+  );
+  assert.match(
+    styles,
+    /@media \(min-width: 1024px\)[\s\S]*?\.footer-nav-band \{[\s\S]*?left: 50%;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?transform: translateX\(-50%\);/u,
+  );
+  assert.match(styles, /\.home-footer nav\.footer-column \{[\s\S]*?justify-items: center;[\s\S]*?text-align: center;/u);
+  assert.doesNotMatch(styles, /--teach-chrome-(?:brand|tools|rail|left|right|column)/u);
 
   for (const file of ["run.css", "docs.css", "results.css", "not-found.css", "case-detail.css"]) {
     const pageStyles = await readFile(join(process.cwd(), "website", "src", file), "utf8");
@@ -564,6 +565,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(contactHtml, /href="\/assets\/contact\.css"/);
     assert.match(contactHtml, /mailto:shuangyan12341234@gmail\.com/u);
     assert.match(contactHtml, /https:\/\/x\.com\/1Shuangyan36877/u);
+    assert.match(contactHtml, /src="\/assets\/x-logo\.svg"/u);
     assert.match(contactHtml, /class="home-footer"/);
     assert.match(notFoundHtml, /<title>Page not found — Teachometry<\/title>/);
     assert.match(notFoundHtml, /<body class="home-page not-found-page">/);
