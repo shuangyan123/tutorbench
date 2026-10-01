@@ -1661,53 +1661,6 @@ body.case-detail-page main .shell {
   to { opacity: 1; transform: scaleX(1); }
 }
 
-html[data-locale-transition="active"] .home-header {
-  view-transition-name: teach-locale-header;
-}
-
-html[data-locale-transition="active"] #main-content {
-  view-transition-name: teach-locale-main;
-}
-
-html[data-locale-transition="active"] .home-footer,
-html[data-locale-transition="active"] .site-footer {
-  view-transition-name: teach-locale-footer;
-}
-
-html[data-locale-transition="active"]::view-transition-old(root),
-html[data-locale-transition="active"]::view-transition-new(root) {
-  animation: none;
-}
-
-html[data-locale-transition="active"]::view-transition-old(teach-locale-header),
-html[data-locale-transition="active"]::view-transition-old(teach-locale-main),
-html[data-locale-transition="active"]::view-transition-old(teach-locale-footer) {
-  animation: none;
-}
-
-html[data-locale-transition="active"]::view-transition-new(teach-locale-header) {
-  animation: teach-locale-focus-in 150ms cubic-bezier(.22, 1, .36, 1) both;
-}
-
-html[data-locale-transition="active"]::view-transition-new(teach-locale-main) {
-  animation: teach-locale-focus-in 180ms 24ms cubic-bezier(.22, 1, .36, 1) both;
-}
-
-html[data-locale-transition="active"]::view-transition-new(teach-locale-footer) {
-  animation: teach-locale-focus-in 190ms 46ms cubic-bezier(.22, 1, .36, 1) both;
-}
-
-@keyframes teach-locale-focus-in {
-  from {
-    opacity: 0;
-    filter: blur(2.4px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .home-header *,
   .home-header *::before,

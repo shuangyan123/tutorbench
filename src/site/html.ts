@@ -13,6 +13,7 @@ import {
   type SiteLocale,
   type SiteUiTextKey,
 } from "./i18n.js";
+import { SITE_ZH_CN_COPY } from "./locale-copy.js";
 
 export const SITE_GITHUB_URL = "https://github.com/shuangyan123/tutorbench";
 export const SITE_CONTACT_EMAIL = "shuangyan12341234@gmail.com";
@@ -37,6 +38,8 @@ export interface SiteRenderContext {
   readonly siteUrl?: string;
   readonly basePath?: string;
   readonly locale?: SiteLocale;
+  /** Prefixes public zh-CN navigation with /zh-cn. Disable for single-locale private builds. */
+  readonly localizedRoutes?: boolean;
   readonly benchmark?: SiteFooterBenchmark;
 }
 
@@ -83,6 +86,27 @@ function sitePath(basePath: string, route: string): string {
   return `${basePath}${route}`;
 }
 
+export function siteLocaleRoute(route: string, locale: SiteLocale): string {
+  if (
+    locale !== "zh-CN" ||
+    !route.startsWith("/") ||
+    route === "/zh-cn" ||
+    route.startsWith("/zh-cn/")
+  ) {
+    return route;
+  }
+  return route === "/" ? "/zh-cn/" : `/zh-cn${route}`;
+}
+
+function siteRoutePath(
+  basePath: string,
+  route: string,
+  locale: SiteLocale,
+  localizedRoutes: boolean,
+): string {
+  return sitePath(basePath, localizedRoutes ? siteLocaleRoute(route, locale) : route);
+}
+
 function brandAssetPath(basePath: string, assetPath: string): string {
   return sitePath(basePath, `${TUTORBENCH_BRAND_ASSET_BASE_PATH}/${assetPath}`);
 }
@@ -97,7 +121,7 @@ function jsonLd(value: unknown): string {
 
 function breadcrumbName(segment: string, page: SitePage, isLast: boolean): string {
   if (isLast) {
-    return page.title.replace(/\s+[—-]\s+Teachometry(?: Blog)?$/u, "");
+    return page.title.replace(/\s+[—-]\s+Teachometry(?: Blog| 博客)?$/u, "");
   }
   const names: Readonly<Record<string, string>> = {
     data: "Benchmark",
@@ -120,11 +144,15 @@ function structuredDataForPage(
   page: SitePage,
   siteUrl: string | undefined,
   benchmark: SiteFooterBenchmark | undefined,
+  locale: SiteLocale,
+  localizedRoutes: boolean,
 ): readonly Record<string, unknown>[] {
   if (siteUrl === undefined || page.route === "/404.html" || page.route.includes("[")) {
     return [];
   }
-  const canonicalUrl = absoluteSiteUrl(siteUrl, page.route);
+  const publicRoute = (route: string): string =>
+    localizedRoutes ? siteLocaleRoute(route, locale) : route;
+  const canonicalUrl = absoluteSiteUrl(siteUrl, publicRoute(page.route));
   const graph: Record<string, unknown>[] = [];
   if (page.route === "/") {
     graph.push(
@@ -163,7 +191,7 @@ function structuredDataForPage(
       creator: {
         "@type": "Organization",
         name: "Teachometry",
-        url: absoluteSiteUrl(siteUrl, "/"),
+        url: absoluteSiteUrl(siteUrl, publicRoute("/")),
       },
       license: "https://creativecommons.org/licenses/by/4.0/",
       isAccessibleForFree: true,
@@ -196,12 +224,12 @@ function structuredDataForPage(
       author: {
         "@type": "Organization",
         name: "Teachometry",
-        url: absoluteSiteUrl(siteUrl, "/"),
+        url: absoluteSiteUrl(siteUrl, publicRoute("/")),
       },
       publisher: {
         "@type": "Organization",
         name: "Teachometry",
-        url: absoluteSiteUrl(siteUrl, "/"),
+        url: absoluteSiteUrl(siteUrl, publicRoute("/")),
       },
     });
   }
@@ -213,8 +241,14 @@ function structuredDataForPage(
       itemListElement: segments.map((segment, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name: breadcrumbName(segment, page, index === segments.length - 1),
-        item: absoluteSiteUrl(siteUrl, `/${segments.slice(0, index + 1).join("/")}/`),
+        name: translateSiteCopy(
+          breadcrumbName(segment, page, index === segments.length - 1),
+          locale,
+        ),
+        item: absoluteSiteUrl(
+          siteUrl,
+          publicRoute(`/${segments.slice(0, index + 1).join("/")}/`),
+        ),
       })),
     });
   }
@@ -242,6 +276,126 @@ export function escapeHtml(value: unknown): string {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function decodeHtmlForTranslation(value: string): string {
+  return value
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&amp;", "&");
+}
+
+function translateSiteCopy(value: string, locale: SiteLocale): string {
+  return locale === "zh-CN" ? (SITE_ZH_CN_COPY[value] ?? value) : value;
+}
+
+function translateTextNode(value: string): string {
+  const leading = value.match(/^\s*/u)?.[0] ?? "";
+  const trailing = value.match(/\s*$/u)?.[0] ?? "";
+  const source = decodeHtmlForTranslation(
+    value.slice(leading.length, value.length - trailing.length),
+  );
+  const translated = SITE_ZH_CN_COPY[source];
+  return translated === undefined ? value : `${leading}${escapeHtml(translated)}${trailing}`;
+}
+
+function translateTagAttributes(tag: string): string {
+  return tag.replace(
+    /\b(placeholder|aria-label|title|alt)=("[^"]*"|'[^']*')/gu,
+    (match, name: string, quoted: string) => {
+      const quote = quoted[0] ?? '"';
+      const source = decodeHtmlForTranslation(quoted.slice(1, -1));
+      const translated = SITE_ZH_CN_COPY[source];
+      return translated === undefined
+        ? match
+        : `${name}=${quote}${escapeHtml(translated)}${quote}`;
+    },
+  );
+}
+
+function localizeHtmlFragment(markup: string, locale: SiteLocale): string {
+  if (locale !== "zh-CN") return markup;
+  const skipTags = new Set(["script", "style", "code", "pre", "textarea"]);
+  const voidTags = new Set([
+    "area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+    "meta", "param", "source", "track", "wbr",
+  ]);
+  const stack: Array<{ readonly tag: string; readonly skip: boolean; readonly uiText?: string }> = [];
+  const tagPattern = /<!--[\s\S]*?-->|<![^>]*>|<\/?[A-Za-z][^>]*>/gu;
+  let output = "";
+  let lastIndex = 0;
+
+  for (const match of markup.matchAll(tagPattern)) {
+    const index = match.index ?? 0;
+    const text = markup.slice(lastIndex, index);
+    const frame = stack.at(-1);
+    if (frame?.uiText !== undefined) {
+      const leading = text.match(/^\s*/u)?.[0] ?? "";
+      const trailing = text.match(/\s*$/u)?.[0] ?? "";
+      output += `${leading}${frame.uiText}${trailing}`;
+    } else {
+      output += frame?.skip === true ? text : translateTextNode(text);
+    }
+
+    const rawTag = match[0];
+    const isClosing = /^<\//u.test(rawTag);
+    const isDeclaration = /^<!/u.test(rawTag);
+    const tagName = rawTag.match(/^<\/?\s*([A-Za-z0-9:-]+)/u)?.[1]?.toLowerCase();
+    const renderedTag = !isClosing && !isDeclaration ? translateTagAttributes(rawTag) : rawTag;
+    output += renderedTag;
+
+    if (tagName !== undefined) {
+      if (isClosing) {
+        for (let i = stack.length - 1; i >= 0; i -= 1) {
+          const frameTag = stack[i]?.tag;
+          stack.pop();
+          if (frameTag === tagName) break;
+        }
+      } else if (!isDeclaration && !rawTag.endsWith("/>") && !voidTags.has(tagName)) {
+        const parentSkip = stack.at(-1)?.skip === true;
+        const uiText = renderedTag.match(/\bdata-ui-(?:text|option)-zh-cn="([^"]*)"/u)?.[1];
+        stack.push({
+          tag: tagName,
+          skip: parentSkip || skipTags.has(tagName) || uiText !== undefined,
+          ...(uiText === undefined ? {} : { uiText }),
+        });
+      }
+    }
+    lastIndex = index + rawTag.length;
+  }
+
+  const tail = markup.slice(lastIndex);
+  const frame = stack.at(-1);
+  output += frame?.skip === true ? tail : translateTextNode(tail);
+  return output;
+}
+
+function localizeNavigationHrefs(
+  markup: string,
+  basePath: string,
+  locale: SiteLocale,
+  localizedRoutes: boolean,
+): string {
+  if (!localizedRoutes || locale !== "zh-CN") return markup;
+  return markup.replace(
+    /(href=['"])(\/[^'"]*)/gu,
+    (match, attribute: string, path: string) => {
+      if (
+        (basePath.length > 0 && (path === basePath || path.startsWith(`${basePath}/`))) ||
+        path === "/zh-cn" ||
+        path.startsWith("/zh-cn/") ||
+        path.startsWith("/assets/") ||
+        path.startsWith("/public-data/") ||
+        path === "/robots.txt" ||
+        path === "/sitemap.xml"
+      ) {
+        return match;
+      }
+      return `${attribute}${siteLocaleRoute(path, locale)}`;
+    },
+  );
 }
 
 /** Safe text nodes that the small static-site script can switch at runtime. */
@@ -311,17 +465,19 @@ function navLink(
   activeRoute: string,
   basePath: string,
   locale: SiteLocale,
+  localizedRoutes: boolean,
 ): string {
   const active =
     activeRoute === route ||
     (route === "/data/" && activeRoute.startsWith("/data/"));
-  return `<a href="${escapeHtml(sitePath(basePath, route))}"${active ? ' aria-current="page"' : ""}>${renderUiText(labelKey, locale)}</a>`;
+  return `<a href="${escapeHtml(siteRoutePath(basePath, route, locale, localizedRoutes))}"${active ? ' aria-current="page"' : ""}>${renderUiText(labelKey, locale)}</a>`;
 }
 
 function renderHeader(
   activeRoute: string,
   basePath: string,
   locale: SiteLocale,
+  localizedRoutes: boolean,
 ): string {
   const isCaseSurface = activeRoute === "/data/cases/" || activeRoute.startsWith("/data/cases/");
   const isBlogPage = activeRoute.startsWith("/blog/");
@@ -349,7 +505,7 @@ function renderHeader(
   if (!usesPublicTeachometryChrome) {
     return `<header class="site-header">
       <div class="shell header-inner">
-        <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" aria-label="TutorBench home">
+        <a class="wordmark" href="${escapeHtml(siteRoutePath(basePath, "/", locale, localizedRoutes))}" aria-label="TutorBench home">
           <img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt="">
           <span class="wordmark-copy">
             <span class="wordmark-name">TutorBench</span>
@@ -358,21 +514,21 @@ function renderHeader(
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">${renderUiText("menu", locale)}</button>
         <nav id="primary-navigation" class="nav-links" aria-label="${escapeHtml(siteText(locale, "primaryNavigation"))}">
-          ${navLink("leaderboard", "/leaderboard/", activeRoute, basePath, locale)}
-          ${navLink("data", "/data/", activeRoute, basePath, locale)}
-          ${navLink("run", "/run/", activeRoute, basePath, locale)}
-          ${navLink("methodology", "/methodology/", activeRoute, basePath, locale)}
-          ${navLink("docs", "/docs/", activeRoute, basePath, locale)}
-          ${navLink("community", "/community/", activeRoute, basePath, locale)}
-          <a href="${escapeHtml(sitePath(basePath, "/blog/"))}"${activeRoute.startsWith("/blog/") ? ' aria-current="page"' : ""}>Blog</a>
+          ${navLink("leaderboard", "/leaderboard/", activeRoute, basePath, locale, localizedRoutes)}
+          ${navLink("data", "/data/", activeRoute, basePath, locale, localizedRoutes)}
+          ${navLink("run", "/run/", activeRoute, basePath, locale, localizedRoutes)}
+          ${navLink("methodology", "/methodology/", activeRoute, basePath, locale, localizedRoutes)}
+          ${navLink("docs", "/docs/", activeRoute, basePath, locale, localizedRoutes)}
+          ${navLink("community", "/community/", activeRoute, basePath, locale, localizedRoutes)}
+          <a href="${escapeHtml(siteRoutePath(basePath, "/blog/", locale, localizedRoutes))}"${activeRoute.startsWith("/blog/") ? ' aria-current="page"' : ""}>Blog</a>
           <a href="${escapeHtml(SITE_GITHUB_URL)}" rel="noreferrer">GitHub ↗</a>
-          <label class="locale-switcher">
+          ${localizedRoutes ? `<label class="locale-switcher">
             <span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span>
-            <select data-locale-switcher aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}">
+            <select data-locale-switcher data-locale-en-url="${escapeHtml(siteRoutePath(basePath, activeRoute, "en", true))}" data-locale-zh-cn-url="${escapeHtml(siteRoutePath(basePath, activeRoute, "zh-CN", true))}" aria-label="${escapeHtml(siteText(locale, "selectLanguage"))}">
               <option value="en"${locale === "en" ? " selected" : ""}>${escapeHtml(siteText("en", "english"))}</option>
               <option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>${escapeHtml(siteText("zh-CN", "chinese"))}</option>
             </select>
-          </label>
+          </label>` : ""}
         </nav>
       </div>
     </header>`;
@@ -404,17 +560,17 @@ function renderHeader(
     [labelKey, route]: (typeof links)[number],
     className = "",
   ): string =>
-    `<a${className === "" ? "" : ` class="${className}"`} href="${escapeHtml(sitePath(basePath, route))}"${isActive(route) ? ' aria-current="page"' : ""}>${renderUiText(labelKey, locale)}</a>`;
+    `<a${className === "" ? "" : ` class="${className}"`} href="${escapeHtml(siteRoutePath(basePath, route, locale, localizedRoutes))}"${isActive(route) ? ' aria-current="page"' : ""}>${renderUiText(labelKey, locale)}</a>`;
 
   return `<header class="site-header home-header"><div class="shell header-inner">
-    <a class="wordmark" href="${escapeHtml(sitePath(basePath, "/"))}" ${localizedAttribute("aria-label", "teachometryHome")}><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">Teachometry</span><span class="wordmark-descriptor">${renderUiText("brandDescriptor", locale)}</span></span></a>
+    <a class="wordmark" href="${escapeHtml(siteRoutePath(basePath, "/", locale, localizedRoutes))}" ${localizedAttribute("aria-label", "teachometryHome")}><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">Teachometry</span><span class="wordmark-descriptor">${renderUiText("brandDescriptor", locale)}</span></span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" ${localizedAttribute("aria-label", "menu")}>${renderUiText("menu", locale)}</button>
     <nav id="primary-navigation" class="nav-links" ${localizedAttribute("aria-label", "primaryNavigation")}><span class="nav-group nav-group-left">${links.slice(0, 3).map((link) => renderHeaderLink(link)).join("")}</span>${renderHeaderLink(links[3], "nav-center")}<span class="nav-group nav-group-right">${links.slice(4).map((link) => renderHeaderLink(link)).join("")}</span></nav>
     <div class="home-header-tools">
-      <label class="locale-switcher"><span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span><select data-locale-switcher ${localizedAttribute("aria-label", "selectLanguage")}><option value="en"${locale === "en" ? " selected" : ""}>${escapeHtml(siteText("en", "english"))}</option><option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>${escapeHtml(siteText("zh-CN", "chinese"))}</option></select></label>
+      ${localizedRoutes ? `<label class="locale-switcher"><span class="visually-hidden">${renderUiText("selectLanguage", locale)}</span><select data-locale-switcher data-locale-en-url="${escapeHtml(siteRoutePath(basePath, activeRoute, "en", true))}" data-locale-zh-cn-url="${escapeHtml(siteRoutePath(basePath, activeRoute, "zh-CN", true))}" ${localizedAttribute("aria-label", "selectLanguage")}><option value="en"${locale === "en" ? " selected" : ""}>${escapeHtml(siteText("en", "english"))}</option><option value="zh-CN"${locale === "zh-CN" ? " selected" : ""}>${escapeHtml(siteText("zh-CN", "chinese"))}</option></select></label>` : ""}
       <div class="theme-controls" role="group" ${localizedAttribute("aria-label", "colorTheme")}><button type="button" data-theme-choice="light" ${localizedAttribute("aria-label", "lightTheme")} ${localizedAttribute("title", "lightTheme")}>${siteIcon("sun")}</button><button type="button" data-theme-choice="dark" ${localizedAttribute("aria-label", "darkTheme")} ${localizedAttribute("title", "darkTheme")}>${siteIcon("moon")}</button></div>
       <a class="github-link" href="${SITE_GITHUB_URL}" ${localizedAttribute("aria-label", "githubRepository")} ${localizedAttribute("title", "githubRepository")}>${siteIcon("github")}</a>
-      <a class="button button-primary" href="${escapeHtml(sitePath(basePath, "/run/"))}">${renderUiText("getStarted", locale)} ${siteIcon("arrow")}</a>
+      <a class="button button-primary" href="${escapeHtml(siteRoutePath(basePath, "/run/", locale, localizedRoutes))}">${renderUiText("getStarted", locale)} ${siteIcon("arrow")}</a>
     </div>
   </div></header>`;
 }
@@ -444,14 +600,19 @@ function renderFooter(benchmark: SiteFooterBenchmark, locale: SiteLocale): strin
 export function renderPage(page: SitePage, context: SiteRenderContext = {}): string {
   const basePath = normalizeSiteBasePath(context.basePath);
   const locale = resolveSiteLocale(context.locale);
+  const localizedRoutes = context.localizedRoutes ?? true;
   const siteUrl = context.siteUrl?.replace(/\/$/, "");
-  const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${page.route}`;
+  const localizedPage: SitePage = locale === "zh-CN"
+    ? { ...page, title: translateSiteCopy(page.title, locale), description: translateSiteCopy(page.description, locale) }
+    : page;
+  const publicRoute = localizedRoutes ? siteLocaleRoute(page.route, locale) : page.route;
+  const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${publicRoute}`;
   const isPlaceholderRoute = page.route.includes("[");
   const shouldNoIndex = page.seo?.noIndex === true || page.route === "/404.html" || page.route.startsWith("/audit/") || isPlaceholderRoute;
   const socialImageUrl = siteUrl === undefined || page.seo?.image === undefined
     ? undefined
     : absoluteSiteUrl(siteUrl, page.seo.image);
-  const structuredData = structuredDataForPage(page, siteUrl, context.benchmark);
+  const structuredData = structuredDataForPage(localizedPage, siteUrl, context.benchmark, locale, localizedRoutes);
   const isCaseDetailRoute = page.route.startsWith("/data/cases/") && page.route !== "/data/cases/";
   const isBlogIndex = page.route === "/blog/";
   const isBlogPage = page.route.startsWith("/blog/");
@@ -507,20 +668,21 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>${escapeHtml(page.title)}</title>
-    <meta name="description" content="${escapeHtml(page.description)}">
+    <title>${escapeHtml(localizedPage.title)}</title>
+    <meta name="description" content="${escapeHtml(localizedPage.description)}">
     <meta name="robots" content="${shouldNoIndex ? "noindex,follow" : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"}">
     <meta property="og:type" content="${page.seo?.type === "article" ? "article" : "website"}">
     <meta property="og:site_name" content="Teachometry">
-    <meta property="og:title" content="${escapeHtml(page.title)}">
-    <meta property="og:description" content="${escapeHtml(page.description)}">
+    <meta property="og:title" content="${escapeHtml(localizedPage.title)}">
+    <meta property="og:description" content="${escapeHtml(localizedPage.description)}">
     <meta property="og:locale" content="${locale === "zh-CN" ? "zh_CN" : "en_US"}">
     ${canonicalUrl === undefined ? "" : `<meta property="og:url" content="${escapeHtml(canonicalUrl)}"><link rel="canonical" href="${escapeHtml(canonicalUrl)}">`}
+    ${siteUrl === undefined || !localizedRoutes || shouldNoIndex ? "" : `<link rel="alternate" hreflang="en" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "en")))}"><link rel="alternate" hreflang="zh-CN" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "zh-CN")))}"><link rel="alternate" hreflang="x-default" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "en")))}">`}
     ${socialImageUrl === undefined ? "" : `<meta property="og:image" content="${escapeHtml(socialImageUrl)}">`}
     ${page.seo?.publishedDate === undefined ? "" : `<meta property="article:published_time" content="${escapeHtml(page.seo.publishedDate)}">`}
     <meta name="twitter:card" content="${socialImageUrl === undefined ? "summary" : "summary_large_image"}">
-    <meta name="twitter:title" content="${escapeHtml(page.title)}">
-    <meta name="twitter:description" content="${escapeHtml(page.description)}">
+    <meta name="twitter:title" content="${escapeHtml(localizedPage.title)}">
+    <meta name="twitter:description" content="${escapeHtml(localizedPage.description)}">
     ${socialImageUrl === undefined ? "" : `<meta name="twitter:image" content="${escapeHtml(socialImageUrl)}">`}
     ${structuredData.map((entry) => `<script type="application/ld+json">${jsonLd(entry)}</script>`).join("\n    ")}
     <link rel="icon" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon.ico"))}" sizes="any">
@@ -544,12 +706,11 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${isExplorerPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/explorers.css"))}">` : ""}
     ${isNotFoundPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/not-found.css"))}">` : ""}
     ${isTeachometryPage ? `<script type="speculationrules">{"prerender":[{"source":"document","where":{"selector_matches":"a[href^='/']"},"eagerness":"moderate"}]}</script>` : ""}
-    ${isTeachometryPage ? `<script src="${escapeHtml(sitePath(basePath, "/assets/locale-zh-cn.js"))}" defer></script>` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
   </head>
   <body${bodyClass}>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    ${renderHeader(page.route, basePath, locale)}
+    ${renderHeader(page.route, basePath, locale, localizedRoutes)}
     <main id="main-content">${page.content}</main>
     ${usesTeachometryFooter ? "" : renderFooter(context.benchmark ?? ({
       statusLabel: "Developer Preview",
@@ -558,5 +719,8 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   </body>
 </html>
 `;
-  return prefixInternalPaths(pageMarkup, basePath);
+  return prefixInternalPaths(
+    localizeNavigationHrefs(localizeHtmlFragment(pageMarkup, locale), basePath, locale, localizedRoutes),
+    basePath,
+  );
 }

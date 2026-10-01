@@ -23,11 +23,15 @@ import {
 } from "../review-translation/index.js";
 import {
   renderPage,
+  siteLocaleRoute,
   TUTORBENCH_BRAND_ASSET_PATHS,
   type SitePage,
 } from "../site/html.js";
-import { resolveSiteLocale, type SiteLocale } from "../site/i18n.js";
-import { SITE_ZH_CN_COPY } from "../site/locale-copy.js";
+import {
+  resolveSiteLocale,
+  SITE_LOCALES,
+  type SiteLocale,
+} from "../site/i18n.js";
 import {
   PUBLIC_SITE_BOTANICAL_ASSET_PATHS,
   PUBLIC_SITE_RASTER_ASSETS,
@@ -157,11 +161,23 @@ async function writeDiscoveryFiles(
   await writeFile(join(outputDirectory, "robots.txt"), robots, "utf8");
   if (normalizedSiteUrl === undefined) return;
   const urls = publicIndexablePages(pages)
-    .map((page) => `  <url><loc>${xmlEscape(`${normalizedSiteUrl}${page.route}`)}</loc></url>`)
+    .flatMap((page) =>
+      SITE_LOCALES.map((locale) => {
+        const loc = `${normalizedSiteUrl}${siteLocaleRoute(page.route, locale)}`;
+        const alternates = [
+          ...SITE_LOCALES.map(
+            (alternateLocale) =>
+              `    <xhtml:link rel="alternate" hreflang="${alternateLocale}" href="${xmlEscape(`${normalizedSiteUrl}${siteLocaleRoute(page.route, alternateLocale)}`)}"/>`,
+          ),
+          `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(`${normalizedSiteUrl}${siteLocaleRoute(page.route, "en")}`)}"/>`,
+        ].join("\n");
+        return `  <url>\n    <loc>${xmlEscape(loc)}</loc>\n${alternates}\n  </url>`;
+      }),
+    )
     .join("\n");
   await writeFile(
     join(outputDirectory, "sitemap.xml"),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`,
     "utf8",
   );
 }
@@ -173,8 +189,12 @@ async function writePage(
   siteUrl: string | undefined,
   basePath: string | undefined,
   locale: SiteLocale,
+  localizedRoutes: boolean,
 ): Promise<void> {
-  const outputPath = pageOutputPath(outputDirectory, page.route);
+  const outputPath = pageOutputPath(
+    outputDirectory,
+    localizedRoutes ? siteLocaleRoute(page.route, locale) : page.route,
+  );
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(
     outputPath,
@@ -183,6 +203,7 @@ async function writePage(
       ...(siteUrl === undefined ? {} : { siteUrl }),
       ...(basePath === undefined ? {} : { basePath }),
       locale,
+      localizedRoutes,
     }),
     "utf8",
   );
@@ -201,7 +222,6 @@ async function copyBrandAssets(outputDirectory: string): Promise<void> {
 interface LocalAuditBuildData {
   readonly artifact: TutorEvaluationAuditArtifact;
   readonly dataset: Awaited<ReturnType<typeof loadTutorEvalDataset>>;
-  readonly locale: SiteLocale;
   readonly reviewTranslation?: ReviewTranslationArtifact;
 }
 
@@ -244,7 +264,7 @@ function routePages(
       page: renderTutorEvaluationAuditIndexPage({
         artifact: audit.artifact,
         dataset: audit.dataset,
-        locale: audit.locale,
+        locale,
         ...(reviewTranslationLookup === undefined ? {} : { reviewTranslation: reviewTranslationLookup }),
       }),
     });
@@ -260,7 +280,7 @@ function routePages(
           dataset: audit.dataset,
           caseId: caseResult.caseId,
           runIndex: caseResult.runIndex,
-          locale: audit.locale,
+          locale,
           ...(reviewTranslationLookup === undefined ? {} : { reviewTranslation: reviewTranslationLookup }),
         }),
       });
@@ -315,7 +335,6 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
           artifact.evaluation.datasetVersion,
         ),
       ),
-      locale,
       ...(reviewTranslation === undefined ? {} : { reviewTranslation }),
     };
   }
@@ -325,11 +344,6 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await rm(outputDirectory, { recursive: true, force: true });
   await mkdir(join(outputDirectory, "assets"), { recursive: true });
   await writeFile(join(outputDirectory, "assets", "styles.css"), stylesheet, "utf8");
-  await writeFile(
-    join(outputDirectory, "assets", "locale-zh-cn.js"),
-    `window.__TEACHOMETRY_ZH_CN_COPY__ = ${JSON.stringify(SITE_ZH_CN_COPY)};\n`,
-    "utf8",
-  );
   await writeFile(join(outputDirectory, "assets", "site.js"), clientScript, "utf8");
   await copyFile(join(websiteRoot, "src", "home.css"), join(outputDirectory, "assets", "home.css"));
   await copyFile(join(websiteRoot, "src", "benchmark.css"), join(outputDirectory, "assets", "benchmark.css"));
@@ -363,57 +377,75 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await writeJson(outputDirectory, "models.json", artifacts.models);
   await writeJson(outputDirectory, "trials.json", artifacts.trials);
 
-  const pages = routePages(artifacts, audit, locale, packageVersion);
-  for (const routePage of pages) {
-    await writePage(
-      outputDirectory,
-      routePage.page,
-      artifacts,
-      options.siteUrl,
-      options.basePath,
-      locale,
-    );
-  }
+  const isPrivateBuild = options.evaluationPath !== undefined;
+  const buildLocales: readonly SiteLocale[] = isPrivateBuild ? [locale] : SITE_LOCALES;
+  let routeCount = 0;
+  let discoveryPages: readonly SitePage[] = [];
 
-  const blogPages = [
-    renderBlogIndexPage(renderTeachometryFooter(artifacts)),
-    renderWhenLearningStartsToFeelLikeFailurePage(renderTeachometryFooter(artifacts)),
-    renderClassroomDoesNotNeedRobotsPage(renderTeachometryFooter(artifacts)),
-    renderWhyTeachingDoesNotScalePage(renderTeachometryFooter(artifacts)),
-    renderTeachingAndSupervisionPage(renderTeachometryFooter(artifacts)),
-  ];
-  for (const blogPage of blogPages) {
-    await writePage(
-      outputDirectory,
-      blogPage,
-      artifacts,
-      options.siteUrl,
-      options.basePath,
-      locale,
+  for (const buildLocale of buildLocales) {
+    const pages = routePages(artifacts, audit, buildLocale, packageVersion);
+    routeCount ||= pages.length;
+    for (const routePage of pages) {
+      await writePage(
+        outputDirectory,
+        routePage.page,
+        artifacts,
+        options.siteUrl,
+        options.basePath,
+        buildLocale,
+        !isPrivateBuild,
+      );
+    }
+
+    const blogPages = [
+      renderBlogIndexPage(renderTeachometryFooter(artifacts)),
+      renderWhenLearningStartsToFeelLikeFailurePage(renderTeachometryFooter(artifacts)),
+      renderClassroomDoesNotNeedRobotsPage(renderTeachometryFooter(artifacts)),
+      renderWhyTeachingDoesNotScalePage(renderTeachometryFooter(artifacts)),
+      renderTeachingAndSupervisionPage(renderTeachometryFooter(artifacts)),
+    ];
+    for (const blogPage of blogPages) {
+      await writePage(
+        outputDirectory,
+        blogPage,
+        artifacts,
+        options.siteUrl,
+        options.basePath,
+        buildLocale,
+        !isPrivateBuild,
+      );
+    }
+
+    if (buildLocale === "en" || discoveryPages.length === 0) {
+      discoveryPages = [...pages.map((entry) => entry.page), ...blogPages];
+    }
+
+    const notFoundPath =
+      !isPrivateBuild && buildLocale === "zh-CN"
+        ? join(outputDirectory, "zh-cn", "404.html")
+        : join(outputDirectory, "404.html");
+    await mkdir(dirname(notFoundPath), { recursive: true });
+    await writeFile(
+      notFoundPath,
+      renderPage(renderNotFoundPage(artifacts), {
+        benchmark: artifacts.benchmark,
+        ...(options.siteUrl === undefined ? {} : { siteUrl: options.siteUrl }),
+        ...(options.basePath === undefined ? {} : { basePath: options.basePath }),
+        locale: buildLocale,
+        localizedRoutes: !isPrivateBuild,
+      }),
+      "utf8",
     );
   }
 
   await writeDiscoveryFiles(
     outputDirectory,
-    [...pages.map((entry) => entry.page), ...blogPages],
+    discoveryPages,
     options.siteUrl,
-    options.evaluationPath !== undefined,
+    isPrivateBuild,
   );
 
-  await writeFile(
-    join(outputDirectory, "404.html"),
-    renderPage(
-      renderNotFoundPage(artifacts),
-      {
-        benchmark: artifacts.benchmark,
-        ...(options.siteUrl === undefined ? {} : { siteUrl: options.siteUrl }),
-        ...(options.basePath === undefined ? {} : { basePath: options.basePath }),
-        locale,
-      },
-    ),
-    "utf8",
-  );
-  return pages.length;
+  return routeCount;
 }
 
 export async function main(args = process.argv.slice(2)): Promise<void> {
@@ -487,7 +519,11 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
   });
   console.log(`Built Tutor Benchmark website: ${outputDirectory}`);
   console.log(`Routes: ${routeCount}`);
-  console.log(`UI locale: ${resolveSiteLocale(localeArgument)}`);
+  console.log(
+    evaluationArgument === undefined
+      ? `UI locales: ${SITE_LOCALES.join(", ")}`
+      : `UI locale: ${resolveSiteLocale(localeArgument)}`,
+  );
   if (evaluationArgument !== undefined) {
     console.log("Local audit pages: enabled (private-dist only)");
   }

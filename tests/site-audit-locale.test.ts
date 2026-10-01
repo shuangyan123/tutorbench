@@ -274,16 +274,17 @@ test("raw evaluation artifacts without the new wrapper remain readable", async (
   assert.match(noResponsePage.content, /No Tutor response was stored/);
 });
 
-test("site localization and overflow safeguards are shipped with the static site", async () => {
+test("static locale routing and overflow safeguards are shipped with the site", async () => {
   const [script, styles] = await Promise.all([
     readFile(resolve("website/src/site.js"), "utf8"),
     readFile(resolve("website/src/styles.css"), "utf8"),
   ]);
-  assert.match(script, /localStorage/);
-  assert.match(script, /tutor-benchmark-ui-locale/);
-  assert.match(script, /data-ui-text-en/);
-  assert.match(script, /data-ui-text-zh-cn/);
-  assert.match(script, /setAttribute\("aria-label"/);
+  assert.match(script, /document\.documentElement\.dataset\.uiLocale/);
+  assert.match(script, /data-locale-en-url/);
+  assert.match(script, /data-locale-zh-cn-url/);
+  assert.match(script, /window\.location\.assign/);
+  assert.doesNotMatch(script, /tutor-benchmark-ui-locale/);
+  assert.doesNotMatch(script, /function applyLocale\(/);
   assert.match(styles, /\.markdown-content/);
   assert.match(styles, /overflow-wrap:\s*anywhere/);
   assert.match(styles, /\.raw-text/);

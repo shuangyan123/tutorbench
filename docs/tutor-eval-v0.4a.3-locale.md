@@ -51,9 +51,13 @@ updated when an existing case's target locale changes.
 
 ## Developer UI locale
 
-The static site has a small `en` / `zh-CN` interface dictionary. The selector
-is independent of case locale, persists the developer choice in browser
-`localStorage`, and never rewrites Tutor response text or Judge free text.
+The static site has a small `en` / `zh-CN` interface dictionary. Case locale
+remains independent from interface locale. The default public build renders
+English at the existing routes and Simplified Chinese at matching
+`/zh-cn/...` routes. The language selector navigates between those static
+counterparts; it does not rewrite the rendered DOM or Tutor/Judge free text at
+runtime. Canonical metadata, `hreflang`, and the sitemap expose both public
+language variants.
 
 The default public build continues to emit only the secret-free Developer
 Preview. A validated local evaluation artifact can be viewed through the
