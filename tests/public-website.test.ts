@@ -96,12 +96,15 @@ test("public footer is one informational system across page styles", async () =>
   for (const resource of ["/run/", "/models/", "/docs/", "/community/", "/contact/"]) {
     assert.match(footer, new RegExp(`href="${resource.replaceAll("/", "\\/")}"`));
   }
-  assert.match(footer, /X \/ @1Shuangyan36877/u);
-  assert.doesNotMatch(footer, /class="github-link"|Join the community|>Home<|>Benchmark<|>Method<|>Results<|>Cases<|>About<|>Blog</u);
+  assert.match(footer, /class="footer-social-link"[^>]*aria-label="Teachometry on X"/u);
+  assert.match(footer, /data-icon="x"/u);
+  assert.equal((footer.match(/href="\/contact\//g) ?? []).length, 1);
+  assert.doesNotMatch(footer, /@1Shuangyan36877|class="github-link"|Join the community|>Home<|>Benchmark<|>Method<|>Results<|>Cases<|>About<|>Blog</u);
 
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
   assert.match(styles, /grid-template-columns: minmax\(250px, 1\.35fr\) repeat\(3, minmax\(140px, \.65fr\)\);/u);
-  assert.match(styles, /\.home-footer nav\.footer-column \{[\s\S]*?display: grid;[\s\S]*?gap: 10px;/u);
+  assert.match(styles, /\.home-footer nav\.footer-column \{[\s\S]*?display: grid;[\s\S]*?justify-items: center;[\s\S]*?text-align: center;/u);
+  assert.match(styles, /\.footer-social-link \{[\s\S]*?width: 32px;[\s\S]*?border-radius: 50%;/u);
   assert.match(styles, /\.home-footer \.footer-column-title/u);
   assert.doesNotMatch(styles, /\/\* One footer component across the redesigned surfaces\. \*\//u);
   assert.doesNotMatch(styles, /\.home-footer nav \{[\s\S]*?display: flex;/u);
