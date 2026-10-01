@@ -1056,7 +1056,6 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "Calibration infrastructure exists, but real Community Review and human calibration have not started.": "校准基础设施已经存在，但真实 Community Review 和人工校准尚未开始。",
   "Judge-vs-human validation and statistical validation are not completed.": "Judge 与人工对照验证以及统计验证尚未完成。",
   "TutorBench measures observable tutoring behavior in specified benchmark scenarios, not long-term learning, retention, transfer, satisfaction, or classroom outcomes.": "TutorBench 测量指定基准情境中的可观察教学行为，而不是长期学习、知识留存、迁移、满意度或真实课堂结果。",
-,
 
   "Dataset snapshot": "数据集快照",
   "Public development set": "公开开发集",
@@ -1267,7 +1266,8 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "September 17, 2026": "2026年9月17日",
   "September 28, 2026": "2026年9月28日",
   "September 30, 2026": "2026年9月30日",
-  "The": "",  "Community — Teachometry": "社区 — Teachometry",
+  "The": "",
+  "Community — Teachometry": "社区 — Teachometry",
   "Learn why future structured human review may help validate Teachometry's evaluation method. Applications are not open yet.": "了解未来的结构化人工评审为什么可能帮助验证 Teachometry 的评测方法。当前暂未开放参与申请。",
 
 };
