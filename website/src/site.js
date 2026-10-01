@@ -353,7 +353,7 @@
       button.addEventListener("click", () => { currentPage = target; update(); });
       pagination.append(button);
     };
-    addButton("Previous", Math.max(1, page - 1), page === 1);
+    addButton(activeSiteLocale === "zh-CN" ? "上一页" : "Previous", Math.max(1, page - 1), page === 1);
     const pageNumbers = new Set([1, pageCount, page - 1, page, page + 1].filter((value) => value >= 1 && value <= pageCount));
     let last = 0;
     [...pageNumbers].sort((a, b) => a - b).forEach((number) => {
@@ -366,7 +366,7 @@
       addButton(String(number), number, false, number === page);
       last = number;
     });
-    addButton("Next", Math.min(pageCount, page + 1), page === pageCount);
+    addButton(activeSiteLocale === "zh-CN" ? "下一页" : "Next", Math.min(pageCount, page + 1), page === pageCount);
   }
 
   function sortCards() {
@@ -386,7 +386,13 @@
   function updateFilterSummary(values, search) {
     const count = Object.values(values).reduce((total, selected) => total + selected.length, 0) + (search ? 1 : 0);
     if (activeFilterCount instanceof HTMLElement) activeFilterCount.textContent = String(count);
-    if (filterSummary instanceof HTMLElement) filterSummary.textContent = count === 0 ? "All cases" : `${count} active ${count === 1 ? "filter" : "filters"}`;
+    if (filterSummary instanceof HTMLElement) {
+      filterSummary.textContent = count === 0
+        ? (activeSiteLocale === "zh-CN" ? "全部案例" : "All cases")
+        : activeSiteLocale === "zh-CN"
+          ? `${count} 个已启用筛选条件`
+          : `${count} active ${count === 1 ? "filter" : "filters"}`;
+    }
   }
 
   function update(syncUrl = true) {
@@ -676,7 +682,12 @@
       active = (index + cases.length) % cases.length;
       cases.forEach((item, itemIndex) => { item.hidden = itemIndex !== active; });
       const announcement = walkthrough.querySelector('[data-case-announcement]');
-      if (announcement) announcement.textContent = `Case ${active + 1} of ${cases.length}: ${cases[active].querySelector('h2').textContent}`;
+      if (announcement) {
+        const caseTitle = cases[active].querySelector('h2')?.textContent ?? "";
+        announcement.textContent = activeSiteLocale === "zh-CN"
+          ? `案例 ${active + 1} / ${cases.length}：${caseTitle}`
+          : `Case ${active + 1} of ${cases.length}: ${caseTitle}`;
+      }
     }
     walkthrough.querySelector('[data-case-prev]')?.addEventListener('click', () => selectCase(active - 1));
     walkthrough.querySelector('[data-case-next]')?.addEventListener('click', () => selectCase(active + 1));
@@ -830,8 +841,12 @@
     });
     if (status instanceof HTMLElement) {
       status.textContent = visibleCount === entries.length && activeCategory === 'all' && query.length === 0
-        ? `Showing ${entries.length} references`
-        : `Showing ${visibleCount} of ${entries.length} references`;
+        ? activeSiteLocale === 'zh-CN'
+          ? `显示 ${entries.length} 条参考资料`
+          : `Showing ${entries.length} references`
+        : activeSiteLocale === 'zh-CN'
+          ? `显示 ${visibleCount} / ${entries.length} 条参考资料`
+          : `Showing ${visibleCount} of ${entries.length} references`;
     }
     if (emptyState instanceof HTMLElement) emptyState.hidden = visibleCount !== 0;
     if (clearButton instanceof HTMLButtonElement) clearButton.hidden = query.length === 0;
@@ -909,11 +924,20 @@
       selection?.removeAllRanges();
     }
     const label = button.querySelector('[data-copy-label]');
-    if (label instanceof HTMLElement) label.textContent = copied ? 'Copied' : 'Copy failed';
-    button.setAttribute('aria-label', copied ? 'Command copied' : 'Copy failed');
+    if (label instanceof HTMLElement) {
+      label.textContent = activeSiteLocale === 'zh-CN'
+        ? copied ? '已复制' : '复制失败'
+        : copied ? 'Copied' : 'Copy failed';
+    }
+    button.setAttribute(
+      'aria-label',
+      activeSiteLocale === 'zh-CN'
+        ? copied ? '命令已复制' : '复制失败'
+        : copied ? 'Command copied' : 'Copy failed',
+    );
     window.setTimeout(() => {
-      if (label instanceof HTMLElement) label.textContent = 'Copy';
-      button.setAttribute('aria-label', 'Copy active command');
+      if (label instanceof HTMLElement) label.textContent = activeSiteLocale === 'zh-CN' ? '复制' : 'Copy';
+      button.setAttribute('aria-label', activeSiteLocale === 'zh-CN' ? '复制当前命令' : 'Copy active command');
     }, 1800);
   }
 
