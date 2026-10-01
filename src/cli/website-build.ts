@@ -27,6 +27,7 @@ import {
   type SitePage,
 } from "../site/html.js";
 import { resolveSiteLocale, type SiteLocale } from "../site/i18n.js";
+import { SITE_ZH_CN_COPY } from "../site/locale-copy.js";
 import {
   PUBLIC_SITE_BOTANICAL_ASSET_PATHS,
   PUBLIC_SITE_RASTER_ASSETS,
@@ -324,6 +325,11 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await rm(outputDirectory, { recursive: true, force: true });
   await mkdir(join(outputDirectory, "assets"), { recursive: true });
   await writeFile(join(outputDirectory, "assets", "styles.css"), stylesheet, "utf8");
+  await writeFile(
+    join(outputDirectory, "assets", "locale-zh-cn.js"),
+    `window.__TEACHOMETRY_ZH_CN_COPY__ = ${JSON.stringify(SITE_ZH_CN_COPY)};\n`,
+    "utf8",
+  );
   await writeFile(join(outputDirectory, "assets", "site.js"), clientScript, "utf8");
   await copyFile(join(websiteRoot, "src", "home.css"), join(outputDirectory, "assets", "home.css"));
   await copyFile(join(websiteRoot, "src", "benchmark.css"), join(outputDirectory, "assets", "benchmark.css"));

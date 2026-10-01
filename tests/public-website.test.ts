@@ -19,6 +19,7 @@ import {
   PUBLIC_SITE_RASTER_ASSETS,
 } from "../src/site/assets.js";
 import { renderPage, TUTORBENCH_BRAND_ASSET_PATHS } from "../src/site/html.js";
+import { SITE_ZH_CN_COPY } from "../src/site/locale-copy.js";
 import { renderEditorialBotanical } from "../src/site/illustrations.js";
 import { renderHomePage } from "../src/site/pages/home.js";
 import { renderHeatmapPage, renderTrialDetailPage, renderTrialsPage } from "../src/site/pages/data.js";
@@ -133,6 +134,90 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
   assert.match(siteScript, /prefetch\.rel = "prefetch"/);
   assert.doesNotMatch(siteScript, /prefetch\.as = "document"/);
 });
+
+test("site-wide locale switch ships a zh-CN copy catalog and runtime translator", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const html = renderPage(renderHomePage(artifacts), { locale: "en" });
+  assert.match(html, /<script src="\/assets\/locale-zh-cn\.js" defer><\/script>/u);
+  assert.doesNotMatch(html, /部署之前，先看证据/u);
+
+  const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
+  assert.match(siteScript, /window\.__TEACHOMETRY_ZH_CN_COPY__/u);
+  assert.match(siteScript, /function applySiteCopyLocale\(locale, root = document\.body\)/u);
+  assert.match(siteScript, /document\.createTreeWalker\(root, NodeFilter\.SHOW_TEXT\)/u);
+  assert.match(siteScript, /\["placeholder", "aria-label", "title", "alt"\]/u);
+  assert.match(siteScript, /new MutationObserver\(scheduleLocaleRefresh\)/u);
+  assert.match(siteScript, /applySiteCopyLocale\(locale\)/u);
+
+  const copyCatalog = await readFile(join(process.cwd(), "src", "site", "locale-copy.ts"), "utf8");
+  for (const source of [
+    "Evidence before deployment",
+    "Teachometry turns authored learning situations into reproducible Tutor Health evaluations",
+    "The Teachometry benchmark",
+    "Questions, collaboration,",
+    "This trail doesn’t lead to a public artifact.",
+  ]) {
+    assert.ok(copyCatalog.includes(source), `missing zh-CN public copy for: ${source}`);
+  }
+});
+
+test("zh-CN copy catalog covers every major public surface and all published essays", () => {
+  const requiredCopy: Readonly<Record<string, string>> = {
+    "Evidence before deployment": "部署之前，先看证据",
+    "The Teachometry benchmark": "Teachometry 基准",
+    "Our methodology": "我们的方法论",
+    "Public benchmark results": "公开基准结果",
+    "Case library": "案例库",
+    "Run · Get started": "运行 · 开始使用",
+    "Documentation": "文档",
+    "About Teachometry": "关于 Teachometry",
+    "Current model-publication status": "当前模型发布状态",
+    "Public channels": "公开渠道",
+    "This trail doesn’t lead to a public artifact.": "这条路径没有通向公开产物。",
+    "When Learning Starts to Feel Like Failure": "当学习开始像失败一样",
+    "The Classroom Does Not Need 30 Robots": "课堂不需要 30 个机器人",
+    "Why Teaching Does Not Scale": "为什么教学难以扩展",
+    "Teaching and Supervision Are Different Jobs": "教学与监督是两份不同的工作",
+  };
+  for (const [source, translation] of Object.entries(requiredCopy)) {
+    assert.equal(SITE_ZH_CN_COPY[source], translation, `missing or changed zh-CN copy for: ${source}`);
+  }
+
+  for (const metadataSource of [
+    "Teachometry — Test how AI tutors behave before you ship them.",
+    "Benchmark — Teachometry",
+    "Methodology — Teachometry",
+    "Results — Teachometry",
+    "Cases — Teachometry",
+    "Run — Teachometry",
+    "Docs — Teachometry",
+    "About — Teachometry",
+    "Models — Teachometry",
+    "Blog — Teachometry",
+    "Contact — Teachometry",
+    "Page not found — Teachometry",
+    "When Learning Starts to Feel Like Failure — Teachometry Blog",
+    "The Classroom Does Not Need 30 Robots — Teachometry Blog",
+    "Why Teaching Does Not Scale — Teachometry Blog",
+    "Teaching and Supervision Are Different Jobs — Teachometry Blog",
+  ]) {
+    assert.ok(SITE_ZH_CN_COPY[metadataSource], `missing localized page metadata: ${metadataSource}`);
+  }
+});
+
+test("runtime locale changes also refresh dynamic UI and social metadata", async () => {
+  const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
+  assert.match(siteScript, /new CustomEvent\("site-locale-change"/u);
+  assert.match(siteScript, /document\.addEventListener\("site-locale-change", \(\) => update\(false\)\)/u);
+  assert.match(siteScript, /document\.addEventListener\('site-locale-change', update\)/u);
+  assert.match(siteScript, /document\.addEventListener\('site-locale-change', \(\) => selectCase\(active\)\)/u);
+  assert.match(siteScript, /activeSiteLocale === "zh-CN"[\s\S]*?上一页/u);
+  assert.match(siteScript, /activeSiteLocale === "zh-CN"[\s\S]*?案例 \$\{active \+ 1\}/u);
+  assert.match(siteScript, /meta\[property="og:title"\]/u);
+  assert.match(siteScript, /meta\[name="twitter:description"\]/u);
+  assert.match(siteScript, /ogLocale\.setAttribute\("content", "zh_CN"\)/u);
+});
+
 
 test("shared public header is consistent, localized, and exposes language controls", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());

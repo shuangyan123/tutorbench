@@ -140,6 +140,6 @@ export function renderTeachometryFooter({ benchmark, models }: PublicBenchmarkAr
         </div>
       </div>
       <div class="home-footer-bottom"><span>Teachometry · ${e(benchmark.statusLabel)}</span></div>
-      <details class="home-evidence"><summary>Evidence &amp; limitations</summary><p>${e(models.notice)} ${e(benchmark.notice)} Calibration infrastructure exists, but real Community Review and human calibration have not started. Judge-vs-human validation and statistical validation are not completed. TutorBench measures observable tutoring behavior in specified benchmark scenarios, not long-term learning, retention, transfer, satisfaction, or classroom outcomes.</p></details>
+      <details class="home-evidence"><summary>Evidence &amp; limitations</summary><p><span>${e(models.notice)}</span> <span>${e(benchmark.notice)}</span> <span>Calibration infrastructure exists, but real Community Review and human calibration have not started.</span> <span>Judge-vs-human validation and statistical validation are not completed.</span> <span>TutorBench measures observable tutoring behavior in specified benchmark scenarios, not long-term learning, retention, transfer, satisfaction, or classroom outcomes.</span></p></details>
     </div></footer>`;
 }
