@@ -340,6 +340,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "run.css"), join(outputDirectory, "assets", "run.css"));
   await copyFile(join(websiteRoot, "src", "docs.css"), join(outputDirectory, "assets", "docs.css"));
   await copyFile(join(websiteRoot, "src", "contact.css"), join(outputDirectory, "assets", "contact.css"));
+  await copyFile(join(websiteRoot, "src", "x-logo.svg"), join(outputDirectory, "assets", "x-logo.svg"));
   await copyFile(join(websiteRoot, "src", "not-found.css"), join(outputDirectory, "assets", "not-found.css"));
   for (const asset of PUBLIC_SITE_RASTER_ASSETS) {
     const destination = join(outputDirectory, "assets", asset);

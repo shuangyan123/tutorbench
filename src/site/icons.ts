@@ -101,8 +101,6 @@ export function siteIcon(name: string): string {
       '<path d="M20 15.8A8.75 8.75 0 0 1 8.2 4 8.75 8.75 0 1 0 20 15.8Z"/>',
     github:
       '<path d="M9 21c-5 1-5-3-7-3m14 4v-4a3.5 3.5 0 0 0-1-3c3-.3 6-1.5 6-6a5 5 0 0 0-1.4-3.5A4.5 4.5 0 0 0 19.5 2S18.3 1.7 16 3a13 13 0 0 0-8 0C5.7 1.7 4.5 2 4.5 2a4.5 4.5 0 0 0-.1 3.5A5 5 0 0 0 3 9c0 4.5 3 5.7 6 6a3.5 3.5 0 0 0-1 3v4"/>',
-    x:
-      '<path d="M5.2 4.25h3.55l10.05 15.5h-3.55z" fill="currentColor" stroke="none"/><path d="M18.7 4.25h-2.35L5.3 19.75h2.35z" fill="currentColor" stroke="none"/>',
   };
 
   const semanticClass = semanticIcons.has(name) ? " site-icon--semantic" : "";
