@@ -229,7 +229,9 @@ let activeSiteLocale = "en";
       element.textContent = template.replaceAll("{start}", start).replaceAll("{end}", end).replaceAll("{count}", count);
     });
     applySiteCopyLocale(locale);
-    document.dispatchEvent(new CustomEvent("site-locale-change", { detail: { locale } }));
+    if (typeof document.dispatchEvent === "function" && typeof CustomEvent !== "undefined") {
+      document.dispatchEvent(new CustomEvent("site-locale-change", { detail: { locale } }));
+    }
     if (localeSwitcher instanceof HTMLSelectElement) {
       localeSwitcher.value = locale;
       const label = document.querySelector('[data-ui-text="selectLanguage"]');
