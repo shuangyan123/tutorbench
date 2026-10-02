@@ -152,11 +152,11 @@ function renderCaseCard(caseArtifact: PublicCaseArtifact["cases"][number], uiLoc
   const objective = excerpt(caseArtifact.tutorInput.learningObjective, 140);
   return `<article class="case-item" ${renderCaseAttributes(caseArtifact)}>
     <div class="case-card-face">
-      <div class="case-card-banner"><span class="case-card-id">${escapeHtml(caseArtifact.id)}</span><span class="case-card-subject">${icon(subjectIcon(caseArtifact.metadata.subject))}${escapeHtml(subject)}</span></div>
-      <div class="case-card-body"><p class="case-card-topic">${escapeHtml(topic)}</p><blockquote>“${escapeHtml(message)}”</blockquote><div class="case-card-tags">${tags.slice(0, 4).map((tag) => `<span>${escapeHtml(displayTaxonomyLabel(tag, uiLocale))}</span>`).join("")}</div><div class="case-card-meta"><span>${icon("adaptation")} ${escapeHtml(level.length > 0 ? displayTaxonomyLabel(level, uiLocale) : "Not specified")}</span><span>${icon("guidance")} ${escapeHtml(state)}</span><span class="case-card-locale">${escapeHtml(locale)}</span></div></div>
+      <div class="case-card-banner"><span class="case-card-id" data-source-content>${escapeHtml(caseArtifact.id)}</span><span class="case-card-subject">${icon(subjectIcon(caseArtifact.metadata.subject))}${escapeHtml(subject)}</span></div>
+      <div class="case-card-body"><p class="case-card-topic" data-source-content>${escapeHtml(topic)}</p><blockquote data-source-content lang="${escapeHtml(locale)}">“${escapeHtml(message)}”</blockquote><div class="case-card-tags">${tags.slice(0, 4).map((tag) => `<span>${escapeHtml(displayTaxonomyLabel(tag, uiLocale))}</span>`).join("")}</div><div class="case-card-meta"><span>${icon("adaptation")} ${escapeHtml(level.length > 0 ? displayTaxonomyLabel(level, uiLocale) : "Not specified")}</span><span>${icon("guidance")} ${escapeHtml(state)}</span><span class="case-card-locale">${escapeHtml(locale)}</span></div></div>
       <a class="case-card-link" href="/data/cases/${encodeURIComponent(caseArtifact.id)}/">View case ${icon("arrow")}</a>
     </div>
-    <div class="case-compact-face"><div><span class="case-card-id">${escapeHtml(caseArtifact.id)}</span><strong>${escapeHtml(subject)}</strong></div><span>${escapeHtml(topic)}</span><span>${escapeHtml(level.length > 0 ? displayTaxonomyLabel(level, uiLocale) : "Not specified")}</span><span>${escapeHtml(state)}</span><span>${escapeHtml(locale)}</span><span>${escapeHtml(tags.slice(0, 3).map((value) => displayTaxonomyLabel(value, uiLocale)).join(" · "))}</span><a class="case-card-link" href="/data/cases/${encodeURIComponent(caseArtifact.id)}/">View case ${icon("arrow")}</a><p>${escapeHtml(objective)}</p></div>
+    <div class="case-compact-face"><div><span class="case-card-id" data-source-content>${escapeHtml(caseArtifact.id)}</span><strong>${escapeHtml(subject)}</strong></div><span data-source-content>${escapeHtml(topic)}</span><span>${escapeHtml(level.length > 0 ? displayTaxonomyLabel(level, uiLocale) : "Not specified")}</span><span>${escapeHtml(state)}</span><span>${escapeHtml(locale)}</span><span>${escapeHtml(tags.slice(0, 3).map((value) => displayTaxonomyLabel(value, uiLocale)).join(" · "))}</span><a class="case-card-link" href="/data/cases/${encodeURIComponent(caseArtifact.id)}/">View case ${icon("arrow")}</a><p data-source-content lang="${escapeHtml(locale)}">${escapeHtml(objective)}</p></div>
   </article>`;
 }
 
@@ -168,7 +168,7 @@ function renderCaseSpecimen(caseArtifact: TutorEvalPublicCase | undefined, uiLoc
   const learnerLevel = typeof difficulty === "object" && difficulty !== null ? displayTaxonomyLabel(difficulty.learnerLevel, uiLocale) : "Not specified";
   const subject = displayTaxonomyLabel(caseArtifact.metadata.subject, uiLocale);
   const tags = caseArtifact.metadata.capabilityTags ?? [];
-  return `<div class="cases-hero-specimen" aria-label="${escapeHtml(formatExampleCaseAriaLabel(caseArtifact.id, uiLocale))}"><span class="specimen-leaf specimen-leaf-one" aria-hidden="true"></span><span class="specimen-leaf specimen-leaf-two" aria-hidden="true"></span><div class="specimen-paper specimen-paper-back" aria-hidden="true"></div><div class="specimen-paper specimen-paper-mid" aria-hidden="true"></div><article class="specimen-paper specimen-paper-front"><div class="specimen-heading"><span>Example case</span><span>${escapeHtml(subject)} · ${escapeHtml(learnerLevel)}</span></div><div class="specimen-message"><span class="specimen-message-mark">${icon("guidance")}</span><div><strong>Student</strong><p>${escapeHtml(excerpt(caseArtifact.tutorInput.studentMessage, 165))}</p></div></div><div class="specimen-meta"><span><b>Learner level</b><em>${escapeHtml(learnerLevel)}</em></span><span><b>Student state</b><em>${escapeHtml(displayTaxonomyLabel(caseArtifact.metadata.studentState ?? "Not specified", uiLocale))}</em></span><span><b>Capability focus</b><em>${escapeHtml(tags.length > 0 ? displayTaxonomyLabel(tags[0] ?? "Public metadata", uiLocale) : "Public metadata")}${tags.length > 1 ? ` <small>+${tags.length - 1}</small>` : ""}</em></span></div><span class="specimen-case-id">${escapeHtml(caseArtifact.id)}</span></article><p class="specimen-note specimen-note-top">Structured context.<br>Inspectable cases.</p><p class="specimen-note specimen-note-bottom">Authored situations.<br>Transparent evidence.</p></div>`;
+  return `<div class="cases-hero-specimen" aria-label="${escapeHtml(formatExampleCaseAriaLabel(caseArtifact.id, uiLocale))}"><span class="specimen-leaf specimen-leaf-one" aria-hidden="true"></span><span class="specimen-leaf specimen-leaf-two" aria-hidden="true"></span><div class="specimen-paper specimen-paper-back" aria-hidden="true"></div><div class="specimen-paper specimen-paper-mid" aria-hidden="true"></div><article class="specimen-paper specimen-paper-front"><div class="specimen-heading"><span>Example case</span><span>${escapeHtml(subject)} · ${escapeHtml(learnerLevel)}</span></div><div class="specimen-message"><span class="specimen-message-mark">${icon("guidance")}</span><div><strong>Student</strong><p data-source-content lang="${escapeHtml(caseArtifact.locale ?? "en")}">${escapeHtml(excerpt(caseArtifact.tutorInput.studentMessage, 165))}</p></div></div><div class="specimen-meta"><span><b>Learner level</b><em>${escapeHtml(learnerLevel)}</em></span><span><b>Student state</b><em>${escapeHtml(displayTaxonomyLabel(caseArtifact.metadata.studentState ?? "Not specified", uiLocale))}</em></span><span><b>Capability focus</b><em>${escapeHtml(tags.length > 0 ? displayTaxonomyLabel(tags[0] ?? "Public metadata", uiLocale) : "Public metadata")}${tags.length > 1 ? ` <small>+${tags.length - 1}</small>` : ""}</em></span></div><span class="specimen-case-id" data-source-content>${escapeHtml(caseArtifact.id)}</span></article><p class="specimen-note specimen-note-top">Structured context.<br>Inspectable cases.</p><p class="specimen-note specimen-note-bottom">Authored situations.<br>Transparent evidence.</p></div>`;
 }
 
 export function renderCasesPage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en"): SitePage {
@@ -220,7 +220,7 @@ function difficultyField(
       ? displayTaxonomyLabel(String(fieldValue), uiLocale)
       : `${String(fieldValue)} / 5`;
   }
-  return value === undefined ? "Not specified" : humanize(String(value));
+  return value === undefined ? publicUiCopy("Not specified", uiLocale) : humanize(String(value));
 }
 
 function renderCaseFacts(
@@ -228,7 +228,7 @@ function renderCaseFacts(
 ): string {
   return `<dl class="case-facts">${items
     .map(
-      ([label, value, iconName]) => `<div><span class="case-fact-icon">${icon(iconName)}</span><div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div></div>`,
+      ([label, value, iconName]) => `<div><span class="case-fact-icon">${icon(iconName)}</span><div><dt>${escapeHtml(label)}</dt><dd data-source-content>${escapeHtml(value)}</dd></div></div>`,
     )
     .join("")}</dl>`;
 }
@@ -244,12 +244,12 @@ function renderCaseProfile(
       : undefined);
   const knownConcepts = profile?.knownConcepts?.length
     ? profile.knownConcepts.join(", ")
-    : "Not specified";
-  const goal = profile?.goal ?? "Not specified";
+    : publicUiCopy("Not specified", uiLocale);
+  const goal = profile?.goal ?? publicUiCopy("Not specified", uiLocale);
   return `<dl class="case-profile-list">
     <div><dt>Learner level</dt><dd>${escapeHtml(level === undefined ? "Not specified" : displayTaxonomyLabel(level, uiLocale))}</dd></div>
-    <div><dt>Goal</dt><dd>${escapeHtml(goal)}</dd></div>
-    <div><dt>Known concepts</dt><dd>${escapeHtml(knownConcepts)}</dd></div>
+    <div><dt>Goal</dt><dd data-source-content>${escapeHtml(goal)}</dd></div>
+    <div><dt>Known concepts</dt><dd data-source-content>${escapeHtml(knownConcepts)}</dd></div>
   </dl>`;
 }
 
@@ -274,7 +274,7 @@ function renderConversation(
         const isTutor = message.role.toLowerCase() === "tutor";
         return `<li class="case-turn ${isTutor ? "case-turn-tutor" : "case-turn-student"}">
           <span class="case-turn-avatar">${icon(isTutor ? "robot" : "user")}</span>
-          <div class="case-turn-bubble"><div class="case-turn-head"><strong>${escapeHtml(humanize(message.role))}</strong><span>Prior context</span></div><p lang="${escapeHtml(locale)}">${escapeHtml(message.text)}</p></div>
+          <div class="case-turn-bubble"><div class="case-turn-head"><strong>${escapeHtml(humanize(message.role))}</strong><span>Prior context</span></div><p data-source-content lang="${escapeHtml(locale)}">${escapeHtml(message.text)}</p></div>
         </li>`;
       },
     )
@@ -282,7 +282,7 @@ function renderConversation(
   return `<ol class="case-transcript" aria-label="Tutor-visible conversation">${historyMarkup}
     <li class="case-turn case-turn-student case-turn-current">
       <span class="case-turn-avatar">${icon("user")}</span>
-      <div class="case-turn-bubble"><div class="case-turn-head"><strong>Student</strong><span>Current message</span></div><p lang="${escapeHtml(locale)}">${escapeHtml(currentStudentMessage)}</p></div>
+      <div class="case-turn-bubble"><div class="case-turn-head"><strong>Student</strong><span>Current message</span></div><p data-source-content lang="${escapeHtml(locale)}">${escapeHtml(currentStudentMessage)}</p></div>
     </li>
   </ol>${history.length === 0 ? `<p class="case-transcript-note"><span>${icon("info")}</span>There is no prior conversation. This case starts with the current student message.</p>` : ""}`;
 }
@@ -318,19 +318,19 @@ export function renderCaseDetailPage(
     ["Student state", displayTaxonomyLabel(caseArtifact.metadata.studentState ?? "Not specified", uiLocale), "user"],
     ["Disclosure policy", displayTaxonomyLabel(caseArtifact.disclosurePolicy ?? "Not specified", uiLocale), "shield"],
   ];
-  return page(
+  const detail = page(
     `${humanize(caseArtifact.metadata.topic)} — Teachometry`,
     formatCaseDescription(caseArtifact.id, caseArtifact.tutorInput.learningObjective, uiLocale),
     `/data/cases/${encodeURIComponent(caseArtifact.id)}/`,
     `<div class="case-detail-main">
       <section class="case-detail-hero" aria-labelledby="case-detail-title">
         <div class="shell">
-          <div class="case-detail-breadcrumbs"><nav aria-label="${uiLocale === "zh-CN" ? "面包屑导航" : "Breadcrumb"}"><a href="/data/cases/">Cases</a><span aria-hidden="true">›</span><a href="/data/cases/#case-library">Case Library</a><span aria-hidden="true">›</span><span aria-current="page">${escapeHtml(caseArtifact.id)}</span></nav><a class="case-detail-back" href="/data/cases/">← Back to case explorer</a></div>
+          <div class="case-detail-breadcrumbs"><nav aria-label="${uiLocale === "zh-CN" ? "面包屑导航" : "Breadcrumb"}"><a href="/data/cases/">Cases</a><span aria-hidden="true">›</span><a href="/data/cases/#case-library">Case Library</a><span aria-hidden="true">›</span><span aria-current="page" data-source-content>${escapeHtml(caseArtifact.id)}</span></nav><a class="case-detail-back" href="/data/cases/">← Back to case explorer</a></div>
           <div class="case-detail-hero-grid">
             <div class="case-detail-hero-copy">
-              <div class="case-detail-identity"><span class="case-detail-bookmark">${icon("bookmark")}</span><span class="case-detail-id">${escapeHtml(caseArtifact.id)}</span><span class="case-detail-subject">${escapeHtml(displayTaxonomyLabel(caseArtifact.metadata.subject, uiLocale))}</span></div>
-              <h1 id="case-detail-title">${escapeHtml(humanize(caseArtifact.metadata.topic))}</h1>
-              <p class="case-detail-summary" lang="${escapeHtml(locale)}">${escapeHtml(caseSummary)}</p>
+              <div class="case-detail-identity"><span class="case-detail-bookmark">${icon("bookmark")}</span><span class="case-detail-id" data-source-content>${escapeHtml(caseArtifact.id)}</span><span class="case-detail-subject">${escapeHtml(displayTaxonomyLabel(caseArtifact.metadata.subject, uiLocale))}</span></div>
+              <h1 id="case-detail-title" data-source-content>${escapeHtml(humanize(caseArtifact.metadata.topic))}</h1>
+              <p class="case-detail-summary" data-source-content lang="${escapeHtml(locale)}">${escapeHtml(caseSummary)}</p>
             </div>
             <div class="case-detail-hero-aside">${renderCaseBotanical()}<p>Authentic challenges.<br><em>Transparent benchmarks.</em></p><span>A closer look at an <br>authored public case.</span></div>
           </div>
@@ -344,10 +344,10 @@ export function renderCaseDetailPage(
           </aside>
           <section class="case-context" aria-labelledby="case-context-title">
             <header class="case-panel-heading"><span class="case-section-icon">${icon("guidance")}</span><div><h2 id="case-context-title">Tutor-visible context and conversation</h2><p>The following context is available to the tutor in this case.</p></div></header>
-            <div class="case-context-body">${caseArtifact.tutorInput.problemContext === undefined ? "" : `<div class="case-context-note" lang="${escapeHtml(locale)}"><span class="case-mini-label">Problem context</span><p>${escapeHtml(caseArtifact.tutorInput.problemContext)}</p></div>`}${renderConversation(caseArtifact.tutorInput.conversationHistory, caseArtifact.tutorInput.studentMessage, locale)}<p class="case-input-note"><span>${icon("document")}</span>This case file presents tutor-visible input context. It is not a generated trial, model response, or evaluation result.</p></div>
+            <div class="case-context-body">${caseArtifact.tutorInput.problemContext === undefined ? "" : `<div class="case-context-note" lang="${escapeHtml(locale)}"><span class="case-mini-label">Problem context</span><p data-source-content>${escapeHtml(caseArtifact.tutorInput.problemContext)}</p></div>`}${renderConversation(caseArtifact.tutorInput.conversationHistory, caseArtifact.tutorInput.studentMessage, locale)}<p class="case-input-note"><span>${icon("document")}</span>This case file presents tutor-visible input context. It is not a generated trial, model response, or evaluation result.</p></div>
           </section>
           <aside class="case-annotations" aria-label="Case annotations">
-            <section class="case-annotation-block" aria-labelledby="objective-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("target")}</span><h2 id="objective-title">Learning objective</h2></div><p class="case-objective" lang="${escapeHtml(locale)}">${escapeHtml(caseArtifact.tutorInput.learningObjective)}</p></section>
+            <section class="case-annotation-block" aria-labelledby="objective-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("target")}</span><h2 id="objective-title">Learning objective</h2></div><p class="case-objective" data-source-content lang="${escapeHtml(locale)}">${escapeHtml(caseArtifact.tutorInput.learningObjective)}</p></section>
             <section class="case-annotation-block" aria-labelledby="profile-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("user")}</span><h2 id="profile-title">Student profile</h2></div>${renderCaseProfile(caseArtifact.tutorInput.studentProfile, difficulty, uiLocale)}</section>
             <section class="case-annotation-block" aria-labelledby="capabilities-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("chart")}</span><h2 id="capabilities-title">Capability focus</h2></div>${renderCapabilityTags(capabilityTags, uiLocale)}</section>
             <section class="case-annotation-block case-notes" aria-labelledby="notes-title"><div class="case-annotation-heading"><span class="case-section-icon">${icon("document")}</span><h2 id="notes-title">Case notes</h2></div><p>This case is an authored, structured scenario from the public Teachometry development set. It is not a real classroom record.</p></section>
@@ -357,6 +357,7 @@ export function renderCaseDetailPage(
       </section>
     </div>${renderTeachometryFooter(artifacts)}`,
   );
+  return { ...detail, titleIsSourceContent: true };
 }
 
 interface ExplorerStat {

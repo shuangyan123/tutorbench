@@ -204,7 +204,7 @@ test("zh-CN copy catalog covers every major public surface and all published ess
     "Current model-publication status": "当前模型发布状态",
     "Public channels": "公开渠道",
     "This trail doesn’t lead to a public artifact.": "这条路径没有通向公开产物。",
-    "When Learning Starts to Feel Like Failure": "当学习开始像失败一样",
+    "When Learning Starts to Feel Like Failure": "当学习开始让人感到失败",
     "The Classroom Does Not Need 30 Robots": "课堂不需要 30 个机器人",
     "Why Teaching Does Not Scale": "为什么教学难以扩展",
     "Teaching and Supervision Are Different Jobs": "教学与监督是两份不同的工作",

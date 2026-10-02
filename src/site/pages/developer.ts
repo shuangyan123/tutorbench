@@ -698,7 +698,7 @@ function renderDocsIndexEntry(entry: DocsIndexEntry, uiLocale: SiteLocale): stri
   const searchText = (uiLocale === "zh-CN"
     ? [...sourceText.slice(0, 3).map(value => publicUiCopy(value, uiLocale)), ...sourceText]
     : sourceText).join(" ");
-  return `<article class="docs-index-entry" data-doc-entry data-doc-category="${escapeHtml(entry.category)}" data-doc-search="${escapeHtml(searchText)}"><a href="${escapeHtml(entry.href)}"${entry.external ? ' rel="noreferrer"' : ""}><span class="docs-index-icon">${icon(entry.glyph)}</span><span class="docs-index-copy"><span class="docs-index-category">${escapeHtml(entry.categoryLabel)}</span><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(entry.summary)}</span><small class="docs-index-source">${escapeHtml(entry.external ? "GitHub" : "Teachometry")} · ${escapeHtml(entry.pathLabel)}${entry.external ? ` ${icon("arrow")}` : ""}</small></span></a></article>`;
+  return `<article class="docs-index-entry" data-doc-entry data-doc-category="${escapeHtml(entry.category)}" data-doc-search="${escapeHtml(searchText)}"><a href="${escapeHtml(entry.href)}"${entry.external ? ' rel="noreferrer"' : ""}><span class="docs-index-icon">${icon(entry.glyph)}</span><span class="docs-index-copy"><span class="docs-index-category">${escapeHtml(entry.categoryLabel)}</span><strong>${escapeHtml(entry.label)}</strong><span>${escapeHtml(entry.summary)}</span><small class="docs-index-source">${escapeHtml(entry.external ? "GitHub" : "Teachometry")} · <span data-source-content>${escapeHtml(entry.pathLabel)}</span>${entry.external ? ` ${icon("arrow")}` : ""}</small></span></a></article>`;
 }
 
 export function renderDocsPage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en"): SitePage {

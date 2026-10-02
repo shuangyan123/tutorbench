@@ -28,15 +28,15 @@ function renderCase(item: TutorEvalPublicCase, index: number, count: number, sel
   // 只展示 public case 输入；没有公开运行时不生成 Tutor 回复或评估成绩。
   return `<article data-home-case${selected ? "" : " hidden"} aria-label="${e(formatCasePositionAriaLabel(index + 1, count, uiLocale))}">
     <div class="walkthrough-meta"><span class="eyebrow">CASE ${String(index + 1).padStart(2, "0")} <span class="case-total">/ ${count}</span></span><span class="case-badge">${e([level, displayTaxonomyLabel(item.metadata.subject, uiLocale)].filter(Boolean).join(" · "))}</span></div>
-    <h2 class="walkthrough-title">${e(humanize(item.metadata.topic))}</h2>
+    <h2 class="walkthrough-title" data-source-content>${e(humanize(item.metadata.topic))}</h2>
     <div class="walkthrough-tabs" role="tablist" aria-label="Case walkthrough">
       ${tabs.map((label, tabIndex) => `<button type="button" role="tab" id="${key}-tab-${tabIndex}" aria-controls="${key}-panel-${tabIndex}" aria-selected="${tabIndex === 0}" tabindex="${tabIndex === 0 ? 0 : -1}">${label}</button>`).join("")}
     </div>
     <div class="walkthrough-body">
       <div class="walkthrough-content">
         <div role="tabpanel" id="${key}-panel-0" aria-labelledby="${key}-tab-0" tabindex="0">
-          <blockquote class="learner-message" lang="${e(item.locale ?? "en")}">${e(item.tutorInput.studentMessage)}</blockquote>
-          <div class="tutor-objective"><span class="micro-label">Authored learning objective</span><p lang="${e(item.locale ?? "en")}">${e(item.tutorInput.learningObjective)}</p></div>
+          <blockquote class="learner-message" data-source-content lang="${e(item.locale ?? "en")}">${e(item.tutorInput.studentMessage)}</blockquote>
+          <div class="tutor-objective"><span class="micro-label">Authored learning objective</span><p data-source-content lang="${e(item.locale ?? "en")}">${e(item.tutorInput.learningObjective)}</p></div>
         </div>
         <div role="tabpanel" id="${key}-panel-1" aria-labelledby="${key}-tab-1" tabindex="0" hidden><div class="tutor-objective"><span class="micro-label">Tutor (AI) · no public response</span><p>This walkthrough shows a synthetic case input. No model response or model score is published here.</p><a href="/run/">Run TutorBench ${icon("arrow")}</a></div></div>
         <div role="tabpanel" id="${key}-panel-2" aria-labelledby="${key}-tab-2" tabindex="0" hidden><div class="tutor-objective"><span class="micro-label">Rubric preview</span><p>Each authored rubric belongs to a primary scoring dimension. This public case view does not expose evaluator-only annotations.</p><a href="/methodology/">Read the rubric method ${icon("arrow")}</a></div></div>

@@ -42,7 +42,7 @@ const COUNT_UNITS = {
   publicModels: [" public models", " 个公开模型"],
   publicProfiles: [" public profiles", " 份公开档案"],
   available: [" available", " 个可用"],
-  modelRuns: [" public model runs available", " 个公开模型运行可用"],
+  modelRuns: [" public model runs available", " 个公开模型运行记录可用"],
   scoreDimensions: [" benchmark score dimensions", " 个基准评分维度"],
 } as const;
 
@@ -100,7 +100,7 @@ export function formatRemainingCaseIdentities(count: number, locale: SiteLocale)
 
 export function formatTrialContext(identity: string, count: number, schema: number, locale: SiteLocale): string {
   return locale === "zh-CN"
-    ? `${identity} · ${count} 个公开案例 · 产物 schema ${schema}。此语境不是模型运行、结果或 trial。`
+    ? `${identity} · ${count} 个公开案例 · 产物 schema ${schema}。此语境不是模型运行、结果或评测记录。`
     : `${identity} · ${count} public cases · ${schema} artifact schema. This context is not a model run, result, or trial.`;
 }
 

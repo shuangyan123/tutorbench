@@ -101,7 +101,7 @@ test("LC-03/04: leaderboard boundaries and dynamic comparison context are static
   }
   for (const translated of [
     "当前公开产物尚未提供模型排名。",
-    "目前尚无校准后的公开模型运行。",
+    "目前尚无校准后的公开模型运行记录。",
     "校准与验证证据仍不完整。",
     "合成演示和初步模型产物不构成公开排名。",
     "仅在相同基准版本和评测配置下比较模型。",
@@ -112,7 +112,7 @@ test("LC-03/04: leaderboard boundaries and dynamic comparison context are static
   const changed = { ...artifacts, benchmark: { ...artifacts.benchmark, dataset: { ...artifacts.benchmark.dataset, version: "future-version" } } };
   const dynamic = renderLeaderboardPage(changed, "zh-CN").content;
   assert.match(dynamic, /数据集 future-version/u);
-  assert.match(dynamic, /数据集 cohort、生成规格 ID、生成规格版本、Prompt 版本/u);
+  assert.match(dynamic, /数据集案例组、生成规格 ID、生成规格版本、Prompt 版本/u);
 });
 
 test("LC-05: model profiles and placeholder trials retain matched-context and non-ranking boundaries", async () => {
@@ -123,10 +123,10 @@ test("LC-05: model profiles and placeholder trials retain matched-context and no
   assert.match(en, /Future model profiles should be interpreted only within matched benchmark versions/u);
   assert.match(en, /Profiles are evidence records, not rankings/u);
   assert.match(enDetail, /Trial records are the audit path/u);
-  assert.match(zh, /基准版本、数据集 cohort、生成条件和评测程序相匹配/u);
+  assert.match(zh, /基准版本、数据集案例组、生成条件和评测程序相匹配/u);
   assert.match(zh, /档案是证据记录，不是排名/u);
   assert.match(zh, /不衡量长期学习增益、知识留存、迁移、学生满意度或一般课堂教学有效性/u);
-  assert.match(zhDetail, /目前尚无公开模型 trials/u);
+  assert.match(zhDetail, /目前尚无公开模型评测记录/u);
   assert.match(zhDetail, /未来结果追溯到案例、Tutor 回复、评估器证据和已脱敏指标的审计路径/u);
   assert.doesNotMatch(zh + zhDetail, /Future model profiles should|Profiles are evidence records|Trial records are the audit path/u);
   assert.ok(zhDetail.includes(artifacts.benchmark.dataset.id + "@" + artifacts.benchmark.dataset.version));
@@ -141,7 +141,7 @@ test("LC-06: Advanced evidence boundaries are Chinese while controls and command
   assert.match(zh, /不约束可选的 temperature、reasoning 和 seed 控制项/u);
   assert.match(zh, /Tutor 可见的语义适配器数据包/u);
   assert.match(zh, /两者均不包含仅供评估器使用的注释/u);
-  assert.match(zh, /不意味着每个供应商都提供相同的推理控制项/u);
+  assert.match(zh, /不意味着每个服务提供方都提供相同的推理控制项/u);
   assert.doesNotMatch(zh, /Collection is not publication|Neither packet includes evaluator-only/u);
   for (const identity of ["baseline-native-default", "temperature", "reasoning", "seed", "tutor:export-cases", "tutor:export-execution"]) {
     assert.ok(en.includes(identity));

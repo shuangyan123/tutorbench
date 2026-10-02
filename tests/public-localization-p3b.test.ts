@@ -54,7 +54,7 @@ test("LC-33: final learning-difficulty paragraph preserves uncertainty and surro
 });
 
 test("LC-34: final application copy describes future data without opening intake or changing identities", async () => {
-  const copy = "首版申请数据契约会刻意保持精简：一个用于未来邀请的联系邮箱、偏好的评审语言、简短动机、可选的相关经验，以及粗粒度的可用程度。";
+  const copy = "首版申请数据契约会刻意保持精简：一个用于未来邀请的联系邮箱、偏好的评审语言、简短动机、可选的相关经验，以及大致可参与的时间范围。";
   const notice = "当前尚未开放申请。本节说明未来的申请数据约定，不是申请表。";
   for (const deployment of deployments) {
     const zh = await html(routes[2], "zh-CN", deployment.directory);
