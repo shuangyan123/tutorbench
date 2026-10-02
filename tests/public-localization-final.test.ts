@@ -33,7 +33,11 @@ after(async () => { if (output !== undefined) await rm(output, { recursive: true
 function html(route: string, locale: SiteLocale = "zh-CN", deployment = "root"): Promise<string> {
   return readFile(join(output, deployment, locale === "zh-CN" ? "zh-cn" : "", route.slice(1), "index.html"), "utf8");
 }
-function text(markup: string): string { return markup.replace(/<[^>]*>/gu, "").replace(/\s+/gu, " ").trim(); }
+function text(markup: string): string {
+  // 仅提取生成 HTML 的文本供断言，不通过删标签构造可再次渲染的 HTML。
+  return [...markup.matchAll(/(?:^|>)([^<]*)/gu)]
+    .map(match => match[1] ?? "").join("").replace(/\s+/gu, " ").trim();
+}
 function code(markup: string): string[] { return [...markup.matchAll(/<code\b[^>]*>([\s\S]*?)<\/code>/gu)].map(match => match[1] ?? ""); }
 
 test("LC-36: article title is consistent in headings, references, navigation and metadata; English stays original", async () => {
