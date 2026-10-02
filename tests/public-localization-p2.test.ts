@@ -46,8 +46,8 @@ test("LC-08: final CTA nodes use Chinese throughout the requested routes", async
     ["Browse documentation", "浏览文档"], ["Browse the documentation", "浏览文档"], ["View on GitHub", "在 GitHub 查看"],
     ["View the documentation", "查看文档"], ["Read our methodology", "阅读方法论"], ["Learn more about our methodology", "了解方法论"],
     ["Follow our progress", "关注进展"], ["See the profile contract", "查看档案契约"], ["Back to Models", "返回模型列表"],
-    ["View the profile contract", "查看档案契约"], ["See the trial contract", "查看 trial 契约"], ["Learn how the matrix works", "了解矩阵的工作方式"],
-    ["Explore the data", "探索数据"], ["Back to model trials", "返回模型 trials"],
+    ["View the profile contract", "查看档案契约"], ["See the trial contract", "查看评测记录契约"], ["Learn how the matrix works", "了解矩阵的工作方式"],
+    ["Explore the data", "探索数据"], ["Back to model trials", "返回模型评测记录"],
   ];
   const caseId = artifacts.cases.cases[0]?.id;
   assert.ok(caseId);
@@ -78,10 +78,10 @@ test("LC-09/10/11/12/16/17/18/19: requested final UI labels and explanatory copy
     "/models/": ["可追踪", "可追踪性", "身份", "可用", "无", "0 个公开模型", "0 份公开档案", "有公开模型档案后开放筛选"],
     "/models/[modelId]/": ["身份"],
     "/leaderboard/": ["效率", "成本", "延迟"],
-    "/run/": ["高级", "安装", "检查", "无需供应商", "HTTP Tutor 适配器（POST /respond）", "输入 TutorTurnInput JSON；输出 { text, metrics? } JSON", "例如，", "当前数据集：tutor-eval-v0.2a@0.2a.6", "标准产物中的 48 个公开案例"],
+    "/run/": ["高级", "安装", "检查", "无需服务提供方", "HTTP Tutor 适配器（POST /respond）", "输入 TutorTurnInput JSON；输出 { text, metrics? } JSON", "例如，", "当前数据集：tutor-eval-v0.2a@0.2a.6", "标准产物中的 48 个公开案例"],
     "/docs/": ["路线图", "许可", "贡献指南", "安全", "公开基准", "模型登记目录", "结果状态", "社区状态", "阅读内容许可", "阅读品牌政策", "Community Review 协议", "CONTRIBUTING.md", "SECURITY.md", "LICENSE"],
     "/data/trials/": ["字段"],
-    "/data/trials/[trialId]/": ["配置", "产物", "可复现性", "模型", "案例", "延迟", "成本", "token 数", "契约字段：", "此语境不是模型运行、结果或 trial。"],
+    "/data/trials/[trialId]/": ["配置", "产物", "可复现性", "模型", "案例", "延迟", "成本", "token 数", "契约字段：", "此语境不是模型运行、结果或评测记录。"],
   };
   for (const [route, strings] of Object.entries(checks)) {
     const markup = text(await html(route));
@@ -103,7 +103,7 @@ test("LC-13/14/15: visual lines, companion text, and empty matrix remain localiz
   for (let index = 1; index <= 5; index += 1) assert.ok(method.includes(`维度 0${index}`));
   assert.doesNotMatch(method, /DIMENSION 0|From<br>cases to insights|A transparent<br>approach/u);
   const expected = {
-    "/data/heatmap/": ["一眼看清整体图景。", "多种视角，更充分的证据。", "目前尚无公开模型 trials。", "矩阵布局、维度和案例结构已定义并准备就绪。", "尚无公开运行", "产物中还有 43 个公开案例标识", "矩阵", "维度", "预留", "数据"],
+    "/data/heatmap/": ["一眼看清整体图景。", "多种视角，更充分的证据。", "目前尚无公开模型评测记录。", "矩阵布局、维度和案例结构已定义并准备就绪。", "尚无公开运行", "产物中还有 43 个公开案例标识", "矩阵", "维度", "预留", "数据"],
     "/data/trials/": ["透明的审计轨迹。", "共享证据，改进教学。"],
     "/data/trials/[trialId]/": ["完整的证据记录。", "可追踪的证据，切实的进展。"],
   };

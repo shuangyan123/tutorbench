@@ -55,6 +55,8 @@ export interface SitePageSeo {
 
 export interface SitePage {
   readonly title: string;
+  /** 案例主题等源内容不能因为 UI 语言改变而进入文案词典。 */
+  readonly titleIsSourceContent?: boolean;
   readonly description: string;
   readonly route: string;
   readonly content: string;
@@ -321,7 +323,8 @@ function translateTagAttributes(tag: string): string {
 
 function localizeHtmlFragment(markup: string, locale: SiteLocale): string {
   if (locale !== "zh-CN") return markup;
-  const skipTags = new Set(["script", "style", "code", "pre", "textarea"]);
+  // 文档标题已由 localizedPage 决定，不能在 HTML 阶段再次翻译源主题。
+  const skipTags = new Set(["script", "style", "code", "pre", "textarea", "title"]);
   const voidTags = new Set([
     "area", "base", "br", "col", "embed", "hr", "img", "input", "link",
     "meta", "param", "source", "track", "wbr",
@@ -347,7 +350,9 @@ function localizeHtmlFragment(markup: string, locale: SiteLocale): string {
     const isClosing = /^<\//u.test(rawTag);
     const isDeclaration = /^<!/u.test(rawTag);
     const tagName = rawTag.match(/^<\/?\s*([A-Za-z0-9:-]+)/u)?.[1]?.toLowerCase();
-    const renderedTag = !isClosing && !isDeclaration ? translateTagAttributes(rawTag) : rawTag;
+    // 源内容边界同时保护文本及其属性；仅界面标签进入现有精确词典。
+    const sourceContent = stack.at(-1)?.skip === true || /\bdata-source-content(?:\s|=|>)/u.test(rawTag);
+    const renderedTag = !isClosing && !isDeclaration && !sourceContent ? translateTagAttributes(rawTag) : rawTag;
     output += renderedTag;
 
     if (tagName !== undefined) {
@@ -362,7 +367,7 @@ function localizeHtmlFragment(markup: string, locale: SiteLocale): string {
         const uiText = renderedTag.match(/\bdata-ui-(?:text|option)-zh-cn="([^"]*)"/u)?.[1];
         stack.push({
           tag: tagName,
-          skip: parentSkip || skipTags.has(tagName) || uiText !== undefined,
+          skip: parentSkip || sourceContent || skipTags.has(tagName) || uiText !== undefined,
           ...(uiText === undefined ? {} : { uiText }),
         });
       }
@@ -609,7 +614,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const localizedPage: SitePage = locale === "zh-CN"
     ? {
       ...page,
-      title: translateSiteCopy(page.title, locale),
+      title: page.titleIsSourceContent === true ? page.title : translateSiteCopy(page.title, locale),
       description: translateSiteCopy(page.description, locale),
       ...(page.seo?.headline === undefined ? {} : {
         seo: { ...page.seo, headline: translateSiteCopy(page.seo.headline, locale) },

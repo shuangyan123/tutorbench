@@ -89,7 +89,7 @@ const EVIDENCE_COPY = {
   },
   modelNotice: {
     en: "No calibrated public model runs yet.",
-    "zh-CN": "目前尚无校准后的公开模型运行。",
+    "zh-CN": "目前尚无校准后的公开模型运行记录。",
   },
   incompleteValidation: {
     en: "Calibration and validation evidence remain incomplete.",
@@ -109,19 +109,19 @@ const EVIDENCE_COPY = {
   },
   profileInterpretation: {
     en: "Future model profiles should be interpreted only within matched benchmark versions, dataset cohorts, generation conditions, and evaluation procedures. Teachometry measures observable tutoring behavior in structured authored cases—not long-term learning gains, retention, transfer, student satisfaction, or general classroom teaching effectiveness.",
-    "zh-CN": "未来模型档案只能在基准版本、数据集 cohort、生成条件和评测程序相匹配的条件下解读。Teachometry 测量结构化、人工编写案例中的可观察教学行为，不衡量长期学习增益、知识留存、迁移、学生满意度或一般课堂教学有效性。",
+    "zh-CN": "未来模型档案只能在基准版本、数据集案例组、生成条件和评测程序相匹配的条件下解读。Teachometry 测量结构化、人工编写案例中的可观察教学行为，不衡量长期学习增益、知识留存、迁移、学生满意度或一般课堂教学有效性。",
   },
   trialAuditPath: {
     en: "Trial records are the audit path from a future result to a case, Tutor response, evaluator evidence, and sanitized metrics.",
-    "zh-CN": "Trial 记录是从未来结果追溯到案例、Tutor 回复、评估器证据和已脱敏指标的审计路径。",
+    "zh-CN": "评测记录是从未来结果追溯到案例、Tutor 回复、评估器证据和已脱敏指标的审计路径。",
   },
   trialNotice: {
     en: "No public model trials available yet.",
-    "zh-CN": "目前尚无公开模型 trials。",
+    "zh-CN": "目前尚无公开模型评测记录。",
   },
   collectionBoundary: {
     en: "Collection is not publication, calibration, or leaderboard eligibility; frozen evidence can be inspected and replayed offline. The baseline-native-default profile leaves optional temperature, reasoning, and seed controls unconstrained so provider-native behavior is not misrepresented as identical across vendors. tutor:export-cases is the semantic Tutor-visible adapter packet; tutor:export-execution is the canonical benchmark packet used to make model runs comparable. Neither packet includes evaluator-only annotations. The same benchmark does not imply that every provider exposes identical inference knobs.",
-    "zh-CN": "采集不等于发布、校准或取得排行榜资格；冻结证据可以离线检查和重放。baseline-native-default 配置不约束可选的 temperature、reasoning 和 seed 控制项，避免将不同供应商的原生行为误称为一致。tutor:export-cases 是 Tutor 可见的语义适配器数据包；tutor:export-execution 是用于使模型运行可比较的标准基准数据包。两者均不包含仅供评估器使用的注释。使用同一基准并不意味着每个供应商都提供相同的推理控制项。",
+    "zh-CN": "采集不等于发布、校准或取得排行榜资格；冻结证据可以离线检查和重放。baseline-native-default 配置不约束可选的 temperature、reasoning 和 seed 控制项，避免将不同服务提供方的原生行为误称为一致。tutor:export-cases 是 Tutor 可见的语义适配器数据包；tutor:export-execution 是用于使模型运行可比较的标准基准数据包。两者均不包含仅供评估器使用的注释。使用同一基准并不意味着每个服务提供方都提供相同的推理控制项。",
   },
 } as const;
 
