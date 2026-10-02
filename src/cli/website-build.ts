@@ -235,16 +235,16 @@ function routePages(
     ? undefined
     : createReviewTranslationLookup(audit.artifact.evaluation, audit.reviewTranslation);
   const pages: RoutePage[] = [
-    { outputRoute: "/", page: renderHomePage(artifacts) },
-    { outputRoute: "/leaderboard/", page: renderLeaderboardPage(artifacts) },
-    { outputRoute: "/models/", page: renderModelsPage(artifacts) },
-    { outputRoute: "/models/[modelId]/", page: renderModelDetailPage(artifacts) },
-    { outputRoute: "/data/", page: renderDataIndexPage(artifacts) },
-    { outputRoute: "/data/cases/", page: renderCasesPage(artifacts) },
+    { outputRoute: "/", page: renderHomePage(artifacts, locale) },
+    { outputRoute: "/leaderboard/", page: renderLeaderboardPage(artifacts, locale) },
+    { outputRoute: "/models/", page: renderModelsPage(artifacts, locale) },
+    { outputRoute: "/models/[modelId]/", page: renderModelDetailPage(artifacts, locale) },
+    { outputRoute: "/data/", page: renderDataIndexPage(artifacts, locale) },
+    { outputRoute: "/data/cases/", page: renderCasesPage(artifacts, locale) },
     { outputRoute: "/data/heatmap/", page: renderHeatmapPage(artifacts) },
     { outputRoute: "/data/trials/", page: renderTrialsPage(artifacts) },
     { outputRoute: "/data/trials/[trialId]/", page: renderTrialDetailPage(artifacts) },
-    { outputRoute: "/run/", page: renderRunPage(artifacts) },
+    { outputRoute: "/run/", page: renderRunPage(artifacts, locale) },
     { outputRoute: "/methodology/", page: renderMethodologyPage(artifacts) },
     { outputRoute: "/docs/", page: renderDocsPage(artifacts) },
     { outputRoute: "/about/", page: renderAboutPage(artifacts, packageVersion) },
@@ -255,7 +255,7 @@ function routePages(
     ...pages,
     ...artifacts.cases.cases.map((caseArtifact) => ({
       outputRoute: `/data/cases/${encodeURIComponent(caseArtifact.id)}/`,
-      page: renderCaseDetailPage(artifacts, caseArtifact),
+      page: renderCaseDetailPage(artifacts, caseArtifact, locale),
     })),
   ];
   if (audit !== undefined) {

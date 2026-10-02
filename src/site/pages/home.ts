@@ -3,6 +3,8 @@ import { TUTOR_EVAL_EVALUATOR_VERSION } from "../../contracts/index.js";
 import { escapeHtml as e, humanize, SITE_GITHUB_URL, type SitePage } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
 import { BLOG_POSTS } from "./blog.js";
+import type { SiteLocale } from "../i18n.js";
+import { displayTaxonomyLabel } from "../public-localization.js";
 
 const dimensions = [
   ["diagnosis", "Diagnosis", "Whether it identifies the learner’s actual error, gap, or reasoning issue.", "Understands learner thinking", "Did it understand the learner?"],
@@ -17,14 +19,14 @@ function renderFoliage(layers: readonly string[]): string {
   return `<div class="home-foliage" aria-hidden="true">${layers.map((layer) => `<img class="foliage-layer foliage-${layer}" src="/assets/foliage-${layer}.webp" alt="" width="1536" height="1024" loading="lazy">`).join("")}</div>`;
 }
 
-function renderCase(item: TutorEvalPublicCase, index: number, count: number, selected: boolean): string {
+function renderCase(item: TutorEvalPublicCase, index: number, count: number, selected: boolean, uiLocale: SiteLocale): string {
   const key = `walkthrough-${index}`;
   const level = typeof item.metadata.difficulty === "object"
-    ? humanize(item.metadata.difficulty.learnerLevel) : item.tutorInput.studentProfile?.level;
+    ? displayTaxonomyLabel(item.metadata.difficulty.learnerLevel, uiLocale) : item.tutorInput.studentProfile?.level;
   const tabs = ["Learner", "Tutor (AI)", "Rubric", "Analysis"];
   // 只展示 public case 输入；没有公开运行时不生成 Tutor 回复或评估成绩。
   return `<article data-home-case${selected ? "" : " hidden"} aria-label="Case ${index + 1} of ${count}">
-    <div class="walkthrough-meta"><span class="eyebrow">CASE ${String(index + 1).padStart(2, "0")} <span class="case-total">/ ${count}</span></span><span class="case-badge">${e([level, humanize(item.metadata.subject)].filter(Boolean).join(" · "))}</span></div>
+    <div class="walkthrough-meta"><span class="eyebrow">CASE ${String(index + 1).padStart(2, "0")} <span class="case-total">/ ${count}</span></span><span class="case-badge">${e([level, displayTaxonomyLabel(item.metadata.subject, uiLocale)].filter(Boolean).join(" · "))}</span></div>
     <h2 class="walkthrough-title">${e(humanize(item.metadata.topic))}</h2>
     <div class="walkthrough-tabs" role="tablist" aria-label="Case walkthrough">
       ${tabs.map((label, tabIndex) => `<button type="button" role="tab" id="${key}-tab-${tabIndex}" aria-controls="${key}-panel-${tabIndex}" aria-selected="${tabIndex === 0}" tabindex="${tabIndex === 0 ? 0 : -1}">${label}</button>`).join("")}
@@ -37,7 +39,7 @@ function renderCase(item: TutorEvalPublicCase, index: number, count: number, sel
         </div>
         <div role="tabpanel" id="${key}-panel-1" aria-labelledby="${key}-tab-1" tabindex="0" hidden><div class="tutor-objective"><span class="micro-label">Tutor (AI) · no public response</span><p>This walkthrough shows a synthetic case input. No model response or model score is published here.</p><a href="/run/">Run TutorBench ${icon("arrow")}</a></div></div>
         <div role="tabpanel" id="${key}-panel-2" aria-labelledby="${key}-tab-2" tabindex="0" hidden><div class="tutor-objective"><span class="micro-label">Rubric preview</span><p>Each authored rubric belongs to a primary scoring dimension. This public case view does not expose evaluator-only annotations.</p><a href="/methodology/">Read the rubric method ${icon("arrow")}</a></div></div>
-        <div role="tabpanel" id="${key}-panel-3" aria-labelledby="${key}-tab-3" tabindex="0" hidden><div class="tutor-objective"><span class="micro-label">Case context · ${e(item.locale ?? "en")}</span><p>${e(humanize(item.metadata.studentState ?? item.metadata.learningTask ?? item.metadata.topic))}</p><p>${e((item.metadata.capabilityTags ?? []).map(humanize).join(" · "))}</p></div></div>
+        <div role="tabpanel" id="${key}-panel-3" aria-labelledby="${key}-tab-3" tabindex="0" hidden><div class="tutor-objective"><span class="micro-label">Case context · ${e(item.locale ?? "en")}</span><p>${e(displayTaxonomyLabel(item.metadata.studentState ?? item.metadata.learningTask ?? item.metadata.topic, uiLocale))}</p><p>${e((item.metadata.capabilityTags ?? []).map((value) => displayTaxonomyLabel(value, uiLocale)).join(" · "))}</p></div></div>
       </div>
       <aside class="rubric-preview" aria-label="Five dimensions, not scored"><p class="micro-label">Evaluation dimensions</p>${dimensions.map(([, label]) => `<div class="rubric-row"><span>${label}</span><span class="score-track" aria-hidden="true"></span><span class="score-pending">N/A</span></div>`).join("")}<p class="score-caption">Not scored · no model run</p></aside>
     </div>
@@ -98,7 +100,7 @@ function renderDimensions(): string {
   </div></section>`;
 }
 
-export function renderHomePage(artifacts: PublicBenchmarkArtifacts): SitePage {
+export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en"): SitePage {
   const { benchmark, cases } = artifacts;
   const initialIndex = Math.max(0, cases.cases.findIndex((item) => item.id === "fraction-misconception-001"));
   return {
@@ -107,7 +109,7 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts): SitePage {
     route: "/",
     content: `<section class="home-hero"><div class="shell home-hero-grid">
       <div class="home-thesis"><p class="eyebrow">Evidence before deployment</p><h1>Test how AI tutors<br><em>behave</em> before<br><span>you ship them.</span></h1><p class="home-lede">Teachometry turns authored learning situations into reproducible Tutor Health evaluations: inspect teaching decisions, diagnose concrete failures, and keep the evidence needed to fix and retest them.</p><div class="home-actions"><a class="button button-primary" href="/run/">Run an Evaluation ${icon("arrow")}</a><a class="button button-secondary" href="/methodology/">${icon("book")} Read the Methodology</a></div><div class="home-features"><span>${icon("leaf")} Open source</span><span>${icon("book")} Evidence-first</span><span>${icon("adaptation")} Developer Preview</span></div></div>
-      <div class="case-walkthrough" data-case-walkthrough data-initial-case="${initialIndex}"><div class="case-controls"><button type="button" aria-label="Previous case" data-case-prev>${icon("left")}</button><button type="button" aria-label="Next case" data-case-next>${icon("right")}</button></div>${cases.cases.map((item, index) => renderCase(item, index, cases.cases.length, index === initialIndex)).join("")}<span class="visually-hidden" aria-live="polite" data-case-announcement></span></div>
+      <div class="case-walkthrough" data-case-walkthrough data-initial-case="${initialIndex}"><div class="case-controls"><button type="button" aria-label="Previous case" data-case-prev>${icon("left")}</button><button type="button" aria-label="Next case" data-case-next>${icon("right")}</button></div>${cases.cases.map((item, index) => renderCase(item, index, cases.cases.length, index === initialIndex, uiLocale)).join("")}<span class="visually-hidden" aria-live="polite" data-case-announcement></span></div>
     </div><div class="shell hero-foot"><a class="scroll-cue" href="#dimensions"><span>${icon("arrow")}</span>Scroll to explore</a><p class="handwritten hero-note">Evidence for<br>human-centered AI tutoring.</p></div></section>
     ${renderDimensions()}
     <section class="home-data" aria-labelledby="home-data-title">${renderFoliage(["left-near"])}<div class="shell home-data-grid">
