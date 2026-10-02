@@ -1,6 +1,12 @@
 import type { SiteLocale } from "./i18n.js";
 import type { PublicBenchmarkArtifacts } from "../datasets/public.js";
 import { humanize } from "./html.js";
+import { SITE_ZH_CN_COPY } from "./locale-copy.js";
+
+// 标点由调用方按结构添加；固定文案仍使用已有的精确节点词典。
+export function publicUiCopy(value: string, locale: SiteLocale): string {
+  return locale === "zh-CN" ? SITE_ZH_CN_COPY[value] ?? value : value;
+}
 
 // 只转换公开展示标签；机器值、筛选参数与案例原文不进入这个映射。
 const TAXONOMY_ZH_CN: Readonly<Record<string, string>> = {

@@ -2,9 +2,10 @@ import type { PublicBenchmarkArtifacts, TutorEvalPublicCase } from "../../datase
 import { TUTOR_EVAL_EVALUATOR_VERSION } from "../../contracts/index.js";
 import { escapeHtml as e, humanize, SITE_GITHUB_URL, type SitePage } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
-import { BLOG_POSTS } from "./blog.js";
+import { BLOG_POSTS, type BlogPostSummary } from "./blog.js";
 import type { SiteLocale } from "../i18n.js";
-import { displayTaxonomyLabel } from "../public-localization.js";
+import { formatPublicationDate } from "../public-localization-formatters.js";
+import { publicUiCopy, displayTaxonomyLabel } from "../public-localization.js";
 
 const dimensions = [
   ["diagnosis", "Diagnosis", "Whether it identifies the learner’s actual error, gap, or reasoning issue.", "Understands learner thinking", "Did it understand the learner?"],
@@ -100,7 +101,7 @@ function renderDimensions(): string {
   </div></section>`;
 }
 
-export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en"): SitePage {
+export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en", blogPosts: readonly BlogPostSummary[] = BLOG_POSTS): SitePage {
   const { benchmark, cases } = artifacts;
   const initialIndex = Math.max(0, cases.cases.findIndex((item) => item.id === "fraction-misconception-001"));
   return {
@@ -116,17 +117,17 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: Si
       <div class="home-data-statement"><p class="eyebrow">Measurement infrastructure for AI tutoring</p><h2 id="home-data-title">Open data.<br>Transparent evaluation.<br><em>Observable behavior.</em></h2><a class="button data-link" href="/data/">Explore the data ${icon("arrow")}</a></div>
       <dl class="home-facts"><div><dt>Synthetic cases</dt><dd>${benchmark.dataset.caseCount}</dd><dd class="fact-note">Public development scenarios</dd></div><div><dt>Authored rubrics</dt><dd>${benchmark.dataset.rubricCount}</dd><dd class="fact-note">Case-specific evaluation criteria</dd></div><div><dt>Current dataset</dt><dd>${e(benchmark.dataset.version)}</dd><dd class="fact-note">${e(benchmark.dataset.id)}</dd></div><div><dt>Evaluator version</dt><dd>${e(TUTOR_EVAL_EVALUATOR_VERSION)}</dd><dd class="fact-note">Open and reproducible</dd></div></dl>
     </div></section>
-    ${renderHomeBlog()}
+    ${renderHomeBlog(uiLocale, blogPosts)}
     ${renderTeachometryFooter(artifacts)}`,
   };
 }
 
 // 第三栏是明确标注的索引，不虚构第三篇文章；文章卡片使用集中维护的真实元数据。
-function renderHomeBlog(): string {
-  const posts = BLOG_POSTS.slice(0, 2);
+function renderHomeBlog(uiLocale: SiteLocale, blogPosts: readonly BlogPostSummary[]): string {
+  const posts = blogPosts.slice(0, 2);
   return `<section class="home-blog" aria-labelledby="home-blog-title">${renderFoliage(["left-mid", "right-near"])}<div class="shell">
     <div class="home-blog-heading"><div><h2 id="home-blog-title">Latest from the Blog</h2><p>Updates, insights, and research perspectives from Teachometry.</p></div><a href="/blog/">View all posts ${icon("arrow")}</a></div>
-    <div class="home-blog-grid">${posts.map((post) => `<article class="home-blog-card"><a href="${e(post.route)}"><img src="/assets/${e(post.image)}" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">${e(post.category)} · ${e(post.publishedDate)}</p><h3>${e(post.title)}</h3><p>${e(post.excerpt)}</p></div></a></article>`).join("")}
+    <div class="home-blog-grid">${posts.map((post) => `<article class="home-blog-card"><a href="${e(post.route)}"><img src="/assets/${e(post.image)}" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">${e(publicUiCopy(post.category, uiLocale))} · ${e(formatPublicationDate(post.publishedDate, uiLocale))}</p><h3>${e(post.title)}</h3><p>${e(post.excerpt)}</p></div></a></article>`).join("")}
     <aside class="home-blog-card home-blog-index"><a href="/blog/"><img src="/assets/home-blog-03.webp" width="1672" height="941" loading="lazy" alt=""><div class="home-blog-copy"><p class="blog-meta">Explore the journal · Blog index</p><h3>Ideas that should become testable questions.</h3><p>Long-form notes on AI teaching, measurement, and the future structure of education.</p></div></a></aside></div>
   </div></section>`;
 }
@@ -141,7 +142,7 @@ export function renderTeachometryFooter({ benchmark, models }: PublicBenchmarkAr
           <nav class="footer-column" aria-label="Connect"><span class="footer-column-title">Connect</span><a href="/contact/">Contact</a><a href="${SITE_GITHUB_URL}/issues">Project support</a></nav>
         </div>
       </div>
-      <div class="home-footer-bottom"><span>Teachometry · ${e(benchmark.statusLabel)}</span></div>
+      <div class="home-footer-bottom"><span>Teachometry · <span>${e(benchmark.statusLabel)}</span></span></div>
       <details class="home-evidence"><summary>Evidence &amp; limitations</summary><p><span>${e(models.notice)}</span> <span>${e(benchmark.notice)}</span> <span>Calibration infrastructure exists, but real Community Review and human calibration have not started.</span> <span>Judge-vs-human validation and statistical validation are not completed.</span> <span>TutorBench measures observable tutoring behavior in specified benchmark scenarios, not long-term learning, retention, transfer, satisfaction, or classroom outcomes.</span></p></details>
     </div></footer>`;
 }
