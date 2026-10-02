@@ -1,6 +1,41 @@
 import type { SiteLocale } from "./i18n.js";
 import { publicUiCopy } from "./public-localization.js";
 
+// 静态渲染与客户端通过 data attribute 共用模板，避免首次加载后措辞跳变。
+export const CASE_COUNT_TEMPLATES = {
+  en: "Showing {start}–{end} of {count} cases",
+  "zh-CN": "显示 {start}–{end} / 共 {count} 个案例",
+} as const;
+
+export const DOC_COUNT_TEMPLATES = {
+  en: { all: "Showing {count} references", filtered: "Showing {visible} of {count} references" },
+  "zh-CN": { all: "显示 {count} 条参考资料", filtered: "显示 {visible} / {count} 条参考资料" },
+} as const;
+
+export function formatCaseCount(start: number, end: number, count: number, locale: SiteLocale): string {
+  return CASE_COUNT_TEMPLATES[locale].replaceAll("{start}", String(start))
+    .replaceAll("{end}", String(end)).replaceAll("{count}", String(count));
+}
+
+export function formatDocCount(count: number, locale: SiteLocale): string {
+  return DOC_COUNT_TEMPLATES[locale].all.replaceAll("{count}", String(count));
+}
+
+export function formatCasePositionAriaLabel(current: number, total: number, locale: SiteLocale): string {
+  return locale === "zh-CN" ? `第 ${current} 个案例，共 ${total} 个` : `Case ${current} of ${total}`;
+}
+
+export function formatExampleCaseAriaLabel(caseId: string, locale: SiteLocale): string {
+  return `${locale === "zh-CN" ? "公开示例案例" : "Example public case"} ${caseId}`;
+}
+
+export function formatCaseDescription(caseId: string, learningObjective: string, locale: SiteLocale): string {
+  // 只翻译 metadata 外层模板；学习目标属于原始案例输入。
+  return locale === "zh-CN"
+    ? `公开 TutorEval 案例 ${caseId}：${learningObjective}`
+    : `Public TutorEval case ${caseId}: ${learningObjective}`;
+}
+
 const COUNT_UNITS = {
   publicCases: [" public cases", " 个公开案例"],
   syntheticCases: [" synthetic cases", " 个合成案例"],

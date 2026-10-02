@@ -492,23 +492,27 @@ function findArticleNeighbor(article: BlogArticle, offset: -1 | 1): BlogArticle 
   return index === -1 ? undefined : BLOG_POSTS[index + offset];
 }
 
-function renderArticleNeighbor(post: BlogArticle | undefined, direction: "previous" | "next"): string {
+function renderArticleNeighbor(post: BlogArticle | undefined, direction: "previous" | "next", uiLocale: SiteLocale): string {
   if (post === undefined) {
     return "";
   }
   const label = direction === "previous" ? "Previous article" : "Next article";
+  const displayTitle = publicUiCopy(post.title, uiLocale);
+  const ariaLabel = uiLocale === "zh-CN"
+    ? `${direction === "previous" ? "上一篇文章" : "下一篇文章"}：${displayTitle}`
+    : `${label}: ${displayTitle}`;
   const arrow = direction === "previous" ? icon("left") : icon("right");
-  return `<a class="article-nav-link article-nav-${direction}" href="${e(post.route)}" aria-label="${e(`${label}: ${post.title}`)}">
+  return `<a class="article-nav-link article-nav-${direction}" href="${e(post.route)}" aria-label="${e(ariaLabel)}">
     <img src="/assets/${e(post.image)}" width="120" height="78" loading="lazy" alt="">
-    <span class="article-nav-copy"><span class="article-nav-label">${label} ${arrow}</span><strong>${e(post.title)}</strong></span>
+    <span class="article-nav-copy"><span class="article-nav-label">${label} ${arrow}</span><strong>${e(displayTitle)}</strong></span>
   </a>`;
 }
 
-function renderArticleNavigation(article: BlogArticle): string {
+function renderArticleNavigation(article: BlogArticle, uiLocale: SiteLocale): string {
   return `<nav class="article-nav" aria-label="Article navigation">
-    ${renderArticleNeighbor(findArticleNeighbor(article, -1), "previous")}
+    ${renderArticleNeighbor(findArticleNeighbor(article, -1), "previous", uiLocale)}
     <a class="article-nav-index" href="/blog/"><span>${icon("grid")}</span><span>Back to all posts</span></a>
-    ${renderArticleNeighbor(findArticleNeighbor(article, 1), "next")}
+    ${renderArticleNeighbor(findArticleNeighbor(article, 1), "next", uiLocale)}
   </nav>`;
 }
 
@@ -545,7 +549,7 @@ function renderBlogArticlePage(article: BlogArticle, footer = "", uiLocale: Site
       <div class="shell article-media-shell"><figure class="article-media"><img src="/assets/${e(article.image)}" width="1672" height="941" fetchpriority="high" alt="${e(article.imageAlt)}"></figure></div>
       <div class="shell article-mobile-toc">${renderArticleToc(article, true)}</div>
       <div class="shell article-layout"><aside class="article-rail">${renderArticleToc(article)}<div class="article-pull-quote"><p>“${e(publicUiCopy(article.pullQuote, uiLocale))}”</p></div></aside><div class="article-content">${article.sections.map(section => renderArticleSection(section, uiLocale)).join("")}${renderArticleCallout({ label: "Evidence boundary", body: article.evidenceBoundary }, true)}</div></div>
-      <div class="shell article-nav-shell">${renderArticleNavigation(article)}</div>
+      <div class="shell article-nav-shell">${renderArticleNavigation(article, uiLocale)}</div>
     </article>
     ${renderArticleTransition()}
     ${footer}`,
@@ -554,6 +558,7 @@ function renderBlogArticlePage(article: BlogArticle, footer = "", uiLocale: Site
     ...rendered,
     seo: {
       type: "article",
+      headline: article.title,
       image: `/assets/${article.image}`,
       publishedDate: articlePublishedIso(article),
     },

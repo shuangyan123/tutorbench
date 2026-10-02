@@ -4,7 +4,7 @@ import { escapeHtml as e, humanize, SITE_GITHUB_URL, type SitePage } from "../ht
 import { siteIcon as icon } from "../icons.js";
 import { BLOG_POSTS, type BlogPostSummary } from "./blog.js";
 import type { SiteLocale } from "../i18n.js";
-import { formatPublicationDate } from "../public-localization-formatters.js";
+import { formatPublicationDate, formatCasePositionAriaLabel } from "../public-localization-formatters.js";
 import { publicUiCopy, displayTaxonomyLabel } from "../public-localization.js";
 
 const dimensions = [
@@ -26,7 +26,7 @@ function renderCase(item: TutorEvalPublicCase, index: number, count: number, sel
     ? displayTaxonomyLabel(item.metadata.difficulty.learnerLevel, uiLocale) : item.tutorInput.studentProfile?.level;
   const tabs = ["Learner", "Tutor (AI)", "Rubric", "Analysis"];
   // 只展示 public case 输入；没有公开运行时不生成 Tutor 回复或评估成绩。
-  return `<article data-home-case${selected ? "" : " hidden"} aria-label="Case ${index + 1} of ${count}">
+  return `<article data-home-case${selected ? "" : " hidden"} aria-label="${e(formatCasePositionAriaLabel(index + 1, count, uiLocale))}">
     <div class="walkthrough-meta"><span class="eyebrow">CASE ${String(index + 1).padStart(2, "0")} <span class="case-total">/ ${count}</span></span><span class="case-badge">${e([level, displayTaxonomyLabel(item.metadata.subject, uiLocale)].filter(Boolean).join(" · "))}</span></div>
     <h2 class="walkthrough-title">${e(humanize(item.metadata.topic))}</h2>
     <div class="walkthrough-tabs" role="tablist" aria-label="Case walkthrough">
