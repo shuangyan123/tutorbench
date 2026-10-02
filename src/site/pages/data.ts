@@ -13,7 +13,7 @@ import {
 } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
 import { siteText, type SiteLocale } from "../i18n.js";
-import { formatPublicCount, formatRemainingCaseIdentities, formatTrialContext } from "../public-localization-formatters.js";
+import { CASE_COUNT_TEMPLATES, formatCaseCount, formatCaseDescription, formatExampleCaseAriaLabel, formatPublicCount, formatRemainingCaseIdentities, formatTrialContext } from "../public-localization-formatters.js";
 import { publicUiCopy, displayTaxonomyLabel, formatTeachingSituations } from "../public-localization.js";
 import { renderTeachometryFooter } from "./home.js";
 
@@ -25,6 +25,8 @@ function page(
 ): SitePage {
   return { title, description, route, content };
 }
+
+const CASES_PAGE_SIZE = 12;
 
 type CaseFilterKey =
   | "subject"
@@ -166,7 +168,7 @@ function renderCaseSpecimen(caseArtifact: TutorEvalPublicCase | undefined, uiLoc
   const learnerLevel = typeof difficulty === "object" && difficulty !== null ? displayTaxonomyLabel(difficulty.learnerLevel, uiLocale) : "Not specified";
   const subject = displayTaxonomyLabel(caseArtifact.metadata.subject, uiLocale);
   const tags = caseArtifact.metadata.capabilityTags ?? [];
-  return `<div class="cases-hero-specimen" aria-label="Example public case ${escapeHtml(caseArtifact.id)}"><span class="specimen-leaf specimen-leaf-one" aria-hidden="true"></span><span class="specimen-leaf specimen-leaf-two" aria-hidden="true"></span><div class="specimen-paper specimen-paper-back" aria-hidden="true"></div><div class="specimen-paper specimen-paper-mid" aria-hidden="true"></div><article class="specimen-paper specimen-paper-front"><div class="specimen-heading"><span>Example case</span><span>${escapeHtml(subject)} · ${escapeHtml(learnerLevel)}</span></div><div class="specimen-message"><span class="specimen-message-mark">${icon("guidance")}</span><div><strong>Student</strong><p>${escapeHtml(excerpt(caseArtifact.tutorInput.studentMessage, 165))}</p></div></div><div class="specimen-meta"><span><b>Learner level</b><em>${escapeHtml(learnerLevel)}</em></span><span><b>Student state</b><em>${escapeHtml(displayTaxonomyLabel(caseArtifact.metadata.studentState ?? "Not specified", uiLocale))}</em></span><span><b>Capability focus</b><em>${escapeHtml(tags.length > 0 ? displayTaxonomyLabel(tags[0] ?? "Public metadata", uiLocale) : "Public metadata")}${tags.length > 1 ? ` <small>+${tags.length - 1}</small>` : ""}</em></span></div><span class="specimen-case-id">${escapeHtml(caseArtifact.id)}</span></article><p class="specimen-note specimen-note-top">Structured context.<br>Inspectable cases.</p><p class="specimen-note specimen-note-bottom">Authored situations.<br>Transparent evidence.</p></div>`;
+  return `<div class="cases-hero-specimen" aria-label="${escapeHtml(formatExampleCaseAriaLabel(caseArtifact.id, uiLocale))}"><span class="specimen-leaf specimen-leaf-one" aria-hidden="true"></span><span class="specimen-leaf specimen-leaf-two" aria-hidden="true"></span><div class="specimen-paper specimen-paper-back" aria-hidden="true"></div><div class="specimen-paper specimen-paper-mid" aria-hidden="true"></div><article class="specimen-paper specimen-paper-front"><div class="specimen-heading"><span>Example case</span><span>${escapeHtml(subject)} · ${escapeHtml(learnerLevel)}</span></div><div class="specimen-message"><span class="specimen-message-mark">${icon("guidance")}</span><div><strong>Student</strong><p>${escapeHtml(excerpt(caseArtifact.tutorInput.studentMessage, 165))}</p></div></div><div class="specimen-meta"><span><b>Learner level</b><em>${escapeHtml(learnerLevel)}</em></span><span><b>Student state</b><em>${escapeHtml(displayTaxonomyLabel(caseArtifact.metadata.studentState ?? "Not specified", uiLocale))}</em></span><span><b>Capability focus</b><em>${escapeHtml(tags.length > 0 ? displayTaxonomyLabel(tags[0] ?? "Public metadata", uiLocale) : "Public metadata")}${tags.length > 1 ? ` <small>+${tags.length - 1}</small>` : ""}</em></span></div><span class="specimen-case-id">${escapeHtml(caseArtifact.id)}</span></article><p class="specimen-note specimen-note-top">Structured context.<br>Inspectable cases.</p><p class="specimen-note specimen-note-bottom">Authored situations.<br>Transparent evidence.</p></div>`;
 }
 
 export function renderCasesPage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en"): SitePage {
@@ -190,7 +192,8 @@ export function renderCasesPage(artifacts: PublicBenchmarkArtifacts, uiLocale: S
   const studentStates = facetValues(publicCases, (item) => item.metadata.studentState === undefined ? [] : [item.metadata.studentState], (value) => displayTaxonomyLabel(value, uiLocale));
   const locales = facetValues(publicCases, (item) => [item.locale ?? "en"], localeLabel);
   const disclosurePolicies = facetValues(publicCases, (item) => item.disclosurePolicy === undefined ? [] : [item.disclosurePolicy], (value) => displayTaxonomyLabel(value, uiLocale));
-  const initialEnd = Math.min(12, total);
+  const initialStart = total === 0 ? 0 : 1;
+  const initialEnd = Math.min(CASES_PAGE_SIZE, total);
   const heading = uiLocale === "zh-CN"
     ? escapeHtml(formatTeachingSituations(total, uiLocale)) + "<br><em>一套基准。</em>"
     : `${escapeHtml(String(total))} teaching<br>situations. <em>One benchmark.</em>`;
@@ -200,7 +203,7 @@ export function renderCasesPage(artifacts: PublicBenchmarkArtifacts, uiLocale: S
     "/data/cases/",
     `<div class="cases-main">
       <section class="cases-hero" aria-labelledby="cases-title"><div class="shell cases-hero-grid"><div class="cases-hero-copy"><p class="eyebrow">Case library</p><h1 id="cases-title">${heading}</h1><p class="cases-hero-lede">Browse structured student–tutor situations from the public Teachometry development set. Each authored case captures a learner context, learning objective, current message, difficulty, and tutoring capability focus.</p><div class="cases-hero-actions"><a class="button button-primary" href="#case-library">Explore the cases ${icon("arrow")}</a><a class="button button-secondary" href="/methodology/#method-scope">${icon("book")} About our cases</a></div><div class="cases-proof"><span><i>${icon("document")}</i><b>${escapeHtml(formatPublicCount(total, "publicCases", uiLocale))}</b><small>Across subjects and language contexts.</small></span><span><i>${icon("book")}</i><b>Authored contexts</b><small>Learner context, objective, and message.</small></span><span><i>${icon("check")}</i><b>Transparent and reproducible</b><small>Public, versioned, and inspectable.</small></span></div></div>${renderCaseSpecimen(exampleCase, uiLocale)}</div></section>
-      <section class="cases-library" id="case-library" aria-labelledby="case-library-title"><div class="shell cases-shell"><button class="cases-filter-toggle" type="button" data-case-filter-toggle aria-expanded="false" aria-controls="case-filter-panel">${icon("filter")}<span>Filters</span><b data-case-active-filter-count>0</b></button><div class="cases-library-layout"><aside class="cases-filter-rail" id="case-filter-panel" data-case-filter-panel aria-label="Filter public cases"><form id="case-filters"><div class="cases-search"><label for="case-search">Search cases...</label><div class="cases-search-control">${icon("search")}<input id="case-search" type="search" placeholder="Search cases..." autocomplete="off" data-case-search></div><p>Search by keyword, topic, or case ID</p></div><div class="cases-filter-heading"><p class="eyebrow">Filters</p><span data-case-filter-summary>All cases</span></div>${renderFilterGroup("subject", "Subject", subjects, total, "All subjects")}${renderFilterGroup("learnerLevel", "Learner level", learnerLevels, total, "All levels")}${renderFilterGroup("taskDifficulty", "Task difficulty", taskDifficulties, total, "All difficulties")}${renderFilterGroup("pedagogicalDifficulty", "Pedagogical difficulty", pedagogicalDifficulties, total, "All difficulties")}${renderFilterGroup("capability", "Capability focus", capabilities, total, "All capabilities")}${renderFilterGroup("studentState", "Student state", studentStates, total, "All states")}${renderFilterGroup("locale", "Locale", locales, total, "All locales")}${renderFilterGroup("disclosurePolicy", "Disclosure policy", disclosurePolicies, total, "All policies")}<button class="cases-reset" type="reset" id="case-filter-reset">${icon("refresh")} ${renderUiText("resetFilters", "en")}</button></form></aside><div class="cases-results-region"><div class="cases-results-head"><div><div class="cases-results-title"><h2 id="case-library-title">${escapeHtml(String(total))} cases</h2><span id="case-result-count" aria-live="polite" data-case-count-value="${total}" data-case-count-start="${total === 0 ? 0 : 1}" data-case-count-end="${initialEnd}" data-case-count-template-en="Showing {start}–{end} of {count} cases" data-case-count-template-zh-cn="显示 {start}–{end} / 共 {count} 个案例">Showing ${total === 0 ? 0 : 1}–${initialEnd} of ${total} cases</span></div></div><div class="cases-results-controls"><div class="cases-view-toggle" role="group" aria-label="Case display mode"><button type="button" data-case-view="cards" aria-pressed="true">${icon("grid")} Cards</button><button type="button" data-case-view="compact" aria-pressed="false">${icon("list")} Compact</button></div><label class="cases-sort"><span>Sort by</span><select data-case-sort aria-label="Sort cases"><option value="case-id-asc">Case ID (A → Z)</option><option value="case-id-desc">Case ID (Z → A)</option><option value="subject">Subject</option><option value="learner-level">Learner level</option><option value="task-difficulty">Task difficulty</option></select></label></div></div><div class="case-results" data-case-results data-view="cards" data-page-size="12"><div class="case-card-grid">${publicCases.map((item) => renderCaseCard(item, uiLocale)).join("")}</div><div class="case-filter-empty" id="case-filter-empty" hidden>${renderEmptyState("No cases match these filters.", "Reset the filters to return to the full public development set.")}</div><nav class="case-pagination" data-case-pagination aria-label="Case pages"></nav></div></div></div></div></section>
+      <section class="cases-library" id="case-library" aria-labelledby="case-library-title"><div class="shell cases-shell"><button class="cases-filter-toggle" type="button" data-case-filter-toggle aria-expanded="false" aria-controls="case-filter-panel">${icon("filter")}<span>Filters</span><b data-case-active-filter-count>0</b></button><div class="cases-library-layout"><aside class="cases-filter-rail" id="case-filter-panel" data-case-filter-panel aria-label="Filter public cases"><form id="case-filters"><div class="cases-search"><label for="case-search">Search cases...</label><div class="cases-search-control">${icon("search")}<input id="case-search" type="search" placeholder="Search cases..." autocomplete="off" data-case-search></div><p>Search by keyword, topic, or case ID</p></div><div class="cases-filter-heading"><p class="eyebrow">Filters</p><span data-case-filter-summary>All cases</span></div>${renderFilterGroup("subject", "Subject", subjects, total, "All subjects")}${renderFilterGroup("learnerLevel", "Learner level", learnerLevels, total, "All levels")}${renderFilterGroup("taskDifficulty", "Task difficulty", taskDifficulties, total, "All difficulties")}${renderFilterGroup("pedagogicalDifficulty", "Pedagogical difficulty", pedagogicalDifficulties, total, "All difficulties")}${renderFilterGroup("capability", "Capability focus", capabilities, total, "All capabilities")}${renderFilterGroup("studentState", "Student state", studentStates, total, "All states")}${renderFilterGroup("locale", "Locale", locales, total, "All locales")}${renderFilterGroup("disclosurePolicy", "Disclosure policy", disclosurePolicies, total, "All policies")}<button class="cases-reset" type="reset" id="case-filter-reset">${icon("refresh")} ${renderUiText("resetFilters", "en")}</button></form></aside><div class="cases-results-region"><div class="cases-results-head"><div><div class="cases-results-title"><h2 id="case-library-title">${escapeHtml(String(total))} cases</h2><span id="case-result-count" aria-live="polite" data-case-count-value="${total}" data-case-count-start="${initialStart}" data-case-count-end="${initialEnd}" data-case-count-template-en="${escapeHtml(CASE_COUNT_TEMPLATES.en)}" data-case-count-template-zh-cn="${escapeHtml(CASE_COUNT_TEMPLATES["zh-CN"])}">${escapeHtml(formatCaseCount(initialStart, initialEnd, total, uiLocale))}</span></div></div><div class="cases-results-controls"><div class="cases-view-toggle" role="group" aria-label="Case display mode"><button type="button" data-case-view="cards" aria-pressed="true">${icon("grid")} Cards</button><button type="button" data-case-view="compact" aria-pressed="false">${icon("list")} Compact</button></div><label class="cases-sort"><span>Sort by</span><select data-case-sort aria-label="Sort cases"><option value="case-id-asc">Case ID (A → Z)</option><option value="case-id-desc">Case ID (Z → A)</option><option value="subject">Subject</option><option value="learner-level">Learner level</option><option value="task-difficulty">Task difficulty</option></select></label></div></div><div class="case-results" data-case-results data-view="cards" data-page-size="${CASES_PAGE_SIZE}"><div class="case-card-grid">${publicCases.map((item) => renderCaseCard(item, uiLocale)).join("")}</div><div class="case-filter-empty" id="case-filter-empty" hidden>${renderEmptyState("No cases match these filters.", "Reset the filters to return to the full public development set.")}</div><nav class="case-pagination" data-case-pagination aria-label="Case pages"></nav></div></div></div></div></section>
       <section class="cases-commitment"><div class="shell cases-commitment-grid"><div><p class="eyebrow">Our commitment</p><h2><span>${icon("leaf")}</span>Open cases<br>for better learning.</h2></div><p>These authored public development cases are released for research, education, and community use. Together, they can help us build more transparent and effective AI tutoring systems.</p><div class="cases-commitment-actions"><a class="button button-primary" href="/docs/">Browse the documentation ${icon("arrow")}</a><a class="button button-secondary" href="${SITE_GITHUB_URL}" rel="noreferrer">${icon("github")} View on GitHub</a></div></div></section>
     </div>${renderTeachometryFooter(artifacts)}`,
   );
@@ -317,12 +320,12 @@ export function renderCaseDetailPage(
   ];
   return page(
     `${humanize(caseArtifact.metadata.topic)} — Teachometry`,
-    `Public TutorEval case ${caseArtifact.id}: ${caseArtifact.tutorInput.learningObjective}`,
+    formatCaseDescription(caseArtifact.id, caseArtifact.tutorInput.learningObjective, uiLocale),
     `/data/cases/${encodeURIComponent(caseArtifact.id)}/`,
     `<div class="case-detail-main">
       <section class="case-detail-hero" aria-labelledby="case-detail-title">
         <div class="shell">
-          <div class="case-detail-breadcrumbs"><nav aria-label="Breadcrumb"><a href="/data/cases/">Cases</a><span aria-hidden="true">›</span><a href="/data/cases/#case-library">Case Library</a><span aria-hidden="true">›</span><span aria-current="page">${escapeHtml(caseArtifact.id)}</span></nav><a class="case-detail-back" href="/data/cases/">← Back to case explorer</a></div>
+          <div class="case-detail-breadcrumbs"><nav aria-label="${uiLocale === "zh-CN" ? "面包屑导航" : "Breadcrumb"}"><a href="/data/cases/">Cases</a><span aria-hidden="true">›</span><a href="/data/cases/#case-library">Case Library</a><span aria-hidden="true">›</span><span aria-current="page">${escapeHtml(caseArtifact.id)}</span></nav><a class="case-detail-back" href="/data/cases/">← Back to case explorer</a></div>
           <div class="case-detail-hero-grid">
             <div class="case-detail-hero-copy">
               <div class="case-detail-identity"><span class="case-detail-bookmark">${icon("bookmark")}</span><span class="case-detail-id">${escapeHtml(caseArtifact.id)}</span><span class="case-detail-subject">${escapeHtml(displayTaxonomyLabel(caseArtifact.metadata.subject, uiLocale))}</span></div>
@@ -453,6 +456,7 @@ function renderExplorerStats(stats: readonly ExplorerStat[]): string {
 }
 
 function renderExplorerHero(options: {
+  readonly uiLocale: SiteLocale;
   readonly kind: "heatmap" | "trials" | "detail";
   readonly breadcrumbs: readonly ExplorerBreadcrumb[];
   readonly eyebrow: string;
@@ -463,7 +467,7 @@ function renderExplorerHero(options: {
   readonly stats?: readonly ExplorerStat[];
 }): string {
   const breadcrumbMarkup = options.breadcrumbs.map((item, index) => `${index > 0 ? `<span aria-hidden="true">›</span>` : ""}${item.href === undefined ? `<span aria-current="page">${escapeHtml(item.label)}</span>` : `<a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a>`}`).join("");
-  return `<section class="explorer-hero explorer-${options.kind}-hero" aria-labelledby="${options.kind}-title"><div class="shell"><div class="explorer-hero-grid"><div class="explorer-hero-copy"><nav class="explorer-breadcrumbs" aria-label="Breadcrumb">${breadcrumbMarkup}</nav><p class="eyebrow">${escapeHtml(options.eyebrow)}</p><h1 id="${options.kind}-title">${escapeHtml(options.heading)}</h1><p class="explorer-hero-editorial">${escapeHtml(options.editorial).replaceAll("\n", "<br>")}</p><p class="explorer-hero-description">${escapeHtml(options.description)}</p></div><div class="explorer-hero-art">${renderExplorerBotanical(`explorer-botanical-${options.kind}`)}<p class="explorer-handwritten">${escapeHtml(options.note).replaceAll("\n", "<br>")}</p></div></div>${options.stats === undefined ? "" : renderExplorerStats(options.stats)}</div></section>`;
+  return `<section class="explorer-hero explorer-${options.kind}-hero" aria-labelledby="${options.kind}-title"><div class="shell"><div class="explorer-hero-grid"><div class="explorer-hero-copy"><nav class="explorer-breadcrumbs" aria-label="${options.uiLocale === "zh-CN" ? "面包屑导航" : "Breadcrumb"}">${breadcrumbMarkup}</nav><p class="eyebrow">${escapeHtml(options.eyebrow)}</p><h1 id="${options.kind}-title">${escapeHtml(options.heading)}</h1><p class="explorer-hero-editorial">${escapeHtml(options.editorial).replaceAll("\n", "<br>")}</p><p class="explorer-hero-description">${escapeHtml(options.description)}</p></div><div class="explorer-hero-art">${renderExplorerBotanical(`explorer-botanical-${options.kind}`)}<p class="explorer-handwritten">${escapeHtml(options.note).replaceAll("\n", "<br>")}</p></div></div>${options.stats === undefined ? "" : renderExplorerStats(options.stats)}</div></section>`;
 }
 
 function renderExplorerTabs(items: readonly [string, string, boolean][], label: string): string {
@@ -497,6 +501,7 @@ export function renderHeatmapPage(artifacts: PublicBenchmarkArtifacts, uiLocale:
     "/data/heatmap/",
     `<div class="explorer-main heatmap-main">${renderExplorerHero({
       kind: "heatmap",
+      uiLocale,
       breadcrumbs: [{ label: "Data", href: "/data/" }, { label: "Heatmap" }],
       eyebrow: "Benchmark explorer",
       heading: "Evidence Matrix",
@@ -548,6 +553,7 @@ export function renderTrialsPage(artifacts: PublicBenchmarkArtifacts, uiLocale: 
     "/data/trials/",
     `<div class="explorer-main trials-main">${renderExplorerHero({
       kind: "trials",
+      uiLocale,
       breadcrumbs: [{ label: "Data", href: "/data/" }, { label: "Trials" }],
       eyebrow: "Benchmark explorer",
       heading: "Model Trials",
@@ -596,6 +602,7 @@ export function renderTrialDetailPage(artifacts: PublicBenchmarkArtifacts, uiLoc
     "/data/trials/[trialId]/",
     `<div class="explorer-main detail-main">${renderExplorerHero({
       kind: "detail",
+      uiLocale,
       breadcrumbs: [{ label: "Data", href: "/data/" }, { label: "Trials", href: "/data/trials/" }, { label: "Trial detail" }],
       eyebrow: "Trial details",
       heading: "Trial detail",

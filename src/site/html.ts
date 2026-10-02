@@ -45,6 +45,8 @@ export interface SiteRenderContext {
 
 export interface SitePageSeo {
   readonly type?: "website" | "article";
+  /** Semantic article title, independent of the document title's site suffix. */
+  readonly headline?: string;
   readonly image?: string;
   /** ISO-8601 date for article metadata. */
   readonly publishedDate?: string;
@@ -174,9 +176,11 @@ function structuredDataForPage(
         contactPoint: {
           "@type": "ContactPoint",
           email: SITE_CONTACT_EMAIL,
-          contactType: "project inquiries",
+          contactType: locale === "zh-CN" ? "项目咨询" : "project inquiries",
         },
-        description: "Open measurement infrastructure for observable AI tutoring behavior.",
+        description: locale === "zh-CN"
+          ? "用于测量 AI 可观察教学行为的开放基础设施。"
+          : "Open measurement infrastructure for observable AI tutoring behavior.",
       },
     );
   }
@@ -215,7 +219,7 @@ function structuredDataForPage(
     graph.push({
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      headline: page.title.replace(/\s+[—-]\s+Teachometry Blog$/u, ""),
+      headline: page.seo.headline ?? page.title,
       description: page.description,
       url: canonicalUrl,
       mainEntityOfPage: canonicalUrl,
@@ -603,7 +607,14 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const localizedRoutes = context.localizedRoutes ?? true;
   const siteUrl = context.siteUrl?.replace(/\/$/, "");
   const localizedPage: SitePage = locale === "zh-CN"
-    ? { ...page, title: translateSiteCopy(page.title, locale), description: translateSiteCopy(page.description, locale) }
+    ? {
+      ...page,
+      title: translateSiteCopy(page.title, locale),
+      description: translateSiteCopy(page.description, locale),
+      ...(page.seo?.headline === undefined ? {} : {
+        seo: { ...page.seo, headline: translateSiteCopy(page.seo.headline, locale) },
+      }),
+    }
     : page;
   const publicRoute = localizedRoutes ? siteLocaleRoute(page.route, locale) : page.route;
   const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${publicRoute}`;

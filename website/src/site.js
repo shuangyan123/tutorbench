@@ -642,13 +642,10 @@ let activeSiteLocale =
       if (visible) visibleCount += 1;
     });
     if (status instanceof HTMLElement) {
-      status.textContent = visibleCount === entries.length && activeCategory === 'all' && query.length === 0
-        ? activeSiteLocale === 'zh-CN'
-          ? `显示 ${entries.length} 条参考资料`
-          : `Showing ${entries.length} references`
-        : activeSiteLocale === 'zh-CN'
-          ? `显示 ${visibleCount} / ${entries.length} 条参考资料`
-          : `Showing ${visibleCount} of ${entries.length} references`;
+      const allReferences = visibleCount === entries.length && activeCategory === 'all' && query.length === 0;
+      // 模板由静态页面按 locale 提供，首次 HTML 与交互状态保持一致。
+      const template = status.getAttribute(allReferences ? 'data-doc-count-template' : 'data-doc-filtered-count-template') ?? '';
+      status.textContent = template.replaceAll('{visible}', String(visibleCount)).replaceAll('{count}', String(entries.length));
     }
     if (emptyState instanceof HTMLElement) emptyState.hidden = visibleCount !== 0;
     if (clearButton instanceof HTMLButtonElement) clearButton.hidden = query.length === 0;
