@@ -29,7 +29,11 @@ after(async () => { if (output !== undefined) await rm(output, { recursive: true
 function html(route: string, locale: SiteLocale = "zh-CN"): Promise<string> {
   return readFile(join(output, locale === "zh-CN" ? "zh-cn" : "", route.slice(1), "index.html"), "utf8");
 }
-function text(markup: string): string { return markup.replace(/<[^>]*>/gu, "").replace(/\s+/gu, " ").trim(); }
+function text(markup: string): string {
+  // 仅提取已生成 HTML 的文本片段供断言比较，不生成或过滤可再次渲染的 HTML。
+  return [...markup.matchAll(/(?:^|>)([^<]*)/gu)]
+    .map(match => match[1] ?? "").join("").replace(/\s+/gu, " ").trim();
+}
 function final(page: SitePage, locale: SiteLocale = "zh-CN"): string { return renderPage(page, { locale }); }
 
 const ROUTES = ["/", "/about/", "/data/", "/data/cases/", "/methodology/", "/leaderboard/", "/models/", "/models/[modelId]/", "/run/", "/docs/", "/data/heatmap/", "/data/trials/", "/data/trials/[trialId]/", "/blog/"];
