@@ -241,13 +241,13 @@ function routePages(
     { outputRoute: "/models/[modelId]/", page: renderModelDetailPage(artifacts, locale) },
     { outputRoute: "/data/", page: renderDataIndexPage(artifacts, locale) },
     { outputRoute: "/data/cases/", page: renderCasesPage(artifacts, locale) },
-    { outputRoute: "/data/heatmap/", page: renderHeatmapPage(artifacts) },
-    { outputRoute: "/data/trials/", page: renderTrialsPage(artifacts) },
-    { outputRoute: "/data/trials/[trialId]/", page: renderTrialDetailPage(artifacts) },
+    { outputRoute: "/data/heatmap/", page: renderHeatmapPage(artifacts, locale) },
+    { outputRoute: "/data/trials/", page: renderTrialsPage(artifacts, locale) },
+    { outputRoute: "/data/trials/[trialId]/", page: renderTrialDetailPage(artifacts, locale) },
     { outputRoute: "/run/", page: renderRunPage(artifacts, locale) },
-    { outputRoute: "/methodology/", page: renderMethodologyPage(artifacts) },
-    { outputRoute: "/docs/", page: renderDocsPage(artifacts) },
-    { outputRoute: "/about/", page: renderAboutPage(artifacts, packageVersion) },
+    { outputRoute: "/methodology/", page: renderMethodologyPage(artifacts, locale) },
+    { outputRoute: "/docs/", page: renderDocsPage(artifacts, locale) },
+    { outputRoute: "/about/", page: renderAboutPage(artifacts, packageVersion, locale) },
     { outputRoute: "/community/", page: renderCommunityPage(artifacts, locale) },
     { outputRoute: "/contact/", page: renderContactPage(artifacts) },
   ];
@@ -399,10 +399,10 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
 
     const blogPages = [
       renderBlogIndexPage(renderTeachometryFooter(artifacts)),
-      renderWhenLearningStartsToFeelLikeFailurePage(renderTeachometryFooter(artifacts)),
-      renderClassroomDoesNotNeedRobotsPage(renderTeachometryFooter(artifacts)),
-      renderWhyTeachingDoesNotScalePage(renderTeachometryFooter(artifacts)),
-      renderTeachingAndSupervisionPage(renderTeachometryFooter(artifacts)),
+      renderWhenLearningStartsToFeelLikeFailurePage(renderTeachometryFooter(artifacts), buildLocale),
+      renderClassroomDoesNotNeedRobotsPage(renderTeachometryFooter(artifacts), buildLocale),
+      renderWhyTeachingDoesNotScalePage(renderTeachometryFooter(artifacts), buildLocale),
+      renderTeachingAndSupervisionPage(renderTeachometryFooter(artifacts), buildLocale),
     ];
     for (const blogPage of blogPages) {
       await writePage(

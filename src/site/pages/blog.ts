@@ -1,4 +1,6 @@
 import { escapeHtml as e, type SitePage } from "../html.js";
+import type { SiteLocale } from "../i18n.js";
+import { publicUiCopy } from "../public-localization.js";
 import { siteIcon as icon } from "../icons.js";
 import { renderEditorialBotanical } from "../illustrations.js";
 
@@ -473,10 +475,10 @@ function renderArticleCallout(callout: BlogCallout, evidence = false): string {
   </aside>`;
 }
 
-function renderArticleSection(section: BlogArticleSection): string {
+function renderArticleSection(section: BlogArticleSection, uiLocale: SiteLocale): string {
   const progression = section.progression === undefined
     ? ""
-    : `<ul class="article-progression">${section.progression.map((item) => `<li><strong>${e(item.label)}:</strong><span>${e(item.text)}</span></li>`).join("")}</ul>`;
+    : `<ul class="article-progression">${section.progression.map((item) => `<li><strong>${e(publicUiCopy(item.label, uiLocale))}${uiLocale === "zh-CN" ? "：" : ":"}</strong><span>${e(item.text)}</span></li>`).join("")}</ul>`;
   return `<section class="article-section" aria-labelledby="${e(articleHeadingId(section.heading))}">
     <h2 id="${e(articleHeadingId(section.heading))}">${e(section.heading)}</h2>
     ${section.paragraphs.map((paragraph) => `<p>${e(paragraph)}</p>`).join("")}
@@ -528,7 +530,7 @@ function articlePublishedIso(article: BlogArticle): string {
   return value;
 }
 
-function renderBlogArticlePage(article: BlogArticle, footer = ""): SitePage {
+function renderBlogArticlePage(article: BlogArticle, footer = "", uiLocale: SiteLocale = "en"): SitePage {
   const rendered = page(
     `${article.title} — Teachometry Blog`,
     article.description,
@@ -542,7 +544,7 @@ function renderBlogArticlePage(article: BlogArticle, footer = ""): SitePage {
       </div><div class="article-hero-art" aria-hidden="true">${renderBotanical()}<p class="article-handwritten">Questions before<br>conclusions.</p><span class="article-art-rule"></span></div></div></header>
       <div class="shell article-media-shell"><figure class="article-media"><img src="/assets/${e(article.image)}" width="1672" height="941" fetchpriority="high" alt="${e(article.imageAlt)}"></figure></div>
       <div class="shell article-mobile-toc">${renderArticleToc(article, true)}</div>
-      <div class="shell article-layout"><aside class="article-rail">${renderArticleToc(article)}<div class="article-pull-quote"><p>“${e(article.pullQuote)}”</p></div></aside><div class="article-content">${article.sections.map(renderArticleSection).join("")}${renderArticleCallout({ label: "Evidence boundary", body: article.evidenceBoundary }, true)}</div></div>
+      <div class="shell article-layout"><aside class="article-rail">${renderArticleToc(article)}<div class="article-pull-quote"><p>“${e(publicUiCopy(article.pullQuote, uiLocale))}”</p></div></aside><div class="article-content">${article.sections.map(section => renderArticleSection(section, uiLocale)).join("")}${renderArticleCallout({ label: "Evidence boundary", body: article.evidenceBoundary }, true)}</div></div>
       <div class="shell article-nav-shell">${renderArticleNavigation(article)}</div>
     </article>
     ${renderArticleTransition()}
@@ -575,18 +577,18 @@ export function renderBlogIndexPage(footer = ""): SitePage {
   );
 }
 
-export function renderWhenLearningStartsToFeelLikeFailurePage(footer = ""): SitePage {
-  return renderBlogArticlePage(WHEN_LEARNING_FEELS_LIKE_FAILURE, footer);
+export function renderWhenLearningStartsToFeelLikeFailurePage(footer = "", uiLocale: SiteLocale = "en"): SitePage {
+  return renderBlogArticlePage(WHEN_LEARNING_FEELS_LIKE_FAILURE, footer, uiLocale);
 }
 
-export function renderClassroomDoesNotNeedRobotsPage(footer = ""): SitePage {
-  return renderBlogArticlePage(CLASSROOM_DOES_NOT_NEED_ROBOTS, footer);
+export function renderClassroomDoesNotNeedRobotsPage(footer = "", uiLocale: SiteLocale = "en"): SitePage {
+  return renderBlogArticlePage(CLASSROOM_DOES_NOT_NEED_ROBOTS, footer, uiLocale);
 }
 
-export function renderWhyTeachingDoesNotScalePage(footer = ""): SitePage {
-  return renderBlogArticlePage(WHY_TEACHING_DOES_NOT_SCALE, footer);
+export function renderWhyTeachingDoesNotScalePage(footer = "", uiLocale: SiteLocale = "en"): SitePage {
+  return renderBlogArticlePage(WHY_TEACHING_DOES_NOT_SCALE, footer, uiLocale);
 }
 
-export function renderTeachingAndSupervisionPage(footer = ""): SitePage {
-  return renderBlogArticlePage(TEACHING_AND_SUPERVISION, footer);
+export function renderTeachingAndSupervisionPage(footer = "", uiLocale: SiteLocale = "en"): SitePage {
+  return renderBlogArticlePage(TEACHING_AND_SUPERVISION, footer, uiLocale);
 }

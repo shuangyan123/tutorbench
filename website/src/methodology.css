@@ -219,6 +219,12 @@
   overflow: visible;
 }
 
+/* 中文使用文本节点；不能继承 SVG 注记容器的零行高。 */
+.method-hero-lettering-copy {
+  font-size: clamp(14px, 3.2cqi, 21px);
+  line-height: 1.25;
+}
+
 .method-hero-note,
 .method-hero-aside {
   position: absolute;

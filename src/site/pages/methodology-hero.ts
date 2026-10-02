@@ -1,6 +1,7 @@
+import type { SiteLocale } from "../i18n.js";
 import { renderMethodologyAnnotation } from "./methodology-annotation.js";
 
-export function renderMethodologyHeroArt(): string {
+export function renderMethodologyHeroArt(uiLocale: SiteLocale = "en"): string {
   // 植物、引线与 HTML 注记共用比例坐标，避免断点变化时枝叶穿过文字。
   return `<div class="method-hero-art" aria-hidden="true">
     <svg class="method-hero-illustration" viewBox="0 0 640 390" aria-hidden="true" focusable="false">
@@ -29,7 +30,7 @@ export function renderMethodologyHeroArt(): string {
       </g>
       <path class="method-hero-leader" d="M551 93C558 112 541 124 514 127Q483 133 451 134M460 128L451 134L461 139" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <p class="method-hero-note"><span class="visually-hidden">From<br>cases to insights.</span>${renderMethodologyAnnotation()}</p>
-    <p class="method-hero-aside">A transparent<br>approach to<br>evaluating<br>AI tutoring.</p>
+    <p class="method-hero-note"><span class="visually-hidden">${uiLocale === "zh-CN" ? "从案例走向洞见。" : "From<br>cases to insights."}</span>${uiLocale === "zh-CN" ? '<span class="method-hero-lettering method-hero-lettering-copy">从案例<br>走向洞见。</span>' : renderMethodologyAnnotation()}</p>
+    <p class="method-hero-aside">${uiLocale === "zh-CN" ? "透明评测<br>AI 教学的<br>方法。" : "A transparent<br>approach to<br>evaluating<br>AI tutoring."}</p>
   </div>`;
 }
