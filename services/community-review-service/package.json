@@ -4,7 +4,7 @@
   "type": "module",
   "dependencies": {
     "jose": "6.2.12",
-    "pg": "8.23.0"
+    "pg": "8.23.1"
   },
   "description": "Isolated P4-A/P4-B/P4-C/P4-D/P4-E/P4-F/P4-G and L2-C2C Community Review service boundary; not a public package.",
   "scripts": {
