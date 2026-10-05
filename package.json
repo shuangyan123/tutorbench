@@ -105,7 +105,7 @@
     "test:local-baseline": "node --test scripts/local-real-model-baseline.test.mjs"
   },
   "devDependencies": {
-    "@auth0/auth0-spa-js": "2.27.0",
+    "@auth0/auth0-spa-js": "2.28.2",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.6",
     "eslint": "^10.11.0",
