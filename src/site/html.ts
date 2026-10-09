@@ -502,6 +502,7 @@ function renderHeader(
     activeRoute === "/leaderboard/" ||
     activeRoute === "/about/" ||
     activeRoute === "/community/" ||
+    activeRoute === "/micro-review/" ||
     activeRoute === "/run/" ||
     activeRoute === "/docs/" ||
     activeRoute === "/contact/" ||
@@ -639,10 +640,13 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const isTrialDetailRoute = page.route === "/data/trials/[trialId]/";
   const isExplorerPage = isHeatmapPage || isTrialsPage || isTrialDetailRoute;
   const isNotFoundPage = page.route === "/404.html";
+  const isMicroReviewPage = page.route === "/micro-review/";
   const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/contact/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
   const usesHomeStyles = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/contact/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
   const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/contact/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
-  const bodyClass = isNotFoundPage
+  const bodyClass = isMicroReviewPage
+    ? ' class="home-page micro-review-page"'
+    : isNotFoundPage
     ? ' class="home-page not-found-page"'
     : page.route === "/"
     ? ' class="home-page"'
@@ -705,7 +709,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="icon" type="image/png" sizes="32x32" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-32.png"))}">
     <link rel="icon" type="image/png" sizes="16x16" href="${escapeHtml(brandAssetPath(basePath, "raster/favicon-16.png"))}">
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
-    ${isTeachometryPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/teachometry.css"))}">` : ""}
+    ${isTeachometryPage || isMicroReviewPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/teachometry.css"))}">${isMicroReviewPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/micro-review.css"))}"><script src="${escapeHtml(sitePath(basePath, "/assets/micro-review.js"))}" defer></script>` : ""}` : ""}
     ${usesHomeStyles ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
     ${page.route === "/data/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/benchmark.css"))}">` : ""}
     ${page.route === "/methodology/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/methodology.css"))}">` : ""}
@@ -728,7 +732,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <a class="skip-link" href="#main-content">Skip to content</a>
     ${renderHeader(page.route, basePath, locale, localizedRoutes)}
     <main id="main-content">${page.content}</main>
-    ${usesTeachometryFooter ? "" : renderFooter(context.benchmark ?? ({
+    ${usesTeachometryFooter || isMicroReviewPage ? "" : renderFooter(context.benchmark ?? ({
       statusLabel: "Developer Preview",
       dataset: { id: TUTOR_EVAL_DATASET_ID, version: TUTOR_EVAL_DATASET_VERSION },
     }), locale)}

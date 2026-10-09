@@ -1,0 +1,197 @@
+.micro-review-page [hidden] {
+  display: none !important;
+}
+
+body.micro-review-page main .micro-review {
+  max-width: 980px;
+  padding-block: 48px 56px;
+}
+
+.micro-review-intro {
+  max-width: 720px;
+  margin-bottom: 36px;
+}
+
+.micro-review-intro h1 {
+  margin: 10px 0 16px;
+  font: 400 clamp(32px, 4vw, 48px)/1.14 var(--teach-serif);
+  letter-spacing: -0.025em;
+}
+
+.micro-review p {
+  margin: 0 0 14px;
+  line-height: 1.65;
+}
+
+.micro-review h2,
+.micro-review legend {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font: 400 24px/1.3 var(--teach-serif);
+}
+
+.micro-review h3 {
+  margin: 0 0 8px;
+}
+
+.micro-review .micro-review-meta,
+.micro-review-provenance,
+.micro-review-editorial,
+.micro-review-boundary,
+#micro-review-choice-help {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.micro-review-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.micro-review-grid > section {
+  min-width: 0;
+}
+
+.micro-review-conversation {
+  border: 1px solid var(--line);
+  border-radius: var(--teach-button-radius);
+  background: var(--surface);
+}
+
+.micro-review-conversation > div {
+  padding: 20px;
+}
+
+.micro-review-conversation > div + div {
+  border-top: 1px solid var(--line);
+  background: var(--surface-muted);
+}
+
+.micro-review-conversation h3 {
+  color: var(--muted);
+  font: 600 12px/1.6 var(--teach-mono);
+}
+
+.micro-review-conversation p {
+  margin: 0;
+}
+
+.micro-review fieldset {
+  min-width: 0;
+  padding: 0;
+  margin: 0 0 20px;
+  border: 0;
+}
+
+.micro-review legend {
+  padding: 0;
+}
+
+.micro-review-options {
+  display: grid;
+  gap: 10px;
+}
+
+.micro-review-options label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--teach-button-radius);
+  cursor: pointer;
+}
+
+.micro-review-options label:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.micro-review-options input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.micro-review-options label:has(input:disabled) {
+  cursor: default;
+}
+
+.micro-review-options input:disabled {
+  opacity: 1;
+}
+
+.micro-review-status:empty {
+  /* 保留空的 live region，让读屏在提交前就能监听完成消息。 */
+  margin: 0;
+}
+
+.micro-review-status {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.micro-review-result {
+  max-width: 720px;
+  padding-top: 32px;
+  margin-top: 32px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.micro-review-equation {
+  color: var(--accent);
+  font: 600 clamp(14px, 2vw, 20px)/1.8 var(--teach-mono);
+  overflow-wrap: anywhere;
+}
+
+.micro-review-invitation {
+  padding: 24px 0 0;
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.micro-review-invitation h3 {
+  font: 400 24px/1.3 var(--teach-serif);
+}
+
+.micro-review-invitation .button {
+  margin-bottom: 14px;
+  white-space: normal;
+}
+
+.micro-review-boundary {
+  max-width: 720px;
+  padding-top: 24px;
+  margin-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 760px) {
+  body.micro-review-page main .micro-review {
+    padding-block: 28px 40px;
+  }
+
+  .micro-review-intro {
+    margin-bottom: 24px;
+  }
+
+  .micro-review-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .micro-review-conversation > div {
+    padding: 16px;
+  }
+}
+
+@media (forced-colors: active) {
+  .micro-review-options label:has(input:checked) {
+    outline: 2px solid Highlight;
+  }
+}
