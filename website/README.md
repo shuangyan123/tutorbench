@@ -32,6 +32,14 @@ future invite-only workflow could work. Applications, public reviewer intake,
 real Community Review, and P5 human calibration remain closed or not started;
 the page has no form, waitlist, login, or service integration.
 
+The standalone `/micro-review/` and `/zh-cn/micro-review/` routes offer one
+explicitly constructed teaching dialogue, three local judgment choices, a short
+authored analysis, and an optional link to the future Reviewer plan. No choice
+is transmitted or persisted, no analytics is enabled, and no formal review or
+benchmark result is created. See `docs/micro-review-experiment.md` for the
+experiment, privacy boundaries, proposed participation measures, and launch
+limitations. The homepage and existing navigation remain unchanged.
+
 `.github/workflows/pages.yml` builds this directory and deploys it to GitHub
 Pages only from `main`. GitHub Pages provides the project `base_path` and
 canonical `base_url` to the generator, so project-site links work under

@@ -697,7 +697,7 @@ test("static website build emits the public artifact files and route shell", asy
     const zhHomeHtml = await readFile(join(outputDirectory, "zh-cn", "index.html"), "utf8");
     const zhNotFoundHtml = await readFile(join(outputDirectory, "zh-cn", "404.html"), "utf8");
 
-    assert.equal(routeCount, 63);
+    assert.equal(routeCount, 64);
     assert.match(zhHomeHtml, /<html lang="zh-CN" data-ui-locale="zh-CN">/);
     assert.match(zhHomeHtml, /部署之前，先看证据/);
     assert.match(zhHomeHtml, /href="\/zh-cn\/run\/">/);

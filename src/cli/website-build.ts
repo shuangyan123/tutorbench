@@ -62,6 +62,7 @@ import {
   renderRunPage,
 } from "../site/pages/developer.js";
 import { renderCommunityPage } from "../site/pages/community.js";
+import { renderMicroReviewPage } from "../site/pages/micro-review.js";
 import { renderContactPage } from "../site/pages/contact.js";
 import { renderTeachometryFooter } from "../site/pages/home.js";
 import { renderNotFoundPage } from "../site/pages/not-found.js";
@@ -249,6 +250,7 @@ function routePages(
     { outputRoute: "/docs/", page: renderDocsPage(artifacts, locale) },
     { outputRoute: "/about/", page: renderAboutPage(artifacts, packageVersion, locale) },
     { outputRoute: "/community/", page: renderCommunityPage(artifacts, locale) },
+    { outputRoute: "/micro-review/", page: renderMicroReviewPage(artifacts) },
     { outputRoute: "/contact/", page: renderContactPage(artifacts) },
   ];
   const routePages = [
@@ -353,6 +355,8 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await copyFile(join(websiteRoot, "src", "case-detail.css"), join(outputDirectory, "assets", "case-detail.css"));
   await copyFile(join(websiteRoot, "src", "about.css"), join(outputDirectory, "assets", "about.css"));
   await copyFile(join(websiteRoot, "src", "community.css"), join(outputDirectory, "assets", "community.css"));
+  await copyFile(join(websiteRoot, "src", "micro-review.css"), join(outputDirectory, "assets", "micro-review.css"));
+  await copyFile(join(websiteRoot, "src", "micro-review.js"), join(outputDirectory, "assets", "micro-review.js"));
   await copyFile(join(websiteRoot, "src", "blog.css"), join(outputDirectory, "assets", "blog.css"));
   await copyFile(join(websiteRoot, "src", "models.css"), join(outputDirectory, "assets", "models.css"));
   await copyFile(join(websiteRoot, "src", "teachometry.css"), join(outputDirectory, "assets", "teachometry.css"));
