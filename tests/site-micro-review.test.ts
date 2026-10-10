@@ -43,18 +43,23 @@ test("Micro-Review reuses bilingual chrome, localizes visible and accessible tex
     assert.match(html, /href="\/preview\/assets\/teachometry\.css"/u);
     assert.match(html, /src="\/preview\/assets\/micro-review\.js"/u);
     assert.match(html, /href="\/preview\/assets\/micro-review\.css"/u);
-    assert.ok(html.includes(`href="${prefix}/community/#community-process"`));
+    const invitation = html.match(/<aside class="micro-review-invitation"[\s\S]*?<\/aside>/u)?.[0];
+    assert.ok(invitation, "Both voluntary links belong to the completion area");
+    assert.ok(invitation.includes(`data-micro-review-contact-link href="${prefix}/contact/"`));
+    assert.ok(invitation.includes(`data-micro-review-reviewer-link href="${prefix}/community/#community-process"`));
+    assert.ok(invitation.indexOf("data-micro-review-contact-link") < invitation.indexOf("data-micro-review-reviewer-link"), "Contact precedes program information in keyboard order");
     assert.match(html, /data-locale-en-url="\/preview\/micro-review\/" data-locale-zh-cn-url="\/preview\/zh-cn\/micro-review\/"/u);
     assert.equal((html.match(/<footer /gu) ?? []).length, 1);
     assert.doesNotMatch(html, /assets\/(?:home|cases|methodology)\.css|<footer class="site-footer">/u);
     if (locale === "zh-CN") {
-      for (const text of ["微评审体验", "基本合适", "存在教学问题", "不确定", "构造示例", "并非真实模型输出", "我觉得", "我把分子相加", "对，完全正确", "你的判断已在上方展示", "了解独立 Reviewer 计划", "评审员申请尚未开放", "效度研究"]) assert.ok(html.includes(text), text);
+      for (const text of ["微评审体验", "基本合适", "存在教学问题", "不确定", "构造示例", "并非真实模型输出", "我觉得", "我把分子相加", "对，完全正确", "你的判断已在上方展示", "联系项目", "欢迎教师、教育研究者及其他教育相关人士主动联系", "目前仅交流参与意向", "了解独立 Reviewer 计划", "正式评审员申请尚未开放", "效度研究"]) assert.ok(html.includes(text), text);
       assert.match(html, /aria-label="三分之一加四分之一等于七分之二"/u);
       assert.match(html, /aria-label="你的教学判断"/u);
-      assert.doesNotMatch(html, /Your judgment is shown|Basically suitable|Has a teaching problem|Not sure|I think|I added the top|Yes, that's right|not a real model output/u);
+      assert.doesNotMatch(html, /Your judgment is shown|Basically suitable|Has a teaching problem|Not sure|I think|I added the top|Yes, that's right|not a real model output|Contact the project|Teachers, education researchers|For now, we are only discussing|Formal Reviewer applications/u);
       assert.match(html, /<title>微评审体验 — Teachometry<\/title>/u);
     } else {
       assert.match(html, /<title>Micro-Review — Teachometry<\/title>/u);
+      for (const text of ["Contact the project", "Teachers, education researchers, and others in education are welcome to contact us", "For now, we are only discussing interest in participating", "Formal Reviewer applications are not open yet"]) assert.ok(invitation.includes(text), text);
     }
   }
 });

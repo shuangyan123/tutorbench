@@ -58,8 +58,12 @@ export function renderMicroReviewPage(artifacts: PublicBenchmarkArtifacts): Site
         <aside class="micro-review-invitation" aria-labelledby="micro-review-invitation-title">
           <h3 id="micro-review-invitation-title">Curious about independent review?</h3>
           <p>Future independent Reviewers would examine AI teaching with shared criteria. You can stop here, or voluntarily learn about the plan.</p>
-          <a class="button button-primary" data-micro-review-reviewer-link href="/community/#community-process">Explore the Reviewer plan</a>
-          <p class="micro-review-meta">Reviewer applications are not open yet. This demo does not enroll you.</p>
+          <p>Teachers, education researchers, and others in education are welcome to contact us. For now, we are only discussing interest in participating.</p>
+          <div class="button-row">
+            <a class="button button-primary" data-micro-review-contact-link href="/contact/">Contact the project</a>
+            <a class="button button-secondary" data-micro-review-reviewer-link href="/community/#community-process">Explore the Reviewer plan</a>
+          </div>
+          <p class="micro-review-meta">Formal Reviewer applications are not open yet. This demo does not enroll you.</p>
         </aside>
       </section>
       <div class="micro-review-boundary">
