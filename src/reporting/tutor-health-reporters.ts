@@ -497,6 +497,17 @@ export function buildTutorHealthReport(options: {
   const seenCaseRuns = new Set<string>();
 
   for (const caseResult of options.evaluation.caseResults) {
+    const context = caseIndex.get(caseResult.caseId)!;
+    const criteria = context.decisionPoint.evaluationCriteria;
+    if (caseResult.rubricResults.some((rubric) => {
+      const criterion = criteria.find((item) => item.rubricId === rubric.rubricId);
+      return criterion === undefined || rubric.category !== criterion.category ||
+        rubric.weight !== criterion.weight || rubric.critical !== false;
+    }) || caseResult.rawJudgeResult?.rubricResults.some((judgment) =>
+      !criteria.some((criterion) => criterion.rubricId === judgment.rubricId && criterion.evaluationType === "judge"),
+    )) {
+      throw new BenchmarkConfigurationError("tutor_health_report_source_mismatch");
+    }
     const key = `${caseResult.caseId}#${caseResult.runIndex}`;
     if (seenCaseRuns.has(key)) {
       throw new BenchmarkConfigurationError("tutor_health_report_case_run_duplicate");
@@ -596,7 +607,10 @@ export function buildTutorHealthReport(options: {
           });
 
           const accumulator = dimensionAccumulators[criterion.dimension];
-          if (rubricResult.result === "ERROR" || rubricResult.score === null) {
+          if (caseResult.rawTutorResponse === null ||
+              (criterion.evaluationType === "judge" &&
+                !caseResult.rawJudgeResult?.rubricResults.some((judgment) => judgment.rubricId === criterion.rubricId)) ||
+              rubricResult.result === "ERROR" || rubricResult.score === null) {
             recordUnresolved(
               accumulator,
               unresolved,

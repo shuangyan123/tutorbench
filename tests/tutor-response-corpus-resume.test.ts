@@ -490,14 +490,14 @@ test("resume recomputes aggregates from canonical case-run order", async () => {
     judge: makeJudge({ count: 0 }),
   });
   const reversed = [...previous.evaluation.caseResults].reverse();
+  await assertResumeFailsClosed(fixture, { ...previous, evaluation: {
+    ...previous.evaluation, passedCount: 0, failedCount: 0, errorCount: reversed.length,
+  } });
   const staleAggregates: TutorResponseCorpusEvaluationResult = {
     ...previous,
     evaluation: {
       ...previous.evaluation,
       caseResults: reversed,
-      passedCount: 0,
-      failedCount: 0,
-      errorCount: reversed.length,
       categoryScores: emptyCategoryScores(),
       overallScore: null,
       criticalFailureRate: 0,
@@ -518,6 +518,19 @@ test("resume recomputes aggregates from canonical case-run order", async () => {
     resumed.evaluation.caseResults.map((result) => result.caseId),
     [...resumed.evaluation.caseResults].map((result) => result.caseId).sort(),
   );
+});
+
+test("resume rejects raw/normalized Judge contradictions before any Judge call", async () => {
+  const fixture = await makeFixture(false);
+  const previous = await runTutorResponseCorpus({ corpus: fixture.corpus,
+    dataset: fixture.dataset, judge: makeJudge({ count: 0 }),
+  });
+  const caseResults = previous.evaluation.caseResults.map((result) => ({ ...result,
+    rawJudgeResult: result.rawJudgeResult === null ? null : { ...result.rawJudgeResult,
+      rubricResults: result.rawJudgeResult.rubricResults.map((rubric) => ({ ...rubric, result: "FAIL" as const })),
+    },
+  }));
+  await assertResumeFailsClosed(fixture, replaceCaseResults(previous, caseResults));
 });
 
 test("reused results are canonicalized without hidden provider metadata", async () => {

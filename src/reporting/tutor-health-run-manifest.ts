@@ -12,6 +12,7 @@ import {
 } from "../contracts/tutor-health-run-manifest.js";
 import { parseTutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext-validation.js";
 import type { TutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext.js";
+import { buildTutorHealthReport } from "./tutor-health-reporters.js";
 
 export interface TutorHealthRunManifestInput {
   readonly suite: TutorScenarioSuiteVNext;
@@ -37,6 +38,10 @@ export function buildTutorHealthRunManifest(input: TutorHealthRunManifestInput):
         report.sourceEvaluation.datasetId !== evaluation.datasetId ||
         report.sourceEvaluation.datasetVersion !== evaluation.datasetVersion ||
         report.sourceEvaluation.evaluatorVersion !== evaluation.evaluatorVersion) {
+      throw new BenchmarkConfigurationError("tutor_health_run_manifest_invalid");
+    }
+    const rebuilt = buildTutorHealthReport({ suite, evaluation, scoringProfile: report.scoringProfile });
+    if (tutorHealthComparisonJson(rebuilt) !== tutorHealthComparisonJson(report)) {
       throw new BenchmarkConfigurationError("tutor_health_run_manifest_invalid");
     }
     // 仅复制通过严格白名单校验的 provenance；不复制响应、对话或隐藏判据。

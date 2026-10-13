@@ -96,7 +96,10 @@ function isRubricResult(value: unknown): boolean {
       record.result === "PARTIAL" ||
       record.result === "FAIL" ||
       record.result === "ERROR") &&
-    isScore(record.score) &&
+    // 单项 score 是归一化状态编码，与可配置的聚合评分分开。
+    record.score === (record.result === "PASS" ? 1
+      : record.result === "PARTIAL" ? 0.5
+        : record.result === "FAIL" ? 0 : null) &&
     typeof record.weight === "number" &&
     Number.isFinite(record.weight) &&
     record.weight > 0 &&
@@ -193,6 +196,61 @@ function isCaseRunResult(value: unknown): value is TutorEvalCaseRunResult {
   );
 }
 
+function hasConsistentCaseEvidence(result: TutorEvalCaseRunResult): boolean {
+  if (result.passed !== (result.status === "passed") ||
+      (result.status === "passed" && (result.qualityGate !== "PASS" || result.overallScore === null)) ||
+      (result.status === "error" && result.overallScore !== null) ||
+      (result.status !== "error" && result.rubricResults.some((rubric) => rubric.result === "ERROR"))) {
+    return false;
+  }
+  const rubrics = new Map<string, TutorEvalCaseRunResult["rubricResults"][number]>();
+  for (const rubric of result.rubricResults) {
+    const previous = rubrics.get(rubric.rubricId);
+    if (previous !== undefined && (previous.result !== rubric.result || previous.category !== rubric.category ||
+        previous.weight !== rubric.weight || previous.critical !== rubric.critical)) return false;
+    rubrics.set(rubric.rubricId, rubric);
+  }
+  const raw = result.rawJudgeResult;
+  if (raw === null) return true; // 缺失来源由有 authored 上下文的报告边界标记 unresolved。
+  if (raw.caseId !== result.caseId) return false;
+  const rawRubrics = new Map(raw.rubricResults.map((rubric) => [rubric.rubricId, rubric]));
+  if (result.rubricResults.some((rubric) => {
+    const judgment = rawRubrics.get(rubric.rubricId);
+    return judgment !== undefined && judgment.result !== rubric.result;
+  })) return false;
+  const severityRank = { minor: 1, major: 2, critical: 3 } as const;
+  const rawFailures = [
+    ...raw.criticalFailures,
+    ...raw.factualErrors.filter((error) => error.severity !== "minor").map((error) => ({
+      type: "severe_factual_error", severity: error.severity,
+    })),
+  ];
+  // runner 按类型保留最高严重度；不能在导入时丢弃或降级 raw Judge 的 failure。
+  return rawFailures.every((failure) => result.criticalFailures.some((normalized) =>
+    normalized.type === failure.type && severityRank[normalized.severity] >= severityRank[failure.severity],
+  ));
+}
+
+function hasConsistentRunEvidence(record: UnknownRecord, cases: readonly TutorEvalCaseRunResult[]): boolean {
+  if (record.passedCount !== cases.filter((item) => item.status === "passed").length ||
+      record.failedCount !== cases.filter((item) => item.status === "failed").length ||
+      record.errorCount !== cases.filter((item) => item.status === "error").length ||
+      cases.length > (record.caseCount as number) * (record.runsPerCase as number)) return false;
+  const identities = new Set<string>();
+  const versions = new Map<string, string>();
+  for (const result of cases) {
+    const key = JSON.stringify([result.caseId, result.runIndex]);
+    if (identities.has(key) || result.runIndex > (record.runsPerCase as number) ||
+        (versions.has(result.caseId) && versions.get(result.caseId) !== result.caseVersion) ||
+        (record.judge === null && result.rawJudgeResult !== null) ||
+        !hasConsistentCaseEvidence(result)) return false;
+    identities.add(key);
+    versions.set(result.caseId, result.caseVersion);
+  }
+  // 允许部分结果；声明的 caseCount 是范围，不强制补齐缺失证据。
+  return versions.size <= (record.caseCount as number);
+}
+
 export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResult {
   const record = asRecord(value);
   const caseResults = record?.caseResults;
@@ -224,7 +282,7 @@ export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResul
     record.passedCount + record.failedCount + record.errorCount === record.caseRunCount &&
     isTutorDescriptor(record.tutor) &&
     isCategoryScores(record.categoryScores) &&
-    isFiniteNumberOrNull(record.overallScore) &&
+    isScore(record.overallScore) &&
     typeof record.criticalFailureRate === "number" &&
     Number.isFinite(record.criticalFailureRate) &&
     record.criticalFailureRate >= 0 &&
@@ -235,7 +293,8 @@ export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResul
     record.answerLeakageRate <= 1 &&
     Array.isArray(caseResults) &&
     record.caseRunCount === caseResults.length &&
-    caseResults.every(isCaseRunResult)
+    caseResults.every(isCaseRunResult) &&
+    hasConsistentRunEvidence(record, caseResults)
   );
 }
 

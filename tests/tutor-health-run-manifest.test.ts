@@ -10,6 +10,7 @@ import {
   isTutorHealthRunManifest, verifyTutorHealthRunManifest,
 } from "../src/index.js";
 import { tutorHealthComparisonJson } from "../src/contracts/tutor-health-comparison-validation.js";
+import { buildTutorHealthReport } from "../src/reporting/tutor-health-reporters.js";
 import { TUTOR_HEALTH_ARTIFACT_FILES, writeTutorHealthArtifacts } from "../src/cli/tutorbench-health-artifacts.js";
 import { syntheticDesignPartnerPilot } from "./helpers/design-partner-pilot.js";
 
@@ -56,9 +57,11 @@ test("run manifest binds exact artifact bytes and canonical complete suite witho
   const changed = { ...input.suite, scenarios: input.suite.scenarios.map((scenario, index) => index === 0 ? {
     ...scenario, decisionPoints: scenario.decisionPoints.map((point) => ({ ...point, expectedBehavior: "Changed synthetic teaching policy." })),
   } : scenario) };
-  assert.notEqual(buildTutorHealthRunManifest({ ...input, suite: changed }).suite.sha256, manifest.suite.sha256);
+  const changedInput = { ...input, suite: changed, reportJson: JSON.stringify(buildTutorHealthReport({ suite: changed, evaluation })) };
+  assert.throws(() => buildTutorHealthRunManifest({ ...input, suite: changed }), /manifest.*invalid/);
+  assert.notEqual(buildTutorHealthRunManifest(changedInput).suite.sha256, manifest.suite.sha256);
   assert.notEqual(buildTutorHealthRunManifest({ ...input, suite: { ...input.suite, scenarios: [...input.suite.scenarios].reverse() } }).suite.sha256, manifest.suite.sha256);
-  assert.throws(() => verifyTutorHealthRunManifest(manifest, { ...input, suite: changed }), /does not match/);
+  assert.throws(() => verifyTutorHealthRunManifest(manifest, changedInput), /does not match/);
   // 来源文件哈希刻意绑定字节：仅重新排版也会失配，suite 语义哈希则忽略对象键顺序。
   for (const key of ["evaluationJson", "reportJson"] as const) {
     assert.throws(() => verifyTutorHealthRunManifest(manifest, { ...input, [key]: `${input[key]}\n` }), /does not match/);

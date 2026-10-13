@@ -352,9 +352,13 @@ test("rejects missing and extra case-runs", async () => {
     const source = results[0];
     assert.ok(source);
     const extra = { ...source, caseId: "unexpected-case" } as Record<string, unknown>;
+    if (extra.rawJudgeResult !== null) {
+      extra.rawJudgeResult = { ...(extra.rawJudgeResult as Record<string, unknown>), caseId: extra.caseId };
+    }
     results.push(extra);
     run.caseResults = results;
     run.caseRunCount = results.length;
+    run.caseCount = (run.caseCount as number) + 1;
     run.passedCount = (run.passedCount as number) + (extra.status === "passed" ? 1 : 0);
     run.failedCount = (run.failedCount as number) + (extra.status === "failed" ? 1 : 0);
     run.errorCount = (run.errorCount as number) + (extra.status === "error" ? 1 : 0);
@@ -376,6 +380,7 @@ test("rejects old evaluator versions, execution errors, and unresolved scores", 
     const previousStatus = first.status;
     first.status = "error";
     first.passed = false;
+    first.overallScore = null;
     run.errorCount = (run.errorCount as number) + 1;
     if (previousStatus === "passed") {
       run.passedCount = (run.passedCount as number) - 1;
@@ -409,6 +414,7 @@ test("rejects invalid source metadata and absent Judge evidence", async () => {
 
   const judgePaths = await copyMutation(undefined, (evaluation) => {
     evaluationRun(evaluation).judge = null;
+    for (const result of evaluationCaseResults(evaluation)) result.rawJudgeResult = null;
   });
   await assertBuildRejects(judgePaths, "publication_judge_missing");
 });
@@ -430,6 +436,7 @@ test("rejects subset evaluation and absent Judge evidence", async () => {
     };
     const run = evaluation.evaluation as Record<string, unknown>;
     run.judge = null;
+    for (const result of evaluationCaseResults(evaluation)) result.rawJudgeResult = null;
   });
   await assertBuildRejects(paths, "publication_evaluation_subset");
 });
@@ -459,8 +466,18 @@ test("rejects unresolved rubric results and leaderboard approval", async () => {
     const run = evaluation.evaluation as Record<string, unknown>;
     const results = run.caseResults as Record<string, unknown>[];
     const rubricResults = results[0]?.rubricResults as Record<string, unknown>[];
-  if (rubricResults[0] !== undefined) {
+    if (rubricResults[0] !== undefined) {
       rubricResults[0].result = "ERROR";
+      rubricResults[0].score = null;
+      const first = results[0]!;
+      const previousStatus = first.status;
+      first.status = "error";
+      first.passed = false;
+      first.overallScore = null;
+      first.rawJudgeResult = null;
+      run.errorCount = (run.errorCount as number) + 1;
+      if (previousStatus === "passed") run.passedCount = (run.passedCount as number) - 1;
+      if (previousStatus === "failed") run.failedCount = (run.failedCount as number) - 1;
     }
   });
   await assertBuildRejects(paths, "publication_score_unresolved");
