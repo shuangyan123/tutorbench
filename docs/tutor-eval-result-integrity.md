@@ -42,8 +42,20 @@ comparison requirements for the current evaluator and recorded locale remain.
 Normalized rubric scores are status encodings. Configurable criterion scores,
 category weights, thresholds and quality gates belong to aggregate scoring.
 Plain v1 results do not record that configuration, so this validator does not
-recompute case/category aggregates using an assumed default. Valid custom
-scoring results remain accepted. Corpus resume retains its existing requirement
+recompute case/category aggregates using an assumed default. The run-level
+`overallScore` retains its original finite-number-or-null parsing boundary;
+the pre-existing `[0,1]` bounds on case overall scores and category scores remain.
+Accepting a finite run aggregate outside `[0,1]` preserves legacy parsing; it does
+not establish that the aggregate was derived correctly.
+
+The direct runner's typed scoring input currently permits configurations such
+as `PASS=2` that produce case/category aggregates outside their old import
+bounds. Those complete results remain rejected by both the pre-TB-A01 and
+current validators. This correction restores only the run-level boundary;
+it does not unify the runner configuration domain and artifact import domain.
+Custom scoring identity and aggregate recomputability remain TB-A05 work.
+
+Corpus resume retains its existing requirement
 for an explicit matching scoring configuration, selection and corpus identity.
 
 Parsing an old result or manifest does not certify its origin. Historical

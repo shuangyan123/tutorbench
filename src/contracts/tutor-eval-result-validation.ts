@@ -282,7 +282,8 @@ export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResul
     record.passedCount + record.failedCount + record.errorCount === record.caseRunCount &&
     isTutorDescriptor(record.tutor) &&
     isCategoryScores(record.categoryScores) &&
-    isScore(record.overallScore) &&
+    // v1 未记录聚合评分配置；保留顶层有限数/null 的原有读取边界。
+    isFiniteNumberOrNull(record.overallScore) &&
     typeof record.criticalFailureRate === "number" &&
     Number.isFinite(record.criticalFailureRate) &&
     record.criticalFailureRate >= 0 &&

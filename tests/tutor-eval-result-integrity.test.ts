@@ -47,7 +47,7 @@ test("case status, passed flag, ERROR score and summary counts must agree", asyn
     "ERROR rubric with numeric score": replaceCases(evaluation, [{ ...first, status: "error", passed: false, overallScore: null,
       rawJudgeResult: null, rubricResults: first.rubricResults.map((rubric) => ({ ...rubric, result: "ERROR", score: 1 })),
     }, ...evaluation.caseResults.slice(1)]),
-    "unbounded overall score": { ...evaluation, overallScore: 2 },
+    "nonfinite overall score": { ...evaluation, overallScore: Number.POSITIVE_INFINITY },
   };
   for (const [name, value] of Object.entries(invalid)) await t.test(name, () => {
     assert.equal(isTutorEvalRunResult(value), false);
