@@ -78,7 +78,7 @@ npm run benchmark
 ```
 
 It uses the canonical `tutor-eval-v0.2a@0.2a.6` dataset and evaluator
-`0.3a.4`. Judge-required semantic criteria remain unresolved when no explicit
+`0.3a.5`. Judge-required semantic criteria remain unresolved when no explicit
 Judge is configured, so the normal no-Judge run reports Judge-unavailable
 errors and no score. Quickstart does not suppress, reinterpret, or replace
 that fail-closed behavior.

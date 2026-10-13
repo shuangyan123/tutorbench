@@ -93,5 +93,5 @@ test("prototype exercises a provider-free Tutor without applying canonical scori
   assert.equal(run.verification.semanticTutoringEvaluation, "not_evaluated");
   assert.equal(run.verification.canonicalScoringApplied, false);
   assert.equal(TUTOR_EVAL_DATASET_VERSION, "0.2a.6");
-  assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.4");
+  assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.5");
 });

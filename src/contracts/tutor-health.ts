@@ -257,6 +257,7 @@ export type TutorHealthUnresolvedReason =
   | "missing_case_result"
   | "missing_rubric_result"
   | "duplicate_rubric_result"
+  | "insufficient_information"
   | "evaluation_error";
 
 export interface TutorHealthUnresolvedDecisionPoint {

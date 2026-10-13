@@ -7,6 +7,7 @@ import {
   TUTOR_EVAL_DATASET_ID,
   TUTOR_EVAL_DATASET_VERSION,
   TUTOR_EVAL_EVALUATOR_VERSION,
+  TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC,
   parseTutorEvalDataset,
   type TutorEvalCase,
   type TutorEvalDataset,
@@ -357,6 +358,7 @@ async function runCase(
     onJudgeCall,
   );
   const judgeFailure = judgeExecution.failure;
+  const insufficientInformation = judgeExecution.rawJudgeResult?.insufficientInformation === true;
 
   const rubricResults = mergeRubricResults(tutorEvalCase.evaluatorOnly.rubrics, [
     ...deterministicResults,
@@ -373,7 +375,7 @@ async function runCase(
     scoring,
   );
   const hasError =
-    judgeFailure !== null || rubricResults.some((result) => result.result === "ERROR");
+    judgeFailure !== null || insufficientInformation || rubricResults.some((result) => result.result === "ERROR");
   const latencyMs =
     output.metrics?.latencyMs ?? Math.round(performance.now() - started);
   return {
@@ -400,12 +402,17 @@ async function runCase(
     diagnostics:
       judgeFailure !== null
         ? stableDiagnostic(judgeFailure.code, judgeFailure.message)
-        : hasError
+        : insufficientInformation
           ? stableDiagnostic(
-              "evaluation_failed",
-              "One or more rubrics could not be evaluated.",
+              TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC.code,
+              TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC.message,
             )
-          : [],
+          : hasError
+            ? stableDiagnostic(
+                "evaluation_failed",
+                "One or more rubrics could not be evaluated.",
+              )
+            : [],
   };
 }
 

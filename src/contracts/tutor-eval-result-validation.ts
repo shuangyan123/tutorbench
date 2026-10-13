@@ -251,6 +251,21 @@ function hasConsistentRunEvidence(record: UnknownRecord, cases: readonly TutorEv
   return versions.size <= (record.caseCount as number);
 }
 
+function hasValidInsufficientInformationEvidence(record: UnknownRecord, results: readonly TutorEvalCaseRunResult[]): boolean {
+  const incomplete = results.filter((item) => item.rawJudgeResult?.insufficientInformation === true);
+  if (incomplete.length === 0) return true;
+  // 仅约束 flag-true 的有效性；不对未记录配置的历史聚合做默认重算。
+  if ((record.errorCount as number) < incomplete.length || record.overallScore !== null ||
+      TUTOR_EVAL_CATEGORIES.some((category) => (record.categoryScores as TutorEvalCategoryScores)[category] !== null)) return false;
+  return incomplete.every((result) => {
+    const raw = result.rawJudgeResult!;
+    if (raw.caseId !== result.caseId || result.status !== "error" || result.passed || result.overallScore !== null) return false;
+    const judgeIds = new Set(raw.rubricResults.map((item) => item.rubricId));
+    // 真正缺失的 rubric 保持缺失，由 authored 报告边界记录 unresolved。
+    return result.rubricResults.every((item) => !judgeIds.has(item.rubricId) || (item.result === "ERROR" && item.score === null));
+  });
+}
+
 export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResult {
   const record = asRecord(value);
   const caseResults = record?.caseResults;
@@ -295,7 +310,8 @@ export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResul
     Array.isArray(caseResults) &&
     record.caseRunCount === caseResults.length &&
     caseResults.every(isCaseRunResult) &&
-    hasConsistentRunEvidence(record, caseResults)
+    hasConsistentRunEvidence(record, caseResults) &&
+    hasValidInsufficientInformationEvidence(record, caseResults)
   );
 }
 

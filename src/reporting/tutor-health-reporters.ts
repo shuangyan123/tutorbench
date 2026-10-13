@@ -607,10 +607,11 @@ export function buildTutorHealthReport(options: {
           });
 
           const accumulator = dimensionAccumulators[criterion.dimension];
+          const insufficientInformation = owner === "judge" && caseResult.rawJudgeResult?.insufficientInformation === true;
           if (caseResult.rawTutorResponse === null ||
               (criterion.evaluationType === "judge" &&
                 !caseResult.rawJudgeResult?.rubricResults.some((judgment) => judgment.rubricId === criterion.rubricId)) ||
-              rubricResult.result === "ERROR" || rubricResult.score === null) {
+              insufficientInformation || rubricResult.result === "ERROR" || rubricResult.score === null) {
             recordUnresolved(
               accumulator,
               unresolved,
@@ -618,7 +619,7 @@ export function buildTutorHealthReport(options: {
                 scenario.identity.id,
                 decisionPoint.id,
                 runIndex,
-                "evaluation_error",
+                insufficientInformation ? "insufficient_information" : "evaluation_error",
                 criterion.rubricId,
               ),
             );
@@ -730,10 +731,12 @@ export function buildTutorHealthReport(options: {
   const knownGateFailure =
     findings.some((finding) => finding.severity === "critical") ||
     options.evaluation.caseResults.some(
-      (result) => result.status !== "error" && result.qualityGate === "FAIL",
+      (result) => result.qualityGate === "FAIL" && (result.status !== "error" ||
+        (result.rawJudgeResult?.insufficientInformation === true && result.criticalFailures.length > 0)),
     );
   const hasUnresolvedEvaluation =
-    unresolved.length > 0 || options.evaluation.errorCount > 0;
+    unresolved.length > 0 || options.evaluation.errorCount > 0 ||
+    options.evaluation.caseResults.some((result) => result.rawJudgeResult?.insufficientInformation === true);
   const releaseGate = knownGateFailure
     ? "FAIL"
     : hasUnresolvedEvaluation

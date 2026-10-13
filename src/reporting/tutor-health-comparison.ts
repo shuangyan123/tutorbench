@@ -42,7 +42,8 @@ function assessPoint(
     );
     if (result === undefined) reasons.add("missing_case_result");
     else {
-      if (result.status === "error" || result.rawTutorResponse === null ||
+      if (result.rawJudgeResult?.insufficientInformation === true) reasons.add("insufficient_information");
+      else if (result.status === "error" || result.rawTutorResponse === null ||
           (point.evaluationCriteria.some((item) => item.evaluationType === "judge") &&
            (source.evaluation.judge === null || result.rawJudgeResult === null))) reasons.add("evaluation_error");
       if (result.rubricResults.some((item) => item.result === "PARTIAL")) reasons.add("partial_evidence");

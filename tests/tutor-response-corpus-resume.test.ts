@@ -24,6 +24,7 @@ interface CallCounter {
 }
 
 interface JudgeOverrides {
+  readonly insufficientInformation?: boolean;
   readonly model?: string;
   readonly promptVersion?: string;
   readonly thinkingMode?: "enabled" | "disabled";
@@ -120,7 +121,7 @@ function makeJudge(
         })),
         criticalFailures: [],
         factualErrors: [],
-        insufficientInformation: false,
+        insufficientInformation: overrides.insufficientInformation ?? false,
       };
     },
   };
@@ -252,6 +253,25 @@ test("resume reuses 45 completed runs, reruns 3 errors, and recomputes the final
       )
       .map((result) => `${result.caseId}@${result.runIndex}`),
   );
+});
+
+test("explicit resume reruns insufficient-information cases instead of reusing them as completed evidence", async () => {
+  const fixture = await makeFixture(false);
+  const initialCalls = { count: 0 };
+  const previous = await runTutorResponseCorpus({ corpus: fixture.corpus, dataset: fixture.dataset,
+    judge: makeJudge(initialCalls, { insufficientInformation: true }),
+  });
+  assert.equal(initialCalls.count, 3);
+  assert.equal(previous.evaluation.errorCount, 3);
+  assert.ok(previous.evaluation.caseResults.every((item) => item.rawJudgeResult?.insufficientInformation === true));
+  await assertResumeFailsClosed(fixture, { ...previous, evaluation: { ...previous.evaluation, evaluatorVersion: "0.3a.4" } });
+  const calls = { count: 0 };
+  const resumed = await runTutorResponseCorpus({ corpus: fixture.corpus, dataset: fixture.dataset,
+    resumeEvaluation: previous, judge: makeJudge(calls),
+  });
+  assert.equal(calls.count, 3);
+  assert.equal(resumed.evaluation.errorCount, 0);
+  assert.ok(resumed.evaluation.caseResults.every((item) => item.rawJudgeResult?.insufficientInformation === false));
 });
 
 test("both passed and failed completed case-runs are reusable", async () => {

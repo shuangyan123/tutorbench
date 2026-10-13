@@ -169,10 +169,8 @@ export function observeWordContextDiscriminationEvaluation(
       observedLabel: fixtureCase.observed.correctness,
       status: caseResult.status,
       answerLeakage: caseResult.status === "error" ? null : caseResult.answerLeakage,
-      insufficientInformation:
-        caseResult.status === "error"
-          ? null
-          : caseResult.rawJudgeResult?.insufficientInformation ?? null,
+      // 结构化 abstention 也使用 error 状态；有 raw 结果时仍应展示真实 flag。
+      insufficientInformation: caseResult.rawJudgeResult?.insufficientInformation ?? null,
       criticalFailures:
         caseResult.status === "error"
           ? []

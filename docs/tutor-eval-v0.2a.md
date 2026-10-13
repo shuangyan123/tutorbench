@@ -122,7 +122,7 @@ The policy audit and rationale are recorded in the
 and the [`critical-failure quality-gate audit`](critical-failure-quality-gate-audit.md).
 
 The ordinary score and case-pass eligibility are separate in current evaluator
-`0.3a.4`. All valid score-bearing rubrics, including `desirable`, remain in
+`0.3a.5`. All valid score-bearing rubrics, including `desirable`, remain in
 category and overall scores. Eligibility applies the configured category
 weights and pass threshold to required-only rubric scores, rejects an explicit
 `prohibited` `FAIL`, and still requires the quality gate to pass. A required
