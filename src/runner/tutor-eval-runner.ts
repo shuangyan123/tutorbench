@@ -494,7 +494,7 @@ export async function runTutorEval(
       caseResults.length === 0 ? 0 : failureCount / caseResults.length,
     answerLeakageRate:
       caseResults.length === 0 ? 0 : leakageCount / caseResults.length,
-    failureSignalMetrics: buildTutorEvalFailureSignalMetrics(caseResults),
+    failureSignalMetrics: buildTutorEvalFailureSignalMetrics(caseResults, orderedCases.length * runsPerCase, scoringProvenance.cases),
     caseResults,
   };
 }

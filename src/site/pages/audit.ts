@@ -216,6 +216,9 @@ function renderLocaleBreakdown(
           ["fail", String(breakdown.failedCount)],
           ["error", String(breakdown.errorCount)],
         ], locale)}
+        <p class="audit-evidence">${locale === "zh-CN" ? "证据范围" : "Evidence scope"}: ${locale === "zh-CN"
+          ? breakdown.scope === "authored_plan" ? "已编写案例计划" : "已观察案例范围"
+          : breakdown.scope === "authored_plan" ? "authored plan" : "observed case scope"}; ${breakdown.caseRunCount}/${breakdown.plannedCaseRunCount} ${locale === "zh-CN" ? "次运行" : "case-runs"}</p>
         <div class="pill-row">${Object.entries(breakdown.categoryScores).map(([category, score]) => `<span class="dimension-pill">${categoryLabel(category, locale)}: ${escapeHtml(score === null ? "n/a" : score.toFixed(2))}</span>`).join("")}</div>
         <p class="audit-evidence">${renderUiText("score", locale)}: ${escapeHtml(breakdown.overallScore === null ? "n/a" : breakdown.overallScore.toFixed(2))} · ${renderUiText("criticalFailure", locale)}: ${escapeHtml(breakdown.criticalFailureRate === null ? "n/a" : `${(breakdown.criticalFailureRate * 100).toFixed(2)}%`)} · ${renderUiText("answerLeakage", locale)}: ${escapeHtml(breakdown.answerLeakageRate === null ? "n/a" : `${(breakdown.answerLeakageRate * 100).toFixed(2)}%`)}</p>
         <p class="audit-evidence">${renderUiText("criticalFailure", locale)}: ${escapeHtml(formatSignalCoverage(breakdown.failureSignalMetrics.criticalFailures, locale))} · ${renderUiText("answerLeakage", locale)}: ${escapeHtml(formatSignalCoverage(breakdown.failureSignalMetrics.answerLeakage, locale))}</p>

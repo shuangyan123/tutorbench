@@ -12,7 +12,8 @@ function finite(value: unknown): value is number { return typeof value === "numb
 function keys(value: Record<string, unknown>, allowed: readonly string[]): boolean {
   return Object.keys(value).every((key) => allowed.includes(key));
 }
-function authoredInputs(dataset: TutorEvalDataset): readonly TutorEvalCaseScoringInputs[] {
+/** Authored rubric context alone does not establish a historical scoring configuration. */
+export function buildTutorEvalAuthoredScoringInputs(dataset: TutorEvalDataset): readonly TutorEvalCaseScoringInputs[] {
   return [...dataset.cases].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0).map((item) => ({
     caseId: item.id, caseVersion: item.version, rubrics: item.evaluatorOnly.rubrics.map((rubric) => ({
       id: rubric.id, category: rubric.category, weight: rubric.weight, behavior: rubric.behavior ?? "required",
@@ -23,7 +24,7 @@ function authoredInputs(dataset: TutorEvalDataset): readonly TutorEvalCaseScorin
 
 export function createTutorEvalScoringProvenance(dataset: TutorEvalDataset, scoring: TutorEvalScoringConfig): TutorEvalScoringProvenance {
   const config = normalizeTutorEvalScoringConfig(scoring);
-  return { schemaVersion: 1, algorithm: "tutor-eval-aggregate@1", identity: tutorEvalScoringIdentity(config), config, cases: authoredInputs(dataset) };
+  return { schemaVersion: 1, algorithm: "tutor-eval-aggregate@1", identity: tutorEvalScoringIdentity(config), config, cases: buildTutorEvalAuthoredScoringInputs(dataset) };
 }
 
 export function isTutorEvalScoringProvenance(value: unknown): value is TutorEvalScoringProvenance {
@@ -69,13 +70,14 @@ export function hasValidTutorEvalScoringEvidence(result: TutorEvalRunResult): bo
   }
   const complete = result.caseResults.filter((item) => item.overallScore !== null);
   const categories = aggregateTutorEvalCategoryScores(complete);
-  const hasError = result.caseResults.some((item) => item.status === "error");
+  const hasError = result.caseResults.length !== result.caseCount * result.runsPerCase ||
+    result.caseResults.some((item) => item.status === "error");
   return TUTOR_EVAL_CATEGORIES.every((category) => result.categoryScores[category] === (hasError ? null : categories[category])) &&
     result.overallScore === (hasError ? null : aggregateTutorEvalOverallScore(result.caseResults.map((item) => item.overallScore)));
 }
 
 export function hasMatchingTutorEvalAuthoredScoring(result: TutorEvalRunResult, dataset: TutorEvalDataset): boolean {
-  const expected = authoredInputs(dataset);
+  const expected = buildTutorEvalAuthoredScoringInputs(dataset);
   return result.scoringProvenance === undefined || result.scoringProvenance.cases.every((item) =>
     expected.some((candidate) => canonicalScoringJson(candidate) === canonicalScoringJson(item)));
 }

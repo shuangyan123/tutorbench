@@ -8,7 +8,7 @@ import {
 import { TUTOR_EVAL_CATEGORIES } from "./tutor-eval.js";
 import { isTutorCaseLocale } from "./locale.js";
 import { isTutorEvalJudgeResult } from "./tutor-eval-validation.js";
-import { hasValidTutorEvalFailureSignalMetrics } from "./tutor-eval-failure-signal-metrics.js";
+import { hasRecordedTutorEvalAnswerLeakage, hasValidTutorEvalFailureSignalMetrics } from "./tutor-eval-failure-signal-metrics.js";
 import { isTutorEvalScoringProvenance, hasValidTutorEvalScoringEvidence } from "../scoring/provenance.js";
 
 type UnknownRecord = Record<string, unknown>;
@@ -202,7 +202,8 @@ function hasConsistentCaseEvidence(result: TutorEvalCaseRunResult): boolean {
   if (result.passed !== (result.status === "passed") ||
       (result.status === "passed" && (result.qualityGate !== "PASS" || result.overallScore === null)) ||
       (result.status === "error" && result.overallScore !== null) ||
-      (result.status !== "error" && result.rubricResults.some((rubric) => rubric.result === "ERROR"))) {
+      (result.status !== "error" && result.rubricResults.some((rubric) => rubric.result === "ERROR")) ||
+      (!result.answerLeakage && hasRecordedTutorEvalAnswerLeakage(result))) {
     return false;
   }
   const rubrics = new Map<string, TutorEvalCaseRunResult["rubricResults"][number]>();
@@ -324,7 +325,9 @@ export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResul
     hasConsistentRunEvidence(record, caseResults) &&
     hasValidInsufficientInformationEvidence(record, caseResults) &&
     (record.failureSignalMetrics === undefined ||
-      hasValidTutorEvalFailureSignalMetrics(record.failureSignalMetrics, caseResults)) &&
+      hasValidTutorEvalFailureSignalMetrics(record.failureSignalMetrics, caseResults,
+        (record.caseCount as number) * record.runsPerCase,
+        (record.scoringProvenance as TutorEvalRunResult["scoringProvenance"])?.cases)) &&
     hasValidTutorEvalScoringEvidence(record as unknown as TutorEvalRunResult)
   );
 }

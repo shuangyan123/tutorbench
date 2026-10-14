@@ -173,7 +173,9 @@ function replaceCaseResults(
       caseResults,
       failureSignalMetrics: buildTutorEvalFailureSignalMetrics(caseResults),
     };
-  const supported = caseResults.every((item) => artifact.evaluation.scoringProvenance?.cases.some((authored) =>
+  // 越界输入保留为负例，交由真实 resume 校验拒绝，避免在 fixture 构造阶段提前失败。
+  const supported = caseResults.length <= artifact.evaluation.caseCount * artifact.evaluation.runsPerCase &&
+    caseResults.every((item) => artifact.evaluation.scoringProvenance?.cases.some((authored) =>
     authored.caseId === item.caseId && authored.caseVersion === item.caseVersion));
   return { ...artifact, evaluation: supported ? recomputeRecordedScoring(evaluation) : evaluation };
 }

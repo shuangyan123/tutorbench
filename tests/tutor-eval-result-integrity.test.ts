@@ -124,7 +124,7 @@ test("raw critical/factual failures cannot be dropped or downgraded during norma
 
 test("missing raw Judge evidence stays readable but cannot imply assessed/resolved evidence", async () => {
   const { baseline, candidate } = await syntheticDesignPartnerPilot();
-  const evaluation = replaceCases(candidate.evaluation, candidate.evaluation.caseResults.map((item) => ({ ...item, rawJudgeResult: null })));
+  const evaluation = recomputeRecordedScoring(replaceCases(candidate.evaluation, candidate.evaluation.caseResults.map((item) => ({ ...item, rawJudgeResult: null }))));
   assert.equal(isTutorEvalRunResult(evaluation), true);
   const report = buildTutorHealthReport({ suite: candidate.suite, evaluation });
   assert.equal(report.releaseGate, "UNRESOLVED");
@@ -133,11 +133,11 @@ test("missing raw Judge evidence stays readable but cannot imply assessed/resolv
   const comparison = compareTutorHealthRuns({ baseline, candidate: { ...candidate, evaluation, report } });
   assert.equal(comparison.counts.resolved, 0);
   assert.equal(comparison.counts.unresolved, 4);
-  const missingJudgments = replaceCases(candidate.evaluation, candidate.evaluation.caseResults.map((item) => ({ ...item,
+  const missingJudgments = recomputeRecordedScoring(replaceCases(candidate.evaluation, candidate.evaluation.caseResults.map((item) => ({ ...item,
     rawJudgeResult: { ...item.rawJudgeResult!, rubricResults: [] },
-  })));
+  }))));
   assert.equal(buildTutorHealthReport({ suite: candidate.suite, evaluation: missingJudgments }).releaseGate, "UNRESOLVED");
-  const missingTutor = replaceCases(candidate.evaluation, candidate.evaluation.caseResults.map((item) => ({ ...item, rawTutorResponse: null })));
+  const missingTutor = recomputeRecordedScoring(replaceCases(candidate.evaluation, candidate.evaluation.caseResults.map((item) => ({ ...item, rawTutorResponse: null }))));
   assert.equal(buildTutorHealthReport({ suite: candidate.suite, evaluation: missingTutor }).healthScore, null);
 });
 

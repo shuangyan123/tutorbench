@@ -24,9 +24,9 @@ export function recomputeRecordedScoring(evaluation: TutorEvalRunResult): TutorE
       passed, status: error ? "error" as const : passed ? "passed" as const : "failed" as const,
     };
   });
-  const hasError = caseResults.some((item) => item.status === "error");
+  const hasError = caseResults.length !== evaluation.caseCount * evaluation.runsPerCase || caseResults.some((item) => item.status === "error");
   return { ...evaluation, caseResults, caseRunCount: caseResults.length,
-    failureSignalMetrics: buildTutorEvalFailureSignalMetrics(caseResults),
+    failureSignalMetrics: buildTutorEvalFailureSignalMetrics(caseResults, evaluation.caseCount * evaluation.runsPerCase, source.cases),
     passedCount: caseResults.filter((item) => item.status === "passed").length,
     failedCount: caseResults.filter((item) => item.status === "failed").length,
     errorCount: caseResults.filter((item) => item.status === "error").length,

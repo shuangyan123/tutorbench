@@ -22,6 +22,10 @@ the recorded inputs and normalized evidence. Contradictions are rejected.
 Missing source evidence can still be unresolved: arithmetic consistency does
 not authenticate a Judge response. When authored data is available, Health,
 diagnostic comparison, and resume also bind the recorded inputs to that data.
+If any planned case/run is missing or has an evaluation error, current run-level
+category and overall aggregates are `null`. Available case-level scores and
+confirmed failure signals remain usable; partial Health scores cannot turn an
+incomplete Release Gate into PASS.
 
 Historical v1 results without provenance retain their original parsing bounds.
 Successful parsing does **not** establish default scoring or valid aggregates.
