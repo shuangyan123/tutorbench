@@ -262,7 +262,11 @@ function hasValidInsufficientInformationEvidence(record: UnknownRecord, results:
     if (raw.caseId !== result.caseId || result.status !== "error" || result.passed || result.overallScore !== null) return false;
     const judgeIds = new Set(raw.rubricResults.map((item) => item.rubricId));
     // 真正缺失的 rubric 保持缺失，由 authored 报告边界记录 unresolved。
-    return result.rubricResults.every((item) => !judgeIds.has(item.rubricId) || (item.result === "ERROR" && item.score === null));
+    return result.rubricResults.every((item) => !judgeIds.has(item.rubricId) || (item.result === "ERROR" && item.score === null)) &&
+      // 类别分数只能由该类别的独立可评分证据支撑；保留数值，不重算历史聚合。
+      TUTOR_EVAL_CATEGORIES.every((category) => result.categoryScores[category] === null ||
+        result.rubricResults.some((item) => item.category === category && !judgeIds.has(item.rubricId) &&
+          item.result !== "ERROR" && item.score !== null));
   });
 }
 

@@ -51,7 +51,13 @@ scores describe only assessed evidence and cannot make the release gate PASS.
 ## Source and compatibility boundaries
 
 Reject imported flag-true results claiming a completed case, scored Judge
-rubrics or complete run aggregates. Preserve their historical bytes; do not
+rubrics, complete run aggregates or a numeric case category score without
+independently scoreable rubric evidence in that category. An independent
+rubric must be outside the raw Judge rubric IDs, have a non-ERROR result and
+a non-null score. Deterministic PASS and FAIL scores remain usable, including
+in a category shared with abstaining Judge rubrics. This checks evidence
+availability, not the numeric aggregate or custom scoring configuration.
+Preserve historical bytes; do not
 silently rewrite them into new evidence. Canonical incomplete results remain
 readable, including missing rubric evidence. Health rebuilds use the flag,
 comparison explicitly treats the affected point as unresolved, and manifests
@@ -74,5 +80,8 @@ corpus resume may rerun incomplete cases.
 
 This branch starts from main and does not include the two local TB-A01 commits.
 Their raw/normalized consistency validator needs an explicit abstention
-exception during a later reviewed integration: raw Judge judgments are kept,
-while normalized Judge rubrics intentionally become ERROR/null for this flag.
+exception during a later reviewed integration. Only valid structured
+flag-true abstention may retain raw PASS/PARTIAL/FAIL while normalized Judge
+rubrics become ERROR/null, with incomplete case/run state and category scores
+supported only by independent evidence. All other source contradictions must
+continue to be rejected by TB-A01. This correction does not integrate TB-A01.
