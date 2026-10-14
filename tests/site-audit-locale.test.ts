@@ -286,10 +286,9 @@ test("audit locale view shows unavailable signal evidence instead of zero rates"
     artifact: parseTutorEvaluationAuditArtifact(historical), dataset,
     locale: "en",
   });
-  const html = page.content.replace(/<[^>]*>/gu, "");
-  assert.match(html, /Critical failure: n\/a/);
-  assert.match(html, /Answer leakage: n\/a/);
-  assert.match(html, /confirmed 0; observed absent 0; unavailable 1/);
+  assert.match(page.content, /Critical failure<\/span>: n\/a/);
+  assert.match(page.content, /Answer leakage<\/span>: n\/a/);
+  assert.match(page.content, /confirmed 0; observed absent 0; unavailable 1/);
 });
 
 test("static locale routing and overflow safeguards are shipped with the site", async () => {
