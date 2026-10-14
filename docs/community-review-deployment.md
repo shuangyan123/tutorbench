@@ -64,6 +64,18 @@ invitation activation is separate and remains `DISABLED` unless a later,
 authorized private staging step sets `INVITE_ONLY`. The raw invitation
 credential is never a configuration value.
 
+Both access-token profiles require a finite NumericDate `exp`; the verifier
+rejects a validly signed token without expiration and preserves the configured
+clock tolerance for expiry and `nbf`. The `rfc9068` profile additionally requires
+all [RFC 9068 section 2.2](https://www.rfc-editor.org/rfc/rfc9068.html#section-2.2)
+claims: `iss`, `exp`, `aud`, `sub`, `client_id`, `iat`, and `jti`. Its `iat` must be
+a finite NumericDate and `jti` a nonempty string. Fractional NumericDate values
+remain valid. Auth0-profile tokens do not acquire an extra `iat` or `jti`
+requirement. Signature, exact issuer/audience/client, scope, channel, and
+operator allowlist checks still apply; claims and tokens do not cross the
+authentication boundary. These checks do not impose a maximum token age or
+provide a replay cache: a verified bearer token may be reused until expiry.
+
 Optional bounded settings are `COMMUNITY_REVIEW_HOST` (default
 `127.0.0.1`), `COMMUNITY_REVIEW_PORT` (default `8787`),
 `COMMUNITY_REVIEW_DATABASE_SSL_REJECT_UNAUTHORIZED` (default `true`),
