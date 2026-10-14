@@ -102,7 +102,8 @@ export function calculateCohenKappa(
     0,
   ) / (total * total);
   if (expected === 1) {
-    return observed === 1 ? 1 : 0;
+    // 零分母无法定义机会校正一致性；原始 agreement 和矩阵仍独立保留。
+    return null;
   }
   return (observed - expected) / (1 - expected);
 }
@@ -150,7 +151,7 @@ export function calculateWeightedCohenKappa(
     0,
   ) / (total * total);
   if (expected === 1) {
-    return observed === 1 ? 1 : 0;
+    return null;
   }
   return (observed - expected) / (1 - expected);
 }

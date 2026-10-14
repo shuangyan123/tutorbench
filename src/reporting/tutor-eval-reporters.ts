@@ -3,12 +3,15 @@ import { dirname } from "node:path";
 
 import {
   assertValidTutorEvalRunResult,
+  buildTutorEvalFailureSignalMetrics,
   resolveTutorCaseLocale,
   type TutorEvalCategory,
   type TutorEvalCaseRunResult,
   type TutorEvalDataset,
   type TutorCaseLocale,
   type TutorEvalRunResult,
+  type TutorEvalFailureSignalMetrics,
+  type TutorEvalFailureSignalRate,
 } from "../contracts/index.js";
 import {
   aggregateTutorEvalCategoryScores,
@@ -119,8 +122,9 @@ export interface TutorEvalLocaleBreakdown {
   readonly errorCount: number;
   readonly categoryScores: TutorEvalRunResult["categoryScores"];
   readonly overallScore: number | null;
-  readonly criticalFailureRate: number;
-  readonly answerLeakageRate: number;
+  readonly criticalFailureRate: number | null;
+  readonly answerLeakageRate: number | null;
+  readonly failureSignalMetrics: TutorEvalFailureSignalMetrics;
 }
 
 function aggregateLocaleCaseResults(
@@ -138,8 +142,7 @@ function aggregateLocaleCaseResults(
   const categoryScores = hasEvaluationErrors
     ? aggregateTutorEvalCategoryScores([])
     : aggregateTutorEvalCategoryScores(aggregates);
-  const failureCount = caseResults.filter((result) => result.criticalFailures.length > 0).length;
-  const leakageCount = caseResults.filter((result) => result.answerLeakage).length;
+  const failureSignalMetrics = buildTutorEvalFailureSignalMetrics(caseResults);
   return {
     passedCount: caseResults.filter((result) => result.status === "passed").length,
     failedCount: caseResults.filter((result) => result.status === "failed").length,
@@ -148,8 +151,9 @@ function aggregateLocaleCaseResults(
     overallScore: hasEvaluationErrors
       ? null
       : aggregateTutorEvalOverallScore(caseResults.map((result) => result.overallScore)),
-    criticalFailureRate: caseResults.length === 0 ? 0 : failureCount / caseResults.length,
-    answerLeakageRate: caseResults.length === 0 ? 0 : leakageCount / caseResults.length,
+    criticalFailureRate: failureSignalMetrics.criticalFailures.rate,
+    answerLeakageRate: failureSignalMetrics.answerLeakage.rate,
+    failureSignalMetrics,
   };
 }
 
@@ -217,10 +221,18 @@ function formatLocaleBreakdown(
     ...categories.map(
       (category) => `  ${labels.categories[category]}: ${formatScore(breakdown.categoryScores[category])}`,
     ),
-    `  ${labels.criticalFailureRate}: ${(breakdown.criticalFailureRate * 100).toFixed(2)}%`,
-    `  ${labels.answerLeakageRate}: ${(breakdown.answerLeakageRate * 100).toFixed(2)}%`,
+    `  ${labels.criticalFailureRate}: ${formatFailureSignalRate(breakdown.failureSignalMetrics.criticalFailures, reportLocale)}`,
+    `  ${labels.answerLeakageRate}: ${formatFailureSignalRate(breakdown.failureSignalMetrics.answerLeakage, reportLocale)}`,
     `  ${labels.overall}: ${formatScore(breakdown.overallScore)}`,
   ];
+}
+
+function formatFailureSignalRate(metric: TutorEvalFailureSignalRate, locale: TutorEvalReportLocale): string {
+  const rate = metric.rate === null ? "n/a" : `${(metric.rate * 100).toFixed(2)}%`;
+  const coverage = locale === "zh-CN"
+    ? `已确认 ${metric.confirmedCount}；未观察到 ${metric.knownAbsentCount}；证据不可用 ${metric.unavailableCount}`
+    : `confirmed ${metric.confirmedCount}; observed absent ${metric.knownAbsentCount}; unavailable ${metric.unavailableCount}`;
+  return `${rate} (${coverage})`;
 }
 
 export function formatTutorEvalSummary(
@@ -230,6 +242,7 @@ export function formatTutorEvalSummary(
   assertValidTutorEvalRunResult(result);
   const reportLocale = options.reportLocale ?? "en";
   const labels = reportLabels[reportLocale];
+  const failureSignalMetrics = buildTutorEvalFailureSignalMetrics(result.caseResults);
   const categoryLines = categories.map(
     (category) => `${labels.categories[category]}: ${formatScore(result.categoryScores[category])}`,
   );
@@ -278,8 +291,8 @@ export function formatTutorEvalSummary(
     `${labels.errors}: ${result.errorCount}`,
     ...categoryLines,
     `${labels.overall}: ${formatScore(result.overallScore)}`,
-    `${labels.criticalFailureRate}: ${(result.criticalFailureRate * 100).toFixed(2)}%`,
-    `${labels.answerLeakageRate}: ${(result.answerLeakageRate * 100).toFixed(2)}%`,
+    `${labels.criticalFailureRate}: ${formatFailureSignalRate(failureSignalMetrics.criticalFailures, reportLocale)}`,
+    `${labels.answerLeakageRate}: ${formatFailureSignalRate(failureSignalMetrics.answerLeakage, reportLocale)}`,
     "",
     `${labels.languageContextBreakdown}:`,
     ...localeBreakdownLines,

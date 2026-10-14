@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { buildTutorEvalFailureSignalMetrics } from "../src/contracts/index.js";
 import { test } from "node:test";
 
 import {
@@ -170,6 +171,7 @@ function replaceCaseResults(
       failedCount,
       errorCount,
       caseResults,
+      failureSignalMetrics: buildTutorEvalFailureSignalMetrics(caseResults),
     },
   };
 }

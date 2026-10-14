@@ -8,6 +8,7 @@ import {
 import { TUTOR_EVAL_CATEGORIES } from "./tutor-eval.js";
 import { isTutorCaseLocale } from "./locale.js";
 import { isTutorEvalJudgeResult } from "./tutor-eval-validation.js";
+import { hasValidTutorEvalFailureSignalMetrics } from "./tutor-eval-failure-signal-metrics.js";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -318,7 +319,9 @@ export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResul
     record.caseRunCount === caseResults.length &&
     caseResults.every(isCaseRunResult) &&
     hasConsistentRunEvidence(record, caseResults) &&
-    hasValidInsufficientInformationEvidence(record, caseResults)
+    hasValidInsufficientInformationEvidence(record, caseResults) &&
+    (record.failureSignalMetrics === undefined ||
+      hasValidTutorEvalFailureSignalMetrics(record.failureSignalMetrics, caseResults))
   );
 }
 

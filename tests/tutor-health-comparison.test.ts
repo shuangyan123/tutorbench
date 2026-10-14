@@ -11,10 +11,15 @@ import {
   type TutorEvalRunResult,
 } from "../src/index.js";
 import { buildTutorHealthReport } from "../src/reporting/tutor-health-reporters.js";
+import { buildTutorEvalFailureSignalMetrics } from "../src/contracts/index.js";
 import { syntheticDesignPartnerPilot } from "./helpers/design-partner-pilot.js";
 
 function rebuild(input: TutorHealthComparisonInput, overrides: Partial<TutorEvalRunResult> = {}): TutorHealthComparisonInput {
   const evaluation = { ...input.evaluation, ...overrides };
+  // fixture 改动后重建 coverage，不让过期派生字段遮住原 comparison 行为断言。
+  if (overrides.caseResults !== undefined) {
+    evaluation.failureSignalMetrics = buildTutorEvalFailureSignalMetrics(evaluation.caseResults);
+  }
   return { ...input, evaluation, report: buildTutorHealthReport({ suite: input.suite, evaluation, scoringProfile: input.report.scoringProfile }) };
 }
 

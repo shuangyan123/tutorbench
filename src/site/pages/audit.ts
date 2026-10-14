@@ -3,6 +3,7 @@ import type {
   TutorEvalCategory,
   TutorEvalCaseRunResult,
   TutorEvalRubric,
+  TutorEvalFailureSignalRate,
 } from "../../contracts/index.js";
 import {
   buildTutorEvalLocaleBreakdowns,
@@ -216,9 +217,16 @@ function renderLocaleBreakdown(
           ["error", String(breakdown.errorCount)],
         ], locale)}
         <div class="pill-row">${Object.entries(breakdown.categoryScores).map(([category, score]) => `<span class="dimension-pill">${categoryLabel(category, locale)}: ${escapeHtml(score === null ? "n/a" : score.toFixed(2))}</span>`).join("")}</div>
-        <p class="audit-evidence">${renderUiText("score", locale)}: ${escapeHtml(breakdown.overallScore === null ? "n/a" : breakdown.overallScore.toFixed(2))} · ${renderUiText("criticalFailure", locale)}: ${escapeHtml(`${(breakdown.criticalFailureRate * 100).toFixed(2)}%`)} · ${renderUiText("answerLeakage", locale)}: ${escapeHtml(`${(breakdown.answerLeakageRate * 100).toFixed(2)}%`)}</p>
+        <p class="audit-evidence">${renderUiText("score", locale)}: ${escapeHtml(breakdown.overallScore === null ? "n/a" : breakdown.overallScore.toFixed(2))} · ${renderUiText("criticalFailure", locale)}: ${escapeHtml(breakdown.criticalFailureRate === null ? "n/a" : `${(breakdown.criticalFailureRate * 100).toFixed(2)}%`)} · ${renderUiText("answerLeakage", locale)}: ${escapeHtml(breakdown.answerLeakageRate === null ? "n/a" : `${(breakdown.answerLeakageRate * 100).toFixed(2)}%`)}</p>
+        <p class="audit-evidence">${renderUiText("criticalFailure", locale)}: ${escapeHtml(formatSignalCoverage(breakdown.failureSignalMetrics.criticalFailures, locale))} · ${renderUiText("answerLeakage", locale)}: ${escapeHtml(formatSignalCoverage(breakdown.failureSignalMetrics.answerLeakage, locale))}</p>
       </article>`).join("")}</div>
   </section>`;
+}
+
+function formatSignalCoverage(metric: TutorEvalFailureSignalRate, locale: SiteLocale): string {
+  return locale === "zh-CN"
+    ? `已确认 ${metric.confirmedCount}；未观察到 ${metric.knownAbsentCount}；证据不可用 ${metric.unavailableCount}`
+    : `confirmed ${metric.confirmedCount}; observed absent ${metric.knownAbsentCount}; unavailable ${metric.unavailableCount}`;
 }
 
 function renderConversation(

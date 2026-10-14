@@ -172,7 +172,25 @@ export interface TutorEvalRunResult {
   readonly errorCount: number;
   readonly categoryScores: TutorEvalCategoryScores;
   readonly overallScore: number | null;
+  /** Legacy recorded-positive count / all case runs; not evidence of absence. */
   readonly criticalFailureRate: number;
+  /** Legacy recorded-positive count / all case runs; not evidence of absence. */
   readonly answerLeakageRate: number;
+  /** Optional for historical v1 compatibility; current writers record evidence coverage. */
+  readonly failureSignalMetrics?: TutorEvalFailureSignalMetrics;
   readonly caseResults: readonly TutorEvalCaseRunResult[];
+}
+
+export interface TutorEvalFailureSignalRate {
+  readonly confirmedCount: number;
+  readonly knownAbsentCount: number;
+  readonly unavailableCount: number;
+  /** Same all-case-run denominator; null for empty or incomplete signal evidence. */
+  readonly rate: number | null;
+}
+
+export interface TutorEvalFailureSignalMetrics {
+  readonly schemaVersion: 1;
+  readonly criticalFailures: TutorEvalFailureSignalRate;
+  readonly answerLeakage: TutorEvalFailureSignalRate;
 }

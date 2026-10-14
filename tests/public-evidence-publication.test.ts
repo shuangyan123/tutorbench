@@ -332,6 +332,8 @@ test("rejects corpus and evaluation identity mismatches", async () => {
 test("rejects missing and extra case-runs", async () => {
   const missingPaths = await copyMutation(undefined, (evaluation) => {
     const run = evaluationRun(evaluation);
+    // 结构负例采用历史 v1 形状；不保留与删改 case 集不符的新派生 coverage。
+    delete run.failureSignalMetrics;
     const results = evaluationCaseResults(evaluation);
     const removed = results.shift();
     run.caseResults = results;
@@ -348,6 +350,7 @@ test("rejects missing and extra case-runs", async () => {
 
   const extraPaths = await copyMutation(undefined, (evaluation) => {
     const run = evaluationRun(evaluation);
+    delete run.failureSignalMetrics;
     const results = evaluationCaseResults(evaluation);
     const source = results[0];
     assert.ok(source);
@@ -464,6 +467,7 @@ test("rejects changed response text and source hash reuse", async () => {
 test("rejects unresolved rubric results and leaderboard approval", async () => {
   const paths = await copyMutation(undefined, (evaluation) => {
     const run = evaluation.evaluation as Record<string, unknown>;
+    delete run.failureSignalMetrics;
     const results = run.caseResults as Record<string, unknown>[];
     const rubricResults = results[0]?.rubricResults as Record<string, unknown>[];
     if (rubricResults[0] !== undefined) {

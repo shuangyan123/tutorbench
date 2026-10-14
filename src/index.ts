@@ -133,6 +133,8 @@ export type {
   TutorEvalCaseRunResult,
   TutorEvalCategoryScores,
   TutorEvalCriticalFailure,
+  TutorEvalFailureSignalMetrics,
+  TutorEvalFailureSignalRate,
   TutorEvalRunResult,
   TutorEvalRubricResult,
 } from "./contracts/result.js";

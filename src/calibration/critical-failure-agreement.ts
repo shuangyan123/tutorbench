@@ -123,7 +123,8 @@ function calculateKappa<L extends string>(
     ) /
     (total * total);
   if (expected === 1) {
-    return observed === 1 ? 1 : 0;
+    // 单标签退化样本的 κ 未定义，不把完全观察一致误作 κ=1。
+    return null;
   }
   return (observed - expected) / (1 - expected);
 }
@@ -173,7 +174,7 @@ function calculateWeightedKappa(
     ) /
     (total * total);
   if (expected === 1) {
-    return observed === 1 ? 1 : 0;
+    return null;
   }
   return (observed - expected) / (1 - expected);
 }
