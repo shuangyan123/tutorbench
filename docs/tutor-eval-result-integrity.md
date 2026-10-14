@@ -14,7 +14,9 @@ and an overall score. Error cases may still contain numeric category scores from
 the completed deterministic subset.
 
 A present raw Judge result must belong to the same case. Its rubric judgments
-must agree with corresponding normalized results. Raw critical failures and
+must agree with corresponding normalized results, except for the structured
+abstention defined in [the integrated contract](tutor-eval-evidence-boundary-integration.md).
+Raw critical failures and
 major/critical factual errors cannot disappear or lose severity in normalized
 critical failures; deduplication may retain a higher severity for the same type.
 A raw Judge result with no Judge execution identity is contradictory.
@@ -65,7 +67,9 @@ original bytes and evidence status; do not silently rewrite it or relabel it as
 verified. Legacy results without source evidence cannot become assessed Health
 evidence merely because their normalized statuses look successful.
 
-This patch does not authenticate transcripts, re-execute deterministic
-evaluators, calibrate a Judge, interpret `insufficientInformation`, prove custom
-aggregate derivation or verify live/historical provider runs. Consistent
+The standalone TB-A01 patch did not interpret `insufficientInformation`;
+the integrated behavior is defined in the contract linked above. Neither patch
+authenticates transcripts, re-executes deterministic evaluators, calibrates a
+Judge, proves custom aggregate derivation or verifies live/historical provider
+runs. Consistent
 co-tampering of all source layers requires a separate provenance mechanism.

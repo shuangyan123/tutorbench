@@ -22,6 +22,7 @@ import {
 } from "../contracts/index.js";
 import { assertValidTutorHealthReport, parseTutorHealthScoringProfile } from "../contracts/tutor-health-validation.js";
 import { assertValidTutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext-validation.js";
+import { hasValidAuthoredAbstention } from "./tutor-health-abstention-validation.js";
 import type {
   TutorCriticalFailure,
   TutorEvalCaseRunResult,
@@ -505,7 +506,7 @@ export function buildTutorHealthReport(options: {
         rubric.weight !== criterion.weight || rubric.critical !== false;
     }) || caseResult.rawJudgeResult?.rubricResults.some((judgment) =>
       !criteria.some((criterion) => criterion.rubricId === judgment.rubricId && criterion.evaluationType === "judge"),
-    )) {
+    ) || !hasValidAuthoredAbstention(caseResult, criteria)) {
       throw new BenchmarkConfigurationError("tutor_health_report_source_mismatch");
     }
     const key = `${caseResult.caseId}#${caseResult.runIndex}`;

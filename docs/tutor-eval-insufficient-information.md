@@ -12,7 +12,7 @@ requires one case-level boolean and PASS/PARTIAL/FAIL for every requested
 rubric. It provides no rubric-level abstention or scope for that boolean.
 The v0.9 prompt also defines a separate critical-failure pass.
 
-Current baseline flow: prompt -> validated structured Judge result -> rubric
+Original main baseline flow: prompt -> validated structured Judge result -> rubric
 normalization -> TutorEval aggregation -> Health -> comparison/manifest.
 The parser retains the boolean, but normalization, aggregation and Health
 ignore it. A synthetic all-PASS Judge result with the flag true can therefore
@@ -78,10 +78,8 @@ agreement or learning effectiveness. Scoring identity and aggregate
 recomputability remain TB-A05. No automatic retry is added; a later explicit
 corpus resume may rerun incomplete cases.
 
-This branch starts from main and does not include the two local TB-A01 commits.
-Their raw/normalized consistency validator needs an explicit abstention
-exception during a later reviewed integration. Only valid structured
-flag-true abstention may retain raw PASS/PARTIAL/FAIL while normalized Judge
-rubrics become ERROR/null, with incomplete case/run state and category scores
-supported only by independent evidence. All other source contradictions must
-continue to be rejected by TB-A01. This correction does not integrate TB-A01.
+The local TB-A01 + TB-A02 integration now implements the narrow abstention
+exception and authored ownership/failure checks. See the
+[integrated contract and source commits](tutor-eval-evidence-boundary-integration.md).
+Other source contradictions remain rejected; genuinely missing normalized
+evidence remains explicit and unresolved.

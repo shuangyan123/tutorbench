@@ -216,7 +216,9 @@ function hasConsistentCaseEvidence(result: TutorEvalCaseRunResult): boolean {
   const rawRubrics = new Map(raw.rubricResults.map((rubric) => [rubric.rubricId, rubric]));
   if (result.rubricResults.some((rubric) => {
     const judgment = rawRubrics.get(rubric.rubricId);
-    return judgment !== undefined && judgment.result !== rubric.result;
+    // 仅结构化 abstention 允许 ERROR/null；完整状态约束由下方 TB-A02 校验保留。
+    return judgment !== undefined && judgment.result !== rubric.result &&
+      !(raw.insufficientInformation && rubric.result === "ERROR" && rubric.score === null);
   })) return false;
   const severityRank = { minor: 1, major: 2, critical: 3 } as const;
   const rawFailures = [
@@ -259,7 +261,8 @@ function hasValidInsufficientInformationEvidence(record: UnknownRecord, results:
       TUTOR_EVAL_CATEGORIES.some((category) => (record.categoryScores as TutorEvalCategoryScores)[category] !== null)) return false;
   return incomplete.every((result) => {
     const raw = result.rawJudgeResult!;
-    if (raw.caseId !== result.caseId || result.status !== "error" || result.passed || result.overallScore !== null) return false;
+    if (raw.caseId !== result.caseId || result.status !== "error" || result.passed || result.overallScore !== null ||
+        (result.qualityGate === "FAIL" && result.criticalFailures.length === 0)) return false;
     const judgeIds = new Set(raw.rubricResults.map((item) => item.rubricId));
     // 真正缺失的 rubric 保持缺失，由 authored 报告边界记录 unresolved。
     return result.rubricResults.every((item) => !judgeIds.has(item.rubricId) || (item.result === "ERROR" && item.score === null)) &&
