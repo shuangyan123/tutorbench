@@ -27,6 +27,9 @@ export function validateTutorHealthComparisonSource(input: TutorHealthComparison
   const report = parseTutorHealthReport(input.report);
   const evaluation = input.evaluation;
   assertValidTutorEvalRunResult(evaluation);
+  if (evaluation.scoringProvenance === undefined) {
+    throw new TutorHealthComparisonError("missing_scoring_provenance");
+  }
   if (evaluation.evaluatorVersion !== TUTOR_EVAL_EVALUATOR_VERSION) {
     throw new TutorHealthComparisonError("missing_or_unsupported_evaluator_version");
   }

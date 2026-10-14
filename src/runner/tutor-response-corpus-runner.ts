@@ -20,6 +20,7 @@ import {
 } from "../corpus/replay.js";
 import {
   DEFAULT_TUTOR_EVAL_SCORING_CONFIG,
+  normalizeTutorEvalScoringConfig,
 } from "../scoring/index.js";
 import {
   runTutorEval,
@@ -152,7 +153,7 @@ function tutorDescriptor(corpus: TutorResponseCorpus): TutorEvalTutorOptions {
 export async function runTutorResponseCorpus(
   options: RunTutorResponseCorpusOptions,
 ): Promise<TutorResponseCorpusEvaluationResult> {
-  const scoring = options.scoring ?? DEFAULT_TUTOR_EVAL_SCORING_CONFIG;
+  const scoring = normalizeTutorEvalScoringConfig(options.scoring ?? DEFAULT_TUTOR_EVAL_SCORING_CONFIG);
   const semanticReplay = options.semanticReplay === undefined
     ? undefined
     : resolveTutorResponseCorpusReplay(options.corpus, options.dataset);

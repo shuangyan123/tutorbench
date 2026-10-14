@@ -8,6 +8,7 @@ import { partitionTutorEvalRubrics, type TutorEvalDataset } from "../contracts/t
 import type { TutorResponseCorpus } from "../contracts/tutor-response-corpus.js";
 import { assertValidTutorEvalRunResult } from "../contracts/tutor-eval-result-validation.js";
 import { hasValidAuthoredAbstention } from "../reporting/tutor-health-abstention-validation.js";
+import { hasMatchingTutorEvalAuthoredScoring } from "../scoring/provenance.js";
 import {
   runTutorResponseCorpus,
   type TutorEvalJudgeRunOptions,
@@ -354,6 +355,9 @@ function validateObservationSet(
   dataset: TutorEvalDataset,
 ): void {
   assertValidTutorEvalRunResult(evaluation.evaluation);
+  if (!hasMatchingTutorEvalAuthoredScoring(evaluation.evaluation, dataset)) {
+    throw new Error("Judge candidate comparison scoring source is invalid.");
+  }
   if (observations.length !== fixture.expectedFixtureIds.length) {
     throw new Error("Judge candidate comparison fixture observation count is invalid.");
   }

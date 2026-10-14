@@ -15,6 +15,7 @@ import { tutorScenarioSuiteToTutorEvalDataset } from "../src/datasets/real-world
 import { buildTutorHealthReport } from "../src/reporting/tutor-health-reporters.js";
 import { DEFAULT_TUTOR_EVAL_SCORING_CONFIG } from "../src/scoring/index.js";
 import { syntheticDesignPartnerPilot } from "./helpers/design-partner-pilot.js";
+import { recomputeRecordedScoring } from "./helpers/recompute-scoring.js";
 
 function replaceCases(evaluation: TutorEvalRunResult, caseResults: readonly TutorEvalCaseRunResult[]): TutorEvalRunResult {
   return { ...evaluation, caseResults, caseRunCount: caseResults.length,
@@ -108,11 +109,14 @@ test("raw critical/factual failures cannot be dropped or downgraded during norma
   };
   const altered = { ...first, rawJudgeResult };
   assert.equal(isTutorEvalRunResult(replaceCases(baseline.evaluation, [altered, ...baseline.evaluation.caseResults.slice(1)])), false);
-  const consistent = { ...altered, criticalFailures: [
+  const consistent = { ...altered, answerLeakage: true, criticalFailures: [
     { type: "answer_leakage" as const, severity: "critical" as const, evidence: "Highest severity after deduplication." },
     { type: "severe_factual_error" as const, severity: "critical" as const, evidence: "Controlled synthetic factual signal." },
   ] };
-  assertValidTutorEvalRunResult(replaceCases(baseline.evaluation, [consistent, ...baseline.evaluation.caseResults.slice(1)]));
+  const consistentEvaluation = recomputeRecordedScoring(replaceCases(baseline.evaluation, [consistent, ...baseline.evaluation.caseResults.slice(1)]));
+  assertValidTutorEvalRunResult(consistentEvaluation);
+  assert.equal(consistentEvaluation.caseResults[0]!.qualityGate, "FAIL");
+  assert.equal(consistentEvaluation.caseResults[0]!.answerLeakage, true);
   assert.equal(isTutorEvalRunResult(replaceCases(baseline.evaluation, [{ ...consistent,
     criticalFailures: consistent.criticalFailures.map((item) => ({ ...item, severity: "minor" })),
   }, ...baseline.evaluation.caseResults.slice(1)])), false);
@@ -165,7 +169,7 @@ test("authored rubric metadata and Judge ownership are bound at the report bound
     rubricResults: [...first.rawJudgeResult!.rubricResults, { rubricId: "not-authored", result: "PASS" }],
   } }, ...evaluation.caseResults.slice(1)]);
   assert.throws(() => buildTutorHealthReport({ suite: baseline.suite, evaluation: unexpectedJudge }),
-    (error: unknown) => error instanceof BenchmarkConfigurationError && error.code === "tutor_health_report_source_mismatch");
+    (error: unknown) => error instanceof BenchmarkConfigurationError && error.code === "tutor_eval_result_invalid");
   for (const [name, rubricResults] of Object.entries({
     weight: first.rubricResults.map((rubric) => ({ ...rubric, weight: 100 })),
     category: first.rubricResults.map((rubric) => ({ ...rubric, category: "correctness" as const })),
@@ -175,7 +179,7 @@ test("authored rubric metadata and Judge ownership are bound at the report bound
     assert.throws(() => buildTutorHealthReport({ suite: baseline.suite,
       evaluation: replaceCases(evaluation, [{ ...first, rubricResults }, ...evaluation.caseResults.slice(1)]),
     }), (error: unknown) => error instanceof BenchmarkConfigurationError &&
-      error.code === "tutor_health_report_source_mismatch");
+      error.code === (name === "critical" ? "tutor_health_report_source_mismatch" : "tutor_eval_result_invalid"));
   });
 });
 
@@ -183,10 +187,11 @@ test("valid v1 optional fields, partial scope and custom scoring remain compatib
   const { baseline, suite } = await syntheticDesignPartnerPilot();
   const legacy = JSON.parse(JSON.stringify(baseline.evaluation)) as Record<string, unknown>;
   delete legacy.evaluatorVersion;
+  delete legacy.scoringProvenance;
   for (const item of legacy.caseResults as Record<string, unknown>[]) { delete item.locale; delete item.judgeMetrics; }
   assertValidTutorEvalRunResult(legacy);
   assert.doesNotThrow(() => buildTutorHealthReport({ suite, evaluation: legacy }));
-  const partial = replaceCases(baseline.evaluation, baseline.evaluation.caseResults.slice(1));
+  const partial = recomputeRecordedScoring(replaceCases(baseline.evaluation, baseline.evaluation.caseResults.slice(1)));
   assertValidTutorEvalRunResult(partial);
   assert.ok(buildTutorHealthReport({ suite, evaluation: partial }).unresolved.length > 0);
   const custom = await runTutorEval({ dataset: tutorScenarioSuiteToTutorEvalDataset(suite),

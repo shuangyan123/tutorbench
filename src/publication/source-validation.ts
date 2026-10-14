@@ -27,6 +27,8 @@ import type {
   PublicEvidenceTutorIdentity,
 } from "./contracts.js";
 import type { JsonDocument } from "./io.js";
+import { createTutorEvalScoringProvenance, hasValidTutorEvalScoringEvidence, hasMatchingTutorEvalAuthoredScoring,
+  tutorEvalScoringIdentity } from "../scoring/index.js";
 
 export interface PublicationArtifactMetadata {
   readonly status: "preliminary";
@@ -46,6 +48,7 @@ export interface PublicationSourceContext {
   readonly expectedGenerationSpec: TutorGenerationSpec;
   readonly sourceCorpusSha256: string;
   readonly sourceEvaluationSha256: string;
+  readonly scoringIdentity?: string;
 }
 
 export interface PublicationSourceValidationResult {
@@ -637,6 +640,26 @@ export async function validatePublicationSources(
     issues,
   );
   validateCaseRuns(corpus, evaluationArtifact.evaluation, dataset, issues);
+  const run = evaluationArtifact.evaluation.evaluation;
+  const config = run.scoringProvenance?.config ?? evaluationArtifact.evaluation.scoring;
+  let scoringIdentity: string | undefined;
+  if (config === undefined) {
+    issues.push({ code: "publication_score_unresolved", field: "scoring_provenance" });
+  } else {
+    try {
+      const checked = run.scoringProvenance === undefined ? { ...run, scoringProvenance: createTutorEvalScoringProvenance(dataset, config) } : run;
+      if (!hasValidTutorEvalScoringEvidence(checked) || !hasMatchingTutorEvalAuthoredScoring(checked, dataset)) {
+        issues.push({ code: "publication_metric_mismatch", field: "scoring_provenance" });
+      } else scoringIdentity = tutorEvalScoringIdentity(config);
+    } catch {
+      issues.push({ code: "publication_metric_mismatch", field: "scoring_provenance" });
+    }
+  }
+  // public v1 的数值契约是 0–1；自定义单位不能被静默当作此格式发布。
+  if ([run.overallScore, ...Object.values(run.categoryScores), ...run.caseResults.flatMap((item) =>
+    [item.overallScore, ...Object.values(item.categoryScores)])].some((score) => score !== null && (score < 0 || score > 1))) {
+    issues.push({ code: "publication_score_unresolved", field: "configured_score_units" });
+  }
   const context: PublicationSourceContext = {
     corpus,
     evaluationArtifact,
@@ -644,6 +667,7 @@ export async function validatePublicationSources(
     expectedGenerationSpec,
     sourceCorpusSha256: corpusDocument.sha256,
     sourceEvaluationSha256: evaluationDocument.sha256,
+    ...(scoringIdentity === undefined ? {} : { scoringIdentity }),
   };
   return { context, issues: sortedIssues(issues) };
 }
@@ -666,6 +690,7 @@ export function toBenchmarkIdentity(
     datasetId: context.corpus.datasetId,
     datasetVersion: context.corpus.datasetVersion,
     evaluatorVersion: context.evaluationArtifact.evaluation.evaluation.evaluatorVersion ?? "",
+    ...(context.scoringIdentity === undefined ? {} : { scoringIdentity: context.scoringIdentity }),
   };
 }
 

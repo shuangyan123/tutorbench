@@ -13,6 +13,9 @@ import type { TutorEvalRubricBehavior } from "../contracts/rubric.js";
 import { TUTOR_EVAL_CATEGORIES } from "../contracts/tutor-eval.js";
 
 export { TUTOR_EVAL_CATEGORIES } from "../contracts/tutor-eval.js";
+import type { TutorEvalScoringConfig } from "../contracts/tutor-eval-scoring.js";
+import { normalizeTutorEvalScoringConfig } from "./config.js";
+export type { TutorEvalScoringConfig } from "../contracts/tutor-eval-scoring.js";
 
 export const DEFAULT_TUTOR_EVAL_SCORING_CONFIG = {
   criterionScores: {
@@ -44,18 +47,6 @@ export const DEFAULT_TUTOR_EVAL_SCORING_CONFIG = {
   },
 } as const;
 
-export interface TutorEvalScoringConfig {
-  readonly criterionScores: Readonly<
-    Record<"PASS" | "PARTIAL" | "FAIL", number>
-  >;
-  readonly categoryWeights: Readonly<Record<TutorEvalCategory, number>>;
-  readonly casePassThreshold: number;
-  readonly qualityGate: {
-    readonly failureTypes: readonly TutorCriticalFailure[];
-    readonly minimumSeverity: TutorCriticalFailureSeverity;
-  };
-}
-
 export interface TutorEvalAggregate {
   readonly categoryScores: TutorEvalCategoryScores;
   readonly overallScore: number | null;
@@ -70,7 +61,28 @@ const severityRank: Readonly<Record<TutorCriticalFailureSeverity, number>> = {
 };
 
 function round(value: number): number {
+  if (Math.abs(value) >= Number.MAX_SAFE_INTEGER) return value;
   return Math.round((value + Number.EPSILON) * 10000) / 10000;
+}
+
+function weightedMean(entries: readonly { readonly score: number; readonly weight: number }[]): number | null {
+  if (entries.length === 0) return null;
+  const originalWeight = entries.reduce((sum, item) => sum + item.weight, 0);
+  const originalTotal = entries.reduce((sum, item) => sum + item.score * item.weight, 0);
+  // 常规范围保留原运算顺序和舍入口径；缩放只处理有限输入的中间溢出。
+  if (Number.isFinite(originalWeight) && Number.isFinite(originalTotal)) {
+    return originalWeight === 0 ? null : round(originalTotal / originalWeight);
+  }
+  const weightScale = entries.reduce((maximum, item) => Math.max(maximum, item.weight), 0);
+  if (weightScale === 0) return null;
+  const scoreScale = entries.reduce((maximum, item) => Math.max(maximum, Math.abs(item.score)), 0);
+  if (scoreScale === 0) return 0;
+  // 同时缩放分数和权重，避免合法有限自定义标度在中间乘加或四位舍入时溢出。
+  const totalWeight = entries.reduce((sum, item) => sum + item.weight / weightScale, 0);
+  const mean = entries.reduce((sum, item) => sum + (item.score / scoreScale) * (item.weight / weightScale), 0) / totalWeight;
+  const minimum = entries.reduce((value, item) => Math.min(value, item.score / scoreScale), 1);
+  const maximum = entries.reduce((value, item) => Math.max(value, item.score / scoreScale), -1);
+  return round(Math.max(minimum, Math.min(maximum, mean)) * scoreScale);
 }
 
 function hasGatedFailure(
@@ -147,12 +159,7 @@ function categoryScoresForRubrics(
       0,
     );
     if (totalWeight > 0) {
-      categoryScores[category] = round(
-        applicable.reduce(
-          (sum, entry) => sum + entry.score * entry.rubric.weight,
-          0,
-        ) / totalWeight,
-      );
+      categoryScores[category] = weightedMean(applicable.map((entry) => ({ score: entry.score, weight: entry.rubric.weight })));
     }
   }
   return categoryScores;
@@ -165,20 +172,7 @@ function weightedCategoryScore(
   const weightedCategories = TUTOR_EVAL_CATEGORIES.filter(
     (category) => categoryScores[category] !== null,
   );
-  const categoryWeight = weightedCategories.reduce(
-    (sum, category) => sum + config.categoryWeights[category],
-    0,
-  );
-  return categoryWeight === 0
-    ? null
-    : round(
-        weightedCategories.reduce(
-          (sum, category) =>
-            sum +
-            (categoryScores[category] ?? 0) * config.categoryWeights[category],
-          0,
-        ) / categoryWeight,
-      );
+  return weightedMean(weightedCategories.map((category) => ({ score: categoryScores[category]!, weight: config.categoryWeights[category] })));
 }
 
 function hasCompleteRubricResults(
@@ -249,11 +243,12 @@ export function aggregateTutorEvalRubrics(
   criticalFailures: readonly TutorEvalCriticalFailure[],
   config: TutorEvalScoringConfig = DEFAULT_TUTOR_EVAL_SCORING_CONFIG,
 ): TutorEvalAggregate {
-  const categoryScores = categoryScoresForRubrics(rubrics, results, config);
-  const overallScore = weightedCategoryScore(categoryScores, config);
+  const effective = normalizeTutorEvalScoringConfig(config);
+  const categoryScores = categoryScoresForRubrics(rubrics, results, effective);
+  const overallScore = weightedCategoryScore(categoryScores, effective);
   const qualityGate: TutorEvalQualityGate = hasGatedFailure(
     criticalFailures,
-    config,
+    effective,
   )
     ? "FAIL"
     : "PASS";
@@ -264,7 +259,7 @@ export function aggregateTutorEvalRubrics(
     qualityGate,
     passed:
       overallScore !== null &&
-      essentialPassEligibility(rubrics, results, config) &&
+      essentialPassEligibility(rubrics, results, effective) &&
       qualityGate === "PASS",
   };
 }
@@ -284,9 +279,7 @@ export function aggregateTutorEvalCategoryScores(
       .map((result) => result.categoryScores[category])
       .filter((score): score is number => score !== null);
     if (scores.length > 0) {
-      aggregate[category] = round(
-        scores.reduce((sum, score) => sum + score, 0) / scores.length,
-      );
+      aggregate[category] = weightedMean(scores.map((score) => ({ score, weight: 1 })));
     }
   }
   return aggregate;
@@ -296,7 +289,5 @@ export function aggregateTutorEvalOverallScore(
   scores: readonly (number | null)[],
 ): number | null {
   const usable = scores.filter((score): score is number => score !== null);
-  return usable.length === 0
-    ? null
-    : round(usable.reduce((sum, score) => sum + score, 0) / usable.length);
+  return weightedMean(usable.map((score) => ({ score, weight: 1 })));
 }

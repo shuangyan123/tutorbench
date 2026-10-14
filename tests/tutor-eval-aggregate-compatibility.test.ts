@@ -32,14 +32,21 @@ test("direct runner custom scoring can exceed one without changing normalized ru
   assert.equal(result.caseResults[0]!.categoryScores.correctness, 2);
   assert.equal(result.caseResults[0]!.overallScore, 2);
   assert.equal(result.overallScore, 2);
-  // case/category 的旧范围限制仍生效；本轮不扩大旧契约，也不认证评分推导。
-  assert.equal(isTutorEvalRunResult(result), false);
+  // 当前有评分身份的结果可以重算自定义尺度，normalized rubric 仍保持 0/0.5/1。
+  assert.ok(result.scoringProvenance);
+  assertValidTutorEvalRunResult(result);
+  assert.equal(isTutorEvalRunResult(result), true);
+  const legacy = { ...result };
+  delete legacy.scoringProvenance;
+  // 无来源的历史 v1 仍保留原 case/category 读取范围，不能借新尺度升级旧证据。
+  assert.equal(isTutorEvalRunResult(legacy), false);
 });
 
 test("v1 run overallScore retains its historical finite-number-or-null parsing boundary", async () => {
   const reference = await syntheticRun();
   const legacy = JSON.parse(JSON.stringify(reference)) as Record<string, unknown>;
   delete legacy.evaluatorVersion;
+  delete legacy.scoringProvenance;
   for (const item of legacy.caseResults as Record<string, unknown>[]) {
     delete item.locale;
     delete item.judgeMetrics;
@@ -50,7 +57,8 @@ test("v1 run overallScore retains its historical finite-number-or-null parsing b
     assert.doesNotThrow(() => assertValidTutorEvalRunResult(input));
     assert.equal(isTutorEvalRunResult(input), true);
   }
-  assertValidTutorEvalRunResult({ ...reference, overallScore: 2 });
+  assert.equal(isTutorEvalRunResult({ ...reference, overallScore: 2 }), false);
+  assertValidTutorEvalRunResult({ ...legacy, overallScore: 2 });
 });
 
 test("aggregate compatibility still rejects nonfinite values and preserves old case/category bounds", async () => {
@@ -59,10 +67,12 @@ test("aggregate compatibility still rejects nonfinite values and preserves old c
     assert.equal(isTutorEvalRunResult({ ...result, overallScore }), false);
   }
   const first = result.caseResults[0]!;
-  assert.equal(isTutorEvalRunResult({ ...result,
+  const legacy = { ...result };
+  delete legacy.scoringProvenance;
+  assert.equal(isTutorEvalRunResult({ ...legacy,
     caseResults: [{ ...first, overallScore: 2 }],
   }), false);
-  assert.equal(isTutorEvalRunResult({ ...result,
+  assert.equal(isTutorEvalRunResult({ ...legacy,
     caseResults: [{ ...first, categoryScores: { ...first.categoryScores, correctness: 2 } }],
   }), false);
 });

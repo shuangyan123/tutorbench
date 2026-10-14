@@ -36,8 +36,8 @@ export const WORD_CONTEXT_DISCRIMINATION_ACTIONABILITY_CRITERION =
   "Ask the student to point to one clue in the sentence." as const;
 
 const wordContextJudgeCriteria = [
-  { rubricId: WORD_CONTEXT_DISCRIMINATION_CORRECTNESS_RUBRIC_ID, category: "correctness", weight: 1, evaluationType: "judge" },
-  { rubricId: WORD_CONTEXT_DISCRIMINATION_ACTIONABILITY_RUBRIC_ID, category: "actionability", weight: 1, evaluationType: "judge" },
+  { rubricId: WORD_CONTEXT_DISCRIMINATION_CORRECTNESS_RUBRIC_ID, category: "correctness", weight: 1, evaluationType: "judge", behavior: "required" },
+  { rubricId: WORD_CONTEXT_DISCRIMINATION_ACTIONABILITY_RUBRIC_ID, category: "actionability", weight: 1, evaluationType: "judge", behavior: "desirable" },
 ] as const;
 
 export type WordContextDiscriminationLabel = "PASS" | "PARTIAL" | "FAIL";
@@ -348,6 +348,12 @@ function assertReportInputIdentity(
     throw new Error("Word-context discrimination Judge identity is invalid.");
   }
   const caseResults = result.evaluation.caseResults;
+  if (result.evaluation.scoringProvenance?.cases.some((item) => item.caseId !== WORD_CONTEXT_DISCRIMINATION_CASE_ID ||
+      item.caseVersion !== WORD_CONTEXT_DISCRIMINATION_CASE_VERSION || item.rubrics.length !== wordContextJudgeCriteria.length ||
+      item.rubrics.some((rubric) => rubric.evaluationType !== "judge" ||
+        !wordContextJudgeCriteria.some((criterion) => rubric.id === criterion.rubricId && rubric.category === criterion.category && rubric.weight === criterion.weight && rubric.behavior === criterion.behavior)))) {
+    throw new Error("Word-context discrimination scoring source is invalid.");
+  }
   // 固定 case@1.1.1 仅含这两个 Judge rubric；不凭 error 状态或未经校验的 flag 推断可用性。
   for (const caseResult of caseResults) {
     const raw = caseResult.rawJudgeResult;

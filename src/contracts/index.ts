@@ -50,6 +50,7 @@ export * from "./critical-failure-calibration.js";
 export * from "./critical-failure-calibration-validation.js";
 export * from "./tutor-eval-result-validation.js";
 export * from "./tutor-eval-failure-signal-metrics.js";
+export * from "./tutor-eval-scoring.js";
 export * from "./tutor-eval-validation.js";
 export * from "./tutor-response-corpus.js";
 export * from "./tutor-response-corpus-validation.js";

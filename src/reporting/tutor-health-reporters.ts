@@ -21,6 +21,8 @@ import {
   type TutorScenarioSuiteVNext,
 } from "../contracts/index.js";
 import { assertValidTutorHealthReport, parseTutorHealthScoringProfile } from "../contracts/tutor-health-validation.js";
+import { hasMatchingTutorEvalAuthoredScoring } from "../scoring/provenance.js";
+import { tutorScenarioSuiteToTutorEvalDataset } from "../datasets/real-world.js";
 import { assertValidTutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext-validation.js";
 import { hasValidAuthoredAbstention } from "./tutor-health-abstention-validation.js";
 import type {
@@ -477,6 +479,9 @@ export function buildTutorHealthReport(options: {
 }): TutorHealthReport {
   assertValidTutorScenarioSuiteVNext(options.suite);
   assertValidTutorEvalRunResult(options.evaluation);
+  if (!hasMatchingTutorEvalAuthoredScoring(options.evaluation, tutorScenarioSuiteToTutorEvalDataset(options.suite))) {
+    throw new BenchmarkConfigurationError("tutor_health_report_source_mismatch");
+  }
   const profile = parseTutorHealthScoringProfile(
     options.scoringProfile ?? DEFAULT_TUTOR_HEALTH_SCORING_PROFILE,
   );
@@ -731,12 +736,12 @@ export function buildTutorHealthReport(options: {
   }
   const knownGateFailure =
     findings.some((finding) => finding.severity === "critical") ||
-    options.evaluation.caseResults.some(
+    (options.evaluation.scoringProvenance !== undefined && options.evaluation.caseResults.some(
       (result) => result.qualityGate === "FAIL" && (result.status !== "error" ||
         (result.rawJudgeResult?.insufficientInformation === true && result.criticalFailures.length > 0)),
-    );
+    ));
   const hasUnresolvedEvaluation =
-    unresolved.length > 0 || options.evaluation.errorCount > 0 ||
+    options.evaluation.scoringProvenance === undefined || unresolved.length > 0 || options.evaluation.errorCount > 0 ||
     options.evaluation.caseResults.some((result) => result.rawJudgeResult?.insufficientInformation === true);
   const releaseGate = knownGateFailure
     ? "FAIL"
@@ -760,6 +765,7 @@ export function buildTutorHealthReport(options: {
       runId: options.evaluation.runId,
       datasetId: options.evaluation.datasetId,
       datasetVersion: options.evaluation.datasetVersion,
+      scoringIdentity: options.evaluation.scoringProvenance?.identity ?? null,
       ...(options.evaluation.evaluatorVersion === undefined
         ? {}
         : { evaluatorVersion: options.evaluation.evaluatorVersion }),
@@ -849,9 +855,10 @@ export function formatTutorHealthReport(
   return [
     `Tutor Health Score: ${report.healthScore === null ? "n/a" : `${report.healthScore}/100`} — ${coverage.status.toUpperCase()} COVERAGE (scored dimensions only: ${profileCoverage})`,
     `Evaluation scope: ${scope.suiteId}@${scope.suiteVersion}; ${scope.scenarioCount} scenarios, ${scope.decisionPointCount} decision points; ${scope.presentCaseRunCount}/${scope.expectedCaseRunCount} case-runs (${Math.round(scope.caseRunRatio * 100)}%)`,
-    `Release Gate: ${report.releaseGate}`,
+    `Release Gate: ${report.sourceEvaluation.scoringIdentity == null && report.releaseGate === "PASS" ? "UNRESOLVED (historical PASS; scoring identity unknown)" : report.releaseGate}`,
     `Findings: critical ${report.findingCounts.critical}, major ${report.findingCounts.major}, minor ${report.findingCounts.minor}, info ${report.findingCounts.info}`,
     `Scoring profile: ${report.scoringProfile.id}@${report.scoringProfile.version}`,
+    `TutorEval scoring identity: ${report.sourceEvaluation.scoringIdentity ?? "unknown (historical evidence)"}; Health uses normalized rubric scores, not configured TutorEval score units`,
     `Unresolved decision points: ${report.unresolved.length}`,
     "",
     "Strongest dimensions:",

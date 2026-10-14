@@ -27,8 +27,10 @@ export function isTutorHealthRunManifest(value: unknown): value is TutorHealthRu
     value.provenance === "local_execution_only" &&
     record(suite) && keys(suite, ["id", "version", "sha256"]) &&
     text(suite.id, 120) && /^[a-z0-9][a-z0-9._-]*$/u.test(suite.id) && text(suite.version, 80) && hash(suite.sha256) &&
-    record(evaluation) && keys(evaluation, ["runId", "evaluatorVersion", "sha256"]) &&
+    record(evaluation) && keys(evaluation, ["runId", "evaluatorVersion", "sha256", "scoringIdentity"]) &&
     text(evaluation.runId, 160) && text(evaluation.evaluatorVersion, 80) && hash(evaluation.sha256) &&
+    (evaluation.scoringIdentity === undefined || evaluation.scoringIdentity === null ||
+      (typeof evaluation.scoringIdentity === "string" && /^tutor-eval-scoring:sha256:[a-f0-9]{64}$/u.test(evaluation.scoringIdentity))) &&
     record(report) && keys(report, ["schemaVersion", "sha256"]) && report.schemaVersion === 2 && hash(report.sha256) &&
     isTutorHealthComparisonDescriptor(value.tutor, false) &&
     (value.judge === null || isTutorHealthComparisonDescriptor(value.judge, true)) &&

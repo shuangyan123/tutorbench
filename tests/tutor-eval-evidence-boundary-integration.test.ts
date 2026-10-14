@@ -10,6 +10,7 @@ import { buildTutorHealthReport } from "../src/reporting/tutor-health-reporters.
 import { compareTutorHealthRuns } from "../src/reporting/tutor-health-comparison.js";
 import { buildTutorHealthRunManifest, verifyTutorHealthRunManifest } from "../src/reporting/tutor-health-run-manifest.js";
 import { insufficientInformationJudge, insufficientInformationSuite } from "./helpers/insufficient-information.js";
+import { recomputeRecordedScoring } from "./helpers/recompute-scoring.js";
 
 const isSourceError = (error: unknown) => error instanceof BenchmarkConfigurationError &&
   (error.code === "tutor_eval_result_invalid" || error.code === "tutor_health_report_source_mismatch");
@@ -201,7 +202,7 @@ test("genuinely missing normalized evidence remains unresolved and cannot resolv
   const suite = await insufficientInformationSuite();
   const baseline = reportChain(suite, await evaluate(suite, insufficientInformationJudge({ result: "FAIL" }), undefined, "baseline"));
   const evaluation = await evaluate(suite, insufficientInformationJudge({ insufficientInformation: true }), undefined, "candidate");
-  const partial = reportChain(suite, withCase(evaluation, { rubricResults: [] }));
+  const partial = reportChain(suite, recomputeRecordedScoring(withCase(evaluation, { rubricResults: [] })));
   assert.equal(partial.report.releaseGate, "UNRESOLVED");
   assert.ok(partial.report.unresolved.some((item) => item.reason === "missing_rubric_result"));
   assert.equal(compareTutorHealthRuns({ baseline, candidate: partial }).counts.resolved, 0);
@@ -226,12 +227,16 @@ test("historical v1 optional fields and finite run aggregate parsing remain comp
   assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.5");
   const suite = await insufficientInformationSuite();
   const evaluation = await evaluate(suite, insufficientInformationJudge());
+  assert.equal(buildTutorHealthReport({ suite, evaluation }).releaseGate, "PASS");
   const legacy = JSON.parse(JSON.stringify(evaluation)) as Record<string, unknown>;
   delete legacy.evaluatorVersion;
+  delete legacy.scoringProvenance;
   for (const item of legacy.caseResults as Record<string, unknown>[]) { delete item.locale; delete item.judgeMetrics; }
   for (const overallScore of [2, -0.25, 1, null]) assertValidTutorEvalRunResult({ ...legacy, overallScore });
   assertValidTutorEvalRunResult(legacy);
-  assert.equal(buildTutorHealthReport({ suite, evaluation: legacy }).releaseGate, "PASS");
+  const historicalReport = buildTutorHealthReport({ suite, evaluation: legacy });
+  assert.equal(historicalReport.releaseGate, "UNRESOLVED");
+  assert.equal(historicalReport.sourceEvaluation.scoringIdentity, null);
 });
 
 test("transport errors retain their separate unresolved diagnostics without structured abstention", async () => {

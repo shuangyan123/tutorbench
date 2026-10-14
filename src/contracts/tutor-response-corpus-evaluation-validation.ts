@@ -17,6 +17,7 @@ import {
   type TutorResponseCorpusEvaluationSelectionMode,
 } from "./tutor-response-corpus.js";
 import type { TutorResponseCorpusSemanticReplay } from "./tutor-response-replay.js";
+import { normalizeTutorEvalScoringConfig, tutorEvalScoringIdentity } from "../scoring/config.js";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -278,7 +279,7 @@ export function parseTutorResponseCorpusEvaluationResult(
   const semanticReplay = record?.semanticReplay === undefined
     ? undefined
     : parseSemanticReplay(record.semanticReplay);
-  const scoring = record?.scoring === undefined
+  let scoring = record?.scoring === undefined
     ? undefined
     : parseScoring(record.scoring);
   let generationSpec: TutorGenerationSpec | undefined;
@@ -291,6 +292,10 @@ export function parseTutorResponseCorpusEvaluationResult(
   }
   try {
     assertValidTutorEvalRunResult(evaluationValue);
+    if (evaluationValue.scoringProvenance !== undefined && record?.scoring !== undefined) {
+      scoring = normalizeTutorEvalScoringConfig(record.scoring);
+      if (tutorEvalScoringIdentity(scoring) !== evaluationValue.scoringProvenance.identity) return invalid();
+    }
   } catch {
     return invalid();
   }

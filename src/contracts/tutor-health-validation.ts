@@ -474,11 +474,13 @@ export function isTutorHealthReport(value: unknown): value is TutorHealthReport 
     !isText(scenarioSuite.version, 80) ||
     !isText(scenarioSuite.healthTaxonomyVersion, 80) ||
     source === null ||
-    !hasOnlyKeys(source, ["runId", "datasetId", "datasetVersion", "evaluatorVersion"]) ||
+    !hasOnlyKeys(source, ["runId", "datasetId", "datasetVersion", "evaluatorVersion", "scoringIdentity"]) ||
     !isText(source.runId, 160) ||
     !isText(source.datasetId, 160) ||
     !isText(source.datasetVersion, 80) ||
     (source.evaluatorVersion !== undefined && !isText(source.evaluatorVersion, 80)) ||
+    (source.scoringIdentity !== undefined && source.scoringIdentity !== null &&
+      (typeof source.scoringIdentity !== "string" || !/^tutor-eval-scoring:sha256:[a-f0-9]{64}$/u.test(source.scoringIdentity))) ||
     !isTutorHealthScoringProfile(record.scoringProfile) ||
     (record.healthScore !== null &&
       (typeof record.healthScore !== "number" ||
@@ -521,8 +523,8 @@ export function isTutorHealthReport(value: unknown): value is TutorHealthReport 
   if (
     (hasCriticalFinding && record.releaseGate !== "FAIL") ||
     (record.releaseGate === "PASS" &&
-      (reportUnresolved.length > 0 || record.healthScore === null)) ||
-    (record.releaseGate === "UNRESOLVED" && reportUnresolved.length === 0)
+      (reportUnresolved.length > 0 || record.healthScore === null || source.scoringIdentity === null)) ||
+    (record.releaseGate === "UNRESOLVED" && reportUnresolved.length === 0 && source.scoringIdentity !== null)
   ) {
     return false;
   }

@@ -6,6 +6,7 @@ import {
   BenchmarkConfigurationError,
   TUTOR_EVAL_CATEGORIES,
   parseTutorResponseCorpus,
+  parseTutorEvalJudgeResult,
   type TutorEvalCaseRunResult,
   type TutorEvalDataset,
   type TutorResponseCorpus,
@@ -14,6 +15,7 @@ import {
 import { loadTutorEvalDataset } from "../src/datasets/index.js";
 import { deriveTutorResponseId } from "../src/corpus/index.js";
 import { runTutorResponseCorpus, type TutorEvalJudgeRunOptions } from "../src/runner/index.js";
+import { recomputeRecordedScoring } from "./helpers/recompute-scoring.js";
 
 interface ResumeFixture {
   readonly dataset: TutorEvalDataset;
@@ -148,7 +150,7 @@ function errorCaseRun(result: TutorEvalCaseRunResult): TutorEvalCaseRunResult {
     })),
     categoryScores: emptyCategoryScores(),
     overallScore: null,
-    qualityGate: "FAIL",
+    qualityGate: "PASS",
     criticalFailures: [],
     answerLeakage: false,
     diagnostics: [{ code: "judge_timeout", message: "Synthetic timeout." }],
@@ -162,9 +164,7 @@ function replaceCaseResults(
   const passedCount = caseResults.filter((result) => result.status === "passed").length;
   const failedCount = caseResults.filter((result) => result.status === "failed").length;
   const errorCount = caseResults.filter((result) => result.status === "error").length;
-  return {
-    ...artifact,
-    evaluation: {
+  const evaluation = {
       ...artifact.evaluation,
       caseRunCount: caseResults.length,
       passedCount,
@@ -172,8 +172,10 @@ function replaceCaseResults(
       errorCount,
       caseResults,
       failureSignalMetrics: buildTutorEvalFailureSignalMetrics(caseResults),
-    },
-  };
+    };
+  const supported = caseResults.every((item) => artifact.evaluation.scoringProvenance?.cases.some((authored) =>
+    authored.caseId === item.caseId && authored.caseVersion === item.caseVersion));
+  return { ...artifact, evaluation: supported ? recomputeRecordedScoring(evaluation) : evaluation };
 }
 
 function clone<T>(value: T): T {
@@ -278,18 +280,16 @@ test("explicit resume reruns insufficient-information cases instead of reusing t
 
 test("both passed and failed completed case-runs are reusable", async () => {
   const fixture = await makeFixture(false);
+  const failedCase = fixture.corpus.responses.map((item) => item.caseId).sort()[1]!;
+  const judge = makeJudge({ count: 0 });
   const previous = await runTutorResponseCorpus({
     corpus: fixture.corpus,
     dataset: fixture.dataset,
-    judge: makeJudge({ count: 0 }),
+    judge: { ...judge, evaluate: async (input) => ({ ...parseTutorEvalJudgeResult(await judge.evaluate!(input)),
+      rubricResults: input.rubrics.map((rubric) => ({ rubricId: rubric.id, result: input.caseId === failedCase ? "FAIL" : "PASS" })),
+    }) },
   });
-  const caseResults = previous.evaluation.caseResults.map((result, index) =>
-    index === 0
-      ? { ...result, status: "passed" as const, passed: true, qualityGate: "PASS" as const }
-      : index === 1
-        ? { ...result, status: "failed" as const, passed: false, qualityGate: "FAIL" as const }
-        : result,
-  );
+  const caseResults = previous.evaluation.caseResults;
   const reusableArtifact = replaceCaseResults(previous, caseResults);
   const calls = { count: 0 };
   const resumed = await runTutorResponseCorpus({
@@ -302,6 +302,21 @@ test("both passed and failed completed case-runs are reusable", async () => {
   assert.equal(resumed.evaluation.caseResults[0]?.status, "passed");
   assert.equal(resumed.evaluation.caseResults[1]?.status, "failed");
   assert.equal(resumed.evaluation.errorCount, 0);
+});
+
+test("historical explicit scoring resumes across equivalent failure-type order without assuming a default", async () => {
+  const fixture = await makeFixture(false);
+  const previous = await runTutorResponseCorpus({ corpus: fixture.corpus, dataset: fixture.dataset, judge: makeJudge({ count: 0 }) });
+  const historical = clone(previous);
+  delete (historical.evaluation as unknown as Record<string, unknown>).scoringProvenance;
+  const legacy = { ...historical, scoring: { ...historical.scoring!, qualityGate: { ...historical.scoring!.qualityGate,
+    failureTypes: [...historical.scoring!.qualityGate.failureTypes].reverse() } } };
+  const bytes = JSON.stringify(legacy);
+  const calls = { count: 0 };
+  const resumed = await runTutorResponseCorpus({ corpus: fixture.corpus, dataset: fixture.dataset, resumeEvaluation: legacy, judge: makeJudge(calls) });
+  assert.equal(calls.count, 0);
+  assert.ok(resumed.evaluation.scoringProvenance);
+  assert.equal(JSON.stringify(legacy), bytes);
 });
 
 test("changed execution timeout and max attempts do not invalidate completed Judge results", async () => {
@@ -526,6 +541,9 @@ test("resume recomputes aggregates from canonical case-run order", async () => {
       answerLeakageRate: 0,
     },
   };
+  await assertResumeFailsClosed(fixture, staleAggregates);
+  // 旧 wrapper 显式记录配置，但顶层聚合未获来源身份认证；只复核并复用 case evidence。
+  delete (staleAggregates.evaluation as unknown as Record<string, unknown>).scoringProvenance;
   const resumed = await runTutorResponseCorpus({
     corpus: fixture.corpus,
     dataset: fixture.dataset,

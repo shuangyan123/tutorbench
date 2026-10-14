@@ -54,9 +54,11 @@ function isSource(value: unknown): value is TutorHealthComparisonSource {
   const { suite, evaluation, report } = value;
   return record(suite) && keys(suite, ["id", "version", "healthTaxonomyVersion", "sha256"]) &&
     text(suite.id, 120) && text(suite.version, 80) && text(suite.healthTaxonomyVersion, 80) && hash(suite.sha256) &&
-    record(evaluation) && keys(evaluation, ["runId", "datasetId", "datasetVersion", "evaluatorVersion", "createdAt", "sha256"]) &&
+    record(evaluation) && keys(evaluation, ["runId", "datasetId", "datasetVersion", "evaluatorVersion", "createdAt", "sha256", "scoringIdentity"]) &&
     text(evaluation.runId, 160) && evaluation.datasetId === suite.id && evaluation.datasetVersion === suite.version &&
     text(evaluation.evaluatorVersion, 80) && text(evaluation.createdAt, 80) &&
+    (evaluation.scoringIdentity === undefined || (typeof evaluation.scoringIdentity === "string" &&
+      /^tutor-eval-scoring:sha256:[a-f0-9]{64}$/u.test(evaluation.scoringIdentity))) &&
     Number.isFinite(Date.parse(evaluation.createdAt)) && hash(evaluation.sha256) &&
     record(report) && keys(report, ["schemaVersion", "sha256"]) && report.schemaVersion === 2 && hash(report.sha256) &&
     isTutorHealthComparisonDescriptor(value.tutor, false) &&
@@ -70,6 +72,7 @@ export function tutorHealthComparisonIncompatibility(
   candidate: TutorHealthComparisonSource,
 ): string | null {
   if (baseline.evaluation.runId === candidate.evaluation.runId) return "run_identity";
+  if (baseline.evaluation.scoringIdentity !== candidate.evaluation.scoringIdentity) return "scoring_identity";
   if (tutorHealthComparisonJson(baseline.suite) !== tutorHealthComparisonJson(candidate.suite)) return "scenario_suite";
   if (tutorHealthComparisonJson(baseline.scoringProfile) !== tutorHealthComparisonJson(candidate.scoringProfile)) return "scoring_profile";
   if (baseline.evaluation.evaluatorVersion !== candidate.evaluation.evaluatorVersion) return "evaluator_version";

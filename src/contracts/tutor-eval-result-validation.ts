@@ -9,6 +9,7 @@ import { TUTOR_EVAL_CATEGORIES } from "./tutor-eval.js";
 import { isTutorCaseLocale } from "./locale.js";
 import { isTutorEvalJudgeResult } from "./tutor-eval-validation.js";
 import { hasValidTutorEvalFailureSignalMetrics } from "./tutor-eval-failure-signal-metrics.js";
+import { isTutorEvalScoringProvenance, hasValidTutorEvalScoringEvidence } from "../scoring/provenance.js";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -156,15 +157,15 @@ function isJudgeDescriptor(value: unknown): boolean {
   );
 }
 
-function isCategoryScores(value: unknown): value is TutorEvalCategoryScores {
+function isCategoryScores(value: unknown, configured = false): value is TutorEvalCategoryScores {
   const record = asRecord(value);
   return (
     record !== null &&
-    TUTOR_EVAL_CATEGORIES.every((category) => isScore(record[category]))
+    TUTOR_EVAL_CATEGORIES.every((category) => configured ? isFiniteNumberOrNull(record[category]) : isScore(record[category]))
   );
 }
 
-function isCaseRunResult(value: unknown): value is TutorEvalCaseRunResult {
+function isCaseRunResult(value: unknown, configured = false): value is TutorEvalCaseRunResult {
   const record = asRecord(value);
   return (
     record !== null &&
@@ -183,8 +184,8 @@ function isCaseRunResult(value: unknown): value is TutorEvalCaseRunResult {
       isJudgeMetrics(record.judgeMetrics)) &&
     Array.isArray(record.rubricResults) &&
     record.rubricResults.every(isRubricResult) &&
-    isCategoryScores(record.categoryScores) &&
-    isScore(record.overallScore) &&
+    isCategoryScores(record.categoryScores, configured) &&
+    (configured ? isFiniteNumberOrNull(record.overallScore) : isScore(record.overallScore)) &&
     (record.qualityGate === "PASS" || record.qualityGate === "FAIL") &&
     Array.isArray(record.criticalFailures) &&
     record.criticalFailures.every(isCriticalFailure) &&
@@ -277,9 +278,11 @@ function hasValidInsufficientInformationEvidence(record: UnknownRecord, results:
 export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResult {
   const record = asRecord(value);
   const caseResults = record?.caseResults;
+  const configured = record?.scoringProvenance !== undefined;
   return (
     record !== null &&
     record.schemaVersion === TUTOR_EVAL_RESULT_SCHEMA_VERSION &&
+    (!configured || isTutorEvalScoringProvenance(record.scoringProvenance)) &&
     typeof record.runId === "string" &&
     typeof record.createdAt === "string" &&
     typeof record.startedAt === "string" &&
@@ -304,7 +307,7 @@ export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResul
     isNonNegativeInteger(record.errorCount) &&
     record.passedCount + record.failedCount + record.errorCount === record.caseRunCount &&
     isTutorDescriptor(record.tutor) &&
-    isCategoryScores(record.categoryScores) &&
+    isCategoryScores(record.categoryScores, configured) &&
     // v1 未记录聚合评分配置；保留顶层有限数/null 的原有读取边界。
     isFiniteNumberOrNull(record.overallScore) &&
     typeof record.criticalFailureRate === "number" &&
@@ -317,11 +320,12 @@ export function isTutorEvalRunResult(value: unknown): value is TutorEvalRunResul
     record.answerLeakageRate <= 1 &&
     Array.isArray(caseResults) &&
     record.caseRunCount === caseResults.length &&
-    caseResults.every(isCaseRunResult) &&
+    caseResults.every((item) => isCaseRunResult(item, configured)) &&
     hasConsistentRunEvidence(record, caseResults) &&
     hasValidInsufficientInformationEvidence(record, caseResults) &&
     (record.failureSignalMetrics === undefined ||
-      hasValidTutorEvalFailureSignalMetrics(record.failureSignalMetrics, caseResults))
+      hasValidTutorEvalFailureSignalMetrics(record.failureSignalMetrics, caseResults)) &&
+    hasValidTutorEvalScoringEvidence(record as unknown as TutorEvalRunResult)
   );
 }
 

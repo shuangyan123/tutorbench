@@ -157,8 +157,8 @@ test("complete evidence retains real zero and nonzero rates while empty samples 
   assert.match(formatTutorEvalSummary(complete), /Critical failure rate: 50\.00%/);
   const zero = await evaluation(["pass"]);
   assert.match(formatTutorEvalSummary(zero), /Answer leakage rate: 0\.00%/);
-  const empty = { ...zero, caseCount: 0, caseRunCount: 0, passedCount: 0, failedCount: 0, errorCount: 0, caseResults: [] };
-  delete (empty as unknown as { failureSignalMetrics?: unknown }).failureSignalMetrics;
+  const empty = await runTutorEval({ dataset: { id: "synthetic-empty-statistics", version: "1", cases: [] },
+    tutor: { id: "synthetic-empty", respond: async () => { throw new Error("Empty scope must not execute a Tutor."); } } });
   assert.match(formatTutorEvalSummary(empty), /Critical failure rate: n\/a/);
 });
 

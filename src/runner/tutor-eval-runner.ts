@@ -29,6 +29,8 @@ import {
   aggregateTutorEvalOverallScore,
   aggregateTutorEvalRubrics,
   DEFAULT_TUTOR_EVAL_SCORING_CONFIG,
+  normalizeTutorEvalScoringConfig,
+  createTutorEvalScoringProvenance,
   type TutorEvalScoringConfig,
 } from "../scoring/index.js";
 import {
@@ -428,7 +430,8 @@ export async function runTutorEval(
   const orderedCases = [...dataset.cases].sort((left, right) =>
     left.id < right.id ? -1 : left.id > right.id ? 1 : 0,
   );
-  const scoring = options.scoring ?? DEFAULT_TUTOR_EVAL_SCORING_CONFIG;
+  const scoring = normalizeTutorEvalScoringConfig(options.scoring ?? DEFAULT_TUTOR_EVAL_SCORING_CONFIG);
+  const scoringProvenance = createTutorEvalScoringProvenance(dataset, scoring);
   const caseResults: TutorEvalCaseRunResult[] = [];
   for (const tutorEvalCase of orderedCases) {
     for (let runIndex = 1; runIndex <= runsPerCase; runIndex += 1) {
@@ -476,6 +479,7 @@ export async function runTutorEval(
     datasetId: dataset.id,
     datasetVersion: dataset.version,
     evaluatorVersion: TUTOR_EVAL_EVALUATOR_VERSION,
+    scoringProvenance,
     tutor: asTutorDescriptor(options),
     judge: asJudgeDescriptor(options.judge),
     runsPerCase,

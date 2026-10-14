@@ -282,6 +282,9 @@ export function formatTutorEvalSummary(
   return [
     `${labels.dataset}: ${result.datasetId}@${result.datasetVersion}`,
     `${labels.evaluator}: ${result.evaluatorVersion ?? "legacy"}`,
+    ...(reportLocale === "zh-CN"
+      ? [`评分来源: ${result.scoringProvenance?.identity ?? "unknown（历史结果未记录配置）"}；总体和类别分数使用配置单位，单项 rubric score 保持归一化状态编码`]
+      : [`Scoring provenance: ${result.scoringProvenance?.identity ?? "unknown (historical configuration not recorded)"}; aggregate/category scores use configured units; rubric scores remain normalized status encodings`]),
     `${labels.tutor}: ${result.tutor.provider}/${result.tutor.model}`,
     `${labels.prompt}: ${result.tutor.promptVersion}`,
     ...judgeLines,

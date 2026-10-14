@@ -646,7 +646,7 @@ test("report builder rejects evaluation artifacts from a different suite identit
           index === 0 ? { ...result, caseVersion: "stale-case-version" } : result,
         ) },
       }),
-    "tutor_health_report_source_mismatch",
+    "tutor_eval_result_invalid",
   );
 });
 

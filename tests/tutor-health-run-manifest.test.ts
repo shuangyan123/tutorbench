@@ -112,7 +112,7 @@ test("manifest validation rejects missing/malformed identity and unbounded descr
     const nested = manifest[key]!;
     for (const field of Object.keys(nested)) {
       invalid.push({ ...manifest, [key]: { ...nested, [field]: "" } });
-      invalid.push({ ...manifest, [key]: Object.fromEntries(Object.entries(nested).filter(([name]) => name !== field)) });
+      if (field !== "scoringIdentity") invalid.push({ ...manifest, [key]: Object.fromEntries(Object.entries(nested).filter(([name]) => name !== field)) });
     }
     invalid.push({ ...manifest, [key]: { ...nested, private: "private-sentinel" } });
   }

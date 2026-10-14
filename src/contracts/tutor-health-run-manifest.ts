@@ -14,6 +14,7 @@ export interface TutorHealthRunManifest {
   readonly evaluation: {
     readonly runId: string;
     readonly evaluatorVersion: string;
+    readonly scoringIdentity?: string | null;
     /** SHA-256 of the exact UTF-8 evaluation.json bytes, including its final newline. */
     readonly sha256: string;
   };

@@ -152,6 +152,9 @@ async function copyMutation(
   const evaluation = JSON.parse(await readFile(fixture.evaluationPath, "utf8")) as Record<string, unknown>;
   mutateCorpus(corpus);
   mutateEvaluation(evaluation);
+  // 这些历史结构/来源负例不携带新算术证明；新 provenance 篡改另有专门回归。
+  delete evaluationRun(evaluation).scoringProvenance;
+  delete evaluationRun(evaluation).failureSignalMetrics;
   const corpusPath = join(directory, "corpus.json");
   const evaluationPath = join(directory, "evaluation.json");
   await writeJson(corpusPath, corpus);
@@ -224,6 +227,7 @@ test("builds, validates, and reproduces a complete offline publication", async (
   }
   const validated = await validatePublicEvidenceOutputDirectory(fixture.outputDirectory);
   assert.equal(validated.publication.publicLeaderboardEligible, false);
+  assert.match(validated.publication.benchmarkIdentity.scoringIdentity ?? "", /^tutor-eval-scoring:sha256:[a-f0-9]{64}$/u);
   assert.equal(validated.models.entries.length, 1);
   assert.equal(validated.trials.entries.length, 48);
   assert.equal(firstOutput.trials.entries.some((trial) => trial.tutorResponse.includes("<script>")), true);
@@ -252,6 +256,23 @@ test("inspection is safe, deterministic, and requires a separate approval step",
   assert.equal(report.coverage.expectedCaseCount, 48);
   assert.equal(report.coverage.caseRunCount, 48);
   assert.doesNotMatch(JSON.stringify(report), /Fixture response|PRIVATE_JUDGE_EVIDENCE|[A-Za-z]:[\\/]/u);
+});
+
+test("publication rejects unknown scoring and forged historical aggregates without assuming a default", async () => {
+  const unknown = await copyMutation(undefined, (evaluation) => { delete evaluation.scoring; });
+  const unknownReport = await inspectPublicationSources(unknown);
+  assert.equal(unknownReport.eligibleForPreliminaryPublication, false);
+  assert.ok(unknownReport.blockingIssues.some((item) => item.code === "publication_score_unresolved" && item.field === "scoring_provenance"));
+  const forged = await copyMutation(undefined, (evaluation) => { evaluationRun(evaluation).overallScore = 0.1234; });
+  const forgedReport = await inspectPublicationSources(forged);
+  assert.equal(forgedReport.eligibleForPreliminaryPublication, false);
+  assert.ok(forgedReport.blockingIssues.some((item) => item.code === "publication_metric_mismatch" && item.field === "scoring_provenance"));
+  const original = await readFile(join(fixture.outputDirectory, "publication.json"), "utf8");
+  const legacy = JSON.parse(original) as PublicEvidencePublicationBundle;
+  delete (legacy.benchmarkIdentity as unknown as Record<string, unknown>).scoringIdentity;
+  const bytes = JSON.stringify(legacy);
+  assert.equal(parsePublicEvidencePublicationBundle(legacy).benchmarkIdentity.scoringIdentity, undefined);
+  assert.equal(JSON.stringify(legacy), bytes);
 });
 
 test("rejects synthetic provenance", async () => {

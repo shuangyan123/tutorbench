@@ -280,6 +280,8 @@ export interface TutorHealthReport {
     readonly datasetId: string;
     readonly datasetVersion: string;
     readonly evaluatorVersion?: string;
+    /** Null is unknown; absence is a historical report, not an implied default. */
+    readonly scoringIdentity?: string | null;
   };
   readonly scoringProfile: TutorHealthScoringProfile;
   readonly coverage: TutorHealthCoverage;
