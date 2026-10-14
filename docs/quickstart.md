@@ -1,6 +1,10 @@
 # TutorBench Quickstart
 
-The five-minute path is a local demonstration for a first run:
+The five-minute path below uses the current repository source with Node 24
+(`>=24 <25`). The published npm `0.1.0` instead requires Node 22 (`>=22 <23`)
+and contains an older source snapshot. Both have a Quickstart demo; their
+canonical dataset, evaluator and advanced features are not interchangeable.
+See [release channels](release.md#installation-channels).
 
 ```bash
 git clone https://github.com/shuangyan123/tutorbench.git
@@ -56,11 +60,11 @@ summary. To write the independent, explicitly non-official report contract:
 npm run quickstart -- --output artifacts/quickstart.json
 ```
 
-Or, after installing the published package:
+Or, using Node 22 with the historical published package:
 
 ```bash
-npm install tutor-benchmark
-tutorbench quickstart
+npm install tutor-benchmark@0.1.0
+npx --no-install tutorbench quickstart
 ```
 
 The JSON artifact has `mode: "quickstart-demo"`,
@@ -77,8 +81,10 @@ The full local benchmark is intentionally separate:
 npm run benchmark
 ```
 
-It uses the canonical `tutor-eval-v0.2a@0.2a.6` dataset and evaluator
-`0.3a.5`. Judge-required semantic criteria remain unresolved when no explicit
+The repository run uses the canonical `tutor-eval-v0.2a@0.2a.6` dataset and
+evaluator `0.3a.5`, recorded in the output. The published `0.1.0` snapshot
+contains `tutor-eval-v0.2a@0.2a.5` and evaluator `0.3a.4` instead; it has no
+Tutor Health CLI or API. Judge-required semantic criteria remain unresolved when no explicit
 Judge is configured, so the normal no-Judge run reports Judge-unavailable
 errors and no score. Quickstart does not suppress, reinterpret, or replace
 that fail-closed behavior.

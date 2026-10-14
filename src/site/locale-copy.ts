@@ -1,4 +1,11 @@
 export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
+  "Published 0.1.0 · Node 22": "已发布 0.1.0 · Node 22",
+  "Historical CLI with Quickstart; Tutor Health requires the Node 24 repository.": "历史 CLI 包含 Quickstart；Tutor Health 需要 Node 24 仓库源码。",
+  "Repository main · Node 24": "仓库 main · Node 24",
+  "Run the repository-only, finding-first Tutor Health workflow against an HTTP Tutor.": "使用仓库专有、以发现项为先的 Tutor Health 工作流评测 HTTP Tutor。",
+  "Choose Node 24 repository source or the historical Node 22 package.": "选择 Node 24 仓库源码，或历史 Node 22 软件包。",
+  "Start with Quickstart; Tutor Health requires the repository build.": "先运行 Quickstart；Tutor Health 需要仓库构建。",
+  "Explicit Judge providers (OpenAI Responses, DeepSeek, generic Chat Completions)": "显式 Judge 服务提供方（OpenAI Responses、DeepSeek、通用 Chat Completions）",
   "Micro-Review — Teachometry": "微评审体验 — Teachometry",
   "Try one AI teaching judgment in about 60 seconds. A constructed example, no account or installation needed.": "用约 60 秒完成一次 AI 教学判断。构造示例，无需注册或安装。",
   "Micro-Review": "微评审体验",

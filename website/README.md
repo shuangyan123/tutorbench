@@ -3,6 +3,12 @@
 The website is a static, read-only Developer Preview generated from the
 canonical TutorEval 0.2A dataset.
 
+The Run and Docs pages describe the current repository channel, not the frozen
+npm `tutor-benchmark@0.1.0` payload. They distinguish Node 24 repository setup
+from the Node 22 published package and mark Tutor Health as repository-only.
+See [release channels](../docs/release.md#installation-channels). A local
+website build does not establish that those changes are deployed.
+
 The public header presents **Teachometry** as the product/project identity and
 uses the TutorBench T1 trajectory mark for the open-source evaluation engine. The website build copies the canonical SVG
 variants and supplied favicon files into `assets/brand/tutorbench/`; it does

@@ -10,6 +10,46 @@ stage-only workflow, generalizes the release-candidate package identity, and
 updates the release policy. It does not configure npm, dispatch the workflow,
 stage a package, approve a stage, change package settings, or alter v0.1.0.
 
+## Installation channels
+
+Verified against the [official npm registry](https://registry.npmjs.org/tutor-benchmark/0.1.0)
+and its published tarball on 2026-10-14: `latest` is `0.1.0`, and it is the
+only published version. Current repository source is a separate channel even
+while `package.json` retains that version number.
+
+| Boundary | Published npm `tutor-benchmark@0.1.0` | Current repository `main` |
+| --- | --- | --- |
+| Node engine | `>=22 <23` | `>=24 <25` |
+| Canonical dataset | `tutor-eval-v0.2a@0.2a.5` | `tutor-eval-v0.2a@0.2a.6` |
+| Quickstart | Four-case deterministic demo, evaluator `0.3a.4` | Same demo identity; evaluator version recorded by the current source |
+| CLI | `quickstart`, `run`, `collect`, `collect-model`, `evaluate`, and historical diagnostic/review commands | Also `health`, `health-compare`, Case System vNext and later review workflows |
+| Opt-in Judge integrations | OpenAI Responses, DeepSeek and generic Chat Completions in corpus replay | Same provider families, also in current Health workflows |
+| Root evaluation API | `runTutorBenchmark`, `runTutorEval`, `loadTutorEvalDataset`, `createHttpTutor`, `toTutorTurnInput`, TutorEval types/constants | Also Health evaluation/reporting, Scenario vNext, stress and Community Review contracts/helpers |
+
+The released CLI has no `health`, `health-compare` or `case-system-vnext-stress`
+command. The released root has no `runTutorHealthEvaluation`,
+`parseTutorScenarioSuiteVNext` or `loadTutorScenarioSuiteVNext` export. Advanced
+internal files do not imply a supported package subpath: both channels export
+only `.` in package metadata. Provider support here means a configured code
+integration, not verified live availability, model revision or calibration.
+
+For a pinned historical install, use Node 22 and
+`npm install tutor-benchmark@0.1.0`, then `npx --no-install tutorbench quickstart`.
+For current workflows, use Node 24, clone the repository, run `npm ci` and
+`npm run build`, then invoke `node dist/src/cli/tutorbench.js <command>`.
+Record the source commit for repository runs; a local tarball or matching
+package version does not establish registry publication or release readiness.
+
+Registry payload identity: SHA-1 `0078e870cf0737baa4d005098225ee5814b424b4`,
+SRI `sha512-JauGTi5xgo3NMMJNJ6mbuj8vNlc4CbUAUDwcLlpuO5iJMocuqCgDMfO8uA3LQi7GKeIsIrgIMvlDNRSsxZ5iJg==`.
+Read-only verification commands are `npm view tutor-benchmark versions dist-tags engines --json --registry=https://registry.npmjs.org`
+and `npm pack tutor-benchmark@0.1.0 --registry=https://registry.npmjs.org` in an
+external evidence directory. Neither command publishes a package.
+
+Website content is built from repository source. Its current feature and
+fixture descriptions do not attest that those features shipped in npm `0.1.0`,
+or that a particular website build is already deployed.
+
 ## Release candidate validation
 
 Run release validation from the exact source commit intended for review. The

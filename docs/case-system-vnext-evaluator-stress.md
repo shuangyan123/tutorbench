@@ -2,6 +2,15 @@
 
 Status: **provider-neutral synthetic diagnostic harness**
 
+The current repository suite is
+`case-system-vnext-evaluator-stress-fixtures@0.5.0` with **17 fixtures** in
+`scenarios/case-system-vnext/evaluator-stress-fixtures.json`. The full current
+plan is 34 judgments at `--runs 1`, or 102 at `--runs 3`. These are execution
+budgets, not model results. Earlier eight- and fifteen-fixture descriptions and
+dated live runs below describe historical snapshots; their observations are
+not recomputed against the current suite. This repository CLI is absent from
+the published npm `0.1.0` package; see [release channels](release.md#installation-channels).
+
 This stress test exists to answer a narrow question before Case System vNext
 archetypes become executable Tutor scenarios:
 
@@ -121,7 +130,7 @@ Each profile has a paired `domain_strategy_alignment` stress fixture. These
 fixtures ask whether the evaluator can apply the exact subject/task criteria,
 not merely generic preferences such as brevity or explanation length.
 
-## Initial fixture set
+## Historical initial fixture set
 
 The first fixture set spans:
 
@@ -190,7 +199,8 @@ blind packet and returns a bounded judgment.
 
 CI uses synthetic Judge functions only and makes no live model calls.
 
-A later live-provider adapter can reuse this boundary, but should preserve:
+The repository's opt-in DeepSeek stress adapter reuses this boundary. Any
+additional live-provider adapter must preserve:
 
 - explicit call budget before execution;
 - repeated runs;
@@ -201,8 +211,9 @@ A later live-provider adapter can reuse this boundary, but should preserve:
 
 ## Expansion gate
 
-The current eight fixtures are enough to validate the harness mechanics, not
-enough to validate the constructs.
+The initial eight-fixture snapshot covered harness mechanics rather than
+construct validity. Expansion to the current 17 synthetic fixtures does not
+establish construct validity either.
 
 Before converting the 15 pilot archetypes into executable Tutor scenarios:
 
@@ -249,8 +260,10 @@ compressed into one generic tie label.
 
 ## Live DeepSeek V4.1 Flash diagnostic
 
-The repository includes an explicit live/paid CLI path for the current
-DeepSeek V4.1 Flash API route:
+The repository includes an explicit live/paid CLI path restricted to the
+configured `deepseek-flash` model ID. “DeepSeek V4.1 Flash” is the historical
+diagnostic label used below; the code's model ID is not a fresh verification of
+the provider's current model revision or availability:
 
 ```text
 DEEPSEEK_API_KEY=...
@@ -258,9 +271,10 @@ DEEPSEEK_JUDGE_MODEL=deepseek-flash
 tutorbench case-system-vnext-stress --judge-deepseek --runs 1
 ```
 
-The default live smoke uses one repetition per fixture: 15 fixtures × two
-presentation orders = 30 Judge calls. A repeated stress run with
-`--runs 3` makes 90 Judge calls. Targeted follow-up diagnostics can select one
+The historical fifteen-fixture plan used one repetition per fixture: 15
+fixtures × two presentation orders = 30 Judge calls; `--runs 3` planned 90 calls.
+The current 17-fixture budgets are 34 and 102 calls respectively. Targeted
+follow-up diagnostics can select one
 or more fixtures without rerunning the entire paid suite:
 
 ```text
