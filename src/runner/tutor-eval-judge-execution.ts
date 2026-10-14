@@ -3,6 +3,7 @@ import {
   buildTutorEvalJudgeInput,
   parseTutorEvalJudgeResult,
   TUTOR_EVAL_JUDGE_FAILURE_MESSAGES,
+  TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC,
   type TutorEvalCase,
   type TutorEvalJudge,
   type TutorEvalJudgeEvaluation,
@@ -12,6 +13,7 @@ import {
   type TutorEvalCriticalFailure,
   type TutorEvalRubric,
   type TutorEvalRubricResult,
+  type TutorEvalDiagnostic,
   TutorEvalJudgeExecutionError,
 } from "../contracts/index.js";
 
@@ -96,7 +98,7 @@ function judgeRubricResults(
 
 function unresolvedJudgeRubricResults(
   judgeRubrics: readonly TutorEvalRubric[],
-  failure: TutorEvalJudgeFailureDiagnostic,
+  diagnostic: TutorEvalDiagnostic,
 ): TutorEvalRubricResult[] {
   return judgeRubrics.map((rubric) => ({
     rubricId: rubric.id,
@@ -105,7 +107,7 @@ function unresolvedJudgeRubricResults(
     score: null,
     weight: rubric.weight,
     critical: rubric.critical ?? false,
-    diagnostics: [{ code: failure.code, message: failure.message }],
+    diagnostics: [{ code: diagnostic.code, message: diagnostic.message }],
   }));
 }
 
@@ -226,7 +228,10 @@ export async function executeTutorEvalJudge(
     );
     return {
       rawJudgeResult: result,
-      rubricResults: judgeRubricResults(judgeRubrics, result),
+      // 全局 flag 无法定位缺失证据；保留 raw 判断，Judge rubric 不进入完整评分。
+      rubricResults: result.insufficientInformation
+        ? unresolvedJudgeRubricResults(judgeRubrics, TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC)
+        : judgeRubricResults(judgeRubrics, result),
       criticalFailures: judgeCriticalFailures(result),
       metrics: evaluation.metrics ?? null,
       failure: null,

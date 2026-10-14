@@ -600,12 +600,15 @@ function parseBenchmarkIdentity(value: unknown) {
       "datasetId",
       "datasetVersion",
       "evaluatorVersion",
+      "scoringIdentity",
     ]) ||
     !nonEmptyString(record.corpusId) ||
     !nonEmptyString(record.corpusVersion) ||
     !nonEmptyString(record.datasetId) ||
     !nonEmptyString(record.datasetVersion) ||
-    !nonEmptyString(record.evaluatorVersion)
+    !nonEmptyString(record.evaluatorVersion) ||
+    (record.scoringIdentity !== undefined && (typeof record.scoringIdentity !== "string" ||
+      !/^tutor-eval-scoring:sha256:[a-f0-9]{64}$/u.test(record.scoringIdentity)))
   ) {
     invalid();
   }
@@ -615,6 +618,7 @@ function parseBenchmarkIdentity(value: unknown) {
     datasetId: record.datasetId,
     datasetVersion: record.datasetVersion,
     evaluatorVersion: record.evaluatorVersion,
+    ...(record.scoringIdentity === undefined ? {} : { scoringIdentity: record.scoringIdentity as string }),
   };
 }
 

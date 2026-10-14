@@ -48,7 +48,7 @@ function validReport(packageVersion = "0.1.0") {
       datasetVersion: "0.1",
       exampleTutorId: "scripted-quickstart-tutor",
       exampleTutorVersion: "1.0.0",
-      evaluatorVersion: "0.3a.4",
+      evaluatorVersion: "0.3a.5",
       passedCount: 3,
       failedCount: 1,
       errorCount: 0,
@@ -56,7 +56,7 @@ function validReport(packageVersion = "0.1.0") {
       publicLeaderboardEligible: false,
     },
     canonicalDatasetIdentity: { id: "tutor-eval-v0.2a", version: "0.2a.6", caseCount: 48 },
-    evaluatorVersion: "0.3a.4",
+    evaluatorVersion: "0.3a.5",
     productionJudgePromptIdentity: {
       id: "tutor-eval-pedagogy-judge-system",
       version: "0.9",
@@ -135,7 +135,7 @@ test("release candidate package identity supports future semver releases without
   const futureReport = validReport("0.2.0-beta.1");
   assert.equal(futureReport.quickstartIdentity.version, "0.1.0");
   assert.equal(futureReport.canonicalDatasetIdentity.version, "0.2a.6");
-  assert.equal(futureReport.evaluatorVersion, "0.3a.4");
+  assert.equal(futureReport.evaluatorVersion, "0.3a.5");
   assert.equal(futureReport.productionJudgePromptIdentity.version, "0.9");
   assert.equal(futureReport.materialJudgePromptIdentity.version, "0.4");
   assert.equal(futureReport.semanticAuditIdentity.version, "0.2.1");

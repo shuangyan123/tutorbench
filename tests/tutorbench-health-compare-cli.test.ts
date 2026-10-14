@@ -131,3 +131,45 @@ test("health-compare writes deterministic validated JSON, preserves sources, and
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test("health-compare rejects a forged PASS candidate even without a manifest and preserves its inputs", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "health-source-integrity-"));
+  try {
+    const { suite, baseline } = await syntheticDesignPartnerPilot();
+    const clean = await runTutorHealthEvaluation({ suite, runId: "controlled-pass-candidate",
+      tutor: { id: "synthetic", respond: async () => ({ text: "Check your next step." }) },
+      tutorDescriptor: baseline.evaluation.tutor,
+      judge: { ...baseline.evaluation.judge!, evaluate: async (input) => ({
+        schemaVersion: 1, caseId: input.caseId, rubricResults: input.rubrics.map((rubric) => ({ rubricId: rubric.id, result: "PASS" })),
+        criticalFailures: [], factualErrors: [], insufficientInformation: false,
+      }) },
+    });
+    const forged = { ...clean, evaluation: { ...clean.evaluation,
+      caseResults: clean.evaluation.caseResults.map((item) => ({ ...item,
+        rawJudgeResult: baseline.evaluation.caseResults.find((source) => source.caseId === item.caseId)!.rawJudgeResult,
+      })),
+    } };
+    const suitePath = join(directory, "suite.json");
+    await writeFile(suitePath, JSON.stringify(suite));
+    const sourcePaths = [suitePath];
+    for (const [role, source] of [["baseline", baseline], ["candidate", forged]] as const) {
+      await mkdir(join(directory, role));
+      for (const [name, value] of [["evaluation.json", source.evaluation], ["health-report.json", source.report]] as const) {
+        const path = join(directory, role, name);
+        sourcePaths.push(path);
+        await writeFile(path, JSON.stringify(value));
+      }
+    }
+    const before = await Promise.all(sourcePaths.map((path) => readFile(path, "utf8")));
+    const output = join(directory, "comparison.json");
+    const rejected = cli(["--baseline", join(directory, "baseline"), "--candidate", join(directory, "candidate"),
+      "--baseline-suite", suitePath, "--candidate-suite", suitePath, "--output", output]);
+    assert.equal(rejected.status, 1, rejected.stderr);
+    assert.match(rejected.stderr, /invalid/);
+    assert.doesNotMatch(rejected.stdout, /resolved 2/);
+    await assert.rejects(access(output));
+    assert.deepEqual(await Promise.all(sourcePaths.map((path) => readFile(path, "utf8"))), before);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

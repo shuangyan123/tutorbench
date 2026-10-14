@@ -103,6 +103,8 @@ export interface PublicEvidenceBenchmarkIdentity {
   readonly datasetId: string;
   readonly datasetVersion: string;
   readonly evaluatorVersion: string;
+  /** Optional for historical public v1 bundles; missing means unknown. */
+  readonly scoringIdentity?: string;
 }
 
 export interface PublicEvidenceGenerationIdentity {

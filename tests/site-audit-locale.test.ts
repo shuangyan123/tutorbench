@@ -236,6 +236,7 @@ test("raw evaluation artifacts without the new wrapper remain readable", async (
       rawJudgeResult: null,
     })),
   };
+  delete (missingJudge as { failureSignalMetrics?: unknown }).failureSignalMetrics;
   const fallback = parseTutorEvaluationAuditArtifact(missingJudge);
   assert.equal(fallback.evaluation.caseResults[0]?.rawJudgeResult, null);
 
@@ -272,6 +273,22 @@ test("raw evaluation artifacts without the new wrapper remain readable", async (
     locale: "en",
   });
   assert.match(noResponsePage.content, /No Tutor response was stored/);
+});
+
+test("audit locale view shows unavailable signal evidence instead of zero rates", async () => {
+  const { artifact, dataset } = await makeAuditArtifact();
+  const historical = {
+    ...artifact.evaluation,
+    caseResults: artifact.evaluation.caseResults.map((caseResult) => ({ ...caseResult, rawJudgeResult: null })),
+  };
+  delete (historical as { failureSignalMetrics?: unknown }).failureSignalMetrics;
+  const page = renderTutorEvaluationAuditIndexPage({
+    artifact: parseTutorEvaluationAuditArtifact(historical), dataset,
+    locale: "en",
+  });
+  assert.match(page.content, /Critical failure<\/span>: n\/a/);
+  assert.match(page.content, /Answer leakage<\/span>: n\/a/);
+  assert.match(page.content, /confirmed 0; observed absent 0; unavailable 1/);
 });
 
 test("static locale routing and overflow safeguards are shipped with the site", async () => {

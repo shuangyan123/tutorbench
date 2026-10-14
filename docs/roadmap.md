@@ -1,5 +1,9 @@
 # Roadmap
 
+This status map describes repository source. The published npm `0.1.0`
+remains the historical Node 22 snapshot; current source uses Node 24 and adds
+features that have not been released to npm. See [release channels](release.md#installation-channels).
+
 ## 0.1 Benchmark Foundation and TutorEval — COMPLETE
 
 - Typed provider-independent contracts
@@ -13,7 +17,7 @@
 - Atomic teaching rubrics and centralized category aggregation
 - Critical-failure quality gates and complete versioned run records
 - Repeated case runs and reserved counterfactual pair identity
-- Contract tests, Node 22 CI, and repository rules
+- Contract tests, historical Node 22 CI, and repository rules (current CI uses Node 24)
 
 ## 0.2 Rubric & Dataset Design — PARTIAL: 0.2A dataset + 0.2B calibration infrastructure + critical-failure extension
 
@@ -74,10 +78,11 @@ See [Case System vNext](case-system-vnext.md), the
 - [ ] Pairwise evaluation
 - [ ] Judge-vs-human calibration using a real 0.2B reference set
 
-See [the 0.3A hybrid orchestration guide](tutor-eval-v0.3a.md) and [the 0.3B
-provider guide](tutor-eval-v0.3b.md). The phase remains partial: the provider
-is single-provider and opt-in, Judge results are not human-calibrated, and no
-pairwise or statistical evaluation claim is included.
+See [the 0.3A hybrid orchestration guide](tutor-eval-v0.3a.md) and [the historical
+0.3B OpenAI provider guide](tutor-eval-v0.3b.md). Current source also has opt-in
+DeepSeek and generic Chat Completions Judge integrations. Provider capability
+does not establish calibration: Judge results are not human-calibrated, and no
+general pairwise or statistical validity claim is included.
 
 ## 0.4 Tutor Integration Layer — PARTIAL: public runner + portable reproducibility + HTTP adapter
 

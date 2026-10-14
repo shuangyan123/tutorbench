@@ -152,6 +152,9 @@ async function copyMutation(
   const evaluation = JSON.parse(await readFile(fixture.evaluationPath, "utf8")) as Record<string, unknown>;
   mutateCorpus(corpus);
   mutateEvaluation(evaluation);
+  // 这些历史结构/来源负例不携带新算术证明；新 provenance 篡改另有专门回归。
+  delete evaluationRun(evaluation).scoringProvenance;
+  delete evaluationRun(evaluation).failureSignalMetrics;
   const corpusPath = join(directory, "corpus.json");
   const evaluationPath = join(directory, "evaluation.json");
   await writeJson(corpusPath, corpus);
@@ -224,6 +227,7 @@ test("builds, validates, and reproduces a complete offline publication", async (
   }
   const validated = await validatePublicEvidenceOutputDirectory(fixture.outputDirectory);
   assert.equal(validated.publication.publicLeaderboardEligible, false);
+  assert.match(validated.publication.benchmarkIdentity.scoringIdentity ?? "", /^tutor-eval-scoring:sha256:[a-f0-9]{64}$/u);
   assert.equal(validated.models.entries.length, 1);
   assert.equal(validated.trials.entries.length, 48);
   assert.equal(firstOutput.trials.entries.some((trial) => trial.tutorResponse.includes("<script>")), true);
@@ -252,6 +256,23 @@ test("inspection is safe, deterministic, and requires a separate approval step",
   assert.equal(report.coverage.expectedCaseCount, 48);
   assert.equal(report.coverage.caseRunCount, 48);
   assert.doesNotMatch(JSON.stringify(report), /Fixture response|PRIVATE_JUDGE_EVIDENCE|[A-Za-z]:[\\/]/u);
+});
+
+test("publication rejects unknown scoring and forged historical aggregates without assuming a default", async () => {
+  const unknown = await copyMutation(undefined, (evaluation) => { delete evaluation.scoring; });
+  const unknownReport = await inspectPublicationSources(unknown);
+  assert.equal(unknownReport.eligibleForPreliminaryPublication, false);
+  assert.ok(unknownReport.blockingIssues.some((item) => item.code === "publication_score_unresolved" && item.field === "scoring_provenance"));
+  const forged = await copyMutation(undefined, (evaluation) => { evaluationRun(evaluation).overallScore = 0.1234; });
+  const forgedReport = await inspectPublicationSources(forged);
+  assert.equal(forgedReport.eligibleForPreliminaryPublication, false);
+  assert.ok(forgedReport.blockingIssues.some((item) => item.code === "publication_metric_mismatch" && item.field === "scoring_provenance"));
+  const original = await readFile(join(fixture.outputDirectory, "publication.json"), "utf8");
+  const legacy = JSON.parse(original) as PublicEvidencePublicationBundle;
+  delete (legacy.benchmarkIdentity as unknown as Record<string, unknown>).scoringIdentity;
+  const bytes = JSON.stringify(legacy);
+  assert.equal(parsePublicEvidencePublicationBundle(legacy).benchmarkIdentity.scoringIdentity, undefined);
+  assert.equal(JSON.stringify(legacy), bytes);
 });
 
 test("rejects synthetic provenance", async () => {
@@ -332,6 +353,8 @@ test("rejects corpus and evaluation identity mismatches", async () => {
 test("rejects missing and extra case-runs", async () => {
   const missingPaths = await copyMutation(undefined, (evaluation) => {
     const run = evaluationRun(evaluation);
+    // 结构负例采用历史 v1 形状；不保留与删改 case 集不符的新派生 coverage。
+    delete run.failureSignalMetrics;
     const results = evaluationCaseResults(evaluation);
     const removed = results.shift();
     run.caseResults = results;
@@ -348,13 +371,18 @@ test("rejects missing and extra case-runs", async () => {
 
   const extraPaths = await copyMutation(undefined, (evaluation) => {
     const run = evaluationRun(evaluation);
+    delete run.failureSignalMetrics;
     const results = evaluationCaseResults(evaluation);
     const source = results[0];
     assert.ok(source);
     const extra = { ...source, caseId: "unexpected-case" } as Record<string, unknown>;
+    if (extra.rawJudgeResult !== null) {
+      extra.rawJudgeResult = { ...(extra.rawJudgeResult as Record<string, unknown>), caseId: extra.caseId };
+    }
     results.push(extra);
     run.caseResults = results;
     run.caseRunCount = results.length;
+    run.caseCount = (run.caseCount as number) + 1;
     run.passedCount = (run.passedCount as number) + (extra.status === "passed" ? 1 : 0);
     run.failedCount = (run.failedCount as number) + (extra.status === "failed" ? 1 : 0);
     run.errorCount = (run.errorCount as number) + (extra.status === "error" ? 1 : 0);
@@ -376,6 +404,7 @@ test("rejects old evaluator versions, execution errors, and unresolved scores", 
     const previousStatus = first.status;
     first.status = "error";
     first.passed = false;
+    first.overallScore = null;
     run.errorCount = (run.errorCount as number) + 1;
     if (previousStatus === "passed") {
       run.passedCount = (run.passedCount as number) - 1;
@@ -409,6 +438,7 @@ test("rejects invalid source metadata and absent Judge evidence", async () => {
 
   const judgePaths = await copyMutation(undefined, (evaluation) => {
     evaluationRun(evaluation).judge = null;
+    for (const result of evaluationCaseResults(evaluation)) result.rawJudgeResult = null;
   });
   await assertBuildRejects(judgePaths, "publication_judge_missing");
 });
@@ -430,6 +460,7 @@ test("rejects subset evaluation and absent Judge evidence", async () => {
     };
     const run = evaluation.evaluation as Record<string, unknown>;
     run.judge = null;
+    for (const result of evaluationCaseResults(evaluation)) result.rawJudgeResult = null;
   });
   await assertBuildRejects(paths, "publication_evaluation_subset");
 });
@@ -457,10 +488,21 @@ test("rejects changed response text and source hash reuse", async () => {
 test("rejects unresolved rubric results and leaderboard approval", async () => {
   const paths = await copyMutation(undefined, (evaluation) => {
     const run = evaluation.evaluation as Record<string, unknown>;
+    delete run.failureSignalMetrics;
     const results = run.caseResults as Record<string, unknown>[];
     const rubricResults = results[0]?.rubricResults as Record<string, unknown>[];
-  if (rubricResults[0] !== undefined) {
+    if (rubricResults[0] !== undefined) {
       rubricResults[0].result = "ERROR";
+      rubricResults[0].score = null;
+      const first = results[0]!;
+      const previousStatus = first.status;
+      first.status = "error";
+      first.passed = false;
+      first.overallScore = null;
+      first.rawJudgeResult = null;
+      run.errorCount = (run.errorCount as number) + 1;
+      if (previousStatus === "passed") run.passedCount = (run.passedCount as number) - 1;
+      if (previousStatus === "failed") run.failedCount = (run.failedCount as number) - 1;
     }
   });
   await assertBuildRejects(paths, "publication_score_unresolved");

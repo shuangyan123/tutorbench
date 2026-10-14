@@ -7,6 +7,7 @@ import type {
   TutorEvalCategory,
 } from "./tutor-eval.js";
 import type { TutorCaseLocale } from "./locale.js";
+import type { TutorEvalScoringProvenance } from "./tutor-eval-scoring.js";
 
 export const RESULT_SCHEMA_VERSION = 1 as const;
 export const TUTOR_EVAL_RESULT_SCHEMA_VERSION = 1 as const;
@@ -162,6 +163,8 @@ export interface TutorEvalRunResult {
   readonly datasetVersion: string;
   /** Optional for v1 result compatibility; present for versioned evaluator runs. */
   readonly evaluatorVersion?: string;
+  /** Absent in historical v1: scoring identity and aggregate derivation are unknown. */
+  readonly scoringProvenance?: TutorEvalScoringProvenance;
   readonly tutor: TutorEvalTutorDescriptor;
   readonly judge: TutorEvalJudgeDescriptor | null;
   readonly runsPerCase: number;
@@ -172,7 +175,25 @@ export interface TutorEvalRunResult {
   readonly errorCount: number;
   readonly categoryScores: TutorEvalCategoryScores;
   readonly overallScore: number | null;
+  /** Legacy recorded-positive count / all case runs; not evidence of absence. */
   readonly criticalFailureRate: number;
+  /** Legacy recorded-positive count / all case runs; not evidence of absence. */
   readonly answerLeakageRate: number;
+  /** Optional for historical v1 compatibility; current writers record evidence coverage. */
+  readonly failureSignalMetrics?: TutorEvalFailureSignalMetrics;
   readonly caseResults: readonly TutorEvalCaseRunResult[];
+}
+
+export interface TutorEvalFailureSignalRate {
+  readonly confirmedCount: number;
+  readonly knownAbsentCount: number;
+  readonly unavailableCount: number;
+  /** Same all-case-run denominator; null for empty or incomplete signal evidence. */
+  readonly rate: number | null;
+}
+
+export interface TutorEvalFailureSignalMetrics {
+  readonly schemaVersion: 1;
+  readonly criticalFailures: TutorEvalFailureSignalRate;
+  readonly answerLeakage: TutorEvalFailureSignalRate;
 }

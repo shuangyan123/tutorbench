@@ -74,7 +74,7 @@ test("the canonical 0.2A dataset loads through the runtime contract and covers a
     ["wrong-reasoning-answer-001-zh-CN", "matches_ground_truth"],
     ["full-solution-correctness-001-zh-CN", "contains_normalized_expression"],
   ]);
-  assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.4");
+  assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.5");
   assert.equal(report.caseCount, 48);
   assert.equal(report.rubricCount, 128);
   for (const capabilityTag of TUTOR_EVAL_CAPABILITY_TAGS) {

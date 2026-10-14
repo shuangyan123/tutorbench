@@ -35,7 +35,7 @@ export interface ReleaseCandidateReport {
     readonly datasetVersion: "0.1";
     readonly exampleTutorId: "scripted-quickstart-tutor";
     readonly exampleTutorVersion: "1.0.0";
-    readonly evaluatorVersion: "0.3a.4";
+    readonly evaluatorVersion: "0.3a.5";
     readonly passedCount: 3;
     readonly failedCount: 1;
     readonly errorCount: 0;
@@ -47,7 +47,7 @@ export interface ReleaseCandidateReport {
     readonly version: "0.2a.6";
     readonly caseCount: 48;
   };
-  readonly evaluatorVersion: "0.3a.4";
+  readonly evaluatorVersion: "0.3a.5";
   readonly productionJudgePromptIdentity: {
     readonly id: "tutor-eval-pedagogy-judge-system";
     readonly version: "0.9";
@@ -203,7 +203,7 @@ export function assertReleaseCandidateReport(
   exactString(quickstart.datasetVersion, "0.1", "quickstartIdentity.datasetVersion");
   exactString(quickstart.exampleTutorId, "scripted-quickstart-tutor", "quickstartIdentity.exampleTutorId");
   exactString(quickstart.exampleTutorVersion, "1.0.0", "quickstartIdentity.exampleTutorVersion");
-  exactString(quickstart.evaluatorVersion, "0.3a.4", "quickstartIdentity.evaluatorVersion");
+  exactString(quickstart.evaluatorVersion, "0.3a.5", "quickstartIdentity.evaluatorVersion");
   exactNumber(quickstart.passedCount, 3, "quickstartIdentity.passedCount");
   exactNumber(quickstart.failedCount, 1, "quickstartIdentity.failedCount");
   exactNumber(quickstart.errorCount, 0, "quickstartIdentity.errorCount");
@@ -214,7 +214,7 @@ export function assertReleaseCandidateReport(
   exactString(canonicalDataset.id, "tutor-eval-v0.2a", "canonicalDatasetIdentity.id");
   exactString(canonicalDataset.version, "0.2a.6", "canonicalDatasetIdentity.version");
   exactNumber(canonicalDataset.caseCount, 48, "canonicalDatasetIdentity.caseCount");
-  exactString(report.evaluatorVersion, "0.3a.4", "evaluatorVersion");
+  exactString(report.evaluatorVersion, "0.3a.5", "evaluatorVersion");
 
   const productionJudge = record(report.productionJudgePromptIdentity, "productionJudgePromptIdentity");
   exactString(productionJudge.id, "tutor-eval-pedagogy-judge-system", "productionJudgePromptIdentity.id");

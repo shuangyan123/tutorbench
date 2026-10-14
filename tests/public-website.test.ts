@@ -55,7 +55,7 @@ test("run page exposes Tutor Health as the product-facing external Tutor workflo
   const page = renderRunPage(artifacts);
   assert.match(page.description, /diagnose real-world tutoring behavior/);
   assert.match(page.content, /data-run-tab="health"/);
-  assert.match(page.content, /tutorbench health/);
+  assert.match(page.content, /node dist\/src\/cli\/tutorbench\.js health/);
   assert.match(page.content, /productive-struggle-intervention-v0\.1/);
   assert.match(page.content, /health-report\.json/);
   assert.match(page.content, /No-Judge runs stay UNRESOLVED/);

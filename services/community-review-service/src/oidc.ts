@@ -150,9 +150,21 @@ export class OidcJwtAuthenticationAdapter implements AuthenticationAdapter {
         audience: this.audience,
         algorithms: ["RS256", "PS256"],
         clockTolerance: this.clockToleranceSeconds,
+        requiredClaims: this.tokenProfile === "rfc9068"
+          ? ["iss", "exp", "aud", "sub", "client_id", "iat", "jti"]
+          : ["exp", "sub"],
       });
       const expectedType = this.tokenProfile === "rfc9068" ? "at+jwt" : "JWT";
       if (result.protectedHeader.typ !== expectedType || !exactAudience(result.payload.aud, this.audience)) {
+        throw new AuthenticationAdapterError();
+      }
+      // 必填不能替代类型校验；合法 JSON 的数值溢出也不能绕过到期检查。
+      if (typeof result.payload.exp !== "number" || !Number.isFinite(result.payload.exp)) {
+        throw new AuthenticationAdapterError();
+      }
+      if (this.tokenProfile === "rfc9068" &&
+        (typeof result.payload.iat !== "number" || !Number.isFinite(result.payload.iat) ||
+          typeof result.payload.jti !== "string" || result.payload.jti.trim().length === 0)) {
         throw new AuthenticationAdapterError();
       }
       assertClientBinding(result.payload, this.tokenProfile, this.clientId);

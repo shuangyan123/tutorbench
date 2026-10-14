@@ -257,6 +257,7 @@ export type TutorHealthUnresolvedReason =
   | "missing_case_result"
   | "missing_rubric_result"
   | "duplicate_rubric_result"
+  | "insufficient_information"
   | "evaluation_error";
 
 export interface TutorHealthUnresolvedDecisionPoint {
@@ -279,6 +280,8 @@ export interface TutorHealthReport {
     readonly datasetId: string;
     readonly datasetVersion: string;
     readonly evaluatorVersion?: string;
+    /** Null is unknown; absence is a historical report, not an implied default. */
+    readonly scoringIdentity?: string | null;
   };
   readonly scoringProfile: TutorHealthScoringProfile;
   readonly coverage: TutorHealthCoverage;

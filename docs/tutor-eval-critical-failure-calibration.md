@@ -218,6 +218,11 @@ The pure agreement functions provide:
 Kappa is reported as evidence, not compared to an invented universal pass
 threshold.
 
+Presence and severity kappa return JSON `null` when there are no scored pairs
+or the chance-correction denominator is zero. Reports display `n/a`, retaining
+raw agreement and confusion matrices. A single unanimously observed label is
+not sufficient to define kappa, even when raw agreement is 100%.
+
 ## 14. Answer-leakage example
 
 The contract can represent a future result such as:

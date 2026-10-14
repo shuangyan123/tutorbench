@@ -77,9 +77,12 @@ field was removed; they retain their historical semantics and are not silently
 rewritten.
 
 This audit's recorded policy transition remains historical at `0.3a.3`.
-Current runs use evaluator `0.3a.4`, which changes only case-pass eligibility:
+Evaluator `0.3a.4` introduced the case-pass eligibility correction:
 the quality gate remains independent and unchanged, while required/prohibited
 behavior is separated from desirable score contribution.
+
+Current evaluator `0.3a.5` retains that policy and adds
+[insufficient-information validity handling](tutor-eval-insufficient-information.md).
 
 ## Offline regression evidence
 

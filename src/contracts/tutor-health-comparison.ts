@@ -28,7 +28,7 @@ export interface TutorHealthComparisonSource {
 
 export const TUTOR_HEALTH_COMPARISON_UNRESOLVED_REASONS = [
   "missing_case_result", "missing_rubric_result", "duplicate_rubric_result",
-  "evaluation_error", "partial_evidence",
+  "evaluation_error", "partial_evidence", "insufficient_information",
 ] as const;
 
 export interface TutorHealthComparisonAssessment {

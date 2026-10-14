@@ -3,17 +3,23 @@ import { dirname } from "node:path";
 
 import {
   assertValidTutorEvalRunResult,
+  buildTutorEvalFailureSignalMetrics,
   resolveTutorCaseLocale,
   type TutorEvalCategory,
   type TutorEvalCaseRunResult,
   type TutorEvalDataset,
   type TutorCaseLocale,
   type TutorEvalRunResult,
+  type TutorEvalCaseScoringInputs,
+  type TutorEvalFailureSignalMetrics,
+  type TutorEvalFailureSignalRate,
 } from "../contracts/index.js";
 import {
   aggregateTutorEvalCategoryScores,
   aggregateTutorEvalOverallScore,
+  hasMatchingTutorEvalAuthoredScoring,
 } from "../scoring/index.js";
+import { buildTutorEvalAuthoredScoringInputs } from "../scoring/provenance.js";
 
 const categories: readonly TutorEvalCategory[] = [
   "correctness",
@@ -119,13 +125,18 @@ export interface TutorEvalLocaleBreakdown {
   readonly errorCount: number;
   readonly categoryScores: TutorEvalRunResult["categoryScores"];
   readonly overallScore: number | null;
-  readonly criticalFailureRate: number;
-  readonly answerLeakageRate: number;
+  readonly criticalFailureRate: number | null;
+  readonly answerLeakageRate: number | null;
+  readonly failureSignalMetrics: TutorEvalFailureSignalMetrics;
+  readonly plannedCaseRunCount: number;
+  readonly scope: "authored_plan" | "observed_case_scope";
 }
 
 function aggregateLocaleCaseResults(
   caseResults: readonly TutorEvalCaseRunResult[],
-): Omit<TutorEvalLocaleBreakdown, "locale" | "caseCount" | "caseRunCount"> {
+  plannedCaseRunCount: number,
+  authoredCases?: readonly TutorEvalCaseScoringInputs[],
+): Omit<TutorEvalLocaleBreakdown, "locale" | "caseCount" | "caseRunCount" | "plannedCaseRunCount" | "scope"> {
   const aggregates = caseResults
     .filter((result) => result.overallScore !== null)
     .map((result) => ({
@@ -134,12 +145,11 @@ function aggregateLocaleCaseResults(
       qualityGate: result.qualityGate,
       passed: result.passed,
     }));
-  const hasEvaluationErrors = caseResults.some((result) => result.status === "error");
+  const hasEvaluationErrors = caseResults.length !== plannedCaseRunCount || caseResults.some((result) => result.status === "error");
   const categoryScores = hasEvaluationErrors
     ? aggregateTutorEvalCategoryScores([])
     : aggregateTutorEvalCategoryScores(aggregates);
-  const failureCount = caseResults.filter((result) => result.criticalFailures.length > 0).length;
-  const leakageCount = caseResults.filter((result) => result.answerLeakage).length;
+  const failureSignalMetrics = buildTutorEvalFailureSignalMetrics(caseResults, plannedCaseRunCount, authoredCases);
   return {
     passedCount: caseResults.filter((result) => result.status === "passed").length,
     failedCount: caseResults.filter((result) => result.status === "failed").length,
@@ -148,8 +158,9 @@ function aggregateLocaleCaseResults(
     overallScore: hasEvaluationErrors
       ? null
       : aggregateTutorEvalOverallScore(caseResults.map((result) => result.overallScore)),
-    criticalFailureRate: caseResults.length === 0 ? 0 : failureCount / caseResults.length,
-    answerLeakageRate: caseResults.length === 0 ? 0 : leakageCount / caseResults.length,
+    criticalFailureRate: failureSignalMetrics.criticalFailures.rate,
+    answerLeakageRate: failureSignalMetrics.answerLeakage.rate,
+    failureSignalMetrics,
   };
 }
 
@@ -163,16 +174,25 @@ export function buildTutorEvalLocaleBreakdowns(
   dataset?: TutorEvalDataset,
 ): readonly TutorEvalLocaleBreakdown[] {
   assertValidTutorEvalRunResult(result);
+  const boundDataset = dataset !== undefined && dataset.id === result.datasetId && dataset.version === result.datasetVersion &&
+    hasMatchingTutorEvalAuthoredScoring(result, dataset) && result.caseResults.every((item) =>
+      dataset.cases.some((authored) => authored.id === item.caseId && authored.version === item.caseVersion)) ? dataset : undefined;
+  // 已知 authored rubric 可核对历史证据完整性，但不能替历史结果补默认评分身份。
+  const authoredCases = boundDataset === undefined ? result.scoringProvenance?.cases : buildTutorEvalAuthoredScoringInputs(boundDataset);
   const datasetLocales = new Map(
-    dataset?.cases.map((tutorEvalCase) => [
+    boundDataset?.cases.map((tutorEvalCase) => [
       tutorEvalCase.id,
       resolveTutorCaseLocale(tutorEvalCase.locale),
     ]) ?? [],
   );
   const grouped = new Map<TutorCaseLocale, TutorEvalCaseRunResult[]>();
+  const plannedCases = boundDataset === undefined ? undefined : result.scoringProvenance === undefined
+    ? boundDataset.cases.length === result.caseCount ? boundDataset.cases : undefined
+    : boundDataset.cases.filter((item) => result.scoringProvenance!.cases.some((input) => input.caseId === item.id && input.caseVersion === item.version));
+  if (plannedCases !== undefined) for (const item of plannedCases) grouped.set(resolveTutorCaseLocale(item.locale), []);
   for (const caseResult of result.caseResults) {
     const locale = resolveTutorCaseLocale(
-      caseResult.locale ?? datasetLocales.get(caseResult.caseId),
+      datasetLocales.get(caseResult.caseId) ?? caseResult.locale,
     );
     const cases = grouped.get(locale) ?? [];
     cases.push(caseResult);
@@ -180,12 +200,18 @@ export function buildTutorEvalLocaleBreakdowns(
   }
   return [...grouped.entries()]
     .sort(([left], [right]) => left.localeCompare(right))
-    .map(([locale, caseResults]) => ({
-      locale,
-      caseCount: new Set(caseResults.map((caseResult) => caseResult.caseId)).size,
-      caseRunCount: caseResults.length,
-      ...aggregateLocaleCaseResults(caseResults),
-    }));
+    .map(([locale, caseResults]) => {
+      const plannedCaseRunCount = (plannedCases === undefined ? new Set(caseResults.map((item) => item.caseId)).size
+        : plannedCases.filter((item) => resolveTutorCaseLocale(item.locale) === locale).length) * result.runsPerCase;
+      return {
+        locale,
+        caseCount: new Set(caseResults.map((caseResult) => caseResult.caseId)).size,
+        caseRunCount: caseResults.length,
+        plannedCaseRunCount,
+        scope: plannedCases === undefined ? "observed_case_scope" as const : "authored_plan" as const,
+        ...aggregateLocaleCaseResults(caseResults, plannedCaseRunCount, authoredCases),
+      };
+    });
 }
 
 function localeLabel(locale: TutorCaseLocale, reportLocale: TutorEvalReportLocale): string {
@@ -211,16 +237,27 @@ function formatLocaleBreakdown(
   return [
     `${localeLabel(breakdown.locale, reportLocale)} (${breakdown.locale}):`,
     `  ${labels.cases}: ${breakdown.caseCount} (${breakdown.caseRunCount} ${labels.runs})`,
+    reportLocale === "zh-CN"
+      ? `  证据范围: ${breakdown.scope === "authored_plan" ? "已编写案例计划" : "已观察案例范围"}；${breakdown.caseRunCount}/${breakdown.plannedCaseRunCount} 次运行`
+      : `  Evidence scope: ${breakdown.scope === "authored_plan" ? "authored plan" : "observed case scope"}; ${breakdown.caseRunCount}/${breakdown.plannedCaseRunCount} case-runs`,
     `  ${labels.passed}: ${breakdown.passedCount}`,
     `  ${labels.failed}: ${breakdown.failedCount}`,
     `  ${labels.errors}: ${breakdown.errorCount}`,
     ...categories.map(
       (category) => `  ${labels.categories[category]}: ${formatScore(breakdown.categoryScores[category])}`,
     ),
-    `  ${labels.criticalFailureRate}: ${(breakdown.criticalFailureRate * 100).toFixed(2)}%`,
-    `  ${labels.answerLeakageRate}: ${(breakdown.answerLeakageRate * 100).toFixed(2)}%`,
+    `  ${labels.criticalFailureRate}: ${formatFailureSignalRate(breakdown.failureSignalMetrics.criticalFailures, reportLocale)}`,
+    `  ${labels.answerLeakageRate}: ${formatFailureSignalRate(breakdown.failureSignalMetrics.answerLeakage, reportLocale)}`,
     `  ${labels.overall}: ${formatScore(breakdown.overallScore)}`,
   ];
+}
+
+function formatFailureSignalRate(metric: TutorEvalFailureSignalRate, locale: TutorEvalReportLocale): string {
+  const rate = metric.rate === null ? "n/a" : `${(metric.rate * 100).toFixed(2)}%`;
+  const coverage = locale === "zh-CN"
+    ? `已确认 ${metric.confirmedCount}；未观察到 ${metric.knownAbsentCount}；证据不可用 ${metric.unavailableCount}`
+    : `confirmed ${metric.confirmedCount}; observed absent ${metric.knownAbsentCount}; unavailable ${metric.unavailableCount}`;
+  return `${rate} (${coverage})`;
 }
 
 export function formatTutorEvalSummary(
@@ -230,6 +267,7 @@ export function formatTutorEvalSummary(
   assertValidTutorEvalRunResult(result);
   const reportLocale = options.reportLocale ?? "en";
   const labels = reportLabels[reportLocale];
+  const failureSignalMetrics = buildTutorEvalFailureSignalMetrics(result.caseResults, result.caseCount * result.runsPerCase, result.scoringProvenance?.cases);
   const categoryLines = categories.map(
     (category) => `${labels.categories[category]}: ${formatScore(result.categoryScores[category])}`,
   );
@@ -269,6 +307,9 @@ export function formatTutorEvalSummary(
   return [
     `${labels.dataset}: ${result.datasetId}@${result.datasetVersion}`,
     `${labels.evaluator}: ${result.evaluatorVersion ?? "legacy"}`,
+    ...(reportLocale === "zh-CN"
+      ? [`评分来源: ${result.scoringProvenance?.identity ?? "unknown（历史结果未记录配置）"}；总体和类别分数使用配置单位，单项 rubric score 保持归一化状态编码`]
+      : [`Scoring provenance: ${result.scoringProvenance?.identity ?? "unknown (historical configuration not recorded)"}; aggregate/category scores use configured units; rubric scores remain normalized status encodings`]),
     `${labels.tutor}: ${result.tutor.provider}/${result.tutor.model}`,
     `${labels.prompt}: ${result.tutor.promptVersion}`,
     ...judgeLines,
@@ -278,8 +319,8 @@ export function formatTutorEvalSummary(
     `${labels.errors}: ${result.errorCount}`,
     ...categoryLines,
     `${labels.overall}: ${formatScore(result.overallScore)}`,
-    `${labels.criticalFailureRate}: ${(result.criticalFailureRate * 100).toFixed(2)}%`,
-    `${labels.answerLeakageRate}: ${(result.answerLeakageRate * 100).toFixed(2)}%`,
+    `${labels.criticalFailureRate}: ${formatFailureSignalRate(failureSignalMetrics.criticalFailures, reportLocale)}`,
+    `${labels.answerLeakageRate}: ${formatFailureSignalRate(failureSignalMetrics.answerLeakage, reportLocale)}`,
     "",
     `${labels.languageContextBreakdown}:`,
     ...localeBreakdownLines,

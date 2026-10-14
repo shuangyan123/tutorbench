@@ -12,9 +12,11 @@ import {
 } from "../src/index.js";
 import { buildTutorHealthReport } from "../src/reporting/tutor-health-reporters.js";
 import { syntheticDesignPartnerPilot } from "./helpers/design-partner-pilot.js";
+import { recomputeRecordedScoring } from "./helpers/recompute-scoring.js";
 
 function rebuild(input: TutorHealthComparisonInput, overrides: Partial<TutorEvalRunResult> = {}): TutorHealthComparisonInput {
-  const evaluation = { ...input.evaluation, ...overrides };
+  const changed = { ...input.evaluation, ...overrides };
+  const evaluation = overrides.caseResults === undefined ? changed : recomputeRecordedScoring(changed);
   return { ...input, evaluation, report: buildTutorHealthReport({ suite: input.suite, evaluation, scoringProfile: input.report.scoringProfile }) };
 }
 
@@ -24,7 +26,9 @@ test("comparison rejects incompatible suite, profile, evaluator, Judge, and exec
     "missing evaluator": rebuild(candidate, { evaluatorVersion: undefined } as unknown as Partial<TutorEvalRunResult>),
     "changed evaluator": rebuild(candidate, { evaluatorVersion: "future-evaluator" }),
     "reused run ID": rebuild(candidate, { runId: baseline.evaluation.runId }),
-    "missing Judge": rebuild(candidate, { judge: null }),
+    "missing Judge": rebuild(candidate, { judge: null,
+      caseResults: candidate.evaluation.caseResults.map((item) => ({ ...item, rawJudgeResult: null })),
+    }),
   };
   for (const [key, value] of Object.entries({
     provider: "other", model: "other", modelVersion: "new", promptId: "other", promptVersion: "new",
@@ -100,7 +104,10 @@ test("missing cases, rubric evidence, partial results, and execution errors cann
         if (mode === "missing_case") return [];
         if (mode === "missing_rubric") return [{ ...item, rubricResults: [] }];
         if (mode === "duplicate_rubric") return [{ ...item, rubricResults: [...item.rubricResults, ...item.rubricResults] }];
-        return [{ ...item, ...(mode === "error" ? { status: "error" as const, rawTutorResponse: null } : {}),
+        return [{ ...item, ...(mode === "error" ? {
+          status: "error" as const, passed: false, overallScore: null, rawTutorResponse: null, rawJudgeResult: null,
+        } : { rawJudgeResult: { ...item.rawJudgeResult!, rubricResults: item.rawJudgeResult!.rubricResults
+          .map((rubric) => ({ ...rubric, result: "PARTIAL" as const })) } }),
           rubricResults: item.rubricResults.map((rubric) => ({ ...rubric,
             result: mode === "partial" ? "PARTIAL" as const : "ERROR" as const,
             score: mode === "partial" ? 0.5 : null,
@@ -144,6 +151,8 @@ test("multiple runs aggregate by authored identity and retain every source occur
   assert.deepEqual(compareTutorHealthRuns({ baseline, candidate }), comparison);
   const partial = rebuild(candidate, { caseResults: candidate.evaluation.caseResults.map((item) =>
     item.caseId === "ps-first-mistake" && item.runIndex === 2 ? { ...item,
+      rawJudgeResult: { ...item.rawJudgeResult!, rubricResults: item.rawJudgeResult!.rubricResults
+        .map((rubric) => ({ ...rubric, result: "PARTIAL" as const })) },
       rubricResults: item.rubricResults.map((rubric) => ({ ...rubric, result: "PARTIAL" as const, score: 0.5 })),
     } : item) });
   assert.equal(compareTutorHealthRuns({ baseline, candidate: partial }).findings

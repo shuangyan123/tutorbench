@@ -70,7 +70,7 @@ learner-outcome work and do not currently imply causal learning gains.
 The approved T1 trajectory mark and its usage rules are documented in
 [`assets/brand/tutorbench/README.md`](assets/brand/tutorbench/README.md).
 
-Current public surfaces include:
+Current repository surfaces include (not all are in the published npm release):
 
 - a 13-scenario Productive Struggle & Intervention suite for Tutor Health;
 - explicit Tutor Health coverage, Release Gate, evidence-backed Findings, and
@@ -91,10 +91,19 @@ module.
 
 ## Install
 
-Requirements: Node 24 (`>=24 <25`).
+Choose the channel before installing:
 
-The published `tutor-benchmark@0.1.0` Developer Preview and the repository
-clone are both supported installation paths. The clone path is:
+| Channel | Runtime | Available surface |
+| --- | --- | --- |
+| Published `tutor-benchmark@0.1.0` | Node 22 (`>=22 <23`) | Quickstart, TutorEval/HTTP evaluation and historical diagnostic CLI |
+| Repository `main` | Node 24 (`>=24 <25`) | Current source, including Tutor Health, Scenario vNext and Community Review contracts |
+
+The repository still declares package version `0.1.0`, but its current payload
+is not the published `0.1.0` tarball. No newer npm release is available as of
+2026-10-14. See [release channels](docs/release.md#installation-channels) for
+the registry evidence, CLI and API boundaries.
+
+For the current source:
 
 ```bash
 git clone https://github.com/shuangyan123/tutorbench.git
@@ -111,11 +120,11 @@ pedagogical `FAIL`; that expected demo outcome still exits successfully. The
 default path prints only a concise summary. Use `--output <path>` if you also
 want an explicitly marked local `QuickstartSummary` JSON artifact.
 
-The published package exposes the same first-run command:
+For the historical published package, use Node 22 and its own bundled demo:
 
 ```bash
-npm install tutor-benchmark
-tutorbench quickstart
+npm install tutor-benchmark@0.1.0
+npx --no-install tutorbench quickstart
 ```
 
 See [`docs/quickstart.md`](docs/quickstart.md) for the exact subset identity,
@@ -123,10 +132,12 @@ eligibility boundary, and failure semantics.
 
 ## Run a Tutor Health evaluation
 
-For an external Tutor, the product-facing path is `tutorbench health`:
+Tutor Health requires the repository build; npm `0.1.0` has no `health` or
+`health-compare` command. In a clone, build with `npm run build` and invoke
+`node dist/src/cli/tutorbench.js` for the CLI examples in this README:
 
 ```bash
-tutorbench health \
+node dist/src/cli/tutorbench.js health \
   --http https://partner.example.com/respond \
   --suite productive-struggle-intervention-v0.1 \
   --tutor-provider partner \
@@ -278,11 +289,14 @@ npm run benchmark
 ```
 
 It runs the current `tutor-eval-v0.2a@0.2a.6` dataset with the existing
-`0.3a.4` evaluator semantics. The canonical cases include Judge-required
+`0.3a.5` evaluator semantics. The canonical cases include Judge-required
 semantic rubrics. Without an explicitly configured Judge, those criteria stay
 unresolved and the normal run reports Judge-unavailable errors with no score;
 it never silently turns missing evidence into a pass. Quickstart does not
 replace or weaken this full-benchmark behavior.
+
+Structured Judge results reporting insufficient information remain unresolved;
+see the [validity contract](docs/tutor-eval-insufficient-information.md).
 
 The intended package install command is:
 
@@ -471,7 +485,12 @@ and the [critical-failure quality-gate audit](docs/critical-failure-quality-gate
 
 ## Public API
 
-The package root is the stable local-evaluation surface:
+The current repository package root is the local-evaluation surface below.
+The published `0.1.0` root exposes `runTutorBenchmark`, `runTutorEval`,
+`loadTutorEvalDataset`, `createHttpTutor`, `toTutorTurnInput`, and their
+TutorEval contracts; it does not expose the Health, Scenario vNext or Community
+Review additions. See [release channels](docs/release.md#installation-channels)
+before writing consumer code against the published package.
 
 - `TutorUnderTest`, `TutorTurnInput`, and `TutorTurnOutput`
 - `runTutorHealthEvaluation` for Scenario vNext → TutorEval → Tutor Health

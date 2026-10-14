@@ -6,6 +6,7 @@ import {
   buildWordContextDiscriminationReport,
   formatWordContextDiscriminationReport,
   getWordContextDiscriminationFixtureCase,
+  observeWordContextDiscriminationEvaluation,
   WORD_CONTEXT_DISCRIMINATION_ACTIONABILITY_CRITERION,
   WORD_CONTEXT_DISCRIMINATION_ACTIONABILITY_RUBRIC_ID,
   WORD_CONTEXT_DISCRIMINATION_CASE_ID,
@@ -107,8 +108,25 @@ test("A/B/C fixture keeps current dataset, case, rubric, and expectation identit
   assert.deepEqual(WORD_CONTEXT_DISCRIMINATION_JUDGE_IDENTITY, {
     promptId: "tutor-eval-pedagogy-judge-system",
     promptVersion: "0.9",
-    evaluatorVersion: "0.3a.4",
+    evaluatorVersion: "0.3a.5",
   });
+});
+
+test("diagnostic observations preserve the structured insufficient-information flag on error cases", async () => {
+  const result = await runTutorResponseCorpus({ corpus: buildWordContextDiscriminationCorpus(),
+    dataset: await loadCurrentDataset(), caseIds: [WORD_CONTEXT_DISCRIMINATION_CASE_ID],
+    judge: { provider: "synthetic", model: "provider-free-judge-fixture",
+      promptId: WORD_CONTEXT_DISCRIMINATION_JUDGE_IDENTITY.promptId,
+      promptVersion: WORD_CONTEXT_DISCRIMINATION_JUDGE_IDENTITY.promptVersion,
+      evaluate: async (input) => ({ ...judgeResultFor(input), insufficientInformation: true }),
+    },
+  });
+  const observations = observeWordContextDiscriminationEvaluation(result);
+  assert.equal(observations.length, 3);
+  assert.ok(observations.every((item) => item.status === "error" && item.insufficientInformation === true));
+  assert.ok(observations.every((item) => item.judgeOutcome === "abstained" && item.executionErrorCode === null));
+  assert.ok(observations.every((item) => item.answerLeakage === null && item.criticalFailures === null));
+  assert.ok(buildWordContextDiscriminationReport(result).cases.every((item) => item.insufficientInformation === true));
 });
 
 test("synthetic diagnostic corpus validates and never claims recorded-model provenance", async () => {

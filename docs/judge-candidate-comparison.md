@@ -189,6 +189,24 @@ sequentially so the call budget remains visible and bounded.
 
 ## Report interpretation
 
+Current comparison version is `0.1.2` (report schema remains 1). Each new
+observation binds `judgeOutcome` to validated case/run evidence: `completed`,
+`abstained`, or `unavailable`. Structured abstentions are counted separately
+from execution errors. An unverified flag or legacy error observation without
+that outcome does not establish evidence availability. A current writer rejects
+flag-true observations without a verified outcome; it does not relabel them as
+transport failures. Ordinary legacy complete/transport observations remain
+supported, and saved historical reports are read without recomputing metrics.
+
+`criticalFailures=null` and `answerLeakage=null` mean unknown. A validated
+abstention retains confirmed positive signals, but an empty signal set does
+not establish absence. Failure distributions include these confirmed positive
+signatures and expose `partialCount` when present. The disagreement statistic
+includes these known signatures; it describes confirmed signal variation,
+not completeness or absence of unobserved failures. This is a versioned change
+from `0.1.1`, which discarded all critical signals on error cases. Saved older
+metrics retain their historical meaning and are not automatically recomputed.
+
 Each candidate records:
 
 - provider/model identity, for example `deepseek/deepseek-v4-flash` and
@@ -208,7 +226,7 @@ Each candidate records:
 - per-fixture modal leakage and modal-leakage share when leakage is available;
 - critical-failure signatures by fixture and the count outside each fixture's
   modal signature;
-- `insufficientInformation` counts and execution errors by stable code;
+- `insufficientInformation`, structured abstention counts and execution errors by stable code;
 - per-call latency, mean, median, and unavailable latency counts; and
 - strict complete input/output/total token measurements plus known totals and
   coverage counts, with unavailable fields left unavailable rather than

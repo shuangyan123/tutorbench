@@ -12,6 +12,7 @@ import {
 } from "../contracts/tutor-health-run-manifest.js";
 import { parseTutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext-validation.js";
 import type { TutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext.js";
+import { buildTutorHealthReport } from "./tutor-health-reporters.js";
 
 export interface TutorHealthRunManifestInput {
   readonly suite: TutorScenarioSuiteVNext;
@@ -39,13 +40,18 @@ export function buildTutorHealthRunManifest(input: TutorHealthRunManifestInput):
         report.sourceEvaluation.evaluatorVersion !== evaluation.evaluatorVersion) {
       throw new BenchmarkConfigurationError("tutor_health_run_manifest_invalid");
     }
+    const rebuilt = buildTutorHealthReport({ suite, evaluation, scoringProfile: report.scoringProfile });
+    if (tutorHealthComparisonJson(rebuilt) !== tutorHealthComparisonJson(report)) {
+      throw new BenchmarkConfigurationError("tutor_health_run_manifest_invalid");
+    }
     // 仅复制通过严格白名单校验的 provenance；不复制响应、对话或隐藏判据。
     return structuredClone(parseTutorHealthRunManifest({
       kind: TUTOR_HEALTH_RUN_MANIFEST_KIND,
       schemaVersion: TUTOR_HEALTH_RUN_MANIFEST_SCHEMA_VERSION,
       provenance: "local_execution_only",
       suite: { id: suite.id, version: suite.version, sha256: sha256(tutorHealthComparisonJson(suite)) },
-      evaluation: { runId: evaluation.runId, evaluatorVersion: evaluation.evaluatorVersion, sha256: sha256(input.evaluationJson) },
+      evaluation: { runId: evaluation.runId, evaluatorVersion: evaluation.evaluatorVersion,
+        scoringIdentity: evaluation.scoringProvenance?.identity ?? null, sha256: sha256(input.evaluationJson) },
       report: { schemaVersion: report.schemaVersion, sha256: sha256(input.reportJson) },
       tutor: evaluation.tutor,
       judge: evaluation.judge,

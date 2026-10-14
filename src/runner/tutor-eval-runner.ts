@@ -2,11 +2,13 @@ import { randomUUID } from "node:crypto";
 
 import {
   BenchmarkConfigurationError,
+  buildTutorEvalFailureSignalMetrics,
   BenchmarkRunnerError,
   isTutorTurnOutput,
   TUTOR_EVAL_DATASET_ID,
   TUTOR_EVAL_DATASET_VERSION,
   TUTOR_EVAL_EVALUATOR_VERSION,
+  TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC,
   parseTutorEvalDataset,
   type TutorEvalCase,
   type TutorEvalDataset,
@@ -27,6 +29,8 @@ import {
   aggregateTutorEvalOverallScore,
   aggregateTutorEvalRubrics,
   DEFAULT_TUTOR_EVAL_SCORING_CONFIG,
+  normalizeTutorEvalScoringConfig,
+  createTutorEvalScoringProvenance,
   type TutorEvalScoringConfig,
 } from "../scoring/index.js";
 import {
@@ -357,6 +361,7 @@ async function runCase(
     onJudgeCall,
   );
   const judgeFailure = judgeExecution.failure;
+  const insufficientInformation = judgeExecution.rawJudgeResult?.insufficientInformation === true;
 
   const rubricResults = mergeRubricResults(tutorEvalCase.evaluatorOnly.rubrics, [
     ...deterministicResults,
@@ -373,7 +378,7 @@ async function runCase(
     scoring,
   );
   const hasError =
-    judgeFailure !== null || rubricResults.some((result) => result.result === "ERROR");
+    judgeFailure !== null || insufficientInformation || rubricResults.some((result) => result.result === "ERROR");
   const latencyMs =
     output.metrics?.latencyMs ?? Math.round(performance.now() - started);
   return {
@@ -400,12 +405,17 @@ async function runCase(
     diagnostics:
       judgeFailure !== null
         ? stableDiagnostic(judgeFailure.code, judgeFailure.message)
-        : hasError
+        : insufficientInformation
           ? stableDiagnostic(
-              "evaluation_failed",
-              "One or more rubrics could not be evaluated.",
+              TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC.code,
+              TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC.message,
             )
-          : [],
+          : hasError
+            ? stableDiagnostic(
+                "evaluation_failed",
+                "One or more rubrics could not be evaluated.",
+              )
+            : [],
   };
 }
 
@@ -420,7 +430,8 @@ export async function runTutorEval(
   const orderedCases = [...dataset.cases].sort((left, right) =>
     left.id < right.id ? -1 : left.id > right.id ? 1 : 0,
   );
-  const scoring = options.scoring ?? DEFAULT_TUTOR_EVAL_SCORING_CONFIG;
+  const scoring = normalizeTutorEvalScoringConfig(options.scoring ?? DEFAULT_TUTOR_EVAL_SCORING_CONFIG);
+  const scoringProvenance = createTutorEvalScoringProvenance(dataset, scoring);
   const caseResults: TutorEvalCaseRunResult[] = [];
   for (const tutorEvalCase of orderedCases) {
     for (let runIndex = 1; runIndex <= runsPerCase; runIndex += 1) {
@@ -468,6 +479,7 @@ export async function runTutorEval(
     datasetId: dataset.id,
     datasetVersion: dataset.version,
     evaluatorVersion: TUTOR_EVAL_EVALUATOR_VERSION,
+    scoringProvenance,
     tutor: asTutorDescriptor(options),
     judge: asJudgeDescriptor(options.judge),
     runsPerCase,
@@ -482,6 +494,7 @@ export async function runTutorEval(
       caseResults.length === 0 ? 0 : failureCount / caseResults.length,
     answerLeakageRate:
       caseResults.length === 0 ? 0 : leakageCount / caseResults.length,
+    failureSignalMetrics: buildTutorEvalFailureSignalMetrics(caseResults, orderedCases.length * runsPerCase, scoringProvenance.cases),
     caseResults,
   };
 }

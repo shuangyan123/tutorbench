@@ -150,6 +150,11 @@ The pure agreement functions provide:
 Kappa is reported as a metric only. This phase does not define a calibration
 threshold such as `kappa >= 0.8`.
 
+Empty scored samples and zero chance-correction denominators return JSON
+`null` (undefined), rendered as `n/a`. In particular, one shared label may
+have 100% raw agreement while kappa remains undefined. Raw agreement and
+the confusion matrix are retained; historical saved metrics are not rewritten.
+
 Reports also include ambiguity and `UNSURE` rates, plus deterministic
 breakdowns by case, rubric, category, capability tag, subject, and disclosure
 policy. Rubrics with any ambiguity or `UNSURE` are listed in descending rate

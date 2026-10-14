@@ -488,6 +488,7 @@ test("OIDC adapter binds verified token profile, client, audience, scope, and ch
       sub: "operator-subject-1",
       scope: "operator:review",
       client_id: "tutorbench-operator",
+      jti: "synthetic-deployment-token",
     }, { typ: "at+jwt" });
     assert.deepEqual(await rfc9068Adapter.authenticate({ authorization: `Bearer ${rfc9068Token}` }), {
       principal: { provider: "example-oidc", subject: "operator-subject-1" },

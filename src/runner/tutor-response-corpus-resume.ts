@@ -24,6 +24,9 @@ import {
   type TutorResponseCorpusReplayPlan,
 } from "../corpus/replay.js";
 import type { TutorEvalScoringConfig } from "../scoring/index.js";
+import { aggregateTutorEvalCategoryScores, aggregateTutorEvalOverallScore, createEmptyTutorEvalCategoryScores } from "../scoring/index.js";
+import { createTutorEvalScoringProvenance, hasValidTutorEvalScoringEvidence, hasMatchingTutorEvalAuthoredScoring } from "../scoring/provenance.js";
+import { tutorEvalScoringIdentity } from "../scoring/config.js";
 import type { TutorEvalJudgeRunOptions } from "./tutor-eval-runner.js";
 
 const CASE_RUN_SEPARATOR = "\u0000";
@@ -155,25 +158,7 @@ function semanticJudgeIdentity(
 function scoringIdentity(
   scoring: TutorEvalScoringConfig,
 ): string {
-  return JSON.stringify({
-    criterionScores: {
-      PASS: scoring.criterionScores.PASS,
-      PARTIAL: scoring.criterionScores.PARTIAL,
-      FAIL: scoring.criterionScores.FAIL,
-    },
-    categoryWeights: {
-      correctness: scoring.categoryWeights.correctness,
-      diagnosis: scoring.categoryWeights.diagnosis,
-      guidance: scoring.categoryWeights.guidance,
-      adaptation: scoring.categoryWeights.adaptation,
-      actionability: scoring.categoryWeights.actionability,
-    },
-    casePassThreshold: scoring.casePassThreshold,
-    qualityGate: {
-      failureTypes: [...scoring.qualityGate.failureTypes],
-      minimumSeverity: scoring.qualityGate.minimumSeverity,
-    },
-  });
+  return tutorEvalScoringIdentity(scoring);
 }
 
 function caseVersionForCorpusResponse(
@@ -334,6 +319,16 @@ function validatePreviousCaseRuns(
   if (previousSelection === undefined) {
     invalidResume();
   }
+  const sourceDataset = { ...options.dataset, cases: options.dataset.cases.filter((item) => previousSelection.selectedCaseIds.includes(item.id)) };
+  const hasError = previous.evaluation.caseResults.some((item) => item.status === "error");
+  // 旧 wrapper 明确记录的配置可以核对，但不能把缺失配置假定为 default。
+  const sourceEvaluation = previous.evaluation.scoringProvenance === undefined ? {
+    ...previous.evaluation, scoringProvenance: createTutorEvalScoringProvenance(sourceDataset, previous.scoring!),
+    categoryScores: hasError ? createEmptyTutorEvalCategoryScores() : aggregateTutorEvalCategoryScores(previous.evaluation.caseResults.filter((item) => item.overallScore !== null)),
+    overallScore: hasError ? null : aggregateTutorEvalOverallScore(previous.evaluation.caseResults.map((item) => item.overallScore)),
+  } : previous.evaluation;
+  if (!hasMatchingTutorEvalAuthoredScoring(sourceEvaluation, sourceDataset) || !hasValidTutorEvalScoringEvidence(sourceEvaluation) ||
+      sourceEvaluation.scoringProvenance!.identity !== tutorEvalScoringIdentity(options.scoring)) invalidResume();
   const datasetCasesById = new Map(
     options.dataset.cases.map((tutorEvalCase) => [tutorEvalCase.id, tutorEvalCase]),
   );

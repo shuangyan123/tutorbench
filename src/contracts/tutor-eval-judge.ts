@@ -14,6 +14,12 @@ import type { TutorEvalJudgeMetrics } from "./result.js";
 
 export const TUTOR_EVAL_JUDGE_SCHEMA_VERSION = 1 as const;
 
+/** A structured abstention, not a provider transport failure or teaching FAIL. */
+export const TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC = {
+  code: "judge_insufficient_information",
+  message: "Judge reported insufficient information; Judge rubric assessments are unresolved.",
+} as const;
+
 export type TutorEvalJudgeRubricStatus = "PASS" | "PARTIAL" | "FAIL";
 
 export const TUTOR_EVAL_JUDGE_RUBRIC_STATUSES: readonly TutorEvalJudgeRubricStatus[] = [
@@ -131,6 +137,7 @@ export interface TutorEvalJudgeResult {
   readonly rubricResults: readonly TutorEvalJudgeRubricResult[];
   readonly criticalFailures: readonly TutorEvalJudgeCriticalFailure[];
   readonly factualErrors: readonly TutorEvalJudgeFactualError[];
+  /** Case-scoped evidence insufficiency; v1 cannot localize it to individual Judge rubrics. */
   readonly insufficientInformation: boolean;
 }
 
