@@ -124,7 +124,8 @@ test("diagnostic observations preserve the structured insufficient-information f
   const observations = observeWordContextDiscriminationEvaluation(result);
   assert.equal(observations.length, 3);
   assert.ok(observations.every((item) => item.status === "error" && item.insufficientInformation === true));
-  assert.ok(observations.every((item) => item.executionErrorCode === "judge_insufficient_information"));
+  assert.ok(observations.every((item) => item.judgeOutcome === "abstained" && item.executionErrorCode === null));
+  assert.ok(observations.every((item) => item.answerLeakage === null && item.criticalFailures === null));
   assert.ok(buildWordContextDiscriminationReport(result).cases.every((item) => item.insufficientInformation === true));
 });
 

@@ -2,7 +2,7 @@
 
 This is a small, provider-free fixture and an optional live probe for the
 current `language-word-context-001@1.1.1` case in
-`tutor-eval-v0.2a@0.2a.5`. It tests whether the Judge distinguishes three
+`tutor-eval-v0.2a@0.2a.6`. It tests whether the Judge distinguishes three
 fixed Tutor responses against the correctness limitation clause. The first
 real probe audited prompt `0.7`, and the second probe audited prompt `0.8`; the
 fixture now remains the regression boundary for current prompt `0.9`.
@@ -88,6 +88,19 @@ labels side by side and never converts their agreement into a benchmark
 pass/fail or general accuracy claim.
 
 ## Provider-free coverage
+
+The current Word report writer uses schema 2; historical schema 1 reports
+remain readable. It records a validated Judge outcome separately from TutorEval
+case status. Structured abstention keeps ERROR/null rubric semantics while
+preserving confirmed critical failures and true leakage. Missing evidence or
+an abstention with no confirmed signal uses null for unknown failure/leakage
+state, displayed as `n/a`. Complete valid Judge results retain their existing
+positive and negative signal behavior. A flag alone cannot certify evidence:
+the projection checks TB-A01/TB-A02 consistency and the fixed authored Judge
+subset for this diagnostic case.
+Reading an old schema-1 error case does not upgrade its stored false/empty
+signals into confirmed absence; the formatter displays them as unavailable
+without changing the saved bytes. Recorded positive signals remain visible.
 
 `tests/judge-word-context-discrimination.test.ts` verifies:
 

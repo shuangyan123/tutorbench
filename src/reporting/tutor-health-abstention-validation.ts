@@ -3,10 +3,10 @@ import { TUTOR_EVAL_INSUFFICIENT_INFORMATION_DIAGNOSTIC } from "../contracts/tut
 
 const severityRank = { minor: 1, major: 2, critical: 3 } as const;
 
-/** Authored ownership is unavailable to standalone v1 parsing; verify it before reporting. */
+/** Authored ownership is unavailable to standalone v1 parsing; callers also bind category/weight metadata. */
 export function hasValidAuthoredAbstention(
   result: TutorEvalCaseRunResult,
-  criteria: readonly TutorScenarioEvaluationCriterion[],
+  criteria: readonly Pick<TutorScenarioEvaluationCriterion, "rubricId" | "evaluationType" | "criticalFailure">[],
 ): boolean {
   const raw = result.rawJudgeResult;
   if (raw?.insufficientInformation !== true) return true;

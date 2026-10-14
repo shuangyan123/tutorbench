@@ -12,7 +12,9 @@ import {
   type TutorResponseCorpusEvaluationResult,
 } from "../contracts/index.js";
 import { deriveTutorResponseId } from "../corpus/identity.js";
-import type { JudgeCandidateComparisonFixture, JudgeCandidateComparisonFixtureObservation } from "./candidate-comparison.js";
+import { assertValidTutorEvalRunResult } from "../contracts/tutor-eval-result-validation.js";
+import { hasValidAuthoredAbstention } from "../reporting/tutor-health-abstention-validation.js";
+import type { JudgeCandidateComparisonFixture, JudgeCandidateComparisonFixtureObservation, JudgeDiagnosticOutcome } from "./candidate-comparison.js";
 import {
   TUTOR_EVAL_PEDAGOGY_JUDGE_PROMPT_ID,
   TUTOR_EVAL_PEDAGOGY_JUDGE_PROMPT_VERSION,
@@ -32,6 +34,11 @@ export const WORD_CONTEXT_DISCRIMINATION_CORRECTNESS_CRITERION =
   "Evaluate the student's proposed meaning against the surrounding context, explain what the pause-before-agreeing clue supports and what it cannot establish on its own, and do not treat the student's guess as automatically correct or incorrect." as const;
 export const WORD_CONTEXT_DISCRIMINATION_ACTIONABILITY_CRITERION =
   "Ask the student to point to one clue in the sentence." as const;
+
+const wordContextJudgeCriteria = [
+  { rubricId: WORD_CONTEXT_DISCRIMINATION_CORRECTNESS_RUBRIC_ID, category: "correctness", weight: 1, evaluationType: "judge" },
+  { rubricId: WORD_CONTEXT_DISCRIMINATION_ACTIONABILITY_RUBRIC_ID, category: "actionability", weight: 1, evaluationType: "judge" },
+] as const;
 
 export type WordContextDiscriminationLabel = "PASS" | "PARTIAL" | "FAIL";
 export type WordContextDiscriminationFixtureCaseId = "A" | "B" | "C";
@@ -117,8 +124,9 @@ export interface WordContextDiscriminationReportCase {
     readonly actionability: WordContextDiscriminationLabel | null;
   };
   readonly status: TutorEvalCaseRunResult["status"];
-  readonly criticalFailures: readonly TutorEvalCriticalFailure[];
-  readonly answerLeakage: boolean;
+  readonly judgeOutcome?: JudgeDiagnosticOutcome;
+  readonly criticalFailures: readonly TutorEvalCriticalFailure[] | null;
+  readonly answerLeakage: boolean | null;
   readonly insufficientInformation: boolean | null;
   readonly factualErrors: TutorEvalJudgeResult["factualErrors"];
   readonly rawJudgeEvidence: readonly {
@@ -129,7 +137,7 @@ export interface WordContextDiscriminationReportCase {
 }
 
 export interface WordContextDiscriminationReport {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 1 | 2;
   readonly fixtureId: typeof WORD_CONTEXT_DISCRIMINATION_FIXTURE_ID;
   readonly fixtureVersion: typeof WORD_CONTEXT_DISCRIMINATION_FIXTURE_VERSION;
   readonly fixtureProvenance: typeof WORD_CONTEXT_DISCRIMINATION_FIXTURE_PROVENANCE;
@@ -168,18 +176,17 @@ export function observeWordContextDiscriminationEvaluation(
       expectedLabel: fixtureCase.expected.correctness,
       observedLabel: fixtureCase.observed.correctness,
       status: caseResult.status,
-      answerLeakage: caseResult.status === "error" ? null : caseResult.answerLeakage,
+      judgeOutcome: fixtureCase.judgeOutcome ?? "unavailable",
+      answerLeakage: fixtureCase.answerLeakage,
       // 结构化 abstention 也使用 error 状态；有 raw 结果时仍应展示真实 flag。
       insufficientInformation: caseResult.rawJudgeResult?.insufficientInformation ?? null,
       criticalFailures:
-        caseResult.status === "error"
-          ? []
-          : caseResult.criticalFailures.map((failure) => ({
-              type: failure.type,
-              severity: failure.severity,
-            })),
+        fixtureCase.criticalFailures?.map((failure) => ({
+          type: failure.type,
+          severity: failure.severity,
+        })) ?? null,
       executionErrorCode:
-        caseResult.status === "error"
+        fixtureCase.judgeOutcome === "unavailable" && caseResult.status === "error"
           ? caseResult.diagnostics[0]?.code ?? "evaluation_error"
           : null,
       latencyMs: caseResult.judgeMetrics?.latencyMs ?? null,
@@ -287,24 +294,31 @@ function caseReport(
   fixtureCase: WordContextDiscriminationFixtureCase,
   caseResult: TutorEvalCaseRunResult,
 ): WordContextDiscriminationReportCase {
+  const raw = caseResult.rawJudgeResult;
+  const judgeOutcome: JudgeDiagnosticOutcome = raw === null || raw.rubricResults.length !== wordContextJudgeCriteria.length
+    ? "unavailable" : raw.insufficientInformation ? "abstained" : "completed";
+  const criticalFailures = judgeOutcome === "unavailable" ||
+    (judgeOutcome === "abstained" && caseResult.criticalFailures.length === 0) ? null : caseResult.criticalFailures;
   return {
     fixtureCaseId: fixtureCase.id,
     runIndex: fixtureCase.runIndex,
     expected: fixtureCase.expected,
     expectationRationale: fixtureCase.expectationRationale,
     observed: {
-      correctness: observedLabel(
+      correctness: judgeOutcome === "completed" ? observedLabel(
         caseResult,
         WORD_CONTEXT_DISCRIMINATION_CORRECTNESS_RUBRIC_ID,
-      ),
-      actionability: observedLabel(
+      ) : null,
+      actionability: judgeOutcome === "completed" ? observedLabel(
         caseResult,
         WORD_CONTEXT_DISCRIMINATION_ACTIONABILITY_RUBRIC_ID,
-      ),
+      ) : null,
     },
     status: caseResult.status,
-    criticalFailures: caseResult.criticalFailures,
-    answerLeakage: caseResult.answerLeakage,
+    judgeOutcome,
+    criticalFailures,
+    answerLeakage: judgeOutcome === "unavailable" ? null : caseResult.answerLeakage ? true
+      : judgeOutcome === "abstained" ? null : false,
     insufficientInformation: caseResult.rawJudgeResult?.insufficientInformation ?? null,
     factualErrors: caseResult.rawJudgeResult?.factualErrors ?? [],
     rawJudgeEvidence: rawJudgeEvidence(caseResult.rawJudgeResult),
@@ -314,6 +328,7 @@ function caseReport(
 function assertReportInputIdentity(
   result: TutorResponseCorpusEvaluationResult,
 ): readonly TutorEvalCaseRunResult[] {
+  assertValidTutorEvalRunResult(result.evaluation);
   if (
     result.corpusId !== WORD_CONTEXT_DISCRIMINATION_FIXTURE_ID ||
     result.corpusVersion !== WORD_CONTEXT_DISCRIMINATION_FIXTURE_VERSION ||
@@ -333,6 +348,17 @@ function assertReportInputIdentity(
     throw new Error("Word-context discrimination Judge identity is invalid.");
   }
   const caseResults = result.evaluation.caseResults;
+  // 固定 case@1.1.1 仅含这两个 Judge rubric；不凭 error 状态或未经校验的 flag 推断可用性。
+  for (const caseResult of caseResults) {
+    const raw = caseResult.rawJudgeResult;
+    if (!hasValidAuthoredAbstention(caseResult, wordContextJudgeCriteria) ||
+        caseResult.rubricResults.some((item) => !wordContextJudgeCriteria.some((criterion) =>
+          item.rubricId === criterion.rubricId && item.category === criterion.category && item.weight === criterion.weight && !item.critical)) ||
+        raw?.rubricResults.some((item) => !wordContextJudgeCriteria.some((criterion) => item.rubricId === criterion.rubricId)) ||
+        (raw !== null && caseResult.answerLeakage !== caseResult.criticalFailures.some((item) => item.type === "answer_leakage"))) {
+      throw new Error("Word-context discrimination evidence source is invalid.");
+    }
+  }
   const expectedRunIndexes = new Set(
     WORD_CONTEXT_DISCRIMINATION_FIXTURES.map((fixtureCase) => fixtureCase.runIndex),
   );
@@ -366,7 +392,7 @@ export function buildWordContextDiscriminationReport(
     return caseReport(fixtureCase, caseResult);
   });
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     fixtureId: WORD_CONTEXT_DISCRIMINATION_FIXTURE_ID,
     fixtureVersion: WORD_CONTEXT_DISCRIMINATION_FIXTURE_VERSION,
     fixtureProvenance: WORD_CONTEXT_DISCRIMINATION_FIXTURE_PROVENANCE,
@@ -387,6 +413,7 @@ export function buildWordContextDiscriminationReport(
       "Developer-authored diagnostic expectations are not human calibration gold.",
       "Observed labels are reported beside expectations; this report does not infer benchmark pass/fail or general Judge accuracy.",
       "The three responses probe one case and one limitation clause only.",
+      "Structured abstention preserves confirmed failures; unknown leakage or failure absence remains unavailable.",
     ],
   };
 }
@@ -406,6 +433,7 @@ export function formatWordContextDiscriminationReport(
     `Fixture: ${report.fixtureId}@${report.fixtureVersion}`,
     `Provenance: ${report.fixtureProvenance}`,
     `Calibration: ${report.calibrationStatus}`,
+    `Report schema: ${report.schemaVersion}`,
     `Dataset: ${report.datasetId}@${report.datasetVersion}`,
     `Case: ${report.caseId}@${report.caseVersion}`,
     `Evaluator: ${report.evaluatorVersion ?? "n/a"}`,
@@ -415,9 +443,12 @@ export function formatWordContextDiscriminationReport(
     "Expected vs observed (diagnostic only; no benchmark pass/fail inferred):",
   ];
   for (const fixtureCase of report.cases) {
+    // 旧 schema 的 error/false 不能升级为已确认的“未泄漏”；保留原字节和已记录的正信号。
+    const legacyUnknown = report.schemaVersion === 1 && fixtureCase.judgeOutcome === undefined && fixtureCase.status === "error";
+    const leakage = legacyUnknown && fixtureCase.answerLeakage !== true ? null : fixtureCase.answerLeakage;
     lines.push(
       `${fixtureCase.fixtureCaseId}: correctness expected ${fixtureCase.expected.correctness} / observed ${labelOrNA(fixtureCase.observed.correctness)}; actionability expected ${fixtureCase.expected.actionability} / observed ${labelOrNA(fixtureCase.observed.actionability)}`,
-      `  status: ${fixtureCase.status}; answer leakage: ${fixtureCase.answerLeakage ? "true" : "false"}; insufficient information: ${fixtureCase.insufficientInformation ?? "n/a"}`,
+      `  status: ${fixtureCase.status}; Judge outcome: ${fixtureCase.judgeOutcome ?? "legacy"}; answer leakage: ${leakage ?? "n/a"}; insufficient information: ${fixtureCase.insufficientInformation ?? "n/a"}`,
       `  expectation: ${fixtureCase.expectationRationale}`,
       "  Judge evidence:",
     );
@@ -430,7 +461,9 @@ export function formatWordContextDiscriminationReport(
         );
       }
     }
-    if (fixtureCase.criticalFailures.length > 0) {
+    if (fixtureCase.criticalFailures === null || (legacyUnknown && fixtureCase.criticalFailures.length === 0)) {
+      lines.push("  Critical failures: n/a");
+    } else if (fixtureCase.criticalFailures.length > 0) {
       lines.push(
         `  Critical failures: ${fixtureCase.criticalFailures.map((failure) => `${failure.type}/${failure.severity}: ${failure.evidence}`).join("; ")}`,
       );

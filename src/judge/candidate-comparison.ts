@@ -4,15 +4,19 @@ import type {
   TutorEvalTokenUsage,
   TutorResponseCorpusEvaluationResult,
 } from "../contracts/index.js";
-import type { TutorEvalDataset } from "../contracts/tutor-eval.js";
+import { partitionTutorEvalRubrics, type TutorEvalDataset } from "../contracts/tutor-eval.js";
 import type { TutorResponseCorpus } from "../contracts/tutor-response-corpus.js";
+import { assertValidTutorEvalRunResult } from "../contracts/tutor-eval-result-validation.js";
+import { hasValidAuthoredAbstention } from "../reporting/tutor-health-abstention-validation.js";
 import {
   runTutorResponseCorpus,
   type TutorEvalJudgeRunOptions,
 } from "../runner/index.js";
 
 export const JUDGE_CANDIDATE_COMPARISON_ID = "judge-candidate-comparison" as const;
-export const JUDGE_CANDIDATE_COMPARISON_VERSION = "0.1.1" as const;
+export const JUDGE_CANDIDATE_COMPARISON_VERSION = "0.1.2" as const;
+
+export type JudgeDiagnosticOutcome = "completed" | "abstained" | "unavailable";
 
 export type JudgeCandidateComparisonJsonValue = string | number | boolean | null;
 export type JudgeCandidateComparisonGenerationProfile = Readonly<
@@ -35,12 +39,14 @@ export interface JudgeCandidateComparisonFixtureObservation {
   readonly expectedLabel: string;
   readonly observedLabel: string | null;
   readonly status: TutorEvalCaseRunResult["status"];
+  /** Legacy observations omit this; an error then remains fail-closed. */
+  readonly judgeOutcome?: JudgeDiagnosticOutcome;
   readonly answerLeakage: boolean | null;
   readonly insufficientInformation: boolean | null;
   readonly criticalFailures: readonly {
     readonly type: string;
     readonly severity: string;
-  }[];
+  }[] | null;
   readonly executionErrorCode: string | null;
   readonly latencyMs: number | null;
   readonly tokenUsage: TutorEvalTokenUsage | null;
@@ -106,6 +112,8 @@ export interface JudgeCandidateComparisonAnswerLeakageDistribution {
 export interface JudgeCandidateComparisonCriticalFailureDistribution {
   readonly counts: Readonly<Record<string, number>>;
   readonly unavailableCount: number;
+  /** Positive signatures from incomplete evidence, included in counts; absence is not inferred. */
+  readonly partialCount?: number;
 }
 
 export interface JudgeCandidateComparisonLabelStability {
@@ -180,7 +188,7 @@ export interface JudgeCandidateComparisonMetrics {
       Record<string, JudgeCandidateComparisonAnswerLeakageStability>
     >;
   };
-  /** Count of known fixture observations outside the modal failure signature. */
+  /** Confirmed signatures, including partial positives, outside the mode; unknown evidence is excluded. */
   readonly criticalFailureDisagreementCount: number;
   readonly insufficientInformation: {
     readonly trueCount: number;
@@ -191,6 +199,8 @@ export interface JudgeCandidateComparisonMetrics {
     readonly count: number;
     readonly byCode: Readonly<Record<string, number>>;
   };
+  /** Optional only for reading historical reports; current writers always emit it. */
+  readonly abstentions?: { readonly count: number };
   readonly latency: {
     readonly perCallMs: readonly (number | null)[];
     readonly meanMs: number | null;
@@ -242,7 +252,7 @@ export interface JudgeCandidateComparisonPairwiseSummary {
 export interface JudgeCandidateComparisonReport {
   readonly schemaVersion: 1;
   readonly comparisonId: typeof JUDGE_CANDIDATE_COMPARISON_ID;
-  readonly comparisonVersion: typeof JUDGE_CANDIDATE_COMPARISON_VERSION;
+  readonly comparisonVersion: typeof JUDGE_CANDIDATE_COMPARISON_VERSION | "0.1.1";
   readonly calibrationStatus: "uncalibrated";
   readonly fixture: {
     readonly id: string;
@@ -340,7 +350,10 @@ function observationsForFixture(
 function validateObservationSet(
   fixture: JudgeCandidateComparisonFixture,
   observations: readonly JudgeCandidateComparisonFixtureObservation[],
+  evaluation: TutorResponseCorpusEvaluationResult,
+  dataset: TutorEvalDataset,
 ): void {
+  assertValidTutorEvalRunResult(evaluation.evaluation);
   if (observations.length !== fixture.expectedFixtureIds.length) {
     throw new Error("Judge candidate comparison fixture observation count is invalid.");
   }
@@ -361,6 +374,48 @@ function validateObservationSet(
       observation.runIndex < 1
     ) {
       throw new Error("Judge candidate comparison fixture observation is invalid.");
+    }
+    if ((observation.judgeOutcome !== undefined && !["completed", "abstained", "unavailable"].includes(observation.judgeOutcome)) ||
+        (observation.judgeOutcome === "completed" && (observation.insufficientInformation !== false || observation.executionErrorCode !== null)) ||
+        (observation.judgeOutcome === "unavailable" && (observation.observedLabel !== null || observation.answerLeakage === false ||
+          observation.criticalFailures?.length === 0)) ||
+        (observation.judgeOutcome === "abstained" && (observation.insufficientInformation !== true ||
+          observation.observedLabel !== null || observation.executionErrorCode !== null || observation.answerLeakage === false ||
+          observation.criticalFailures?.length === 0))) {
+      throw new Error("Judge candidate comparison evidence availability is invalid.");
+    }
+    if (observation.judgeOutcome === undefined && observation.insufficientInformation === true) {
+      throw new Error("Judge candidate comparison abstention outcome is unverified.");
+    }
+    if (observation.judgeOutcome !== undefined) {
+      const sources = evaluation.evaluation.caseResults.filter((item) => item.runIndex === observation.runIndex &&
+        (fixture.caseIdentity === undefined || item.caseId === fixture.caseIdentity.caseId));
+      const source = sources.length === 1 ? sources[0] : undefined;
+      const authored = dataset.cases.find((item) => item.id === source?.caseId && item.version === source.caseVersion);
+      if (source === undefined || authored === undefined) throw new Error("Judge candidate comparison observation source is invalid.");
+      const { judgeRubrics } = partitionTutorEvalRubrics(authored);
+      if ((source.rawJudgeResult !== null && (source.rawJudgeResult.rubricResults.length !== judgeRubrics.length ||
+          source.rawJudgeResult.rubricResults.some((item) => !judgeRubrics.some((rubric) => item.rubricId === rubric.id)))) ||
+          source.rubricResults.some((item) => !authored.evaluatorOnly.rubrics.some((rubric) =>
+            item.rubricId === rubric.id && item.category === rubric.category && item.weight === rubric.weight && item.critical === (rubric.critical ?? false))) ||
+          !hasValidAuthoredAbstention(source, authored.evaluatorOnly.rubrics.map((rubric) => ({ rubricId: rubric.id,
+            evaluationType: judgeRubrics.some((item) => item.id === rubric.id) ? "judge" : "deterministic",
+            ...(rubric.criticalFailure === undefined ? {} : { criticalFailure: rubric.criticalFailure }),
+          })))) throw new Error("Judge candidate comparison observation source is invalid.");
+      const expectedOutcome = source?.rawJudgeResult === null ? "unavailable"
+        : source?.rawJudgeResult?.insufficientInformation === true ? "abstained" : "completed";
+      // 新 outcome 必须绑定已校验的 case/run 来源；旧观察不凭 flag 获得新可信度。
+      if (observation.judgeOutcome !== expectedOutcome ||
+          observation.status !== source.status ||
+          observation.insufficientInformation !== (source.rawJudgeResult?.insufficientInformation ?? null) ||
+          (source.answerLeakage && observation.answerLeakage !== true) ||
+          (!source.answerLeakage && observation.answerLeakage === true) ||
+          (source.criticalFailures.length > 0 && observation.criticalFailures === null) ||
+          (observation.criticalFailures !== null && (observation.criticalFailures.length !== source.criticalFailures.length ||
+            observation.criticalFailures.some((failure) => !source.criticalFailures.some((item) =>
+              item.type === failure.type && item.severity === failure.severity))))) {
+        throw new Error("Judge candidate comparison observation source is invalid.");
+      }
     }
   }
 }
@@ -463,7 +518,8 @@ function mode<T extends string | boolean>(
 function criticalFailureSignature(
   observation: JudgeCandidateComparisonFixtureObservation,
 ): string | null {
-  if (observation.status === "error") {
+  if (observation.criticalFailures === null ||
+      (observation.judgeOutcome === undefined && observation.status === "error")) {
     return null;
   }
   const failures = [...observation.criticalFailures]
@@ -481,15 +537,17 @@ function buildCriticalFailureDistribution(
 ): JudgeCandidateComparisonCriticalFailureDistribution {
   const counts: Record<string, number> = {};
   let unavailableCount = 0;
+  let partialCount = 0;
   for (const observation of observations) {
     const signature = criticalFailureSignature(observation);
     if (signature === null) {
       unavailableCount += 1;
     } else {
       increment(counts, signature);
+      if (observation.judgeOutcome === "abstained" || observation.judgeOutcome === "unavailable") partialCount += 1;
     }
   }
-  return { counts, unavailableCount };
+  return { counts, unavailableCount, ...(partialCount > 0 ? { partialCount } : {}) };
 }
 
 function buildCriticalFailureDisagreementCount(
@@ -628,11 +686,14 @@ function buildCandidateMetrics(
   ).length;
   const executionErrorsByCode: Record<string, number> = {};
   let executionErrorCount = 0;
+  let abstentionCount = 0;
   let trueInsufficientInformation = 0;
   let falseInsufficientInformation = 0;
   let unavailableInsufficientInformation = 0;
   for (const observation of observations) {
-    if (observation.status === "error") {
+    if (observation.judgeOutcome === "abstained") abstentionCount += 1;
+    if (observation.executionErrorCode !== null ||
+        (observation.judgeOutcome === undefined && observation.status === "error")) {
       executionErrorCount += 1;
       increment(executionErrorsByCode, observation.executionErrorCode ?? "evaluation_error");
     }
@@ -684,6 +745,7 @@ function buildCandidateMetrics(
       count: executionErrorCount,
       byCode: executionErrorsByCode,
     },
+    abstentions: { count: abstentionCount },
     latency: {
       perCallMs,
       meanMs: mean(knownLatency),
@@ -818,7 +880,7 @@ export async function runJudgeCandidateComparison(options: {
         runId: `${JUDGE_CANDIDATE_COMPARISON_ID}-${candidate.id}-${repetition}`,
       });
       const observations = fixture.observeEvaluation(evaluation);
-      validateObservationSet(fixture, observations);
+      validateObservationSet(fixture, observations, evaluation, dataset);
       repetitions.push({
         repetition,
         judgeCallCount: calls,
@@ -860,6 +922,7 @@ export async function runJudgeCandidateComparison(options: {
       "Developer-authored diagnostic expectations are not human calibration gold.",
       "Expected-label agreement is descriptive agreement with this fixed probe, not Judge accuracy or calibration.",
       "Execution failure is an availability signal, not an observed rubric label or semantic disagreement.",
+      "Confirmed failure signatures from abstentions are partial evidence; they do not establish absence of other failures.",
       "Run-to-run stability and critical-failure distributions are measured only for the selected fixture and repetition count.",
       "A same-provider Tutor and Judge can share correlated bias; higher agreement does not establish independent reliability.",
       "Token and latency fields are provider-reported or observed measurements; unavailable fields are not estimated.",
@@ -876,6 +939,7 @@ export function formatJudgeCandidateComparisonReport(
 ): string {
   const lines = [
     "Judge candidate comparison report",
+    `Comparison: ${report.comparisonId}@${report.comparisonVersion}`,
     `Fixture: ${report.fixture.id}@${report.fixture.version}`,
     `Dataset: ${report.datasetId}@${report.datasetVersion}`,
     `Evaluator: ${report.evaluatorVersion ?? "n/a"}`,
@@ -901,7 +965,7 @@ export function formatJudgeCandidateComparisonReport(
       const leakageStability = candidate.metrics.stability.answerLeakageByFixture[fixtureId];
       lines.push(
         `  ${fixtureId} modal label: ${labelStability?.modalLabel ?? "n/a"} (${labelStability?.modalShare === null || labelStability === undefined ? "unavailable" : labelStability.modalShare.toFixed(3)}; ${labelStability?.unanimous ? "unanimous" : "not unanimous"})`,
-        `  ${fixtureId} modal leakage: ${leakageStability?.modalLeakage ?? "n/a"} (${leakageStability?.modalShare === null || leakageStability === undefined ? "unavailable" : leakageStability.modalShare.toFixed(3)})`,
+        `  ${fixtureId} modal leakage: ${leakageStability?.modalLeakage ?? "n/a"} (${leakageStability?.modalShare === null || leakageStability === undefined ? "unavailable" : leakageStability.modalShare.toFixed(3)}; observed ${leakageStability?.observedCount ?? "n/a"}; unavailable ${leakageStability?.unavailableCount ?? "n/a"})`,
       );
     }
     lines.push(
@@ -911,10 +975,14 @@ export function formatJudgeCandidateComparisonReport(
       `  exact expected runs: ${candidate.metrics.exactExpectedRunAgreement.agreedCount}/${candidate.metrics.exactExpectedRunAgreement.totalCount}`,
       `  unanimous fixtures: ${candidate.metrics.unanimousFixtureCount}/${candidate.metrics.fixtureCount}`,
       `  critical-failure disagreement count: ${candidate.metrics.criticalFailureDisagreementCount}`,
+      `  critical-failure partial signatures: ${report.comparisonVersion === JUDGE_CANDIDATE_COMPARISON_VERSION
+        ? Object.values(candidate.metrics.criticalFailureDistribution).reduce((count, item) => count + (item.partialCount ?? 0), 0)
+        : "unavailable (legacy report)"}`,
       `  mean/median latency: ${candidate.metrics.latency.meanMs ?? "unavailable"}/${candidate.metrics.latency.medianMs ?? "unavailable"} ms`,
       `  known total tokens: ${candidate.metrics.tokenUsageCoverage.totalTokens.knownTotal} (${candidate.metrics.tokenUsageCoverage.totalTokens.knownCount}/${candidate.metrics.tokenUsageCoverage.totalTokens.plannedCount} observations)`,
       `  complete total tokens: ${candidate.metrics.tokenUsage.totalTokens ?? "unavailable"}`,
-      `  execution errors: ${candidate.metrics.executionErrors.count}`,
+      `  execution errors: ${candidate.metrics.executionErrors.count}${report.comparisonVersion === "0.1.1" ? " (legacy status-based count)" : ""}`,
+      `  structured abstentions: ${candidate.metrics.abstentions?.count ?? "unavailable (legacy report)"}`,
       "",
     );
   }
