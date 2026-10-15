@@ -3,6 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { join } from "node:path";
 
+import OpenAI from "openai";
 import type { Response } from "openai/resources/responses/responses.js";
 
 import {
@@ -229,6 +230,39 @@ test("OpenAI adapter returns a validated result and sanitized metrics only", asy
     promptVersion: baseOptions.promptVersion,
   });
   assert.doesNotMatch(JSON.stringify(evaluation.result), /provider-response-secret|providerResponse/);
+});
+
+test("installed OpenAI SDK serializes the adapter request and parses a synthetic HTTP response on Node 24", async () => {
+  let requests = 0;
+  const client = new OpenAI({
+    apiKey: "synthetic-test-key",
+    baseURL: "https://openai.example.invalid/v1",
+    maxRetries: 0,
+    fetch: async (url, init) => {
+      requests += 1;
+      assert.equal(String(url), "https://openai.example.invalid/v1/responses");
+      assert.equal(init?.method, "POST");
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      assert.equal(body.model, baseOptions.model);
+      assert.equal(body.store, false);
+      assert.equal((body.text as { format: { type: string } }).format.type, "json_schema");
+      // 显式替换 SDK transport；不允许任何真实模型网络请求。
+      return new globalThis.Response(JSON.stringify({
+        id: "synthetic-response", object: "response", status: "completed",
+        output: [{
+          id: "synthetic-message", type: "message", role: "assistant", status: "completed",
+          content: [{ type: "output_text", text: validJudgeResult("provider-case-001"), annotations: [] }],
+        }],
+        usage: { input_tokens: 11, output_tokens: 7, total_tokens: 18 },
+      }), { headers: { "content-type": "application/json" } });
+    },
+  });
+  const judge = createOpenAIJudge({ ...baseOptions, client });
+  const evaluation = await judge.evaluateWithMetrics(judgeInput());
+  assert.equal((evaluation.result as { caseId: string }).caseId, "provider-case-001");
+  assert.deepEqual(evaluation.metrics?.tokenUsage, { inputTokens: 11, outputTokens: 7, totalTokens: 18 });
+  assert.equal(requests, 1);
+  assert.doesNotMatch(JSON.stringify(evaluation), /synthetic-test-key|synthetic-response/u);
 });
 
 test("OpenAI adapter maps invalid, refusal, and incomplete structured output to judge_result_invalid", async () => {

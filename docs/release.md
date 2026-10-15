@@ -50,6 +50,21 @@ Website content is built from repository source. Its current feature and
 fixture descriptions do not attest that those features shipped in npm `0.1.0`,
 or that a particular website build is already deployed.
 
+## Optional OpenAI peer in current source
+
+The current source and tarballs built from it declare OpenAI SDK **exactly
+`7.32.0`** as an optional peer, matching the development dependency. Provider-free
+consumers can omit it. Consumers using the OpenAI adapter must install that
+exact version; an existing `7.23.0` installation does not satisfy the new peer
+contract and can produce an npm peer-resolution conflict. No compatibility with
+older SDK versions is claimed. This contract describes current source, not the
+historical npm `0.1.0` package above.
+
+`npm run test:package` checks an absent peer, the installed `7.32.0` SDK and a
+synthetic `7.23.0` metadata fixture that must fail strict npm peer resolution.
+The fixture checks installation policy only; it does not test the old SDK's
+runtime. Adapter tests use mock transports and do not contact model services.
+
 ## Release candidate validation
 
 Run release validation from the exact source commit intended for review. The

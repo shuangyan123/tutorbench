@@ -15,6 +15,11 @@ updates:
     open-pull-requests-limit: 5
 
   - package-ecosystem: "github-actions"
+    groups:
+      codeql-action:
+        patterns:
+          - "github/codeql-action/init"
+          - "github/codeql-action/analyze"
     directory: "/"
     schedule:
       interval: "weekly"

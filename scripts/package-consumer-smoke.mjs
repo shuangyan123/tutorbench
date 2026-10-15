@@ -537,6 +537,48 @@ console.log("consumer API smoke passed");
         healthServer.close((error) => (error === undefined ? resolveClose() : reject(error)));
       });
     }
+    // 实际安装包验证精确 optional peer；旧版本仅构造元数据以检查 npm 冲突语义。
+    const sdkRoot = join(repositoryRoot, "node_modules", "openai");
+    const sdkManifest = JSON.parse(await readFile(join(sdkRoot, "package.json"), "utf8"));
+    assertCondition(packageJson.peerDependencies.openai === packageJson.devDependencies.openai &&
+      sdkManifest.version === packageJson.peerDependencies.openai &&
+      /^\d+\.\d+\.\d+$/.test(sdkManifest.version) &&
+      packageJson.peerDependenciesMeta.openai.optional === true,
+    "OpenAI must retain an exact matching optional peer contract.");
+    const sdkPack = JSON.parse((await run(npmCommand,
+      [...npmArguments, "pack", sdkRoot, "--pack-destination", packDirectory, "--json", "--ignore-scripts"],
+      consumerRoot, environment)).stdout)[0];
+    await run(npmCommand, [...npmArguments, "install", "--offline", "--ignore-scripts", "--no-audit", "--no-fund",
+      "--no-package-lock", "--strict-peer-deps", join(packDirectory, sdkPack.filename)], consumerRoot, environment);
+    await writeFile(join(consumerRoot, "peer.mjs"), `
+import assert from "node:assert/strict";
+import OpenAI from "openai";
+import { createOpenAIJudge } from "./node_modules/${packageJson.name}/dist/src/providers/openai/index.js";
+const client = new OpenAI({ apiKey: "synthetic-package-key", fetch: async () => { throw new Error("Network forbidden"); } });
+assert.equal(typeof client.responses.create, "function");
+assert.equal(typeof createOpenAIJudge, "function");
+`, "utf8");
+    await run(process.execPath, ["peer.mjs"], consumerRoot, environment);
+
+    const mismatchRoot = join(temporaryRoot, "peer-mismatch");
+    const oldSdkFixture = join(temporaryRoot, "old-sdk-metadata-fixture");
+    await mkdir(mismatchRoot);
+    await mkdir(oldSdkFixture);
+    await writeFile(join(oldSdkFixture, "package.json"), JSON.stringify({ name: "openai", version: "7.23.0" }));
+    const oldPack = JSON.parse((await run(npmCommand,
+      [...npmArguments, "pack", oldSdkFixture, "--pack-destination", packDirectory, "--json", "--ignore-scripts"],
+      mismatchRoot, environment)).stdout)[0];
+    await writeFile(join(mismatchRoot, "package.json"), JSON.stringify({
+      name: "synthetic-old-peer-conflict", private: true,
+      dependencies: { [packageJson.name]: `file:${tarballPath.replaceAll("\\", "/")}`,
+        openai: `file:${join(packDirectory, oldPack.filename).replaceAll("\\", "/")}` },
+    }));
+    const mismatch = await run(npmCommand, [...npmArguments, "install", "--offline", "--ignore-scripts",
+      "--no-audit", "--no-fund", "--no-package-lock", "--strict-peer-deps"], mismatchRoot, environment,
+    { expectedExitCode: 1 });
+    assertCondition(/ERESOLVE/.test(mismatch.stderr) && /peerOptional openai/.test(mismatch.stderr),
+      "npm must reject the synthetic 7.23.0 metadata fixture against the exact OpenAI peer.");
+    console.log(`OpenAI consumer contract passed: absent peer, actual ${sdkManifest.version}, synthetic 7.23.0 conflict.`);
     console.log(`Package consumer smoke passed: ${packInfo.filename}`);
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
