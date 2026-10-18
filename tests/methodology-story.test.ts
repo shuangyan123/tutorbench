@@ -26,12 +26,21 @@ async function createStory(desktop = true, reduced = false) {
     removeAttribute(key: string) { delete this.attributes[key]; }
     getBoundingClientRect() { reads++; return { top: this.top + shift - scrollY, bottom: this.bottom + shift - scrollY }; }
     querySelector(selector: string): Element | null { queries++; return selector === "h3" ? this : selector.includes("current") ? current : null; }
-    querySelectorAll(selector: string) { queries++; return selector.includes("chapter") ? chapters : selector.includes("part") ? Object.values(parts) : labels; }
+    querySelectorAll(selector: string) {
+      queries++;
+      if (selector.includes("chapter")) return chapters;
+      if (selector.includes("part")) return Object.values(parts);
+      if (selector.includes("rail")) return railLinks;
+      if (selector.includes("key")) return keys;
+      return labels;
+    }
   }
   const chapters = Array.from({ length: 5 }, (_, i) => new Element({}, 500 + i * 600));
   const partNames = ["reference", "trace", "deviation", "inspection", "evidence", "guided", "checkpoint-one", "checkpoint-two", "decision", "selected", "alternate", "resolve", "endpoint", "complete"];
   const parts = Object.fromEntries(partNames.map((name) => [name, new Element({ methodPart: name })]));
   const labels = ["correctness", "diagnosis", "guidance", "adaptation", "actionability"].map((name) => new Element({ methodStoryLabel: name }));
+  const railLinks = Array.from({ length: 5 }, () => new Element());
+  const keys = Array.from({ length: 5 }, (_, i) => new Element({ methodStoryKey: String(i) }));
   const story = new Element({}, 400, 3500);
   const current = new Element();
   let observeVisibility = (_entries: { isIntersecting: boolean }[]) => {};
@@ -54,7 +63,7 @@ async function createStory(desktop = true, reduced = false) {
     window: {
       innerHeight: 900,
       get scrollY() { return scrollY; },
-      matchMedia: (query: string) => media[query.includes("901") ? 0 : 1],
+      matchMedia: (query: string) => media[query.includes("1024") ? 0 : 1],
       requestAnimationFrame: (callback: () => void) => { frames.set(++nextFrame, callback); return nextFrame; },
       cancelAnimationFrame: (id: number) => frames.delete(id),
       addEventListener: (name: string, callback: () => void) => listeners.set(name, callback),
@@ -68,7 +77,7 @@ async function createStory(desktop = true, reduced = false) {
   const go = (progress: number) => { scrollY = 50 + progress * 600 + shift; listeners.get("scroll")?.(); flush(); };
   const snapshot = () => JSON.stringify({ parts: Object.fromEntries(Object.entries(parts).map(([name, element]) => [name, [element.style, element.attributes]])), labels: labels.map((label) => label.style), progress: story.dataset.methodStoryProgress });
   return {
-    story, parts, chapters, current, go, flush, snapshot, frames, listeners, media,
+    story, parts, chapters, labels, railLinks, keys, current, go, flush, snapshot, frames, listeners, media,
     get queries() { return queries; },
     get reads() { return reads; },
     emitScroll: () => listeners.get("scroll")?.(),
@@ -165,4 +174,36 @@ test("Methodology disables tracking for fallback and resets cleanly when prefere
   assert.equal(scene.story.dataset.methodStoryProgress, "1.0000");
   scene.go(0);
   assert.equal(scene.parts.complete?.style.visibility, "hidden");
+});
+
+test("Methodology keeps the rail, figure labels and figure key on the active chapter", async () => {
+  const scene = await createStory();
+  scene.go(2.5);
+  assert.equal(scene.story.dataset.methodStoryActiveIndex, "2");
+  assert.deepEqual(scene.railLinks.map((link) => link.dataset.state), ["past", "past", "current", "upcoming", "upcoming"]);
+  assert.deepEqual(scene.railLinks.map((link) => link.attributes["aria-current"]), [undefined, undefined, "step", undefined, undefined]);
+  assert.deepEqual(scene.labels.map((label) => label.dataset.state), ["past", "past", "current", "upcoming", "upcoming"]);
+  assert.deepEqual(scene.keys.map((key) => key.attributes["data-active"] !== undefined), [false, false, true, false, false]);
+  scene.go(.5);
+  assert.equal(scene.railLinks[0]?.attributes["aria-current"], "step");
+  assert.equal(scene.keys[2]?.attributes["data-active"], undefined);
+  assert.equal(scene.keys[0]?.attributes["data-active"], "");
+});
+
+test("Methodology hands a clean, completed drawing back to CSS when tracking stops", async () => {
+  const scene = await createStory();
+  scene.go(1.5);
+  assert.notEqual(scene.parts.guided?.style.strokeDashoffset, "");
+  scene.media[0]!.matches = false;
+  scene.media[0]!.change();
+  for (const part of Object.values(scene.parts)) {
+    for (const property of ["strokeDashoffset", "visibility", "opacity", "strokeWidth", "fillOpacity"]) {
+      assert.equal(part.style[property] ?? "", "");
+    }
+  }
+  assert.equal(scene.parts.inspection?.attributes.r, "4");
+  assert.equal(scene.parts.alternate?.attributes.d, "M382 320C430 320 430 396 478 396");
+  assert.ok(scene.labels.every((label) => label.dataset.state === undefined && label.style.opacity === ""));
+  assert.ok(scene.railLinks.every((link) => link.dataset.state === undefined && link.attributes["aria-current"] === undefined));
+  assert.ok(scene.keys.every((key) => key.attributes["data-active"] === undefined));
 });

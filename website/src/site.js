@@ -297,8 +297,12 @@ let activeSiteLocale =
   const anchors = chapters.map((chapter) => chapter.querySelector('h3') || chapter);
   const parts = Object.fromEntries([...story.querySelectorAll('[data-method-part]')].map((part) => [part.dataset.methodPart, part]));
   const labels = [...story.querySelectorAll('[data-method-story-label]')];
+  const railLinks = [...story.querySelectorAll('[data-method-story-rail-link]')];
+  const keys = [...story.querySelectorAll('[data-method-story-key]')];
   const currentIndex = story.querySelector('[data-method-story-current]');
-  const desktop = window.matchMedia('(min-width: 901px)');
+  // Same boundary as the shared header and the homepage story: below 1024px the
+  // header collapses, so the page switches to the static figure instead.
+  const desktop = window.matchMedia('(min-width: 1024px)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
   let activeIndex = -1;
@@ -325,6 +329,19 @@ let activeSiteLocale =
     chapters.forEach((chapter, chapterIndex) => {
       if (chapterIndex === index) chapter.setAttribute('aria-current', 'step');
       else chapter.removeAttribute('aria-current');
+    });
+    // Rail, figure labels and the figure key share one state per position, so
+    // the text column, the drawing and the navigation always agree.
+    const stateOf = (position) => (position < index ? 'past' : position === index ? 'current' : 'upcoming');
+    railLinks.forEach((link, position) => {
+      link.dataset.state = stateOf(position);
+      if (position === index) link.setAttribute('aria-current', 'step');
+      else link.removeAttribute('aria-current');
+    });
+    labels.forEach((label, position) => { label.dataset.state = stateOf(position); });
+    keys.forEach((key, position) => {
+      if (position === index) key.setAttribute('data-active', '');
+      else key.removeAttribute('data-active');
     });
     story.dataset.methodStoryActiveIndex = String(index);
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = String(index + 1).padStart(2, '0');
@@ -427,6 +444,16 @@ let activeSiteLocale =
     delete story.dataset.methodStoryActiveIndex;
     delete story.dataset.methodStoryProgress;
     chapters.forEach((chapter) => chapter.removeAttribute('aria-current'));
+    // Hand the drawing back to CSS: the static (tablet / reduced-motion) figure
+    // shows the completed state and must not inherit a half-painted frame.
+    Object.values(parts).forEach((part) => {
+      ['strokeDashoffset', 'visibility', 'opacity', 'strokeWidth', 'fillOpacity'].forEach((property) => { part.style[property] = ''; });
+    });
+    parts.inspection.setAttribute('r', '4');
+    parts.alternate.setAttribute('d', 'M382 320C430 320 430 396 478 396');
+    railLinks.forEach((link) => { delete link.dataset.state; link.removeAttribute('aria-current'); });
+    labels.forEach((label) => { delete label.dataset.state; label.style.opacity = ''; });
+    keys.forEach((key) => key.removeAttribute('data-active'));
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = '';
   }
 

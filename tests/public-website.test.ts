@@ -915,6 +915,23 @@ test("static website build emits the public artifact files and route shell", asy
     }
     assert.match(methodologyHtml, /<figcaption class="method-story-center">Observable tutoring behavior<\/figcaption>/u);
     assert.match(methodologyHtml, /data-method-story-current>01/);
+    // The ghost route is a static preview: it must never become an animated part.
+    const ghost = methodologyStorySvg.match(/<g class="method-story-ghost">[\s\S]*?<\/g>/u)?.[0];
+    assert.ok(ghost);
+    assert.doesNotMatch(ghost, /data-method-part/u);
+    // Rail, chapter anchors, figure keys and chapter marks stay one-to-one with the artifact's dimensions.
+    assert.equal((methodologyHtml.match(/data-method-story-rail-link/g) ?? []).length, scoreDimensionCount);
+    assert.equal((methodologyHtml.match(/data-method-story-key=/g) ?? []).length, scoreDimensionCount);
+    assert.equal((methodologyHtml.match(/<svg class="method-story-glyph"/g) ?? []).length, scoreDimensionCount);
+    for (const dimension of artifacts.benchmark.dimensions.score) {
+      assert.match(methodologyHtml, new RegExp(`href="#method-dimension-${dimension}" data-method-story-rail-link`));
+      assert.match(methodologyHtml, new RegExp(`<h3 id="method-dimension-${dimension}">`));
+    }
+    assert.match(methodologyHtml, /<nav class="method-story-rail" aria-label="Jump to a dimension">/u);
+    assert.match(methodologyHtml, /<span class="method-story-label-number">01<\/span><strong>Correctness<\/strong>/u);
+    assert.match(methodologyHtml, /Inspection ring/u);
+    assert.match(methodologyHtml, /not an evaluator order or a score/u);
+    assert.doesNotMatch(methodologyHtml, /method-story-overview/u);
     assert.match(methodologyHtml, /Whether the Tutor stays factually and conceptually correct/);
     assert.match(methodologyHtml, /What we look for/);
     for (const dimension of ["Correctness", "Diagnosis", "Guidance", "Adaptation", "Actionability"]) {
@@ -980,7 +997,7 @@ test("static website build emits the public artifact files and route shell", asy
     const storyScript = siteScript.slice(storyScriptStart, storyScriptEnd);
     assert.match(storyScript, /requestAnimationFrame\(updateActiveChapter\)/);
     assert.match(storyScript, /addEventListener\('scroll', scheduleUpdate, \{ passive: true \}\)/);
-    assert.match(storyScript, /min-width: 901px/);
+    assert.match(storyScript, /min-width: 1024px/);
     assert.match(storyScript, /!desktop\.matches \|\| reducedMotion\.matches/);
     assert.match(storyScript, /data-method-part/);
     assert.match(storyScript, /IntersectionObserver/);
@@ -988,11 +1005,18 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(storyScript, /prefers-reduced-motion: reduce/);
     assert.doesNotMatch(storyScript, /wheel|touchmove|preventDefault/);
     assert.match(methodologyStyles, /\.method-story-stage \{\s*position: sticky;/);
-    assert.match(methodologyStyles, /@media \(max-width: 900px\) \{[\s\S]*?\.method-story-stage \{\s*position: relative;/);
+    assert.match(methodologyStyles, /@media \(max-width: 1023px\) \{[\s\S]*?\.method-story-stage \{\s*position: relative;/);
     assert.match(methodologyStyles, /\.method-story-chapter \{\s*display: flex;\s*min-height: clamp\(450px, 66svh, 660px\);/);
     assert.match(methodologyStyles, /@media \(max-width: 640px\) \{[\s\S]*?\.method-story-stage \{\s*display: none;/);
-    assert.match(methodologyStyles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.method-story-overview \{\s*display: block;/);
-    assert.match(methodologyStyles, /stroke-dasharray: 1 1;\s*stroke-dashoffset: 1;/);
+    // Without scroll tracking (tablet, reduced motion, no script) the figure is shown completed.
+    assert.match(methodologyStyles, /\.method-story:not\(\[data-method-story-enhanced\]\) \.method-story-map \.method-story-draw,[\s\S]*?\{\s*stroke-dashoffset: 0;\s*visibility: visible;/);
+    assert.match(methodologyStyles, /@media \(prefers-reduced-motion: reduce\) and \(min-width: 1024px\) \{[\s\S]*?\.method-story-chapter \{\s*min-height: 0;/);
+    // A gap of 2 keeps an undrawn path's end out of the next dash (no round-cap dot at the end).
+    assert.match(methodologyStyles, /stroke-dasharray: 1 2;\s*stroke-dashoffset: 1;/);
+    // pathLength reveals are only exact in user units; non-scaling strokes leave gaps when scaled up.
+    const storyStrokeRule = methodologyStyles.match(/\.method-story-map path,\s*\.method-story-inspection,\s*\.method-story-endpoint \{[^}]*\}/u)?.[0];
+    assert.ok(storyStrokeRule);
+    assert.doesNotMatch(storyStrokeRule, /vector-effect/u);
     assert.doesNotMatch(storyScript, /classList\.toggle\('is-active'/);
     assert.match(aboutHtml, /<title>About — Teachometry<\/title>/);
     assert.match(aboutHtml, /<body class="about-page">/);
