@@ -353,7 +353,10 @@ function renderMethodologyLens(scoreDimensions: readonly string[], uiLocale: Sit
     '<p class="method-story-number"><span>' + (uiLocale === "zh-CN" ? "维度 " : "DIMENSION ") + number + '</span><span>Score lens</span></p>' +
     '<h3 id="' + methodologyDimensionAnchorId(dimension) + '">' + escapeHtml(details.label) + '</h3>' +
     '<p class="method-story-description">' + escapeHtml(details.description) + '</p>' +
-    '<p class="method-story-lens"><span>What we look for</span>' + escapeHtml(details.lens) + '</p></li>'
+    '<p class="method-story-lens"><span>What we look for</span>' + escapeHtml(details.lens) + '</p>' +
+    // The figure key travels with its chapter: it is the only key wherever the
+    // pinned stage is not tracking (tablet, short windows, reduced motion, no JS).
+    '<p class="method-story-figure-note"><span>In the figure</span>' + escapeHtml(details.figure.note) + '</p></li>'
   ).join("");
   const railMarkup = dimensions.map(({ dimension, details, number }) =>
     '<li><a href="#' + methodologyDimensionAnchorId(dimension) + '" data-method-story-rail-link>' +

@@ -1137,6 +1137,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "What we look for": "我们关注什么",
   "Observable tutoring behavior": "可观察教学行为",
   "Jump to a dimension": "跳转到评测维度",
+  "In the figure": "图中含义",
   "Reference line": "基准线",
   "Inspection ring": "检查环",
   "Guided path": "引导路径",

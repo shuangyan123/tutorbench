@@ -929,6 +929,14 @@ test("static website build emits the public artifact files and route shell", asy
     }
     assert.match(methodologyHtml, /<nav class="method-story-rail" aria-label="Jump to a dimension">/u);
     assert.match(methodologyHtml, /<span class="method-story-label-number">01<\/span><strong>Correctness<\/strong>/u);
+    // Labels carry their anchor as fractions of the drawing (anchored or legend mode share it).
+    assert.match(methodologyHtml, /data-method-story-label="correctness" data-number="01" data-placement="above-start" style="--label-x:0\.0567;--label-y:0\.1361"/u);
+    assert.match(methodologyHtml, /<div class="method-story-canvas" style="--figure-ratio:0\.4900">/u);
+    // Every chapter carries its own figure key, readable wherever the stage is not tracking.
+    assert.equal((methodologyHtml.match(/<p class="method-story-figure-note"><span>In the figure<\/span>/g) ?? []).length, scoreDimensionCount);
+    const zhMethodologyHtml = await readFile(join(outputDirectory, "zh-cn", "methodology", "index.html"), "utf8");
+    assert.equal((zhMethodologyHtml.match(/<p class="method-story-figure-note"><span>图中含义<\/span>/g) ?? []).length, scoreDimensionCount);
+    assert.doesNotMatch(zhMethodologyHtml, /In the figure/u);
     assert.match(methodologyHtml, /Inspection ring/u);
     assert.match(methodologyHtml, /not an evaluator order or a score/u);
     assert.doesNotMatch(methodologyHtml, /method-story-overview/u);
@@ -998,19 +1006,34 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(storyScript, /requestAnimationFrame\(updateActiveChapter\)/);
     assert.match(storyScript, /addEventListener\('scroll', scheduleUpdate, \{ passive: true \}\)/);
     assert.match(storyScript, /min-width: 1024px/);
-    assert.match(storyScript, /!desktop\.matches \|\| reducedMotion\.matches/);
+    assert.match(storyScript, /if \(stacked \|\| !split\.matches \|\| reducedMotion\.matches\) stopTracking\(\);/);
+    // CSS and script gate the pinned split layout on one identical media query.
+    const splitQuery = storyScript.match(/const METHOD_STORY_SPLIT_QUERY = '([^']+)';/u)?.[1];
+    assert.equal(splitQuery, "(min-width: 1024px) and (min-height: 700px)");
+    assert.ok(methodologyStyles.includes(`@media ${splitQuery} {`));
     assert.match(storyScript, /data-method-part/);
     assert.match(storyScript, /IntersectionObserver/);
     assert.match(storyScript, /ResizeObserver/);
     assert.match(storyScript, /prefers-reduced-motion: reduce/);
     assert.doesNotMatch(storyScript, /wheel|touchmove|preventDefault/);
-    assert.match(methodologyStyles, /\.method-story-stage \{\s*position: sticky;/);
-    assert.match(methodologyStyles, /@media \(max-width: 1023px\) \{[\s\S]*?\.method-story-stage \{\s*position: relative;/);
-    assert.match(methodologyStyles, /\.method-story-chapter \{\s*display: flex;\s*min-height: clamp\(450px, 66svh, 660px\);/);
+    // The stage is in normal flow by default and only pinned inside the gated split layout,
+    // which a measured "stacked" fallback switches off.
+    assert.match(methodologyStyles, /\.method-story-stage \{\s*position: relative;\s*order: -1;/);
+    assert.equal((methodologyStyles.match(/position: sticky/g) ?? []).length, 1);
+    assert.match(methodologyStyles, /@media \(min-width: 1024px\) and \(min-height: 700px\) \{[\s\S]*?\.method-story:not\(\[data-method-story-layout="stacked"\]\) \.method-story-stage \{\s*position: sticky;/);
+    assert.match(methodologyStyles, /\.method-story:not\(\[data-method-story-layout="stacked"\]\) \.method-story-chapter \{\s*display: flex;\s*min-height: clamp\(450px, 66svh, 660px\);/);
     assert.match(methodologyStyles, /@media \(max-width: 640px\) \{[\s\S]*?\.method-story-stage \{\s*display: none;/);
     // Without scroll tracking (tablet, reduced motion, no script) the figure is shown completed.
     assert.match(methodologyStyles, /\.method-story:not\(\[data-method-story-enhanced\]\) \.method-story-map \.method-story-draw,[\s\S]*?\{\s*stroke-dashoffset: 0;\s*visibility: visible;/);
-    assert.match(methodologyStyles, /@media \(prefers-reduced-motion: reduce\) and \(min-width: 1024px\) \{[\s\S]*?\.method-story-chapter \{\s*min-height: 0;/);
+    assert.match(methodologyStyles, /@media \(prefers-reduced-motion: reduce\) and \(min-width: 1024px\) and \(min-height: 700px\) \{[\s\S]*?\.method-story-chapter \{\s*min-height: 0;/);
+    // Enlarged text: the rail wraps by content instead of five fixed columns, and the legend
+    // mode keeps only numbers on the drawing with the names flowing beneath it.
+    const railList = methodologyStyles.match(/\.method-story-rail ol \{[^}]*\}/u)?.[0];
+    assert.ok(railList);
+    assert.match(railList, /flex-wrap: wrap;/u);
+    assert.doesNotMatch(railList, /grid-auto-flow: column/u);
+    assert.match(methodologyStyles, /\.method-story\[data-method-story-labels="legend"\] \.method-story-labels \{\s*position: static;\s*display: flex;\s*flex-wrap: wrap;/);
+    assert.match(methodologyStyles, /\.method-story\[data-method-story-labels="legend"\] \.method-story-label-number \{\s*position: absolute;/);
     // A gap of 2 keeps an undrawn path's end out of the next dash (no round-cap dot at the end).
     assert.match(methodologyStyles, /stroke-dasharray: 1 2;\s*stroke-dashoffset: 1;/);
     // pathLength reveals are only exact in user units; non-scaling strokes leave gaps when scaled up.

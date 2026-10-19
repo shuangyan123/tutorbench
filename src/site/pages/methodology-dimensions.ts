@@ -40,8 +40,8 @@ function labelAnchor(dimension: string, index: number): LabelAnchor {
   return labelAnchors[dimension] ?? { x: 58 + index * 120, y: 398, placement: "below" };
 }
 
-function percent(value: number, origin: number, size: number): string {
-  return `${(((value - origin) / size) * 100).toFixed(3)}%`;
+function fraction(value: number, origin: number, size: number): string {
+  return ((value - origin) / size).toFixed(4);
 }
 
 export function methodologyDimensionAnchorId(dimension: string): string {
@@ -51,7 +51,9 @@ export function methodologyDimensionAnchorId(dimension: string): string {
 export function renderMethodologyLensArt(dimensions: readonly LensDimension[]): string {
   const labels = dimensions.map(({ dimension, number, details }, index) => {
     const { x, y, placement } = labelAnchor(dimension, index);
-    return `<span class="method-story-label" data-method-story-label="${escapeHtml(dimension)}" data-placement="${placement}" style="left:${percent(x, VIEW.x, VIEW.width)};top:${percent(y, VIEW.y, VIEW.height)}"><span class="method-story-label-number">${number}</span><strong>${escapeHtml(details.label)}</strong></span>`;
+    // Anchors are fractions of the drawing, so CSS can place either the whole
+    // label (anchored mode) or only its number (legend mode) on the element.
+    return `<span class="method-story-label" data-method-story-label="${escapeHtml(dimension)}" data-number="${number}" data-placement="${placement}" style="--label-x:${fraction(x, VIEW.x, VIEW.width)};--label-y:${fraction(y, VIEW.y, VIEW.height)}"><span class="method-story-label-number">${number}</span><strong>${escapeHtml(details.label)}</strong></span>`;
   }).join("");
 
   // 同一视觉世界：基准/轨迹贯穿五章，偏离点 (242,242) 原位扩成检查环。
@@ -59,7 +61,7 @@ export function renderMethodologyLensArt(dimensions: readonly LensDimension[]): 
   // 选定分支保留；另一分支在最后一章连续收拢到它，随后延伸到固定终点 (580,320)。
   // 这是互补评分视角的视觉比喻，不代表评估器执行顺序或真实评分结果。
   // 虚线 ghost 预先勾出完整路线，让前几章的画面不显得残缺；它不参与动画。
-  return `<div class="method-story-canvas"><svg class="method-story-map" viewBox="${VIEW.x} ${VIEW.y} ${VIEW.width} ${VIEW.height}" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
+  return `<div class="method-story-canvas" style="--figure-ratio:${(VIEW.height / VIEW.width).toFixed(4)}"><svg class="method-story-map" viewBox="${VIEW.x} ${VIEW.y} ${VIEW.width} ${VIEW.height}" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
     <g class="method-story-reference" data-method-part="reference">
       <path d="M58 166H588"/>
       <path class="method-story-ticks" d="M58 160V172M150 162V170M242 160V172M334 162V170M426 162V170M518 162V170M588 160V172"/>
