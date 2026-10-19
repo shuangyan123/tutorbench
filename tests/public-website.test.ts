@@ -103,11 +103,16 @@ test("public footer aligns Resources beneath centered Results without duplicatin
   assert.doesNotMatch(footer, /x\.com|footer-social-link|@1Shuangyan36877|class="github-link"|Join the community|>Home<|>Benchmark<|>Method<|>Results<|>Cases<|>About<|>Blog</u);
 
   const styles = await readFile(join(process.cwd(), "website", "src", "teachometry.css"), "utf8");
+  // Results stays at the centre of the navigation (equal outer columns) and the
+  // navigation at the centre of the page while both header sides have room
+  // (equal flex sides). The navigation is in normal flow, so it can never sit
+  // under the header tools; see scripts/website-hit-test.mjs.
   assert.match(
     styles,
-    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?left: 50%;[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto minmax\(0, 1fr\);[\s\S]*?transform: translateX\(-50%\);/u,
+    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?position: static;[\s\S]*?grid-template-columns: minmax\(min-content, 1fr\) auto minmax\(min-content, 1fr\);/u,
   );
-  assert.match(styles, /\.home-header \.nav-center \{[\s\S]*?justify-self: center;/u);
+  assert.match(styles, /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.wordmark \{\s*flex: 1 1 0;\s*min-width: fit-content;/u);
+  assert.match(styles, /@media \(min-width: 1024px\)[\s\S]*?\.home-header-tools \{\s*flex: 1 1 0;\s*min-width: fit-content;/u);
   assert.match(
     styles,
     /@media \(min-width: 1024px\)[\s\S]*?\.footer-nav-band \{[\s\S]*?left: 50%;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?transform: translateX\(-50%\);/u,
@@ -297,20 +302,12 @@ test("shared public header is consistent, localized, and exposes language contro
   assert.ok(compactHeaderStyles.includes('.home-header .nav-links[data-open="true"] ~ .home-header-tools { display: flex;'));
   assert.ok(compactHeaderStyles.includes("grid-template-columns: repeat(2, minmax(0, 1fr));"));
   assert.match(chromeStyles, /@media \(max-width: 1100px\) and \(min-width: 1024px\) \{[\s\S]*?\.home-header \.header-inner/);
-  assert.match(
-    chromeStyles,
-    /@media \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: clamp\(500px, 36vw, 580px\);[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto minmax\(0, 1fr\);[\s\S]*?column-gap: 26px;/u,
-  );
-  assert.match(chromeStyles, /\.home-header \.nav-group-left \{[\s\S]*?justify-content: flex-end;/u);
-  assert.match(chromeStyles, /\.home-header \.nav-group-right \{[\s\S]*?justify-content: flex-start;/u);
-  assert.match(
-    chromeStyles,
-    /@media \(max-width: 1100px\) and \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-links \{[\s\S]*?width: 470px;[\s\S]*?column-gap: 20px;[\s\S]*?font-size: 11px;/u,
-  );
-  assert.match(
-    chromeStyles,
-    /@media \(max-width: 1100px\) and \(min-width: 1024px\)[\s\S]*?\.home-header \.nav-group \{[\s\S]*?gap: 18px;/u,
-  );
+  const desktopHeaderStyles = chromeStyles.slice(chromeStyles.indexOf("@media (min-width: 1024px) {"), compactHeaderStart);
+  assert.match(desktopHeaderStyles, /\.home-header \.nav-links \{[\s\S]*?grid-template-columns: minmax\(min-content, 1fr\) auto minmax\(min-content, 1fr\);[\s\S]*?column-gap: 24px;/u);
+  assert.doesNotMatch(desktopHeaderStyles, /\.home-header \.nav-links \{[^}]*(?:position: absolute|left: 50%|width: \d+px|font-size: 11px)/u);
+  // Each nav group wraps its own links when text grows; the left group hugs the centre.
+  assert.match(desktopHeaderStyles, /\.home-header \.nav-group \{\s*display: flex;\s*flex-wrap: wrap;/u);
+  assert.match(desktopHeaderStyles, /\.home-header \.nav-group-left \{[\s\S]*?justify-content: flex-end;/u);
   assert.match(
     chromeStyles,
     /@media \(width < 1024px\)[\s\S]*?\.home-header \.nav-group \{[\s\S]*?display: contents;/u,
@@ -784,7 +781,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /src="\/assets\/site\.js"/);
     assert.match(homeHtml, /src="\/assets\/brand\/tutorbench\/web\/tutorbench-mark-small\.svg"/);
     assert.match(homeHtml, /TutorBench/);
-    assert.match(homeHtml, /AI teaching evaluation/);
+    assert.match(homeHtml, /AI tutor evaluation/);
     assert.match(homeHtml, /Measurement infrastructure/);
     assert.match(homeHtml, /rel="icon" href="\/assets\/brand\/tutorbench\/raster\/favicon\.ico"/);
     assert.match(homeHtml, /rel="icon" type="image\/png" sizes="32x32" href="\/assets\/brand\/tutorbench\/raster\/favicon-32\.png"/);

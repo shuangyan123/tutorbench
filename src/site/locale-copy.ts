@@ -73,7 +73,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "New here?": "第一次来？",
   "Try one teaching case": "体验一个教学案例",
   "A constructed example. About 60 seconds, nothing to install, not a model evaluation.": "人工编写的示例，约 60 秒，无需安装，也不是模型评测。",
-  "An AI teaching quality evaluation product by Teachometry.": "Teachometry 旗下的 AI 教学质量评测产品。",
+  "An AI tutoring quality evaluation product by Teachometry.": "Teachometry 旗下的 AI 教学质量评测产品。",
   "Where to go next": "接下来可以",
   "Run a real evaluation with TutorBench": "使用 TutorBench 运行真实评测",
   "Evaluate your own AI Tutor on your machine. Requires the repository and Node.js.": "在你自己的环境中评测 AI Tutor，需要仓库源码和 Node.js。",

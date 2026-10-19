@@ -289,6 +289,30 @@ let activeSiteLocale =
   update(false);
 })();
 
+// Sticky content (Methodology stage, homepage story, anchor jumps) sits below the
+// sticky header. On desktop the header can wrap to more than one row (narrow
+// desktop widths, enlarged text), so publish its real height as
+// --teach-header-offset instead of trusting the 88px design height.
+(() => {
+  const header = document.querySelector('header.home-header');
+  if (!(header instanceof HTMLElement) || typeof ResizeObserver === 'undefined') return;
+  const root = document.documentElement;
+  const desktop = window.matchMedia('(min-width: 1024px)');
+  let current = '';
+  const sync = () => {
+    const next = desktop.matches ? `${Math.ceil(header.getBoundingClientRect().height)}px` : '';
+    if (next === current) return;
+    current = next;
+    if (next) root.style.setProperty('--teach-header-offset', next);
+    else root.style.removeProperty('--teach-header-offset');
+    // Layout that depends on the offset (the Methodology stage fit) re-checks.
+    window.dispatchEvent(new window.Event('teach:header-offset'));
+  };
+  new ResizeObserver(sync).observe(header);
+  desktop.addEventListener('change', sync);
+  sync();
+})();
+
 (() => {
   const story = document.querySelector('[data-method-story]');
   if (!(story instanceof HTMLElement)) return;
@@ -540,6 +564,7 @@ let activeSiteLocale =
   const stageSize = new ResizeObserver(scheduleLayout);
   if (stage instanceof HTMLElement) stageSize.observe(stage);
   window.addEventListener('resize', scheduleLayout);
+  window.addEventListener('teach:header-offset', scheduleLayout);
   document.fonts.ready.then(() => { invalidateLayout(); scheduleLayout(); });
   split.addEventListener('change', syncLayout);
   reducedMotion.addEventListener('change', syncLayout);

@@ -248,7 +248,7 @@ const translations: Record<SiteLocale, Record<SiteUiTextKey, string>> = {
     blogNav: "Blog",
     getStarted: "Get Started",
     menu: "Menu",
-    productDescriptor: "AI teaching evaluation",
+    productDescriptor: "AI tutor evaluation",
     lightTheme: "Light theme",
     darkTheme: "Dark theme",
     githubRepository: "GitHub repository",

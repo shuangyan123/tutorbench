@@ -9,10 +9,13 @@ from the Node 22 published package and mark Tutor Health as repository-only.
 See [release channels](../docs/release.md#installation-channels). A local
 website build does not establish that those changes are deployed.
 
-The public header presents **Teachometry** as the product/project identity and
-uses the TutorBench T1 trajectory mark for the open-source evaluation engine. The website build copies the canonical SVG
-variants and supplied favicon files into `assets/brand/tutorbench/`; it does
-not redraw or rasterize the primary mark.
+**Teachometry** is the parent brand and has no approved logo yet, so the shared
+header and footer set its name as text. **TutorBench** is Teachometry's AI tutor
+evaluation product; its T1 trajectory mark appears only beside the TutorBench
+name ("TutorBench · AI tutor evaluation" in the header, "An AI tutoring quality
+evaluation product by Teachometry." in the footer). The website build copies
+the canonical SVG variants and supplied favicon files into
+`assets/brand/tutorbench/`; it does not redraw or rasterize the primary mark.
 
 ```text
 benchmark core
@@ -26,7 +29,14 @@ Build or serve it from the repository root:
 ```bash
 npm run website:build
 npm run website:dev
+npm run test:website:hit   # real-browser click/hit test (needs Chrome or CHROME_PATH)
 ```
+
+The hit test serves the build, drives a local Chrome/Chromium through the
+DevTools protocol and checks that every visible header control and the three
+homepage paths own their own click area (centre and edges), including at
+1024/1100/1440 px, in both locales and with 200% text. CI runs it after the
+website build.
 
 `website/dist/` is generated and ignored. The build does not require
 `OPENAI_API_KEY`, does not call a Judge, and does not include model rankings or

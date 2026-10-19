@@ -146,7 +146,7 @@ function renderHomeBlog(uiLocale: SiteLocale, blogPosts: readonly BlogPostSummar
 export function renderTeachometryFooter({ benchmark, models }: PublicBenchmarkArtifacts): string {
   return `<footer class="home-footer"><div class="shell">
       <div class="home-footer-main">
-        <div class="home-footer-identity"><a class="home-footer-brand" href="/">Teachometry</a><p class="home-footer-product"><img src="/assets/brand/tutorbench/web/tutorbench-mark-small.svg" width="16" height="16" alt=""><span><strong>TutorBench</strong> <span>An AI teaching quality evaluation product by Teachometry.</span></span></p><span class="footer-descriptor">Open source for better learning.</span></div>
+        <div class="home-footer-identity"><a class="home-footer-brand" href="/">Teachometry</a><p class="home-footer-product"><img src="/assets/brand/tutorbench/web/tutorbench-mark-small.svg" width="16" height="16" alt=""><span><strong>TutorBench</strong> <span>An AI tutoring quality evaluation product by Teachometry.</span></span></p><span class="footer-descriptor">Open source for better learning.</span></div>
         <div class="footer-nav-band">
           <nav class="footer-column" aria-label="Product"><span class="footer-column-title">Product</span><a href="/run/">Run</a><a href="/models/">Models</a></nav>
           <nav class="footer-column" aria-label="Resources"><span class="footer-column-title">Resources</span><a href="/docs/">Documentation</a><a href="/community/">Community</a></nav>

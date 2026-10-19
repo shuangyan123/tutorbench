@@ -43,6 +43,9 @@
   --teach-gutter-tablet: 32px;
   --teach-gutter-mobile: 18px;
   --teach-header-height: 88px;
+  /* Actual height of the sticky header, for content that must stay below it.
+     site.js keeps it exact at desktop widths, where the header can wrap. */
+  --teach-header-offset: var(--teach-header-height);
   --teach-wordmark-size: 29px;
   --teach-control-size: 29px;
   --teach-icon-size: 18px;
@@ -217,7 +220,10 @@ body:is(
   .run-page,
   .docs-page
 ) .home-header .wordmark {
-  flex-shrink: 0;
+  /* May shrink (and its product line wrap) when enlarged text no longer fits
+     the row, instead of pushing the header past the viewport. */
+  flex: 0 1 auto;
+  min-width: 0;
   align-items: center;
   gap: 10px;
   color: var(--accent);
@@ -245,10 +251,14 @@ body:is(
    ever appears beside the TutorBench name. */
 .home-header .wordmark-product {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 5px;
-  margin-top: 4px;
-  white-space: nowrap;
+  gap: 2px 6px;
+  margin-top: 5px;
+}
+
+.home-header .wordmark-name {
+  overflow-wrap: anywhere;
 }
 
 .home-header .wordmark-product-mark {
@@ -258,22 +268,30 @@ body:is(
   height: 16px;
 }
 
+/* Product line at a normal reading size: the TutorBench name and what it is. */
 .home-header .wordmark-product-name {
   color: var(--ink);
-  font: 600 11px/1 var(--teach-sans);
+  font: 600 12px/1.35 var(--teach-sans);
   letter-spacing: 0;
 }
 
 .home-header .wordmark-product-note {
   color: var(--muted);
-  text-transform: uppercase;
-  font: 600 7px/1 var(--teach-mono);
-  letter-spacing: 0.14em;
+  font: 400 12px/1.35 var(--teach-sans);
+  letter-spacing: 0;
 }
 
 .home-header .wordmark-product-note::before {
   content: "·";
-  margin-right: 5px;
+  margin-right: 6px;
+}
+
+/* Very narrow screens keep "Teachometry" and the TutorBench name and mark; the
+   descriptive phrase is dropped here and stated in full in the footer. */
+@media (max-width: 359px) {
+  .home-header .wordmark-product-note {
+    display: none;
+  }
 }
 
 body:is(
@@ -935,6 +953,16 @@ body.case-detail-page main .shell {
 }
 
 @media (min-width: 1024px) {
+  /* Header in normal flow: wordmark, navigation and tools each keep their own
+     box. The old absolutely centred navigation could sit under the tools (1024px
+     About/Blog under the language selector). Now:
+     - the two sides share the free space equally (flex: 1 1 0), so with room
+       to spare the navigation is centred on the page as before;
+     - neither side shrinks below its content (min-width: fit-content), so when
+       space is short the navigation shifts instead of being covered;
+     - when the row cannot hold all three, it wraps in DOM order (the tools move
+       to a second row), and a part wider than the whole row wraps internally.
+     Focus order stays equal to visual order. */
   body:is(
     .home-page,
     .methodology-page,
@@ -950,6 +978,30 @@ body.case-detail-page main .shell {
   ) .home-header .header-inner {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    column-gap: 24px;
+    row-gap: 8px;
+    height: auto;
+    padding-block: 10px;
+  }
+
+  body:is(
+    .home-page,
+    .methodology-page,
+    .results-page,
+    .cases-page,
+    .case-detail-page,
+    .about-page,
+    .blog-page,
+    .models-page,
+    .model-detail-page,
+    .run-page,
+    .docs-page
+  ) .home-header .wordmark {
+    flex: 1 1 0;
+    min-width: fit-content;
   }
 
   body:is(
@@ -965,14 +1017,16 @@ body.case-detail-page main .shell {
     .run-page,
     .docs-page
   ) .home-header .nav-links {
-    position: absolute;
-    left: 50%;
-    width: clamp(500px, 36vw, 580px);
+    position: static;
+    flex: 0 1 auto;
+    width: auto;
+    /* Equal outer columns keep "Results" at the centre of the navigation (and so
+       of the page when both sides have room), as in the original design. */
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-columns: minmax(min-content, 1fr) auto minmax(min-content, 1fr);
     align-items: center;
-    column-gap: 26px;
-    transform: translateX(-50%);
+    column-gap: 24px;
+    transform: none;
   }
 
   body:is(
@@ -989,8 +1043,10 @@ body.case-detail-page main .shell {
     .docs-page
   ) .home-header .nav-group {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 24px;
+    column-gap: 24px;
+    row-gap: 2px;
   }
 
   body:is(
@@ -1021,40 +1077,12 @@ body.case-detail-page main .shell {
     .model-detail-page,
     .run-page,
     .docs-page
-  ) .home-header .nav-group-right {
-    justify-content: flex-start;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-    .run-page,
-    .docs-page
-  ) .home-header .nav-center {
-    justify-self: center;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-    .run-page,
-    .docs-page
   ) .home-header-tools {
-    margin-left: auto;
+    flex: 1 1 0;
+    min-width: fit-content;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 8px;
   }
 
   body:is(
@@ -1101,6 +1129,14 @@ body.case-detail-page main .shell {
   }
 }
 
+/* Without script the measured offset is unavailable; in this range the English
+   header wraps to two rows (about 124px), so sticky content stays below it. */
+@media (min-width: 1024px) and (max-width: 1099px) {
+  :root {
+    --teach-header-offset: 124px;
+  }
+}
+
 @media (max-width: 1100px) and (min-width: 1024px) {
   body:is(
     .home-page,
@@ -1117,42 +1153,7 @@ body.case-detail-page main .shell {
   ) .home-header .header-inner {
     width: calc(100% - (var(--teach-gutter-tablet) * 2));
     max-width: none;
-    gap: 16px;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-    .run-page,
-    .docs-page
-  ) .home-header .nav-links {
-    width: 470px;
-    min-width: 0;
-    column-gap: 20px;
-    font-size: 11px;
-  }
-
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-    .run-page,
-    .docs-page
-  ) .home-header .nav-group {
-    gap: 18px;
+    column-gap: 16px;
   }
 
   body:is(
@@ -1233,10 +1234,6 @@ body.case-detail-page main .shell {
   .docs-page
   ) .home-header .wordmark-name {
     font-size: 26px;
-  }
-
-  .home-header .wordmark-product-note {
-    font-size: 6px;
   }
 
   body:is(
@@ -1788,10 +1785,10 @@ body:is(
   display: flex;
   align-items: flex-start;
   gap: 7px;
-  max-width: 240px;
+  max-width: 260px;
   margin: 0;
   color: var(--muted);
-  font: 11px/1.45 var(--teach-sans);
+  font: 12px/1.45 var(--teach-sans);
 }
 
 .home-footer-product img {

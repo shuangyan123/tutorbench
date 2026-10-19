@@ -163,8 +163,9 @@ function structuredDataForPage(
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
+        // TutorBench is a product of Teachometry, not another name for this
+        // site, so it is not declared as an alternateName.
         name: "Teachometry",
-        alternateName: "TutorBench",
         url: canonicalUrl,
         description: page.description,
       },

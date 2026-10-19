@@ -22,7 +22,8 @@ const html = new Map<string, string>();
 
 test.before(async () => {
   outputDirectory = await mkdtemp(join(tmpdir(), "tutorbench-brand-entry-"));
-  await buildWebsite({ outputDirectory });
+  // siteUrl as in the production build, so canonical URLs and JSON-LD are emitted.
+  await buildWebsite({ outputDirectory, siteUrl: "https://teachometry.com" });
   for (const { prefix } of LOCALES) {
     for (const page of PAGES) html.set(prefix + page, await readFile(join(outputDirectory, prefix, page, "index.html"), "utf8"));
   }
@@ -67,12 +68,12 @@ test("Teachometry is a text wordmark and the TutorBench mark only sits beside th
   }
 });
 
-test("header and footer say that TutorBench is Teachometry's AI teaching evaluation product, in both locales", () => {
+test("header and footer say that TutorBench is Teachometry's AI tutor evaluation product, in both locales", () => {
   const en = html.get("") ?? "";
   const zh = html.get("zh-cn/") ?? "";
-  assert.match(en, /<span class="wordmark-product-note"><span data-ui-text="productDescriptor"[^>]*>AI teaching evaluation<\/span>/u);
+  assert.match(en, /<span class="wordmark-product-note"><span data-ui-text="productDescriptor"[^>]*>AI tutor evaluation<\/span>/u);
   assert.match(zh, /<span class="wordmark-product-note"><span data-ui-text="productDescriptor"[^>]*>AI 教学质量评测<\/span>/u);
-  assert.match(en, /<strong>TutorBench<\/strong> <span>An AI teaching quality evaluation product by Teachometry\.<\/span>/u);
+  assert.match(en, /<strong>TutorBench<\/strong> <span>An AI tutoring quality evaluation product by Teachometry\.<\/span>/u);
   assert.match(zh, /<strong>TutorBench<\/strong> <span>Teachometry 旗下的 AI 教学质量评测产品。<\/span>/u);
   assert.match(en, /<span>Teachometry · TutorBench · <span>Developer Preview<\/span><\/span>/u);
   assert.match(en, /With TutorBench, Teachometry turns authored learning situations/u);
@@ -125,4 +126,83 @@ test("Micro-Review ends with the two formal paths, localized, without changing i
     assert.ok(page.indexOf('class="micro-review-boundary"') < page.indexOf('class="micro-review-next"'));
     assert.match(page, prefix === "" ? /It is not sent to a server or saved\./u : /不发送到服务器、不保存/u);
   }
+});
+
+test("home JSON-LD names the Teachometry site without declaring TutorBench as its alias", () => {
+  for (const { prefix } of LOCALES) {
+    const page = html.get(prefix) ?? "";
+    const blocks = [...page.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gu)].map((match) => JSON.parse(match[1] ?? "null"));
+    const nodes = blocks.flatMap((block) => (Array.isArray(block) ? block : Array.isArray(block?.["@graph"]) ? block["@graph"] : [block]));
+    const site = nodes.find((node) => node?.["@type"] === "WebSite");
+    assert.ok(site, `${prefix}: WebSite node`);
+    assert.equal(site.name, "Teachometry");
+    assert.equal(site.alternateName, undefined, "TutorBench is a product, not another name for the site");
+    for (const node of nodes) {
+      assert.equal(node?.logo, undefined, "no unconfirmed logo");
+      assert.notEqual(node?.alternateName, "TutorBench");
+    }
+  }
+});
+
+// Source-level guards for the layout rules behind the real-browser hit test
+// (scripts/website-hit-test.mjs, run in CI), so a regression is also caught here.
+const css = async (file: string) => readFile(join("website", "src", file), "utf8");
+const rule = (source: string, selector: RegExp): string => {
+  const match = source.match(new RegExp(`${selector.source}\\s*\\{([^}]*)\\}`, selector.flags));
+  assert.ok(match, `missing rule ${selector}`);
+  return match[1] ?? "";
+};
+
+test("homepage path units wrap instead of shrinking under their buttons", async () => {
+  const home = await css("home.css");
+  assert.match(rule(home, /^\.home-actions/mu), /flex-wrap: wrap;/u);
+  const unit = rule(home, /^\.home-action/mu);
+  assert.doesNotMatch(unit, /min-width:\s*0/u, "a unit narrower than its button lets the button overlap the next unit");
+  assert.match(unit, /max-width: 100%;/u);
+  const button = rule(home, /^\.home-page \.home-action \.button/mu);
+  assert.match(button, /white-space: normal;/u);
+  assert.match(button, /max-width: 100%;/u);
+});
+
+test("desktop header keeps navigation in flow and lets rows wrap instead of overlapping the tools", async () => {
+  const chrome = await css("teachometry.css");
+  const desktop = chrome.slice(chrome.indexOf("@media (min-width: 1024px) {"), chrome.indexOf("@media (min-width: 1024px) and (max-width: 1099px) {"));
+  assert.ok(desktop.length > 0);
+  assert.match(rule(desktop, /\) \.home-header \.header-inner/u), /flex-wrap: wrap;[\s\S]*height: auto;/u);
+  const nav = rule(desktop, /\) \.home-header \.nav-links/u);
+  assert.match(nav, /position: static;/u);
+  assert.match(nav, /grid-template-columns: minmax\(min-content, 1fr\) auto minmax\(min-content, 1fr\);/u, "columns never shrink below their links");
+  assert.doesNotMatch(nav, /position: absolute|left: 50%/u, "an absolutely centred nav can sit under the tools");
+  assert.match(rule(desktop, /\) \.home-header \.nav-group/u), /flex-wrap: wrap;/u);
+  for (const side of [/\) \.home-header \.wordmark/u, /\) \.home-header-tools/u]) {
+    assert.match(rule(desktop, side), /min-width: fit-content;/u, "header sides never shrink under their content");
+  }
+  assert.match(rule(desktop, /\) \.home-header-tools/u), /flex-wrap: wrap;/u);
+  assert.doesNotMatch(chrome, /\.home-header \.nav-links \{[^}]*font-size: 11px/u, "no further font shrinking for the narrow desktop range");
+});
+
+test("sticky content follows the real header height, which site.js publishes on desktop", async () => {
+  const site = await readFile(join("website", "src", "site.js"), "utf8");
+  assert.match(site, /root\.style\.setProperty\('--teach-header-offset'/u);
+  assert.match(site, /new ResizeObserver\(sync\)\.observe\(header\)/u);
+  assert.match(site, /window\.addEventListener\('teach:header-offset', scheduleLayout\)/u);
+  for (const file of ["home.css", "methodology.css"]) {
+    const source = await css(file);
+    assert.doesNotMatch(source, /calc\(var\(--teach-header-height(?:, 72px)?\) [+-]/u, `${file}: offsets use --teach-header-offset`);
+    assert.match(source, /var\(--teach-header-offset, var\(--teach-header-height/u);
+  }
+});
+
+test("the header product line is set at a readable size", async () => {
+  const chrome = await css("teachometry.css");
+  for (const selector of [/^\.home-header \.wordmark-product-name/mu, /^\.home-header \.wordmark-product-note/mu]) {
+    const size = Number(rule(chrome, selector).match(/font: \d+ (\d+)px/u)?.[1]);
+    assert.ok(size >= 12, `${selector} is ${size}px`);
+  }
+  assert.doesNotMatch(chrome, /\.wordmark-product-note \{\s*font-size: [67]px/u);
+});
+
+test("CI runs the real-browser hit test after building the website", async () => {
+  const workflow = await readFile(join(".github", "workflows", "ci.yml"), "utf8");
+  assert.ok(workflow.indexOf("run: npm run website:build") < workflow.indexOf("run: node scripts/website-hit-test.mjs"));
 });

@@ -486,7 +486,7 @@
   margin: 0 0 16px;
   font: 400 clamp(38px, 4vw, 62px)/.98 var(--serif);
   letter-spacing: -.055em;
-  scroll-margin-top: calc(var(--teach-header-height) + 28px);
+  scroll-margin-top: calc(var(--teach-header-offset, var(--teach-header-height)) + 28px);
 }
 
 /* Rail jumps land a heading just past the reading line the story script
@@ -1439,7 +1439,7 @@
 
   .method-story:not([data-method-story-layout="stacked"]) .method-story-stage {
     position: sticky;
-    top: max(calc(var(--teach-header-height) + 20px), calc(50svh - 300px));
+    top: max(calc(var(--teach-header-offset, var(--teach-header-height)) + 20px), calc(50svh - 300px));
     order: 0;
     justify-self: end;
     margin: 0;
