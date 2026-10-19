@@ -376,15 +376,23 @@
   line-height: 1.5;
 }
 
+/* Default (stacked) layout: the static figure sits above a compact chapter
+   list in one left-aligned reading column. It applies below the shared 1024px
+   header boundary, in windows too short for the pinned stage, and whenever
+   site.js measures that the pinned stage would not fit
+   (data-method-story-layout="stacked"). The pinned split layout is opt-in
+   further down. */
 .method-story {
-  display: grid;
-  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
-  align-items: start;
-  gap: clamp(34px, 5.6vw, 82px);
-  margin-top: clamp(20px, 3vw, 42px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 22px;
 }
 
 .method-story-chapters {
+  width: 100%;
+  max-width: 720px;
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -392,12 +400,16 @@
 }
 
 .method-story-chapter {
-  display: flex;
-  min-height: clamp(450px, 66svh, 660px);
-  flex-direction: column;
-  justify-content: center;
-  padding: 36px clamp(10px, 1.8vw, 26px) 36px 0;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  column-gap: clamp(18px, 3vw, 32px);
+  align-content: start;
+  padding: 28px 0 30px;
   border-top: 1px solid var(--line-strong);
+}
+
+.method-story-chapter > * {
+  grid-column: 2;
 }
 
 .method-story-chapter:last-child {
@@ -408,11 +420,56 @@
   border-top-color: var(--accent);
 }
 
+/* Chapter mark: the dimension's own fragment of the figure. */
+.method-story-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 4px 0 0;
+}
+
+.method-story-chapter > .method-story-mark {
+  grid-column: 1;
+  grid-row: 1 / span 5;
+}
+
+.method-story-glyph {
+  flex: none;
+  width: 80px;
+  height: 42px;
+  overflow: visible;
+}
+
+.method-story-glyph path,
+.method-story-glyph circle {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.method-story-glyph .glyph-faint { stroke: var(--accent-strong); opacity: .42; }
+.method-story-glyph .glyph-strong { stroke-width: 2.2; }
+.method-story-glyph .glyph-node { fill: var(--method-mint); }
+.method-story-glyph .glyph-ring { fill: var(--surface); fill-opacity: .7; stroke-width: 1.3; }
+.method-story-glyph .glyph-dot { fill: var(--accent-strong); stroke: none; }
+.method-story-glyph .glyph-end { fill: var(--accent); }
+.method-story-glyph .glyph-arrow { stroke: var(--method-mint); stroke-width: 1.6; }
+
+.method-story-mark-name {
+  color: var(--muted);
+  font: 500 12px/1.3 var(--teach-sans);
+  letter-spacing: .01em;
+}
+
 .method-story-number {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   color: var(--accent-strong);
   font: 600 10px/1.3 ui-monospace, SFMono-Regular, Consolas, monospace;
   letter-spacing: .08em;
@@ -429,6 +486,13 @@
   margin: 0 0 16px;
   font: 400 clamp(38px, 4vw, 62px)/.98 var(--serif);
   letter-spacing: -.055em;
+  scroll-margin-top: calc(var(--teach-header-height) + 28px);
+}
+
+/* Rail jumps land a heading just past the reading line the story script
+   tracks (heading top = 50% of the viewport), so the target chapter is active. */
+.method-story[data-method-story-enhanced] .method-story-chapter h3 {
+  scroll-margin-top: calc(50svh - 4px);
 }
 
 .method-story-description {
@@ -458,33 +522,63 @@
   text-transform: uppercase;
 }
 
+/* The chapter's own figure key. While the pinned stage tracks the chapters its
+   key panel shows the same sentence, so here it is kept for assistive tech only. */
+.method-story-figure-note {
+  display: grid;
+  max-width: 430px;
+  gap: 6px;
+  margin: 14px 0 0;
+  color: var(--ink);
+  font: 400 15px/1.45 var(--serif);
+}
+
+.method-story-figure-note span {
+  color: var(--accent-strong);
+  font: 600 10px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.method-story[data-method-story-enhanced] .method-story-figure-note {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Stage: one framed panel in normal flow — navigation, drawing, key, caption. */
 .method-story-stage {
-  position: sticky;
-  top: 9vh;
+  position: relative;
+  order: -1;
   display: grid;
   width: 100%;
-  max-width: 660px;
-  height: auto;
-  min-height: 0;
-  aspect-ratio: 640 / 520;
-  container-type: inline-size;
+  max-width: 720px;
   align-self: start;
-  justify-self: end;
-  place-items: center;
-  margin: 0;
+  margin: 0 0 18px;
+  padding: clamp(18px, 2vw, 28px) clamp(18px, 2.2vw, 32px) clamp(18px, 2vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface) 74%, transparent);
   isolation: isolate;
 }
 
+.method-story-stage-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(14px, 1.8vw, 24px);
+}
+
 .method-story-stage-index {
-  position: absolute;
-  z-index: 2;
-  top: 5%;
-  right: 5%;
   display: flex;
   gap: 5px;
-  margin: 0;
+  margin: 0 0 1px;
   color: var(--muted);
   font: 12px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: nowrap;
 }
 
 .method-story-stage-index span:first-child {
@@ -492,106 +586,288 @@
   font-weight: 700;
 }
 
+/* Each link is as wide as its name and the row wraps when the names no longer
+   fit, so enlarged text adds rows instead of overlapping neighbours. */
+.method-story-rail ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.method-story-rail li {
+  flex: 1 1 auto;
+}
+
+.method-story-rail-name {
+  overflow-wrap: anywhere;
+}
+
+.method-story-rail a {
+  display: grid;
+  gap: 5px;
+  min-height: 44px;
+  align-content: start;
+  padding: 9px 4px 0 0;
+  border-top: 2px solid var(--line-strong);
+  color: var(--muted);
+  font: 500 clamp(11px, 1vw, 12.5px)/1.2 var(--teach-sans);
+  text-decoration: none;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.method-story-rail-number {
+  color: var(--accent-strong);
+  font: 600 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .06em;
+}
+
+.method-story-rail a:hover { color: var(--ink); }
+.method-story-rail a[data-state="past"] { border-top-color: var(--accent); color: var(--ink); }
+.method-story-rail a[aria-current="step"] { border-top-color: var(--accent-strong); color: var(--accent-strong); }
+
+.method-story-rail a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.method-story-canvas {
+  position: relative;
+  margin: clamp(18px, 2.4vw, 30px) 0 clamp(10px, 1.4vw, 16px);
+  container-type: inline-size;
+}
+
 .method-story-map {
-  display: none;
+  display: block;
   width: 100%;
   height: auto;
-  max-height: 100%;
   overflow: visible;
 }
 
-.method-story[data-method-story-enhanced] .method-story-map { display: block; }
-.method-story-overview { display: block; width: 100%; height: auto; }
-.method-story[data-method-story-enhanced] .method-story-overview { display: none; }
-
+/* Strokes stay in user units (no non-scaling-stroke): the pathLength="1" dash
+   reveal is only exact when dashes and path length share one coordinate space;
+   otherwise a figure rendered above 1:1 leaves gaps at the end of each stroke. */
 .method-story-map path,
 .method-story-inspection,
 .method-story-endpoint {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 1.5;
+  stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
 }
 
-/* 笔画按统一长度展开；不用时间过渡，快滚和倒滚都直接对应当前位置。 */
+/* 笔画按统一长度展开；不用时间过渡，快滚和倒滚都直接对应当前位置。
+   间隔取 2 而非 1：否则路径终点恰好落在下一段虚线起点，圆头线帽会画出残点。 */
 .method-story-map .method-story-draw,
 .method-story-endpoint {
-  stroke-dasharray: 1 1;
+  stroke-dasharray: 1 2;
   stroke-dashoffset: 1;
   visibility: hidden;
 }
 
 .method-story-map .method-story-reference path {
   stroke: var(--accent-strong);
-  stroke-width: .8;
+  stroke-width: 1;
 }
 
 .method-story-reference { opacity: .7; }
-.method-story-map .method-story-ticks { stroke-width: .65; }
+
+/* Faint preview of the whole route; the animated strokes draw over it. */
+.method-story-map .method-story-ghost path,
+.method-story-map .method-story-ghost circle {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+  opacity: .3;
+}
+
+.method-story:not([data-method-story-enhanced]) .method-story-ghost { display: none; }
+.method-story-map .method-story-ticks { stroke-width: 1; }
 .method-story-map .method-story-deviation { stroke-dasharray: 2 4; stroke-width: 1; opacity: .6; }
-.method-story-map .method-story-trace { stroke-width: 2; }
-.method-story-map .method-story-evidence { stroke-width: 1; }
-.method-story-inspection { fill: var(--method-mint); fill-opacity: .45; opacity: 0; }
+.method-story-map .method-story-trace { stroke-width: 2.4; }
+.method-story-map .method-story-evidence { stroke-width: 1.2; }
+.method-story-inspection { fill: var(--method-mint); fill-opacity: .55; opacity: 0; }
 .method-story-focus { fill: var(--accent-strong); }
 .method-story-map .method-story-guided,
-.method-story-map .method-story-resolve { stroke-width: 2.2; }
-.method-story-map .method-story-alternate { stroke: var(--accent-strong); stroke-width: 1.2; }
+.method-story-map .method-story-resolve { stroke-width: 2.6; }
+.method-story-map .method-story-alternate { stroke: var(--accent-strong); stroke-width: 1.3; }
 .method-story-checkpoints circle,
-.method-story-decision { fill: var(--method-mint); stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; opacity: 0; }
+.method-story-decision { fill: var(--surface); stroke: var(--accent); stroke-width: 1.6; opacity: 0; }
 .method-story-endpoint { fill: var(--accent); fill-opacity: 0; stroke-width: 1.8; stroke-linecap: butt; }
-.method-story-map .method-story-complete { stroke: var(--method-mint); stroke-width: 1.6; }
+.method-story-map .method-story-complete { stroke: var(--method-mint); stroke-width: 1.8; }
 
-.method-story-labels { position: absolute; inset: 0; pointer-events: none; display: none; }
-.method-story[data-method-story-enhanced] .method-story-labels { display: block; }
+/* Labels sit on the element that stands for their dimension. */
+.method-story-labels { position: absolute; inset: 0; pointer-events: none; }
+
 .method-story-label {
   position: absolute;
-  width: 24%;
+  left: calc(var(--label-x) * 100%);
+  top: calc(var(--label-y) * 100%);
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
   color: var(--ink);
-  font: 400 clamp(11px, 2.4cqi, 15px)/1.35 var(--teach-sans);
-  opacity: 0;
+  font: 500 clamp(11.5px, 2.3cqi, 14px)/1.2 var(--teach-sans);
+  white-space: nowrap;
+  transform: translate(-50%, 0);
+  transition: color 180ms ease;
 }
+
+.method-story-label[data-placement="above-start"] { transform: translate(0, -100%); }
+.method-story-label[data-placement="above"] { transform: translate(-50%, -100%); }
+.method-story-label[data-placement="below-end"] { transform: translate(-100%, 0); }
 .method-story-label strong { font-weight: 500; }
 
-.method-story-center {
-  position: absolute;
-  bottom: 2%;
-  left: 0;
-  width: 100%;
+.method-story-label-number,
+.method-story[data-method-story-labels="legend"] .method-story-label::before {
+  display: inline-grid;
+  min-width: 2.2em;
+  place-items: center;
+  /* Padding instead of a fixed height: the badge grows with a minimum font size. */
+  padding: .38em .3em;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
   color: var(--accent-strong);
-  font: 400 clamp(14px, 2.7cqi, 18px)/1.3 var(--serif);
-  letter-spacing: -.02em;
-  text-align: center;
+  font: 600 .72em/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
 }
 
-/* 无脚本、平板及减弱动态模式共用静态概览。 */
-.method-story:not([data-method-story-enhanced]) .method-story-stage {
-  position: relative;
-  top: auto;
-  aspect-ratio: auto;
-}
-.method-story:not([data-method-story-enhanced]) .method-story-stage-index { display: none; }
-.method-story:not([data-method-story-enhanced]) .method-story-center { position: static; margin-top: 2px; }
-.method-story-overview-track {
-  fill: none;
-  stroke: var(--line-strong);
-  stroke-width: 1.2;
+.method-story[data-method-story-enhanced] .method-story-label { opacity: 0; }
+.method-story-label[data-state="past"] { color: var(--muted); }
+.method-story-label[data-state="current"] { color: var(--accent-strong); }
+
+.method-story-label[data-state="current"] .method-story-label-number,
+.method-story[data-method-story-labels="legend"] .method-story-label[data-state="current"]::before {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+  color: var(--surface);
 }
 
-.method-story-overview-node circle,
-.method-story-overview-core {
-  fill: var(--surface);
-  stroke: var(--accent);
-  stroke-width: 1.3;
+/* Legend mode (set by site.js when anchored names would collide or leave the
+   drawing, e.g. with enlarged or minimum font sizes): only the numbers stay on
+   the drawing, and the numbered names flow as a wrapping legend beneath it. */
+.method-story[data-method-story-labels="legend"] .method-story-labels {
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 14px;
 }
 
-.method-story-overview-node text {
-  fill: var(--accent-strong);
-  font: 600 8px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
-  text-anchor: middle;
-  dominant-baseline: central;
+.method-story[data-method-story-labels="legend"] .method-story-label {
+  position: static;
+  white-space: normal;
+  transform: none;
 }
+
+.method-story[data-method-story-labels="legend"] .method-story-label::before {
+  content: attr(data-number);
+}
+
+.method-story[data-method-story-labels="legend"] .method-story-label-number {
+  position: absolute;
+  /* The canvas is the inline-size container and the drawing fills its width,
+     so cqi places the number on its element whatever the legend's height. */
+  left: calc(var(--label-x) * 100cqi);
+  top: calc(var(--label-y) * var(--figure-ratio) * 100cqi);
+  height: auto;
+  padding: .15em .4em;
+  line-height: 1.15;
+  transform: translate(-50%, 0);
+}
+
+.method-story[data-method-story-labels="legend"] [data-placement="above-start"] .method-story-label-number { transform: translate(0, -100%); }
+.method-story[data-method-story-labels="legend"] [data-placement="above"] .method-story-label-number { transform: translate(-50%, -100%); }
+.method-story[data-method-story-labels="legend"] [data-placement="below-end"] .method-story-label-number { transform: translate(-100%, 0); }
+
+/* Figure key: what the active drawn element stands for. */
+.method-story-keys {
+  display: grid;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.method-story-key {
+  display: grid;
+  grid-area: 1 / 1;
+  gap: 5px;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+/* Only the incoming key animates; the outgoing one leaves at once, so two
+   sentences never overlap in the shared cell. */
+.method-story-key[data-active] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.method-story-key-name {
+  display: flex;
+  gap: .9em;
+  color: var(--accent-strong);
+  font: 600 10px/1.3 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.method-story-key-note {
+  color: var(--ink);
+  font: 400 clamp(15px, 1.25vw, 17px)/1.4 var(--serif);
+  letter-spacing: -.01em;
+}
+
+.method-story-disclaimer {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font: 400 11.5px/1.45 var(--teach-sans);
+}
+
+.method-story-center {
+  margin: 4px 0 0;
+  color: var(--accent-strong);
+  font: italic 400 17px/1.3 var(--serif);
+  letter-spacing: -.01em;
+}
+
+/* Static figure (tablet, reduced motion, no script): the completed drawing. */
+.method-story:not([data-method-story-enhanced]) .method-story-stage-index,
+.method-story:not([data-method-story-enhanced]) .method-story-keys {
+  display: none;
+}
+
+.method-story:not([data-method-story-enhanced]) .method-story-stage-head {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.method-story:not([data-method-story-enhanced]) .method-story-canvas {
+  margin-bottom: 0;
+}
+
+.method-story:not([data-method-story-enhanced]) .method-story-map .method-story-draw,
+.method-story:not([data-method-story-enhanced]) .method-story-endpoint {
+  stroke-dashoffset: 0;
+  visibility: visible;
+}
+
+.method-story:not([data-method-story-enhanced]) .method-story-inspection { r: 42px; opacity: .45; }
+.method-story:not([data-method-story-enhanced]) .method-story-reference { opacity: .32; }
+.method-story:not([data-method-story-enhanced]) .method-story-trace { opacity: .5; }
+.method-story:not([data-method-story-enhanced]) .method-story-deviation { opacity: .2; }
+.method-story:not([data-method-story-enhanced]) .method-story-evidence { opacity: .5; }
+.method-story:not([data-method-story-enhanced]) .method-story-checkpoints circle,
+.method-story:not([data-method-story-enhanced]) .method-story-decision { opacity: 1; }
+.method-story:not([data-method-story-enhanced]) .method-story-selected { stroke-width: 2.7; }
+.method-story:not([data-method-story-enhanced]) .method-story-alternate { opacity: 0; }
+.method-story:not([data-method-story-enhanced]) .method-story-endpoint { fill-opacity: 1; }
 
 .method-dimensions-note {
   margin: 26px 0 0;
@@ -1106,10 +1382,6 @@
     align-self: center;
   }
 
-  .method-story {
-    gap: 32px;
-  }
-
   .method-architecture-grid,
   .method-status-grid {
     grid-template-columns: minmax(205px, .6fr) minmax(0, 1.8fr);
@@ -1129,6 +1401,55 @@
     padding: 9px 8px;
   }
 
+}
+
+/* Pinned split layout: chapters scroll beside a sticky stage. It needs the
+   shared 1024px header boundary *and* enough height for the whole stage; site.js
+   uses this exact query (METHOD_STORY_SPLIT_QUERY) and additionally measures
+   the stage, falling back to data-method-story-layout="stacked" when the panel
+   would not fit (for example with enlarged text). Keep the two in sync. */
+@media (min-width: 1024px) and (min-height: 700px) {
+  .method-story:not([data-method-story-layout="stacked"]) {
+    display: grid;
+    grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+    align-items: start;
+    gap: clamp(32px, 4.6vw, 72px);
+    margin-top: clamp(20px, 3vw, 42px);
+  }
+
+  .method-story:not([data-method-story-layout="stacked"]) .method-story-chapters {
+    width: auto;
+    max-width: none;
+  }
+
+  .method-story:not([data-method-story-layout="stacked"]) .method-story-chapter {
+    display: flex;
+    min-height: clamp(450px, 66svh, 660px);
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px clamp(10px, 1.8vw, 26px) 36px 0;
+  }
+
+  .method-story:not([data-method-story-layout="stacked"]) .method-story-mark {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 22px;
+  }
+
+  .method-story:not([data-method-story-layout="stacked"]) .method-story-stage {
+    position: sticky;
+    top: max(calc(var(--teach-header-height) + 20px), calc(50svh - 300px));
+    order: 0;
+    justify-self: end;
+    margin: 0;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1120px) and (min-height: 700px) {
+  .method-story:not([data-method-story-layout="stacked"]) {
+    gap: 32px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1195,60 +1516,6 @@
 
   .method-stage-icon {
     grid-row: span 2;
-  }
-
-  .method-story {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 22px;
-  }
-
-  .method-story-stage {
-    position: relative;
-    top: auto;
-    order: -1;
-    width: min(100%, 500px);
-    height: auto;
-    min-height: 0;
-    aspect-ratio: auto;
-    grid-template-rows: auto auto;
-    align-self: center;
-    margin-bottom: 8px;
-  }
-
-  .method-story-stage-index {
-    display: none;
-  }
-
-  .method-story-map,
-  .method-story-labels {
-    display: none;
-  }
-
-  .method-story-overview {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .method-story-center {
-    position: static;
-    display: block;
-    width: auto;
-    aspect-ratio: auto;
-    margin-top: 2px;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    font-size: 17px;
-    text-align: center;
-    transform: none;
-  }
-
-  .method-story-chapter {
-    min-height: 0;
-    padding: 27px 0 30px;
   }
 
   .method-dimensions-grid {
@@ -1389,6 +1656,20 @@
     display: none;
   }
 
+  /* Phones get each dimension's mark above its text instead of a shrunk figure. */
+  .method-story-chapter {
+    display: flex;
+    flex-direction: column;
+    padding: 26px 0 28px;
+  }
+
+  .method-story-chapter > .method-story-mark {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px;
+  }
+
   .method-story-chapter h3 {
     font-size: 39px;
   }
@@ -1516,53 +1797,13 @@
     scroll-behavior: auto !important;
     transition: none !important;
   }
+}
 
-  .method-story-stage {
-    position: relative;
-    top: auto;
-    order: -1;
-    width: min(100%, 500px);
-    align-self: center;
-    height: auto;
+/* Reduced motion keeps the split layout where it applies: the completed figure
+   stays pinned beside compact chapters; only the scroll-driven drawing is off. */
+@media (prefers-reduced-motion: reduce) and (min-width: 1024px) and (min-height: 700px) {
+  .method-story:not([data-method-story-layout="stacked"]) .method-story-chapter {
     min-height: 0;
-    aspect-ratio: auto;
+    padding: 34px clamp(10px, 1.8vw, 26px) 38px 0;
   }
-
-  .method-story {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .method-story-chapter {
-    min-height: 0;
-    padding: 27px 0 30px;
-  }
-
-  .method-story-stage-index,
-  .method-story-map,
-  .method-story-labels {
-    display: none;
-  }
-
-  .method-story-overview {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .method-story-center {
-    position: static;
-    display: block;
-    width: auto;
-    aspect-ratio: auto;
-    margin-top: 2px;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    font-size: 17px;
-    text-align: center;
-    transform: none;
-  }
-
 }

@@ -297,8 +297,17 @@ let activeSiteLocale =
   const anchors = chapters.map((chapter) => chapter.querySelector('h3') || chapter);
   const parts = Object.fromEntries([...story.querySelectorAll('[data-method-part]')].map((part) => [part.dataset.methodPart, part]));
   const labels = [...story.querySelectorAll('[data-method-story-label]')];
+  const railLinks = [...story.querySelectorAll('[data-method-story-rail-link]')];
+  const keys = [...story.querySelectorAll('[data-method-story-key]')];
   const currentIndex = story.querySelector('[data-method-story-current]');
-  const desktop = window.matchMedia('(min-width: 901px)');
+  const stage = story.querySelector('[data-method-story-stage]');
+  const canvas = story.querySelector('.method-story-canvas');
+  // Pinned split layout: the shared 1024px header boundary plus enough height
+  // for the stage. methodology.css gates the split layout on this exact query.
+  const METHOD_STORY_SPLIT_QUERY = '(min-width: 1024px) and (min-height: 700px)';
+  // Room kept below the pinned stage so its last line is never at the edge.
+  const STAGE_FIT_MARGIN = 16;
+  const split = window.matchMedia(METHOD_STORY_SPLIT_QUERY);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
   let activeIndex = -1;
@@ -325,6 +334,19 @@ let activeSiteLocale =
     chapters.forEach((chapter, chapterIndex) => {
       if (chapterIndex === index) chapter.setAttribute('aria-current', 'step');
       else chapter.removeAttribute('aria-current');
+    });
+    // Rail, figure labels and the figure key share one state per position, so
+    // the text column, the drawing and the navigation always agree.
+    const stateOf = (position) => (position < index ? 'past' : position === index ? 'current' : 'upcoming');
+    railLinks.forEach((link, position) => {
+      link.dataset.state = stateOf(position);
+      if (position === index) link.setAttribute('aria-current', 'step');
+      else link.removeAttribute('aria-current');
+    });
+    labels.forEach((label, position) => { label.dataset.state = stateOf(position); });
+    keys.forEach((key, position) => {
+      if (position === index) key.setAttribute('data-active', '');
+      else key.removeAttribute('data-active');
     });
     story.dataset.methodStoryActiveIndex = String(index);
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = String(index + 1).padStart(2, '0');
@@ -404,6 +426,67 @@ let activeSiteLocale =
     scheduleUpdate();
   }
 
+  const overlapping = (a, b) =>
+    Math.min(a.right, b.right) - Math.max(a.left, b.left) > 1 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1;
+
+  // Anchored figure labels only work while they clear each other and stay on
+  // the drawing. Enlarged text, minimum font sizes and CJK widths are only
+  // visible in rendered boxes (Firefox's minimum size is not even in computed
+  // style), so measure them instead of guessing a breakpoint.
+  function labelsCollide() {
+    if (!(canvas instanceof HTMLElement) || labels.length === 0) return false;
+    const area = canvas.getBoundingClientRect();
+    if (area.width === 0) return false;
+    const boxes = labels.map((label) => label.getBoundingClientRect());
+    return boxes.some((box, index) =>
+      box.left < area.left - 1 || box.right > area.right + 1 || box.top < area.top - 1 || box.bottom > area.bottom + 1 ||
+      boxes.slice(index + 1).some((other) => overlapping(box, other)));
+  }
+
+  // The pinned stage must fit between its sticky top and the window bottom,
+  // otherwise its lower part (the figure key) is covered for the whole story.
+  function stageFits() {
+    if (!(stage instanceof HTMLElement)) return true;
+    const top = Number.parseFloat(window.getComputedStyle(stage).top) || 0;
+    return top + stage.getBoundingClientRect().height + STAGE_FIT_MARGIN <= window.innerHeight;
+  }
+
+  function setLabelMode() {
+    delete story.dataset.methodStoryLabels;
+    if (labelsCollide()) story.dataset.methodStoryLabels = 'legend';
+  }
+
+  // One decision for layout and tracking, so CSS and script never disagree:
+  // the split layout is measured in the state it would actually show
+  // (enhanced unless motion is reduced) and kept only if it fits.
+  let layoutFrame = 0;
+  function syncLayout() {
+    layoutFrame = 0;
+    const enhanced = story.dataset.methodStoryEnhanced;
+    delete story.dataset.methodStoryLayout;
+    let stacked = false;
+    if (split.matches) {
+      if (!reducedMotion.matches) story.dataset.methodStoryEnhanced = 'true';
+      setLabelMode();
+      stacked = !stageFits();
+      if (stacked) {
+        delete story.dataset.methodStoryEnhanced;
+        story.dataset.methodStoryLayout = 'stacked';
+        setLabelMode();
+      }
+    } else {
+      setLabelMode();
+    }
+    if (enhanced === undefined) delete story.dataset.methodStoryEnhanced;
+    else story.dataset.methodStoryEnhanced = enhanced;
+    if (stacked || !split.matches || reducedMotion.matches) stopTracking();
+    else startTracking();
+  }
+
+  function scheduleLayout() {
+    if (layoutFrame === 0) layoutFrame = window.requestAnimationFrame(syncLayout);
+  }
+
   const visibility = new IntersectionObserver(([entry]) => {
     inView = entry.isIntersecting;
     if (inView) scheduleUpdate();
@@ -427,11 +510,21 @@ let activeSiteLocale =
     delete story.dataset.methodStoryActiveIndex;
     delete story.dataset.methodStoryProgress;
     chapters.forEach((chapter) => chapter.removeAttribute('aria-current'));
+    // Hand the drawing back to CSS: the static (tablet / reduced-motion) figure
+    // shows the completed state and must not inherit a half-painted frame.
+    Object.values(parts).forEach((part) => {
+      ['strokeDashoffset', 'visibility', 'opacity', 'strokeWidth', 'fillOpacity'].forEach((property) => { part.style[property] = ''; });
+    });
+    parts.inspection.setAttribute('r', '4');
+    parts.alternate.setAttribute('d', 'M382 320C430 320 430 396 478 396');
+    railLinks.forEach((link) => { delete link.dataset.state; link.removeAttribute('aria-current'); });
+    labels.forEach((label) => { delete label.dataset.state; label.style.opacity = ''; });
+    keys.forEach((key) => key.removeAttribute('data-active'));
     if (currentIndex instanceof HTMLElement) currentIndex.textContent = '';
   }
 
   function startTracking() {
-    if (tracking || !desktop.matches || reducedMotion.matches || chapters.length === 0) return;
+    if (tracking || chapters.length === 0) return;
     tracking = true;
     story.dataset.methodStoryEnhanced = 'true';
     layoutDirty = true;
@@ -442,15 +535,15 @@ let activeSiteLocale =
     scheduleUpdate();
   }
 
-  function syncTracking() {
-    if (desktop.matches && !reducedMotion.matches) startTracking();
-    else stopTracking();
-  }
-
-  document.fonts.ready.then(invalidateLayout);
-  desktop.addEventListener('change', syncTracking);
-  reducedMotion.addEventListener('change', syncTracking);
-  syncTracking();
+  // Text size changes (zoom, minimum font size, late fonts) resize the stage
+  // without a window resize, so the stage itself is watched as well.
+  const stageSize = new ResizeObserver(scheduleLayout);
+  if (stage instanceof HTMLElement) stageSize.observe(stage);
+  window.addEventListener('resize', scheduleLayout);
+  document.fonts.ready.then(() => { invalidateLayout(); scheduleLayout(); });
+  split.addEventListener('change', syncLayout);
+  reducedMotion.addEventListener('change', syncLayout);
+  syncLayout();
 })();
 
 (() => {

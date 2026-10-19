@@ -12,7 +12,13 @@ import { renderBotanicalSvg } from "../illustrations.js";
 import { renderTeachometryFooter } from "./home.js";
 import { renderMethodologyHeroArt } from "./methodology-hero.js";
 import { renderMethodologyBotanical } from "./methodology-botanicals.js";
-import { renderMethodologyLensArt } from "./methodology-dimensions.js";
+import {
+  methodologyDimensionAnchorId,
+  renderMethodologyDimensionGlyph,
+  renderMethodologyLensArt,
+  renderMethodologyLensKeys,
+  type LensFigureKey,
+} from "./methodology-dimensions.js";
 import type { SiteLocale } from "../i18n.js";
 import { DOC_COUNT_TEMPLATES, formatDocCount, formatPublicCount, formatCurrentDataset, formatCanonicalCases } from "../public-localization-formatters.js";
 import { publicUiCopy, publicArtifactNotice, publicEvidenceCopy } from "../public-localization.js";
@@ -253,6 +259,7 @@ type MethodologyDimensionDetails = {
   readonly description: string;
   readonly lens: string;
   readonly icon: string;
+  readonly figure: LensFigureKey;
 };
 
 const methodologyDimensionDetails: Readonly<Record<string, MethodologyDimensionDetails>> = {
@@ -261,30 +268,50 @@ const methodologyDimensionDetails: Readonly<Record<string, MethodologyDimensionD
     description: "Whether the Tutor stays factually and conceptually correct.",
     lens: "Factual and conceptual accuracy",
     icon: "correctness",
+    figure: {
+      name: "Reference line",
+      note: "The response is held to factually and conceptually correct content.",
+    },
   },
   diagnosis: {
     label: "Diagnosis",
     description: "Whether it identifies the learner’s actual error, gap, or reasoning issue.",
     lens: "Identifies learner needs and misconceptions",
     icon: "diagnosis",
+    figure: {
+      name: "Inspection ring",
+      note: "Marks where the learner’s reasoning departs from the reference.",
+    },
   },
   guidance: {
     label: "Guidance",
     description: "Whether its explanation or hint helps the learner make progress.",
     lens: "Provides clear, correct, productive guidance",
     icon: "guidance",
+    figure: {
+      name: "Guided path",
+      note: "Hints that move the learner forward, one checkpoint at a time.",
+    },
   },
   adaptation: {
     label: "Adaptation",
     description: "Whether it changes its help for the learner’s state and context.",
     lens: "Adapts to learner state, level, and context",
     icon: "adaptation",
+    figure: {
+      name: "Branch point",
+      note: "Help that changes direction with the learner’s state and context.",
+    },
   },
   actionability: {
     label: "Actionability",
     description: "Whether it leaves the learner with a clear, executable next step.",
     lens: "Actionable next steps for the learner",
     icon: "actionability",
+    figure: {
+      name: "Endpoint",
+      note: "The learner leaves with a clear step they can take next.",
+    },
   },
 };
 
@@ -302,6 +329,10 @@ function methodologyDimension(dimension: string): MethodologyDimensionDetails {
     description: "A versioned score dimension supplied by the public benchmark artifact.",
     lens: "A complementary observable-behavior lens",
     icon: "grid",
+    figure: {
+      name: "Trajectory",
+      note: "A complementary lens on the same observable tutoring behavior.",
+    },
   };
 }
 
@@ -315,26 +346,33 @@ function renderMethodologyLens(scoreDimensions: readonly string[], uiLocale: Sit
     return { dimension, details, index, number: String(index + 1).padStart(2, "0") };
   });
   const total = String(dimensions.length).padStart(2, "0");
-  const chapterMarkup = dimensions.map(({ details, index, number }) =>
+  const chapterMarkup = dimensions.map(({ dimension, details, index, number }) =>
     '<li class="method-story-chapter" data-method-story-chapter data-method-story-index="' + index + '">' +
+    '<div class="method-story-mark">' + renderMethodologyDimensionGlyph(dimension) +
+    '<span class="method-story-mark-name">' + escapeHtml(details.figure.name) + '</span></div>' +
     '<p class="method-story-number"><span>' + (uiLocale === "zh-CN" ? "维度 " : "DIMENSION ") + number + '</span><span>Score lens</span></p>' +
-    '<h3>' + escapeHtml(details.label) + '</h3>' +
+    '<h3 id="' + methodologyDimensionAnchorId(dimension) + '">' + escapeHtml(details.label) + '</h3>' +
     '<p class="method-story-description">' + escapeHtml(details.description) + '</p>' +
-    '<p class="method-story-lens"><span>What we look for</span>' + escapeHtml(details.lens) + '</p></li>'
+    '<p class="method-story-lens"><span>What we look for</span>' + escapeHtml(details.lens) + '</p>' +
+    // The figure key travels with its chapter: it is the only key wherever the
+    // pinned stage is not tracking (tablet, short windows, reduced motion, no JS).
+    '<p class="method-story-figure-note"><span>In the figure</span>' + escapeHtml(details.figure.note) + '</p></li>'
   ).join("");
-  const visualMarkup = renderMethodologyLensArt(dimensions);
-  const overviewNodes = dimensions.map(({ index, number }) => {
-    const x = dimensions.length <= 1 ? 320 : 48 + (index * 482) / (dimensions.length - 1);
-    return '<g class="method-story-overview-node"><circle cx="' + x.toFixed(2) + '" cy="42" r="14"></circle><text x="' + x.toFixed(2) + '" y="42">' + number + '</text></g>';
-  }).join("");
+  const railMarkup = dimensions.map(({ dimension, details, number }) =>
+    '<li><a href="#' + methodologyDimensionAnchorId(dimension) + '" data-method-story-rail-link>' +
+    '<span class="method-story-rail-number">' + number + '</span> ' +
+    '<span class="method-story-rail-name">' + escapeHtml(details.label) + '</span></a></li>'
+  ).join("");
 
   return '<div class="method-story" data-method-story>' +
     '<ol class="method-story-chapters" aria-label="' + escapeHtml(formatPublicCount(dimensions.length, "scoreDimensions", uiLocale)) + '">' + chapterMarkup + '</ol>' +
     '<figure class="method-story-stage" data-method-story-stage>' +
+    '<div class="method-story-stage-head">' +
     '<p class="method-story-stage-index" aria-hidden="true"><span data-method-story-current>01</span><span> / ' + total + '</span></p>' +
-    visualMarkup +
-    '<svg class="method-story-overview" viewBox="0 0 640 84" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">' +
-    '<path class="method-story-overview-track" d="M48 42H580"/><g class="method-story-overview-nodes">' + overviewNodes + '</g><circle class="method-story-overview-core" cx="592" cy="42" r="6"/></svg>' +
+    '<nav class="method-story-rail" aria-label="Jump to a dimension"><ol>' + railMarkup + '</ol></nav></div>' +
+    renderMethodologyLensArt(dimensions) +
+    renderMethodologyLensKeys(dimensions) +
+    '<p class="method-story-disclaimer">An illustration of complementary lenses, not an evaluator order or a score.</p>' +
     '<figcaption class="method-story-center">Observable tutoring behavior</figcaption></figure></div>';
 }
 
