@@ -16,8 +16,11 @@ The Community page describes a future Reviewer program; applications and the
 real campaign remain closed. Micro-Review links to this existing informational
 entry without opening intake or connecting to the private Reviewer service.
 
-Routes: `/micro-review/` and `/zh-cn/micro-review/`. Direct links can be shared
-after a separately authorized launch; the homepage and navigation are unchanged.
+Routes: `/micro-review/` and `/zh-cn/micro-review/`. The homepage hero links to
+the localized route as a labeled "Try one teaching case" demo entry, next to the
+two formal paths (run an evaluation, read the Methodology); the page ends with
+the same two paths. This is a navigation entry only: it adds no analytics,
+collection, campaign, or Reviewer intake. Primary navigation is unchanged.
 The page inherits the existing Teachometry shell and theme tokens. Its stylesheet
 and small interaction script load only on this route. No dependency is added.
 

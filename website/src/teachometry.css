@@ -43,7 +43,6 @@
   --teach-gutter-tablet: 32px;
   --teach-gutter-mobile: 18px;
   --teach-header-height: 88px;
-  --teach-wordmark-mark: 28px;
   --teach-wordmark-size: 29px;
   --teach-control-size: 29px;
   --teach-icon-size: 18px;
@@ -236,48 +235,45 @@ body:is(
   .model-detail-page,
   .run-page,
   .docs-page
-) .home-header .wordmark-mark {
-  width: var(--teach-wordmark-mark);
-  height: var(--teach-wordmark-mark);
-  margin-top: 0;
-}
-
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
 ) .home-header .wordmark-name {
   color: var(--accent);
   font: var(--teach-wordmark-size)/1.1 var(--teach-serif);
   letter-spacing: -0.05em;
 }
 
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page
-) .home-header .wordmark-descriptor {
-  margin-top: 5px;
+/* Product line under the text-only Teachometry name: the TutorBench mark only
+   ever appears beside the TutorBench name. */
+.home-header .wordmark-product {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+.home-header .wordmark-product-mark {
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.home-header .wordmark-product-name {
+  color: var(--ink);
+  font: 600 11px/1 var(--teach-sans);
+  letter-spacing: 0;
+}
+
+.home-header .wordmark-product-note {
   color: var(--muted);
   text-transform: uppercase;
-  font: 600 7px/1.6 var(--teach-mono);
-  letter-spacing: 0.16em;
+  font: 600 7px/1 var(--teach-mono);
+  letter-spacing: 0.14em;
+}
+
+.home-header .wordmark-product-note::before {
+  content: "·";
+  margin-right: 5px;
 }
 
 body:is(
@@ -1239,19 +1235,7 @@ body.case-detail-page main .shell {
     font-size: 26px;
   }
 
-  body:is(
-    .home-page,
-    .methodology-page,
-    .results-page,
-    .cases-page,
-    .case-detail-page,
-    .about-page,
-    .blog-page,
-    .models-page,
-    .model-detail-page,
-  .run-page,
-  .docs-page
-  ) .home-header .wordmark-descriptor {
+  .home-header .wordmark-product-note {
     font-size: 6px;
   }
 
@@ -1800,22 +1784,26 @@ body:is(
   white-space: nowrap;
 }
 
-body:is(
-  .home-page,
-  .methodology-page,
-  .results-page,
-  .cases-page,
-  .case-detail-page,
-  .about-page,
-  .blog-page,
-  .models-page,
-  .model-detail-page,
-  .run-page,
-  .docs-page,
-  .contact-page
-) .home-footer-brand img {
-  width: 26px;
-  height: 26px;
+.home-footer-product {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  max-width: 240px;
+  margin: 0;
+  color: var(--muted);
+  font: 11px/1.45 var(--teach-sans);
+}
+
+.home-footer-product img {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.home-footer-product strong {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 body:is(

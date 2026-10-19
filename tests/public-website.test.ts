@@ -280,7 +280,7 @@ test("shared public header is consistent, localized, and exposes language contro
     assert.match(html, /class="nav-group nav-group-left"/);
     assert.match(html, /class="nav-center"[^>]*>[\s\S]*?data-ui-text="resultsNav"/u);
     assert.match(html, /class="nav-group nav-group-right"/);
-    assert.match(html, /data-ui-text="brandDescriptor"/);
+    assert.match(html, /data-ui-text="productDescriptor"/);
     assert.match(html, /data-ui-text="getStarted"/);
     assert.match(html, /data-ui-aria-en="Primary navigation"/);
     assert.match(html, /data-ui-aria-zh-cn="主导航"/);
@@ -784,7 +784,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(homeHtml, /src="\/assets\/site\.js"/);
     assert.match(homeHtml, /src="\/assets\/brand\/tutorbench\/web\/tutorbench-mark-small\.svg"/);
     assert.match(homeHtml, /TutorBench/);
-    assert.match(homeHtml, /Real-world evaluation for AI tutoring/);
+    assert.match(homeHtml, /AI teaching evaluation/);
     assert.match(homeHtml, /Measurement infrastructure/);
     assert.match(homeHtml, /rel="icon" href="\/assets\/brand\/tutorbench\/raster\/favicon\.ico"/);
     assert.match(homeHtml, /rel="icon" type="image\/png" sizes="32x32" href="\/assets\/brand\/tutorbench\/raster\/favicon-32\.png"/);

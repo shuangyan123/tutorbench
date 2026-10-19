@@ -101,6 +101,17 @@ function renderDimensions(): string {
   </div></section>`;
 }
 
+// Three distinct ways in. The two existing buttons keep their place and say what
+// they lead to; the Micro-Review link is a lighter, clearly labelled demo, not a
+// model evaluation, a Reviewer application or a data-collection campaign.
+function renderHomeEntryPoints(): string {
+  return `<div class="home-actions">
+      <div class="home-action"><a class="button button-primary" aria-describedby="home-action-run-note" href="/run/">Run an Evaluation ${icon("arrow")}</a><span class="home-action-note" id="home-action-run-note">Uses TutorBench on your own machine</span></div>
+      <div class="home-action"><a class="button button-secondary" aria-describedby="home-action-method-note" href="/methodology/">${icon("book")} Read the Methodology</a><span class="home-action-note" id="home-action-method-note">How formal evaluations work</span></div>
+    </div>
+    <a class="home-try" href="/micro-review/" data-home-try><span class="home-try-copy"><span class="home-try-kicker">New here?</span><span class="home-try-title">Try one teaching case</span><span class="home-try-note">A constructed example. About 60 seconds, nothing to install, not a model evaluation.</span></span>${icon("arrow")}</a>`;
+}
+
 export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en", blogPosts: readonly BlogPostSummary[] = BLOG_POSTS): SitePage {
   const { benchmark, cases } = artifacts;
   const initialIndex = Math.max(0, cases.cases.findIndex((item) => item.id === "fraction-misconception-001"));
@@ -109,7 +120,7 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: Si
     description: "Scenario-based evaluation and regression infrastructure for observable AI tutoring behavior. Teachometry Developer Preview.",
     route: "/",
     content: `<section class="home-hero"><div class="shell home-hero-grid">
-      <div class="home-thesis"><p class="eyebrow">Evidence before deployment</p><h1>Test how AI tutors<br><em>behave</em> before<br><span>you ship them.</span></h1><p class="home-lede">Teachometry turns authored learning situations into reproducible Tutor Health evaluations: inspect teaching decisions, diagnose concrete failures, and keep the evidence needed to fix and retest them.</p><div class="home-actions"><a class="button button-primary" href="/run/">Run an Evaluation ${icon("arrow")}</a><a class="button button-secondary" href="/methodology/">${icon("book")} Read the Methodology</a></div><div class="home-features"><span>${icon("leaf")} Open source</span><span>${icon("book")} Evidence-first</span><span>${icon("adaptation")} Developer Preview</span></div></div>
+      <div class="home-thesis"><p class="eyebrow">Evidence before deployment</p><h1>Test how AI tutors<br><em>behave</em> before<br><span>you ship them.</span></h1><p class="home-lede">With TutorBench, Teachometry turns authored learning situations into reproducible Tutor Health evaluations: inspect teaching decisions, diagnose concrete failures, and keep the evidence needed to fix and retest them.</p>${renderHomeEntryPoints()}<div class="home-features"><span>${icon("leaf")} Open source</span><span>${icon("book")} Evidence-first</span><span>${icon("adaptation")} Developer Preview</span></div></div>
       <div class="case-walkthrough" data-case-walkthrough data-initial-case="${initialIndex}"><div class="case-controls"><button type="button" aria-label="Previous case" data-case-prev>${icon("left")}</button><button type="button" aria-label="Next case" data-case-next>${icon("right")}</button></div>${cases.cases.map((item, index) => renderCase(item, index, cases.cases.length, index === initialIndex, uiLocale)).join("")}<span class="visually-hidden" aria-live="polite" data-case-announcement></span></div>
     </div><div class="shell hero-foot"><a class="scroll-cue" href="#dimensions"><span>${icon("arrow")}</span>Scroll to explore</a><p class="handwritten hero-note">Evidence for<br>human-centered AI tutoring.</p></div></section>
     ${renderDimensions()}
@@ -135,14 +146,14 @@ function renderHomeBlog(uiLocale: SiteLocale, blogPosts: readonly BlogPostSummar
 export function renderTeachometryFooter({ benchmark, models }: PublicBenchmarkArtifacts): string {
   return `<footer class="home-footer"><div class="shell">
       <div class="home-footer-main">
-        <div class="home-footer-identity"><a class="home-footer-brand" href="/"><img src="/assets/brand/tutorbench/web/tutorbench-mark-small.svg" width="26" height="26" alt="">Teachometry</a><span class="footer-descriptor">Open source for better learning.</span></div>
+        <div class="home-footer-identity"><a class="home-footer-brand" href="/">Teachometry</a><p class="home-footer-product"><img src="/assets/brand/tutorbench/web/tutorbench-mark-small.svg" width="16" height="16" alt=""><span><strong>TutorBench</strong> <span>An AI teaching quality evaluation product by Teachometry.</span></span></p><span class="footer-descriptor">Open source for better learning.</span></div>
         <div class="footer-nav-band">
           <nav class="footer-column" aria-label="Product"><span class="footer-column-title">Product</span><a href="/run/">Run</a><a href="/models/">Models</a></nav>
           <nav class="footer-column" aria-label="Resources"><span class="footer-column-title">Resources</span><a href="/docs/">Documentation</a><a href="/community/">Community</a></nav>
           <nav class="footer-column" aria-label="Connect"><span class="footer-column-title">Connect</span><a href="/contact/">Contact</a><a href="${SITE_GITHUB_URL}/issues">Project support</a></nav>
         </div>
       </div>
-      <div class="home-footer-bottom"><span>Teachometry · <span>${e(benchmark.statusLabel)}</span></span></div>
+      <div class="home-footer-bottom"><span>Teachometry · TutorBench · <span>${e(benchmark.statusLabel)}</span></span></div>
       <details class="home-evidence"><summary>Evidence &amp; limitations</summary><p><span>${e(models.notice)}</span> <span>${e(benchmark.notice)}</span> <span>Calibration infrastructure exists, but real Community Review and human calibration have not started.</span> <span>Judge-vs-human validation and statistical validation are not completed.</span> <span>TutorBench measures observable tutoring behavior in specified benchmark scenarios, not long-term learning, retention, transfer, satisfaction, or classroom outcomes.</span></p></details>
     </div></footer>`;
 }

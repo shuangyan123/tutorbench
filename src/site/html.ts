@@ -573,7 +573,7 @@ function renderHeader(
     `<a${className === "" ? "" : ` class="${className}"`} href="${escapeHtml(siteRoutePath(basePath, route, locale, localizedRoutes))}"${isActive(route) ? ' aria-current="page"' : ""}>${renderUiText(labelKey, locale)}</a>`;
 
   return `<header class="site-header home-header"><div class="shell header-inner">
-    <a class="wordmark" href="${escapeHtml(siteRoutePath(basePath, "/", locale, localizedRoutes))}" ${localizedAttribute("aria-label", "teachometryHome")}><img class="wordmark-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="32" height="32" alt=""><span class="wordmark-copy"><span class="wordmark-name">Teachometry</span><span class="wordmark-descriptor">${renderUiText("brandDescriptor", locale)}</span></span></a>
+    <a class="wordmark" href="${escapeHtml(siteRoutePath(basePath, "/", locale, localizedRoutes))}" ${localizedAttribute("aria-label", "teachometryHome")}><span class="wordmark-copy"><span class="wordmark-name">Teachometry</span>${renderProductLine(basePath, locale)}</span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" ${localizedAttribute("aria-label", "menu")}>${renderUiText("menu", locale)}</button>
     <nav id="primary-navigation" class="nav-links" ${localizedAttribute("aria-label", "primaryNavigation")}><span class="nav-group nav-group-left">${links.slice(0, 3).map((link) => renderHeaderLink(link)).join("")}</span>${renderHeaderLink(links[3], "nav-center")}<span class="nav-group nav-group-right">${links.slice(4).map((link) => renderHeaderLink(link)).join("")}</span></nav>
     <div class="home-header-tools">
@@ -583,6 +583,13 @@ function renderHeader(
       <a class="button button-primary" href="${escapeHtml(siteRoutePath(basePath, "/run/", locale, localizedRoutes))}">${renderUiText("getStarted", locale)} ${siteIcon("arrow")}</a>
     </div>
   </div></header>`;
+}
+
+// Teachometry is the parent brand and has no approved logo yet, so it is set as
+// text only. The TutorBench T1 mark identifies the product and therefore sits
+// only next to the TutorBench name (small optical variant, 16-32 px range).
+function renderProductLine(basePath: string, locale: SiteLocale): string {
+  return `<span class="wordmark-product"><img class="wordmark-product-mark" src="${escapeHtml(brandAssetPath(basePath, "web/tutorbench-mark-small.svg"))}" width="16" height="16" alt=""><span class="wordmark-product-name">TutorBench</span><span class="wordmark-product-note">${renderUiText("productDescriptor", locale)}</span></span>`;
 }
 
 function renderFooter(benchmark: SiteFooterBenchmark, locale: SiteLocale): string {

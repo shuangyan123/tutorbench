@@ -44,7 +44,9 @@ authored analysis, and an optional link to the future Reviewer plan. No choice
 is transmitted or persisted, no analytics is enabled, and no formal review or
 benchmark result is created. See `docs/micro-review-experiment.md` for the
 experiment, privacy boundaries, proposed participation measures, and launch
-limitations. The homepage and existing navigation remain unchanged.
+limitations. The homepage hero links to it as a clearly labeled constructed
+demo, separate from running a TutorBench evaluation and from the Methodology;
+the primary navigation is unchanged.
 
 `.github/workflows/pages.yml` builds this directory and deploys it to GitHub
 Pages only from `main`. GitHub Pages provides the project `base_path` and

@@ -25,8 +25,11 @@ their geometry and endpoint treatment are not edited.
 - `raster/favicon.ico`, `raster/favicon-16.png`, `raster/favicon-32.png` — supplied website favicon files
 
 The generated website copies the active files to
-`website/dist/assets/brand/tutorbench/` and references the small optical mark
-in its header plus the supplied favicon files in each page head. The package
+`website/dist/assets/brand/tutorbench/` and uses the small optical mark (16 px)
+only beside the TutorBench product name in the shared header and footer, plus
+the supplied favicon files in each page head. Teachometry has no approved logo
+yet, so the site sets the Teachometry name as text; neither the T1 mark nor the
+botanical illustrations are a Teachometry logo. The package
 metadata includes the active web and favicon directories so the README mark
 remains available in the packaged artifact.
 
