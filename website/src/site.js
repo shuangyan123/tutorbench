@@ -303,8 +303,13 @@ let activeSiteLocale =
     const next = desktop.matches ? `${Math.ceil(header.getBoundingClientRect().height)}px` : '';
     if (next === current) return;
     current = next;
-    if (next) root.style.setProperty('--teach-header-offset', next);
-    else root.style.removeProperty('--teach-header-offset');
+    if (next) {
+      root.style.setProperty('--teach-header-offset', next);
+      root.dataset.teachHeaderMeasured = 'true';
+    } else {
+      root.style.removeProperty('--teach-header-offset');
+      delete root.dataset.teachHeaderMeasured;
+    }
     // Layout that depends on the offset (the Methodology stage fit) re-checks.
     window.dispatchEvent(new window.Event('teach:header-offset'));
   };

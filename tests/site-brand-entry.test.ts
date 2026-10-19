@@ -166,7 +166,7 @@ test("homepage path units wrap instead of shrinking under their buttons", async 
 
 test("desktop header keeps navigation in flow and lets rows wrap instead of overlapping the tools", async () => {
   const chrome = await css("teachometry.css");
-  const desktop = chrome.slice(chrome.indexOf("@media (min-width: 1024px) {"), chrome.indexOf("@media (min-width: 1024px) and (max-width: 1099px) {"));
+  const desktop = chrome.slice(chrome.indexOf("@media (min-width: 1024px) {"), chrome.indexOf("/* Enlarged text uses one reading order"));
   assert.ok(desktop.length > 0);
   assert.match(rule(desktop, /\) \.home-header \.header-inner/u), /flex-wrap: wrap;[\s\S]*height: auto;/u);
   const nav = rule(desktop, /\) \.home-header \.nav-links/u);

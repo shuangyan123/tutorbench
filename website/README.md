@@ -35,8 +35,24 @@ npm run test:website:hit   # real-browser click/hit test (needs Chrome or CHROME
 The hit test serves the build, drives a local Chrome/Chromium through the
 DevTools protocol and checks that every visible header control and the three
 homepage paths own their own click area (centre and edges), including at
-1024/1100/1440 px, in both locales and with 200% text. CI runs it after the
-website build.
+1024/1100/1440 px, in both locales and with 200% text; the 1024px header also
+checks 300% text and visual navigation order. A click must produce a completed
+navigation to its own URL, including same-URL links, with a successful document
+response. Header geometry and hit failures block CI; unrelated document content
+overflow is emitted as a non-blocking diagnostic.
+
+CDP requests and page loads have 10-second deadlines, browser startup has a
+20-second deadline, and shutdown starts its force timer before requesting
+`Browser.close`. Disconnects reject pending requests and event waits. Cleanup
+only removes the fresh profile created by this invocation. The command and CI
+also run isolated real-Chrome subprocess tests for normal exit, missing/failed
+startup, disconnect/error, crash, pending request timeout, stalled navigation,
+no-op clicks, HTTP errors, stalled close, and overflow/overlap regressions.
+
+Without JavaScript (or before the header is measured), Methodology keeps its
+static single-column figure and an unpinned desktop header, so native chapter
+anchors cannot land behind an unmeasured header. Measured sticky layout uses the existing
+viewport-height and panel-fit guards; no width-specific guessed offset is used.
 
 `website/dist/` is generated and ignored. The build does not require
 `OPENAI_API_KEY`, does not call a Judge, and does not include model rankings or

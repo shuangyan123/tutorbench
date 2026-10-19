@@ -977,6 +977,7 @@ body.case-detail-page main .shell {
     .docs-page
   ) .home-header .header-inner {
     position: relative;
+    container: teach-header / inline-size;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1129,11 +1130,20 @@ body.case-detail-page main .shell {
   }
 }
 
-/* Without script the measured offset is unavailable; in this range the English
-   header wraps to two rows (about 124px), so sticky content stays below it. */
-@media (min-width: 1024px) and (max-width: 1099px) {
-  :root {
-    --teach-header-offset: 124px;
+/* Enlarged text uses one reading order across all seven links. Container em
+   units follow the header text size; normal text retains the centred grid. */
+@media (min-width: 1024px) {
+  @container teach-header (width < 42em) {
+    body .home-header .header-inner .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px 24px;
+      max-width: 100%;
+    }
+
+    body .home-header .header-inner .nav-links .nav-group {
+      display: contents;
+    }
   }
 }
 
