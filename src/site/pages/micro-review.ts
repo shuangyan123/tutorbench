@@ -70,6 +70,13 @@ export function renderMicroReviewPage(artifacts: PublicBenchmarkArtifacts): Site
         <p>Your choice stays on this page. It is not sent to a server or saved. Reloading starts over.</p>
         <p>This public demo is separate from Expert Review, benchmark results, and validity research.</p>
       </div>
+      <nav class="micro-review-next" aria-labelledby="micro-review-next-title">
+        <h2 id="micro-review-next-title">Where to go next</h2>
+        <ul>
+          <li><a href="/run/" data-micro-review-run-link>Run a real evaluation with TutorBench</a><span>Evaluate your own AI Tutor on your machine. Requires the repository and Node.js.</span></li>
+          <li><a href="/methodology/" data-micro-review-methodology-link>Read the Methodology</a><span>How formal TutorBench evaluations are designed and scored.</span></li>
+        </ul>
+      </nav>
     </div>
     ${renderTeachometryFooter(artifacts)}`,
   };

@@ -486,7 +486,7 @@
   margin: 0 0 16px;
   font: 400 clamp(38px, 4vw, 62px)/.98 var(--serif);
   letter-spacing: -.055em;
-  scroll-margin-top: calc(var(--teach-header-height) + 28px);
+  scroll-margin-top: calc(var(--teach-header-offset, var(--teach-header-height)) + 28px);
 }
 
 /* Rail jumps land a heading just past the reading line the story script
@@ -1403,13 +1403,21 @@
 
 }
 
-/* Pinned split layout: chapters scroll beside a sticky stage. It needs the
+/* 无 JS 或尚未测量 Header 时保留完整的静态单列阅读布局。
+   Pinned split layout: chapters scroll beside a sticky stage. It needs the
    shared 1024px header boundary *and* enough height for the whole stage; site.js
    uses this exact query (METHOD_STORY_SPLIT_QUERY) and additionally measures
    the stage, falling back to data-method-story-layout="stacked" when the panel
    would not fit (for example with enlarged text). Keep the two in sync. */
+@media (min-width: 1024px) {
+  /* 未测量时 Header 也不吸顶，原生章节锚点无需猜测 Header 高度。 */
+  :root:not([data-teach-header-measured]) .methodology-page .home-header {
+    position: relative;
+  }
+}
+
 @media (min-width: 1024px) and (min-height: 700px) {
-  .method-story:not([data-method-story-layout="stacked"]) {
+  :root[data-teach-header-measured] .method-story:not([data-method-story-layout="stacked"]) {
     display: grid;
     grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
     align-items: start;
@@ -1417,12 +1425,12 @@
     margin-top: clamp(20px, 3vw, 42px);
   }
 
-  .method-story:not([data-method-story-layout="stacked"]) .method-story-chapters {
+  :root[data-teach-header-measured] .method-story:not([data-method-story-layout="stacked"]) .method-story-chapters {
     width: auto;
     max-width: none;
   }
 
-  .method-story:not([data-method-story-layout="stacked"]) .method-story-chapter {
+  :root[data-teach-header-measured] .method-story:not([data-method-story-layout="stacked"]) .method-story-chapter {
     display: flex;
     min-height: clamp(450px, 66svh, 660px);
     flex-direction: column;
@@ -1430,16 +1438,16 @@
     padding: 36px clamp(10px, 1.8vw, 26px) 36px 0;
   }
 
-  .method-story:not([data-method-story-layout="stacked"]) .method-story-mark {
+  :root[data-teach-header-measured] .method-story:not([data-method-story-layout="stacked"]) .method-story-mark {
     flex-direction: row;
     align-items: center;
     gap: 14px;
     margin: 0 0 22px;
   }
 
-  .method-story:not([data-method-story-layout="stacked"]) .method-story-stage {
+  :root[data-teach-header-measured] .method-story:not([data-method-story-layout="stacked"]) .method-story-stage {
     position: sticky;
-    top: max(calc(var(--teach-header-height) + 20px), calc(50svh - 300px));
+    top: max(calc(var(--teach-header-offset, var(--teach-header-height)) + 20px), calc(50svh - 300px));
     order: 0;
     justify-self: end;
     margin: 0;
@@ -1447,7 +1455,7 @@
 }
 
 @media (min-width: 1024px) and (max-width: 1120px) and (min-height: 700px) {
-  .method-story:not([data-method-story-layout="stacked"]) {
+  :root[data-teach-header-measured] .method-story:not([data-method-story-layout="stacked"]) {
     gap: 32px;
   }
 }

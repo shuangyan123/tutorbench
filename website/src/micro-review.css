@@ -195,3 +195,37 @@ body.micro-review-page main .micro-review {
     outline: 2px solid Highlight;
   }
 }
+
+/* Where to go next: the two formal paths, separate from this demo. */
+.micro-review-next {
+  max-width: 720px;
+  margin-top: 28px;
+}
+
+.micro-review .micro-review-next h2 {
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.micro-review-next ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.micro-review-next li {
+  display: grid;
+  gap: 2px;
+}
+
+.micro-review-next a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.micro-review-next span {
+  color: var(--muted);
+  font-size: 13px;
+}

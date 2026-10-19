@@ -49,6 +49,12 @@ jobs:
         run: npm run website:build
       - name: Check public website artifact
         run: node scripts/website-artifact-smoke.mjs
+      - name: Check browser failure handling and hit-test regressions
+        timeout-minutes: 3
+        run: node --test scripts/website-hit-test.test.mjs
+      - name: Check public website click targets in a real browser
+        timeout-minutes: 5
+        run: node scripts/website-hit-test.mjs
       - name: Run package consumer smoke
         run: npm run test:package
 

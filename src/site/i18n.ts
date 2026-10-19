@@ -13,7 +13,7 @@ export type SiteUiTextKey =
   | "blogNav"
   | "getStarted"
   | "menu"
-  | "brandDescriptor"
+  | "productDescriptor"
   | "lightTheme"
   | "darkTheme"
   | "githubRepository"
@@ -248,13 +248,13 @@ const translations: Record<SiteLocale, Record<SiteUiTextKey, string>> = {
     blogNav: "Blog",
     getStarted: "Get Started",
     menu: "Menu",
-    brandDescriptor: "Real-world evaluation for AI tutoring",
+    productDescriptor: "AI tutor evaluation",
     lightTheme: "Light theme",
     darkTheme: "Dark theme",
     githubRepository: "GitHub repository",
     primaryNavigation: "Primary navigation",
     colorTheme: "Color theme",
-    teachometryHome: "Teachometry home",
+    teachometryHome: "Teachometry TutorBench home",
     leaderboard: "Leaderboard",
     data: "Data",
     run: "Run",
@@ -482,13 +482,13 @@ const translations: Record<SiteLocale, Record<SiteUiTextKey, string>> = {
     blogNav: "博客",
     getStarted: "开始使用",
     menu: "菜单",
-    brandDescriptor: "AI 辅导的真实场景评测",
+    productDescriptor: "AI 教学质量评测",
     lightTheme: "浅色主题",
     darkTheme: "深色主题",
     githubRepository: "GitHub 仓库",
     primaryNavigation: "主导航",
     colorTheme: "颜色主题",
-    teachometryHome: "Teachometry 首页",
+    teachometryHome: "Teachometry TutorBench 首页",
     leaderboard: "排行榜",
     data: "数据",
     run: "运行",

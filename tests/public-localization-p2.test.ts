@@ -208,8 +208,8 @@ test("LC-23: shared footer is Chinese in every final static route", async () => 
       if (item.isDirectory()) await visit(path);
       else if (item.name.endsWith(".html")) {
         const markup = await readFile(path, "utf8");
-        assert.match(markup, /home-footer-bottom"><span>Teachometry · <span>开发者预览<\/span>/u);
-        assert.doesNotMatch(markup, /Teachometry · Developer Preview<\/span>/u);
+        assert.match(markup, /home-footer-bottom"><span>Teachometry · TutorBench · <span>开发者预览<\/span>/u);
+        assert.doesNotMatch(markup, /TutorBench · <span>Developer Preview<\/span>/u);
       }
     }
   }
