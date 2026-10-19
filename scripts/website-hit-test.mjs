@@ -111,6 +111,20 @@ async function openPage(browser) {
     if (exceptionDetails) throw new Error(exceptionDetails.exception?.description ?? exceptionDetails.text);
     return result.value;
   };
+  // Runs a function defined in this script with JSON arguments. Values are passed
+  // as protocol arguments, so no data is ever spliced into page code.
+  const call = async (fn, ...args) => {
+    const { result: global } = await send("Runtime.evaluate", { expression: "globalThis" });
+    const { result, exceptionDetails } = await send("Runtime.callFunctionOn", {
+      objectId: global.objectId,
+      functionDeclaration: fn.toString(),
+      arguments: args.map((value) => ({ value })),
+      returnByValue: true,
+      awaitPromise: true,
+    });
+    if (exceptionDetails) throw new Error(exceptionDetails.exception?.description ?? exceptionDetails.text);
+    return result.value;
+  };
   const loaded = () => new Promise((done) => {
     const listener = (message) => {
       if (message.sessionId === sessionId && message.method === "Page.loadEventFired") { browser.listeners.delete(listener); done(); }
@@ -119,6 +133,7 @@ async function openPage(browser) {
   });
   return {
     evaluate,
+    call,
     async viewport(width, height) {
       await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: false });
     },
@@ -130,7 +145,7 @@ async function openPage(browser) {
       if (zoom !== 1) {
         // Text-size simulation: double every element's computed font size
         // (collected first so nothing compounds), as browser text zoom would.
-        await evaluate(`(() => { const all = [...document.querySelectorAll('body, body *')]; const sizes = all.map((el) => parseFloat(getComputedStyle(el).fontSize)); all.forEach((el, i) => el.style.setProperty('font-size', (sizes[i] * ${zoom}) + 'px', 'important')); return true; })()`);
+        await call(scaleText, zoom);
       }
       await sleep(250);
     },
@@ -143,35 +158,58 @@ async function openPage(browser) {
   };
 }
 
+// --- Functions below run inside the page (serialised with Function#toString). ---
+/* global document, getComputedStyle, innerWidth */
+
+function scaleText(factor) {
+  const all = [...document.querySelectorAll("body, body *")];
+  const sizes = all.map((el) => parseFloat(getComputedStyle(el).fontSize));
+  all.forEach((el, i) => el.style.setProperty("font-size", `${sizes[i] * factor}px`, "important"));
+  return true;
+}
+
 // Points inside a control: centre and 4px inside each edge (corners are left out
 // because hit testing follows border-radius on round controls).
-const POINTS = `(r) => [['center', r.left + r.width / 2, r.top + r.height / 2], ['left', r.left + 4, r.top + r.height / 2], ['right', r.right - 4, r.top + r.height / 2], ['top', r.left + r.width / 2, r.top + 3], ['bottom', r.left + r.width / 2, r.bottom - 3]]`;
-
-const HEADER_PROBE = `(() => {
-  const visible = (el) => { const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; for (let n = el; n; n = n.parentElement) { const s = getComputedStyle(n); if (s.display === 'none' || s.visibility === 'hidden') return false; } return true; };
-  const header = document.querySelector('header.site-header');
-  const controls = [...header.querySelectorAll('.wordmark, .nav-links a, .nav-toggle, .home-header-tools select, .home-header-tools button, .home-header-tools > a')].filter(visible);
+function headerProbe() {
+  const pointsOf = (r) => [["center", r.left + r.width / 2, r.top + r.height / 2], ["left", r.left + 4, r.top + r.height / 2], ["right", r.right - 4, r.top + r.height / 2], ["top", r.left + r.width / 2, r.top + 3], ["bottom", r.left + r.width / 2, r.bottom - 3]];
+  const visible = (el) => {
+    const r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return false;
+    for (let n = el; n; n = n.parentElement) {
+      const s = getComputedStyle(n);
+      if (s.display === "none" || s.visibility === "hidden") return false;
+    }
+    return true;
+  };
+  const header = document.querySelector("header.site-header");
+  const controls = [...header.querySelectorAll(".wordmark, .nav-links a, .nav-toggle, .home-header-tools select, .home-header-tools button, .home-header-tools > a")].filter(visible);
   const problems = [];
   for (const el of controls) {
-    for (const [name, x, y] of (${POINTS})(el.getBoundingClientRect())) {
+    for (const [name, x, y] of pointsOf(el.getBoundingClientRect())) {
       const hit = document.elementFromPoint(x, y);
-      if (!hit || !(hit === el || el.contains(hit))) problems.push((el.getAttribute('href') || el.tagName) + ' @' + name + ' -> ' + (hit ? (hit.closest('a, button, select') || hit).outerHTML.slice(0, 60) : 'nothing'));
+      if (!hit || !(hit === el || el.contains(hit))) problems.push(`${el.getAttribute("href") || el.tagName} @${name} -> ${hit ? (hit.closest("a, button, select") || hit).outerHTML.slice(0, 60) : "nothing"}`);
     }
   }
-  if (document.documentElement.scrollWidth > innerWidth + 1) problems.push('horizontal overflow');
+  if (document.documentElement.scrollWidth > innerWidth + 1) problems.push("horizontal overflow");
   return { count: controls.length, problems };
-})()`;
+}
 
-const target = (selector, index = 0) => `(() => { const el = [...document.querySelectorAll(${JSON.stringify(selector)})].filter((x) => x.getBoundingClientRect().width > 0)[${index}]; if (!el) return null; el.scrollIntoView({ block: 'center', behavior: 'instant' }); return { href: new URL(el.href).pathname, points: (${POINTS})(el.getBoundingClientRect()) }; })()`;
+function locateTarget(selector, index) {
+  const pointsOf = (r) => [["center", r.left + r.width / 2, r.top + r.height / 2], ["left", r.left + 4, r.top + r.height / 2], ["right", r.right - 4, r.top + r.height / 2], ["top", r.left + r.width / 2, r.top + 3], ["bottom", r.left + r.width / 2, r.bottom - 3]];
+  const el = [...document.querySelectorAll(selector)].filter((x) => x.getBoundingClientRect().width > 0)[index];
+  if (!el) return null;
+  el.scrollIntoView({ block: "center", behavior: "instant" });
+  return { href: new URL(el.href).pathname, points: pointsOf(el.getBoundingClientRect()) };
+}
 
 async function clickCheck(page, url, zoom, selector, index, failures, label) {
   await page.goto(url, zoom);
-  const first = await page.evaluate(target(selector, index));
+  const first = await page.call(locateTarget, selector, index);
   if (!first) { failures.push(`${label}: ${selector}[${index}] not found`); return 0; }
   let clicks = 0;
   for (let point = 0; point < first.points.length; point += 1) {
     if (point > 0) await page.goto(url, zoom);
-    const { href, points } = await page.evaluate(target(selector, index));
+    const { href, points } = await page.call(locateTarget, selector, index);
     const [name, x, y] = points[point];
     await page.click(x, y);
     let landed = "";
@@ -199,7 +237,7 @@ try {
     for (const path of ["/", "/methodology/", "/docs/", "/blog/", "/zh-cn/", "/zh-cn/blog/"]) {
       for (const zoom of width === 1023 ? [1] : [1, 2]) {
         await page.goto(origin + path, zoom);
-        const { count, problems } = await page.evaluate(HEADER_PROBE);
+        const { count, problems } = await page.call(headerProbe);
         checks += count;
         problems.forEach((problem) => failures.push(`header ${width}px ${path} x${zoom}: ${problem}`));
       }
