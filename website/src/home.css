@@ -37,18 +37,33 @@
 .case-controls { left: 137px; top: 22px; gap: 4px; }
 .case-badge { max-width: 44%; font-size: 8px; letter-spacing: .03em; }
 .home-page .walkthrough-title { font-size: 31px; margin: 11px 0 12px; }
-.walkthrough-tabs { margin-bottom: 12px; gap: 8px; }
+.walkthrough-tabs { margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
 .walkthrough-tabs button { padding: 10px 13px; font-size: 13px; }
 .walkthrough-body { grid-template-columns: 1fr 1fr; gap: 14px; }
 .walkthrough-content { height: 222px; }
 .learner-message { font-size: 13px; line-height: 1.5; padding: 14px; margin-bottom: 10px; }
 .tutor-objective { padding: 13px; font-size: 12px; line-height: 1.4; }
 .micro-label { font-size: 8px; letter-spacing: .05em; }
-.rubric-preview { padding: 14px; min-height: 222px; }
-.rubric-row { grid-template-columns: 86px 1fr 26px; gap: 6px; font-size: 14px; margin: 7px 0; }
+/* Dimension | track | status: the five rows share one subgrid, so the name and
+   status columns take the width of their longest text (e.g. "不适用") and only
+   the decorative track flexes. The panel grows with its rows instead of being
+   clipped to a fixed height. */
+.rubric-preview { display: grid; grid-template-columns: minmax(min-content, max-content) minmax(24px, 1fr) max-content; column-gap: 6px; align-content: start; min-height: 222px; padding: 14px; font-size: 14px; container-type: inline-size; }
+.rubric-preview > .micro-label, .rubric-preview > .score-caption { grid-column: 1 / -1; }
+.rubric-row { grid-column: 1 / -1; grid-template-columns: subgrid; gap: 6px; font-size: inherit; margin: 7px 0; }
+.rubric-row > span:first-child { overflow-wrap: anywhere; }
+.score-pending { justify-self: end; white-space: nowrap; }
+/* The panel carries the row text size, so this em is the row's em. One line
+   needs at most ~10.5em (longest name + status + 24px track); a narrower panel
+   (enlarged text, narrow column) puts each status beside its dimension and the
+   track on its own line instead of squeezing the row. */
+@container (max-width: 10.5em) {
+  .rubric-row { grid-template-columns: minmax(0, 1fr) max-content; row-gap: 3px; }
+  .rubric-row > .score-track { grid-column: 1 / -1; grid-row: 2; }
+}
 .score-track { height: 7px; }
 .score-caption { font-size: 9px; margin-top: 18px; }
-.walkthrough-bottom { font-size: 11px; margin-top: 16px; flex-wrap: nowrap; }
+.walkthrough-bottom { font-size: 11px; margin-top: 16px; flex-wrap: wrap; }
 .case-open, .walkthrough-status { padding: 11px 12px; gap: 8px; }
 .hero-foot { position: relative; min-height: 120px; display: flex; justify-content: center; align-items: center; }
 .scroll-cue { display: flex; flex-direction: column; align-items: center; gap: 7px; font-size: 10px; color: var(--muted); }
@@ -145,12 +160,13 @@
   .walkthrough-tabs button { font-size: 10px; padding: 7px 10px; }
   .walkthrough-tabs { margin-bottom: 9px; }
   .walkthrough-body { gap: 12px; }
-  .walkthrough-content, .rubric-preview { height: 160px; min-height: 160px; }
+  .walkthrough-content { height: 160px; min-height: 160px; }
+  .rubric-preview { min-height: 160px; }
   .learner-message { font-size: 10px; padding: 10px; }
   .tutor-objective { font-size: 9px; padding: 10px; }
   .micro-label { font-size: 6px; }
-  .rubric-preview { padding: 10px; }
-  .rubric-row { grid-template-columns: 62px 1fr 22px; font-size: 11px; gap: 5px; margin: 5px 0; }
+  .rubric-preview { padding: 10px; column-gap: 5px; font-size: 11px; }
+  .rubric-row { gap: 5px; margin: 5px 0; }
   .score-pending { font-size: 8px; }
   .score-caption { font-size: 8px; margin-top: 12px; }
   .walkthrough-bottom { font-size: 9px; gap: 6px; margin-top: 12px; }
@@ -214,8 +230,7 @@
   .learner-message { font-size: 13px; }
   .tutor-objective { font-size: 12px; }
   .micro-label { font-size: 8px; }
-  .rubric-preview { height: auto; min-height: 0; }
-  .rubric-row { grid-template-columns: 95px 1fr 28px; font-size: 14px; }
+  .rubric-preview { height: auto; min-height: 0; font-size: 14px; }
   .score-caption { font-size: 10px; margin-top: 12px; }
   .walkthrough-bottom { flex-wrap: wrap; gap: 8px; }
   .hero-foot { min-height: 105px; }
