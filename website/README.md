@@ -112,9 +112,14 @@ hopes for education, and a transition into Home. It is brand writing, not
 evidence, and it says TutorBench cannot yet show learning gains. It is a native
 modal `<dialog>` rendered before the header (`SitePage.prelude`) with a small
 inline script that opens it before first paint only for a first Home visit.
-JavaScript off, reduced motion, unavailable storage, repeat visits, and every
-other route go straight to the page. Skip and Escape work even if
-`assets/letter.js` never loads. The only state is `localStorage`
+JavaScript off, reduced motion, storage that cannot be read or written, repeat
+visits, and every other route go straight to the page. Skip and Escape work
+even if `assets/letter.js` never loads, and if it never marks
+`<html data-letter-ready>` the letter closes at `DOMContentLoaded`. Back and
+Forward follow `#letter`, and a page restored from the back/forward cache shows
+the letter only when its URL asks for it. `scripts/website-letter-checks.mjs`
+(run by the hit test) covers layout at 320-1440 px with doubled text, contrast,
+history, and these failure modes. The only state is `localStorage`
 `teachometry-letter-v1 = "1"`. The Home entry "A letter to learners" and any
 `#letter` link reopen it. `letter.css` and `letter.js` load only on Home. See
 `docs/home-letter-opening.md` for the concept, full copy, and open decisions.

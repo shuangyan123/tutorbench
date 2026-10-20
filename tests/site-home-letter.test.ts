@@ -121,10 +121,14 @@ test("only Home carries the letter", async () => {
 
 interface GateRun {
   readonly opened: boolean;
-  readonly ready: boolean;
+  /** The Home entry's place is reserved (JavaScript is running). */
+  readonly reserved: boolean;
   readonly theme: string | null;
   readonly stored: string | null;
+  readonly closedWith: string | null;
   readonly activate: () => void;
+  /** Fires DOMContentLoaded, after letter.js has (or has not) marked itself ready. */
+  readonly contentLoaded: (letterReady: boolean) => void;
 }
 
 function runGate({
@@ -134,6 +138,7 @@ function runGate({
   darkScheme = false,
   theme = null,
   storageThrows = false,
+  writeThrows = false,
   prerendering = false,
   showModal = true,
 }: {
@@ -143,6 +148,7 @@ function runGate({
   darkScheme?: boolean;
   theme?: string | null;
   storageThrows?: boolean;
+  writeThrows?: boolean;
   prerendering?: boolean;
   showModal?: boolean;
 } = {}): GateRun {
@@ -151,15 +157,23 @@ function runGate({
   if (theme !== null) values.set("tutorbench-home-theme", theme);
   const attributes = new Map<string, string>();
   const rootAttributes = new Map<string, string>();
+  const listeners = new Map<string, () => void>();
   let opened = false;
-  let activation: (() => void) | undefined;
+  let open = false;
+  let closedWith: string | null = null;
   const dialog = {
+    get open() { return open; },
     setAttribute: (name: string, value: string) => { attributes.set(name, value); },
-    ...(showModal ? { showModal: () => { opened = true; } } : {}),
+    close: (value: string) => { open = false; closedWith = value; },
+    ...(showModal ? { showModal: () => { opened = true; open = true; } } : {}),
   };
   const storage = {
     getItem: (key: string) => values.get(key) ?? null,
-    setItem: (key: string, value: string) => { values.set(key, value); },
+    setItem: (key: string, value: string) => {
+      if (writeThrows) throw Object.assign(new Error("The quota has been exceeded."), { name: "QuotaExceededError" });
+      values.set(key, value);
+    },
+    removeItem: (key: string) => { values.delete(key); },
   };
   const window = {
     location: { hash },
@@ -173,54 +187,82 @@ function runGate({
   };
   const document = {
     prerendering,
-    documentElement: { setAttribute: (name: string, value: string) => { rootAttributes.set(name, value); } },
+    documentElement: {
+      setAttribute: (name: string, value: string) => { rootAttributes.set(name, value); },
+      hasAttribute: (name: string) => rootAttributes.has(name),
+    },
     getElementById: (id: string) => (id === "home-letter" ? dialog : null),
-    addEventListener: (name: string, listener: () => void) => { if (name === "prerenderingchange") activation = listener; },
+    addEventListener: (name: string, listener: () => void) => { listeners.set(name, listener); },
   };
   runInNewContext(HOME_LETTER_GATE_SCRIPT, { window, document });
   return {
     opened,
-    ready: rootAttributes.has("data-letter-ready"),
+    reserved: rootAttributes.has("data-letter-js"),
     theme: attributes.get("data-theme") ?? null,
     get stored() { return values.get(HOME_LETTER_STORAGE_KEY) ?? null; },
-    activate: () => activation?.(),
+    get closedWith() { return closedWith; },
+    activate: () => listeners.get("prerenderingchange")?.(),
+    contentLoaded: (letterReady: boolean) => {
+      if (letterReady) rootAttributes.set("data-letter-ready", "");
+      listeners.get("DOMContentLoaded")?.();
+    },
   };
 }
 
 test("the letter opens on its own once, for a first Home visit only", () => {
   const first = runGate();
   assert.equal(first.opened, true);
-  assert.equal(first.ready, true);
+  assert.equal(first.reserved, true);
   assert.equal(first.stored, "1");
   assert.equal(first.theme, "light");
+  first.contentLoaded(true);
+  assert.equal(first.closedWith, null, "a working letter.js keeps the letter open");
 
   const again = runGate({ stored: "1" });
   assert.equal(again.opened, false, "a returning visitor goes straight to Home");
-  assert.equal(again.ready, true, "the Home entry back to the letter stays available");
+  assert.equal(again.reserved, true, "the place of the Home entry back to the letter is kept");
 
   assert.equal(runGate({ darkScheme: true }).theme, "dark");
   assert.equal(runGate({ darkScheme: true, theme: "light" }).theme, "light", "a chosen site theme wins");
 });
 
-test("reduced motion, unavailable storage, and old browsers go straight to Home", () => {
+test("reduced motion, unusable storage, and old browsers go straight to Home", () => {
   const reduced = runGate({ reducedMotion: true });
   assert.equal(reduced.opened, false);
   assert.equal(reduced.stored, null);
-  assert.equal(reduced.ready, true);
+  assert.equal(reduced.reserved, true);
 
   // Without storage the visit cannot be remembered, so it never opens on its own.
-  const noStorage = runGate({ storageThrows: true });
-  assert.equal(noStorage.opened, false);
+  assert.equal(runGate({ storageThrows: true }).opened, false);
+
+  // Readable storage that refuses writes (QuotaExceededError) would reopen the
+  // letter on every reload, so it is treated like no storage.
+  const full = runGate({ writeThrows: true });
+  assert.equal(full.opened, false);
+  assert.equal(full.stored, null);
+  assert.equal(runGate({ writeThrows: true, stored: "1" }).opened, false);
 
   const noDialog = runGate({ showModal: false });
   assert.equal(noDialog.opened, false);
-  assert.equal(noDialog.ready, false, "no entry is shown when the dialog cannot open");
+  assert.equal(noDialog.reserved, false, "no entry is reserved when the dialog cannot open");
+});
+
+test("if letter.js never takes over, the letter steps aside at DOMContentLoaded", () => {
+  const broken = runGate();
+  assert.equal(broken.opened, true);
+  broken.contentLoaded(false);
+  assert.equal(broken.closedWith, "unavailable", "nobody is left in front of an envelope that cannot open");
+
+  const linked = runGate({ stored: "1", hash: "#letter" });
+  linked.contentLoaded(false);
+  assert.equal(linked.closedWith, "unavailable");
 });
 
 test("a #letter link always opens the letter, and a prerender is not counted as a visit", () => {
   assert.equal(runGate({ stored: "1", hash: "#letter" }).opened, true);
   assert.equal(runGate({ reducedMotion: true, hash: "#letter" }).opened, true);
   assert.equal(runGate({ storageThrows: true, hash: "#letter" }).opened, true);
+  assert.equal(runGate({ writeThrows: true, hash: "#letter" }).opened, true);
 
   const prerender = runGate({ prerendering: true });
   assert.equal(prerender.opened, true);
@@ -229,15 +271,31 @@ test("a #letter link always opens the letter, and a prerender is not counted as 
   assert.equal(prerender.stored, "1");
 });
 
-test("letter assets keep motion optional and reveal nothing without the gate", async () => {
-  const styles = await readFile("website/src/letter.css", "utf8");
-  const script = await readFile("website/src/letter.js", "utf8");
+// Source files may be checked out with CRLF line endings (Windows autocrlf).
+const normalizeLineEndings = (text: string): string => text.replace(/\r\n?/gu, "\n");
+
+function assertLetterAssets(stylesSource: string, scriptSource: string): void {
+  const styles = normalizeLineEndings(stylesSource);
+  const script = normalizeLineEndings(scriptSource);
   // No external animation library, sound, or autoplay.
   assert.doesNotMatch(script, /import\s|require\(|AudioContext|new Audio|\.play\(/u);
   assert.match(script, /prefers-reduced-motion: reduce/u);
-  // The entry is hidden unless the gate marked the document as able to open the letter.
+  // letter.js announces itself only after wiring every control.
+  assert.match(script, /setAttribute\("data-letter-ready", ""\);\n\}\)\(\);\n$/u);
+  // The entry is absent without JavaScript and visible only once letter.js is ready.
   assert.match(styles, /\.home-letter-entry \{\n {2}display: none;\n\}/u);
-  assert.match(styles, /html\[data-letter-ready\] \.home-letter-entry \{/u);
-  // The page behind the modal keeps its width, so closing the letter shifts nothing.
-  assert.match(styles, /html:has\(#home-letter\[open\]\) \{\n {2}overflow: hidden;\n {2}scrollbar-gutter: stable;/u);
+  assert.match(styles, /html\[data-letter-js\] \.home-letter-entry \{[^}]*visibility: hidden;/u);
+  assert.match(styles, /html\[data-letter-ready\] \.home-letter-entry \{\n {2}visibility: visible;\n\}/u);
+}
+
+test("letter assets add no dependency or sound and only reveal working controls", async () => {
+  assertLetterAssets(await readFile("website/src/letter.css", "utf8"), await readFile("website/src/letter.js", "utf8"));
+});
+
+test("the asset checks pass unchanged on a CRLF checkout", async () => {
+  const toCrlf = (text: string): string => normalizeLineEndings(text).replace(/\n/gu, "\r\n");
+  const styles = toCrlf(await readFile("website/src/letter.css", "utf8"));
+  const script = toCrlf(await readFile("website/src/letter.js", "utf8"));
+  assert.ok(styles.includes("\r\n") && script.includes("\r\n"));
+  assertLetterAssets(styles, script);
 });

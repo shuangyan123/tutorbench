@@ -12,11 +12,11 @@
 //     ("N/A" / "不适用", one line each), caption, footer and controls inside
 //     their own boxes without overlapping, across widths, text sizes, case
 //     switching and keyboard tab changes.
-//   - the Home opening letter: a first visit opens it over Home (every header
-//     control is covered), its Skip control owns its own points and closes it
-//     with a real click, Escape closes it, the visit is remembered, the envelope
-//     opens into the letter, and the Home entry reopens it. Without JavaScript
-//     Home is reachable directly.
+//   - the Home opening letter (scripts/website-letter-checks.mjs): layout and
+//     real hits at 320-1440 px with normal and doubled text, contrast, first
+//     and repeat visits, Skip, Escape, keyboard, a full read, the Home entry,
+//     Back/Forward and back/forward-cache restores, a missing letter.js, full
+//     storage, reduced motion; without JavaScript Home is reachable directly.
 // The header, homepage-path and case-card checks model a returning visitor (the
 // letter already delivered), because the letter is a separate one-time layer.
 // Scenarios cover 1024/1100/1440 px, English and zh-CN, and a 200% text
@@ -32,6 +32,7 @@ import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { findBrowser, launchBrowser, openPage } from "./website-browser.mjs";
+import { runLetterChecks } from "./website-letter-checks.mjs";
 
 const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp", ".ico": "image/x-icon", ".json": "application/json", ".woff2": "font/woff2" };
 
@@ -59,7 +60,7 @@ const LETTER_KEY = "teachometry-letter-v1";
 const RETURNING_VISITOR = `try { localStorage.setItem(${JSON.stringify(LETTER_KEY)}, "1"); } catch { /* storage is optional */ }`;
 
 // --- Functions below run inside the page (serialised with Function#toString). ---
-/* global document, getComputedStyle, innerWidth, innerHeight, localStorage, requestAnimationFrame */
+/* global document, getComputedStyle, innerWidth, innerHeight, requestAnimationFrame */
 
 function scaleText(factor) {
   const all = [...document.querySelectorAll("body, body *")];
@@ -190,26 +191,6 @@ function focusFirstTab() {
   return true;
 }
 
-function letterState() {
-  const dialog = document.getElementById("home-letter");
-  let stored;
-  try { stored = localStorage.getItem("teachometry-letter-v1"); } catch { stored = "unavailable"; }
-  return { open: Boolean(dialog?.open), state: dialog?.dataset.letterState ?? null, stored, focus: document.activeElement?.getAttribute("class") ?? null };
-}
-
-// While the letter is open every visible header control is covered by it.
-function letterCoversHeader() {
-  const dialog = document.getElementById("home-letter");
-  const controls = [...document.querySelectorAll("header.site-header a, header.site-header button, header.site-header select")]
-    .filter((el) => el.getBoundingClientRect().width > 0);
-  const exposed = controls.filter((el) => {
-    const r = el.getBoundingClientRect();
-    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-    return !dialog || !dialog.contains(hit);
-  });
-  return { count: controls.length, exposed: exposed.map((el) => el.outerHTML.slice(0, 60)) };
-}
-
 // A letter control owns the centre and the points just inside each edge.
 function letterControlProbe(selector) {
   const el = document.querySelector(selector);
@@ -332,85 +313,9 @@ export async function runHitTest(directory, executable = findBrowser()) {
         checks += 1;
       }
     }
-    // Home opening letter, starting each check as a first visit.
+    // Home opening letter (scripts/website-letter-checks.mjs), from a first visit on.
     await page.send("Page.removeScriptToEvaluateOnNewDocument", { identifier: returningVisitor });
-    const firstVisit = async (url) => {
-      await page.goto(url);
-      await page.evaluate("localStorage.clear()");
-      await page.goto(url);
-    };
-    const pause = (ms) => new Promise((done) => setTimeout(done, ms));
-    for (const [width, height] of [[1440, 900], [390, 844]]) {
-      await page.viewport(width, height);
-      for (const home of ["/", "/zh-cn/"]) {
-        const label = `letter ${width}px ${home}`;
-        await firstVisit(origin + home);
-        let state = await page.call(letterState);
-        if (!state.open || state.state !== "sealed") failures.push(`${label}: first visit did not open the sealed letter (${JSON.stringify(state)})`);
-        if (state.stored !== "1") failures.push(`${label}: first visit was not remembered`);
-        if (state.focus !== "letter-envelope") failures.push(`${label}: focus starts on ${state.focus}, not the envelope`);
-        const cover = await page.call(letterCoversHeader);
-        checks += cover.count;
-        cover.exposed.forEach((control) => failures.push(`${label}: header control not covered: ${control}`));
-        for (const selector of ["[data-letter-skip]", "[data-letter-envelope]"]) {
-          const { count, problems } = await page.call(letterControlProbe, selector);
-          checks += count;
-          problems.forEach((problem) => failures.push(`${label}: ${problem}`));
-        }
-        const skip = await page.call(locateTarget, "[data-letter-skip]", 0);
-        await page.click(skip.points[0][1], skip.points[0][2]);
-        await pause(500);
-        state = await page.call(letterState);
-        if (state.open) failures.push(`${label}: Skip did not close the letter`);
-        checks += 1;
-        // Home is usable right away, and a reload goes straight to Home.
-        checks += await clickCheck(page, origin + home, 1, ".home-actions a.button-primary", 0, failures, `${label} after skip`);
-        await page.goto(origin + home);
-        if ((await page.call(letterState)).open) failures.push(`${label}: letter reopened on a repeat visit`);
-        checks += 1;
-      }
-    }
-    await page.viewport(1440, 900);
-    for (const home of ["/", "/zh-cn/"]) {
-      const label = `letter keyboard ${home}`;
-      await firstVisit(origin + home);
-      // Enter needs its text so the focused button is activated as a real key press would.
-      const key = async (name, code, keyCode) => {
-        const text = name === "Enter" ? { text: "\r", unmodifiedText: "\r" } : {};
-        await page.send("Input.dispatchKeyEvent", { type: "keyDown", key: name, code, windowsVirtualKeyCode: keyCode, ...text });
-        await page.send("Input.dispatchKeyEvent", { type: "keyUp", key: name, code, windowsVirtualKeyCode: keyCode });
-      };
-      await key("Escape", "Escape", 27);
-      await pause(500);
-      if ((await page.call(letterState)).open) failures.push(`${label}: Escape did not close the letter`);
-      checks += 1;
-      // A #letter link reopens the sealed letter; Enter on the envelope opens it for reading.
-      await page.evaluate("location.hash = '#letter'");
-      await pause(200);
-      await key("Enter", "Enter", 13);
-      await pause(2600);
-      let state = await page.call(letterState);
-      if (state.state !== "reading" || state.focus !== "letter-scroll") failures.push(`${label}: Enter did not open the letter for reading (${JSON.stringify(state)})`);
-      const next = await page.call(letterControlProbe, "[data-letter-next]");
-      checks += next.count + 1;
-      next.problems.forEach((problem) => failures.push(`${label}: ${problem}`));
-      await key("Escape", "Escape", 27);
-      await pause(500);
-      // The Home entry reopens the letter straight into reading and returns focus.
-      const entry = await page.call(letterControlProbe, "[data-letter-open]");
-      checks += entry.count;
-      entry.problems.forEach((problem) => failures.push(`${label}: ${problem}`));
-      const target = await page.call(locateTarget, "[data-letter-open]", 0);
-      await page.click(target.points[0][1], target.points[0][2]);
-      await pause(700);
-      state = await page.call(letterState);
-      if (!state.open || state.state !== "reading") failures.push(`${label}: Home entry did not reopen the letter (${JSON.stringify(state)})`);
-      await key("Escape", "Escape", 27);
-      await pause(500);
-      state = await page.call(letterState);
-      if (state.open || state.focus !== "home-letter-entry") failures.push(`${label}: closing did not return focus to the Home entry (${JSON.stringify(state)})`);
-      checks += 2;
-    }
+    checks += await runLetterChecks(page, origin, failures, diagnostics);
 
     // 无脚本时必须使用可完整阅读的静态布局，而非猜测多行 Header 的高度。
     await page.setJavaScriptEnabled(false);

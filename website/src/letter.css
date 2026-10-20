@@ -21,10 +21,11 @@
   --lt-crease-light: rgba(255, 255, 255, .9);
   --lt-ghost-line: rgba(18, 58, 91, .09);
   --lt-ink: #123a5b;
-  --lt-muted: #536d80;
+  --lt-muted: #4b6577;
+  /* Unread passages: lighter than ink, still at least 4.5:1 on the paper. */
+  --lt-draft: #4b6577;
   --lt-accent: #086965;
   --lt-accent-strong: #07524f;
-  --lt-faint: .26;
   --lt-line: rgba(18, 58, 91, .12);
   --lt-line-strong: rgba(18, 58, 91, .24);
   --lt-chip: rgba(255, 255, 255, .55);
@@ -76,9 +77,9 @@
   --lt-ghost-line: rgba(239, 247, 240, .12);
   --lt-ink: #eef4ec;
   --lt-muted: #b7ccc6;
+  --lt-draft: #a9c0b9;
   --lt-accent: #afe0cf;
   --lt-accent-strong: #d0f1e5;
-  --lt-faint: .3;
   --lt-line: rgba(239, 247, 240, .13);
   --lt-line-strong: rgba(239, 247, 240, .26);
   --lt-chip: rgba(24, 50, 46, .6);
@@ -103,6 +104,9 @@
 
 .home-letter[open] {
   display: grid;
+  /* One shrinkable column: no child, however large its text, can widen the
+   * letter past the viewport. */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
 }
 
@@ -173,45 +177,55 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 
 /* --- Top bar ----------------------------------------------------------- */
 
+/* With large text the bar wraps: the actions move under the name, and the
+ * two actions may stack. Skip never leaves the viewport. */
 .letter-bar {
   position: relative;
   z-index: 2;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px 16px;
   padding: 16px clamp(16px, 4vw, 40px);
   transition: opacity .2s ease;
 }
 
 .letter-brand {
   display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 12px;
+  gap: 2px 12px;
   min-width: 0;
   margin: 0;
 }
 
 .letter-brand-name {
+  flex: none;
+  max-width: 100%;
   color: var(--lt-accent-strong);
-  font: 400 23px/1 var(--lt-serif);
+  font: 400 23px/1.1 var(--lt-serif);
   letter-spacing: -.025em;
+  overflow-wrap: anywhere;
 }
 
 .letter-brand-note {
-  overflow: hidden;
+  min-width: 0;
   color: var(--lt-muted);
   font-size: 12px;
   letter-spacing: .03em;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .letter-bar-actions {
   display: flex;
-  flex: none;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
+  max-width: 100%;
+  margin-left: auto;
 }
 
 .letter-bar-actions form {
@@ -223,13 +237,15 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
   min-height: 40px;
-  padding: 0 14px;
+  padding: 6px 14px;
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
   color: var(--lt-ink);
-  font: 500 13px/1 var(--lt-sans);
+  font: 500 13px/1.2 var(--lt-sans);
+  text-align: start;
   text-decoration: none;
   cursor: pointer;
   transition: background-color .2s ease, border-color .2s ease;
@@ -264,11 +280,20 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   position: relative;
   z-index: 1;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
   justify-items: center;
   align-items: center;
   min-height: 0;
   padding: 0 16px clamp(14px, 3.4vh, 34px);
+}
+
+/* A sealed letter with very large text scrolls below the bar instead of
+ * being cut off. */
+.home-letter[data-letter-state="sealed"] .letter-stage {
+  grid-template-rows: minmax(min-content, 1fr) auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .letter-envelope-wrap,
@@ -279,9 +304,12 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 
 .letter-envelope-wrap {
   display: grid;
+  justify-self: stretch;
   justify-items: center;
   gap: clamp(18px, 4vh, 34px);
+  max-width: 100%;
   margin-top: -3vh;
+  padding-block: 16px;
 }
 
 /* --- Envelope ---------------------------------------------------------- */
@@ -291,11 +319,17 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   --tilt-y: 0deg;
   --lift: 0px;
   position: relative;
-  display: block;
-  width: min(520px, 86vw, calc((100dvh - 250px) * 1.55));
-  min-width: 240px;
+  /* The address is in flow, so larger text makes the envelope taller rather
+   * than spilling over the seal. Sizes inside follow the envelope width. */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* Leaves room for the 12px dashed focus ring on the narrowest screens. */
+  width: min(520px, 100% - 28px, calc((100dvh - 250px) * 1.55));
+  min-width: min(240px, 100% - 28px);
   aspect-ratio: 520 / 336;
   padding: 0;
+  container-type: inline-size;
   border: 0;
   border-radius: 8px;
   background: none;
@@ -319,7 +353,7 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 .letter-envelope:focus-visible::after {
   content: "";
   position: absolute;
-  inset: -13px;
+  inset: -12px;
   border: 1.5px dashed var(--lt-accent);
   border-radius: 14px;
 }
@@ -367,7 +401,7 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   z-index: 2;
   border-radius: 6px;
   background: linear-gradient(172deg, var(--lt-glass-1), var(--lt-glass-2));
-  clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+  clip-path: polygon(0 0, 50% 35cqw, 100% 0, 100% 100%, 0 100%);
 }
 
 .envelope-seams {
@@ -385,16 +419,16 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 }
 
 .envelope-address {
-  position: absolute;
+  position: relative;
   z-index: 3;
-  right: 10%;
-  bottom: 12%;
-  left: 10%;
+  /* Clears the seal (centre 36.8cqw, at least 38px wide) with room to spare. */
+  margin: max(44cqw, 36.8cqw + 30px) 10cqw 7.5cqw;
   padding-bottom: .5em;
   border-bottom: 1px solid var(--lt-line);
   color: var(--lt-ink);
-  font: italic 400 clamp(14px, 3.6vw, 22px)/1.3 var(--lt-serif);
+  font: italic 400 clamp(14px, 4.2cqw, 22px)/1.3 var(--lt-serif);
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .home-letter:lang(zh-CN) .envelope-address {
@@ -404,22 +438,24 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 
 .envelope-flap {
   z-index: 4;
+  bottom: auto;
+  height: 37.5cqw;
   border-radius: 6px 6px 0 0;
   background:
-    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--lt-glass-edge) 50%, transparent calc(50% + 1px)) 0 0 / 50% 58% no-repeat,
-    linear-gradient(to bottom left, transparent calc(50% - 1px), var(--lt-glass-edge) 50%, transparent calc(50% + 1px)) 100% 0 / 50% 58% no-repeat,
-    linear-gradient(180deg, var(--lt-flap-1), var(--lt-flap-2) 58%);
-  clip-path: polygon(0 0, 100% 0, 50% 58%);
+    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--lt-glass-edge) 50%, transparent calc(50% + 1px)) 0 0 / 50% 100% no-repeat,
+    linear-gradient(to bottom left, transparent calc(50% - 1px), var(--lt-glass-edge) 50%, transparent calc(50% + 1px)) 100% 0 / 50% 100% no-repeat,
+    linear-gradient(180deg, var(--lt-flap-1), var(--lt-flap-2));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
   transform-origin: 50% 0;
 }
 
 .envelope-seal {
   position: absolute;
   z-index: 5;
-  top: 57%;
+  top: 36.8cqw;
   left: 50%;
   display: grid;
-  width: clamp(38px, 9vw, 54px);
+  width: clamp(38px, 10.4cqw, 54px);
   aspect-ratio: 1;
   place-items: center;
   border-radius: 50% 47% 52% 49%;
@@ -429,7 +465,7 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
     inset 0 -2px 4px rgba(0, 0, 0, .12),
     0 3px 8px rgba(var(--lt-shadow), .28);
   color: var(--lt-seal-ink);
-  font: italic 600 clamp(20px, 4.6vw, 28px)/1 var(--lt-serif);
+  font: italic 600 clamp(20px, 5.2cqw, 28px)/1 var(--lt-serif);
   translate: -50% -50%;
   animation: letter-seal-breathe 2.8s ease-in-out infinite;
 }
@@ -441,8 +477,10 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 .letter-hint {
   display: grid;
   gap: 7px;
+  max-width: 100%;
   margin: 0;
   text-align: center;
+  overflow-wrap: anywhere;
   transition: opacity .25s ease;
 }
 
@@ -661,6 +699,7 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   color: var(--lt-ink);
   font: 400 clamp(16.5px, .35vw + 14.2px, 19px)/1.75 var(--lt-serif);
   hanging-punctuation: first;
+  overflow-wrap: break-word;
 }
 
 .home-letter:lang(zh-CN) .letter-text {
@@ -669,18 +708,44 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   letter-spacing: .03em;
 }
 
+/* Ink follows the reader. Every passage is readable from the start (at least
+ * 4.5:1). A passage the reader reaches settles from draft grey into ink, and
+ * a thin rule is drawn beside it in the margin, so progress lives in the
+ * margin rather than in hard-to-read text. */
 .letter-stanza {
   position: relative;
   margin: 0 0 1.7em;
-  color: var(--lt-accent);
-  opacity: var(--lt-faint);
-  transition: opacity 1s ease, color 1.3s ease;
+  color: var(--lt-draft);
+  transition: color 1.2s ease;
 }
 
-/* Ink follows the reader: a stanza turns from a pale draft into settled ink. */
 .letter-stanza.is-inked {
   color: var(--lt-ink);
-  opacity: 1;
+}
+
+.letter-stanza::before {
+  content: "";
+  position: absolute;
+  top: .3em;
+  bottom: .3em;
+  left: calc(-1 * min(1.1em, 18px));
+  width: 2px;
+  border-radius: 2px;
+  background: var(--lt-accent);
+  opacity: .55;
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform 1.1s .15s cubic-bezier(.45, 0, .2, 1);
+}
+
+.letter-stanza.is-inked::before {
+  transform: scaleY(1);
+}
+
+/* The site colours every p and h3 directly; inside the letter they take the
+ * stanza's draft or ink colour instead. */
+.letter-text :is(p, h3) {
+  color: inherit;
 }
 
 .letter-stanza p {
@@ -812,7 +877,7 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   stroke-linecap: round;
 }
 
-.letter-postscript {
+.letter-text .letter-postscript {
   color: var(--lt-muted);
   font-size: .88em;
   font-style: italic;
@@ -828,6 +893,7 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 
 .letter-controls {
   grid-row: 2;
+  max-width: 100%;
   padding-top: clamp(12px, 2.4vh, 22px);
   transition: opacity .2s ease;
 }
@@ -836,14 +902,16 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  max-width: 100%;
   min-height: 46px;
-  padding: 0 22px 0 24px;
+  padding: 8px 22px 8px 24px;
   border: 0;
   border-radius: 999px;
   background: var(--lt-button);
   box-shadow: 0 12px 26px -14px rgba(var(--lt-shadow), .55);
   color: var(--lt-button-ink);
-  font: 600 14px/1 var(--lt-sans);
+  font: 600 14px/1.2 var(--lt-sans);
+  text-align: center;
   letter-spacing: .01em;
   cursor: pointer;
   transition: background-color .2s ease, transform .2s ease;
@@ -944,14 +1012,18 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 
 /* --- Home entry ("read it again") -------------------------------------- */
 
+/* The entry is absent without JavaScript. The first-visit script reserves its
+ * place before first paint (data-letter-js), and letter.js makes it visible
+ * only once it can really open the letter (data-letter-ready). */
 .home-letter-entry {
   display: none;
 }
 
-html[data-letter-ready] .home-letter-entry {
+html[data-letter-js] .home-letter-entry {
   position: absolute;
   bottom: 22px;
   left: 0;
+  visibility: hidden;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -961,10 +1033,13 @@ html[data-letter-ready] .home-letter-entry {
   border-radius: 999px;
   background: color-mix(in srgb, var(--surface) 72%, transparent);
   color: var(--ink);
-  font: italic 400 13px/1 var(--teach-serif, Georgia, serif);
+  font: italic 400 13px/1.2 var(--teach-serif, Georgia, serif);
   text-decoration: none;
-  white-space: nowrap;
   transition: border-color .2s ease, background-color .2s ease;
+}
+
+html[data-letter-ready] .home-letter-entry {
+  visibility: visible;
 }
 
 .home-letter-entry svg {
@@ -981,7 +1056,7 @@ html[data-letter-ready] .home-letter-entry {
   outline-offset: 3px;
 }
 
-html[data-letter-ready]:lang(zh-CN) .home-letter-entry {
+html[data-letter-js]:lang(zh-CN) .home-letter-entry {
   font-style: normal;
   letter-spacing: .04em;
 }
@@ -1003,7 +1078,7 @@ html[data-letter-ready]:lang(zh-CN) .home-letter-entry {
 
   .letter-language,
   .letter-skip {
-    padding: 0 12px;
+    padding: 6px 12px;
   }
 
   .letter-stage {
@@ -1015,13 +1090,41 @@ html[data-letter-ready]:lang(zh-CN) .home-letter-entry {
   }
 }
 
-/* Narrow Home: the scroll cue moves left, so the entry joins the handwritten note. */
+/* Narrow Home: the entry, the scroll cue and the handwritten note each get
+ * their own place in the hero foot, so none can cover another at any text
+ * size. Only applies when the entry exists (JavaScript on). */
 @media (max-width: 900px) {
-  html[data-letter-ready] .home-letter-entry {
-    top: 4px;
-    right: 0;
-    bottom: auto;
-    left: auto;
+  html[data-letter-js] .hero-foot {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "entry entry"
+      "cue note";
+    align-items: center;
+    gap: 14px 18px;
+    min-height: 0;
+    padding-block: 12px 22px;
+  }
+
+  html[data-letter-js] .home-letter-entry {
+    position: static;
+    grid-area: entry;
+    justify-self: start;
+    max-width: 100%;
+  }
+
+  html[data-letter-js] .hero-foot .scroll-cue {
+    grid-area: cue;
+    margin: 0;
+  }
+
+  html[data-letter-js] .hero-foot .hero-note {
+    position: static;
+    grid-area: note;
+    justify-self: end;
+    max-width: 100%;
+    margin: .6em 0;
+    white-space: normal;
   }
 }
 

@@ -7,6 +7,11 @@
 // reader-paced ink, the way into Home, and the quiet way back to the letter.
 // Nothing here runs on its own clock except the opening the visitor started:
 // the letter only moves forward when the reader asks it to.
+//
+// URL rule: apart from the one automatic first-visit opening, the letter is
+// open exactly when the URL ends in #letter. Back, Forward and a page restored
+// from the back/forward cache are brought in line with the URL; closing the
+// letter never adds a history entry.
 (() => {
   const dialog = document.getElementById("home-letter");
   if (!(dialog instanceof HTMLDialogElement) || typeof dialog.showModal !== "function") return;
@@ -46,6 +51,10 @@
   let observer = null;
   let opener = null;
   let tiltFrame = 0;
+  // True when this document pushed the #letter entry being shown, so closing
+  // can step back over it instead of leaving a duplicate entry behind.
+  let ownsHistoryEntry = false;
+  let pendingFrom = null;
 
   const still = () => reducedMotion.matches;
   const state = () => dialog.dataset.letterState;
@@ -166,6 +175,12 @@
     if (dialog.open) dialog.close(reason);
   }
 
+  // The URL left #letter (Back) or a cached page came back: follow the URL
+  // at once, without touching history again.
+  function closeForUrl() {
+    if (dialog.open) close("url");
+  }
+
   // Skip or Escape: step aside quickly.
   function leave() {
     if (!dialog.open || state() === "leaving" || state() === "entering") return;
@@ -210,11 +225,25 @@
     if (dialog.open) return;
     reset();
     syncTheme();
+    dialog.returnValue = "";
     if (from === "entry") dialog.dataset.letterFrom = "entry";
     dialog.showModal();
+    // Someone who kept the letter goes straight back to reading it.
     if (from === "entry") {
       startReading();
       window.setTimeout(() => { if (state() === "reading") delete dialog.dataset.letterFrom; }, 600);
+    }
+  }
+
+  function syncWithUrl() {
+    const wanted = window.location.hash === "#letter";
+    if (wanted && !dialog.open) {
+      const from = pendingFrom ?? "link";
+      pendingFrom = null;
+      ownsHistoryEntry = true;
+      open(from);
+    } else if (!wanted && dialog.open && !dialog.hasAttribute("data-letter-auto")) {
+      closeForUrl();
     }
   }
 
@@ -232,10 +261,16 @@
 
   dialog.addEventListener("close", () => {
     const returnTo = opener;
+    const reason = dialog.returnValue;
+    const stepBack = ownsHistoryEntry;
     opener = null;
+    ownsHistoryEntry = false;
     reset();
-    if (window.location.hash === "#letter") {
-      history.replaceState(history.state, "", `${window.location.pathname}${window.location.search}`);
+    // Closed by the reader while the URL still asks for the letter: undo our
+    // own #letter entry, or drop the hash a link arrived with. Never push.
+    if (reason !== "url" && window.location.hash === "#letter") {
+      if (stepBack) history.back();
+      else history.replaceState(history.state, "", `${window.location.pathname}${window.location.search}`);
     }
     if (returnTo instanceof HTMLElement && returnTo.isConnected) returnTo.focus();
   });
@@ -258,18 +293,32 @@
     envelope.style.removeProperty("--tilt-y");
   });
 
-  // Someone who kept the letter goes straight back to reading it.
+  // The entry is a real #letter link: following it adds one history entry,
+  // which Back (or closing the letter) removes again.
   if (entry instanceof HTMLAnchorElement) {
     entry.addEventListener("click", (event) => {
-      event.preventDefault();
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       opener = entry;
-      open("entry");
+      if (window.location.hash === "#letter") {
+        event.preventDefault();
+        ownsHistoryEntry = false;
+        open("entry");
+      } else {
+        pendingFrom = "entry";
+      }
     });
   }
 
-  window.addEventListener("hashchange", () => {
-    if (window.location.hash === "#letter") open("link");
+  window.addEventListener("hashchange", syncWithUrl);
+  window.addEventListener("popstate", syncWithUrl);
+  window.addEventListener("pageshow", (event) => {
+    if (!event.persisted) return;
+    // A restored page shows the letter only if its URL asks for it.
+    dialog.removeAttribute("data-letter-auto");
+    syncWithUrl();
   });
 
   updateNext();
+  // Tells the first-visit script and the Home entry that the letter works.
+  document.documentElement.setAttribute("data-letter-ready", "");
 })();

@@ -10,9 +10,10 @@ import type { SiteLocale } from "../i18n.js";
  *
  * It is a native modal <dialog> rendered at the start of <body>. A small inline
  * script opens it once, before first paint, for a first Home visit; without
- * JavaScript, with reduced motion, or without storage the dialog stays closed
- * and Home is unchanged. Skipping works through `<form method="dialog">` even
- * if the enhancement script never loads.
+ * JavaScript, with reduced motion, or without writable storage the dialog
+ * stays closed and Home is unchanged. Skipping works through
+ * `<form method="dialog">`, and if letter.js never takes over, the inline
+ * script closes the letter at DOMContentLoaded.
  */
 
 /** Storage key for "this browser has already been handed the letter". */
@@ -206,18 +207,29 @@ function renderLetterText(copy: HomeLetterCopy): string {
  * header and Home content exist, so a first visit never flashes Home first.
  * Kept ES5-simple and free of `href=`/`src=` text so the HTML path rewriters
  * leave it untouched.
+ *
+ * - The letter opens on its own only when the visit can be remembered: storage
+ *   must accept a write, or every reload would open it again.
+ * - letter.js marks <html data-letter-ready> when it has taken over. Deferred
+ *   scripts always run before DOMContentLoaded, so if that mark is missing by
+ *   then (blocked, failed or broken script) the letter steps aside and Home is
+ *   usable: nobody is left in front of an envelope that cannot open.
  */
 export const HOME_LETTER_GATE_SCRIPT = `(function () {
   var dialog = document.getElementById("home-letter");
   if (!dialog || typeof dialog.showModal !== "function") return;
-  // Shows the Home entry back to the letter from first paint, so it never shifts layout.
-  document.documentElement.setAttribute("data-letter-ready", "");
+  var root = document.documentElement;
+  // Reserves the Home entry's place from first paint; letter.js reveals it.
+  root.setAttribute("data-letter-js", "");
   var key = "${HOME_LETTER_STORAGE_KEY}";
   var requested = window.location.hash === "#letter";
   var storage = null;
-  try { storage = window.localStorage; storage.getItem(key); } catch (error) { storage = null; }
+  try {
+    storage = window.localStorage;
+    storage.setItem("${HOME_LETTER_STORAGE_KEY}-probe", "1");
+    storage.removeItem("${HOME_LETTER_STORAGE_KEY}-probe");
+  } catch (error) { storage = null; }
   var media = function (query) { return typeof window.matchMedia === "function" && window.matchMedia(query).matches; };
-  // Without storage the visit cannot be remembered, so the letter never opens on its own.
   if (!requested && (storage === null || storage.getItem(key) !== null || media("(prefers-reduced-motion: reduce)"))) return;
   var theme = null;
   try { theme = storage === null ? null : storage.getItem("tutorbench-home-theme"); } catch (error) { theme = null; }
@@ -228,6 +240,9 @@ export const HOME_LETTER_GATE_SCRIPT = `(function () {
   // A speculative prerender has not been seen yet; remember only once it is shown.
   if (document.prerendering) document.addEventListener("prerenderingchange", remember, { once: true });
   else remember();
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!root.hasAttribute("data-letter-ready") && dialog.open) dialog.close("unavailable");
+  }, { once: true });
 })();`;
 
 /** The opening scene. Rendered before the header; see HOME_LETTER_GATE_SCRIPT. */
@@ -274,8 +289,10 @@ export function renderHomeLetter(locale: SiteLocale): string {
 }
 
 /**
- * Quiet way back to the letter. CSS shows it only after the gate script marks
- * <html> as able to open the dialog, so it is absent without JavaScript.
+ * Quiet way back to the letter. It is absent without JavaScript, its place is
+ * reserved before first paint, and it becomes visible only when letter.js is
+ * ready to open the letter. Following it adds `#letter` to the URL, so Back
+ * closes the letter again.
  */
 export function renderHomeLetterEntry(locale: SiteLocale): string {
   const copy = HOME_LETTER_COPY[locale];

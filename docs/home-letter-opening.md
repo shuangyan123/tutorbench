@@ -24,9 +24,12 @@ freely, at your own pace):
   open until the visitor opens it. After the short opening (about two seconds,
   started by the visitor), the text only moves forward when the reader scrolls
   or presses Continue.
-- **Ink follows the reader.** The whole letter is visible from the start, so its
-  length is never hidden, but unread passages are a pale draft. As a passage
-  reaches the reader it settles into ink, and its margin mark is drawn.
+- **Ink follows the reader.** The whole letter is visible and readable from the
+  start (every passage meets 4.5:1 contrast), so its length is never hidden.
+  Unread passages are set in a lighter draft grey. As a passage reaches the
+  reader it settles into ink, a thin rule is drawn beside it in the margin,
+  and the three hopes draw their margin marks: progress lives in the margin,
+  never in hard-to-read text.
 - **The paper becomes the page.** At the end, the sheet widens into the page
   beneath it and the letter steps aside, so Home appears out of the paper
   rather than after a curtain.
@@ -160,24 +163,36 @@ word for word. The source of truth is `src/site/pages/home-letter.ts`.
 | Situation | Behaviour |
 | --- | --- |
 | First visit to Home (`/` or `/zh-cn/`) | Opens before first paint, so Home never flashes first |
-| Any later Home visit, refresh, or Back | Home directly |
+| Any later Home visit or refresh | Home directly |
 | Any other route, including direct links | Never shown |
 | `prefers-reduced-motion: reduce` | Home directly; the letter is available from Home and opens fully inked with no animation |
 | JavaScript off | Home directly; no letter and no entry |
-| Storage blocked or unavailable | Home directly, because the visit could not be remembered |
+| Storage blocked, or readable but refusing writes (e.g. `QuotaExceededError`) | Home directly, because the visit could not be remembered and the letter would otherwise return on every reload |
+| `letter.js` blocked, failed or broken | The letter steps aside at `DOMContentLoaded` (deferred scripts always run before it) and the entry stays hidden; Home is usable |
 | Link ending in `#letter` | Opens the sealed letter even for returning visitors (shareable) |
+| Back or Forward across `#letter` | The letter follows the URL: it closes when the URL leaves `#letter` and reopens on Forward |
+| Back to a page restored from the back/forward cache | The letter shows only if that page's URL ends in `#letter`; an already delivered envelope is not shown again |
 | Speculative prerender of Home | Rendered, but not remembered until the page is actually shown |
 
+**URL rule:** apart from the one automatic first-visit opening, the letter is
+open exactly when the URL ends in `#letter`. Closing it never adds a history
+entry: if this page pushed the `#letter` entry, closing steps back over it;
+if the visitor arrived with `#letter`, closing drops the hash in place.
+
 **State kept:** one `localStorage` key, `teachometry-letter-v1`, with the value
-`"1"`, written when the letter is first shown. No cookie, no server call, no
-analytics, and nothing about how the letter was read. Raising the key version
+`"1"`, written when the letter is first shown (a throwaway probe key checks
+that storage accepts writes and is removed at once). No cookie, no server call,
+no analytics, and nothing about how the letter was read. Raising the key version
 would deliver a substantially rewritten letter once more.
 
-**Reading it again:** Home shows a small "A letter to learners" entry beside
-the hero's handwritten note. It reopens the letter directly at the unfolded
-sheet (no envelope), and focus returns to it on close. The entry is shown only
-when the letter can open, and it is visible from first paint, so it never
-shifts the layout.
+**Reading it again:** Home shows a small "A letter to learners" entry in the
+hero foot. It is a real `#letter` link that reopens the letter directly at the
+unfolded sheet (no envelope); Back closes it again, and focus returns to the
+entry on close. Its place is reserved before first paint and it becomes
+visible only once `letter.js` reports that it can open the letter, so it never
+shifts the layout and is never a dead control. On screens up to 900 px wide
+the hero foot gives the entry, the scroll cue and the handwritten note their
+own grid cells, so none can cover another at any text size.
 
 **Language:** the letter is in the page language. Its top bar links to the
 other language's letter (`zh-cn/#letter` or `../#letter`; relative so it works
@@ -195,6 +210,15 @@ under any base path).
 - The letter is a native modal `<dialog>`, so the page behind is inert and
   focus is contained. Skip is a `<form method="dialog">` button and Escape is
   native, so both work even if `letter.js` never loads.
+- Progressive enhancement: the inline script marks `<html data-letter-js>`
+  (JavaScript is running) and opens a first-visit letter; `letter.js` marks
+  `<html data-letter-ready>` as its last step. Without that mark at
+  `DOMContentLoaded` the inline script closes the letter, and the entry, which
+  is shown only with the mark, stays hidden.
+- Large text: the dialog has one shrinkable grid column, the top bar wraps and
+  its actions stack, a sealed stage scrolls below the bar instead of being cut
+  off, and the envelope grows taller around its in-flow address. Text keeps its
+  enlarged size everywhere; nothing relies on `overflow: hidden` to hide it.
 - While the letter is open, `html` does not scroll and keeps its scrollbar
   gutter, so Home's width is the same before and after. Measured cumulative
   layout shift for a full first visit is 0.
@@ -209,10 +233,26 @@ under any base path).
 - The dialog is named "A letter from Teachometry" / "Teachometry 的一封信". Focus
   starts on the envelope, so Enter opens it, as the hint says.
 - After opening, focus moves to the letter text so screen readers read it, and
-  Enter there continues. Pale "unread" passages are a visual state only; the
-  whole text is always in the accessibility tree.
+  Enter there continues. The whole text is always in the accessibility tree.
+- Every visible letter text meets at least 4.5:1 contrast in light and dark,
+  before and after the reader reaches it (draft `#4b6577` / `#a9c0b9`, ink
+  `#123a5b` / `#eef4ec`). The short fade masks at the top and bottom edge of
+  the scrolling sheet only touch lines that are being scrolled past.
+- At 200% text on 320 px screens the bar, Skip, letter, Continue and Home
+  entry stay inside the viewport, readable, and clickable.
 - Every control works with mouse, touch, and keyboard and has a visible focus
   style. Reduced motion removes all animation.
+
+### Tests
+
+`scripts/website-letter-checks.mjs` runs inside the CI hit test against a real
+Chromium: layout and real hits at 320, 390, 768, 1024 and 1440 px, English and
+zh-CN, normal and doubled text; contrast in light and dark; first and repeat
+visits, Skip, Escape, keyboard, a full read, the Home entry; Back/Forward over
+`#letter` and a back/forward-cache restore; a blocked `letter.js`; storage that
+refuses writes; reduced motion. `tests/site-home-letter.test.ts` covers the
+copy's honesty, the markup per locale and base path, and the inline script's
+decisions.
 
 ### Search and direct access
 
@@ -223,10 +263,17 @@ the letter covering Home, as a first visitor does. See residual risks.
 
 ## Residual risks and owner decisions
 
-- **Interstitial risk.** Search engines can discount pages that cover content
-  for visitors arriving from search, especially on mobile. Possible changes, if
-  wanted: never auto-open on narrow screens, or show the letter only on direct
-  visits.
+- **Interstitial risk (awaiting a product decision).** Search engines can
+  discount pages that cover content for visitors arriving from search,
+  especially on mobile. The automatic first-visit letter is kept as designed;
+  possible changes, if wanted: never auto-open on narrow screens, or show the
+  letter only on direct visits.
+- **Script failure shows a brief envelope.** When `letter.js` is blocked or
+  broken, a first visitor can see the sealed envelope until `DOMContentLoaded`
+  before Home appears; the visit still counts as delivered, so it happens once.
+- **Real devices.** Layout, contrast and history behaviour are verified in
+  headless Chromium; Safari/iOS (back/forward cache, `dvh`, container units)
+  and assistive technologies have not been tried on real devices.
 - **Reduced motion means no automatic letter.** This reads "reduce motion" as
   "go straight to content". The alternative is a static, auto-opened letter.
 - **The opening is about two seconds.** It is started by the visitor and
