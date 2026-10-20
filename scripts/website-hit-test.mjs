@@ -13,10 +13,12 @@
 //     their own boxes without overlapping, across widths, text sizes, case
 //     switching and keyboard tab changes.
 //   - the Home opening letter (scripts/website-letter-checks.mjs): layout and
-//     real hits at 320-1440 px with normal and doubled text, contrast, first
-//     and repeat visits, Skip, Escape, keyboard, a full read, the Home entry,
-//     Back/Forward and back/forward-cache restores, a missing letter.js, full
-//     storage, reduced motion; without JavaScript Home is reachable directly.
+//     real hits at 320-1440 px with normal and doubled text, every line of
+//     letter text measured as a text Range, contrast, first and repeat
+//     visits, Skip, Escape, keyboard, a full read, the Home entry,
+//     Back/Forward (also back to back, with late close events), the
+//     back/forward cache, a missing letter.js, full storage, reduced motion;
+//     without JavaScript Home is reachable directly.
 // The header, homepage-path and case-card checks model a returning visitor (the
 // letter already delivered), because the letter is a separate one-time layer.
 // Scenarios cover 1024/1100/1440 px, English and zh-CN, and a 200% text
@@ -242,6 +244,7 @@ export async function runHitTest(directory, executable = findBrowser()) {
   const errors = [];
   const diagnostics = new Set();
   let checks = 0;
+  let letter = null;
   try {
     server = await serve(directory);
     browser = await launchBrowser(executable);
@@ -315,7 +318,7 @@ export async function runHitTest(directory, executable = findBrowser()) {
     }
     // Home opening letter (scripts/website-letter-checks.mjs), from a first visit on.
     await page.send("Page.removeScriptToEvaluateOnNewDocument", { identifier: returningVisitor });
-    checks += await runLetterChecks(page, origin, failures, diagnostics);
+    letter = await runLetterChecks(page, origin, failures, diagnostics);
 
     // 无脚本时必须使用可完整阅读的静态布局，而非猜测多行 Header 的高度。
     await page.setJavaScriptEnabled(false);
@@ -352,13 +355,16 @@ export async function runHitTest(directory, executable = findBrowser()) {
   }
   if (errors.length) throw new AggregateError(errors, "Website hit test or cleanup failed");
   for (const note of diagnostics) console.warn(`Diagnostic: ${note}`);
+  if (letter) {
+    console.log(`Letter checks: ${letter.assertions} assertions, ${letter.hitPoints} elementFromPoint hit points, ${letter.clicks} real mouse clicks, ${letter.keys} key presses; ${letter.raceRuns} fast Back/Forward runs and ${letter.heldCloseEvents} close events delivered late on purpose; back/forward cache: ${letter.bfcache}.`);
+  }
 
   if (failures.length > 0) {
     console.error(`Website hit test failed (${failures.length}):`);
     failures.forEach((failure) => console.error(`  - ${failure}`));
     throw new Error(`Website hit test failed (${failures.length})`);
   }
-  console.log(`Website hit test passed: ${checks} controls and clicks checked.`);
+  console.log(`Website hit test passed: ${checks} header, homepage-path, case-card and no-JavaScript checks (hit points, click destinations and layout probes), plus the letter checks above.`);
 }
 
 if (resolve(process.argv[1] ?? "") === fileURLToPath(import.meta.url)) {

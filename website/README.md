@@ -116,10 +116,13 @@ JavaScript off, reduced motion, storage that cannot be read or written, repeat
 visits, and every other route go straight to the page. Skip and Escape work
 even if `assets/letter.js` never loads, and if it never marks
 `<html data-letter-ready>` the letter closes at `DOMContentLoaded`. Back and
-Forward follow `#letter`, and a page restored from the back/forward cache shows
-the letter only when its URL asks for it. `scripts/website-letter-checks.mjs`
-(run by the hit test) covers layout at 320-1440 px with doubled text, contrast,
-history, and these failure modes. The only state is `localStorage`
+Forward follow `#letter`, even back to back (each opening is a session settled
+when the dialog closes, so a late `close` event cannot touch a newer letter),
+and a page restored from the back/forward cache shows the letter only when its
+URL asks for it. `scripts/website-letter-checks.mjs` (run by the hit test)
+covers layout at 320-1440 px with doubled text, every line of letter text
+measured as a text `Range`, contrast, history including fast Back/Forward, and
+these failure modes. The only state is `localStorage`
 `teachometry-letter-v1 = "1"`. The Home entry "A letter to learners" and any
 `#letter` link reopen it. `letter.css` and `letter.js` load only on Home. See
 `docs/home-letter-opening.md` for the concept, full copy, and open decisions.

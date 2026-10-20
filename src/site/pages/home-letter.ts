@@ -189,6 +189,13 @@ function renderLines(lines: readonly string[]): string {
   return lines.map((line) => e(line)).join("<br>");
 }
 
+// A soft hyphen gives the large signature one good place to break
+// (Teach-ometry) when large text leaves no room for it on one line. It is
+// invisible otherwise, and find-in-page still matches "Teachometry".
+function renderSignature(signature: string): string {
+  return e(signature).replace("Teachometry", "Teach&shy;ometry");
+}
+
 function renderLetterText(copy: HomeLetterCopy): string {
   const stanza = (className: string, body: string, extra = ""): string =>
     `<section class="letter-stanza ${className}" data-letter-stanza${extra}>${body}</section>`;
@@ -198,7 +205,7 @@ function renderLetterText(copy: HomeLetterCopy): string {
       ${copy.hopes.map((hope) => stanza("letter-hope", `${renderMark(hope.mark)}<h3><span class="letter-numeral">${e(hope.numeral)}</span><span class="letter-hope-title">${e(hope.title)}</span></h3>${hope.paragraphs.map((paragraph) => `<p>${e(paragraph)}</p>`).join("")}`, ` data-letter-mark="${hope.mark}"`)).join("\n      ")}
       ${stanza("letter-honesty", `<span class="letter-rule" aria-hidden="true"></span><p>${e(copy.honesty)}</p>`)}
       ${stanza("letter-beginning", copy.beginning.map((paragraph) => `<p>${e(paragraph)}</p>`).join(""))}
-      ${stanza("letter-sign", `<p class="letter-closing">${renderLines(copy.closing)}</p><p class="letter-signature"><span>${e(copy.signature)}</span><svg class="letter-flourish" viewBox="0 0 220 24" aria-hidden="true" focusable="false"><path pathLength="1" d="M3 15.5c31-6.4 76-10.6 128-8.6 31 1.2 56 4.6 70 8.4 6 1.6 9.4 1.2 15-1.6"/></svg></p><p class="letter-postscript">${e(copy.postscript.before)}<a href="/contact/">${e(copy.postscript.link)}</a>${e(copy.postscript.after)}</p>`)}
+      ${stanza("letter-sign", `<p class="letter-closing">${renderLines(copy.closing)}</p><p class="letter-signature"><span>${renderSignature(copy.signature)}</span><svg class="letter-flourish" viewBox="0 0 220 24" aria-hidden="true" focusable="false"><path pathLength="1" d="M3 15.5c31-6.4 76-10.6 128-8.6 31 1.2 56 4.6 70 8.4 6 1.6 9.4 1.2 15-1.6"/></svg></p><p class="letter-postscript">${e(copy.postscript.before)}<a href="/contact/">${e(copy.postscript.link)}</a>${e(copy.postscript.after)}</p>`)}
     </article>`;
 }
 

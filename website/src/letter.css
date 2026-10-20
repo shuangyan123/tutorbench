@@ -771,21 +771,27 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
 
 .letter-hope h3 {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: .7em;
+  gap: .15em .7em;
   margin: 0 0 .6em;
   font: 400 1.34em/1.25 var(--lt-serif);
   letter-spacing: -.01em;
 }
 
 .letter-numeral {
+  flex: none;
   min-width: 1.9em;
   color: var(--lt-accent);
   font: 400 .72em/1 var(--lt-serif);
   letter-spacing: .08em;
 }
 
+/* Beside the numeral while the line has room for about eight letters of the
+ * title; with large text on a narrow screen the title moves below it. */
 .letter-hope-title {
+  flex: 1 1 8em;
+  min-width: 0;
   font-style: italic;
 }
 
@@ -823,7 +829,10 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   stroke-dashoffset: 0;
 }
 
-@container (max-width: 620px) {
+/* No room for the marks in the margin: they sit above their passage. The
+ * limit is in em (about 620px at the page's 15px text), so enlarged text,
+ * which needs a wider margin, brings the marks inside as well. */
+@container (max-width: 41.3em) {
   .letter-mark {
     position: static;
     display: block;
@@ -867,8 +876,18 @@ html:has(#home-letter[open][data-letter-state="entering"][data-theme="dark"]) {
   letter-spacing: -.01em;
 }
 
+/* Too wide for the line only with large text on a narrow screen: the name
+ * then breaks at its soft hyphen (Teach-ometry), and anywhere as a last
+ * resort, instead of running off the paper. */
+.letter-signature > span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: end;
+}
+
 .letter-flourish {
   width: 5.4em;
+  max-width: 100%;
   height: .62em;
   margin-top: .1em;
   fill: none;

@@ -76,6 +76,10 @@ test("Home renders the letter as a closed dialog before the header, in the page 
     assert.match(dialog, /class="letter-paper" data-letter-paper hidden/u);
     assert.match(dialog, /class="letter-controls" data-letter-controls hidden/u);
     assert.equal((dialog.match(/data-letter-stanza/gu) ?? []).length, 8);
+    // The signature reads "Teachometry"; its only break point is a soft hyphen,
+    // used when large text leaves no room for it on one line.
+    assert.match(dialog, /<p class="letter-signature"><span>Teach&shy;ometry<\/span>/u);
+    assert.equal(copy.signature, "Teachometry");
 
     // Home content is unchanged and still the main landmark.
     assert.match(html, /<main id="main-content"><section class="home-hero">/u);

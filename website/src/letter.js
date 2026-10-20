@@ -12,6 +12,12 @@
 // open exactly when the URL ends in #letter. Back, Forward and a page restored
 // from the back/forward cache are brought in line with the URL; closing the
 // letter never adds a history entry.
+//
+// Sessions: each opening of the dialog is one session, which holds what its
+// closing needs (who opened it, whether it owns the #letter history entry).
+// A session is settled at the moment the dialog closes. The browser's close
+// event arrives later, as a separate task; by then Back and Forward may have
+// opened a new session, so that event never reads or resets the new one.
 (() => {
   const dialog = document.getElementById("home-letter");
   if (!(dialog instanceof HTMLDialogElement) || typeof dialog.showModal !== "function") return;
@@ -49,12 +55,13 @@
   let inkQueue = [];
   let inkTimer = 0;
   let observer = null;
-  let opener = null;
   let tiltFrame = 0;
-  // True when this document pushed the #letter entry being shown, so closing
-  // can step back over it instead of leaving a duplicate entry behind.
-  let ownsHistoryEntry = false;
-  let pendingFrom = null;
+  // The open letter: { opener, ownsHistoryEntry }, or null while closed.
+  // ownsHistoryEntry is true when this document pushed the #letter entry being
+  // shown, so closing steps back over it instead of leaving a duplicate behind.
+  let session = dialog.open ? { opener: null, ownsHistoryEntry: false } : null;
+  // A click on the Home entry, waiting for the #letter navigation it starts.
+  let pendingEntry = null;
 
   const still = () => reducedMotion.matches;
   const state = () => dialog.dataset.letterState;
@@ -170,9 +177,26 @@
     later(startReading, OPENING_MS);
   }
 
+  // Settles the session that just closed, once. Closed by the reader while
+  // the URL still asks for the letter: undo our own #letter entry, or drop the
+  // hash a link arrived with. Never push.
+  function finish(reason) {
+    const ended = session;
+    session = null;
+    if (ended === null) return;
+    reset();
+    if (reason !== "url" && window.location.hash === "#letter") {
+      if (ended.ownsHistoryEntry) history.back();
+      else history.replaceState(history.state, "", `${window.location.pathname}${window.location.search}`);
+    }
+    if (ended.opener instanceof HTMLElement && ended.opener.isConnected) ended.opener.focus();
+  }
+
   function close(reason) {
     clearTimers();
-    if (dialog.open) dialog.close(reason);
+    if (!dialog.open) return;
+    dialog.close(reason);
+    finish(reason);
   }
 
   // The URL left #letter (Back) or a cached page came back: follow the URL
@@ -221,27 +245,29 @@
     scroller.scrollTo({ top: Math.max(0, target.offsetTop - scroller.clientHeight * 0.16), behavior: still() ? "auto" : "smooth" });
   }
 
-  function open(from) {
+  function open(from, { opener = null, ownsHistoryEntry = false } = {}) {
     if (dialog.open) return;
     reset();
     syncTheme();
     dialog.returnValue = "";
+    const current = { opener, ownsHistoryEntry };
+    session = current;
     if (from === "entry") dialog.dataset.letterFrom = "entry";
     dialog.showModal();
     // Someone who kept the letter goes straight back to reading it.
     if (from === "entry") {
       startReading();
-      window.setTimeout(() => { if (state() === "reading") delete dialog.dataset.letterFrom; }, 600);
+      window.setTimeout(() => { if (session === current && state() === "reading") delete dialog.dataset.letterFrom; }, 600);
     }
   }
 
   function syncWithUrl() {
     const wanted = window.location.hash === "#letter";
     if (wanted && !dialog.open) {
-      const from = pendingFrom ?? "link";
-      pendingFrom = null;
-      ownsHistoryEntry = true;
-      open(from);
+      const request = pendingEntry;
+      pendingEntry = null;
+      if (request === null) open("link", { ownsHistoryEntry: true });
+      else open("entry", { opener: request, ownsHistoryEntry: true });
     } else if (!wanted && dialog.open && !dialog.hasAttribute("data-letter-auto")) {
       closeForUrl();
     }
@@ -259,20 +285,12 @@
     if (event.key === "Enter" && event.target === scroller) { event.preventDefault(); advance(); }
   });
 
+  // Our own closes settle their session at once (see close). This event
+  // matters only when the browser closed the dialog by itself. If the letter
+  // is open again by the time it arrives, it belongs to an earlier session
+  // that is already settled, and the open one is left alone.
   dialog.addEventListener("close", () => {
-    const returnTo = opener;
-    const reason = dialog.returnValue;
-    const stepBack = ownsHistoryEntry;
-    opener = null;
-    ownsHistoryEntry = false;
-    reset();
-    // Closed by the reader while the URL still asks for the letter: undo our
-    // own #letter entry, or drop the hash a link arrived with. Never push.
-    if (reason !== "url" && window.location.hash === "#letter") {
-      if (stepBack) history.back();
-      else history.replaceState(history.state, "", `${window.location.pathname}${window.location.search}`);
-    }
-    if (returnTo instanceof HTMLElement && returnTo.isConnected) returnTo.focus();
+    if (!dialog.open) finish(dialog.returnValue);
   });
 
   // A gentle, physical response to a fine pointer; nothing on touch or reduced motion.
@@ -298,13 +316,11 @@
   if (entry instanceof HTMLAnchorElement) {
     entry.addEventListener("click", (event) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      opener = entry;
       if (window.location.hash === "#letter") {
         event.preventDefault();
-        ownsHistoryEntry = false;
-        open("entry");
+        open("entry", { opener: entry });
       } else {
-        pendingFrom = "entry";
+        pendingEntry = entry;
       }
     });
   }

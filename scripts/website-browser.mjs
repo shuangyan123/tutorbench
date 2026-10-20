@@ -126,7 +126,10 @@ export async function launchBrowser(executable, {
   })();
   try {
     const endpoint = waitFor((m) => m.endpoint, "Browser startup", startupMs);
-    child = spawn(executable, ["--headless=new", "--remote-debugging-port=0", `--user-data-dir=${profile}`, "--no-first-run", "--no-default-browser-check", "--disable-extensions", "--disable-background-networking", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", "about:blank"], { stdio: ["ignore", "ignore", "pipe"], detached: process.platform !== "win32", windowsHide: true });
+    // --disable-ipc-flooding-protection: Chrome silently drops a frame's history
+    // navigations after about 200 in ten seconds. The letter's fast Back/Forward
+    // checks run faster than any person, so without it their own steps vanish.
+    child = spawn(executable, ["--headless=new", "--remote-debugging-port=0", `--user-data-dir=${profile}`, "--no-first-run", "--no-default-browser-check", "--disable-extensions", "--disable-background-networking", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", "--disable-ipc-flooding-protection", "about:blank"], { stdio: ["ignore", "ignore", "pipe"], detached: process.platform !== "win32", windowsHide: true });
     child.once("error", (error) => {
       exited = true; resolveExit(); fail(new Error(`Browser launch failed: ${error.message}`, { cause: error }));
     });

@@ -170,7 +170,7 @@ word for word. The source of truth is `src/site/pages/home-letter.ts`.
 | Storage blocked, or readable but refusing writes (e.g. `QuotaExceededError`) | Home directly, because the visit could not be remembered and the letter would otherwise return on every reload |
 | `letter.js` blocked, failed or broken | The letter steps aside at `DOMContentLoaded` (deferred scripts always run before it) and the entry stays hidden; Home is usable |
 | Link ending in `#letter` | Opens the sealed letter even for returning visitors (shareable) |
-| Back or Forward across `#letter` | The letter follows the URL: it closes when the URL leaves `#letter` and reopens on Forward |
+| Back or Forward across `#letter` | The letter follows the URL: it closes when the URL leaves `#letter` and reopens on Forward, however quickly the two follow each other |
 | Back to a page restored from the back/forward cache | The letter shows only if that page's URL ends in `#letter`; an already delivered envelope is not shown again |
 | Speculative prerender of Home | Rendered, but not remembered until the page is actually shown |
 
@@ -178,6 +178,13 @@ word for word. The source of truth is `src/site/pages/home-letter.ts`.
 open exactly when the URL ends in `#letter`. Closing it never adds a history
 entry: if this page pushed the `#letter` entry, closing steps back over it;
 if the visitor arrived with `#letter`, closing drops the hash in place.
+
+**Sessions:** each opening of the dialog is one session that holds what its
+closing needs (who opened it, whether it owns the `#letter` history entry). A
+session is settled at the moment the dialog closes. The browser delivers the
+dialog's `close` event a task or two later; by then Back and Forward may have
+opened a new session, so that event never reads, resets or steps back over
+the new one. It only settles a session the browser closed by itself.
 
 **State kept:** one `localStorage` key, `teachometry-letter-v1`, with the value
 `"1"`, written when the letter is first shown (a throwaway probe key checks
@@ -219,6 +226,13 @@ under any base path).
   its actions stack, a sealed stage scrolls below the bar instead of being cut
   off, and the envelope grows taller around its in-flow address. Text keeps its
   enlarged size everywhere; nothing relies on `overflow: hidden` to hide it.
+- Inside the letter at large text on narrow screens: a hope's title moves below
+  its numeral when the line has no room for about eight letters of it; the
+  signature breaks at its soft hyphen (Teach-ometry) and, as a last resort,
+  anywhere; the flourish narrows with the line; the margin marks move above
+  their passage (the container query is in em, so enlarged text, which needs a
+  wider margin, brings them inside too). At normal text sizes the letter looks
+  as before.
 - While the letter is open, `html` does not scroll and keeps its scrollbar
   gutter, so Home's width is the same before and after. Measured cumulative
   layout shift for a full first visit is 0.
@@ -239,20 +253,47 @@ under any base path).
   `#123a5b` / `#eef4ec`). The short fade masks at the top and bottom edge of
   the scrolling sheet only touch lines that are being scrolled past.
 - At 200% text on 320 px screens the bar, Skip, letter, Continue and Home
-  entry stay inside the viewport, readable, and clickable.
+  entry stay inside the viewport, readable, and clickable, and every line of
+  the letter, including the third hope, the signature and the postscript,
+  stays inside the paper and can be scrolled clear of the edge fades.
 - Every control works with mouse, touch, and keyboard and has a visible focus
   style. Reduced motion removes all animation.
 
 ### Tests
 
 `scripts/website-letter-checks.mjs` runs inside the CI hit test against a real
-Chromium: layout and real hits at 320, 390, 768, 1024 and 1440 px, English and
-zh-CN, normal and doubled text; contrast in light and dark; first and repeat
-visits, Skip, Escape, keyboard, a full read, the Home entry; Back/Forward over
-`#letter` and a back/forward-cache restore; a blocked `letter.js`; storage that
-refuses writes; reduced motion. `tests/site-home-letter.test.ts` covers the
-copy's honesty, the markup per locale and base path, and the inline script's
-decisions.
+Chromium:
+
+- layout and real hits at 320, 390, 768, 1024 and 1440 px, English and zh-CN,
+  light and dark, normal and doubled text;
+- every line of letter text measured as a text `Range`, not its element's box:
+  inside every box that clips it, not overlapping other text, reachable clear
+  of the edge fades; the third hope, the signature and the postscript are
+  scrolled to for real and hit-tested, and the letter is scrolled to its end.
+  Doubled text with WCAG 1.4.12 text spacing stands in for serif faces wider
+  than the ones the test machine has (the fallback there is narrower than
+  Georgia, which is how the title overflow first slipped through);
+- contrast in light and dark; first and repeat visits, Skip, Escape,
+  keyboard, a full read, the Home entry; Back/Forward over `#letter`;
+- the back/forward cache: verified only when the browser really restores the
+  page; a browser that reloads it instead gets the reload path checked and a
+  diagnostic saying the cache was not verified;
+- fast Back/Forward from the Home entry and from a `#letter` link, with normal
+  and reduced motion: the order that once broke is forced (the page holds the
+  dialog's close events until Forward has opened the letter again), then real
+  back-to-back traversals run 30 times each way. After every step the URL, the
+  dialog, `:modal`, focus and the session history (Navigation API entries)
+  must agree and stay that way;
+- a blocked `letter.js`; storage that refuses writes; reduced motion.
+
+Every wait is an assertion: a timeout fails with the page state. The hit test
+prints the letter checks as assertions, `elementFromPoint` hit points, real
+mouse clicks and key presses, fast Back/Forward runs, and the back/forward-cache
+outcome. Its Chromium runs with `--disable-ipc-flooding-protection`, because
+Chrome silently drops a frame's history navigations after about 200 in ten
+seconds, faster than any person but not than these checks.
+`tests/site-home-letter.test.ts` covers the copy's honesty, the markup per
+locale and base path, and the inline script's decisions.
 
 ### Search and direct access
 
@@ -273,7 +314,11 @@ the letter covering Home, as a first visitor does. See residual risks.
   before Home appears; the visit still counts as delivered, so it happens once.
 - **Real devices.** Layout, contrast and history behaviour are verified in
   headless Chromium; Safari/iOS (back/forward cache, `dvh`, container units)
-  and assistive technologies have not been tried on real devices.
+  and assistive technologies have not been tried on real devices. Text fit is
+  measured with the fonts of the test machine plus a text-spacing stress, not
+  with every serif a visitor may have. The signature's soft hyphen stays in
+  the accessibility text (Chromium keeps U+00AD in the name); screen readers
+  normally skip it, but none was tried.
 - **Reduced motion means no automatic letter.** This reads "reduce motion" as
   "go straight to content". The alternative is a static, auto-opened letter.
 - **The opening is about two seconds.** It is started by the visitor and
