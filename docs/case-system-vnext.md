@@ -627,6 +627,7 @@ educational effectiveness require independent validation.
 
 See also:
 
+- [Pedagogical Principles Research](research/pedagogical-principles/README.md) — versioned candidate hypotheses and synthetic case notes; non-canonical, with no scoring changes or learner-outcome claims.
 - [Coverage Matrix](case-system-vnext-coverage-matrix.md)
 - [Evaluation Framework Research Audit](audits/evaluation-framework-research-audit-2026-09.md)
 - [Measurement Claim Specification](measurement-claim-specification.md)
