@@ -72,3 +72,141 @@ In another terminal, first perform the required dry-run, then a 1–3 case smoke
 run, and only after reviewing it consider the complete 24-case run. The exact
 sequence and ignored artifact paths are documented in
 [`docs/first-real-baseline.md`](../../docs/first-real-baseline.md).
+
+## Google AI Studio Gemini host
+
+`gemini-server.mjs` uses the official [`@google/genai` SDK](https://github.com/googleapis/js-genai),
+exactly pinned to **2.30.0** as a development dependency in the root manifest
+and lockfile. It is checkout-only: the SDK is absent from Benchmark Core,
+browser code, and the published package's runtime dependencies. Use Node 24
+and `npm ci`; do not install the deprecated `@google/generativeai` package.
+
+The host uses **Gemini Developer API**, with `vertexai: false` and a fixed
+`https://generativelanguage.googleapis.com/v1beta` endpoint. It reads only
+`GEMINI_API_KEY`, `GEMINI_MODEL`, optional `GEMINI_TIMEOUT_MS` (default `60000`,
+positive integer up to `2147483647`), and `CANONICAL_MODEL_HOST_PORT` (default
+`9001`). SDK cloud/backend/base-URL environment settings cannot redirect this
+host. It binds only `127.0.0.1` and is a local operator example, without a
+remote hosting/authentication boundary.
+
+Prepare and dry-run in PowerShell; **no key or running host is needed**:
+
+```powershell
+npm ci
+npm run build
+$env:GEMINI_MODEL = "<explicit versioned Gemini model ID>"
+node dist/src/cli/tutorbench.js collect-model `
+  --http http://127.0.0.1:9001/generate `
+  --provider google `
+  --model $env:GEMINI_MODEL `
+  --limit 1 `
+  --dry-run
+```
+
+Choose the currently available explicit model ID from Google's
+[model documentation](https://ai.google.dev/gemini-api/docs/models). There is
+no default model. The host rejects `latest`, unversioned aliases and resource
+paths. A versioned stable name (for example `gemini-2.5-flash` in synthetic
+tests) is **not an immutable weights snapshot**: Google can update or retire
+models. Match collector `--model` to `GEMINI_MODEL`; use `--model-version` only
+for independently verified snapshot information, never an invented version.
+Provider `modelVersion` metadata is not copied into the corpus or inferred as
+a pinned snapshot. No live model availability/compatibility was established
+by these offline tests.
+
+Only after separate authorization for a **potentially billable live smoke**,
+start the host in a dedicated terminal using a locally configured AI Studio
+key (never paste a real key into chat/source/committed files):
+
+```powershell
+# Configure GEMINI_API_KEY securely in this local process first.
+$env:GEMINI_MODEL = "<same explicit versioned Gemini model ID>"
+$env:GEMINI_TIMEOUT_MS = "60000"
+node examples/canonical-model-host/gemini-server.mjs
+```
+
+Starting the process makes no provider call. An authorized live `/generate`
+or `collect-model` invocation does. In another terminal, first repeat the
+dry-run above, then deliberately invoke the bounded live collection:
+
+```powershell
+$env:GEMINI_MODEL = "<same explicit versioned Gemini model ID>"
+node dist/src/cli/tutorbench.js collect-model `
+  --http http://127.0.0.1:9001/generate `
+  --provider google `
+  --model $env:GEMINI_MODEL `
+  --timeout-ms 65000 `
+  --limit 1 `
+  --corpus-id preliminary-google-gemini-smoke-001 `
+  --output artifacts/real-model/preliminary-google-gemini-smoke-001.corpus.json `
+  --report artifacts/real-model/preliminary-google-gemini-smoke-001.report.json
+```
+
+The collector timeout should exceed the host deadline. An abort is a local
+deadline, not proof that Google cancelled generation or billing. Inspect the
+one-case result before authorizing further calls; no automatic retry occurs.
+`--resume` is a new deliberate invocation and may incur another charge for a
+previously failed case. Artifacts remain ignored, preliminary, uncalibrated,
+and ineligible for public leaderboards. This host enables a model under test;
+Gemini Judge integration, calibration, P-001, and publication are separate work.
+
+### Forwarding and failures
+
+The existing packet parser validates the prompt digest and hidden-data
+firewall. One leading system message maps exactly to `systemInstruction`;
+every later user/assistant message becomes its own `Content` with role
+`user`/`model` and one text part. This preserves content, whitespace, order,
+and adjacent user messages (including canonical visible context), without
+flattening. Later system messages or consecutive assistant messages fail
+before any SDK call.
+
+The host calls [`models.generateContent`](https://googleapis.github.io/js-genai/release_docs/classes/models.Models.html)
+once with `candidateCount: 1`, `responseModalities: ["TEXT"]`, and the packet's
+exact `maxOutputTokens`. It attests only `{ maxOutputTokens: true }`.
+Requested `temperature`, `seed`, or `reasoningEffort` fail closed with
+`unsupported_generation_control`; no model-specific sampling/reasoning
+support is assumed. Native thinking defaults remain in effect. No extra
+prompt, tool, grounding, safety override, cache, interaction/session, or
+provider storage API is used.
+
+SDK 2.30.0 supports automatic continuation as well as retries. The host sets
+`automaticContinuation: false`, `automaticFunctionCalling.disable: true`, and
+[`httpOptions.retryOptions.attempts: 1`](https://googleapis.github.io/js-genai/release_docs/interfaces/types.HttpRetryOptions.html)
+(the initial attempt counts). The host deadline races the complete SDK call
+and passes its abort signal into the SDK; it cannot silently continue/retry.
+
+The SDK's [`response.text`](https://googleapis.github.io/js-genai/release_docs/classes/types.GenerateContentResponse.html#text)
+excludes thought parts, but also takes the first candidate and warns/ignores
+non-text parts. This host instead validates exactly one intended candidate,
+`STOP`, role `model`, no continuation token, and text-only parts before
+concatenating only parts without `thought: true`. Thoughts, signatures,
+provider IDs, metadata, and error bodies never enter output/logs/artifacts.
+Blank, blocked, thought-only, tool/non-text, and abnormal-finish results fail
+with `provider_response_invalid`; `MAX_TOKENS` fails with
+`provider_response_truncated` (collector `execution_output_truncated`). No
+partial answer is recorded as success.
+
+401/403/429/5xx map to `provider_unauthorized`, `provider_forbidden`,
+`provider_rate_limited`, and `provider_server_error`. Other HTTP failures,
+transport errors, and deadline expiry use `provider_http_error`,
+`provider_request_failed`, and `provider_request_timeout`. Responses contain
+only these bounded codes. Invalid packet/configuration values are never
+echoed. The existing HTTP adapter and collector preserve their corresponding
+stable failure classifications.
+
+Usage copies only nonnegative safe integer `promptTokenCount`,
+`candidatesTokenCount`, and `totalTokenCount` to input/output/total counts
+when present. Missing counts remain absent. `thoughtsTokenCount` is not
+exported or added to visible-output tokens; total usage can include billed
+thinking tokens, so input plus output need not equal total. Consult Google's
+[thinking documentation](https://ai.google.dev/gemini-api/docs/thinking) and
+[pricing](https://ai.google.dev/gemini-api/docs/pricing) before a live run.
+
+Offline verification uses the real pinned SDK with an injected fake fetch,
+plus the existing HTTP host adapter and canonical collector. It neither
+contacts Google nor proves live-provider compatibility:
+
+```powershell
+npm run build
+node --test dist/tests/gemini-canonical-model-host.test.js
+```
