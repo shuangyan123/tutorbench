@@ -84,8 +84,9 @@ and `npm ci`; do not install the deprecated `@google/generativeai` package.
 The host uses **Gemini Developer API**, with `vertexai: false` and a fixed
 `https://generativelanguage.googleapis.com/v1beta` endpoint. It reads only
 `GEMINI_API_KEY`, `GEMINI_MODEL`, optional `GEMINI_TIMEOUT_MS` (default `60000`,
-positive integer up to `2147483647`), and `CANONICAL_MODEL_HOST_PORT` (default
-`9001`). SDK cloud/backend/base-URL environment settings cannot redirect this
+positive integer up to `2147483647`), `CANONICAL_MODEL_HOST_PORT` (default
+`9001`), and the opt-in `GEMINI_HOST_DIAGNOSTICS` flag described below. SDK
+cloud/backend/base-URL environment settings cannot redirect this
 host. It binds only `127.0.0.1` and is a local operator example, without a
 remote hosting/authentication boundary.
 
@@ -194,6 +195,89 @@ only these bounded codes. Invalid packet/configuration values are never
 echoed. The existing HTTP adapter and collector preserve their corresponding
 stable failure classifications.
 
+### Opt-in local failure diagnostics
+
+Only the exact `GEMINI_HOST_DIAGNOSTICS=1` enables diagnostics. All other
+values (including an unset flag) keep failure diagnostics silent. Successes
+produce no diagnostic event. The existing startup notice and configuration
+error messages are unchanged. In a dedicated PowerShell host terminal:
+
+```powershell
+# Configure GEMINI_API_KEY securely in this process; never print it.
+$env:GEMINI_MODEL = "<explicit versioned Gemini model ID>"
+$env:GEMINI_HOST_DIAGNOSTICS = "1"
+node examples/canonical-model-host/gemini-server.mjs
+# To disable on the next startup:
+# Remove-Item Env:GEMINI_HOST_DIAGNOSTICS
+```
+
+Starting this host does not call Google. Do not send `/generate`, replay or
+resume a prior failed smoke without separate live-call authorization. This
+diagnostic change authorizes no further live attempt and does not establish
+the cause of a historical `execution_http_error`.
+
+Each relevant failure writes one JSON line to **the host's local stderr**,
+for example this **synthetic** upstream rejection:
+
+```json
+{"event":"gemini_host_failure","stage":"sdk_request","category":"http","code":"provider_http_error","upstreamStatus":404}
+```
+
+The only fields are `event`, `stage`, `category`, `code`, and
+`upstreamStatus`. Stages/categories distinguish:
+
+| Stage | Category | Meaning |
+| --- | --- | --- |
+| `local_request` | `request_rejected` | Wrong method/path, malformed JSON, oversized or unreadable body; no SDK call |
+| `local_packet` | `request_rejected` | Packet/parser, message-role or unsupported-control rejection; no SDK call |
+| `sdk_request` | `http` | SDK `ApiError` with an integer HTTP status from 400 through 599 |
+| `sdk_request` | `timeout` | Host deadline expired; upstream status unknown |
+| `sdk_request` | `transport_or_sdk` | Transport or otherwise unclassified SDK failure; upstream status unknown |
+| `sdk_response` | `response_validation` | SDK JSON parsing or host response validation/truncation failure |
+| `host` | `unknown` | Unclassified local handler failure |
+
+`upstreamStatus` is `null` unless a trustworthy integer is available from
+the SDK's [`ApiError.status`](https://googleapis.github.io/js-genai/release_docs/classes/errors.ApiError.html#status).
+The host never parses messages, nested causes, response bodies, or arbitrary
+errors' `status` properties to infer a status. If the SDK fails parsing an
+HTTP error body before constructing `ApiError`, the status remains unknown.
+`transport_or_sdk` deliberately does not assert a network-only root cause.
+Codes are existing bounded host failure codes. The HTTP response and
+collector failure classifications are unchanged; no diagnostic fields are
+added to packets, reports, corpora, or `artifacts`. Do not redirect these
+events into collection artifacts. Logging does not retry, continue, change
+models, or call Judge; failure to write diagnostics does not change the
+original response.
+
+Events contain no request/response text, generated answers, hidden thoughts,
+signatures, raw payload, SDK message/cause/stack, URL/query, headers,
+API key, bearer token, or proxy credentials. No raw provider logging is
+enabled. Offline tests use the real pinned SDK and an injected fake fetch;
+they prove diagnostic behavior, not live compatibility or billing outcomes.
+
+### Optional Node 24 proxy startup
+
+For an authorized operator environment that requires a trusted HTTP proxy,
+Node 24 supports explicit [`--use-env-proxy`](https://nodejs.org/docs/latest-v24.x/api/cli.html#--use-env-proxy)
+startup. Configure only that dedicated host process; these are placeholders,
+not a personal proxy address or credentials:
+
+```powershell
+$env:HTTP_PROXY = "http://<trusted-proxy-host>:<port>"
+$env:HTTPS_PROXY = "http://<trusted-proxy-host>:<port>"
+$env:NO_PROXY = "localhost,127.0.0.1,::1"
+$env:GEMINI_HOST_DIAGNOSTICS = "1"
+node --use-env-proxy examples/canonical-model-host/gemini-server.mjs
+```
+
+Keep loopback collector-to-host traffic out of the proxy. Do not print proxy
+variables or include real proxy credentials in source, logs or artifacts.
+An unauthenticated HTTP **404 at the API root** is only a connectivity
+smoke: it does not validate an API key, model availability, the generation
+route, a successful model invocation, or live SDK compatibility. These
+offline tests do not exercise proxy routing. A local timeout/abort is never
+proof that upstream generation stopped or no billing occurred.
+
 Usage copies only nonnegative safe integer `promptTokenCount`,
 `candidatesTokenCount`, and `totalTokenCount` to input/output/total counts
 when present. Missing counts remain absent. `thoughtsTokenCount` is not
@@ -209,4 +293,5 @@ contacts Google nor proves live-provider compatibility:
 ```powershell
 npm run build
 node --test dist/tests/gemini-canonical-model-host.test.js
+node --test dist/tests/gemini-host-diagnostics.test.js
 ```
