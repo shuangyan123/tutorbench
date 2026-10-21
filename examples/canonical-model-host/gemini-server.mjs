@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { GoogleGenAI } from "@google/genai";
+import { ApiError, GoogleGenAI } from "@google/genai";
 
 import { parseTutorExecutionPacketFile } from "../../dist/src/contracts/index.js";
 
@@ -43,7 +43,24 @@ export function readConfiguration(environment = process.env) {
     model,
     timeoutMs: integerEnvironment("GEMINI_TIMEOUT_MS", environment, 60_000, 1, MAX_TIMEOUT_MS),
     port: integerEnvironment("CANONICAL_MODEL_HOST_PORT", environment, 9001, 0, 65_535),
+    diagnostics: environment.GEMINI_HOST_DIAGNOSTICS === "1",
   };
+}
+
+function diagnostic(configuration, stage, category, code, upstreamStatus = null) {
+  if (configuration.diagnostics !== true) return;
+  // 只接收内部固定分类及可信状态码，绝不序列化异常、请求或响应对象。
+  try {
+    console.error(JSON.stringify({ event: "gemini_host_failure", stage, category, code, upstreamStatus }));
+  } catch {
+    // 诊断输出失败不能改变原有 HTTP 结果或触发第二次模型调用。
+  }
+}
+
+function upstreamHttpStatus(error) {
+  // 不从 message/cause/body 或任意同名 status 属性推断上游 HTTP 状态。
+  return error instanceof ApiError && Number.isInteger(error.status) && error.status >= 400 && error.status <= 599
+    ? error.status : null;
 }
 
 function requestForPacket(packet, model) {
@@ -165,10 +182,21 @@ async function executePacket(client, packet, configuration) {
       executionSupport: { maxOutputTokens: true },
     };
   } catch (error) {
-    if (controller.signal.aborted) throw new CanonicalHostRequestError("provider_request_timeout");
-    if (error instanceof CanonicalHostRequestError) throw error;
+    if (controller.signal.aborted) {
+      diagnostic(configuration, "sdk_request", "timeout", "provider_request_timeout");
+      throw new CanonicalHostRequestError("provider_request_timeout");
+    }
+    if (error instanceof CanonicalHostRequestError) {
+      diagnostic(configuration, "sdk_response", "response_validation", error.code);
+      throw error;
+    }
     // 只映射稳定代码，不复制 SDK message/cause/响应体。
-    throw new CanonicalHostRequestError(providerErrorCode(error));
+    const code = providerErrorCode(error);
+    const status = upstreamHttpStatus(error);
+    if (status !== null) diagnostic(configuration, "sdk_request", "http", code, status);
+    else if (error instanceof SyntaxError) diagnostic(configuration, "sdk_response", "response_validation", code);
+    else diagnostic(configuration, "sdk_request", "transport_or_sdk", code);
+    throw new CanonicalHostRequestError(code);
   } finally {
     clearTimeout(timer);
   }
@@ -193,15 +221,20 @@ function sendJson(response, statusCode, body) {
 
 async function handleRequest(request, response, client, configuration) {
   if (request.method !== "POST" || request.url !== "/generate") {
+    diagnostic(configuration, "local_request", "request_rejected", "not_found");
     sendJson(response, 404, { error: "not_found" });
     return;
   }
   let packet;
+  let stage = "local_request";
   try {
-    packet = parseTutorExecutionPacketFile(await readJsonBody(request));
+    const body = await readJsonBody(request);
+    stage = "local_packet";
+    packet = parseTutorExecutionPacketFile(body);
     if (packet.cases.length !== 1) throw new CanonicalHostRequestError("tutor_execution_packet_invalid");
   } catch (error) {
     const tooLarge = error instanceof CanonicalHostRequestError && error.code === "request_too_large";
+    diagnostic(configuration, stage, "request_rejected", tooLarge ? "request_too_large" : "tutor_execution_packet_invalid");
     sendJson(response, tooLarge ? 413 : 400, {
       error: tooLarge ? "request_too_large" : "tutor_execution_packet_invalid",
     });
@@ -211,6 +244,9 @@ async function handleRequest(request, response, client, configuration) {
     sendJson(response, 200, await executePacket(client, packet, configuration));
   } catch (error) {
     const code = error instanceof CanonicalHostRequestError ? error.code : "provider_request_failed";
+    if (code === "unsupported_generation_control" || code === "tutor_execution_packet_invalid") {
+      diagnostic(configuration, "local_packet", "request_rejected", code);
+    }
     const status = {
       unsupported_generation_control: 422,
       tutor_execution_packet_invalid: 400,
@@ -237,6 +273,7 @@ export async function startServer(configuration, fetchImplementation) {
   });
   const server = createServer((request, response) => {
     void handleRequest(request, response, client, configuration).catch(() => {
+      diagnostic(configuration, "host", "unknown", "canonical_host_failed");
       if (!response.headersSent) sendJson(response, 500, { error: "canonical_host_failed" });
     });
   });

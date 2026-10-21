@@ -233,7 +233,7 @@ test("Gemini rejects unsupported controls, hidden fields, invalid packets and un
 });
 
 test("Gemini configuration fails closed without echoing values or accepting floating aliases", () => {
-  assert.deepEqual(readConfiguration(environment), { apiKey: environment.GEMINI_API_KEY, model: environment.GEMINI_MODEL, timeoutMs: 60_000, port: 0 });
+  assert.deepEqual(readConfiguration(environment), { apiKey: environment.GEMINI_API_KEY, model: environment.GEMINI_MODEL, timeoutMs: 60_000, port: 0, diagnostics: false });
   for (const overrides of [
     { GEMINI_API_KEY: "" }, { GEMINI_MODEL: "" }, { GEMINI_MODEL: "gemini-flash-latest" },
     { GEMINI_MODEL: "gemini-2.5-flash-latest" }, { GEMINI_MODEL: "models/gemini-2.5-flash" },
