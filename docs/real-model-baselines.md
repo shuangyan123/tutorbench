@@ -174,8 +174,16 @@ is real-model evidence, but remains preliminary, uncalibrated, and
 `publicLeaderboardEligible: false`; a synthetic fixture does not become real
 evidence merely because it runs locally.
 
-Both hosts are local integration code, not Benchmark Core or package runtime
-dependencies, and neither is invoked by CI. See [the first real baseline
+The dedicated [Google AI Studio Gemini host](../examples/canonical-model-host/README.md#google-ai-studio-gemini-host)
+uses the exact-pinned official `@google/genai` SDK through the same canonical
+boundary. It is a model-under-test host, not a Judge. Its offline fake-transport
+tests do not establish live compatibility. Dry-run needs no credential and
+makes no host/provider call; later live execution requires separate explicit
+authorization and may be billable. The host attests only `maxOutputTokens`
+and rejects optional controls rather than guessing Gemini capabilities.
+
+These hosts are local integration code, not Benchmark Core or package runtime
+dependencies. CI exercises only synthetic transports. See [the first real baseline
 procedure](first-real-baseline.md) for provider setup, bilingual smoke, full
 collection, resume, validation, Judge, and private Review Translation order.
 

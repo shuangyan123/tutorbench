@@ -72,6 +72,14 @@ baseline.
 
 ## Configure the Tutor host
 
+For **Google AI Studio Gemini Developer API**, use the dedicated official
+SDK host rather than the Chat Completions bridge below. Follow its
+[PowerShell setup, zero-call dry-run, and separately authorized live-smoke directions](../examples/canonical-model-host/README.md#google-ai-studio-gemini-host).
+The `@google/genai` version is pinned in the checkout lockfile; only the
+baseline output limit is supported, and thinking/tool/blocked/truncated
+payloads cannot become apparently successful answers. Offline tests establish
+the packet/SDK/collector boundary, not live compatibility or model quality.
+
 Build with the repository-supported Node 24 runtime first:
 
 ```powershell
