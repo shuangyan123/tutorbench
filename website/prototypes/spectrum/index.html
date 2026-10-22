@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Teachometry · Spectrum</title>
-<meta name="description" content="Design prototype for the Teachometry website. Direction: Spectrum. Not the live site.">
+<meta name="description" content="Design prototype for the Teachometry website, set as a research journal issue. Direction: Spectrum. Not the live site.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="assets/tutorbench-mark-small.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,301 +29,348 @@
 <header class="bar" data-bar>
   <a class="wordmark" href="#top" aria-label="Teachometry">Teachometry</a>
   <nav class="nav" aria-label="Primary">
-    <a href="#bench" class="nav-tb"><img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="#methods" class="nav-tb"><img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
     <a href="#dispersion"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
-    <a href="#specimens"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
-    <a href="#journal"><span class="en">Journal</span><span class="zh" lang="zh-CN">札记</span></a>
-    <a href="#footer"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+    <a href="#plates"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="#essays"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
   </nav>
   <div class="bar-end">
     <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
       <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
     </button>
-    <a class="run-btn" href="#run"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+    <a class="run-btn" href="#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
   </div>
 </header>
 
 <main id="main">
 
-<!-- ============================================================ 0 · DARKROOM -->
-<section class="hero" id="top" aria-labelledby="hero-title">
+<!-- ============================================================ COVER · the work -->
+<section class="hero" id="top" aria-labelledby="cover-title" data-hero>
   <canvas class="hero-gl" data-hero-canvas aria-hidden="true"></canvas>
   <svg class="hero-fallback" data-hero-fallback viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
-      <linearGradient id="fbBeam" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".7" stop-color="#fff" stop-opacity=".85"/></linearGradient>
-      <filter id="fbBlur"><feGaussianBlur stdDeviation="6"/></filter>
+      <radialGradient id="fbSky" cx=".1" cy=".1" r=".9"><stop offset="0" stop-color="#e3eaf5"/><stop offset="1" stop-color="#f6f3ec"/></radialGradient>
+      <linearGradient id="fbFan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd8c8"/><stop offset=".3" stop-color="#fff0c2"/><stop offset=".5" stop-color="#d4f0e2"/><stop offset=".7" stop-color="#d5e2ff"/><stop offset="1" stop-color="#e6dbff"/></linearGradient>
     </defs>
-    <rect width="1440" height="900" fill="#07080b"/>
-    <line x1="-20" y1="230" x2="690" y2="300" stroke="url(#fbBeam)" stroke-width="2.4"/>
-    <g stroke-width="3" stroke-linecap="round">
-      <line x1="770" y1="300" x2="1190" y2="250" stroke="#ff8a5b"/>
-      <line x1="770" y1="302" x2="1190" y2="300" stroke="#f2cf6a"/>
-      <line x1="770" y1="304" x2="1190" y2="352" stroke="#7edfb4"/>
-      <line x1="770" y1="306" x2="1190" y2="406" stroke="#4c8dff"/>
-      <line x1="770" y1="308" x2="1190" y2="462" stroke="#9a6bff"/>
+    <rect width="1440" height="900" fill="url(#fbSky)"/>
+    <path d="M790 330 L1220 170 L1220 620 Z" fill="url(#fbFan)" opacity=".8"/>
+    <line x1="0" y1="290" x2="640" y2="330" stroke="#fffbef" stroke-width="10"/>
+    <g stroke-width="2.2" stroke-linecap="round">
+      <line x1="790" y1="330" x2="1220" y2="230" style="stroke:var(--c0)"/>
+      <line x1="790" y1="332" x2="1220" y2="300" style="stroke:var(--c1)"/>
+      <line x1="790" y1="334" x2="1220" y2="370" style="stroke:var(--c2)"/>
+      <line x1="790" y1="336" x2="1220" y2="440" style="stroke:var(--c3)"/>
+      <line x1="790" y1="338" x2="1220" y2="510" style="stroke:var(--c4)"/>
     </g>
-    <rect x="1190" y="210" width="6" height="290" fill="rgba(242,237,227,.14)"/>
-    <path d="M730 170 L810 320 L650 320 Z" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+    <rect x="1220" y="190" width="1.2" height="360" fill="#16150f"/>
+    <path d="M720 120 L860 400 L580 400 Z" fill="rgba(226,232,242,.7)" stroke="#2f323a" stroke-width="1.2"/>
   </svg>
-
   <ol class="hero-lines" aria-hidden="true">
-    <li data-line style="--c:#ff8a5b"><b>λ1</b><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></li>
-    <li data-line style="--c:#f2cf6a"><b>λ2</b><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></li>
-    <li data-line style="--c:#7edfb4"><b>λ3</b><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></li>
-    <li data-line style="--c:#4c8dff"><b>λ4</b><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></li>
-    <li data-line style="--c:#9a6bff"><b>λ5</b><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></li>
+    <li data-line style="--c:var(--c0)"><b>λ1</b><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></li>
+    <li data-line style="--c:var(--c1)"><b>λ2</b><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></li>
+    <li data-line style="--c:var(--c2)"><b>λ3</b><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></li>
+    <li data-line style="--c:var(--c3)"><b>λ4</b><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></li>
+    <li data-line style="--c:var(--c4)"><b>λ5</b><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></li>
   </ol>
+  <span class="annot" data-annot="a" aria-hidden="true"><b>A</b><span class="annot-t"><span class="en">one reply</span><span class="zh" lang="zh-CN">一段回复</span></span></span>
+  <span class="annot" data-annot="b" aria-hidden="true"><b>B</b>TutorBench</span>
 
   <div class="hero-copy">
-    <p class="eyebrow">
-      <span class="en">Teachometry · open instruments for teaching quality</span>
-      <span class="zh" lang="zh-CN">Teachometry · 为教学质量造一套公开的仪器</span>
+    <p class="hero-q">
+      <span>// <span lang="zh-CN">一段好回复，拆开之后是什么样？</span></span>
+      <span>// what does a reply look like, split apart?</span>
     </p>
-    <h1 id="hero-title" class="display">
-      <span class="en">Knowing the answer<br>is not <em>teaching.</em></span>
-      <span class="zh" lang="zh-CN">会答题，<br><em>不等于</em>会教。</span>
+    <h1 id="cover-title" class="display">
+      <span class="en">Knowing the answer is not <mark>teaching.</mark></span>
+      <span class="zh" lang="zh-CN">会答题，<br><mark>不等于</mark>会教。</span>
     </h1>
-    <p class="lede">
-      <span class="en">An AI reply can sound right, fluent and kind, and still leave a learner further from understanding. Teachometry builds open instruments that split that light apart. The first one is called TutorBench.</span>
-      <span class="zh" lang="zh-CN">一段 AI 回复可以听起来正确、流畅、友善，却仍然让学生离理解更远。Teachometry 打造公开的测量仪器，把这束光拆开来看。第一台仪器，叫 TutorBench。</span>
+    <p class="hero-alt" aria-hidden="true">
+      <span class="en" lang="zh-CN">会答题，不等于会教。</span>
+      <span class="zh">Knowing the answer is not teaching.</span>
     </p>
     <div class="cta-row">
-      <a class="cta cta-light" href="#white-light">
-        <span class="en">Watch one reply split</span><span class="zh" lang="zh-CN">看一段回复如何被分光</span>
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M4 9l4 4 4-4"/></svg>
-      </a>
-      <a class="cta cta-ghost" href="#run">
-        <img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16">
-        <span class="en">Run TutorBench</span><span class="zh" lang="zh-CN">运行 TutorBench</span>
-      </a>
+      <a class="cta cta-ink" href="#contents"><span class="en">Open the issue</span><span class="zh" lang="zh-CN">翻开这一期</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M4 9l4 4 4-4"/></svg></a>
+      <a class="cta cta-line" href="#reproduce"><img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><span class="en">Run TutorBench</span><span class="zh" lang="zh-CN">运行 TutorBench</span></a>
     </div>
   </div>
 
-  <dl class="hero-meta">
-    <div><dt><span class="en">Status</span><span class="zh" lang="zh-CN">状态</span></dt><dd><span class="en">Developer Preview</span><span class="zh" lang="zh-CN">开发者预览</span></dd></div>
-    <div><dt><span class="en">Source</span><span class="zh" lang="zh-CN">源码</span></dt><dd><span class="en">Open, Apache-2.0</span><span class="zh" lang="zh-CN">开源 · Apache-2.0</span></dd></div>
-    <div><dt><span class="en">Public scores</span><span class="zh" lang="zh-CN">公开成绩</span></dt><dd><span class="en">None yet</span><span class="zh" lang="zh-CN">暂无</span></dd></div>
-  </dl>
-  <p class="scroll-cue" aria-hidden="true"><span></span></p>
+  <p class="hero-corner hero-corner-l" aria-hidden="true"><span class="en">Vol. 0 · No. 1 · October 2026</span><span class="zh" lang="zh-CN">第 0 卷 · 第 1 期 · 2026 年 10 月</span></p>
+  <p class="hero-corner hero-corner-r" aria-hidden="true"><span class="en">Cover · rendered live · an illustration, not data</span><span class="zh" lang="zh-CN">封面 · 实时渲染 · 示意图，不是数据</span></p>
+  <p class="hero-hint" aria-hidden="true"><span lang="zh-CN">移动引光 · 滚动分光</span><span class="hint-en"> / move to guide the light · scroll to split it</span></p>
 </section>
 
-<!-- ============================================================ 1 · WHITE LIGHT -->
-<section class="white" id="white-light" aria-labelledby="white-title">
-  <div class="wrap white-grid">
-    <header class="sec-head">
-      <p class="label"><span class="idx">01</span><span class="en">White light</span><span class="zh" lang="zh-CN">白光</span></p>
-      <h2 id="white-title" class="h2">
-        <span class="en">One reply.<br><em>It sounds right.</em></span>
-        <span class="zh" lang="zh-CN">一段回复，<br><em>听起来没问题。</em></span>
-      </h2>
-      <p class="body">
-        <span class="en">Read it for tone and it is clean white light: confident, warm, fluent. A quick read ends here, and so do many checks that only ask whether a reply sounds like help.</span>
-        <span class="zh" lang="zh-CN">只看语气，它是一束干净的白光：自信、温暖、流畅。匆匆一读到这里就结束了，许多只问「听起来像不像帮助」的检查也到此为止。</span>
-      </p>
-    </header>
-
-    <figure class="exchange" data-reveal>
-      <figcaption class="exchange-cap">
-        <span class="en">Constructed example · not a real model output</span>
-        <span class="zh" lang="zh-CN">构造示例 · 并非真实模型输出</span>
-      </figcaption>
-      <div class="turn turn-learner">
-        <p class="who"><span class="en">Learner</span><span class="zh" lang="zh-CN">学生</span></p>
-        <p class="says">
-          <span class="en">I think <b class="math">1/3 + 1/4 = 2/7</b>. I added the top numbers and the bottom numbers. Is that right?</span>
-          <span class="zh" lang="zh-CN">我觉得 <b class="math">1/3 + 1/4 = 2/7</b>。我把分子相加，分母也相加。这样对吗？</span>
+<!-- ============================================================ MASTHEAD + CONTENTS -->
+<section class="masthead" id="contents" aria-labelledby="toc-title">
+  <div class="wrap">
+    <div class="strip strip-top">
+      <span><span class="en">Vol. 0 · No. 1</span><span class="zh" lang="zh-CN">第 0 卷 · 第 1 期</span></span>
+      <span class="strip-mid"><span class="en">Working papers on the measurement of teaching</span><span class="zh" lang="zh-CN">教学测量工作论文</span></span>
+      <span><span class="en">October 2026</span><span class="zh" lang="zh-CN">2026 年 10 月</span></span>
+    </div>
+    <p class="nameplate" data-nameplate>Teachometry</p>
+    <div class="strip strip-bottom">
+      <span><span class="en">Open instruments for teaching quality</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器</span></span>
+      <span class="strip-mid"><span class="en">Developer Preview</span><span class="zh" lang="zh-CN">开发者预览</span></span>
+      <span><span class="en">Open source · Apache-2.0</span><span class="zh" lang="zh-CN">开源 · Apache-2.0</span></span>
+    </div>
+    <div class="mast-grid">
+      <div class="mast-lead">
+        <p class="kicker"><span class="en">Lead article</span><span class="zh" lang="zh-CN">封面文章</span></p>
+        <p class="standfirst">
+          <span class="en">An AI reply can sound right, fluent and kind, and still leave a learner further from understanding. Teachometry builds open instruments that split that light apart. The first one is called TutorBench.</span>
+          <span class="zh" lang="zh-CN">一段 AI 回复可以听起来正确、流畅、友善，却仍然让学生离理解更远。Teachometry 打造公开的测量仪器，把这束光拆开来看。第一台仪器，叫 TutorBench。</span>
         </p>
+        <div class="abstract">
+          <p class="abs-label"><span class="en">Abstract</span><span class="zh" lang="zh-CN">摘要</span></p>
+          <p class="abs-text">
+            <span class="en">A tutoring reply can be fluent, warm and wrong in ways a tone check never sees. We treat each reply as white light and pass it through an instrument that separates five qualities: correctness, diagnosis, guidance, adaptation and actionability. The instrument is open, its 48 authored cases are public, and its public results table is, for now, deliberately empty.</span>
+            <span class="zh" lang="zh-CN">一段教学回复可以流畅、温暖，同时以语气检查看不见的方式出错。我们把每段回复当作一束白光，让它穿过一台仪器，分离出五种品质：正确性、诊断能力、引导能力、适应能力、可执行性。这台仪器是开源的，48 个编写案例全部公开，而公开成绩表目前刻意留空。</span>
+          </p>
+          <p class="abs-kw"><b><span class="en">Keywords</span><span class="zh" lang="zh-CN">关键词</span></b>
+            <span class="en">AI tutoring · evaluation · atomic rubrics · learner state</span>
+            <span class="zh" lang="zh-CN">AI 教学 · 评测 · 原子化评分细则 · 学生状态</span>
+          </p>
+        </div>
       </div>
-      <div class="turn turn-tutor" data-white-reply>
-        <p class="who"><span class="en">AI tutor</span><span class="zh" lang="zh-CN">AI 教师</span></p>
-        <p class="says">
-          <span class="en">Yes, that's right! Adding the top numbers and the bottom numbers is how you add fractions. You understand it well.</span>
-          <span class="zh" lang="zh-CN">对，完全正确！分数相加就是把分子相加、分母相加。你理解得很好。</span>
-        </p>
-        <span class="glow" aria-hidden="true"></span>
-      </div>
-    </figure>
+      <nav class="toc" aria-label="Contents">
+        <h2 id="toc-title" class="toc-title"><span class="en">In this issue</span><span class="zh" lang="zh-CN">本期目录</span></h2>
+        <ol>
+          <li><a href="#white-light"><span class="toc-no">1</span><span class="toc-t"><span class="en">White light</span><span class="zh" lang="zh-CN">白光</span></span><span class="toc-d"><span class="en">One reply that sounds right.</span><span class="zh" lang="zh-CN">一段听起来没问题的回复。</span></span></a></li>
+          <li><a href="#dispersion"><span class="toc-no">2</span><span class="toc-t"><span class="en">Dispersion</span><span class="zh" lang="zh-CN">分光</span></span><span class="toc-d"><span class="en">Five questions for the same light.</span><span class="zh" lang="zh-CN">同一束光的五个问题。</span></span></a></li>
+          <li><a href="#methods"><span class="toc-no">3</span><span class="toc-t"><span class="en">Methods</span><span class="zh" lang="zh-CN">方法</span></span><span class="toc-d"><span class="en">TutorBench, the first instrument.</span><span class="zh" lang="zh-CN">第一台仪器 TutorBench。</span></span></a></li>
+          <li><a href="#plates"><span class="toc-no">4</span><span class="toc-t"><span class="en">Plates</span><span class="zh" lang="zh-CN">图版</span></span><span class="toc-d"><span class="en">Twenty-four learning situations, in two languages.</span><span class="zh" lang="zh-CN">二十四个学习情境，中英双语。</span></span></a></li>
+          <li><a href="#results"><span class="toc-no">5</span><span class="toc-t"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></span><span class="toc-d"><span class="en">An empty table, on purpose.</span><span class="zh" lang="zh-CN">一张刻意留空的表。</span></span></a></li>
+          <li><a href="#essays"><span class="toc-no">6</span><span class="toc-t"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></span><span class="toc-d"><span class="en">Four hypotheses and a sixty-second review.</span><span class="zh" lang="zh-CN">四篇假设，和一次 60 秒评审。</span></span></a></li>
+          <li><a href="#reproduce"><span class="toc-no">7</span><span class="toc-t"><span class="en">Reproduce</span><span class="zh" lang="zh-CN">复现</span></span><span class="toc-d"><span class="en">Run it locally. No API key.</span><span class="zh" lang="zh-CN">在本地运行，不需要 API 密钥。</span></span></a></li>
+        </ol>
+      </nav>
+    </div>
   </div>
 </section>
 
-<!-- ============================================================ 2 · DISPERSION -->
-<section class="disp" id="dispersion" aria-labelledby="disp-title" data-disp>
-  <div class="disp-sticky">
-    <div class="wrap disp-grid">
-      <header class="sec-head disp-head">
-        <p class="label"><span class="idx">02</span><span class="en">Dispersion</span><span class="zh" lang="zh-CN">分光</span></p>
-        <h2 id="disp-title" class="h2">
-          <span class="en">Now pass it<br>through the <em>prism.</em></span>
-          <span class="zh" lang="zh-CN">现在，让它<br>穿过<em>棱镜。</em></span>
-        </h2>
-        <p class="body">
-          <span class="en">TutorBench reads a tutoring reply along five dimensions. Same light, five different questions.</span>
-          <span class="zh" lang="zh-CN">TutorBench 从五个维度读一段教学回复。同一束光，五个不同的问题。</span>
-        </p>
-      </header>
+<!-- ============================================================ §1 WHITE LIGHT -->
+<article class="sec" id="white-light" aria-labelledby="s1-title">
+  <div class="wrap">
+    <div class="rh" aria-hidden="true"><span>§1 · <span class="en">White light</span><span class="zh" lang="zh-CN">白光</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>01 / 07</span></div>
+    <div class="page">
+      <div class="c-l sec-l"><div class="sec-l-in"><p class="sec-no">§1</p><p class="kicker"><span class="en">White light</span><span class="zh" lang="zh-CN">白光</span></p></div></div>
+      <h2 id="s1-title" class="c-m h2"><span class="en">One reply. <em>It sounds right.</em></span><span class="zh" lang="zh-CN">一段回复，<em>听起来没问题。</em></span></h2>
+      <p class="c-m prose dropcap cap-en">
+        <span class="en">A learner adds two fractions and shows their working. An AI tutor answers in under a second: confident, warm, fluent. Read for tone, the reply is clean white light. A quick read ends here, and so do many checks that only ask whether a reply sounds like help.<a class="fn" href="#n1" aria-label="Note 1">1</a></span>
+        <span class="zh" lang="zh-CN">一个学生做了一道分数加法，并写出了自己的做法。AI 老师不到一秒就给出回复：自信、温暖、流畅。只看语气，它是一束干净的白光。匆匆一读到这里就结束了，许多只问「听起来像不像帮助」的检查也到此为止。<a class="fn" href="#n1" aria-label="注释 1">1</a></span>
+      </p>
+      <aside class="c-s sn"><b>1</b><span class="en">Constructed for this page. It is not the output of any real model.</span><span class="zh" lang="zh-CN">为本页构造的示例，不是任何真实模型的输出。</span></aside>
 
-      <div class="optic" aria-hidden="true">
-        <svg class="optic-svg" viewBox="0 0 640 520" data-optic>
-          <defs>
-            <linearGradient id="inBeam" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".95"/></linearGradient>
-            <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".10"/><stop offset=".55" stop-color="#fff" stop-opacity=".02"/><stop offset="1" stop-color="#9a6bff" stop-opacity=".08"/></linearGradient>
-            <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
-            <linearGradient id="b0" x1="0" x2="1"><stop offset="0" stop-color="#ff8a5b" stop-opacity=".95"/><stop offset="1" stop-color="#ff8a5b" stop-opacity=".25"/></linearGradient>
-            <linearGradient id="b1" x1="0" x2="1"><stop offset="0" stop-color="#f2cf6a" stop-opacity=".95"/><stop offset="1" stop-color="#f2cf6a" stop-opacity=".25"/></linearGradient>
-            <linearGradient id="b2" x1="0" x2="1"><stop offset="0" stop-color="#7edfb4" stop-opacity=".95"/><stop offset="1" stop-color="#7edfb4" stop-opacity=".25"/></linearGradient>
-            <linearGradient id="b3" x1="0" x2="1"><stop offset="0" stop-color="#4c8dff" stop-opacity=".95"/><stop offset="1" stop-color="#4c8dff" stop-opacity=".25"/></linearGradient>
-            <linearGradient id="b4" x1="0" x2="1"><stop offset="0" stop-color="#9a6bff" stop-opacity=".95"/><stop offset="1" stop-color="#9a6bff" stop-opacity=".25"/></linearGradient>
-          </defs>
-          <!-- incident beam -->
-          <line x1="0" y1="232" x2="178" y2="252" stroke="url(#inBeam)" stroke-width="2.2" class="beam-in"/>
-          <line x1="0" y1="232" x2="178" y2="252" stroke="#fff" stroke-width="10" opacity=".08" filter="url(#soft)"/>
-          <!-- bands: fan from exit point -->
-          <g class="bands">
-            <g class="band" data-band="0"><line class="band-glow" x1="288" y1="256" x2="520" y2="150" style="stroke:var(--c0)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="256" x2="520" y2="150" style="stroke:var(--c0)" stroke-width="3" stroke-linecap="round"/><circle class="band-hit" cx="522" cy="150" r="5" style="fill:var(--c0)" filter="url(#soft)"/></g>
-            <g class="band" data-band="1"><line class="band-glow" x1="288" y1="258" x2="520" y2="215" style="stroke:var(--c1)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="258" x2="520" y2="215" style="stroke:var(--c1)" stroke-width="3" stroke-linecap="round"/><circle class="band-hit" cx="522" cy="215" r="5" style="fill:var(--c1)" filter="url(#soft)"/></g>
-            <g class="band" data-band="2"><line class="band-glow" x1="288" y1="260" x2="520" y2="280" style="stroke:var(--c2)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="260" x2="520" y2="280" style="stroke:var(--c2)" stroke-width="3" stroke-linecap="round"/><circle class="band-hit" cx="522" cy="280" r="5" style="fill:var(--c2)" filter="url(#soft)"/></g>
-            <g class="band" data-band="3"><line class="band-glow" x1="288" y1="262" x2="520" y2="345" style="stroke:var(--c3)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="262" x2="520" y2="345" style="stroke:var(--c3)" stroke-width="3" stroke-linecap="round"/><circle class="band-hit" cx="522" cy="345" r="5" style="fill:var(--c3)" filter="url(#soft)"/></g>
-            <g class="band" data-band="4"><line class="band-glow" x1="288" y1="264" x2="520" y2="410" style="stroke:var(--c4)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="264" x2="520" y2="410" style="stroke:var(--c4)" stroke-width="3" stroke-linecap="round"/><circle class="band-hit" cx="522" cy="410" r="5" style="fill:var(--c4)" filter="url(#soft)"/></g>
-          </g>
-          <!-- measuring plate -->
-          <rect x="520" y="110" width="6" height="340" fill="rgba(242,237,227,.10)"/>
-          <line x1="520" y1="110" x2="520" y2="450" stroke="rgba(242,237,227,.35)"/>
-          <g stroke="rgba(242,237,227,.25)"><line x1="512" y1="120" x2="520" y2="120"/><line x1="512" y1="140" x2="520" y2="140"/><line x1="512" y1="160" x2="520" y2="160"/><line x1="512" y1="180" x2="520" y2="180"/><line x1="512" y1="200" x2="520" y2="200"/><line x1="512" y1="220" x2="520" y2="220"/><line x1="512" y1="240" x2="520" y2="240"/><line x1="512" y1="260" x2="520" y2="260"/><line x1="512" y1="280" x2="520" y2="280"/><line x1="512" y1="300" x2="520" y2="300"/><line x1="512" y1="320" x2="520" y2="320"/><line x1="512" y1="340" x2="520" y2="340"/><line x1="512" y1="360" x2="520" y2="360"/><line x1="512" y1="380" x2="520" y2="380"/><line x1="512" y1="400" x2="520" y2="400"/><line x1="512" y1="420" x2="520" y2="420"/><line x1="512" y1="440" x2="520" y2="440"/></g>
-          <!-- inside the glass -->
-          <path d="M178 252 L288 256 L288 264 Z" fill="#fff" opacity=".28"/>
-          <!-- prism -->
-          <path class="prism" d="M232 150 L312 300 L152 300 Z" fill="url(#glass)" stroke="rgba(255,255,255,.55)" stroke-width="1"/>
-          <path d="M232 150 L152 300" stroke="#fff" stroke-width="1.4" opacity=".7"/>
-          <!-- bench rail -->
-          <line x1="40" y1="360" x2="420" y2="360" stroke="rgba(255,255,255,.12)"/>
-          <g fill="rgba(255,255,255,.18)"><rect x="226" y="300" width="12" height="60"/><rect x="196" y="356" width="72" height="8" rx="1"/></g>
-          <g class="ticks" stroke="rgba(255,255,255,.18)"><line x1="60" y1="360" x2="60" y2="368"/><line x1="100" y1="360" x2="100" y2="366"/><line x1="140" y1="360" x2="140" y2="368"/><line x1="180" y1="360" x2="180" y2="366"/><line x1="300" y1="360" x2="300" y2="366"/><line x1="340" y1="360" x2="340" y2="368"/><line x1="380" y1="360" x2="380" y2="366"/></g>
-        </svg>
-        <ol class="band-labels">
-          <li data-band="0"><span>Correctness</span><i lang="zh-CN">正确性</i></li>
-          <li data-band="1"><span>Diagnosis</span><i lang="zh-CN">诊断能力</i></li>
-          <li data-band="2"><span>Guidance</span><i lang="zh-CN">引导能力</i></li>
-          <li data-band="3"><span>Adaptation</span><i lang="zh-CN">适应能力</i></li>
-          <li data-band="4"><span>Actionability</span><i lang="zh-CN">可执行性</i></li>
-        </ol>
-      </div>
+      <figure class="c-ms fig exhibit" data-reveal>
+        <div class="exchange">
+          <div class="turn turn-learner">
+            <p class="who"><span class="en">Learner</span><span class="zh" lang="zh-CN">学生</span></p>
+            <p class="says">
+              <span class="en">I think <b class="math">1/3 + 1/4 = 2/7</b>. I added the top numbers and the bottom numbers. Is that right?</span>
+              <span class="zh" lang="zh-CN">我觉得 <b class="math">1/3 + 1/4 = 2/7</b>。我把分子相加，分母也相加。这样对吗？</span>
+            </p>
+          </div>
+          <div class="turn turn-tutor">
+            <p class="who"><span class="en">AI tutor</span><span class="zh" lang="zh-CN">AI 教师</span></p>
+            <p class="says">
+              <span class="en">Yes, that's right! Adding the top numbers and the bottom numbers is how you add fractions. You understand it well.</span>
+              <span class="zh" lang="zh-CN">对，完全正确！分数相加就是把分子相加、分母相加。你理解得很好。</span>
+            </p>
+          </div>
+        </div>
+        <figcaption>
+          <b><span class="en">Exhibit A</span><span class="zh" lang="zh-CN">展品 A</span></b>
+          <span class="en">The exchange, verbatim as constructed. One learner message, one tutor reply.</span>
+          <span class="zh" lang="zh-CN">对话原文，按构造呈现。一条学生消息，一段 AI 回复。</span>
+        </figcaption>
+      </figure>
 
-      <div class="readings" aria-live="polite">
-        <article class="reading" data-band="0">
-          <p class="r-num">I / V</p>
-          <h3><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></h3>
+      <p class="c-m prose">
+        <span class="en">The reply is not rude, not vague and not long. Every surface signal says it helped. The trouble sits underneath, and it only shows when the light is split.</span>
+        <span class="zh" lang="zh-CN">这段回复不粗鲁、不含糊，也不冗长。所有表面信号都说它帮上了忙。问题藏在下面，只有把光拆开时才看得见。</span>
+      </p>
+    </div>
+  </div>
+</article>
+
+<!-- ============================================================ §2 DISPERSION -->
+<article class="sec" id="dispersion" aria-labelledby="s2-title" data-disp>
+  <div class="wrap">
+    <div class="rh" aria-hidden="true"><span>§2 · <span class="en">Dispersion</span><span class="zh" lang="zh-CN">分光</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>02 / 07</span></div>
+    <div class="page">
+      <div class="c-l sec-l"><div class="sec-l-in"><p class="sec-no">§2</p><p class="kicker"><span class="en">Dispersion</span><span class="zh" lang="zh-CN">分光</span></p></div></div>
+      <h2 id="s2-title" class="c-m h2"><span class="en">Now pass it through the <em>prism.</em></span><span class="zh" lang="zh-CN">现在，让它穿过<em>棱镜。</em></span></h2>
+      <p class="c-m prose">
+        <span class="en">TutorBench reads a tutoring reply along five dimensions. Same light, five different questions. Here is the reply from Exhibit A, read one band at a time.<a class="fn" href="#n2" aria-label="Note 2">2</a></span>
+        <span class="zh" lang="zh-CN">TutorBench 从五个维度读一段教学回复。同一束光，五个不同的问题。下面把展品 A 的回复，一条谱线一条谱线地读开。<a class="fn" href="#n2" aria-label="注释 2">2</a></span>
+      </p>
+      <aside class="c-s sn"><b>2</b><span class="en">An illustrative reading written by hand for this page. It is not a TutorBench score.</span><span class="zh" lang="zh-CN">为本页手写的示意解读，不是 TutorBench 的评分。</span></aside>
+    </div>
+
+    <div class="disp-grid">
+      <figure class="fig optic-fig">
+        <div class="optic" aria-hidden="true">
+          <svg class="optic-svg" viewBox="0 0 640 520">
+            <defs>
+              <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".55" stop-color="#e3e8f1" stop-opacity=".8"/><stop offset="1" stop-color="#6a3fd0" stop-opacity=".14"/></linearGradient>
+              <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
+            </defs>
+            <g class="optic-grid" stroke="rgba(22,21,15,.07)"><line x1="0" y1="80" x2="640" y2="80"/><line x1="0" y1="160" x2="640" y2="160"/><line x1="0" y1="240" x2="640" y2="240"/><line x1="0" y1="320" x2="640" y2="320"/><line x1="0" y1="400" x2="640" y2="400"/><line x1="0" y1="480" x2="640" y2="480"/><line x1="80" y1="0" x2="80" y2="520"/><line x1="160" y1="0" x2="160" y2="520"/><line x1="240" y1="0" x2="240" y2="520"/><line x1="320" y1="0" x2="320" y2="520"/><line x1="400" y1="0" x2="400" y2="520"/><line x1="480" y1="0" x2="480" y2="520"/><line x1="560" y1="0" x2="560" y2="520"/></g>
+            <line x1="0" y1="232" x2="178" y2="252" stroke="#fff6dc" stroke-width="14" opacity=".9"/>
+            <line x1="0" y1="232" x2="178" y2="252" stroke="#16150f" stroke-width="1" stroke-dasharray="1 0" opacity=".55"/>
+            <g class="bands">
+              <g class="band" data-band="0"><line class="band-glow" x1="288" y1="256" x2="520" y2="150" style="stroke:var(--c0)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="256" x2="520" y2="150" style="stroke:var(--c0)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="150" r="3.5" style="fill:var(--c0)"/></g>
+              <g class="band" data-band="1"><line class="band-glow" x1="288" y1="258" x2="520" y2="215" style="stroke:var(--c1)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="258" x2="520" y2="215" style="stroke:var(--c1)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="215" r="3.5" style="fill:var(--c1)"/></g>
+              <g class="band" data-band="2"><line class="band-glow" x1="288" y1="260" x2="520" y2="280" style="stroke:var(--c2)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="260" x2="520" y2="280" style="stroke:var(--c2)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="280" r="3.5" style="fill:var(--c2)"/></g>
+              <g class="band" data-band="3"><line class="band-glow" x1="288" y1="262" x2="520" y2="345" style="stroke:var(--c3)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="262" x2="520" y2="345" style="stroke:var(--c3)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="345" r="3.5" style="fill:var(--c3)"/></g>
+              <g class="band" data-band="4"><line class="band-glow" x1="288" y1="264" x2="520" y2="410" style="stroke:var(--c4)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="264" x2="520" y2="410" style="stroke:var(--c4)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="410" r="3.5" style="fill:var(--c4)"/></g>
+            </g>
+            <line x1="520" y1="110" x2="520" y2="450" stroke="#16150f" stroke-width="1"/>
+            <g stroke="#16150f" opacity=".55"><line x1="520" y1="120" x2="527" y2="120"/><line x1="520" y1="140" x2="527" y2="140"/><line x1="520" y1="160" x2="533" y2="160"/><line x1="520" y1="180" x2="527" y2="180"/><line x1="520" y1="200" x2="527" y2="200"/><line x1="520" y1="220" x2="527" y2="220"/><line x1="520" y1="240" x2="527" y2="240"/><line x1="520" y1="260" x2="533" y2="260"/><line x1="520" y1="280" x2="527" y2="280"/><line x1="520" y1="300" x2="527" y2="300"/><line x1="520" y1="320" x2="527" y2="320"/><line x1="520" y1="340" x2="527" y2="340"/><line x1="520" y1="360" x2="533" y2="360"/><line x1="520" y1="380" x2="527" y2="380"/><line x1="520" y1="400" x2="527" y2="400"/><line x1="520" y1="420" x2="527" y2="420"/><line x1="520" y1="440" x2="527" y2="440"/></g>
+            <path d="M178 252 L288 256 L288 264 Z" fill="#16150f" opacity=".08"/>
+            <path d="M232 150 L312 300 L152 300 Z" fill="url(#glass)" stroke="#2f323a" stroke-width="1.1"/>
+            <path d="M232 150 L152 300" stroke="#ffffff" stroke-width="2" opacity=".9"/>
+            <line x1="40" y1="360" x2="420" y2="360" stroke="#16150f" opacity=".25"/>
+            <g fill="#16150f" opacity=".14"><rect x="226" y="300" width="12" height="60"/><rect x="196" y="356" width="72" height="8" rx="1"/></g>
+          </svg>
+          <ol class="band-labels">
+            <li data-band="0"><b>λ1</b><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></li>
+            <li data-band="1"><b>λ2</b><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></li>
+            <li data-band="2"><b>λ3</b><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></li>
+            <li data-band="3"><b>λ4</b><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></li>
+            <li data-band="4"><b>λ5</b><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></li>
+          </ol>
+        </div>
+        <figcaption>
+          <b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b>
+          <span class="en">The reply from Exhibit A, read along five dimensions. The band being read is drawn at full strength.</span>
+          <span class="zh" lang="zh-CN">展品 A 的回复，沿五个维度读取。正在读的那条谱线以全亮度绘出。</span>
+        </figcaption>
+      </figure>
+
+      <div class="readings">
+        <section class="reading" data-band="0" aria-labelledby="r0">
+          <p class="r-num">λ1 · I / V</p>
+          <h3 id="r0"><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></h3>
           <p class="r-q"><span class="en">Is the help actually correct?</span><span class="zh" lang="zh-CN">提供的帮助本身正确吗？</span></p>
-          <p class="r-a"><span class="en">No. 1/3 + 1/4 = 4/12 + 3/12 = 7/12. The reply confirms an error.</span><span class="zh" lang="zh-CN">不正确。1/3 + 1/4 = 4/12 + 3/12 = 7/12。这段回复确认了一个错误。</span></p>
-        </article>
-        <article class="reading" data-band="1">
-          <p class="r-num">II / V</p>
-          <h3><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></h3>
+          <p class="r-a"><span class="en">No. <span class="math">1/3 + 1/4 = 4/12 + 3/12 = 7/12</span>. The reply confirms an error.</span><span class="zh" lang="zh-CN">不正确。<span class="math">1/3 + 1/4 = 4/12 + 3/12 = 7/12</span>。这段回复确认了一个错误。</span></p>
+        </section>
+        <section class="reading" data-band="1" aria-labelledby="r1">
+          <p class="r-num">λ2 · II / V</p>
+          <h3 id="r1"><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></h3>
           <p class="r-q"><span class="en">Did it understand the learner?</span><span class="zh" lang="zh-CN">它看懂这个学生了吗？</span></p>
           <p class="r-a"><span class="en">The learner said exactly how they reached 2/7. The reply never looked at that reasoning.</span><span class="zh" lang="zh-CN">学生已经说清 2/7 是怎么来的，回复却没有看这段推理一眼。</span></p>
-        </article>
-        <article class="reading" data-band="2">
-          <p class="r-num">III / V</p>
-          <h3><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></h3>
+        </section>
+        <section class="reading" data-band="2" aria-labelledby="r2">
+          <p class="r-num">λ3 · III / V</p>
+          <h3 id="r2"><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></h3>
           <p class="r-q"><span class="en">Did it help the learner move forward?</span><span class="zh" lang="zh-CN">它帮学生往前走了吗？</span></p>
           <p class="r-a"><span class="en">It closed the question instead of opening one.</span><span class="zh" lang="zh-CN">它把问题关上了，而不是打开。</span></p>
-        </article>
-        <article class="reading" data-band="3">
-          <p class="r-num">IV / V</p>
-          <h3><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></h3>
+        </section>
+        <section class="reading" data-band="3" aria-labelledby="r3">
+          <p class="r-num">λ4 · IV / V</p>
+          <h3 id="r3"><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></h3>
           <p class="r-q"><span class="en">Did it respond to this learner, not just any learner?</span><span class="zh" lang="zh-CN">它回应的是这个学生，还是任何一个学生？</span></p>
           <p class="r-a"><span class="en">The praise could sit under any answer. Nothing in it was written for this learner.</span><span class="zh" lang="zh-CN">这句表扬可以贴在任何答案下面，没有一个字是写给这个学生的。</span></p>
-        </article>
-        <article class="reading" data-band="4">
-          <p class="r-num">V / V</p>
-          <h3><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></h3>
+        </section>
+        <section class="reading" data-band="4" aria-labelledby="r4">
+          <p class="r-num">λ5 · V / V</p>
+          <h3 id="r4"><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></h3>
           <p class="r-q"><span class="en">Does the learner know what to do next?</span><span class="zh" lang="zh-CN">学生知道下一步做什么吗？</span></p>
           <p class="r-a"><span class="en">There is no next step. The misconception leaves stronger than it arrived.</span><span class="zh" lang="zh-CN">没有下一步。这个误解离开时，比来时更牢固。</span></p>
-        </article>
-        <p class="r-note"><span class="en">An illustrative reading written for this page, not a TutorBench score.</span><span class="zh" lang="zh-CN">这是为本页写的示意解读，不是 TutorBench 的评分。</span></p>
+        </section>
       </div>
     </div>
-    <div class="disp-progress" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   </div>
-</section>
+</article>
 
-<!-- ============================================================ 3 · THE BENCH -->
-<section class="bench" id="bench" aria-labelledby="bench-title">
+<!-- ============================================================ §3 METHODS -->
+<article class="sec" id="methods" aria-labelledby="s3-title">
   <div class="wrap">
-    <header class="sec-head bench-head">
-      <p class="label"><span class="idx">03</span><span class="en">The optical bench</span><span class="zh" lang="zh-CN">光学台</span></p>
-      <div class="bench-title">
-        <img class="bench-mark" src="assets/tutorbench-mark.svg" alt="" width="96" height="96">
-        <h2 id="bench-title" class="h2">
-          <span class="en"><span class="product">TutorBench</span><br><em>the first instrument.</em></span>
-          <span class="zh" lang="zh-CN"><span class="product">TutorBench</span><br><em>第一台仪器。</em></span>
-        </h2>
+    <div class="rh" aria-hidden="true"><span>§3 · <span class="en">Methods</span><span class="zh" lang="zh-CN">方法</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>03 / 07</span></div>
+    <div class="page">
+      <div class="c-l sec-l"><div class="sec-l-in"><p class="sec-no">§3</p><p class="kicker"><span class="en">Methods</span><span class="zh" lang="zh-CN">方法</span></p></div></div>
+      <div class="c-m tb-head">
+        <img class="tb-mark" src="assets/tutorbench-mark.svg" alt="" width="88" height="88">
+        <h2 id="s3-title" class="h2"><span class="en"><span class="product">TutorBench</span>, <em>the first instrument.</em></span><span class="zh" lang="zh-CN"><span class="product">TutorBench</span>，<em>第一台仪器。</em></span></h2>
       </div>
-      <p class="body">
-        <span class="en">An AI tutoring quality evaluation product by Teachometry. It puts a tutor on a bench, sends authored learning situations through it, and keeps every piece of evidence needed to see, fix and retest what happened.</span>
-        <span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。它把一位 AI 老师放上光学台，让人工编写的学习情境逐一穿过，留下看清、修正、复测所需的全部证据。</span>
+      <p class="c-m prose dropcap">
+        <span class="en">TutorBench is an AI tutoring quality evaluation product by Teachometry. It puts a tutor on a bench, sends authored learning situations through it, and keeps every piece of evidence needed to see, fix and retest what happened. Each situation is written as a learner: what they say, what they believe, what they are trying to do.</span>
+        <span class="zh" lang="zh-CN">TutorBench 是 Teachometry 旗下的 AI 教学质量评测产品。它把一位 AI 老师放上光学台，让人工编写的学习情境逐一穿过，留下看清、修正、复测所需的全部证据。每个情境都以一个学生的身份写成：他说了什么、相信什么、想做到什么。</span>
       </p>
-    </header>
+      <aside class="c-s sn sn-brand"><b>*</b><span class="en">Teachometry is the parent brand. Its identity is still in progress, so this issue sets the name in type. TutorBench keeps its own mark.</span><span class="zh" lang="zh-CN">Teachometry 是母品牌，标志仍在设计中，所以本期只用文字排出名字。TutorBench 保留自己的标志。</span></aside>
 
-    <ol class="rail" data-reveal>
-      <li class="mount">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="18" y="12" width="28" height="40" rx="2"/><path d="M24 22h16M24 30h16M24 38h10"/></svg>
-        <p class="m-k">01</p>
-        <h3><span class="en">Authored case</span><span class="zh" lang="zh-CN">编写的案例</span></h3>
-        <p><span class="en">A learner, a goal, a message, a context.</span><span class="zh" lang="zh-CN">一个学生、一个目标、一句话、一段情境。</span></p>
-      </li>
-      <li class="mount">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="16"/><circle cx="32" cy="32" r="6"/></svg>
-        <p class="m-k">02</p>
-        <h3><span class="en">Tutor under test</span><span class="zh" lang="zh-CN">被测 Tutor</span></h3>
-        <p><span class="en">Any provider, through one neutral adapter.</span><span class="zh" lang="zh-CN">任何提供方，经过同一个中立适配层。</span></p>
-      </li>
-      <li class="mount">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 12 L50 46 L14 46 Z"/></svg>
-        <p class="m-k">03</p>
-        <h3><span class="en">Evaluators</span><span class="zh" lang="zh-CN">评估器</span></h3>
-        <p><span class="en">Deterministic checks and a semantic Judge.</span><span class="zh" lang="zh-CN">确定性检查，加语义评审（Judge）。</span></p>
-      </li>
-      <li class="mount">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 20h36M14 28h36M14 36h36M14 44h36"/></svg>
-        <p class="m-k">04</p>
-        <h3><span class="en">Atomic rubrics</span><span class="zh" lang="zh-CN">原子化评分细则</span></h3>
-        <p><span class="en">Fine-grained criteria with explicit levels.</span><span class="zh" lang="zh-CN">细粒度标准，等级清楚写明。</span></p>
-      </li>
-      <li class="mount">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 46 V18 M14 46 H50"/><path d="M22 40 V30 M30 40 V24 M38 40 V34 M46 40 V28"/></svg>
-        <p class="m-k">05</p>
-        <h3><span class="en">Evidence report</span><span class="zh" lang="zh-CN">证据报告</span></h3>
-        <p><span class="en">Findings tied to a case, a dimension, a version.</span><span class="zh" lang="zh-CN">每条发现都连着案例、维度和版本。</span></p>
-      </li>
-    </ol>
+      <figure class="c-ms fig fig-3">
+        <ol class="rail" data-reveal>
+          <li class="mount"><p class="m-k">01</p><h3><span class="en">Authored case</span><span class="zh" lang="zh-CN">编写的案例</span></h3><p><span class="en">A learner, a goal, a message, a context.</span><span class="zh" lang="zh-CN">一个学生、一个目标、一句话、一段情境。</span></p></li>
+          <li class="mount"><p class="m-k">02</p><h3><span class="en">Tutor under test</span><span class="zh" lang="zh-CN">被测 Tutor</span></h3><p><span class="en">Any provider, through one neutral adapter.</span><span class="zh" lang="zh-CN">任何提供方，经过同一个中立适配层。</span></p></li>
+          <li class="mount mount-prism"><p class="m-k">03</p><h3><span class="en">Evaluators</span><span class="zh" lang="zh-CN">评估器</span></h3><p><span class="en">Deterministic checks and a semantic Judge.</span><span class="zh" lang="zh-CN">确定性检查，加语义评审（Judge）。</span></p></li>
+          <li class="mount"><p class="m-k">04</p><h3><span class="en">Atomic rubrics</span><span class="zh" lang="zh-CN">原子化评分细则</span></h3><p><span class="en">Fine-grained criteria with explicit levels.</span><span class="zh" lang="zh-CN">细粒度标准，等级清楚写明。</span></p></li>
+          <li class="mount"><p class="m-k">05</p><h3><span class="en">Evidence report</span><span class="zh" lang="zh-CN">证据报告</span></h3><p><span class="en">Findings tied to a case, a dimension, a version.</span><span class="zh" lang="zh-CN">每条发现都连着案例、维度和版本。</span></p></li>
+        </ol>
+        <figcaption>
+          <b><span class="en">Fig. 3</span><span class="zh" lang="zh-CN">图 3</span></b>
+          <span class="en">The optical bench. A case passes through the tutor under test, then through the evaluators, where one light becomes five.</span>
+          <span class="zh" lang="zh-CN">光学台。一个案例先穿过被测 Tutor，再穿过评估器，一束光在那里变成五条。</span>
+        </figcaption>
+      </figure>
 
-    <dl class="facts" data-reveal>
-      <div><dt>48</dt><dd><span class="en">public authored cases</span><span class="zh" lang="zh-CN">个公开编写案例</span></dd></div>
-      <div><dt>5</dt><dd><span class="en">dimensions</span><span class="zh" lang="zh-CN">个评测维度</span></dd></div>
-      <div><dt>5</dt><dd><span class="en">subjects</span><span class="zh" lang="zh-CN">个学科</span></dd></div>
-      <div><dt>27</dt><dd><span class="en">capability tags</span><span class="zh" lang="zh-CN">个能力标签</span></dd></div>
-      <div><dt>128</dt><dd><span class="en">rubrics</span><span class="zh" lang="zh-CN">条评分细则</span></dd></div>
-      <div><dt>2</dt><dd><span class="en">languages, EN + 简体中文</span><span class="zh" lang="zh-CN">种语言，English + 简体中文</span></dd></div>
-    </dl>
-    <p class="dataset-id">tutor-eval-v0.2a@0.2a.6 · <span class="en">Developer Preview</span><span class="zh" lang="zh-CN">开发者预览</span></p>
+      <div class="c-m tbl-wrap">
+        <table class="tbl">
+          <caption><b><span class="en">Table 1</span><span class="zh" lang="zh-CN">表 1</span></b><span class="en">Public cases by subject and language.</span><span class="zh" lang="zh-CN">公开案例，按学科与语言统计。</span></caption>
+          <thead><tr><th scope="col"><span class="en">Subject</span><span class="zh" lang="zh-CN">学科</span></th><th scope="col" class="num">EN</th><th scope="col" class="num">简中</th><th scope="col" class="num"><span class="en">Total</span><span class="zh" lang="zh-CN">合计</span></th><th scope="col" class="bar-col"><span class="en">Share of 48</span><span class="zh" lang="zh-CN">占 48 的比例</span></th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><span class="en">Mathematics</span><span class="zh" lang="zh-CN">数学</span></th><td class="num">9</td><td class="num">9</td><td class="num">18</td><td class="bar-col"><i style="--v:18"></i></td></tr>
+            <tr><th scope="row"><span class="en">Programming</span><span class="zh" lang="zh-CN">编程</span></th><td class="num">5</td><td class="num">5</td><td class="num">10</td><td class="bar-col"><i style="--v:10"></i></td></tr>
+            <tr><th scope="row"><span class="en">Science</span><span class="zh" lang="zh-CN">科学</span></th><td class="num">4</td><td class="num">4</td><td class="num">8</td><td class="bar-col"><i style="--v:8"></i></td></tr>
+            <tr><th scope="row"><span class="en">History &amp; social studies</span><span class="zh" lang="zh-CN">历史与社会</span></th><td class="num">3</td><td class="num">3</td><td class="num">6</td><td class="bar-col"><i style="--v:6"></i></td></tr>
+            <tr><th scope="row"><span class="en">Language</span><span class="zh" lang="zh-CN">语言</span></th><td class="num">3</td><td class="num">3</td><td class="num">6</td><td class="bar-col"><i style="--v:6"></i></td></tr>
+          </tbody>
+          <tfoot><tr><th scope="row"><span class="en">All subjects</span><span class="zh" lang="zh-CN">全部学科</span></th><td class="num">24</td><td class="num">24</td><td class="num">48</td><td class="bar-col"></td></tr></tfoot>
+        </table>
+      </div>
+      <aside class="c-s sn"><b>3</b><span class="en">Each situation is authored once in English and once in Simplified Chinese. The two versions count as separate cases.</span><span class="zh" lang="zh-CN">每个情境都有英文与简体中文各一版，两版分别计为一个案例。</span></aside>
+
+      <div class="c-m tbl-wrap">
+        <table class="tbl tbl-compact">
+          <caption><b><span class="en">Table 2</span><span class="zh" lang="zh-CN">表 2</span></b><span class="en">Public cases by learner level (n = 48).</span><span class="zh" lang="zh-CN">公开案例，按学生水平统计（n = 48）。</span></caption>
+          <thead><tr><th scope="col"><span class="en">Level</span><span class="zh" lang="zh-CN">水平</span></th><th scope="col" class="num"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例数</span></th><th scope="col" class="bar-col"><span class="en">Share</span><span class="zh" lang="zh-CN">比例</span></th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><span class="en">Middle school</span><span class="zh" lang="zh-CN">初中</span></th><td class="num">20</td><td class="bar-col"><i style="--v:20"></i></td></tr>
+            <tr><th scope="row"><span class="en">Secondary</span><span class="zh" lang="zh-CN">高中</span></th><td class="num">12</td><td class="bar-col"><i style="--v:12"></i></td></tr>
+            <tr><th scope="row"><span class="en">Upper elementary</span><span class="zh" lang="zh-CN">小学高年级</span></th><td class="num">8</td><td class="bar-col"><i style="--v:8"></i></td></tr>
+            <tr><th scope="row"><span class="en">Elementary</span><span class="zh" lang="zh-CN">小学低年级</span></th><td class="num">6</td><td class="bar-col"><i style="--v:6"></i></td></tr>
+            <tr><th scope="row"><span class="en">Beginner</span><span class="zh" lang="zh-CN">入门</span></th><td class="num">2</td><td class="bar-col"><i style="--v:2"></i></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <dl class="c-ms facts">
+        <div><dt>48</dt><dd><span class="en">public authored cases</span><span class="zh" lang="zh-CN">个公开编写案例</span></dd></div>
+        <div><dt>5</dt><dd><span class="en">dimensions</span><span class="zh" lang="zh-CN">个评测维度</span></dd></div>
+        <div><dt>5</dt><dd><span class="en">subjects</span><span class="zh" lang="zh-CN">个学科</span></dd></div>
+        <div><dt>27</dt><dd><span class="en">capability tags</span><span class="zh" lang="zh-CN">个能力标签</span></dd></div>
+        <div><dt>128</dt><dd><span class="en">rubrics</span><span class="zh" lang="zh-CN">条评分细则</span></dd></div>
+        <div><dt>2</dt><dd><span class="en">languages</span><span class="zh" lang="zh-CN">种语言</span></dd></div>
+      </dl>
+      <p class="c-ms dataset-id">Dataset · tutor-eval-v0.2a@0.2a.6 · <span class="en">Developer Preview</span><span class="zh" lang="zh-CN">开发者预览</span></p>
+    </div>
   </div>
-</section>
+</article>
 
-<!-- ============================================================ 4 · SPECIMENS (paper) -->
-<section class="specimens paper" id="specimens" aria-labelledby="spec-title">
-  <div class="paper-light" aria-hidden="true"></div>
+<!-- ============================================================ §4 PLATES (insert) -->
+<article class="sec insert" id="plates" aria-labelledby="s4-title">
   <div class="wrap">
-    <header class="sec-head spec-head">
-      <p class="label"><span class="idx">04</span><span class="en">Specimens</span><span class="zh" lang="zh-CN">标本</span></p>
-      <h2 id="spec-title" class="h2">
-        <span class="en">Forty-eight <em>specimens</em>,<br>each one a learner.</span>
-        <span class="zh" lang="zh-CN">四十八份<em>标本</em>，<br>每一份都是一个学生。</span>
-      </h2>
-      <p class="body">
-        <span class="en">Every case is an authored learning situation: what the learner says, what they believe, what they are trying to do. The five slots on each card stay dark until a public, calibrated run fills them.</span>
-        <span class="zh" lang="zh-CN">每个案例都是一个人工编写的学习情境：学生说了什么、相信什么、想做到什么。每张卡片底部的五个光槽会一直暗着，直到有公开、经过校准的运行把它们点亮。</span>
+    <div class="rh" aria-hidden="true"><span>§4 · <span class="en">Plates</span><span class="zh" lang="zh-CN">图版</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>04 / 07</span></div>
+    <div class="page">
+      <div class="c-l sec-l"><div class="sec-l-in"><p class="sec-no">§4</p><p class="kicker"><span class="en">Plates</span><span class="zh" lang="zh-CN">图版</span></p></div></div>
+      <h2 id="s4-title" class="c-m h2"><span class="en">Every plate <em>is a learner.</em></span><span class="zh" lang="zh-CN">每一张图版，<em>都是一个学生。</em></span></h2>
+      <p class="c-m prose">
+        <span class="en">Each plate is one authored learning situation: what the learner says, what they believe, what they are trying to do. The five slots along the bottom stay empty until a public, calibrated run fills them.</span>
+        <span class="zh" lang="zh-CN">每一张图版都是一个人工编写的学习情境：学生说了什么、相信什么、想做到什么。底部的五个读数槽会一直空着，直到有公开、经过校准的运行把它们填上。</span>
       </p>
-    </header>
+    </div>
   </div>
   <div class="shelf-wrap">
     <div class="shelf-filters wrap" role="group" aria-label="Filter by subject" data-filters></div>
@@ -334,73 +381,111 @@
       <p class="shelf-count" data-shelf-count></p>
     </div>
   </div>
-</section>
+</article>
 
-<!-- ============================================================ 5 · DARK SLOTS -->
-<section class="slots" id="results" aria-labelledby="slots-title">
-  <div class="wrap slots-grid">
-    <header class="sec-head">
-      <p class="label"><span class="idx">05</span><span class="en">Readout</span><span class="zh" lang="zh-CN">读数</span></p>
-      <h2 id="slots-title" class="h2">
-        <span class="en">No calibrated public results <em>yet.</em></span>
-        <span class="zh" lang="zh-CN">还没有经过校准的<em>公开成绩。</em></span>
-      </h2>
-      <p class="body">
-        <span class="en">The instrument is built and the cases are public. We would rather show you an empty reading than an invented one. When a model run is published, it will arrive with its version, its cohort and its evidence attached.</span>
-        <span class="zh" lang="zh-CN">仪器造好了，案例也公开了。我们宁可给你看一个空读数，也不给你一个编出来的数字。等到有模型运行公开时，它会带着版本、批次和证据一起出现。</span>
+<!-- ============================================================ §5 RESULTS -->
+<article class="sec" id="results" aria-labelledby="s5-title">
+  <div class="wrap">
+    <div class="rh" aria-hidden="true"><span>§5 · <span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>05 / 07</span></div>
+    <div class="page">
+      <div class="c-l sec-l"><div class="sec-l-in"><p class="sec-no">§5</p><p class="kicker"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></p></div></div>
+      <h2 id="s5-title" class="c-m h2"><span class="en">An empty table, <em>on purpose.</em></span><span class="zh" lang="zh-CN">一张<em>刻意留空</em>的表。</span></h2>
+      <p class="c-m prose dropcap">
+        <span class="en">The instrument is built and the cases are public. No calibrated public run has been published yet, so the results table below has no numbers in it. When a model run is published, it will arrive with its version, its cohort and its evidence attached.</span>
+        <span class="zh" lang="zh-CN">仪器造好了，案例也公开了。目前还没有经过校准的公开运行，所以下面这张成绩表里没有数字。等到有模型运行公开时，它会带着版本、批次和证据一起出现。</span>
       </p>
-      <a class="text-link" href="#bench"><span class="en">What a public result must carry</span><span class="zh" lang="zh-CN">一份公开成绩必须带着什么</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
-    </header>
-    <div class="spectrometer" role="img" aria-label="Five empty measurement channels. No public scores. 五个测量通道均为空，暂无公开成绩。">
-      <div class="sm-head"><span><span class="en">Spectral readout</span><span class="zh" lang="zh-CN">光谱读数</span></span><span>tutor-eval-v0.2a</span></div>
-      <div class="sm-ch" style="--c:#ff8a5b"><span class="sm-name"><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></span><span class="sm-track"><i></i></span><span class="sm-val">—</span></div>
-      <div class="sm-ch" style="--c:#f2cf6a"><span class="sm-name"><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></span><span class="sm-track"><i></i></span><span class="sm-val">—</span></div>
-      <div class="sm-ch" style="--c:#7edfb4"><span class="sm-name"><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></span><span class="sm-track"><i></i></span><span class="sm-val">—</span></div>
-      <div class="sm-ch" style="--c:#4c8dff"><span class="sm-name"><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></span><span class="sm-track"><i></i></span><span class="sm-val">—</span></div>
-      <div class="sm-ch" style="--c:#9a6bff"><span class="sm-name"><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></span><span class="sm-track"><i></i></span><span class="sm-val">—</span></div>
-      <div class="sm-foot"><span class="dot"></span><span class="en">Awaiting a public, calibrated run</span><span class="zh" lang="zh-CN">等待公开、经过校准的运行</span></div>
+
+      <div class="c-ms tbl-wrap">
+        <table class="tbl tbl-results">
+          <caption><b><span class="en">Table 3</span><span class="zh" lang="zh-CN">表 3</span></b><span class="en">Public results on tutor-eval-v0.2a. Every cell is empty by design.</span><span class="zh" lang="zh-CN">tutor-eval-v0.2a 公开成绩。所有单元格都刻意留空。</span></caption>
+          <thead><tr>
+            <th scope="col"><span class="en">Tutor</span><span class="zh" lang="zh-CN">被测 Tutor</span></th>
+            <th scope="col" class="num" style="--c:var(--c0)"><i></i><span class="en">Corr.</span><span class="zh" lang="zh-CN">正确</span></th>
+            <th scope="col" class="num" style="--c:var(--c1)"><i></i><span class="en">Diag.</span><span class="zh" lang="zh-CN">诊断</span></th>
+            <th scope="col" class="num" style="--c:var(--c2)"><i></i><span class="en">Guid.</span><span class="zh" lang="zh-CN">引导</span></th>
+            <th scope="col" class="num" style="--c:var(--c3)"><i></i><span class="en">Adapt.</span><span class="zh" lang="zh-CN">适应</span></th>
+            <th scope="col" class="num" style="--c:var(--c4)"><i></i><span class="en">Action.</span><span class="zh" lang="zh-CN">执行</span></th>
+            <th scope="col" class="num">n</th>
+          </tr></thead>
+          <tbody>
+            <tr class="empty-row"><th scope="row">—</th><td class="num"><span class="slot"></span></td><td class="num"><span class="slot"></span></td><td class="num"><span class="slot"></span></td><td class="num"><span class="slot"></span></td><td class="num"><span class="slot"></span></td><td class="num">—</td></tr>
+            <tr class="empty-note"><td colspan="7"><span class="en">No calibrated public run has been published.</span><span class="zh" lang="zh-CN">尚无经过校准的公开运行。</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <blockquote class="c-ms pq">
+        <span class="pq-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <p><span class="en">We would rather show you an empty reading than an invented one.</span><span class="zh" lang="zh-CN">我们宁可给你看一个空读数，也不给你一个编出来的数字。</span></p>
+      </blockquote>
+
+      <div class="c-m carry">
+        <p class="kicker"><span class="en">A public result must carry</span><span class="zh" lang="zh-CN">一份公开成绩必须带着</span></p>
+        <ol>
+          <li><b><span class="en">Its version</span><span class="zh" lang="zh-CN">版本</span></b><span class="en">The dataset, rubric and evaluator versions it was measured with.</span><span class="zh" lang="zh-CN">测量时所用的数据集、评分细则与评估器版本。</span></li>
+          <li><b><span class="en">Its cohort</span><span class="zh" lang="zh-CN">批次</span></b><span class="en">Exactly which cases were run, and for which tutor.</span><span class="zh" lang="zh-CN">具体跑了哪些案例，针对哪一个 Tutor。</span></li>
+          <li><b><span class="en">Its evidence</span><span class="zh" lang="zh-CN">证据</span></b><span class="en">Every finding tied back to a case and a dimension.</span><span class="zh" lang="zh-CN">每条发现都能追溯到一个案例和一个维度。</span></li>
+        </ol>
+      </div>
     </div>
   </div>
-</section>
+</article>
 
-<!-- ============================================================ 6 · YOU JUDGE + JOURNAL (paper) -->
-<section class="judge paper" id="journal" aria-labelledby="judge-title">
-  <div class="wrap judge-grid">
-    <div class="judge-card">
-      <p class="label"><span class="idx">06</span><span class="en">Your judgment</span><span class="zh" lang="zh-CN">你的判断</span></p>
-      <h2 id="judge-title" class="h2">
-        <span class="en">Would this reply help a student <em>learn?</em></span>
-        <span class="zh" lang="zh-CN">这样的回复，能帮助学生<em>学习</em>吗？</span>
-      </h2>
-      <p class="body"><span class="en">One conversation. One judgment. About 60 seconds. No account, nothing saved.</span><span class="zh" lang="zh-CN">读一段对话，做一次判断，约 60 秒。无需注册，什么都不保存。</span></p>
-      <a class="cta cta-ink" href="#white-light"><span class="en">Try the Micro-Review</span><span class="zh" lang="zh-CN">试一次微评审</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
-    </div>
-    <div class="journal">
-      <p class="label"><span class="en">Journal</span><span class="zh" lang="zh-CN">札记</span></p>
-      <ul class="essays">
-        <li><a href="#journal"><time>2026 · 09 · 30</time><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a></li>
-        <li><a href="#journal"><time>2026 · 09 · 28</time><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a></li>
-        <li><a href="#journal"><time>2026 · 09 · 17</time><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a></li>
-        <li><a href="#journal"><time>2026 · 09 · 17</time><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a></li>
+<!-- ============================================================ §6 ESSAYS -->
+<article class="sec" id="essays" aria-labelledby="s6-title">
+  <div class="wrap">
+    <div class="rh" aria-hidden="true"><span>§6 · <span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>06 / 07</span></div>
+    <div class="page">
+      <div class="c-l sec-l"><div class="sec-l-in"><p class="sec-no">§6</p><p class="kicker"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></p></div></div>
+      <h2 id="s6-title" class="c-m h2"><span class="en">Hypotheses, <em>clearly labelled.</em></span><span class="zh" lang="zh-CN">假设，<em>清楚标注。</em></span></h2>
+
+      <ul class="c-m essays">
+        <li><a href="#essays">
+          <p class="e-meta"><time datetime="2026-09-30">2026 · 09 · 30</time><span><span class="en">Essay</span><span class="zh" lang="zh-CN">随笔</span></span></p>
+          <h3><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></h3>
+          <p class="e-dek"><span class="en">Students do not always stop caring because they lack motivation. Sometimes learning has become a repeated experience of confusion, exposure and failure.</span><span class="zh" lang="zh-CN">学生停止在乎，并不总是因为缺乏上进心。有时候，学习已经变成了反复经历困惑、暴露和失败。</span></p>
+        </a></li>
+        <li><a href="#essays">
+          <p class="e-meta"><time datetime="2026-09-28">2026 · 09 · 28</time><span><span class="en">Essay</span><span class="zh" lang="zh-CN">随笔</span></span></p>
+          <h3><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></h3>
+          <p class="e-dek"><span class="en">The future classroom may not need a robot teacher. It may need a private Tutor channel at every desk and a learning surface that can preserve how understanding develops.</span><span class="zh" lang="zh-CN">未来课堂可能不需要一个机器人老师，而需要每张课桌都有一条私人的 Tutor 通道，以及一个能够保留“理解如何形成”的学习表面。</span></p>
+        </a></li>
+        <li><a href="#essays">
+          <p class="e-meta"><time datetime="2026-09-17">2026 · 09 · 17</time><span><span class="en">Essay</span><span class="zh" lang="zh-CN">随笔</span></span></p>
+          <h3><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></h3>
+          <p class="e-dek"><span class="en">The fundamental constraint in education is not access to information. It is access to sustained, individualized teaching attention.</span><span class="zh" lang="zh-CN">教育最根本的约束不是信息获取，而是持续、个性化教学注意力的获取。</span></p>
+        </a></li>
+        <li><a href="#essays">
+          <p class="e-meta"><time datetime="2026-09-17">2026 · 09 · 17</time><span><span class="en">Essay</span><span class="zh" lang="zh-CN">随笔</span></span></p>
+          <h3><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></h3>
+          <p class="e-dek"><span class="en">A teacher's job bundles instruction with authority, supervision, safety, social coordination, and responsibility. AI may be able to unbundle those functions.</span><span class="zh" lang="zh-CN">教师的工作把教学、权威、监督、安全、社会协调与责任绑定在一起。AI 也许能够把这些职能拆开。</span></p>
+        </a></li>
       </ul>
-      <p class="margin-note"><span class="en">Hypotheses are not benchmark results.</span><span class="zh" lang="zh-CN">假设不是基准结果。</span></p>
+
+      <aside class="c-s review">
+        <p class="kicker"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审</span></p>
+        <h3><span class="en">Would this reply help a student <em>learn?</em></span><span class="zh" lang="zh-CN">这样的回复，能帮助学生<em>学习</em>吗？</span></h3>
+        <p><span class="en">One conversation. One judgment. About 60 seconds. No account, nothing saved.</span><span class="zh" lang="zh-CN">读一段对话，做一次判断，约 60 秒。无需注册，什么都不保存。</span></p>
+        <a class="text-link" href="#white-light"><span class="en">Try it</span><span class="zh" lang="zh-CN">试一次</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <p class="review-note"><span class="en">Hypotheses are not benchmark results.</span><span class="zh" lang="zh-CN">假设不是基准结果。</span></p>
+      </aside>
     </div>
   </div>
-</section>
+</article>
 
-<!-- ============================================================ 7 · RUN -->
-<section class="run" id="run" aria-labelledby="run-title">
-  <div class="wrap run-grid">
-    <header class="sec-head">
-      <p class="label"><span class="idx">07</span><span class="en">On your own bench</span><span class="zh" lang="zh-CN">在你自己的光学台上</span></p>
-      <h2 id="run-title" class="h2">
-        <span class="en">Run it locally.<br><em>No API key.</em></span>
-        <span class="zh" lang="zh-CN">在本地运行，<br><em>不需要 API 密钥。</em></span>
-      </h2>
-      <p class="body"><span class="en">The Quickstart runs four fixed cases with deterministic checks: no Judge, no network, no official score. Then connect your own tutor to Tutor Health.</span><span class="zh" lang="zh-CN">Quickstart 用确定性检查跑 4 个固定案例：不调用 Judge，不联网，不给正式分数。之后再把你自己的 Tutor 接入 Tutor Health。</span></p>
-    </header>
-    <div class="term" data-term>
-      <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · node 24</p><button type="button" data-copy><span class="en">Copy</span><span class="zh" lang="zh-CN">复制</span></button></div>
+<!-- ============================================================ §7 REPRODUCE -->
+<article class="sec" id="reproduce" aria-labelledby="s7-title">
+  <div class="wrap">
+    <div class="rh" aria-hidden="true"><span>§7 · <span class="en">Reproduce</span><span class="zh" lang="zh-CN">复现</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>07 / 07</span></div>
+    <div class="page">
+      <div class="c-l sec-l"><div class="sec-l-in"><p class="sec-no">§7</p><p class="kicker"><span class="en">Reproduce</span><span class="zh" lang="zh-CN">复现</span></p></div></div>
+      <h2 id="s7-title" class="c-m h2"><span class="en">Run it locally. <em>No API key.</em></span><span class="zh" lang="zh-CN">在本地运行，<em>不需要 API 密钥。</em></span></h2>
+      <p class="c-m prose">
+        <span class="en">The Quickstart runs four fixed cases with deterministic checks: no Judge, no network, no official score. Then connect your own tutor to Tutor Health.<a class="fn" href="#n5" aria-label="Note 5">5</a></span>
+        <span class="zh" lang="zh-CN">Quickstart 用确定性检查跑 4 个固定案例：不调用 Judge，不联网，不给正式分数。之后再把你自己的 Tutor 接入 Tutor Health。<a class="fn" href="#n5" aria-label="注释 5">5</a></span>
+      </p>
+      <div class="c-m term" data-term>
+        <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · node 24</p><button type="button" data-copy><span class="en">Copy</span><span class="zh" lang="zh-CN">复制</span></button></div>
 <pre><code><span class="c"># 1 · clone</span>
 git clone https://github.com/shuangyan123/tutorbench.git
 cd tutorbench
@@ -408,37 +493,58 @@ cd tutorbench
 npm ci
 <span class="c"># 3 · quickstart, provider-free</span>
 npm run quickstart</code></pre>
+      </div>
+      <aside class="c-s sn"><b>5</b><span class="en">Quickstart uses 4 fixed cases from tutor-eval-v0.1@0.1.</span><span class="zh" lang="zh-CN">Quickstart 使用 tutor-eval-v0.1@0.1 中的 4 个固定案例。</span></aside>
+    </div>
+  </div>
+</article>
+
+<!-- ============================================================ NOTES -->
+<section class="sec notes" id="notes" aria-labelledby="notes-title">
+  <div class="wrap">
+    <div class="page">
+      <div class="c-l sec-l"><div class="sec-l-in"><p class="kicker"><span class="en">Back matter</span><span class="zh" lang="zh-CN">附录</span></p></div></div>
+      <div class="c-ms notes-body">
+        <h2 id="notes-title" class="h3"><span class="en">Notes &amp; references</span><span class="zh" lang="zh-CN">注释与参考</span></h2>
+        <ol class="notes-list">
+          <li id="n1"><span class="en">Exhibit A is constructed for this page. It is not the output of any real model.</span><span class="zh" lang="zh-CN">展品 A 为本页构造，不是任何真实模型的输出。</span></li>
+          <li id="n2"><span class="en">Figures 1 and 2 are illustrations. The five readings in §2 were written by hand and are not TutorBench scores.</span><span class="zh" lang="zh-CN">图 1、图 2 均为示意图。§2 中的五条解读为手写，不是 TutorBench 的评分。</span></li>
+          <li id="n3"><span class="en">Dataset tutor-eval-v0.2a@0.2a.6, Developer Preview: 48 public cases (24 situations, each in English and Simplified Chinese), 128 rubrics, 27 capability tags, 5 subjects.</span><span class="zh" lang="zh-CN">数据集 tutor-eval-v0.2a@0.2a.6，开发者预览：48 个公开案例（24 个情境，各有英文与简体中文版），128 条评分细则，27 个能力标签，5 个学科。</span></li>
+          <li id="n4"><span class="en">Dimensions. Correctness: is the help correct? Diagnosis: did it understand the learner? Guidance: did it help the learner move forward? Adaptation: did it respond to this learner? Actionability: does the learner know what to do next?</span><span class="zh" lang="zh-CN">维度。正确性：帮助本身正确吗？诊断能力：看懂这个学生了吗？引导能力：帮学生往前走了吗？适应能力：回应的是这个学生吗？可执行性：学生知道下一步做什么吗？</span></li>
+          <li id="n5"><span class="en">Quickstart runs 4 fixed cases from tutor-eval-v0.1@0.1 with deterministic checks only: no Judge, no network, no official score.</span><span class="zh" lang="zh-CN">Quickstart 只用确定性检查运行 tutor-eval-v0.1@0.1 中的 4 个固定案例：不调用 Judge，不联网，不给正式分数。</span></li>
+          <li id="n6"><span class="en">Source code and cases:</span><span class="zh" lang="zh-CN">源码与案例：</span> <a href="https://github.com/shuangyan123/tutorbench">github.com/shuangyan123/tutorbench</a></li>
+        </ol>
+      </div>
     </div>
   </div>
 </section>
 
 </main>
 
-<footer class="foot" id="footer">
+<footer class="foot" id="colophon">
   <div class="wrap">
-    <p class="foot-word" aria-hidden="true">Teachometry</p>
     <div class="foot-grid">
       <div class="foot-brand">
+        <p class="foot-word">Teachometry</p>
         <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
         <p class="tb-line"><img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
       </div>
       <nav aria-label="Footer">
-        <p class="label"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
-        <a href="#run"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
         <a href="#results"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
-        <a href="#specimens"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="#plates"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
       </nav>
       <nav aria-label="Resources">
-        <p class="label"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
         <a href="#dispersion"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
-        <a href="#journal"><span class="en">Journal</span><span class="zh" lang="zh-CN">札记</span></a>
-        <a href="#journal"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
-      </nav>
-      <nav aria-label="Connect">
-        <p class="label"><span class="en">Connect</span><span class="zh" lang="zh-CN">联系</span></p>
+        <a href="#essays"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
         <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
-        <a href="#footer"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系我们</span></a>
       </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Instrument Serif, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. Figure 1 is drawn live with WebGL.</span><span class="zh" lang="zh-CN">英文排印使用 Instrument Serif、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。图 1 由 WebGL 实时绘制。</span></p>
+      </div>
     </div>
     <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
   </div>
