@@ -11,21 +11,25 @@ cd website/prototypes/spectrum && python3 -m http.server 8770
 # http://localhost:8770/?lang=zh   (or ?lang=en, add &motion=reduce to preview reduced motion)
 ```
 
-Edition: light "research journal". The first screen is a live 3D scene: an open issue of
-the journal on a desk in low sunlight through blinds, a glass prism lying on the right
-page, and its spectrum falling on a printed λ1–λ5 scale. Scrolling moves the camera down
-onto the left page, which fades into the masthead. Everything after it is laid out as one journal issue: masthead and
+Edition: light "research journal". The first screen is a live kaleidoscope. Its material is
+one photograph (a learner's notebook with 1/3 + 1/4 = 2/7, a glass prism, the light it
+throws), seen through a round eyepiece folded by 12 mirrors. Pointer movement and scrolling
+turn the tube; scrolling also takes the mirrors out (12 → 6 → 3 → 1) and opens the eyepiece
+until the plain photograph is left, captioned as Fig. 0. Two more photographs open §2 and §3
+as full-bleed plates. All three are generated illustrations and are captioned as such.
+Everything after it is laid out as one journal issue: masthead and
 contents, running heads, margin notes, figures (Fig. 1–3), booktabs tables (Table 1–3),
 a pull quote, notes and references, and a colophon.
 
 - `index.html` — page structure, bilingual copy (paired `.en` / `.zh` spans).
 - `spectrum.css` — design tokens (paper, ink, five spectral bands), journal grid and components.
-- `cover3d.js` — the cover scene (ES module, three.js 0.165 from jsDelivr via an import map;
-  page typography is drawn to canvas textures and redrawn on language change; SVG fallback).
+- `kaleido.js` — the cover kaleidoscope (plain WebGL 1, no libraries). Without WebGL the
+  eyepiece shows the still photograph; with reduced motion it holds one six-mirror frame.
 - `spectrum.js` — language switch, bar, sticky-figure dispersion chapter, plates shelf, reveals.
 - `specimens.js` — generated from `website/dist/public-data/cases.json`
   (`tutor-eval-v0.2a@0.2a.6`): public case inputs only, no responses or scores.
-- `assets/` — byte-for-byte copies of the approved TutorBench T1 mark.
+- `assets/` — byte-for-byte copies of the approved TutorBench T1 mark, plus the three key
+  visuals (`mistake-*`, `tabs-*`, `bench-*`, wide and tall crops, WebP).
 
 Boundaries kept: no model scores, rankings or model names; the tutoring exchange is a
 constructed example (the same one used by Micro-Review) and the five-dimension reading

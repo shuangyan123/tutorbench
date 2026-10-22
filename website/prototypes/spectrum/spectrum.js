@@ -1,6 +1,6 @@
 /* global window, document, navigator, history, location, requestAnimationFrame, setTimeout, IntersectionObserver, URL, CustomEvent */
 /* Teachometry · Spectrum — prototype interactions.
-   1) 语言切换  2) 顶栏状态  3) 封面见 cover3d.js  4) 分光滚动叙事  5) 图版架  6) 进场与复制 */
+   1) 语言切换  2) 顶栏状态  3) 封面见 kaleido.js  4) 分光滚动叙事  5) 图版架  6) 进场与复制 */
 (function () {
   "use strict";
 
@@ -32,13 +32,13 @@
     if (window.scrollY > 24) bar.setAttribute("data-scrolled", ""); else bar.removeAttribute("data-scrolled");
   }
 
-  /* ------------------------------------------------------------ 3 cover: see cover3d.js (ES module, three.js) */
+  /* ------------------------------------------------------------ 3 cover: see kaleido.js (WebGL kaleidoscope) */
 
   /* ------------------------------------------------------------ 4 dispersion (figure stays, readings scroll) */
   var disp = document.querySelector("[data-disp]");
   var dispWide = window.matchMedia("(min-width: 961px) and (min-height: 600px)");
-  var bands = disp ? disp.querySelectorAll(".band") : [];
-  var labels = disp ? disp.querySelectorAll(".band-labels li") : [];
+  var fig2 = disp ? disp.querySelector("[data-fig2]") : null;
+  var labels = disp ? disp.querySelectorAll(".proof-scale li") : [];
   var readings = disp ? disp.querySelectorAll(".reading") : [];
   function dispMode() {
     if (!disp) return;
@@ -53,10 +53,11 @@
   }
   function updateDisp() {
     if (!disp) return;
-    if (disp.getAttribute("data-mode") !== "scrolly") { mark(bands, -1); mark(labels, -1); mark(readings, -1); return; }
+    if (disp.getAttribute("data-mode") !== "scrolly") { mark(labels, -1); mark(readings, -1); if (fig2) fig2.removeAttribute("data-active"); return; }
     var line = window.innerHeight * .58, idx = 0;
     Array.prototype.forEach.call(readings, function (el, i) { if (el.getBoundingClientRect().top < line) idx = i; });
-    mark(bands, idx); mark(labels, idx); mark(readings, idx);
+    mark(labels, idx); mark(readings, idx);
+    if (fig2) fig2.setAttribute("data-active", String(idx));
   }
 
   /* ------------------------------------------------------------ 5 specimen shelf */

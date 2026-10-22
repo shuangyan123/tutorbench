@@ -48,29 +48,14 @@
 <!-- ============================================================ COVER · the work -->
 <section class="hero" id="top" aria-labelledby="cover-title" data-hero>
  <div class="hero-stage">
-  <canvas class="hero-gl" data-hero-canvas aria-hidden="true"></canvas>
-  <svg class="hero-fallback" data-hero-fallback viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs>
-      <radialGradient id="fbSky" cx=".1" cy=".1" r=".9"><stop offset="0" stop-color="#e3eaf5"/><stop offset="1" stop-color="#f6f3ec"/></radialGradient>
-      <linearGradient id="fbFan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd8c8"/><stop offset=".3" stop-color="#fff0c2"/><stop offset=".5" stop-color="#d4f0e2"/><stop offset=".7" stop-color="#d5e2ff"/><stop offset="1" stop-color="#e6dbff"/></linearGradient>
-    </defs>
-    <rect width="1440" height="900" fill="url(#fbSky)"/>
-    <path d="M790 330 L1220 170 L1220 620 Z" fill="url(#fbFan)" opacity=".8"/>
-    <line x1="0" y1="290" x2="640" y2="330" stroke="#fffbef" stroke-width="10"/>
-    <g stroke-width="2.2" stroke-linecap="round">
-      <line x1="790" y1="330" x2="1220" y2="230" style="stroke:var(--c0)"/>
-      <line x1="790" y1="332" x2="1220" y2="300" style="stroke:var(--c1)"/>
-      <line x1="790" y1="334" x2="1220" y2="370" style="stroke:var(--c2)"/>
-      <line x1="790" y1="336" x2="1220" y2="440" style="stroke:var(--c3)"/>
-      <line x1="790" y1="338" x2="1220" y2="510" style="stroke:var(--c4)"/>
-    </g>
-    <rect x="1220" y="190" width="1.2" height="360" fill="#16150f"/>
-    <path d="M720 120 L860 400 L580 400 Z" fill="rgba(226,232,242,.7)" stroke="#2f323a" stroke-width="1.2"/>
-  </svg>
+  <canvas class="scope-gl" data-scope-gl aria-hidden="true"></canvas>
+  <div class="scope-still" aria-hidden="true"></div>
+  <svg class="scope-dial" data-scope-dial aria-hidden="true"></svg>
+
   <div class="hero-copy">
     <p class="hero-q">
-      <span>// <span lang="zh-CN">一段好回复，拆开之后是什么样？</span></span>
-      <span>// what does a reply look like, split apart?</span>
+      <span>// <span lang="zh-CN">一段回复，放进万花筒里会是什么样？</span></span>
+      <span>// one tutoring reply, seen through a kaleidoscope</span>
     </p>
     <h1 id="cover-title" class="display">
       <span class="en">Knowing the answer is not <mark>teaching.</mark></span>
@@ -86,9 +71,21 @@
     </div>
   </div>
 
+  <p class="scope-read" aria-hidden="true">
+    <span class="sr-k"><span class="en">Mirrors</span><span class="zh" lang="zh-CN">镜面</span></span>
+    <span class="sr-steps" data-scope-steps><i class="on">12</i><i>6</i><i>3</i><i>1</i></span>
+    <span class="sr-k"><span class="en">Turn</span><span class="zh" lang="zh-CN">转角</span></span><b data-scope-theta>034°</b>
+  </p>
+
+  <p class="scope-cap" aria-hidden="true">
+    <b><span class="en">Fig. 0</span><span class="zh" lang="zh-CN">图 0</span></b>
+    <span class="en">Every fragment in the kaleidoscope came from this one scene: a learner's <em>1/3 + 1/4 = 2/7</em>, and the light that falls on it. Generated illustration.</span>
+    <span class="zh" lang="zh-CN">万花筒里的每一块碎片，都来自这一个画面：学生写下的 <em>1/3 + 1/4 = 2/7</em>，和落在上面的光。生成示意图。</span>
+  </p>
+
   <p class="hero-corner hero-corner-l" aria-hidden="true"><span class="en">Vol. 0 · No. 1 · October 2026</span><span class="zh" lang="zh-CN">第 0 卷 · 第 1 期 · 2026 年 10 月</span></p>
-  <p class="hero-corner hero-corner-r" aria-hidden="true"><span class="en">Cover · rendered live in your browser</span><span class="zh" lang="zh-CN">封面 · 在你的浏览器里实时渲染</span></p>
-  <p class="hero-hint" aria-hidden="true"><span lang="zh-CN">移动引光 · 滚动翻开</span><span class="hint-en"> / move to shift the light · scroll to open the issue</span></p>
+  <p class="hero-corner hero-corner-r" aria-hidden="true"><span class="en">Cover · a kaleidoscope, turned live</span><span class="zh" lang="zh-CN">封面 · 一只实时转动的万花筒</span></p>
+  <p class="hero-hint" aria-hidden="true"><span lang="zh-CN">移动转动镜筒 · 滚动拆掉镜子</span><span class="hint-en"> / move to turn the tube · scroll to take the mirrors out</span></p>
  </div>
 </section>
 
@@ -187,6 +184,21 @@
 </article>
 
 <!-- ============================================================ §2 DISPERSION -->
+<!-- ============================================================ PLATE I (photo) -->
+<figure class="photo-plate" style="--pos: 72% 50%">
+  <div class="pp-img">
+  <picture>
+    <source media="(max-aspect-ratio: 4/5)" srcset="assets/tabs-tall.webp" width="941" height="1672">
+    <img src="assets/tabs-wide.webp" alt="Five translucent coloured strips, red to violet, laid across a printed page beside a brass loupe and a pencil." width="1916" height="821" loading="lazy" decoding="async">
+  </picture>
+  <div class="pp-over">
+    <p class="kicker"><span class="en">Plate I</span><span class="zh" lang="zh-CN">图版 I</span></p>
+    <p class="pp-line"><span class="en">Same light,<br><em>five questions.</em></span><span class="zh" lang="zh-CN">同一束光，<br><em>五个问题。</em></span></p>
+  </div>
+  </div>
+  <figcaption class="pp-cap"><b><span class="en">Plate I</span><span class="zh" lang="zh-CN">图版 I</span></b><span class="en">Five coloured filters laid over one page of text. Each one lets a single kind of question through. Generated illustration.</span><span class="zh" lang="zh-CN">五片彩色滤片压在同一页文字上，每一片只放过一种问题。生成示意图。</span></figcaption>
+</figure>
+
 <article class="sec" id="dispersion" aria-labelledby="s2-title" data-disp>
   <div class="wrap">
     <div class="rh" aria-hidden="true"><span>§2 · <span class="en">Dispersion</span><span class="zh" lang="zh-CN">分光</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>02 / 07</span></div>
@@ -201,43 +213,38 @@
     </div>
 
     <div class="disp-grid">
-      <figure class="fig optic-fig">
-        <div class="optic" aria-hidden="true">
-          <svg class="optic-svg" viewBox="0 0 640 520">
-            <defs>
-              <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".55" stop-color="#e3e8f1" stop-opacity=".8"/><stop offset="1" stop-color="#6a3fd0" stop-opacity=".14"/></linearGradient>
-              <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
-            </defs>
-            <g class="optic-grid" stroke="rgba(22,21,15,.07)"><line x1="0" y1="80" x2="640" y2="80"/><line x1="0" y1="160" x2="640" y2="160"/><line x1="0" y1="240" x2="640" y2="240"/><line x1="0" y1="320" x2="640" y2="320"/><line x1="0" y1="400" x2="640" y2="400"/><line x1="0" y1="480" x2="640" y2="480"/><line x1="80" y1="0" x2="80" y2="520"/><line x1="160" y1="0" x2="160" y2="520"/><line x1="240" y1="0" x2="240" y2="520"/><line x1="320" y1="0" x2="320" y2="520"/><line x1="400" y1="0" x2="400" y2="520"/><line x1="480" y1="0" x2="480" y2="520"/><line x1="560" y1="0" x2="560" y2="520"/></g>
-            <line x1="0" y1="232" x2="178" y2="252" stroke="#fff6dc" stroke-width="14" opacity=".9"/>
-            <line x1="0" y1="232" x2="178" y2="252" stroke="#16150f" stroke-width="1" stroke-dasharray="1 0" opacity=".55"/>
-            <g class="bands">
-              <g class="band" data-band="0"><line class="band-glow" x1="288" y1="256" x2="520" y2="150" style="stroke:var(--c0)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="256" x2="520" y2="150" style="stroke:var(--c0)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="150" r="3.5" style="fill:var(--c0)"/></g>
-              <g class="band" data-band="1"><line class="band-glow" x1="288" y1="258" x2="520" y2="215" style="stroke:var(--c1)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="258" x2="520" y2="215" style="stroke:var(--c1)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="215" r="3.5" style="fill:var(--c1)"/></g>
-              <g class="band" data-band="2"><line class="band-glow" x1="288" y1="260" x2="520" y2="280" style="stroke:var(--c2)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="260" x2="520" y2="280" style="stroke:var(--c2)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="280" r="3.5" style="fill:var(--c2)"/></g>
-              <g class="band" data-band="3"><line class="band-glow" x1="288" y1="262" x2="520" y2="345" style="stroke:var(--c3)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="262" x2="520" y2="345" style="stroke:var(--c3)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="345" r="3.5" style="fill:var(--c3)"/></g>
-              <g class="band" data-band="4"><line class="band-glow" x1="288" y1="264" x2="520" y2="410" style="stroke:var(--c4)" stroke-width="12" filter="url(#soft)"/><line class="band-core" x1="288" y1="264" x2="520" y2="410" style="stroke:var(--c4)" stroke-width="2.4" stroke-linecap="round"/><circle cx="521" cy="410" r="3.5" style="fill:var(--c4)"/></g>
-            </g>
-            <line x1="520" y1="110" x2="520" y2="450" stroke="#16150f" stroke-width="1"/>
-            <g stroke="#16150f" opacity=".55"><line x1="520" y1="120" x2="527" y2="120"/><line x1="520" y1="140" x2="527" y2="140"/><line x1="520" y1="160" x2="533" y2="160"/><line x1="520" y1="180" x2="527" y2="180"/><line x1="520" y1="200" x2="527" y2="200"/><line x1="520" y1="220" x2="527" y2="220"/><line x1="520" y1="240" x2="527" y2="240"/><line x1="520" y1="260" x2="533" y2="260"/><line x1="520" y1="280" x2="527" y2="280"/><line x1="520" y1="300" x2="527" y2="300"/><line x1="520" y1="320" x2="527" y2="320"/><line x1="520" y1="340" x2="527" y2="340"/><line x1="520" y1="360" x2="533" y2="360"/><line x1="520" y1="380" x2="527" y2="380"/><line x1="520" y1="400" x2="527" y2="400"/><line x1="520" y1="420" x2="527" y2="420"/><line x1="520" y1="440" x2="527" y2="440"/></g>
-            <path d="M178 252 L288 256 L288 264 Z" fill="#16150f" opacity=".08"/>
-            <path d="M232 150 L312 300 L152 300 Z" fill="url(#glass)" stroke="#2f323a" stroke-width="1.1"/>
-            <path d="M232 150 L152 300" stroke="#ffffff" stroke-width="2" opacity=".9"/>
-            <line x1="40" y1="360" x2="420" y2="360" stroke="#16150f" opacity=".25"/>
-            <g fill="#16150f" opacity=".14"><rect x="226" y="300" width="12" height="60"/><rect x="196" y="356" width="72" height="8" rx="1"/></g>
-          </svg>
-          <ol class="band-labels">
-            <li data-band="0"><b>λ1</b><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></li>
-            <li data-band="1"><b>λ2</b><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></li>
-            <li data-band="2"><b>λ3</b><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></li>
-            <li data-band="3"><b>λ4</b><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></li>
-            <li data-band="4"><b>λ5</b><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></li>
+      <figure class="fig optic-fig" data-fig2>
+        <div class="proof">
+          <ol class="proof-scale" aria-hidden="true">
+            <li data-band="0"><i></i><b>λ1</b><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></li>
+            <li data-band="1"><i></i><b>λ2</b><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></li>
+            <li data-band="2"><i></i><b>λ3</b><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></li>
+            <li data-band="3"><i></i><b>λ4</b><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></li>
+            <li data-band="4"><i></i><b>λ5</b><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></li>
           </ol>
+
+          <div class="proof-turn">
+            <p class="proof-who"><span class="en">Learner</span><span class="zh" lang="zh-CN">学生</span></p>
+            <p class="proof-text en">I think <span class="m" data-b="0"><span class="strike">1/3 + 1/4 = 2/7</span><span class="fix" data-b="0">7/12</span></span>. <span class="m" data-b="1">I added the top numbers and the bottom numbers.</span> Is that right?</p>
+            <p class="proof-text zh" lang="zh-CN">我觉得 <span class="m" data-b="0"><span class="strike">1/3 + 1/4 = 2/7</span><span class="fix" data-b="0">7/12</span></span>。<span class="m" data-b="1">我把分子相加，分母也相加。</span>这样对吗？</p>
+          </div>
+
+          <div class="proof-turn proof-tutor">
+            <p class="proof-who"><span class="en">AI tutor</span><span class="zh" lang="zh-CN">AI 教师</span></p>
+            <p class="proof-text en"><span class="gap" data-b="1"><i>‸</i><em>never looks at the method above</em></span><span class="m" data-b="0"><span class="strike">Yes, that's right!</span></span> <span class="m" data-b="0"><span class="strike">Adding the top numbers and the bottom numbers is how you add fractions.</span></span> <span class="m" data-b="3">You understand it well.</span><span class="tag" data-b="3">fits any answer</span><span class="gap" data-b="2"><i>‸</i><em>no question back to the learner</em></span><span class="gap" data-b="4"><i>‸</i><em>no next step</em></span></p>
+            <p class="proof-text zh" lang="zh-CN"><span class="gap" data-b="1"><i>‸</i><em>没有看上面的做法</em></span><span class="m" data-b="0"><span class="strike">对，完全正确！</span></span><span class="m" data-b="0"><span class="strike">分数相加就是把分子相加、分母相加。</span></span><span class="m" data-b="3">你理解得很好。</span><span class="tag" data-b="3">放在哪个答案下都行</span><span class="gap" data-b="2"><i>‸</i><em>没有反问学生</em></span><span class="gap" data-b="4"><i>‸</i><em>没有下一步</em></span></p>
+          </div>
+
+          <p class="proof-key" aria-hidden="true">
+            <span><s>abc</s> <span class="en">marked wrong</span><span class="zh" lang="zh-CN">判为错误</span></span>
+            <span><u>abc</u> <span class="en">evidence for this band</span><span class="zh" lang="zh-CN">本维度的依据</span></span>
+            <span><b>‸</b> <span class="en">something missing</span><span class="zh" lang="zh-CN">此处缺失</span></span>
+          </p>
         </div>
         <figcaption>
           <b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b>
-          <span class="en">The reply from Exhibit A, read along five dimensions. The band being read is drawn at full strength.</span>
-          <span class="zh" lang="zh-CN">展品 A 的回复，沿五个维度读取。正在读的那条谱线以全亮度绘出。</span>
+          <span class="en">Exhibit A, marked up one band at a time, the way an editor marks a proof: struck text is wrong, underlines are the evidence, carets show what the reply left out. Hand-marked for this page; not a TutorBench score.</span>
+          <span class="zh" lang="zh-CN">把展品 A 像校样一样逐个维度批注：删除线表示错误，下划线是依据，插入号标出回复漏掉的东西。本页手工批注，不是 TutorBench 的评分。</span>
         </figcaption>
       </figure>
 
@@ -278,6 +285,21 @@
 </article>
 
 <!-- ============================================================ §3 METHODS -->
+<!-- ============================================================ PLATE II (photo) -->
+<figure class="photo-plate" style="--pos: 80% 50%">
+  <div class="pp-img">
+  <picture>
+    <source media="(max-aspect-ratio: 4/5)" srcset="assets/bench-tall.webp" width="941" height="1672">
+    <img src="assets/bench-wide.webp" alt="A glass prism on graph paper at an optical bench, splitting a beam of light into a spectrum." width="1916" height="821" loading="lazy" decoding="async">
+  </picture>
+  <div class="pp-over">
+    <p class="kicker"><span class="en">Plate II</span><span class="zh" lang="zh-CN">图版 II</span></p>
+    <p class="pp-line"><span class="en">Then put it<br><em>on the bench.</em></span><span class="zh" lang="zh-CN">然后，把它<br><em>放上工作台。</em></span></p>
+  </div>
+  </div>
+  <figcaption class="pp-cap"><b><span class="en">Plate II</span><span class="zh" lang="zh-CN">图版 II</span></b><span class="en">A prism on graph paper at an optical bench. Method means the same reading, done the same way, every time. Generated illustration.</span><span class="zh" lang="zh-CN">光学台上，方格纸和一块棱镜。方法的意思是：每一次都用同样的方式读。生成示意图。</span></figcaption>
+</figure>
+
 <article class="sec" id="methods" aria-labelledby="s3-title">
   <div class="wrap">
     <div class="rh" aria-hidden="true"><span>§3 · <span class="en">Methods</span><span class="zh" lang="zh-CN">方法</span></span><span class="rh-mid">Teachometry · <span class="en">Vol. 0, No. 1</span><span class="zh" lang="zh-CN">第 0 卷第 1 期</span></span><span>03 / 07</span></div>
@@ -544,7 +566,6 @@ npm run quickstart</code></pre>
 
 <script src="specimens.js"></script>
 <script src="spectrum.js"></script>
-<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.min.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/" } }</script>
-<script type="module" src="cover3d.js"></script>
+<script src="kaleido.js"></script>
 </body>
 </html>
