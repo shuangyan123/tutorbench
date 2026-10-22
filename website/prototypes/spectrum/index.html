@@ -47,6 +47,7 @@
 
 <!-- ============================================================ COVER · the work -->
 <section class="hero" id="top" aria-labelledby="cover-title" data-hero>
+ <div class="hero-stage">
   <canvas class="hero-gl" data-hero-canvas aria-hidden="true"></canvas>
   <svg class="hero-fallback" data-hero-fallback viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
@@ -66,16 +67,6 @@
     <rect x="1220" y="190" width="1.2" height="360" fill="#16150f"/>
     <path d="M720 120 L860 400 L580 400 Z" fill="rgba(226,232,242,.7)" stroke="#2f323a" stroke-width="1.2"/>
   </svg>
-  <ol class="hero-lines" aria-hidden="true">
-    <li data-line style="--c:var(--c0)"><b>λ1</b><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></li>
-    <li data-line style="--c:var(--c1)"><b>λ2</b><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></li>
-    <li data-line style="--c:var(--c2)"><b>λ3</b><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></li>
-    <li data-line style="--c:var(--c3)"><b>λ4</b><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></li>
-    <li data-line style="--c:var(--c4)"><b>λ5</b><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></li>
-  </ol>
-  <span class="annot" data-annot="a" aria-hidden="true"><b>A</b><span class="annot-t"><span class="en">one reply</span><span class="zh" lang="zh-CN">一段回复</span></span></span>
-  <span class="annot" data-annot="b" aria-hidden="true"><b>B</b>TutorBench</span>
-
   <div class="hero-copy">
     <p class="hero-q">
       <span>// <span lang="zh-CN">一段好回复，拆开之后是什么样？</span></span>
@@ -96,8 +87,9 @@
   </div>
 
   <p class="hero-corner hero-corner-l" aria-hidden="true"><span class="en">Vol. 0 · No. 1 · October 2026</span><span class="zh" lang="zh-CN">第 0 卷 · 第 1 期 · 2026 年 10 月</span></p>
-  <p class="hero-corner hero-corner-r" aria-hidden="true"><span class="en">Cover · rendered live · an illustration, not data</span><span class="zh" lang="zh-CN">封面 · 实时渲染 · 示意图，不是数据</span></p>
-  <p class="hero-hint" aria-hidden="true"><span lang="zh-CN">移动引光 · 滚动分光</span><span class="hint-en"> / move to guide the light · scroll to split it</span></p>
+  <p class="hero-corner hero-corner-r" aria-hidden="true"><span class="en">Cover · rendered live in your browser</span><span class="zh" lang="zh-CN">封面 · 在你的浏览器里实时渲染</span></p>
+  <p class="hero-hint" aria-hidden="true"><span lang="zh-CN">移动引光 · 滚动翻开</span><span class="hint-en"> / move to shift the light · scroll to open the issue</span></p>
+ </div>
 </section>
 
 <!-- ============================================================ MASTHEAD + CONTENTS -->
@@ -552,5 +544,7 @@ npm run quickstart</code></pre>
 
 <script src="specimens.js"></script>
 <script src="spectrum.js"></script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.min.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/" } }</script>
+<script type="module" src="cover3d.js"></script>
 </body>
 </html>
