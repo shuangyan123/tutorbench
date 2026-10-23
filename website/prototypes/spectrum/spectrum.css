@@ -23,10 +23,17 @@
   --c2: #0a6040; /* Guidance 引导能力 */
   --c3: #1d47b8; /* Adaptation 适应能力 */
   --c4: #5a2fc0; /* Actionability 可执行性 */
+  /* 五个维度：发光的谱线色（只用于图形，不用于文字），取自封面玻璃 */
+  --s0: #f2482a;
+  --s1: #f39a12;
+  --s2: #13a25e;
+  --s3: #2d5cf6;
+  --s4: #7b3ef2;
   --spectrum: linear-gradient(90deg, var(--c0), var(--c1), var(--c2), var(--c3), var(--c4));
   --pastel: linear-gradient(90deg, #ffd6c4, #ffeab0 26%, #cdeedd 50%, #d3e0ff 74%, #e3d6ff);
 
   --f-display: "Instrument Serif", "Noto Serif SC", "Songti SC", serif;
+  --f-head: "Geist", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;  /* 瑞士式标题 */
   --f-text: "Newsreader", "Noto Serif SC", "Songti SC", Georgia, serif;
   --f-ui: "Geist", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
   --f-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -38,6 +45,7 @@
 }
 :root[data-lang="zh"] {
   --f-display: "Noto Serif SC", "Instrument Serif", "Songti SC", serif;
+  --f-head: "Noto Sans SC", "Geist", "PingFang SC", system-ui, sans-serif;
   --f-text: "Noto Serif SC", "Newsreader", "Songti SC", serif;
   --f-ui: "Noto Sans SC", "Geist", "PingFang SC", system-ui, sans-serif;
 }
@@ -72,22 +80,21 @@ ul, ol { list-style: none; }
 :root[data-lang="zh"] .kicker { font-family: var(--f-mono), var(--f-ui); letter-spacing: .08em; font-size: 12.5px; }
 
 .display {
-  font-family: var(--f-display); font-weight: 400;
-  font-size: clamp(52px, 7.6vw, 128px); line-height: .92; letter-spacing: -.022em;
+  font-family: var(--f-head); font-weight: 500;
+  font-size: clamp(52px, 7.6vw, 128px); line-height: .94; letter-spacing: -.045em;
   text-wrap: balance;
 }
-:root[data-lang="zh"] .display { font-weight: 700; font-size: clamp(42px, 6vw, 100px); line-height: 1.12; letter-spacing: .01em; }
+:root[data-lang="zh"] .display { font-weight: 600; font-size: clamp(42px, 6vw, 100px); line-height: 1.12; letter-spacing: .01em; }
 mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; padding: 0 .06em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.display mark { font-style: italic; }
+.display mark, .display em, .h2 em, .pp-line em { font-family: var(--f-display); font-weight: 400; font-style: italic; letter-spacing: -.01em; }
 :root[data-lang="zh"] .display mark { font-style: normal; }
 
 .h2 {
-  font-family: var(--f-display); font-weight: 400;
-  font-size: clamp(38px, 4.8vw, 72px); line-height: 1; letter-spacing: -.015em; text-wrap: balance;
+  font-family: var(--f-head); font-weight: 500;
+  font-size: clamp(42px, 6vw, 100px); line-height: .98; letter-spacing: -.045em; text-wrap: balance;
 }
-.h2 em { font-style: italic; }
-:root[data-lang="zh"] .h2 { font-weight: 600; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.25; letter-spacing: .01em; }
-:root[data-lang="zh"] .h2 em { font-style: normal; }
+:root[data-lang="zh"] .h2 { font-weight: 600; font-size: clamp(32px, 4.4vw, 70px); line-height: 1.18; letter-spacing: -.01em; }
+:root[data-lang="zh"] .h2 em, :root[data-lang="zh"] .display em, :root[data-lang="zh"] .display mark, :root[data-lang="zh"] .pp-line em { font-family: "Noto Serif SC", var(--f-display); font-style: normal; font-weight: 600; }
 .h3 { font-family: var(--f-display); font-weight: 400; font-size: clamp(28px, 2.6vw, 38px); line-height: 1.1; }
 :root[data-lang="zh"] .h3 { font-weight: 600; font-size: clamp(22px, 2vw, 28px); }
 
@@ -132,7 +139,8 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
 /* frosted glass, in the spirit of the palette reference */
 .glass { background: rgba(214, 222, 242, .58); backdrop-filter: blur(22px) saturate(1.35); -webkit-backdrop-filter: blur(22px) saturate(1.35);
   border: 1px solid rgba(255, 255, 255, .55); box-shadow: 0 24px 60px -30px rgba(30, 40, 90, .45), inset 0 1px 0 rgba(255, 255, 255, .6); }
-.glass-chip { background: rgba(214, 222, 242, .62); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, .5); border-radius: 999px; padding: 7px 12px; }
+.glass-chip { padding: 7px 0; }  /* 不再做玻璃，只留印刷感的小字 */
+.glass-keep { background: rgba(214, 222, 242, .62); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, .5); border-radius: 999px; padding: 7px 12px; }
 
 .seq-read { position: absolute; z-index: 2; right: max(var(--gutter), env(safe-area-inset-right, 0px)); top: calc(var(--bar-h) + env(safe-area-inset-top, 0px) + 16px);
   display: flex; gap: 8px; align-items: baseline; white-space: nowrap; font: 500 10.5px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
@@ -141,7 +149,7 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
 :root[data-lang="zh"] .seq-read { font-family: var(--f-mono), var(--f-ui); letter-spacing: .04em; }
 
 .scope-cap { position: absolute; z-index: 2; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: clamp(24px, 5vh, 56px);
-  max-width: min(440px, calc(100% - 2 * var(--gutter))); padding: 14px 16px 15px; border-radius: 14px;
+  max-width: min(400px, calc(100% - 2 * var(--gutter))); padding: 10px 0 0; border-top: 1px solid var(--ink);
   font: 14px/1.5 var(--f-text); color: var(--ink-2);
   opacity: calc(clamp(0, (var(--p, 0) - .3) * 8, 1) - clamp(0, (var(--p, 0) - .9) * 12, 1)); }
 .scope-cap b { font: 500 10.5px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); margin-right: 8px; }
@@ -158,6 +166,7 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
   display: grid; gap: 16px;
 }
 .hero .display { font-size: clamp(40px, 4.6vw, 78px); }
+:root[data-lang="zh"] .hero .display { font-size: clamp(36px, 3.9vw, 64px); line-height: 1.16; }
 .hero:not([data-narrow]) .hero-copy { width: clamp(430px, 36vw, 520px); }
 .hero[data-narrow] .display { font-size: clamp(38px, 11vw, 56px); }
 .hero[data-narrow] .hero-copy { bottom: 64px; }
@@ -197,7 +206,7 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
 .photo-plate picture, .photo-plate img { display: block; width: 100%; }
 .photo-plate img { height: clamp(360px, 70vh, 760px); object-fit: cover; object-position: var(--pos, 70% 50%); filter: saturate(.86) contrast(.98); }
 .pp-over { position: absolute; left: clamp(18px, 4vw, 64px); top: 50%; transform: translateY(-50%); display: grid; gap: 14px; max-width: min(44%, 560px); }
-.pp-line { font-family: var(--f-display); font-size: clamp(40px, 5.2vw, 84px); line-height: 1; letter-spacing: -.01em; color: var(--ink); text-wrap: balance; }
+.pp-line { font-family: var(--f-head); font-weight: 500; font-size: clamp(42px, 5.8vw, 96px); line-height: .98; letter-spacing: -.045em; color: var(--ink); text-wrap: balance; }
 .pp-line em { font-style: italic; }
 :root[data-lang="zh"] .pp-line { font-weight: 700; font-size: clamp(34px, 4.4vw, 70px); line-height: 1.15; }
 :root[data-lang="zh"] .pp-line em { font-style: normal; }
@@ -427,6 +436,10 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
   min-height: 330px; position: relative; box-shadow: 0 18px 40px -30px rgba(14, 15, 20, .4);
   transition: transform .35s cubic-bezier(.2, .7, .2, 1), box-shadow .35s;
 }
+.spec-sig { display: grid; gap: 7px; padding-top: 12px; border-top: 1px solid var(--hair); }
+.sig-foot { display: flex; justify-content: space-between; gap: 10px; font: 400 10.5px/1 var(--f-mono); letter-spacing: .06em; color: var(--ink-3); }
+.sig-foot b { font-weight: 500; }
+.sig-foot em { font-style: normal; white-space: nowrap; }
 .spec:hover { transform: translateY(-4px); box-shadow: 0 28px 50px -30px rgba(14, 15, 20, .5); }
 .spec-meta { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--ink); font: 500 10.5px/1.3 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
 :root[data-lang="zh"] .spec-meta { font-family: var(--f-mono), var(--f-ui); letter-spacing: .04em; font-size: 11.5px; }
@@ -437,10 +450,6 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
 .spec blockquote:lang(zh-CN) { font-family: "Noto Serif SC", var(--f-text); font-style: normal; font-size: 15.5px; line-height: 1.85; }
 .spec-state { align-self: end; font: 400 12px/1.4 var(--f-ui); color: var(--ink-3); }
 .spec-state b { font-weight: 500; color: var(--ink-2); }
-.slots5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)) auto; align-items: center; gap: 5px; padding-top: 12px; border-top: 1px solid var(--hair); }
-.slots5 i { height: 8px; border: 1px dashed rgba(14, 15, 20, .32); position: relative; }
-.slots5 i::after { content: ""; position: absolute; left: 3px; right: 3px; top: 50%; height: 2px; transform: translateY(-50%); background: var(--c); opacity: .3; }
-.slots5 em { font: 400 10.5px/1 var(--f-mono); font-style: normal; color: var(--ink-3); letter-spacing: .06em; margin-left: 6px; white-space: nowrap; }
 .shelf-nav { display: flex; align-items: center; gap: 10px; }
 .shelf-nav button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--hair-2); background: transparent; display: grid; place-items: center; cursor: pointer; }
 .shelf-nav button:hover { border-color: var(--ink); }
@@ -591,3 +600,46 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
 :root[data-motion="reduce"] { scroll-behavior: auto; }
 :root[data-motion="reduce"] .hero { height: auto; }
 :root[data-motion="reduce"] .hero-hint { display: none; }
+
+/* ---------------------------------------------------------------- spectral signature (signature.js) */
+.sig { display: block; width: 100%; height: 34px; }
+.sig-base { fill: #fff; opacity: .5; }
+.sig-band { opacity: .12; }
+.sig-glow { opacity: .22; filter: blur(1.2px); }
+.sig-line { opacity: .95; }
+.sig-tick { fill: rgba(14, 15, 20, .3); }
+.spec .sig { height: 34px; }
+
+/* Fig. 4 — atlas of signatures */
+.atlas { margin-block: clamp(18px, 2.4vw, 34px); }
+.atlas-k { margin: 0; }
+.atlas-body { position: relative; --lab: clamp(150px, 18vw, 230px); }
+.atlas-head, .a-row { display: grid; grid-template-columns: var(--lab) minmax(0, 1fr); column-gap: 14px; align-items: center; }
+.atlas-head { padding-bottom: 8px; border-bottom: 1px solid var(--ink); }
+.a-bands { display: grid; grid-template-columns: 5fr 6fr 7fr 5fr 4fr; }
+.a-bands > span { font: 500 10px/1.2 var(--f-mono); letter-spacing: .03em; text-transform: uppercase; color: var(--ink-3); padding-left: 4px; border-left: 2px solid var(--c); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.a-bands b { color: var(--c); font-weight: 500; text-transform: none; }
+:root[data-lang="zh"] .a-bands > span { font-family: var(--f-mono), var(--f-ui); letter-spacing: .04em; font-size: 11px; }
+.atlas-rows { list-style: none; margin: 0; padding: 0; }
+.a-row { padding: 3px 0; }
+.a-row .sig { height: 16px; }
+.a-sub { font: 500 10.5px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); padding: 14px 0 6px; }
+:root[data-lang="zh"] .a-sub { font-family: var(--f-mono), var(--f-ui); letter-spacing: .06em; font-size: 11.5px; }
+.a-lab { display: flex; gap: 10px; align-items: baseline; min-width: 0; font-size: 13px; color: var(--ink-2); }
+.a-no { font: 500 10.5px/1 var(--f-mono); color: var(--ink-3); flex: none; width: 1.6em; }
+.a-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
+:root[data-lang="zh"] .a-t { text-transform: none; }
+.a-sum { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--ink); }
+.a-sum .sig { height: 30px; }
+.a-sum .a-t { color: var(--ink); font-weight: 500; }
+.a-cursor { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ink); opacity: 0; pointer-events: none; transition: opacity .15s; }
+.atlas[data-hover] .a-cursor { opacity: .55; }
+.atlas-read { min-height: 1.4em; margin: 0; font-size: 11.5px; letter-spacing: .04em; color: var(--ink-2); text-transform: none; }
+.atlas-read b { font-weight: 500; }
+@media (max-width: 640px) {
+  .atlas-head, .a-row { grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
+  .atlas-head .a-lab { display: none; }
+  .a-bands > span { font-size: 0; }
+  .a-bands > span b { font-size: 10px; }
+  .a-row { padding: 6px 0; }
+}

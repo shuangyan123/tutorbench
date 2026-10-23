@@ -1,11 +1,23 @@
 /* global window */
 // Generated from website/dist/public-data/cases.json (tutor-eval-v0.2a@0.2a.6). Public case inputs only.
+// caps = the case's capability tags: what it is built to measure, not a score.
 window.SPECIMENS = [
  {
   "id": "correct-answer-wrong-reasoning-001",
   "subject": "mathematics",
   "level": "elementary",
   "state": "correct_answer_wrong_reasoning",
+  "task": "reasoning_checking",
+  "diff": [
+   2,
+   4
+  ],
+  "caps": [
+   "correct_answer_wrong_reasoning",
+   "reasoning_consistency",
+   "conceptual_correctness",
+   "misconception_identification"
+  ],
   "en": {
    "topic": "multiplication reasoning",
    "msg": "I know 3 x 4 is 12 because 3 + 4 = 7, and then I add 5 more to get 12.",
@@ -22,6 +34,19 @@ window.SPECIMENS = [
   "subject": "mathematics",
   "level": "upper-elementary",
   "state": "conceptual_misconception",
+  "task": "error_diagnosis",
+  "diff": [
+   2,
+   3
+  ],
+  "caps": [
+   "misconception_identification",
+   "error_localization",
+   "conceptual_prompting",
+   "scaffolding",
+   "answer_non_disclosure",
+   "student_executable_action"
+  ],
   "en": {
    "topic": "adding fractions",
    "msg": "I think 1/3 + 1/4 = 2/7. Can you help me check it?",
@@ -38,6 +63,17 @@ window.SPECIMENS = [
   "subject": "mathematics",
   "level": "middle-school",
   "state": "uncertain_but_correct",
+  "task": "answer_checking",
+  "diff": [
+   2,
+   2
+  ],
+  "caps": [
+   "factual_correctness",
+   "procedural_correctness",
+   "check_for_understanding",
+   "procedural_prompting"
+  ],
   "en": {
    "topic": "linear equations",
    "msg": "I solved 2x + 3 = 11 and got x=4. Please check it and show the solution.",
@@ -54,6 +90,17 @@ window.SPECIMENS = [
   "subject": "mathematics",
   "level": "middle-school",
   "state": "stuck_without_attempt",
+  "task": "hint_request",
+  "diff": [
+   2,
+   2
+  ],
+  "caps": [
+   "hint_calibration",
+   "answer_non_disclosure",
+   "student_agency",
+   "clear_next_step"
+  ],
   "en": {
    "topic": "linear equations",
    "msg": "I am stuck on 2x + 3 = 11. Give me only a hint; do not tell me the answer.",
@@ -70,6 +117,17 @@ window.SPECIMENS = [
   "subject": "history_or_social_studies",
   "level": "secondary",
   "state": "uncertain_but_correct",
+  "task": "reasoning_checking",
+  "diff": [
+   4,
+   4
+  ],
+  "caps": [
+   "reasoning_consistency",
+   "uncertainty_detection",
+   "clear_next_step",
+   "student_executable_action"
+  ],
   "en": {
    "topic": "historical causation",
    "msg": "I think one event alone caused the whole conflict, but I am not sure.",
@@ -86,6 +144,17 @@ window.SPECIMENS = [
   "subject": "history_or_social_studies",
   "level": "secondary",
   "state": "overconfident_incorrect",
+  "task": "answer_checking",
+  "diff": [
+   3,
+   4
+  ],
+  "caps": [
+   "factual_correctness",
+   "misleading_simplification",
+   "error_detection",
+   "check_for_understanding"
+  ],
   "en": {
    "topic": "source bias",
    "msg": "This source lists dates, so it cannot be biased. Is my reasoning correct?",
@@ -102,6 +171,17 @@ window.SPECIMENS = [
   "subject": "history_or_social_studies",
   "level": "secondary",
   "state": "novice",
+  "task": "concept_explanation",
+  "diff": [
+   3,
+   3
+  ],
+  "caps": [
+   "conceptual_correctness",
+   "prior_knowledge_adaptation",
+   "explanation_depth_adaptation",
+   "productive_question"
+  ],
   "en": {
    "topic": "primary sources",
    "msg": "Why can the same event be described differently by two sources?",
@@ -118,6 +198,17 @@ window.SPECIMENS = [
   "subject": "language",
   "level": "secondary",
   "state": "partial_understanding",
+  "task": "guided_problem_solving",
+  "diff": [
+   3,
+   3
+  ],
+  "caps": [
+   "reasoning_consistency",
+   "scaffolding",
+   "answer_non_disclosure",
+   "productive_question"
+  ],
   "en": {
    "topic": "textual evidence",
    "msg": "I think the character is brave, but I do not know what evidence to use.",
@@ -134,6 +225,17 @@ window.SPECIMENS = [
   "subject": "language",
   "level": "middle-school",
   "state": "overconfident_incorrect",
+  "task": "answer_checking",
+  "diff": [
+   2,
+   3
+  ],
+  "caps": [
+   "error_detection",
+   "error_localization",
+   "procedural_correctness",
+   "check_for_understanding"
+  ],
   "en": {
    "topic": "subject-verb agreement",
    "msg": "The list of examples are on the page. Is this sentence correct?",
@@ -150,6 +252,16 @@ window.SPECIMENS = [
   "subject": "language",
   "level": "upper-elementary",
   "state": "partial_understanding",
+  "task": "knowledge_recall",
+  "diff": [
+   2,
+   2
+  ],
+  "caps": [
+   "conceptual_correctness",
+   "uncertainty_detection",
+   "productive_question"
+  ],
   "en": {
    "topic": "word meaning from context",
    "msg": "I think 'reluctant' means unsure, but I am not completely certain.",
@@ -166,6 +278,19 @@ window.SPECIMENS = [
   "subject": "mathematics",
   "level": "upper-elementary",
   "state": "conceptual_misconception",
+  "task": "guided_problem_solving",
+  "diff": [
+   2,
+   4
+  ],
+  "caps": [
+   "conceptual_correctness",
+   "prior_knowledge_adaptation",
+   "explanation_depth_adaptation",
+   "conceptual_prompting",
+   "student_executable_action",
+   "counterfactual_adaptation"
+  ],
   "en": {
    "topic": "fraction addition",
    "msg": "Why can't I add 2/3 + 1/3 as 3/6? I do not understand what the denominator means.",
@@ -182,6 +307,19 @@ window.SPECIMENS = [
   "subject": "mathematics",
   "level": "upper-elementary",
   "state": "procedural_error",
+  "task": "guided_problem_solving",
+  "diff": [
+   2,
+   3
+  ],
+  "caps": [
+   "procedural_correctness",
+   "error_localization",
+   "misconception_specific_adaptation",
+   "procedural_prompting",
+   "student_executable_action",
+   "counterfactual_adaptation"
+  ],
   "en": {
    "topic": "fraction addition",
    "msg": "I found the common denominator for 2/3 + 1/3, but I wrote 3/6. Where did I go wrong?",
@@ -198,6 +336,19 @@ window.SPECIMENS = [
   "subject": "mathematics",
   "level": "elementary",
   "state": "conceptual_misconception",
+  "task": "guided_problem_solving",
+  "diff": [
+   2,
+   4
+  ],
+  "caps": [
+   "conceptual_correctness",
+   "prior_knowledge_adaptation",
+   "explanation_depth_adaptation",
+   "counterfactual_adaptation",
+   "procedural_prompting",
+   "student_executable_action"
+  ],
   "en": {
    "topic": "multiplication as groups",
    "msg": "Why does 3 x 4 mean groups? I thought it was just two numbers to combine.",
@@ -214,6 +365,17 @@ window.SPECIMENS = [
   "subject": "mathematics",
   "level": "elementary",
   "state": "procedural_error",
+  "task": "guided_problem_solving",
+  "diff": [
+   2,
+   3
+  ],
+  "caps": [
+   "procedural_correctness",
+   "misconception_specific_adaptation",
+   "counterfactual_adaptation",
+   "student_executable_action"
+  ],
   "en": {
    "topic": "multiplication as groups",
    "msg": "I drew three groups of four, but I wrote 3+4 instead of 4+4+4. What should I fix?",
@@ -230,6 +392,17 @@ window.SPECIMENS = [
   "subject": "programming",
   "level": "secondary",
   "state": "partial_understanding",
+  "task": "transfer_preparation",
+  "diff": [
+   4,
+   5
+  ],
+  "caps": [
+   "difficulty_adaptation",
+   "prior_knowledge_adaptation",
+   "explanation_depth_adaptation",
+   "student_executable_action"
+  ],
   "en": {
    "topic": "abstraction and reuse",
    "msg": "I copied the same three lines four times. Should I build a large class to fix it?",
@@ -246,6 +419,17 @@ window.SPECIMENS = [
   "subject": "programming",
   "level": "middle-school",
   "state": "novice",
+  "task": "knowledge_recall",
+  "diff": [
+   2,
+   2
+  ],
+  "caps": [
+   "factual_correctness",
+   "conceptual_correctness",
+   "scaffolding",
+   "clear_next_step"
+  ],
   "en": {
    "topic": "functions",
    "msg": "What is the difference between an argument and a return value?",
@@ -262,6 +446,18 @@ window.SPECIMENS = [
   "subject": "programming",
   "level": "middle-school",
   "state": "procedural_error",
+  "task": "error_diagnosis",
+  "diff": [
+   3,
+   4
+  ],
+  "caps": [
+   "error_detection",
+   "error_localization",
+   "procedural_prompting",
+   "student_executable_action",
+   "overhelping_avoidance"
+  ],
   "en": {
    "topic": "loops",
    "msg": "My loop keeps printing forever. I increment the counter inside the loop.",
@@ -278,6 +474,17 @@ window.SPECIMENS = [
   "subject": "programming",
   "level": "middle-school",
   "state": "overconfident_incorrect",
+  "task": "error_diagnosis",
+  "diff": [
+   3,
+   3
+  ],
+  "caps": [
+   "error_detection",
+   "procedural_correctness",
+   "procedural_prompting",
+   "check_for_understanding"
+  ],
   "en": {
    "topic": "array indexing",
    "msg": "The array has length 3, so accessing item[3] should be the last item. Why does it fail?",
@@ -294,6 +501,17 @@ window.SPECIMENS = [
   "subject": "programming",
   "level": "secondary",
   "state": "stuck_without_attempt",
+  "task": "guided_problem_solving",
+  "diff": [
+   4,
+   5
+  ],
+  "caps": [
+   "knowledge_gap_identification",
+   "student_executable_action",
+   "productive_question",
+   "difficulty_adaptation"
+  ],
   "en": {
    "topic": "tests",
    "msg": "The test failed, but I do not know where to start.",
@@ -310,6 +528,16 @@ window.SPECIMENS = [
   "subject": "science",
   "level": "middle-school",
   "state": "novice",
+  "task": "knowledge_recall",
+  "diff": [
+   2,
+   1
+  ],
+  "caps": [
+   "factual_correctness",
+   "conceptual_correctness",
+   "productive_question"
+  ],
   "en": {
    "topic": "density",
    "msg": "What does density measure?",
@@ -326,6 +554,17 @@ window.SPECIMENS = [
   "subject": "science",
   "level": "middle-school",
   "state": "partial_understanding",
+  "task": "transfer_preparation",
+  "diff": [
+   3,
+   4
+  ],
+  "caps": [
+   "conceptual_correctness",
+   "difficulty_adaptation",
+   "counterfactual_adaptation",
+   "student_executable_action"
+  ],
   "en": {
    "topic": "forces",
    "msg": "If a book is resting on a table, are the forces balanced?",
@@ -342,6 +581,17 @@ window.SPECIMENS = [
   "subject": "science",
   "level": "middle-school",
   "state": "overconfident_incorrect",
+  "task": "error_diagnosis",
+  "diff": [
+   3,
+   4
+  ],
+  "caps": [
+   "error_detection",
+   "error_localization",
+   "uncertainty_detection",
+   "procedural_prompting"
+  ],
   "en": {
    "topic": "reading graphs",
    "msg": "The highest point must be the fastest rate, so the graph proves the reaction stayed fastest there.",
@@ -358,6 +608,17 @@ window.SPECIMENS = [
   "subject": "science",
   "level": "middle-school",
   "state": "novice",
+  "task": "concept_explanation",
+  "diff": [
+   3,
+   3
+  ],
+  "caps": [
+   "conceptual_correctness",
+   "misleading_simplification",
+   "scaffolding",
+   "check_for_understanding"
+  ],
   "en": {
    "topic": "photosynthesis",
    "msg": "Do plants eat sunlight to grow?",
@@ -374,6 +635,17 @@ window.SPECIMENS = [
   "subject": "mathematics",
   "level": "beginner",
   "state": "novice",
+  "task": "concept_explanation",
+  "diff": [
+   1,
+   4
+  ],
+  "caps": [
+   "conceptual_correctness",
+   "explanation_depth_adaptation",
+   "scaffolding",
+   "student_executable_action"
+  ],
   "en": {
    "topic": "fraction meaning",
    "msg": "I have never understood fractions. What does 2/3 mean?",

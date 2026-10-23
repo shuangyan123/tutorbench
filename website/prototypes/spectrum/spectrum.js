@@ -1,6 +1,6 @@
 /* global window, document, navigator, history, location, requestAnimationFrame, setTimeout, IntersectionObserver, URL, CustomEvent */
 /* Teachometry · Spectrum — prototype interactions.
-   1) 语言切换  2) 顶栏状态  3) 封面见 cover.js  4) 分光滚动叙事  5) 图版架  6) 进场与复制 */
+   1) 语言切换  2) 顶栏状态  3) 封面见 cover.js  4) 分光滚动叙事  5) 图版架  5b) 光谱签名与图 4  6) 进场与复制 */
 (function () {
   "use strict";
 
@@ -98,7 +98,6 @@
     }).join("");
     var list = all.filter(function (s) { return current === "all" || s.subject === current; });
     var lk = lang() === "zh" ? "zh" : "en";
-    var colors = ["var(--c0)", "var(--c1)", "var(--c2)", "var(--c3)", "var(--c4)"];
     shelf.setAttribute("aria-label", lang() === "zh" ? "公开案例" : "Public cases");
     shelf.innerHTML = list.map(function (s) {
       var v = s[lk] || s.en;
@@ -108,7 +107,7 @@
         "<h3>" + esc(v.topic) + "</h3>" +
         '<blockquote lang="' + (lk === "zh" ? "zh-CN" : "en") + '">' + esc(v.msg) + "</blockquote>" +
         '<p class="spec-state">' + esc(L(T.state)) + " · <b>" + esc(L(STATE[s.state]) || s.state) + "</b></p>" +
-        '<span class="slots5" role="img" aria-label="' + (lang() === "zh" ? "五个维度均未评分" : "Five dimensions, not scored") + '">' + colors.map(function (c) { return '<i style="--c:' + c + '"></i>'; }).join("") + '<em aria-hidden="true">' + (lang() === "zh" ? "未评分" : "not scored") + "</em></span>" +
+        sigBlock(s) +
         "</li>";
     }).join("");
     if (countEl) countEl.textContent = T.count(list.length, all.length);
@@ -129,6 +128,74 @@
     if (prev) prev.setAttribute("aria-label", lang() === "zh" ? "上一组" : "Previous");
     if (next) next.setAttribute("aria-label", lang() === "zh" ? "下一组" : "Next");
   }
+
+  /* ------------------------------------------------------------ 5b spectral signatures (signature.js) */
+  var SIG = window.Signature;
+  var LAMBDA = ["λ1", "λ2", "λ3", "λ4", "λ5"];
+  function capList(caps) {
+    return caps.map(function (c) { return SIG.name(c, lang()); }).join(lang() === "zh" ? "、" : ", ");
+  }
+  function sigBlock(s) {
+    if (!SIG || !s.caps) return "";
+    var zh = lang() === "zh";
+    var bs = SIG.bands(s.caps).map(function (b) { return '<b style="color:var(--c' + b + ')">' + LAMBDA[b] + "</b>"; }).join(" ");
+    var label = (zh ? "光谱签名：这道题测 " : "Spectral signature. This case measures ") + capList(s.caps) + (zh ? "。未评分。" : ". Not scored.");
+    return '<div class="spec-sig" role="img" aria-label="' + esc(label) + '">' + SIG.svg(s.caps, { h: 34 }) +
+      '<p class="sig-foot" aria-hidden="true"><span>' + bs + " · " + s.caps.length + (zh ? " 条谱线" : " lines") + "</span><em>" + (zh ? "未评分" : "not scored") + "</em></p></div>";
+  }
+
+  // Fig. 4 — the atlas: all 24 situations as line spectra, plus the summed spectrum of all 48 cases
+  var atlas = document.querySelector("[data-atlas]");
+  var atlasCounts = {};
+  function renderAtlas() {
+    if (!atlas || !SIG || !window.SPECIMENS) return;
+    var zh = lang() === "zh", all = window.SPECIMENS, lk = zh ? "zh" : "en";
+    atlasCounts = {};
+    all.forEach(function (s) { s.caps.forEach(function (c) { atlasCounts[c] = (atlasCounts[c] || 0) + 2; }); }); // each situation = 2 cases
+    var max = 0; Object.keys(atlasCounts).forEach(function (k) { max = Math.max(max, atlasCounts[k]); });
+    var weights = {}; Object.keys(atlasCounts).forEach(function (k) { weights[k] = atlasCounts[k] / max; });
+    var order = Object.keys(SUBJ);
+    var rows = all.map(function (s, i) { return { s: s, i: i }; }).sort(function (a, b) {
+      return (order.indexOf(a.s.subject) - order.indexOf(b.s.subject)) || (a.i - b.i);
+    });
+    var head = '<div class="atlas-head" aria-hidden="true"><span class="a-lab"></span><span class="a-bands">' +
+      SIG.BANDS.map(function (b, bi) { return '<span style="--n:' + b.caps.length + ";--c:var(--c" + bi + ')"><b>' + LAMBDA[bi] + "</b> " + (zh ? b.zh : b.en) + "</span>"; }).join("") + "</span></div>";
+    var last = "";
+    var body = rows.map(function (r) {
+      var s = r.s, v = s[lk] || s.en, sub = "";
+      if (s.subject !== last) { last = s.subject; sub = '<li class="a-sub" aria-hidden="true">' + esc(L(SUBJ[s.subject])) + "</li>"; }
+      return sub + '<li class="a-row"><span class="a-lab"><span class="a-no">' + String(r.i + 1).padStart(2, "0") + '</span><span class="a-t">' + esc(v.topic) + "</span></span>" +
+        '<span class="a-sig" role="img" aria-label="' + esc((zh ? "图版 " : "Plate ") + (r.i + 1) + "：" + capList(s.caps)) + '">' + SIG.svg(s.caps, { h: 16 }) + "</span></li>";
+    }).join("");
+    var sum = '<li class="a-row a-sum"><span class="a-lab"><span class="a-no">Σ</span><span class="a-t">' + (zh ? "全部 48 个案例" : "All 48 cases") + "</span></span>" +
+      '<span class="a-sig" role="img" aria-label="' + (zh ? "所有案例叠加后的光谱：线越粗，测这项能力的案例越多" : "Summed spectrum of all cases: the thicker the line, the more cases measure that capability") + '">' + SIG.svg(null, { h: 30, weights: weights, ticks: false, cls: "sig-sum" }) + "</span></li>";
+    atlas.querySelector("[data-atlas-body]").innerHTML = head + '<ol class="atlas-rows">' + body + sum + '</ol><i class="a-cursor" aria-hidden="true"></i>';
+    atlasRead(-1);
+  }
+  function atlasRead(slot) {
+    var out = atlas.querySelector("[data-atlas-read]"); if (!out) return;
+    var zh = lang() === "zh";
+    if (slot < 0) {
+      out.innerHTML = zh ? "把指针移到谱线上，看它是哪一项能力。" : "Point at a line to see which capability it is.";
+      atlas.removeAttribute("data-hover"); return;
+    }
+    var a = SIG.AXIS[slot], b = SIG.BANDS[a.band], n = atlasCounts[a.cap] || 0;
+    out.innerHTML = '<b style="color:var(--c' + a.band + ')">' + LAMBDA[a.band] + " " + (zh ? b.zh : b.en) + "</b> · " + esc(SIG.name(a.cap, lang())) + " · " +
+      (zh ? n + " / 48 个案例" : n + " of 48 cases");
+    atlas.setAttribute("data-hover", "");
+  }
+  if (atlas) atlas.addEventListener("pointermove", function (e) {
+    var svg = e.target.closest && e.target.closest(".a-sig");
+    var bodyEl = atlas.querySelector("[data-atlas-body]");
+    var cur = atlas.querySelector(".a-cursor");
+    if (!svg || !cur) { atlasRead(-1); return; }
+    var r = svg.getBoundingClientRect(), br = bodyEl.getBoundingClientRect();
+    var slot = Math.max(0, Math.min(SIG.AXIS.length - 1, Math.floor((e.clientX - r.left) / r.width * SIG.AXIS.length)));
+    cur.style.left = (r.left - br.left + (slot + 0.5) * r.width / SIG.AXIS.length) + "px";
+    cur.style.top = "0px";
+    atlasRead(slot);
+  });
+  if (atlas) atlas.addEventListener("pointerleave", function () { atlasRead(-1); });
 
   /* ------------------------------------------------------------ 6 reveal + copy */
   var reveals = document.querySelectorAll("[data-reveal], .rail");
@@ -153,7 +220,7 @@
   });
 
   /* ------------------------------------------------------------ wiring */
-  langListeners.push(renderShelf, navLabels);
+  langListeners.push(renderShelf, renderAtlas, navLabels);
   var ticking = false;
   window.addEventListener("scroll", function () {
     if (ticking) return; ticking = true;
@@ -163,5 +230,5 @@
   if (dispWide.addEventListener) dispWide.addEventListener("change", dispMode);
   if (reduceQuery.addEventListener) reduceQuery.addEventListener("change", dispMode);
 
-  renderShelf(); navLabels(); dispMode(); updateBar();
+  renderShelf(); renderAtlas(); navLabels(); dispMode(); updateBar();
 })();

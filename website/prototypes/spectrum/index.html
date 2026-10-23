@@ -52,8 +52,8 @@
 
   <div class="hero-copy glass">
     <p class="hero-q">
-      <span>// <span lang="zh-CN">一段回复，放进万花筒里会是什么样？</span></span>
-      <span>// one tutoring reply, seen through a kaleidoscope</span>
+      <span>// <span lang="zh-CN">一段回复里，藏着五种光</span></span>
+      <span>// one tutoring reply holds five kinds of light</span>
     </p>
     <h1 id="cover-title" class="display">
       <span class="en">Knowing the answer is not <mark>teaching.</mark></span>
@@ -69,14 +69,14 @@
     </div>
   </div>
 
-  <p class="seq-read glass-chip" aria-hidden="true">
-    <span class="en">Kaleidoscope No. 01</span><span class="zh" lang="zh-CN">万花筒 01 号</span>
-    <span class="sep">·</span><span class="en">3 mirrors at 60°</span><span class="zh" lang="zh-CN">三面镜 · 60°</span>
+  <p class="seq-read glass-chip glass-keep" aria-hidden="true">
+    <span class="en">Cover · Vol. 0, No. 1</span><span class="zh" lang="zh-CN">封面 · 第 0 卷第 1 期</span>
+    <span class="sep">·</span><span class="en">Kaleidoscope No. 01</span><span class="zh" lang="zh-CN">万花筒 01 号</span>
     <span class="sep">·</span><span><b data-seq-frame>001</b> / 029</span>
   </p>
 
-  <p class="scope-cap glass" aria-hidden="true">
-    <b><span class="en">Fig. 0</span><span class="zh" lang="zh-CN">图 0</span></b>
+  <p class="scope-cap" aria-hidden="true">
+    <b><span class="en">On the cover</span><span class="zh" lang="zh-CN">本期封面</span></b>
     <span class="en">Kaleidoscope No. 01: three mirrors at 60°, glass in the five TutorBench colours, and three scraps of one learner's working — <em>1/3</em>, <em>1/4</em>, <em>2/7</em>. Rendered in Blender, not photographed.</span>
     <span class="zh" lang="zh-CN">万花筒 01 号：三面镜子成 60°，玻璃是 TutorBench 的五种颜色，还有三片学生演算纸的碎片：<em>1/3</em>、<em>1/4</em>、<em>2/7</em>。Blender 渲染，不是实拍。</span>
   </p>
@@ -326,6 +326,17 @@
         </figcaption>
       </figure>
 
+      <figure class="c-ms fig atlas" data-atlas>
+        <p class="atlas-k kicker"><span class="en">One rule for every case</span><span class="zh" lang="zh-CN">每个案例，同一条规则</span></p>
+        <div class="atlas-body" data-atlas-body></div>
+        <p class="atlas-read mono" data-atlas-read aria-live="polite"></p>
+        <figcaption>
+          <b><span class="en">Fig. 4</span><span class="zh" lang="zh-CN">图 4</span></b>
+          <span class="en">Spectral signatures. Each row is one learning situation, drawn as a line spectrum: the axis is TutorBench's 27 capabilities, grouped into the five dimensions, and a line is lit for each capability the case is built to measure. The bottom row sums all 48 cases. Generated from the public case data; these are not scores.</span>
+          <span class="zh" lang="zh-CN">光谱签名。每一行是一个学习情境，画成一条线光谱：横轴是 TutorBench 的 27 项能力，按五个维度分组；这个案例要测哪项能力，那里就亮一条线。最下面一行是全部 48 个案例的叠加。由公开案例数据生成，不是分数。</span>
+        </figcaption>
+      </figure>
+
       <div class="c-m tbl-wrap">
         <table class="tbl">
           <caption><b><span class="en">Table 1</span><span class="zh" lang="zh-CN">表 1</span></b><span class="en">Public cases by subject and language.</span><span class="zh" lang="zh-CN">公开案例，按学科与语言统计。</span></caption>
@@ -377,8 +388,8 @@
       <div class="c-l sec-l"><div class="sec-l-in"><p class="sec-no">§4</p><p class="kicker"><span class="en">Plates</span><span class="zh" lang="zh-CN">图版</span></p></div></div>
       <h2 id="s4-title" class="c-m h2"><span class="en">Every plate <em>is a learner.</em></span><span class="zh" lang="zh-CN">每一张图版，<em>都是一个学生。</em></span></h2>
       <p class="c-m prose">
-        <span class="en">Each plate is one authored learning situation: what the learner says, what they believe, what they are trying to do. The five slots along the bottom stay empty until a public, calibrated run fills them.</span>
-        <span class="zh" lang="zh-CN">每一张图版都是一个人工编写的学习情境：学生说了什么、相信什么、想做到什么。底部的五个读数槽会一直空着，直到有公开、经过校准的运行把它们填上。</span>
+        <span class="en">Each plate is one authored learning situation: what the learner says, what they believe, what they are trying to do. The spectrum along the bottom is the plate's signature: one line for each capability the case is built to measure (Fig. 4). It shows what the case asks of a tutor, not how any tutor did.</span>
+        <span class="zh" lang="zh-CN">每一张图版都是一个人工编写的学习情境：学生说了什么、相信什么、想做到什么。底部那条光谱是这张图版的签名：这个案例要测哪项能力，就亮一条线（见图 4）。它说明这道题考什么，不代表任何 Tutor 的成绩。</span>
       </p>
     </div>
   </div>
@@ -561,6 +572,7 @@ npm run quickstart</code></pre>
 </footer>
 
 <script src="specimens.js"></script>
+<script src="signature.js"></script>
 <script src="spectrum.js"></script>
 <script src="cover.js"></script>
 </body>
