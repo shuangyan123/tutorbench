@@ -1,6 +1,8 @@
 # Teachometry cover: a real three-mirror kaleidoscope, rendered in Cycles.
 # usage: python scene.py SEQ FRAME OUT.png [W H SAMPLES]
 #   SEQ = L (loop: camera at the eyepiece, cell turning) or P (pull-out to the desk)
+#         or Q (the part of P the page shows, from the end cap to the desk, NQ frames, framed for
+#         wide screens: 1.2x lens with the kaleidoscope shifted right of centre)
 import bpy, bmesh, math, random, sys, os, addon_utils
 from mathutils import Vector
 
@@ -12,6 +14,7 @@ W = int(args[3]) if len(args) > 3 else 960
 H = int(args[4]) if len(args) > 4 else 600
 SPP = int(args[5]) if len(args) > 5 else 64
 NL, NP = 30, 48  # frames per sequence
+NQ = int(os.environ.get("NQ", 60)); Q0 = 19 / 47  # Q starts where the page opens (old P_019)
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 addon_utils.enable("cycles", default_set=True)
@@ -77,6 +80,16 @@ mr = nt.nodes.new("ShaderNodeMapRange"); mr.inputs["To Min"].default_value = 0.1
 nt.links.new(t.outputs["Color"], mr.inputs["Value"]); nt.links.new(mr.outputs["Result"], bsdf.inputs["Roughness"])
 mm = nt.nodes.new("ShaderNodeMapRange"); mm.inputs["To Min"].default_value = 1.0; mm.inputs["To Max"].default_value = 0.2
 nt.links.new(t.outputs["Color"], mm.inputs["Value"]); nt.links.new(mm.outputs["Result"], bsdf.inputs["Metallic"])
+# machined aluminium: concentric lathe brushing (anisotropic around the tube axis) + engraved depth
+if os.environ.get("CAPV", "2") == "2":
+    mr.inputs["To Min"].default_value = 0.2
+    mc.inputs["A"].default_value = (0.82, 0.83, 0.86, 1)
+    bsdf.inputs["Anisotropic"].default_value = 0.85
+    tg = nt.nodes.new("ShaderNodeTangent"); tg.direction_type = "RADIAL"; tg.axis = "Y"
+    nt.links.new(tg.outputs["Tangent"], bsdf.inputs["Tangent"])
+    bp = nt.nodes.new("ShaderNodeBump"); bp.inputs["Strength"].default_value = 0.6; bp.inputs["Distance"].default_value = 0.0006
+    bp.invert = True
+    nt.links.new(t.outputs["Color"], bp.inputs["Height"]); nt.links.new(bp.outputs["Normal"], bsdf.inputs["Normal"])
 
 # ------------------------------------------------------------------ the tube
 def cyl(name, r, depth, y, verts=128, fill="NGON", mat=None, z=R):
@@ -95,12 +108,15 @@ for y in (0.1, L - 0.16):
 RC, RH, CT = R + 0.012, 0.085, 0.05   # cap radius, eyepiece hole, thickness
 bm = bmesh.new(); NV = 128
 def ring_v(r, y): return [bm.verts.new((r * math.cos(2 * math.pi * i / NV), y, R + r * math.sin(2 * math.pi * i / NV))) for i in range(NV)]
-of, inf, ob, ib = ring_v(RC, -CT + 0.005), ring_v(RH, -CT + 0.005), ring_v(RC, 0.005), ring_v(RH, 0.005)
+CH = 0.008  # chamfer on the outer front edge, catches a bright rim of light
+of, inf, ob, ib = ring_v(RC - CH, -CT + 0.005), ring_v(RH, -CT + 0.005), ring_v(RC, 0.005), ring_v(RH, 0.005)
+oc = ring_v(RC, -CT + 0.005 + CH)
 for i in range(NV):
     j = (i + 1) % NV
     bm.faces.new((of[i], of[j], inf[j], inf[i]))      # front face (towards the viewer, -Y)
     bm.faces.new((ob[i], ib[i], ib[j], ob[j]))        # back face
-    bm.faces.new((of[i], ob[i], ob[j], of[j]))        # outer rim
+    bm.faces.new((of[i], oc[i], oc[j], of[j]))        # chamfer
+    bm.faces.new((oc[i], ob[i], ob[j], oc[j]))        # outer rim
     bm.faces.new((inf[i], inf[j], ib[j], ib[i]))      # hole wall
 bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 uvl = bm.loops.layers.uv.new("UV")
@@ -230,7 +246,9 @@ pk = bpy.context.object; pk.data.size = 4.0; pk.data.energy = 900; pk.data.color
 look(pk, (0, 1.4, 0.3)); pk.visible_camera = False
 for nm, loc, size, en, tgt in [("strip_top", (0.2, 1.2, 2.6), (4.0, 0.35), 160, (0, 1.4, 0.3)),
                                 ("strip_right", (2.6, -0.6, 1.2), (0.4, 2.4), 160, (0, 1.0, 0.3)),
-                                ("rim", (1.2, 4.6, 1.4), (2.0, 1.0), 220, (0, 1.6, 0.3))]:
+                                ("rim", (1.2, 4.6, 1.4), (2.0, 1.0), 220, (0, 1.6, 0.3))] + (
+                               [("cap_strip", (0.9, -3.4, 2.2), (3.2, 0.22), float(os.environ.get("CAPL", 140)), (0, 0, R))]
+                               if os.environ.get("CAPV", "2") == "2" else []):
     bpy.ops.object.light_add(type="AREA", location=loc); o = bpy.context.object
     o.data.shape = "RECTANGLE"; o.data.size, o.data.size_y = size; o.data.energy = en; o.data.color = (0.98, 0.98, 1.0)
     look(o, tgt); o.visible_camera = False
@@ -257,11 +275,13 @@ if SEQ == "L":
     cam.location = V(0, -0.004, R); aim.location = V(0, 1, R); cam_d.lens = float(os.environ.get("LENS", 60))
     cell.rotation_euler = (0, math.radians(36) * t, 0)
 else:
-    t = FRAME / (NP - 1)
+    t = FRAME / (NP - 1) if SEQ == "P" else Q0 + (1 - Q0) * FRAME / (NQ - 1)
     cam.location = path([(0, V(0, -0.004, R)), (0.38, V(0, -1.75, R)), (0.68, V(-1.0, -2.7, 0.95)), (1, V(-1.75, -2.35, 2.35))], t)
     aim.location = path([(0, V(0, 1, R)), (0.38, V(0, 1, R)), (1, V(0.45, 0.85, 0.15))], t)
     cam_d.lens = path([(0, 60.0), (0.38, 50.0), (1, 38.0)], t)
     cell.rotation_euler = (0, math.radians(-30) * t, 0)
+    if SEQ == "Q":
+        cam_d.lens *= 1.2; cam_d.shift_x = -0.1
 
 # ------------------------------------------------------------------ render
 sc.render.engine = "CYCLES"; cy = sc.cycles

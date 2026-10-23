@@ -159,7 +159,7 @@
       return (order.indexOf(a.s.subject) - order.indexOf(b.s.subject)) || (a.i - b.i);
     });
     var head = '<div class="atlas-head" aria-hidden="true"><span class="a-lab"></span><span class="a-bands">' +
-      SIG.BANDS.map(function (b, bi) { return '<span style="--n:' + b.caps.length + ";--c:var(--c" + bi + ')"><b>' + LAMBDA[bi] + "</b> " + (zh ? b.zh : b.en) + "</span>"; }).join("") + "</span></div>";
+      SIG.BANDS.map(function (b, bi) { return '<span style="--n:' + b.caps.length + ";--c:var(--c" + bi + ");--bead:var(--bead" + bi + ')"><i></i><b>' + LAMBDA[bi] + "</b> " + (zh ? b.zh : b.en) + "</span>"; }).join("") + "</span></div>";
     var last = "";
     var body = rows.map(function (r) {
       var s = r.s, v = s[lk] || s.en, sub = "";

@@ -5,7 +5,7 @@
    (src/contracts/tutor-eval-taxonomy.ts, mapping from src/audits/rubric-authoring-qa.ts).
    A case lights the lines for the capabilities it is built to measure. It shows what a case
    asks of a tutor. It is never a score. */
-/* global window */
+/* global window, document */
 (function () {
   "use strict";
 
@@ -41,31 +41,68 @@
     return lang === "zh" ? (ZH[cap] || cap) : cap.replace(/_/g, " ");
   }
 
+  /* Shared gradients, defined once per page (a gradient inside a hidden svg would not paint).
+     Lines are drawn the way a spectrograph records them: a bright core that falls off to the
+     sides and feathers out at both ends, over a soft continuous spectrum. */
+  function defs() {
+    if (typeof document === "undefined" || document.getElementById("sig-defs")) return;
+    var d = ['<svg id="sig-defs" width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs>'];
+    // continuum across the whole axis, hue stops at each band's centre
+    d.push('<linearGradient id="sig-cont" x1="0" x2="1" y1="0" y2="0">');
+    BANDS.forEach(function (b, bi) {
+      d.push('<stop offset="' + ((b.start + b.caps.length / 2) / AXIS.length).toFixed(3) + '" style="stop-color:var(--s' + bi + ')"/>');
+    });
+    d.push("</linearGradient>");
+    // vertical feather, used as a mask for continuum and lines
+    d.push('<linearGradient id="sig-v" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".22" stop-color="#fff" stop-opacity="1"/><stop offset=".78" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>');
+    d.push('<mask id="sig-m" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#sig-v)"/></mask>');
+    // one emission profile per band: transparent → colour → near-white core → colour → transparent
+    BANDS.forEach(function (b, bi) {
+      d.push('<linearGradient id="sig-l' + bi + '" x1="0" x2="1" y1="0" y2="0">' +
+        '<stop offset="0" style="stop-color:var(--s' + bi + ')" stop-opacity="0"/>' +
+        '<stop offset=".3" style="stop-color:var(--s' + bi + ')" stop-opacity=".55"/>' +
+        '<stop offset=".5" stop-color="#fff9f2" stop-opacity="1"/>' +
+        '<stop offset=".7" style="stop-color:var(--s' + bi + ')" stop-opacity=".55"/>' +
+        '<stop offset="1" style="stop-color:var(--s' + bi + ')" stop-opacity="0"/></linearGradient>');
+      d.push('<linearGradient id="sig-c' + bi + '" x1="0" x2="1" y1="0" y2="0">' +
+        '<stop offset="0" style="stop-color:var(--s' + bi + ')" stop-opacity="0"/>' +
+        '<stop offset=".5" style="stop-color:var(--s' + bi + ')" stop-opacity="1"/>' +
+        '<stop offset="1" style="stop-color:var(--s' + bi + ')" stop-opacity="0"/></linearGradient>');
+    });
+    d.push("</defs></svg>");
+    document.body.insertAdjacentHTML("afterbegin", d.join(""));
+  }
+
   /* svg(caps, { h, weights, ticks, cls })
      caps     the case's capability tags (lit lines)
      weights  optional { cap: 0..1 } → line width, used for the summed spectrum
      h        height in user units */
   function svg(caps, o) {
+    defs();
     o = o || {};
     var h = o.h || 30, lit = {}, out = [];
     (caps || []).forEach(function (c) { if (c in SLOT) lit[c] = true; });
     out.push('<svg class="sig ' + (o.cls || "") + '" viewBox="0 0 ' + W + " " + h + '" preserveAspectRatio="none" aria-hidden="true" focusable="false">');
-    out.push('<rect class="sig-base" x="0" y="0" width="' + W + '" height="' + h + '"/>');
-    // continuum: each band a faint wash of its own colour, so the five colours are always readable
-    BANDS.forEach(function (b, bi) {
-      out.push('<rect class="sig-band" x="' + (b.start * U + 0.6) + '" y="0" width="' + (b.caps.length * U - 1.2) + '" height="' + h + '" style="fill:var(--s' + bi + ')"/>');
-    });
+    out.push('<rect class="sig-cont" x="0" y="0" width="' + W + '" height="' + h + '" fill="url(#sig-cont)" mask="url(#sig-m)"/>');
+    out.push('<g mask="url(#sig-m)">');
     AXIS.forEach(function (a, i) {
       var x = i * U + U / 2;
       var wgt = o.weights ? (o.weights[a.cap] || 0) : (lit[a.cap] ? 1 : 0);
       if (wgt > 0) {
-        var lw = o.weights ? 0.8 + wgt * 5.2 : 2.6;
-        out.push('<rect class="sig-glow" x="' + (x - lw * 1.6) + '" y="0" width="' + (lw * 3.2) + '" height="' + h + '" style="fill:var(--s' + a.band + ')"/>');
-        out.push('<rect class="sig-line" data-slot="' + i + '" x="' + (x - lw / 2) + '" y="0" width="' + lw + '" height="' + h + '" style="fill:var(--s' + a.band + ')"/>');
-      } else if (o.ticks !== false) {
-        out.push('<rect class="sig-tick" x="' + (x - 0.4) + '" y="' + (h - Math.min(4, h * 0.22)) + '" width="0.8" height="' + Math.min(4, h * 0.22) + '"/>');
+        var lw = o.weights ? 2.4 + wgt * 6.6 : 7;
+        // wide coloured halo, then the hot core
+        out.push('<rect class="sig-halo" x="' + (x - lw * 1.4) + '" y="0" width="' + (lw * 2.8) + '" height="' + h + '" fill="url(#sig-c' + a.band + ')"/>');
+        out.push('<rect class="sig-line" data-slot="' + i + '" x="' + (x - lw / 2) + '" y="0" width="' + lw + '" height="' + h + '" fill="url(#sig-l' + a.band + ')"/>');
       }
     });
+    out.push("</g>");
+    if (o.ticks !== false) {
+      AXIS.forEach(function (a, i) {
+        if (o.weights || lit[a.cap]) return;
+        var x = i * U + U / 2, th = Math.min(3.5, h * 0.2);
+        out.push('<rect class="sig-tick" x="' + (x - 0.35) + '" y="' + (h - th) + '" width="0.7" height="' + th + '"/>');
+      });
+    }
     out.push("</svg>");
     return out.join("");
   }
