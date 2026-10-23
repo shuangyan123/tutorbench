@@ -31,6 +31,7 @@
     }
     serif();
     window.addEventListener("hashchange", serif);
+    if (location.hash === "#inkdot") root.classList.add("np-ink");
   })();
 </script>
 </head>
@@ -104,7 +105,11 @@
       <span class="strip-mid"><span class="en">Working papers on the measurement of teaching</span><span class="zh" lang="zh-CN">教学测量工作论文</span></span>
       <span><span class="en">October 2026</span><span class="zh" lang="zh-CN">2026 年 10 月</span></span>
     </div>
-    <p class="nameplate" data-nameplate>Teachometry</p>
+    <p class="nameplate" data-nameplate aria-label="Teachometry"><span aria-hidden="true">Teach<span class="np-dot"></span>ometry</span></p>
+    <p class="np-gloss">
+      <span class="en"><span class="nw"><b>teach·om·e·try</b> <i>/tiːˈtʃɒmɪtri/</i></span> <abbr title="noun">n.</abbr> the measurement of teaching. From <em>teach</em> + <em>-ometry</em>, as in geometry.</span>
+      <span class="zh" lang="zh-CN"><span class="nw"><b>teach·om·e·try</b> <i>/tiːˈtʃɒmɪtri/</i></span> <span class="nw">名词，教学测量。</span><span class="nw"><em>teach</em>（教）+ <em>-ometry</em>（测量）</span></span>
+    </p>
     <div class="strip strip-bottom">
       <span><span class="en">Open instruments for teaching quality</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器</span></span>
       <span class="strip-mid"><span class="en">Developer Preview</span><span class="zh" lang="zh-CN">开发者预览</span></span>
