@@ -23,11 +23,11 @@
     // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
     var qs = new URLSearchParams(location.search);
     root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
-    // serif for the didone display: bodoni (default) / cormorant / instrument
-    // (?serif=… or #cormorant / #instrument, since the hosted preview passes only a plain hash)
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
     function serif() {
       var v = qs.get("serif") || location.hash.slice(1);
-      root.setAttribute("data-serif", /^(cormorant|instrument)$/.test(v) ? v : "bodoni");
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
     }
     serif();
     window.addEventListener("hashchange", serif);

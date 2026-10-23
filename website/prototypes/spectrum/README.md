@@ -26,8 +26,9 @@ over it as a sheet, so there is no empty band before the issue starts. The older
 and `L_*` frames are kept but not shown. Dimension markers are five Blender glass beads (`assets/beads/`,
 `render/beads.py`) instead of flat colour bars. Two GPT
 photographs open §2 and §3 as framed plates, captioned as generated illustrations.
-Display type is a high-contrast didone, set in Bodoni Moda as a free stand-in for Kessler
-(Production Type, commercial licence needed); `?display=grotesk` switches headings to Geist.
+Display headings are set in Cormorant Garamond (OFL; chosen over Bodoni Moda and Instrument
+Serif as free alternatives to Kessler, which needs a commercial licence). `#bodoni` /
+`#instrument` (or `?serif=`) switch the face for comparison; `?display=grotesk` sets Geist.
 Everything after it is laid out as one journal issue: masthead and
 contents, running heads, margin notes, figures (Fig. 1–3), booktabs tables (Table 1–3),
 a pull quote, notes and references, and a colophon.

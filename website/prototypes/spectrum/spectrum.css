@@ -51,7 +51,7 @@
 }
 :root[data-display="didone"] {
   /* 展示型排版：高反差衬线。Kessler（Production Type）需购买网页授权，原型先用免费字体代替：
-     ?serif=bodoni（默认，Bodoni Moda）/ cormorant（Cormorant Garamond）/ instrument（Instrument Serif） */
+     ?serif=cormorant（默认，Cormorant Garamond）/ bodoni（Bodoni Moda）/ instrument（Instrument Serif） */
   --f-serif: "Bodoni Moda";
   --serif-w: 400; --serif-ls: -.025em; --serif-np-ls: -.045em; --serif-np-div: 5.9;
   --f-head: var(--f-serif), "Noto Serif SC", "Songti SC", serif;
