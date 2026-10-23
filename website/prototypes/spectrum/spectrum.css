@@ -50,9 +50,18 @@
   color-scheme: light;
 }
 :root[data-display="didone"] {
-  /* 展示型排版：高反差衬线。Kessler（Production Type）需购买网页授权，原型先用 Bodoni Moda 代替 */
-  --f-head: "Bodoni Moda", "Noto Serif SC", "Songti SC", serif;
-  --f-display: "Bodoni Moda", "Noto Serif SC", "Songti SC", serif;
+  /* 展示型排版：高反差衬线。Kessler（Production Type）需购买网页授权，原型先用免费字体代替：
+     ?serif=bodoni（默认，Bodoni Moda）/ cormorant（Cormorant Garamond）/ instrument（Instrument Serif） */
+  --f-serif: "Bodoni Moda";
+  --serif-w: 400; --serif-ls: -.025em; --serif-np-ls: -.045em; --serif-np-div: 5.9;
+  --f-head: var(--f-serif), "Noto Serif SC", "Songti SC", serif;
+  --f-display: var(--f-serif), "Noto Serif SC", "Songti SC", serif;
+}
+:root[data-display="didone"][data-serif="cormorant"] {
+  --f-serif: "Cormorant Garamond"; --serif-w: 500; --serif-ls: -.015em; --serif-np-ls: -.03em; --serif-np-div: 5.6;
+}
+:root[data-display="didone"][data-serif="instrument"] {
+  --f-serif: "Instrument Serif"; --serif-w: 400; --serif-ls: -.02em; --serif-np-ls: -.035em; --serif-np-div: 5.2;
 }
 :root[data-lang="zh"] {
   --f-display: "Noto Serif SC", "Instrument Serif", "Songti SC", serif;
@@ -663,14 +672,22 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 }
 
 /* ---------------------------------------------------------------- didone display (Kessler stand-in) */
+/* Optical size follows the rendered size (font-optical-sizing: auto), so Bodoni's hairlines stay
+   whole at heading sizes and only reach their finest at the nameplate. */
 :root[data-display="didone"] .display, :root[data-display="didone"] .h2, :root[data-display="didone"] .pp-line {
-  font-weight: 400; letter-spacing: -.025em; font-variation-settings: "opsz" 96; }
+  font-weight: var(--serif-w); letter-spacing: var(--serif-ls); font-optical-sizing: auto; }
 :root[data-display="didone"] .display { line-height: .98; }
+/* Bodoni Moda's display cut thins its hairlines until they break up on 1x screens at heading sizes;
+   a text-ish optical size keeps them whole. The nameplate keeps the finest cut. */
+:root[data-display="didone"][data-serif="bodoni"] .display, :root[data-display="didone"][data-serif="bodoni"] .h2,
+:root[data-display="didone"][data-serif="bodoni"] .pp-line, :root[data-display="didone"][data-serif="bodoni"] .display em,
+:root[data-display="didone"][data-serif="bodoni"] .h2 em, :root[data-display="didone"][data-serif="bodoni"] .pp-line em,
+:root[data-display="didone"][data-serif="bodoni"] .pq p { font-variation-settings: "opsz" 28; }
 :root[data-display="didone"] .display mark, :root[data-display="didone"] .display em, :root[data-display="didone"] .h2 em, :root[data-display="didone"] .pp-line em {
-  font-family: "Bodoni Moda", serif; font-style: italic; font-weight: 400; letter-spacing: -.02em; }
-:root[data-display="didone"] .nameplate { font-family: "Bodoni Moda", serif; font-variation-settings: "opsz" 96; font-weight: 400; letter-spacing: -.045em;
-  font-size: clamp(48px, calc((min(100vw, var(--maxw)) - 2 * var(--gutter)) / 5.9), 230px); }
-:root[data-display="didone"] .wordmark, :root[data-display="didone"] .foot-word { font-family: "Bodoni Moda", serif; font-variation-settings: "opsz" 48; letter-spacing: -.02em; }
-:root[data-display="didone"] .pq p { font-family: "Bodoni Moda", serif; font-variation-settings: "opsz" 96; }
+  font-family: var(--f-serif), serif; font-style: italic; font-weight: var(--serif-w); letter-spacing: -.02em; }
+:root[data-display="didone"] .nameplate { font-family: var(--f-serif), serif; font-optical-sizing: auto; font-weight: var(--serif-w); letter-spacing: var(--serif-np-ls);
+  font-size: clamp(48px, calc((min(100vw, var(--maxw)) - 2 * var(--gutter)) / var(--serif-np-div)), 230px); }
+:root[data-display="didone"] .wordmark, :root[data-display="didone"] .foot-word { font-family: var(--f-serif), serif; font-optical-sizing: auto; font-weight: var(--serif-w); letter-spacing: -.02em; }
+:root[data-display="didone"] .pq p { font-family: var(--f-serif), serif; font-optical-sizing: auto; }
 :root[data-display="didone"][data-lang="zh"] .display, :root[data-display="didone"][data-lang="zh"] .h2, :root[data-display="didone"][data-lang="zh"] .pp-line {
   font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 600; letter-spacing: 0; }
