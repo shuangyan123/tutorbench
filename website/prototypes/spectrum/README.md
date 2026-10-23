@@ -12,20 +12,21 @@ cd website/prototypes/spectrum && python3 -m http.server 8770
 ```
 
 Edition: light "research journal" in a periwinkle palette (reference: Noomo Agency). The
-first screen is a real kaleidoscope rendered in Blender (Cycles): three mirrors at 60°, glass
-in the five TutorBench colours and three scraps of a learner's working (1/3, 1/4, 2/7). The
-page opens on a still frame (the machined aluminium end cap, the pattern small in its window);
-scrolling plays `R_000`–`R_119` (120 frames, 1920×1200, 40 spp: sequence Q in `render/scene.py`
-with the detailed object cell, `NQ=120`, run by `render/render_r.sh`), backing the camera away
-until the kaleidoscope lies on the desk next to the notebook. The object cell holds thick
-bevelled shards (some frosted like sea glass), small crystals, glass beads and crumpled paper
-scraps over a noisy opal diffuser. `cover.js` decodes each frame before using it (every 4th
-frame first, then every 2nd, then the rest), eases towards the scroll position and blends
-neighbouring frames. Nothing moves on its own. Near the end of the cover the masthead slides up
-over it as a sheet, so there is no empty band before the issue starts. The older `Q_*`, `P_*`
-and `L_*` frames are kept but not shown. Dimension markers are five Blender glass beads (`assets/beads/`,
-`render/beads.py`) instead of flat colour bars. Two GPT
-photographs open §2 and §3 as framed plates, captioned as generated illustrations.
+first screen is a real two-mirror kaleidoscope rendered in Blender (Cycles): mirrors at 30°
+over a chamber of cathedral and dichroic glass, millefiori slices, cut crystal and air bubbles
+in oil (`render/mandala.py`, palette "cool", seed 3). It opens on a still rosette inside a glass
+eyepiece rim that floats on the page light; scrolling plays `K_000`–`K_119` (1400×1400, alpha
+outside the eyepiece), turning the chamber by 15° so the pattern re-forms. The view never spins
+and nothing moves on its own. Each frame renders a single wedge without mirrors (`WEDGE=1`), and
+`render/fold.py` mirrors it into the rosette; two flat mirrors through the eye reflect exactly
+across their lines, so this matches the full mirror render at a fraction of the cost
+(`render/render_k.sh`, then `render/to_webp_k.py`). `cover.js` decodes each frame before using
+it (every 4th frame first, then every 2nd, then the rest), eases towards the scroll position and
+blends neighbouring frames. Near the end of the cover the masthead slides up over it as a sheet.
+The earlier three-mirror end-cap sequences (`R_*`, `Q_*`, `P_*`, `L_*`, `render/scene.py`) are
+kept but not shown. Dimension markers are five Blender glass beads (`assets/beads/`,
+`render/beads.py`) instead of flat colour bars. Two GPT photographs open §2 and §3 as framed
+plates, captioned as generated illustrations.
 Display headings are set in Cormorant Garamond (OFL; chosen over Bodoni Moda and Instrument
 Serif as free alternatives to Kessler, which needs a commercial licence). `#bodoni` /
 `#instrument` (or `?serif=`) switch the face for comparison; `?display=grotesk` sets Geist.

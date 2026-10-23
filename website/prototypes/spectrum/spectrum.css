@@ -157,10 +157,18 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .run-btn svg, .cta svg, .text-link svg, .shelf-nav svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---------------------------------------------------------------- cover · the work */
-.hero { position: relative; height: 340vh; background: var(--bg); overflow: clip; }
-.hero-stage { position: sticky; top: 0; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate; background: var(--bg-2); }
-.seq { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: 0; transition: opacity 1s ease; }
+.hero { position: relative; height: 260vh; overflow: clip; }
+/* the cover sits on the page's own light (body::before), so the eyepiece floats in the haze */
+.hero-stage { position: sticky; top: 0; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate; }
+.seq { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; opacity: 0; transition: opacity 1s ease; }
 .hero[data-cover="on"] .seq { opacity: 1; }
+/* the eyepiece rim: a glass edge and the soft shadow of a lens held up to the light (placed by cover.js) */
+.scope-ring { position: absolute; z-index: 0; left: calc(var(--cx, 62%) - var(--d, 70vh) / 2); top: calc(var(--cy, 50%) - var(--d, 70vh) / 2);
+  width: var(--d, 70vh); height: var(--d, 70vh); border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .75), 0 0 0 9px rgba(255, 255, 255, .16), 0 0 0 10px rgba(22, 21, 15, .08),
+    0 50px 110px -40px rgba(40, 46, 110, .5), 0 0 140px 10px rgba(255, 236, 240, .35);
+  opacity: 0; transition: opacity 1s ease; }
+.hero[data-cover="on"] .scope-ring { opacity: 1; }
 
 /* frosted glass, in the spirit of the palette reference */
 .glass { background: rgba(214, 222, 242, .58); backdrop-filter: blur(22px) saturate(1.35); -webkit-backdrop-filter: blur(22px) saturate(1.35);
@@ -174,7 +182,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .seq-read .sep { color: var(--ink-3); }
 :root[data-lang="zh"] .seq-read { font-family: var(--f-mono), var(--f-ui); letter-spacing: .04em; }
 
-.scope-cap { position: absolute; z-index: 2; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: clamp(24px, 5vh, 56px);
+.scope-cap { position: absolute; z-index: 2; left: max(var(--gutter), env(safe-area-inset-left, 0px)); bottom: clamp(24px, 5vh, 56px);
   max-width: min(400px, calc(100% - 2 * var(--gutter))); padding: 10px 0 0; border-top: 1px solid var(--ink);
   font: 14px/1.5 var(--f-text); color: var(--ink-2);
   opacity: calc(clamp(0, (var(--p, 0) - .3) * 8, 1) - clamp(0, (var(--p, 0) - .9) * 12, 1)); }
@@ -259,12 +267,13 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
   font-size: clamp(60px, calc((min(100vw, var(--maxw)) - 2 * var(--gutter)) / 4.2), 300px);
   line-height: .86; letter-spacing: -.035em; padding-block: .05em .2em; white-space: nowrap;
 }
-/* Teach·ometry: the dot shows where the word splits, on the nameplate only. Running text, URLs and
-   metadata keep the plain "Teachometry". The dot is one of the cover's glass beads (#inkdot: plain ink). */
-.np-dot { display: inline-block; width: .12em; height: .12em; margin-inline: .05em .035em; vertical-align: .15em;
-  border-radius: 50%; background: var(--bead3) center / 128% no-repeat; }
-:root.np-ink .np-dot { background: var(--ink); width: .085em; height: .085em; margin-inline: .06em .045em; vertical-align: .17em; }
-.np-gloss .nw { white-space: nowrap; }
+/* Teach·ometry: the signature with the glass-bead dot is the masthead only (logo system v2,
+   assets/logo/). Nav and footer use the plain italic wordmark; running text, URLs and metadata
+   keep "Teachometry". */
+.masthead .nameplate { font-size: 16px; line-height: 1; letter-spacing: 0; white-space: normal; padding-block: clamp(14px, 2vw, 28px) clamp(6px, 1vw, 12px); }
+.nameplate img { display: block; margin-inline: auto; width: min(100%, 1060px); height: auto; }
+.wordmark img { height: 24px; width: auto; }
+.foot-word img { width: min(300px, 100%); height: auto; }   /* the signature, as the footer's sign-off */
 .np-gloss { text-align: center; font-family: var(--f-text); font-size: clamp(13px, 1.05vw, 15px); color: var(--ink-2); padding-block: 2px 10px; text-wrap: balance; }
 .np-gloss b { font-weight: 600; color: var(--ink); letter-spacing: .01em; }
 .np-gloss i { font-family: var(--f-mono); font-style: normal; font-size: .86em; letter-spacing: .02em; margin-inline: .3em; }

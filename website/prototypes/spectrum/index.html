@@ -6,7 +6,10 @@
 <title>Teachometry · Spectrum</title>
 <meta name="description" content="Design prototype for the Teachometry website, set as a research journal issue. Direction: Spectrum. Not the live site.">
 <meta name="robots" content="noindex">
-<link rel="icon" href="assets/tutorbench-mark-small.svg" type="image/svg+xml">
+<link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
@@ -31,7 +34,6 @@
     }
     serif();
     window.addEventListener("hashchange", serif);
-    if (location.hash === "#inkdot") root.classList.add("np-ink");
   })();
 </script>
 </head>
@@ -39,7 +41,7 @@
 <a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
 
 <header class="bar" data-bar>
-  <a class="wordmark" href="#top" aria-label="Teachometry">Teachometry</a>
+  <a class="wordmark" href="#top"><img src="assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
   <nav class="nav" aria-label="Primary">
     <a href="#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
     <a href="#methods" class="nav-tb"><img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
@@ -60,6 +62,7 @@
 <!-- ============================================================ COVER · the work -->
 <section class="hero" id="top" aria-labelledby="cover-title" data-hero>
  <div class="hero-stage">
+  <div class="scope-ring" aria-hidden="true"></div>
   <canvas class="seq" data-seq aria-hidden="true"></canvas>
 
   <div class="hero-copy glass">
@@ -89,11 +92,11 @@
 
   <p class="scope-cap" aria-hidden="true">
     <b><span class="en">On the cover</span><span class="zh" lang="zh-CN">本期封面</span></b>
-    <span class="en">Kaleidoscope No. 01: three mirrors at 60°, glass in the five TutorBench colours, and three scraps of one learner's working — <em>1/3</em>, <em>1/4</em>, <em>2/7</em>. Rendered in Blender, not photographed.</span>
-    <span class="zh" lang="zh-CN">万花筒 01 号：三面镜子成 60°，玻璃是 TutorBench 的五种颜色，还有三片学生演算纸的碎片：<em>1/3</em>、<em>1/4</em>、<em>2/7</em>。Blender 渲染，不是实拍。</span>
+    <span class="en">Kaleidoscope No. 01: two mirrors at 30°, cathedral and dichroic glass, millefiori slices, cut crystal and air bubbles in oil. Scrolling turns the chamber; the view never spins. Rendered in Blender, not photographed.</span>
+    <span class="zh" lang="zh-CN">万花筒 01 号：两面镜子成 30°，镜筒里是教堂彩色玻璃、二色性玻璃、千花玻璃切片、切面水晶和油中的气泡。滚动只转动镜筒，画面本身不旋转。Blender 渲染，不是实拍。</span>
   </p>
 
-  <p class="hero-hint glass-chip" aria-hidden="true"><span lang="zh-CN">向下滚动 · 把它放回桌上</span><span class="hint-en"> / scroll to set it down</span></p>
+  <p class="hero-hint glass-chip" aria-hidden="true"><span lang="zh-CN">向下滚动 · 转动镜筒</span><span class="hint-en"> / scroll to turn the chamber</span></p>
  </div>
 </section>
 
@@ -105,7 +108,7 @@
       <span class="strip-mid"><span class="en">Working papers on the measurement of teaching</span><span class="zh" lang="zh-CN">教学测量工作论文</span></span>
       <span><span class="en">October 2026</span><span class="zh" lang="zh-CN">2026 年 10 月</span></span>
     </div>
-    <p class="nameplate" data-nameplate aria-label="Teachometry"><span aria-hidden="true">Teach<span class="np-dot"></span>ometry</span></p>
+    <p class="nameplate" data-nameplate><img src="assets/logo/teachometry-masthead-glass.svg" alt="Teachometry" width="1098" height="260"></p>
     <p class="np-gloss">
       <span class="en"><span class="nw"><b>teach·om·e·try</b> <i>/tiːˈtʃɒmɪtri/</i></span> <abbr title="noun">n.</abbr> the measurement of teaching. From <em>teach</em> + <em>-ometry</em>, as in geometry.</span>
       <span class="zh" lang="zh-CN"><span class="nw"><b>teach·om·e·try</b> <i>/tiːˈtʃɒmɪtri/</i></span> <span class="nw">名词，教学测量。</span><span class="nw"><em>teach</em>（教）+ <em>-ometry</em>（测量）</span></span>
@@ -562,7 +565,7 @@ npm run quickstart</code></pre>
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
-        <p class="foot-word">Teachometry</p>
+        <p class="foot-word"><img src="assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="74"></p>
         <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
         <p class="tb-line"><img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
       </div>

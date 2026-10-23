@@ -1,8 +1,10 @@
 /* Teachometry · cover — a real kaleidoscope, rendered in Blender (Cycles).
-   The page opens on a still frame (the machined end cap, the pattern small in its window).
-   Scrolling moves the camera back until the kaleidoscope lies on the desk beside the learner's
-   notebook. Nothing moves unless the reader scrolls; with reduced motion the still frame stays.
-   Frames: assets/cover/R_000–R_119.webp, rendered by render/render_r.sh (scene.py, sequence Q, NQ=120). */
+   Two mirrors at 30° over a chamber of cathedral and dichroic glass, millefiori slices, cut
+   crystal and air bubbles in oil. The page opens on a still rosette; scrolling turns the chamber
+   by 15°, so the pattern slowly re-forms. The picture itself never spins, and nothing moves unless
+   the reader scrolls; with reduced motion the still rosette stays.
+   Frames: assets/cover/K_000–K_119.webp (1400×1400, transparent outside the eyepiece), rendered by
+   render/render_k.sh (mandala.py, one wedge per frame, folded by render/fold.py). */
 /* global window, document, requestAnimationFrame, Image, setTimeout */
 (function () {
   "use strict";
@@ -23,10 +25,7 @@
   function pad(n) { return ("00" + n).slice(-3); }
   function smooth(a, b, x) { var t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
 
-  // The page opens on a still (the engraved end cap, the pattern small in its window); scrolling
-  // only moves the camera back to the desk. Nothing turns on its own.
-  // R_000–R_119: 120 frames at 1920×1200, framed for wide screens (kaleidoscope right of centre).
-  var N = 120, SEQ = "R_";
+  var N = 120, SEQ = "K_";
   var F = new Array(N);
   // a frame counts as ready only once it is decoded, so drawing it never stalls a scroll
   function img(src) {
@@ -66,25 +65,40 @@
     return { a: F[a], b: F[b], f: b === a ? 0 : (x - a) / (b - a), gap: b - a };
   }
 
-  var W = 0, H = 0, dpr = 1, narrow = false;
+  var W = 0, H = 0, dpr = 1, narrow = false, CX = 0, CY = 0, D = 0;
+  var copy = hero.querySelector(".hero-copy");
+  // Place the eyepiece: right of the cover copy on wide screens, above it on narrow ones.
+  function layout() {
+    var w = stage.clientWidth, h = stage.clientHeight, bar = 60, g = Math.max(16, Math.min(56, w * 0.04));
+    narrow = w / h < 0.9;
+    if (narrow) {
+      D = Math.min(w - 2 * g, h * 0.5); CX = w / 2; CY = bar + 12 + D / 2;
+    } else {
+      var cr = copy ? copy.getBoundingClientRect().right - stage.getBoundingClientRect().left : w * 0.38;
+      D = Math.min(h * 0.8, w * 0.6);
+      CX = Math.max(w * 0.62, cr + D * 0.36);
+      if (CX + D / 2 > w - g) { D = Math.max(h * 0.5, 2 * (w - g - Math.max(w * 0.6, cr + 24)) / 1.36); CX = Math.min(w - g - D / 2, Math.max(w * 0.6, cr + D * 0.36)); }
+      CY = bar / 2 + h / 2 + 8;
+    }
+    stage.style.setProperty("--cx", CX.toFixed(1) + "px");
+    stage.style.setProperty("--cy", CY.toFixed(1) + "px");
+    stage.style.setProperty("--d", D.toFixed(1) + "px");
+  }
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = Math.round(stage.clientWidth * dpr); H = Math.round(stage.clientHeight * dpr);
     if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
-    narrow = stage.clientWidth / stage.clientHeight < 0.9;
-    hero.toggleAttribute("data-narrow", narrow);
+    hero.toggleAttribute("data-narrow", stage.clientWidth / stage.clientHeight < 0.9);   // sets the copy's width first
+    layout();
     kick();
   }
 
-  // object-fit: cover. The frames already place the kaleidoscope right of centre for wide screens;
-  // on narrow screens the crop is centred on it (60% across the frame) instead.
+  // the frames are square, transparent outside the eyepiece circle
   function draw1(im, alpha) {
     if (!ready(im) || alpha <= 0) return;
-    var iw = im.naturalWidth, ih = im.naturalHeight, k = Math.max(W / iw, H / ih);
-    var dw = iw * k, dh = ih * k;
-    var x = narrow ? Math.min(0, Math.max(W - dw, W / 2 - dw * 0.6)) : (W - dw) / 2;
+    var d = D * dpr;
     ctx.globalAlpha = alpha;
-    ctx.drawImage(im, x, (H - dh) / 2, dw, dh);
+    ctx.drawImage(im, CX * dpr - d / 2, CY * dpr - d / 2, d, d);
   }
 
   // the shown position eases towards the scroll position, and neighbouring frames are blended,
