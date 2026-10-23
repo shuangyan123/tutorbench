@@ -271,7 +271,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
    assets/logo/). Nav and footer use the plain italic wordmark; running text, URLs and metadata
    keep "Teachometry". */
 .masthead .nameplate { font-size: 16px; line-height: 1; letter-spacing: 0; white-space: normal; padding-block: clamp(14px, 2vw, 28px) clamp(6px, 1vw, 12px); }
-.nameplate img { display: block; margin-inline: auto; width: min(100%, 1060px); height: auto; }
+.nameplate img { display: block; margin-inline: auto; width: min(100%, 980px); height: auto; }
 .wordmark img { height: 24px; width: auto; }
 .foot-word img { width: min(300px, 100%); height: auto; }   /* the signature, as the footer's sign-off */
 .np-gloss { text-align: center; font-family: var(--f-text); font-size: clamp(13px, 1.05vw, 15px); color: var(--ink-2); padding-block: 2px 10px; text-wrap: balance; }
