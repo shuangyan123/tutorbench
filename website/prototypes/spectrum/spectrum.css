@@ -124,7 +124,7 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
 .run-btn svg, .cta svg, .text-link svg, .shelf-nav svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---------------------------------------------------------------- cover · the work */
-.hero { position: relative; height: 420vh; background: var(--bg); overflow: clip; }
+.hero { position: relative; height: 340vh; background: var(--bg); overflow: clip; }
 .hero-stage { position: sticky; top: 0; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate; background: var(--bg-2); }
 .seq { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; opacity: 0; transition: opacity 1s ease; }
 .hero[data-cover="on"] .seq { opacity: 1; }
@@ -158,6 +158,7 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
   display: grid; gap: 16px;
 }
 .hero .display { font-size: clamp(40px, 4.6vw, 78px); }
+.hero:not([data-narrow]) .hero-copy { width: clamp(430px, 36vw, 520px); }
 .hero[data-narrow] .display { font-size: clamp(38px, 11vw, 56px); }
 .hero[data-narrow] .hero-copy { bottom: 64px; }
 .hero[data-narrow] .hero-corner { display: none; }
@@ -582,9 +583,11 @@ mark { color: inherit; background: var(--pastel) no-repeat 0 88% / 100% .3em; pa
   [data-reveal] { transform: none; transition: none; }
   .rail::after { --beam: 1; transition: none; }
   .hero { height: auto; }
+  .hero-hint { display: none; }
 }
 :root[data-motion="reduce"] .hero-copy > *, :root[data-motion="reduce"] .hero-corner, :root[data-motion="reduce"] .hero-hint { animation: none; opacity: 1; transform: none; }
 :root[data-motion="reduce"] [data-reveal] { transform: none; transition: none; }
 :root[data-motion="reduce"] .rail::after { --beam: 1; transition: none; }
 :root[data-motion="reduce"] { scroll-behavior: auto; }
 :root[data-motion="reduce"] .hero { height: auto; }
+:root[data-motion="reduce"] .hero-hint { display: none; }

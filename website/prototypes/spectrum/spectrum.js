@@ -1,6 +1,6 @@
 /* global window, document, navigator, history, location, requestAnimationFrame, setTimeout, IntersectionObserver, URL, CustomEvent */
 /* Teachometry · Spectrum — prototype interactions.
-   1) 语言切换  2) 顶栏状态  3) 封面见 kaleido.js  4) 分光滚动叙事  5) 图版架  6) 进场与复制 */
+   1) 语言切换  2) 顶栏状态  3) 封面见 cover.js  4) 分光滚动叙事  5) 图版架  6) 进场与复制 */
 (function () {
   "use strict";
 
@@ -32,7 +32,7 @@
     if (window.scrollY > 24) bar.setAttribute("data-scrolled", ""); else bar.removeAttribute("data-scrolled");
   }
 
-  /* ------------------------------------------------------------ 3 cover: see kaleido.js (WebGL kaleidoscope) */
+  /* ------------------------------------------------------------ 3 cover: see cover.js (Blender frames) */
 
   /* ------------------------------------------------------------ 4 dispersion (figure stays, readings scroll) */
   var disp = document.querySelector("[data-disp]");

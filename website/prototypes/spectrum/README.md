@@ -13,10 +13,11 @@ cd website/prototypes/spectrum && python3 -m http.server 8770
 
 Edition: light "research journal" in a periwinkle palette (reference: Noomo Agency). The
 first screen is a real kaleidoscope rendered in Blender (Cycles): three mirrors at 60°, glass
-in the five TutorBench colours and three scraps of a learner's working (1/3, 1/4, 2/7). Two
-pre-rendered sequences play on a canvas: `L_*` looks into the eyepiece while the cell turns
-(plays back and forth; the pointer nudges it), `P_*` backs the camera out of the eyepiece
-until the kaleidoscope lies on the desk next to the notebook (driven by scroll). Two GPT
+in the five TutorBench colours and three scraps of a learner's working (1/3, 1/4, 2/7). The
+page opens on a still frame (the engraved end cap, pattern small in its window); scrolling
+plays `P_019`–`P_047`, backing the camera away until the kaleidoscope lies on the desk next to
+the notebook. Nothing moves on its own: the earlier full-screen eyepiece opening (`L_*`,
+`P_000`–`P_018`) made readers dizzy, so those frames are kept but not shown. Two GPT
 photographs open §2 and §3 as framed plates, captioned as generated illustrations.
 Everything after it is laid out as one journal issue: masthead and
 contents, running heads, margin notes, figures (Fig. 1–3), booktabs tables (Table 1–3),
@@ -25,7 +26,7 @@ a pull quote, notes and references, and a colophon.
 - `index.html` — page structure, bilingual copy (paired `.en` / `.zh` spans).
 - `spectrum.css` — design tokens (paper, ink, five spectral bands), journal grid and components.
 - `cover.js` — plays the rendered cover frames (`assets/cover/`, WebP, 1200×750) on a 2D
-  canvas with cross-fades. Reduced motion holds one still frame (the engraved eyepiece cap).
+  canvas, snapping to the nearest frame. Reduced motion holds the opening still.
 - `spectrum.js` — language switch, bar, sticky-figure dispersion chapter, plates shelf, reveals.
 - `specimens.js` — generated from `website/dist/public-data/cases.json`
   (`tutor-eval-v0.2a@0.2a.6`): public case inputs only, no responses or scores.
