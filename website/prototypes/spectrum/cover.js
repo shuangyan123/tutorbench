@@ -2,7 +2,7 @@
    The page opens on a still frame (the machined end cap, the pattern small in its window).
    Scrolling moves the camera back until the kaleidoscope lies on the desk beside the learner's
    notebook. Nothing moves unless the reader scrolls; with reduced motion the still frame stays.
-   Frames: assets/cover/Q_000–Q_059.webp, rendered by render/scene.py (sequence Q). */
+   Frames: assets/cover/R_000–R_119.webp, rendered by render/render_r.sh (scene.py, sequence Q, NQ=120). */
 /* global window, document, requestAnimationFrame, Image, setTimeout */
 (function () {
   "use strict";
@@ -25,8 +25,8 @@
 
   // The page opens on a still (the engraved end cap, the pattern small in its window); scrolling
   // only moves the camera back to the desk. Nothing turns on its own.
-  // Q_000–Q_059: 60 frames at 1920×1200, framed for wide screens (kaleidoscope right of centre).
-  var N = 60, SEQ = "Q_";
+  // R_000–R_119: 120 frames at 1920×1200, framed for wide screens (kaleidoscope right of centre).
+  var N = 120, SEQ = "R_";
   var F = new Array(N);
   // a frame counts as ready only once it is decoded, so drawing it never stalls a scroll
   function img(src) {
@@ -101,7 +101,7 @@
     ctx.globalAlpha = 1;
     ctx.clearRect(0, 0, W, H);
     draw1(s.a, 1);
-    if (s.gap === 1 && s.f > 0.02) draw1(s.b, s.f);
+    if (s.gap <= 2 && s.f > 0.02) draw1(s.b, s.f);
     if (readF) readF.textContent = pad(Math.round(shown) + 1);
     if (shown !== target) raf = requestAnimationFrame(frame); else last = 0;
   }

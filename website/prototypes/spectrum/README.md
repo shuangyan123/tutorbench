@@ -15,20 +15,26 @@ Edition: light "research journal" in a periwinkle palette (reference: Noomo Agen
 first screen is a real kaleidoscope rendered in Blender (Cycles): three mirrors at 60°, glass
 in the five TutorBench colours and three scraps of a learner's working (1/3, 1/4, 2/7). The
 page opens on a still frame (the machined aluminium end cap, the pattern small in its window);
-scrolling plays `Q_000`–`Q_059` (60 frames, 1920×1200, sequence Q in `render/scene.py`, run by
-`render/render_q.sh`), backing the camera away until the kaleidoscope lies on the desk next to
-the notebook. `cover.js` decodes each frame before using it, eases towards the scroll position
-and blends neighbouring frames. Nothing moves on its own. The older `P_*` / `L_*` frames are
-kept but not shown. Dimension markers are five Blender glass beads (`assets/beads/`,
+scrolling plays `R_000`–`R_119` (120 frames, 1920×1200, 40 spp: sequence Q in `render/scene.py`
+with the detailed object cell, `NQ=120`, run by `render/render_r.sh`), backing the camera away
+until the kaleidoscope lies on the desk next to the notebook. The object cell holds thick
+bevelled shards (some frosted like sea glass), small crystals, glass beads and crumpled paper
+scraps over a noisy opal diffuser. `cover.js` decodes each frame before using it (every 4th
+frame first, then every 2nd, then the rest), eases towards the scroll position and blends
+neighbouring frames. Nothing moves on its own. Near the end of the cover the masthead slides up
+over it as a sheet, so there is no empty band before the issue starts. The older `Q_*`, `P_*`
+and `L_*` frames are kept but not shown. Dimension markers are five Blender glass beads (`assets/beads/`,
 `render/beads.py`) instead of flat colour bars. Two GPT
 photographs open §2 and §3 as framed plates, captioned as generated illustrations.
+Display type is a high-contrast didone, set in Bodoni Moda as a free stand-in for Kessler
+(Production Type, commercial licence needed); `?display=grotesk` switches headings to Geist.
 Everything after it is laid out as one journal issue: masthead and
 contents, running heads, margin notes, figures (Fig. 1–3), booktabs tables (Table 1–3),
 a pull quote, notes and references, and a colophon.
 
 - `index.html` — page structure, bilingual copy (paired `.en` / `.zh` spans).
 - `spectrum.css` — design tokens (paper, ink, five spectral bands), journal grid and components.
-- `cover.js` — plays the rendered cover frames (`assets/cover/`, WebP, 1200×750) on a 2D
+- `cover.js` — plays the rendered cover frames (`assets/cover/`, WebP, 1920×1200) on a 2D
   canvas, decoded first and blended between neighbours. Reduced motion holds the opening still.
 - `signature.js` — the brand's one repeatable visual rule, the **spectral signature**: every case is
   drawn as a line spectrum over TutorBench's 27 capability tags, grouped into the five dimensions

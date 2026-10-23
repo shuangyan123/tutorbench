@@ -163,6 +163,8 @@ def glass(i, rough=0.03):
     return principled(f"glass{i}_{rough}", c, rough, trans=1.0, ior=1.52)
 glasses = [glass(i) for i in range(6)] + [glass(3, 0.3), glass(4, 0.3), glass(1, 0.3)]
 
+V2 = os.environ.get("CELL", "3") == "3"   # CELL=3: the detailed object cell (thick bevelled glass, crystals, crumpled paper)
+
 def shard(mat, size, pos, rot):
     n = random.randint(4, 7); bm = bmesh.new(); vs = []
     ang = sorted(random.uniform(0, 2 * math.pi) for _ in range(n))
@@ -170,13 +172,27 @@ def shard(mat, size, pos, rot):
     for a in ang: vs.append(bm.verts.new((sx * math.cos(a), 0, sz * math.sin(a))))
     f = bm.faces.new(vs)
     ext = bmesh.ops.extrude_face_region(bm, geom=[f])
-    bmesh.ops.translate(bm, vec=(0, random.uniform(0.008, 0.016), 0),
+    th = random.uniform(0.014, 0.03) if V2 else random.uniform(0.008, 0.016)
+    bmesh.ops.translate(bm, vec=(0, th, 0),
                         verts=[v for v in ext["geom"] if isinstance(v, bmesh.types.BMVert)])
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     me = bpy.data.meshes.new("shard"); bm.to_mesh(me); bm.free()
     o = bpy.data.objects.new("shard", me); sc.collection.objects.link(o); o.data.materials.append(mat)
     o.parent = cell; o.location = pos; o.rotation_euler = rot
-    bv = o.modifiers.new("bv", "BEVEL"); bv.width = 0.0025; bv.segments = 2
+    bv = o.modifiers.new("bv", "BEVEL")
+    if V2:  # tumbled edges: wide, rounded bevels that catch light like real cut glass
+        bv.width = th * 0.42; bv.segments = 5; bv.limit_method = "ANGLE"
+        for p_ in o.data.polygons: p_.use_smooth = True
+        ws = o.modifiers.new("ws", "WEIGHTED_NORMAL"); ws.keep_sharp = True
+    else:
+        bv.width = 0.0025; bv.segments = 2
+    return o
+
+def crystal(mat, r, pos):
+    # a cut gem: low-poly ico with flat facets, so it throws small sharp highlights
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=r, location=(0, 0, 0)); o = bpy.context.object
+    o.scale = (1, random.uniform(0.55, 0.8), random.uniform(0.8, 1.2)); o.data.materials.append(mat)
+    o.parent = cell; o.location = pos; o.rotation_euler = tuple(random.uniform(0, 6.28) for _ in range(3))
     return o
 
 def in_cell(rmax):
@@ -184,30 +200,63 @@ def in_cell(rmax):
         x, z = random.uniform(-rmax, rmax), random.uniform(-rmax, rmax)
         if x * x + z * z < rmax * rmax: return x, z
 
-for i in range(44):
-    x, z = in_cell(0.25)
-    shard(glasses[i % len(glasses)], random.uniform(0.05, 0.13),
-          (x, random.uniform(-0.05, 0.035), z),
-          (random.uniform(-0.35, 0.35), random.uniform(0, 6.28), random.uniform(-0.35, 0.35)))
-for i in range(16):  # beads
-    x, z = in_cell(0.24)
-    bpy.ops.mesh.primitive_uv_sphere_add(radius=random.uniform(0.01, 0.022), location=(0, 0, 0), segments=24, ring_count=12)
-    o = bpy.context.object; shade_smooth(o); o.data.materials.append(glasses[random.randrange(6)])
-    o.parent = cell; o.location = (x, random.uniform(-0.04, 0.03), z)
+if V2:
+    sea = [principled(f"sea{i}", GLASS[i], 0.12, trans=1.0, ior=1.5) for i in range(5)]  # frosted, like sea glass
+    for i in range(90):
+        x, z = in_cell(0.26)
+        big = i < 26
+        m_ = glasses[i % 6] if i % 5 else sea[i % 5]
+        shard(m_, random.uniform(0.06, 0.11) if big else random.uniform(0.025, 0.06),
+              (x, random.uniform(-0.05, 0.035), z),
+              (random.uniform(-0.45, 0.45), random.uniform(0, 6.28), random.uniform(-0.45, 0.45)))
+    for i in range(22):
+        x, z = in_cell(0.24)
+        crystal(glasses[random.choice([5, 5, 0, 2, 3, 4])], random.uniform(0.012, 0.026), (x, random.uniform(-0.045, 0.03), z))
+    for i in range(40):  # beads, a few very small
+        x, z = in_cell(0.25)
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=random.choice([random.uniform(0.004, 0.009), random.uniform(0.01, 0.02)]), location=(0, 0, 0), segments=32, ring_count=16)
+        o = bpy.context.object; shade_smooth(o); o.data.materials.append(glasses[random.randrange(6)])
+        o.parent = cell; o.location = (x, random.uniform(-0.045, 0.03), z)
+else:
+    for i in range(44):
+        x, z = in_cell(0.25)
+        shard(glasses[i % len(glasses)], random.uniform(0.05, 0.13),
+              (x, random.uniform(-0.05, 0.035), z),
+              (random.uniform(-0.35, 0.35), random.uniform(0, 6.28), random.uniform(-0.35, 0.35)))
+    for i in range(16):  # beads
+        x, z = in_cell(0.24)
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=random.uniform(0.01, 0.022), location=(0, 0, 0), segments=24, ring_count=12)
+        o = bpy.context.object; shade_smooth(o); o.data.materials.append(glasses[random.randrange(6)])
+        o.parent = cell; o.location = (x, random.uniform(-0.04, 0.03), z)
 
 for i in range(6):
     x, z = in_cell(0.22)
     bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=random.uniform(0.006, 0.01), depth=random.uniform(0.08, 0.16))
     o = bpy.context.object; shade_smooth(o); o.data.materials.append(glasses[5])
     o.parent = cell; o.location = (x, random.uniform(-0.04, 0.02), z); o.rotation_euler = (random.uniform(0, 3.14), 0, random.uniform(0, 3.14))
-for name, sz, pos, rz in [("scrap27", 0.15, (0.03, -0.045, 0.02), 0.25), ("scrap14", 0.11, (-0.13, -0.035, -0.1), -0.6),
-                          ("scrap13", 0.11, (0.12, -0.03, -0.12), 1.1)]:
+SCR = [("scrap27", 0.15, (0.03, -0.045, 0.02), 0.25), ("scrap14", 0.11, (-0.13, -0.035, -0.1), -0.6), ("scrap13", 0.11, (0.12, -0.03, -0.12), 1.1)]
+if V2: SCR = [("scrap27", 0.1, (0.04, -0.047, 0.03), 0.25), ("scrap14", 0.075, (-0.14, -0.04, -0.1), -0.6), ("scrap13", 0.075, (0.13, -0.036, -0.13), 1.1)]
+for name, sz, pos, rz in SCR:
     bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 0, 0), rotation=(math.radians(90), 0, 0))
     o = bpy.context.object; o.scale = (sz, sz * 0.7, 1)
     o.data.materials.append(paper_mat(name, os.path.join(TEX, name + ".png")))
     o.parent = cell; o.location = pos; o.rotation_euler = (math.radians(90), rz, 0)
     # plane faces -Y after the 90° turn; flip UV so writing reads from the eyepiece
     for d in o.data.uv_layers[0].data: d.uv = (1 - d.uv[0], d.uv[1])
+    if V2:  # crumple: subdivide and push the paper about a little, so it is not a flat card
+        sd = o.modifiers.new("sd", "SUBSURF"); sd.subdivision_type = "SIMPLE"; sd.levels = sd.render_levels = 4
+        tx = bpy.data.textures.new(name + "_n", "CLOUDS"); tx.noise_scale = 0.18
+        dp = o.modifiers.new("dp", "DISPLACE"); dp.texture = tx; dp.strength = 0.012; dp.mid_level = 0.5
+        for p_ in o.data.polygons: p_.use_smooth = True
+
+if V2:
+    # frosted back window: uneven, like real opal glass, instead of a flat lit card
+    nt_ = frost.node_tree; nz = nt_.nodes.new("ShaderNodeTexNoise"); nz.inputs["Scale"].default_value = 18.0; nz.inputs["Detail"].default_value = 6.0
+    rm = nt_.nodes.new("ShaderNodeMapRange"); rm.inputs["To Min"].default_value = 0.12; rm.inputs["To Max"].default_value = 0.42
+    nt_.links.new(nz.outputs["Fac"], rm.inputs["Value"]); nt_.links.new(rm.outputs["Result"], mx_.inputs[0])
+    # a thin clear lens in the eyepiece: one more surface to catch a highlight
+    lens = principled("lens", (1, 1, 1), 0.0, trans=1.0, ior=1.5)
+    cyl("lens", RH + 0.002, 0.004, -0.02, mat=lens)
 
 # ------------------------------------------------------------------ desk, notebook, pencil
 desk = principled("cyc", (0.47, 0.56, 0.86), 0.72)   # periwinkle seamless backdrop (#CAD6ED-ish)
