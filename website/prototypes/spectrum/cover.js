@@ -107,10 +107,8 @@
       var pi = smooth(0.02, 0.86, p) * (NP - 1);
       if (hand < 1) draw(pick(L, li));
       if (hand > 0) {
-        var s = pick(P, pi);
-        ctx.globalAlpha = 1;
-        draw1(s.a, hand);
-        if (s.b && s.f > 0.01) draw1(s.b, hand * s.f);
+        // the camera moves a lot between pull-out frames, so snap to the nearest one (no ghosting)
+        draw1(pick(P, Math.round(pi)).a, hand);
       }
       label = hand < 0.5 ? Math.round(li) : NL + Math.round(pi);
     }
