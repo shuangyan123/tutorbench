@@ -24,8 +24,9 @@ across their lines, so this matches the full mirror render at a fraction of the 
 it (every 4th frame first, then every 2nd, then the rest), eases towards the scroll position and
 blends neighbouring frames. Near the end of the cover the masthead slides up over it as a sheet.
 The earlier three-mirror end-cap sequences (`R_*`, `Q_*`, `P_*`, `L_*`, `render/scene.py`) are
-kept but not shown. Dimension markers are five Blender glass beads (`assets/beads/`,
-`render/beads.py`) instead of flat colour bars. Two GPT photographs open §2 and §3 as framed
+kept but not shown. Dimension markers are five Blender cut gems (`assets/gems/`,
+`render/gems.py`): ruby oval, citrine pear, emerald step cut, sapphire cushion, amethyst trillion,
+each rendered in three IOR passes for fire. The earlier glass beads (`assets/beads/`) show with `#beads`. Two GPT photographs open §2 and §3 as framed
 plates, captioned as generated illustrations.
 Display headings are set in Cormorant Garamond (OFL; chosen over Bodoni Moda and Instrument
 Serif as free alternatives to Kessler, which needs a commercial licence). `#bodoni` /

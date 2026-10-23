@@ -32,12 +32,12 @@
   --s2: #13a25e;
   --s3: #2d5cf6;
   --s4: #7b3ef2;
-  /* 五颗玻璃珠（Blender 渲染），代替平涂色条 */
-  --bead0: url(assets/beads/bead-0.webp);
-  --bead1: url(assets/beads/bead-1.webp);
-  --bead2: url(assets/beads/bead-2.webp);
-  --bead3: url(assets/beads/bead-3.webp);
-  --bead4: url(assets/beads/bead-4.webp);
+  /* 五颗切工宝石（Blender 渲染）：红宝石椭圆、黄水晶水滴、祖母绿阶梯、蓝宝石枕形、紫水晶三角 */
+  --bead0: url(assets/gems/gem-0.webp);
+  --bead1: url(assets/gems/gem-1.webp);
+  --bead2: url(assets/gems/gem-2.webp);
+  --bead3: url(assets/gems/gem-3.webp);
+  --bead4: url(assets/gems/gem-4.webp);
   --spectrum: linear-gradient(90deg, var(--c0), var(--c1), var(--c2), var(--c3), var(--c4));
   --pastel: linear-gradient(90deg, #ffd6c4, #ffeab0 26%, #cdeedd 50%, #d3e0ff 74%, #e3d6ff);
 
@@ -52,10 +52,10 @@
   --bar-h: 60px;
   color-scheme: light;
 }
-/* test: the five dimension markers as cut gems (ruby, citrine, emerald, sapphire, amethyst), #gems */
-:root.gems {
-  --bead0: url(assets/gems/gem-0.webp); --bead1: url(assets/gems/gem-1.webp); --bead2: url(assets/gems/gem-2.webp);
-  --bead3: url(assets/gems/gem-3.webp); --bead4: url(assets/gems/gem-4.webp);
+/* the earlier glass beads, kept for comparison: #beads */
+:root.beads {
+  --bead0: url(assets/beads/bead-0.webp); --bead1: url(assets/beads/bead-1.webp); --bead2: url(assets/beads/bead-2.webp);
+  --bead3: url(assets/beads/bead-3.webp); --bead4: url(assets/beads/bead-4.webp);
 }
 :root[data-display="didone"] {
   /* 展示型排版：高反差衬线。Kessler（Production Type）需购买网页授权，原型先用免费字体代替：
