@@ -48,11 +48,9 @@
 <!-- ============================================================ COVER · the work -->
 <section class="hero" id="top" aria-labelledby="cover-title" data-hero>
  <div class="hero-stage">
-  <canvas class="scope-gl" data-scope-gl aria-hidden="true"></canvas>
-  <div class="scope-still" aria-hidden="true"></div>
-  <svg class="scope-dial" data-scope-dial aria-hidden="true"></svg>
+  <canvas class="seq" data-seq aria-hidden="true"></canvas>
 
-  <div class="hero-copy">
+  <div class="hero-copy glass">
     <p class="hero-q">
       <span>// <span lang="zh-CN">一段回复，放进万花筒里会是什么样？</span></span>
       <span>// one tutoring reply, seen through a kaleidoscope</span>
@@ -71,21 +69,19 @@
     </div>
   </div>
 
-  <p class="scope-read" aria-hidden="true">
-    <span class="sr-k"><span class="en">Mirrors</span><span class="zh" lang="zh-CN">镜面</span></span>
-    <span class="sr-steps" data-scope-steps><i class="on">12</i><i>6</i><i>3</i><i>1</i></span>
-    <span class="sr-k"><span class="en">Turn</span><span class="zh" lang="zh-CN">转角</span></span><b data-scope-theta>034°</b>
+  <p class="seq-read glass-chip" aria-hidden="true">
+    <span class="en">Kaleidoscope No. 01</span><span class="zh" lang="zh-CN">万花筒 01 号</span>
+    <span class="sep">·</span><span class="en">3 mirrors at 60°</span><span class="zh" lang="zh-CN">三面镜 · 60°</span>
+    <span class="sep">·</span><span><b data-seq-frame>000</b> / 077</span>
   </p>
 
-  <p class="scope-cap" aria-hidden="true">
+  <p class="scope-cap glass" aria-hidden="true">
     <b><span class="en">Fig. 0</span><span class="zh" lang="zh-CN">图 0</span></b>
-    <span class="en">Every fragment in the kaleidoscope came from this one scene: a learner's <em>1/3 + 1/4 = 2/7</em>, and the light that falls on it. Generated illustration.</span>
-    <span class="zh" lang="zh-CN">万花筒里的每一块碎片，都来自这一个画面：学生写下的 <em>1/3 + 1/4 = 2/7</em>，和落在上面的光。生成示意图。</span>
+    <span class="en">Kaleidoscope No. 01: three mirrors at 60°, glass in the five TutorBench colours, and three scraps of one learner's working — <em>1/3</em>, <em>1/4</em>, <em>2/7</em>. Rendered in Blender, not photographed.</span>
+    <span class="zh" lang="zh-CN">万花筒 01 号：三面镜子成 60°，玻璃是 TutorBench 的五种颜色，还有三片学生演算纸的碎片：<em>1/3</em>、<em>1/4</em>、<em>2/7</em>。Blender 渲染，不是实拍。</span>
   </p>
 
-  <p class="hero-corner hero-corner-l" aria-hidden="true"><span class="en">Vol. 0 · No. 1 · October 2026</span><span class="zh" lang="zh-CN">第 0 卷 · 第 1 期 · 2026 年 10 月</span></p>
-  <p class="hero-corner hero-corner-r" aria-hidden="true"><span class="en">Cover · a kaleidoscope, turned live</span><span class="zh" lang="zh-CN">封面 · 一只实时转动的万花筒</span></p>
-  <p class="hero-hint" aria-hidden="true"><span lang="zh-CN">移动转动镜筒 · 滚动拆掉镜子</span><span class="hint-en"> / move to turn the tube · scroll to take the mirrors out</span></p>
+  <p class="hero-hint glass-chip" aria-hidden="true"><span lang="zh-CN">移动鼠标转动镜筒 · 滚动退出目镜</span><span class="hint-en"> / move to turn · scroll to step back</span></p>
  </div>
 </section>
 
@@ -566,6 +562,6 @@ npm run quickstart</code></pre>
 
 <script src="specimens.js"></script>
 <script src="spectrum.js"></script>
-<script src="kaleido.js"></script>
+<script src="cover.js"></script>
 </body>
 </html>
