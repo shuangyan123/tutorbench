@@ -52,6 +52,11 @@
   --bar-h: 60px;
   color-scheme: light;
 }
+/* test: the five dimension markers as cut gems (ruby, citrine, emerald, sapphire, amethyst), #gems */
+:root.gems {
+  --bead0: url(assets/gems/gem-0.webp); --bead1: url(assets/gems/gem-1.webp); --bead2: url(assets/gems/gem-2.webp);
+  --bead3: url(assets/gems/gem-3.webp); --bead4: url(assets/gems/gem-4.webp);
+}
 :root[data-display="didone"] {
   /* 展示型排版：高反差衬线。Kessler（Production Type）需购买网页授权，原型先用免费字体代替：
      ?serif=cormorant（默认，Cormorant Garamond）/ bodoni（Bodoni Moda）/ instrument（Instrument Serif） */
