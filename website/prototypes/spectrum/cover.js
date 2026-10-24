@@ -3,7 +3,8 @@
    crystal and air bubbles in oil. The page opens on a still rosette; scrolling turns the chamber
    by 15°, so the pattern slowly re-forms. The picture itself never spins, and nothing moves unless
    the reader scrolls; with reduced motion the still rosette stays.
-   Frames: assets/cover/K_000–K_119.webp (1400×1400, transparent outside the eyepiece), rendered by
+   Frames: assets/cover/K_000–K_119.webp (1400×1400, transparent outside the eyepiece; a 1000px copy
+   in assets/cover-m/ for small screens), rendered by
    render/render_k.sh (mandala.py, one wedge per frame, folded by render/fold.py). */
 /* global window, document, requestAnimationFrame, Image, setTimeout */
 (function () {
@@ -16,8 +17,11 @@
   var ctx = canvas.getContext("2d");
   var readF = hero.querySelector("[data-seq-frame]");
   var root = document.documentElement;
-  var DIR = "assets/cover/";
-  
+  // the eyepiece is at most ~520 CSS px wide on phones and small tablets: there a 1000px set
+  // looks the same and weighs about half as much
+  var small = Math.min(window.innerWidth, window.innerHeight * 1.25) <= 700;
+  var DIR = small ? "assets/cover-m/" : "assets/cover/";
+
   function reduced() {
     return root.getAttribute("data-motion") === "reduce" ||
       (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
