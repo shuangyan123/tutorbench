@@ -89,11 +89,24 @@
         <h2 id="s1"><span class="no">§1</span><span>The scarce resource is attention</span></h2>
         <p>One teacher can explain an idea to a room, but cannot continuously observe every learner, diagnose every misconception, choose a different explanation for each student, verify genuine understanding, and adjust the next task for everyone at once. That is a capacity constraint even when the teacher is excellent and conscientious.</p>
         <p>K12 systems therefore work at the level of groups. They need classrooms to remain orderly, curricula to move forward, exams to be administered, and students to cross common thresholds. Individual optimization is desirable, but it competes with the practical requirement to teach many people at the same time.</p>
-        <blockquote class="pull">“The fundamental constraint in education is not access to information. It is access to sustained, individualized teaching attention.”</blockquote>
+        <figure class="fig fig-wide" id="fig1">
+          <img src="assets/journal/classroom.webp" alt="An empty classroom seen from the back row in daylight: thirty desks facing one blackboard." width="1800" height="1000" loading="lazy">
+          <figcaption><b>Fig. 1</b> Thirty desks, one blackboard. The room is built for one person’s attention to be shared. Rendered in Blender.</figcaption>
+        </figure>
         <h2 id="s2"><span class="no">§2</span><span>Scores create a powerful external structure</span></h2>
         <p>Much K12 learning is not purely voluntary. Families and schools use grades, exams, schedules, expectations, and supervision to make learning happen even when a student is not intrinsically interested in the subject. Students who perform well often receive more recognition and confidence; students who repeatedly fall behind can experience the opposite.</p>
         <p>This means an education system is doing at least two jobs at once: teaching, and creating an environment in which learning is difficult to avoid. Any serious AI education system has to understand both jobs.</p>
         <h2 id="s3"><span class="no">§3</span><span>Private tutoring reveals what families are really buying</span></h2>
+        <figure class="fig fig-margin" id="fig2">
+          <ol class="ledger">
+            <li>Dedicated attention</li>
+            <li>Direct accountability to the family</li>
+            <li>Supervision of the student</li>
+            <li>Visible progress</li>
+            <li>A trust signal: credentials, experience, reputation, past results</li>
+          </ol>
+          <figcaption><b>Fig. 2</b> What a private tutor sells, as listed in this section. Only the first item is teaching.</figcaption>
+        </figure>
         <p>A private tutor is valuable not only because the tutor may explain a subject well. The product also includes dedicated attention, direct accountability to the family, supervision of the student, visible progress, and a trust signal built from credentials, experience, reputation, or past results.</p>
         <p>The expensive part is that all of this is tied to a person’s time. High-quality one-to-one attention is difficult to distribute broadly because each additional learner requires another block of human labor.</p>
         <h2 id="s4"><span class="no">§4</span><span>AI changes the cost structure only if it can actually teach</span></h2>
@@ -105,9 +118,34 @@
         </aside>
         <h2 id="s5"><span class="no">§5</span><span>The standard cannot be “the student got the answer”</span></h2>
         <p>An AI can make a learner look more capable by doing cognitive work on the learner’s behalf. That is not the same as learning. The stronger test is whether the student can retain, transfer, and apply the knowledge after the AI is removed.</p>
+        <figure class="fig" id="fig3">
+          <div class="dialog">
+            <p class="d-who">Learner</p>
+            <p class="d-says">I think <b>1/3 + 1/4 = 2/7</b>. I added the top numbers and the bottom numbers. Is that right?</p>
+            <div class="d-pair">
+              <div class="d-reply">
+                <p class="d-who">Reply A · answers</p>
+                <p class="d-says">Yes, that’s right! Adding the top numbers and the bottom numbers is how you add fractions. You understand it well.</p>
+              </div>
+              <div class="d-reply d-teach">
+                <p class="d-who">Reply B · teaches</p>
+                <p class="d-says">You told me exactly how you got 2/7, which helps. Before we decide: is 2/7 bigger or smaller than 1/3 on its own?</p>
+              </div>
+            </div>
+          </div>
+          <figcaption><b>Fig. 3</b> The same learner message, two replies. Reply A is the constructed exchange from the homepage; Reply B is constructed for this figure. Neither is the output of a real model, and neither is a TutorBench score.</figcaption>
+        </figure>
         <p>For that reason, AI education should not be trusted because a model sounds intelligent or because it solves benchmark questions. It should be trusted only to the extent that we can show that its teaching changes the learner in durable and useful ways.</p>
         <h2 id="s6"><span class="no">§6</span><span>Why Teachometry exists</span></h2>
         <p>The long-run question is not simply whether an AI can answer correctly. It is whether an AI can take responsibility for progressively larger parts of teaching. That requires measurement at several levels: observable tutoring behavior, actual learning effectiveness, and eventually instructional autonomy over longer periods.</p>
+        <figure class="fig" id="fig4">
+          <ol class="ladder">
+            <li class="now"><span class="l-no">Level 1</span><span class="l-name">Observable tutoring behaviour</span><span class="l-note">What TutorBench measures today</span></li>
+            <li><span class="l-no">Level 2</span><span class="l-name">Actual learning effectiveness</span><span class="l-note">Needs separate empirical validation</span></li>
+            <li><span class="l-no">Level 3</span><span class="l-name">Instructional autonomy over longer periods</span><span class="l-note">Needs separate empirical validation</span></li>
+          </ol>
+          <figcaption><b>Fig. 4</b> The three levels of measurement named in this section, and where the current benchmark stands.</figcaption>
+        </figure>
         <p>Teachometry exists to turn those claims into testable questions. The goal is not to assume that AI has already replaced the teacher. The goal is to build the evidence needed to know what it can reliably do, for whom, under what conditions, and where human teaching remains necessary.</p>
         <aside class="callout boundary">
           <p class="kicker">Evidence boundary</p>
