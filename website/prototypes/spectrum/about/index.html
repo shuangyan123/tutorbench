@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About — Teachometry</title>
+<meta name="description" content="Teachometry measures observable AI tutoring behavior, not merely whether a model produces a correct answer.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../spectrum.css">
+<link rel="stylesheet" href="../journal.css">
+<link rel="stylesheet" href="../about.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var root = document.documentElement;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../index.html#methods" class="nav-tb"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+</header>
+
+<main id="main" class="ab">
+  <header class="essay-head ab-head">
+    <div class="wrap">
+      <p class="essay-meta kicker"><span class="issue"><span class="en">About Teachometry</span><span class="zh" lang="zh-CN">关于 Teachometry</span></span><span class="rule" aria-hidden="true"></span><span><span class="en">Open measurement infrastructure for AI tutoring</span><span class="zh" lang="zh-CN">面向 AI 教学的开放测量基础设施</span></span></p>
+      <div class="ab-head-grid">
+        <h1 class="essay-title" id="about-title"><span class="en">A model can know the answer <em>without being a good tutor.</em></span><span class="zh" lang="zh-CN">模型可以知道答案<em>却未必是好的 Tutor。</em></span></h1>
+        <div>
+          <p class="en ab-lede">Teachometry is open measurement infrastructure for AI tutoring. We evaluate observable tutoring behavior in structured cases—not just whether the answer is right.</p><p class="zh ab-lede" lang="zh-CN">Teachometry 是面向 AI 教学的开放测量基础设施。我们在结构化案例中评估可观察的教学行为，而不只是检查答案是否正确。</p>
+          <p class="cx-actions"><a class="cta cta-ink" href="../methodology/index.html"><span class="en">Read our approach</span><span class="zh" lang="zh-CN">了解我们的方法</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a class="cta cta-line" href="../data/index.html"><span class="en">Explore the benchmark</span><span class="zh" lang="zh-CN">探索基准</span></a></p>
+        </div>
+      </div>
+      <figure class="ab-plate">
+        <img src="../assets/about/press.webp" alt="One line of lead type, ANSWERS ≠ TEACHING, set in a steel composing stick, its faces inked in five colours. In front lies the proof pulled from it, the colours blending across the line; behind, a brayer rests on a glass slab rolled out with the same five inks." width="1600" height="960" data-alt-en="One line of lead type, ANSWERS ≠ TEACHING, set in a steel composing stick, its faces inked in five colours. In front lies the proof pulled from it, the colours blending across the line; behind, a brayer rests on a glass slab rolled out with the same five inks." data-alt-zh="一行铅字 ANSWERS ≠ TEACHING 排在钢制排字手托里，字面上着五种颜色的墨。前面是从这行字拓下的样张，颜色沿着一行字渐次相融；后面，墨辊停在玻璃墨台上，墨台上滚开的是同样的五种墨。">
+        <figcaption class="kicker"><span class="fount" aria-hidden="true"></span><span><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">Set by hand, inked split-fountain: five inks laid side by side on one roller, so each blends into the next across the line, as the five dimensions do across one reply. Rendered in Blender.</span><span class="zh" lang="zh-CN">手工排字，分色墨辊上墨：五种墨并排放在同一根墨辊上，在一行字里彼此相融，正如五个维度在同一条回复里相互交织。Blender 渲染。</span></span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <section class="wrap ab-row ab-why" aria-labelledby="about-why-title">
+    <div class="ab-why-head">
+      <p class="kicker"><span class="en">Why Teachometry exists</span><span class="zh" lang="zh-CN">为什么要做 Teachometry</span></p>
+      <h2 class="ab-neq" id="about-why-title"><span class="en">Answers <i>≠</i> Teaching.</span><span class="zh" lang="zh-CN">答案 <i>≠</i> 教学。</span></h2>
+    </div>
+    <div class="ab-why-arg">
+      <p class="en">AI models can often produce correct answers, but tutoring asks for more: noticing where a learner is stuck, guiding reasoning, adapting help, and leaving an actionable next step. A correct answer is evidence of correctness—not evidence that the interaction taught well.</p><p class="zh" lang="zh-CN">AI 模型往往能够给出正确答案，但教学要求更多：发现学生卡在哪里、引导推理、调整帮助，并留下可执行的下一步。正确答案只能证明正确性，不能证明这次交互教得好。</p>
+      <p class="en ab-quote">To evaluate AI tutoring, we need evidence of what models do with learners—not only what they know.</p><p class="zh ab-quote" lang="zh-CN">要评估 AI 教学，我们需要模型如何与学生互动的证据，而不仅仅是它知道什么。</p>
+    </div>
+    <div>
+      <p class="en ab-dims-intro">The public benchmark keeps these questions separate, so each result remains tied to a case, a dimension, and its observable evidence.</p><p class="zh ab-dims-intro" lang="zh-CN">公开基准将这些问题保持分离，因此每个结果都仍然与具体案例、维度和可观察证据绑定。</p>
+      <ol class="ab-dims" aria-label="Canonical benchmark score dimensions" data-aria-label-en="Canonical benchmark score dimensions" data-aria-label-zh="标准基准评分维度">
+        <li><span class="n">01</span><span><strong><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></strong><small><span class="en">Whether the Tutor stays factually and conceptually correct.</span><span class="zh" lang="zh-CN">Tutor 是否在事实与概念层面保持正确。</span></small></span><span class="ink" aria-hidden="true"></span></li>
+        <li><span class="n">02</span><span><strong><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></strong><small><span class="en">Whether it identifies the learner’s actual error, gap, or reasoning issue.</span><span class="zh" lang="zh-CN">是否识别出学生真实的错误、知识缺口或推理问题。</span></small></span><span class="ink" aria-hidden="true"></span></li>
+        <li><span class="n">03</span><span><strong><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></strong><small><span class="en">Whether its explanation or hint helps the learner make progress.</span><span class="zh" lang="zh-CN">解释或提示是否帮助学生取得进展。</span></small></span><span class="ink" aria-hidden="true"></span></li>
+        <li><span class="n">04</span><span><strong><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></strong><small><span class="en">Whether it changes its help for the learner’s state and context.</span><span class="zh" lang="zh-CN">是否根据学生当前状态与语境调整帮助方式。</span></small></span><span class="ink" aria-hidden="true"></span></li>
+        <li><span class="n">05</span><span><strong><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></strong><small><span class="en">Whether it leaves the learner with a clear, executable next step.</span><span class="zh" lang="zh-CN">是否让学生得到清晰且可执行的下一步。</span></small></span><span class="ink" aria-hidden="true"></span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="about-boundary-title">
+    <div>
+      <p class="kicker"><span class="en">Our position</span><span class="zh" lang="zh-CN">我们的立场</span></p>
+      <p class="ab-side-note"><span class="en">Same cases.<br><em>Clear criteria.</em></span><span class="zh" lang="zh-CN">相同案例。<br><em>清晰标准。</em></span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="about-boundary-title"><span class="en">We measure tutors.<br>We don’t build the tutor.</span><span class="zh" lang="zh-CN">我们测量 Tutor。<br>我们不构建 Tutor。</span></h2>
+      <p class="jx-p"><span class="en">Teachometry's TutorBench engine evaluates a <code>TutorUnderTest</code> through a provider-neutral adapter boundary. Provider-specific behavior enters at the edge; the engine’s cases, contracts, evaluators, and reports remain independent.</span><span class="zh" lang="zh-CN">Teachometry 的 TutorBench 引擎评估一个 <code>TutorUnderTest</code> ，通过独立于服务提供方的适配器边界接入。服务提供方特定行为只在边缘进入；引擎的案例、契约、评估器和报告保持独立。</span></p>
+      <figure class="ab-flow">
+        <div class="ab-flow-row">
+          <div class="ab-out"><p><span class="en">Outside our scope</span><span class="zh" lang="zh-CN">不在我们的范围内</span></p><ul><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg><span><span class="en">Chat application</span><span class="zh" lang="zh-CN">聊天应用</span></span></li><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg><span><span class="en">Prompt playground</span><span class="zh" lang="zh-CN">Prompt 试验场</span></span></li></ul></div>
+          <div class="ab-core">
+            <div class="ab-node"><strong><code>TutorUnderTest</code></strong><small><span class="en">provider adapter boundary</span><span class="zh" lang="zh-CN">服务提供方适配器边界</span></small></div>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            <div class="ab-node"><strong>Teachometry <span class="en">evaluation</span><span class="zh" lang="zh-CN">评测</span></strong><small><span class="en">cases · rubrics · reports</span><span class="zh" lang="zh-CN">案例 · 评分标准 · 报告</span></small></div>
+          </div>
+          <div class="ab-out"><p><span class="en">Outside our scope</span><span class="zh" lang="zh-CN">不在我们的范围内</span></p><ul><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg><span><span class="en">Model fine-tuning</span><span class="zh" lang="zh-CN">模型微调</span></span></li><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg><span><span class="en">Admin dashboard</span><span class="zh" lang="zh-CN">管理后台</span></span></li><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg><span><span class="en">Review Workspace module</span><span class="zh" lang="zh-CN">Review Workspace 模块</span></span></li></ul></div>
+        </div>
+        <figcaption><span class="en">Same cases. Clear criteria. Reproducible evaluation.</span><span class="zh" lang="zh-CN">相同案例，清晰标准，可复现评测。</span></figcaption>
+      </figure>
+      <p class="cx-actions"><a class="text-link" href="https://github.com/shuangyan123/tutorbench" rel="noreferrer"><span class="en">Inspect the repository</span><span class="zh" lang="zh-CN">查看仓库</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></p>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="about-principles-title">
+    <div>
+      <p class="kicker" id="about-principles-title"><span class="en">What we believe</span><span class="zh" lang="zh-CN">我们的信念</span></p>
+      <p class="ab-side-note"><span class="en">Open science<br><em>for better learning.</em></span><span class="zh" lang="zh-CN">开放科学，<br><em>为了更好的学习。</em></span></p>
+    </div>
+    <div class="ab-principles">
+      <article><span class="n">01</span><h3><span class="en">Observable over assumed</span><span class="zh" lang="zh-CN">可观察胜过假设</span></h3><p class="en">Evaluate what a tutor says and does in the interaction, not inferred intentions or claimed capabilities.</p><p class="zh" lang="zh-CN">评估 Tutor 在交互中实际说了什么、做了什么，而不是推断其意图或相信其自称能力。</p></article>
+      <article><span class="n">02</span><h3><span class="en">Evidence over hype</span><span class="zh" lang="zh-CN">证据胜过炒作</span></h3><p class="en">Favor transparent methods, reproducible artifacts, and inspectable evidence over marketing narratives.</p><p class="zh" lang="zh-CN">优先选择透明方法、可复现产物和可检查证据，而不是营销叙事。</p></article>
+      <article><span class="n">03</span><h3><span class="en">Context over a single score</span><span class="zh" lang="zh-CN">语境胜过单一分数</span></h3><p class="en">Results belong to specific cases, versions, dimensions, and evaluation contexts—not a universal number.</p><p class="zh" lang="zh-CN">结果属于具体案例、版本、维度和评测语境，而不是一个放之四海而皆准的数字。</p></article>
+      <article><span class="n">04</span><h3><span class="en">Open methods over black boxes</span><span class="zh" lang="zh-CN">开放方法胜过黑箱</span></h3><p class="en">Publish cases, methodology, contracts, and public artifacts so claims can be inspected and challenged.</p><p class="zh" lang="zh-CN">公开案例、方法论、契约和公开产物，让主张可以被检查和质疑。</p></article>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="about-status-title">
+    <div>
+      <p class="kicker"><span class="en">Where we are now</span><span class="zh" lang="zh-CN">我们现在处于什么阶段</span></p>
+      <h2 class="ab-status-h" id="about-status-title"><span class="en">Developer Preview</span><span class="zh" lang="zh-CN">开发者预览</span></h2>
+      <p class="en jx-p">Teachometry is in active development. The public site packages approved development metadata and public cases; it does not publish private runs or claim completed calibration.</p><p class="zh jx-p" lang="zh-CN">Teachometry 正处于积极开发阶段。公开网站打包展示经批准的开发元数据和公开案例；不会发布私有运行，也不会声称校准已经完成。</p>
+      <p class="cx-actions"><a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/docs/release.md" rel="noreferrer"><span class="en">View current release notes</span><span class="zh" lang="zh-CN">查看当前版本说明</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></p>
+    </div>
+    <dl class="ab-ledger">
+      <div><dt><span class="en">Website</span><span class="zh" lang="zh-CN">网站</span></dt><dd><span class="en">Developer Preview</span><span class="zh" lang="zh-CN">开发者预览</span></dd></div>
+      <div><dt><span class="en">Package</span><span class="zh" lang="zh-CN">软件包</span></dt><dd><span class="en">tutor-benchmark@0.1.0 published</span><span class="zh" lang="zh-CN">已发布 tutor-benchmark@0.1.0</span></dd></div>
+      <div><dt><span class="en">Dataset</span><span class="zh" lang="zh-CN">数据集</span></dt><dd><span class="en">tutor-eval-v0.2a@0.2a.6</span><span class="zh" lang="zh-CN">tutor-eval-v0.2a@0.2a.6</span></dd></div>
+      <div><dt><span class="en">Public cases</span><span class="zh" lang="zh-CN">公开案例</span></dt><dd><span class="en">48 synthetic cases</span><span class="zh" lang="zh-CN">48 个合成案例</span></dd></div>
+      <div class="pending"><dt><span class="en">Public model runs</span><span class="zh" lang="zh-CN">公开模型运行记录</span></dt><dd><span class="en">No calibrated public model runs yet.</span><span class="zh" lang="zh-CN">目前尚无校准后的公开模型运行记录。</span></dd></div>
+      <div class="pending"><dt><span class="en">Calibration</span><span class="zh" lang="zh-CN">校准</span></dt><dd><span class="en">Not completed; results remain preliminary and uncalibrated where applicable.</span><span class="zh" lang="zh-CN">尚未完成；适用情况下，结果仍属于初步且未校准状态。</span></dd></div>
+    </dl>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="about-open-title">
+    <div>
+      <p class="kicker"><span class="en">Open by design</span><span class="zh" lang="zh-CN">从设计上开放</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="about-open-title"><span class="en">A shared resource for the AI tutoring community.</span><span class="zh" lang="zh-CN">面向 AI 教学社区的共享资源。</span></h2>
+      <p class="en jx-p">Teachometry is developed in the open, with separate boundaries for software, authored benchmark content, and the TutorBench name and brand assets.</p><p class="zh jx-p" lang="zh-CN">Teachometry 以开放方式开发，并为软件、人工编写的基准内容以及 TutorBench 名称和品牌资产分别划定边界。</p>
+      <div class="ab-res">
+        <a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/licensing.md" rel="noreferrer"><strong><span class="en">Licensing scope</span><span class="zh" lang="zh-CN">许可范围</span></strong><small><span class="en">Read the boundaries</span><span class="zh" lang="zh-CN">阅读边界说明</span></small><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+        <a href="https://github.com/shuangyan123/tutorbench/blob/main/LICENSE" rel="noreferrer"><strong><span class="en">Software license</span><span class="zh" lang="zh-CN">软件许可</span></strong><small><span class="en">Apache-2.0</span><span class="zh" lang="zh-CN">Apache-2.0</span></small><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+        <a href="https://github.com/shuangyan123/tutorbench/blob/main/LICENSES/CC-BY-4.0.txt" rel="noreferrer"><strong><span class="en">Benchmark content</span><span class="zh" lang="zh-CN">基准内容</span></strong><small><span class="en">CC BY 4.0</span><span class="zh" lang="zh-CN">CC BY 4.0</span></small><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+        <a href="https://github.com/shuangyan123/tutorbench/blob/main/LICENSES/BRAND-POLICY.md" rel="noreferrer"><strong><span class="en">TutorBench Brand Policy</span><span class="zh" lang="zh-CN">TutorBench Brand Policy</span></strong><small><span class="en">Usage guidelines</span><span class="zh" lang="zh-CN">使用指南</span></small><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+        <a href="https://github.com/shuangyan123/tutorbench/blob/main/CONTRIBUTING.md" rel="noreferrer"><strong><span class="en">Contributing</span><span class="zh" lang="zh-CN">贡献指南</span></strong><small><span class="en">Get involved</span><span class="zh" lang="zh-CN">参与项目</span></small><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+        <a href="https://github.com/shuangyan123/tutorbench/blob/main/SECURITY.md" rel="noreferrer"><strong><span class="en">Security</span><span class="zh" lang="zh-CN">安全</span></strong><small><span class="en">Report an issue</span><span class="zh" lang="zh-CN">报告 issue</span></small><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer"><strong><span class="en">GitHub</span><span class="zh" lang="zh-CN">GitHub</span></strong><small><span class="en">View repository</span><span class="zh" lang="zh-CN">查看仓库</span></small><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="jx-close" aria-labelledby="about-close-title">
+    <div class="wrap">
+      <p class="kicker fount-k"><span class="en">Write to us</span><span class="zh" lang="zh-CN">写信给我们</span></p>
+      <h2 id="about-close-title" class="jx-h2"><span class="en">Questions, collaboration, or project feedback.</span><span class="zh" lang="zh-CN">问题、合作，或项目反馈。</span></h2>
+      <p class="cx-actions"><a class="cta cta-ink" href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a class="cta cta-line" href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+  </div>
+</footer>
+
+<script src="../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "About — Teachometry", zh: "关于 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

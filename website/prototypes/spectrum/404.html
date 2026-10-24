@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Page not found — Teachometry</title>
+<meta name="description" content="The requested page is not part of the public Teachometry site.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="spectrum.css">
+<link rel="stylesheet" href="journal.css">
+<link rel="stylesheet" href="about.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var root = document.documentElement;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="index.html"><img src="assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="index.html#methods" class="nav-tb"><img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+</header>
+
+<main id="main" class="nf">
+  <div class="wrap">
+    <article class="nf-slip" aria-labelledby="not-found-title">
+      <div class="nf-top kicker"><span><span class="en">Erratum</span><span class="zh" lang="zh-CN">勘误</span></span><span>Teachometry · <span class="en">Developer Preview</span><span class="zh" lang="zh-CN">开发者预览</span></span></div>
+      <span class="nf-num" aria-hidden="true">404</span>
+      <h1 id="not-found-title"><span class="visually-hidden">404 · </span><span class="en">This trail doesn’t lead to a public artifact.</span><span class="zh" lang="zh-CN">这条路径没有通向公开产物。</span></h1>
+      <dl class="nf-err">
+        <dt><span class="en">Missing</span><span class="zh" lang="zh-CN">缺页</span></dt><dd><span class="en">The page you’re looking for isn’t part of the public Teachometry site.</span><span class="zh" lang="zh-CN">你正在寻找的页面不属于 Teachometry 的公开网站。</span></dd>
+        <dt><span class="en">Likely cause</span><span class="zh" lang="zh-CN">可能原因</span></dt><dd><span class="en">You might have followed an outdated link or typed the address incorrectly.</span><span class="zh" lang="zh-CN">你可能打开了过期链接，或输入了错误地址。</span></dd>
+      </dl>
+      <nav class="nf-actions" aria-label="Helpful public routes" data-aria-label-en="Helpful public routes" data-aria-label-zh="有用的公开路径">
+        <a class="cta cta-ink" href="index.html"><span class="en">Return home</span><span class="zh" lang="zh-CN">返回首页</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <a class="cta cta-line" href="data/index.html"><span class="en">Explore the benchmark</span><span class="zh" lang="zh-CN">探索基准</span></a>
+        <a class="cta cta-line" href="docs/index.html"><span class="en">Read the documentation</span><span class="zh" lang="zh-CN">阅读文档</span></a>
+      </nav>
+    </article>
+  </div>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+  </div>
+</footer>
+
+<script src="spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Page not found — Teachometry", zh: "页面未找到 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>
