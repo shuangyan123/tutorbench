@@ -76,7 +76,7 @@ ${scripts.map((js) => `<script src="${prefix}${js}"></script>\n`).join("")}<scri
     var T = { en: ${JSON.stringify(title)}, zh: ${JSON.stringify(titleZh)} };
     function apply() {
       var zh = document.documentElement.getAttribute("data-lang") === "zh";
-      document.title = zh ? T.zh : T.en;
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
       Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
     }
     apply(); document.addEventListener("langchange", apply);

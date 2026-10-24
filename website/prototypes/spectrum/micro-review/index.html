@@ -19,9 +19,11 @@
 <script>
   // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
   (function () {
-    var q = new URLSearchParams(location.search).get("lang");
-    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
     var root = document.documentElement;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with data-route-lang
+    var fixed = root.getAttribute("data-route-lang");
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = fixed ? fixed === "zh" : q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
     root.setAttribute("data-lang", zh ? "zh" : "en");
     root.lang = zh ? "zh-CN" : "en";
     if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
@@ -211,7 +213,7 @@
       </div>
     </div>
     <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
-    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
   </div>
 </footer>
 
@@ -223,7 +225,7 @@
     var T = { en: "Micro-Review — Teachometry", zh: "微评审体验 — Teachometry" };
     function apply() {
       var zh = document.documentElement.getAttribute("data-lang") === "zh";
-      document.title = zh ? T.zh : T.en;
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
       Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
     }
     apply(); document.addEventListener("langchange", apply);

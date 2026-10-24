@@ -56,6 +56,9 @@
   /* ------------------------------------------------------------ 1 language */
   var langListeners = [];
   function setLang(next) {
+    // published site: each language has its own URL, so the toggle goes to the other page
+    var alt = root.getAttribute("data-alt-href");
+    if (alt) { location.href = alt + location.hash; return; }
     root.setAttribute("data-lang", next);
     root.lang = next === "zh" ? "zh-CN" : "en";
     try {

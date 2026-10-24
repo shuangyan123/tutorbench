@@ -20,7 +20,9 @@
   // the eyepiece is at most ~520 CSS px wide on phones and small tablets: there a 1000px set
   // looks the same and weighs about half as much
   var small = Math.min(window.innerWidth, window.innerHeight * 1.25) <= 700;
-  var DIR = small ? "assets/cover-m/" : "assets/cover/";
+  // frames sit next to this script, wherever the page itself lives (/ or /zh-cn/)
+  var BASE = (document.currentScript && document.currentScript.src || "").replace(/[^/]*$/, "");
+  var DIR = BASE + (small ? "assets/cover-m/" : "assets/cover/");
 
   function reduced() {
     return root.getAttribute("data-motion") === "reduce" ||
