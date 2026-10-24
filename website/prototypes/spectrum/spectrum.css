@@ -155,7 +155,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .nav a:hover { color: var(--ink); }
 .bar-end { justify-self: end; display: flex; align-items: center; gap: 10px; }
 .lang { background: rgba(255, 255, 255, .4); border: 1px solid var(--hair-2); border-radius: 999px; height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; font: 500 12.5px/1 var(--f-ui); cursor: pointer; }
-.lang-opt { opacity: .42; }
+.lang-opt { opacity: .62; }   /* the other language stays readable (4.5:1) */
 .lang-sep { opacity: .3; }
 :root[data-lang="zh"] .lang-opt[data-opt="zh"], :root[data-lang="en"] .lang-opt[data-opt="en"] { opacity: 1; }
 .run-btn { height: 32px; padding: 0 13px 0 15px; border-radius: 999px; background: var(--ink); color: var(--bg); display: inline-flex; align-items: center; gap: 8px; font: 500 12.5px/1 var(--f-ui); white-space: nowrap; }
@@ -258,6 +258,18 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .hero-corner { animation-delay: 2.3s; }
 .hero-hint { animation-delay: 2.8s; }
 @keyframes rise { to { opacity: 1; transform: none; } }
+/* The glass panel comes in with its first line. Until then it stays hidden, so the web fonts, which
+   arrive just after the first paint, settle the copy's height before anyone sees the panel move. */
+.hero-copy { visibility: hidden; animation: panel-in .9s cubic-bezier(.2, .7, .2, 1) 1.45s forwards; }
+@keyframes panel-in {
+  from { visibility: visible; background-color: rgba(214, 222, 242, 0); border-color: rgba(255, 255, 255, 0);
+    box-shadow: 0 24px 60px -30px rgba(30, 40, 90, 0), inset 0 1px 0 rgba(255, 255, 255, 0);
+    backdrop-filter: blur(0) saturate(1); -webkit-backdrop-filter: blur(0) saturate(1); }
+  to { visibility: visible; }
+}
+/* Below the cover, the home page's sections are laid out only as they come near the screen, so a
+   phone paints the cover without first setting the whole issue. */
+.hero ~ .sec { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
 
 /* ---------------------------------------------------------------- photo plates (full bleed) */
 .photo-plate { margin: 0; background: var(--frame); padding: clamp(12px, 2.6vw, 36px) max(clamp(12px, 2.6vw, 36px), env(safe-area-inset-right, 0px)) 0 max(clamp(12px, 2.6vw, 36px), env(safe-area-inset-left, 0px)); }
@@ -423,6 +435,8 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .proof-key b { font: 400 16px/1 var(--f-text); color: var(--ink-2); }
 /* without a scroll position (phones, reduced motion) every mark shows at once */
 [data-disp][data-mode="static"] .m { background-size: 100% 100%; }
+/* without the scrolling figure nothing lights the scale, so on phones every band reads at full strength */
+[data-disp][data-mode="static"] .proof-scale li { opacity: 1; }
 [data-disp][data-mode="static"] .strike { text-decoration-color: var(--c0); }
 [data-disp][data-mode="static"] .fix, [data-disp][data-mode="static"] .tag { display: inline-flex; }
 .readings { display: grid; gap: clamp(40px, 5vw, 64px); min-width: 0; }
@@ -585,7 +599,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .term-bar p { margin-left: 10px; font: 400 12px/1 var(--f-mono); color: #8c8f98; flex: 1; }
 .term-bar button { background: none; color: #e6e7ea; border: 1px solid rgba(255, 255, 255, .25); border-radius: 5px; height: 28px; padding: 0 10px; font: 500 12px/1 var(--f-ui); cursor: pointer; }
 .term pre { margin: 0; padding: 20px 22px 24px; overflow-x: auto; font: 400 14px/1.75 var(--f-mono); color: #e6e7ea; }
-.term .c { color: #6c707b; }
+.term .c { color: #8c8f98; }
 
 /* ---------------------------------------------------------------- notes */
 .notes { padding-top: 0; }
@@ -673,6 +687,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .hero-copy > *, .hero-corner, .hero-hint { animation: none; opacity: 1; transform: none; }
+  .hero-copy { animation: none; visibility: visible; }
   [data-reveal] { transform: none; transition: none; }
   .rail::after { --beam: 1; transition: none; }
   .hero { height: auto; }
@@ -680,6 +695,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
   .masthead { margin-top: 0; }
 }
 :root[data-motion="reduce"] .hero-copy > *, :root[data-motion="reduce"] .hero-corner, :root[data-motion="reduce"] .hero-hint { animation: none; opacity: 1; transform: none; }
+:root[data-motion="reduce"] .hero-copy { animation: none; visibility: visible; }
 :root[data-motion="reduce"] [data-reveal] { transform: none; transition: none; }
 :root[data-motion="reduce"] .rail::after { --beam: 1; transition: none; }
 :root[data-motion="reduce"] { scroll-behavior: auto; }

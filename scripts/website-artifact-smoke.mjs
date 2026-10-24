@@ -65,6 +65,9 @@ const requiredFiles = [
   "public-data/trials.json",
   // the published Spectrum site (website/prototypes/spectrum)
   "spectrum.css",
+  "fonts.css",
+  "assets/fonts/noto-serif-sc.woff2",
+  "assets/fonts/noto-sans-sc.woff2",
   "spectrum.js",
   "cover.js",
   "assets/cover/K_000.webp",

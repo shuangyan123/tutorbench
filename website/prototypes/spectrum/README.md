@@ -37,6 +37,16 @@ kept but not shown. Dimension markers are five Blender cut gems (`assets/gems/`,
 `render/gems.py`): ruby oval, citrine pear, emerald step cut, sapphire cushion, amethyst trillion,
 each rendered in three IOR passes for fire. The earlier glass beads (`assets/beads/`) show with `#beads`. Two GPT photographs open §2 and §3 as framed
 plates, captioned as generated illustrations.
+Fonts and speed. The site serves its own fonts (`fonts.css`, `assets/fonts/`, all SIL OFL): the
+same Google Fonts files, limited to the weights the pages use and cut to the characters they contain
+(the Chinese faces hold only the ~1,100 characters on the pages). `tools/build-fonts.py` rebuilds
+them; `tests/spectrum-site.test.ts` fails when a page gains a Chinese character the fonts lack. On a
+first visit the page paints in the reader's own fonts and `fonts.css` is switched on right after the
+first paint (the head script in `index.html`); once the fonts are cached, later pages load them up
+front. Below the cover, the home page's sections use `content-visibility: auto`, so a phone lays
+out only the first screen. The build strips comments and spare whitespace from the stylesheets.
+Checked with Lighthouse (mobile): 91–99 across the sections, 98 on the Chinese home page.
+
 Display headings are set in Cormorant Garamond (OFL; chosen over Bodoni Moda and Instrument
 Serif as free alternatives to Kessler, which needs a commercial licence). `#bodoni` /
 `#instrument` (or `?serif=`) switch the face for comparison; `?display=grotesk` sets Geist.
