@@ -579,6 +579,10 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 
 /* ---------------------------------------------------------------- footer / colophon */
 .foot { border-top: 1px solid var(--ink); padding-block: 40px 36px; }
+.foot .wrap { position: relative; }
+/* the engraved seal, stamped at the foot of the colophon like a press mark */
+.foot-seal { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: -6px; width: 112px; height: auto; transform: rotate(-9deg); opacity: .78; mix-blend-mode: multiply; pointer-events: none; }
+@media (max-width: 760px) { .foot-seal { position: static; display: block; width: 92px; margin: 28px 0 6px auto; } }
 .foot-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.6fr); gap: 32px; font-size: 14px; }
 .foot-word { font-family: "Instrument Serif", serif; font-size: 44px; line-height: 1; letter-spacing: -.02em; color: var(--ink); }
 .foot-grid nav, .colophon { display: grid; gap: 10px; align-content: start; }
