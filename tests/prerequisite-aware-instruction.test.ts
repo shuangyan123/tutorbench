@@ -7,7 +7,7 @@ import { tutorScenarioSuiteToTutorEvalDataset } from "../src/datasets/real-world
 import { toTutorTurnInput } from "../src/contracts/tutor-eval.js";
 
 const suiteUrl = new URL(
-  "../scenarios/experimental/prerequisite-aware-instruction-v0.1/suite.json",
+  "../../scenarios/experimental/prerequisite-aware-instruction-v0.1/suite.json",
   import.meta.url,
 );
 
@@ -92,5 +92,5 @@ test("contrived unsupported misconception reference cannot bypass evidence valid
   unknown.evaluatorReferenceState.misconceptions = [
     { statement: "Unobserved misconception", evidenceLearnerTurns: [2] },
   ];
-  assert.throws(() => parseTutorScenarioSuiteVNext(invalid), /tutor_scenario_vnext_invalid/);
+  assert.throws(() => parseTutorScenarioSuiteVNext(invalid), (error: unknown) =>\n    error instanceof Error && "code" in error && error.code === "tutor_scenario_vnext_invalid",\n  );
 });
