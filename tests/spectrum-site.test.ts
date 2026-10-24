@@ -1,0 +1,135 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, posix } from "node:path";
+import { buildWebsite } from "../src/cli/website-build.js";
+
+// The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
+// generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
+// link and asset must resolve inside the published folder.
+
+const SITE_URL = "https://example.org/tb";
+const BASE = "/tb";
+let root = "";
+let spectrum = "";
+let legacy = "";
+
+async function htmlFiles(directory: string, prefix = ""): Promise<string[]> {
+  const files: string[] = [];
+  for (const entry of await readdir(join(directory, prefix), { withFileTypes: true })) {
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) files.push(...(await htmlFiles(directory, relative)));
+    else if (entry.name.endsWith(".html")) files.push(relative);
+  }
+  return files;
+}
+
+async function isFile(path: string): Promise<boolean> {
+  try {
+    return (await stat(path)).isFile();
+  } catch {
+    return false;
+  }
+}
+
+const page = (path: string): Promise<string> => readFile(join(spectrum, path), "utf8");
+
+test.before(async () => {
+  root = await mkdtemp(join(tmpdir(), "tutorbench-spectrum-site-"));
+  spectrum = join(root, "spectrum");
+  legacy = join(root, "legacy");
+  await buildWebsite({ outputDirectory: spectrum, siteUrl: SITE_URL, basePath: BASE, site: "spectrum" });
+  await buildWebsite({ outputDirectory: legacy, siteUrl: SITE_URL, basePath: BASE });
+});
+
+test.after(async () => {
+  await rm(root, { recursive: true, force: true });
+});
+
+test("every existing page URL is still published, in English and Chinese", async () => {
+  const published = new Set(await htmlFiles(spectrum));
+  const existing = (await htmlFiles(legacy)).filter((file) => !file.startsWith("spectrum/"));
+  assert.ok(existing.length > 120);
+  for (const file of existing) assert.ok(published.has(file), `missing ${file}`);
+  assert.ok(published.has("zh-cn/models/[modelId]/index.html"));
+  assert.ok(!published.has("journal-sample.html"));
+  assert.deepEqual((await htmlFiles(spectrum)).filter((file) => file.startsWith("spectrum/")), ["spectrum/index.html"]);
+});
+
+test("public data and discovery files are unchanged by the redesign", async () => {
+  for (const file of ["benchmark.json", "cases.json", "models.json", "trials.json"]) {
+    assert.equal(
+      await readFile(join(spectrum, "public-data", file), "utf8"),
+      await readFile(join(legacy, "public-data", file), "utf8"),
+    );
+  }
+  for (const file of ["robots.txt", "sitemap.xml"]) {
+    assert.equal(await readFile(join(spectrum, file), "utf8"), await readFile(join(legacy, file), "utf8"));
+  }
+});
+
+test("each page keeps its route's title, description, robots and canonical metadata", async () => {
+  for (const file of ["index.html", "about/index.html", "zh-cn/index.html", "zh-cn/blog/index.html", "data/cases/fraction-misconception-001/index.html"]) {
+    const html = await page(file);
+    const before = await readFile(join(legacy, file), "utf8");
+    for (const pattern of [/<title>[^<]*<\/title>/u, /<meta name="description" content="[^"]*">/u, /<meta name="robots" content="[^"]*">/u, /<link rel="canonical" href="[^"]*">/u]) {
+      assert.equal(html.match(pattern)?.[0], before.match(pattern)?.[0], `${file} ${pattern}`);
+    }
+    assert.doesNotMatch(html, /Design prototype|设计原型|Teachometry · Spectrum/u);
+  }
+  const home = await page("index.html");
+  assert.match(home, /<title>Teachometry — Test how AI tutors behave before you ship them\.<\/title>/u);
+  assert.match(home, /<meta name="robots" content="index,follow/u);
+  assert.match(home, /<link rel="canonical" href="https:\/\/example\.org\/tb\/">/u);
+  assert.match(home, /<html lang="en" data-lang="en" data-route-lang="en" data-alt-href="zh-cn\/">/u);
+  const zhHome = await page("zh-cn/index.html");
+  assert.match(zhHome, /<html lang="zh-CN" data-lang="zh" data-route-lang="zh" data-alt-href="\.\.\/">/u);
+  assert.match(zhHome, /<link rel="canonical" href="https:\/\/example\.org\/tb\/zh-cn\/">/u);
+  assert.match(await page("models/[modelId]/index.html"), /<meta name="robots" content="noindex,follow">/u);
+});
+
+test("template routes without a page of their own redirect, and the preview path points home", async () => {
+  assert.match(await page("data/trials/[trialId]/index.html"), /http-equiv="refresh" content="0; url=\.\.\/"/u);
+  assert.match(await page("zh-cn/data/trials/[trialId]/index.html"), /http-equiv="refresh" content="0; url=\.\.\/"/u);
+  assert.match(await page("spectrum/index.html"), /http-equiv="refresh" content="0; url=\.\.\/"/u);
+});
+
+test("every link and asset in every page resolves inside the published site", async () => {
+  const files = await htmlFiles(spectrum);
+  let checked = 0;
+  for (const file of files) {
+    const html = (await page(file)).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gu, (script) => script.replace(/>[\s\S]*<\/script>$/u, "></script>"));
+    const urls = [...html.matchAll(/\s(?:href|src)="([^"]*)"/gu)].map((match) => match[1] ?? "");
+    for (const srcset of html.matchAll(/\ssrcset="([^"]*)"/gu)) {
+      urls.push(...(srcset[1] ?? "").split(",").map((candidate) => candidate.trim().split(/\s+/u)[0] ?? ""));
+    }
+    for (const url of urls) {
+      if (url === "" || /^(?:#|[a-z][a-z0-9+.-]*:)/iu.test(url)) continue;
+      const path = decodeURI(url.replace(/[?#].*$/u, ""));
+      let target: string;
+      if (path.startsWith("/")) {
+        assert.ok(path.startsWith(`${BASE}/`), `${file}: ${url} is outside the base path`);
+        target = path.slice(BASE.length + 1);
+      } else {
+        // the 404 page is served at any depth, so its URLs must not be relative
+        assert.ok(!file.endsWith("404.html"), `${file}: relative URL ${url}`);
+        target = posix.normalize(posix.join(posix.dirname(file), path));
+      }
+      if (target === "." || target === "") target = "index.html";
+      else if (target.endsWith("/") || !posix.basename(target).includes(".")) target = posix.join(target, "index.html");
+      assert.ok(!target.startsWith(".."), `${file}: ${url} leaves the site`);
+      assert.ok(await isFile(join(spectrum, target)), `${file}: ${url} -> ${target} does not exist`);
+      checked += 1;
+    }
+  }
+  assert.ok(checked > 5000, `only ${checked} references checked`);
+});
+
+test("product facts stay on the published pages", async () => {
+  const contact = await page("contact/index.html");
+  assert.match(contact, /shuangyan12341234@gmail\.com/u);
+  assert.match(contact, /https:\/\/x\.com\/1Shuangyan36877/u);
+  assert.match(await page("leaderboard/index.html"), /No calibrated public model runs yet\./u);
+  assert.match(await page("zh-cn/micro-review/index.html"), /<html lang="zh-CN"/u);
+});

@@ -1,9 +1,17 @@
-# Spectrum — Teachometry homepage prototype
+# Spectrum — the Teachometry website
 
-Design prototype for the Teachometry website overhaul (direction A, "Spectrum / 分光").
-It is a standalone static page. `npm run website:build` copies it as-is to `/spectrum/`, a
-noindex preview next to the generated site (render scripts, tools and the unused earlier cover
-sequences are left out). It does not replace the generated homepage or any other route.
+The Teachometry website (direction A, "Spectrum / 分光"): one static, bilingual page per route.
+`npm run website:build` publishes it as the public site (`src/cli/spectrum-site.ts`): every page
+is written in English at its route and in Chinese under `/zh-cn/`, with the search metadata
+(title, description, robots, Open Graph, canonical, hreflang, structured data) of the existing
+generated page for that route. Render scripts, tools, `journal-sample.html` and the unused earlier
+cover sequences are left out. `TUTOR_BENCHMARK_SITE=legacy npm run website:build` builds the
+generated pages instead (they also stay in use for the private audit build).
+
+Language: on the published site the URL decides (`/zh-cn/` is Chinese). A reader whose browser
+is set to Chinese and who lands on an English URL is sent to the Chinese page; the toggle opens
+the other language's URL and the choice is remembered. In this folder, `?lang=` or the toggle
+switches in place.
 
 Open it with any static server from this folder:
 
