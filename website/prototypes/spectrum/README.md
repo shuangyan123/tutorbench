@@ -1,8 +1,9 @@
 # Spectrum — Teachometry homepage prototype
 
 Design prototype for the Teachometry website overhaul (direction A, "Spectrum / 分光").
-It is a standalone static page. It is **not** part of `npm run website:build`, is not
-deployed by the Pages workflow, and does not replace any live route.
+It is a standalone static page. `npm run website:build` copies it as-is to `/spectrum/`, a
+noindex preview next to the generated site (render scripts, tools and the unused earlier cover
+sequences are left out). It does not replace the generated homepage or any other route.
 
 Open it with any static server from this folder:
 

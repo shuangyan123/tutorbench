@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -226,6 +226,29 @@ interface LocalAuditBuildData {
   readonly reviewTranslation?: ReviewTranslationArtifact;
 }
 
+// The Spectrum homepage redesign ships as a static preview at /spectrum/ (noindex) so it can be
+// reviewed on the real host before it replaces the generated homepage. Render scripts, tools and
+// the unused earlier cover sequences stay in the repository only.
+const spectrumPrototypeRoot = join(websiteRoot, "prototypes", "spectrum");
+function isSpectrumPreviewFile(relativePath: string): boolean {
+  const [top] = relativePath.split("/");
+  if (top === "render" || top === "tools" || relativePath === "README.md") return false;
+  return !/^assets\/cover\/(?!K_)/.test(relativePath);
+}
+
+async function copySpectrumPreview(outputDirectory: string): Promise<void> {
+  const entries = await readdir(spectrumPrototypeRoot, { recursive: true, withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    const sourcePath = join(entry.parentPath, entry.name);
+    const relativePath = sourcePath.slice(spectrumPrototypeRoot.length + 1).replaceAll("\\", "/");
+    if (!isSpectrumPreviewFile(relativePath)) continue;
+    const destination = join(outputDirectory, "spectrum", relativePath);
+    await mkdir(dirname(destination), { recursive: true });
+    await copyFile(sourcePath, destination);
+  }
+}
+
 function routePages(
   artifacts: PublicBenchmarkArtifacts,
   audit: LocalAuditBuildData | undefined,
@@ -376,6 +399,9 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
     await copyFile(join(websiteRoot, "src", "assets", asset), destination);
   }
   await copyBrandAssets(outputDirectory);
+  if (options.evaluationPath === undefined) {
+    await copySpectrumPreview(outputDirectory);
+  }
   await writeJson(outputDirectory, "benchmark.json", artifacts.benchmark);
   await writeJson(outputDirectory, "cases.json", artifacts.cases);
   await writeJson(outputDirectory, "models.json", artifacts.models);
