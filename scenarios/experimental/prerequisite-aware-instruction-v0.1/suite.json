@@ -1,0 +1,643 @@
+{
+  "schemaVersion": 3,
+  "id": "prerequisite-aware-instruction-v0.1",
+  "version": "0.1.0",
+  "title": "Prerequisite-Aware Instructional Adaptation (Synthetic Pilot)",
+  "description": "Public synthetic, author-owned research checkpoints testing evidence-calibrated prerequisite explanations and fading. Experimental, uncalibrated, non-canonical; not sourced from any design partner.",
+  "healthTaxonomyVersion": "0.1.0",
+  "scenarios": [
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pai-unknown-cause",
+        "version": "0.1.0",
+        "title": "Incorrect sum with unknown error cause",
+        "suiteId": "prerequisite-aware-instruction-v0.1"
+      },
+      "description": "Only the wrong numerical answer is visible; the tutor has no evidence for a particular hidden cause.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "meaning of fractional units and fraction addition",
+        "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+        "learnerLevel": "upper primary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I got 1/3 + 1/4 = 2/7. Is that right?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pai-unknown-cause",
+          "turnIndex": 1,
+          "expectedDecision": "ask_diagnostic_question",
+          "expectedBehavior": "Explain that 2/7 is not the correct sum and provide a concise correction or ask for the key step; do not diagnose a specific missing prerequisite as established fact.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pai-unknown-cause-math",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Correctly reject 2/7 as the sum of 1/3 and 1/4.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-unknown-cause_math",
+                "title": "Incorrect sum affirmed",
+                "severity": "minor",
+                "observedBehavior": "The tutor praises or repeats the incorrect result as correct.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Correctly reject 2/7 as the sum of 1/3 and 1/4."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-unknown-cause/next-response"
+                ],
+                "confidence": 0.6
+              }
+            },
+            {
+              "rubricId": "pai-unknown-cause-uncertainty",
+              "category": "diagnosis",
+              "dimension": "learner_diagnosis",
+              "criterion": "Avoid asserting that the learner lacks the meaning of denominator, whole, or equivalent fractions without evidence for that particular cause.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-unknown-cause_uncertainty",
+                "title": "Unsupported diagnosis",
+                "severity": "minor",
+                "observedBehavior": "The tutor asserts an unobserved root cause of the learner's error as established.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Avoid asserting that the learner lacks the meaning of denominator, whole, or equivalent fractions without evidence for that particular cause."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-unknown-cause/next-response"
+                ],
+                "confidence": 0.6
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pai-whole-undefined",
+        "version": "0.1.0",
+        "title": "Unfamiliar prerequisite term in an explanation",
+        "suiteId": "prerequisite-aware-instruction-v0.1"
+      },
+      "description": "The learner explicitly identifies 'a whole' as a term they do not understand in the tutor's explanation.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "meaning of fractional units and fraction addition",
+        "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+        "learnerLevel": "upper primary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 2,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "Why do we need a denominator?"
+          },
+          {
+            "role": "assistant",
+            "content": "A denominator tells how many equal parts a whole has been split into."
+          },
+          {
+            "role": "user",
+            "content": "What does 'a whole' mean? I do not know what that word means here."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pai-whole-undefined",
+          "turnIndex": 2,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Explain the chosen whole using a familiar object (such as one sheet of paper or one entire pizza), without assuming the learner already knows the word; connect it back to equal parts without launching into unrelated abstractions.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pai-whole-undefined-concrete",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Explain 'a whole' as the chosen entire object or collection using one concrete example that the learner could identify.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-whole-undefined_concrete",
+                "title": "Prerequisite left unexplained",
+                "severity": "minor",
+                "observedBehavior": "The reply only repeats 'a whole' or replaces it with equally inaccessible jargon.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Explain 'a whole' as the chosen entire object or collection using one concrete example that the learner could identify."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-whole-undefined/next-response"
+                ],
+                "confidence": 0.6
+              }
+            },
+            {
+              "rubricId": "pai-whole-undefined-depth",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Respond to the learner's explicit term-level question before continuing with denominator arithmetic.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-whole-undefined_depth",
+                "title": "Explanation level not adapted",
+                "severity": "minor",
+                "observedBehavior": "The tutor ignores the clarified prerequisite question and repeats the original abstract definition.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Respond to the learner's explicit term-level question before continuing with denominator arithmetic."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-whole-undefined/next-response"
+                ],
+                "confidence": 0.6
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pai-rule-misconception",
+        "version": "0.1.0",
+        "title": "Evidenced incorrect fraction-addition rule",
+        "suiteId": "prerequisite-aware-instruction-v0.1"
+      },
+      "description": "The learner explains a general but incorrect rule rather than just producing a wrong answer.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "meaning of fractional units and fraction addition",
+        "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+        "learnerLevel": "upper primary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "a fraction represents parts of a chosen whole"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "The learner believes fractions are added by separately adding numerators and denominators.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ]
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I know a denominator tells how many equal parts the whole has. I always add top numbers and bottom numbers separately, so 1/3 + 1/4 is 2/7. That rule must work for any fractions."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pai-rule-misconception",
+          "turnIndex": 1,
+          "expectedDecision": "probe_understanding",
+          "expectedBehavior": "Address the stated rule with a diagnostic counterexample or equal-unit comparison, rather than restarting the meaning of a whole; do not affirm the incorrect rule.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pai-rule-misconception-reference",
+              "category": "diagnosis",
+              "dimension": "learner_diagnosis",
+              "criterion": "Identify the explicitly stated separate-numerator-and-denominator addition rule as the problem, without inventing a different cause.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-rule-misconception_reference",
+                "title": "Expressed misconception ignored",
+                "severity": "minor",
+                "observedBehavior": "The reply ignores the learner's explicit rule or diagnoses a different unsupported cause.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Identify the explicitly stated separate-numerator-and-denominator addition rule as the problem, without inventing a different cause."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-rule-misconception/next-response"
+                ],
+                "confidence": 0.6
+              }
+            },
+            {
+              "rubricId": "pai-rule-misconception-counterexample",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Use a mathematically sound counterexample, equal-unit representation, or targeted comparison to explain why the stated addition rule fails.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-rule-misconception_counterexample",
+                "title": "Rule not challenged",
+                "severity": "minor",
+                "observedBehavior": "The reply only supplies the correct answer or repeats 'use a common denominator' with no explanation of why the rule is wrong.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Use a mathematically sound counterexample, equal-unit representation, or targeted comparison to explain why the stated addition rule fails."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-rule-misconception/next-response"
+                ],
+                "confidence": 0.6
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pai-after-progress",
+        "version": "0.1.0",
+        "title": "Move on after evidence of local conceptual progress",
+        "suiteId": "prerequisite-aware-instruction-v0.1"
+      },
+      "description": "The learner can restate the selected-whole idea after a concrete explanation, and now asks about equal parts. This is local evidence, not proof of mastery.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "meaning of fractional units and fraction addition",
+        "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+        "learnerLevel": "upper primary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 2,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "What do you mean by 'a whole' in the denominator explanation?"
+          },
+          {
+            "role": "assistant",
+            "content": "Think of one full sheet of paper. We can choose the entire sheet as the whole and then divide that sheet into equal pieces."
+          },
+          {
+            "role": "user",
+            "content": "Okay, the whole is all of the sheet before we cut it. But why do the pieces have to be equal?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pai-after-progress",
+          "turnIndex": 2,
+          "expectedDecision": "fade_support",
+          "expectedBehavior": "Build on the learner's locally demonstrated meaning of 'whole' and explain equal-sized parts, possibly with a concrete comparison; do not keep defining 'whole', and do not declare the learner has mastered fractions.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pai-after-progress-fade",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Use the learner's paraphrase as local evidence to move from 'whole' to why parts must be equal, rather than repeating the prior definition.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-after-progress_fade",
+                "title": "Assistance not faded",
+                "severity": "minor",
+                "observedBehavior": "The tutor restarts the meaning of a whole without answering the new equal-parts question.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Use the learner's paraphrase as local evidence to move from 'whole' to why parts must be equal, rather than repeating the prior definition."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-after-progress/next-response"
+                ],
+                "confidence": 0.6
+              }
+            },
+            {
+              "rubricId": "pai-after-progress-next",
+              "category": "actionability",
+              "dimension": "intervention_strategy",
+              "criterion": "Provide a concrete next example, distinction, or question that makes equal-sized parts understandable and actionable.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-after-progress_next",
+                "title": "No accessible next step",
+                "severity": "minor",
+                "observedBehavior": "The reply offers only generic approval or declares mastery without addressing equal parts.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Provide a concrete next example, distinction, or question that makes equal-sized parts understandable and actionable."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-after-progress/next-response"
+                ],
+                "confidence": 0.6
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pai-known-foundation",
+        "version": "0.1.0",
+        "title": "Do not re-teach an already evidenced prerequisite",
+        "suiteId": "prerequisite-aware-instruction-v0.1"
+      },
+      "description": "The learner shows understanding of the whole and equal parts and asks for the method of adding unlike denominators.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "meaning of fractional units and fraction addition",
+        "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+        "learnerLevel": "upper primary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "whole as chosen reference unit",
+          "equal-sized fractional parts"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I know that 1/3 and 1/4 use the same whole split into different-sized equal parts. How can I rewrite them to add them?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pai-known-foundation",
+          "turnIndex": 1,
+          "expectedDecision": "fade_support",
+          "expectedBehavior": "Move to rewriting both fractions in common-sized units and offer a usable next step; avoid explaining from scratch what 'a whole' means.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pai-known-foundation-reuse",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Respect the learner's explicit knowledge of the whole and equal-sized parts, rather than restarting introductory definitions.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-known-foundation_reuse",
+                "title": "Known foundation ignored",
+                "severity": "minor",
+                "observedBehavior": "The tutor teaches the definition of whole again instead of using the learner's evidenced starting point.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Respect the learner's explicit knowledge of the whole and equal-sized parts, rather than restarting introductory definitions."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-known-foundation/next-response"
+                ],
+                "confidence": 0.6
+              }
+            },
+            {
+              "rubricId": "pai-known-foundation-scaffold",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Offer a correct, focused next step toward common-sized units for adding 1/3 and 1/4.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pai-known-foundation_scaffold",
+                "title": "Common-unit scaffold absent",
+                "severity": "minor",
+                "observedBehavior": "The response never connects the already-known fraction units to a method of finding compatible units.",
+                "diagnosis": "The observed response did not match the evidenced prerequisite and instructional decision boundary in this authored synthetic checkpoint.",
+                "impact": "The learner may receive an explanation at an inaccessible level, unnecessary repetition, or an unsupported diagnosis.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The tutor may not be conditioning its explanation on the learner's latest observable reasoning and prerequisite signals.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Compare the response against the learner's explicit statements and check this one behavior: Offer a correct, focused next step toward common-sized units for adding 1/3 and 1/4."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Consider tying the next explanation depth to observable learner turns, not an assumed global ability label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pai-known-foundation/next-response"
+                ],
+                "confidence": 0.6
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
