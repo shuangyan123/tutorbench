@@ -4,6 +4,8 @@ import { extname, resolve, join } from "node:path";
 const outputDirectory = resolve(process.cwd(), process.argv[2] ?? "website/dist");
 const requiredFiles = [
   "assets/home.css",
+  "assets/letter.css",
+  "assets/letter.js",
   "assets/about.css",
   "assets/blog.css",
   "assets/models.css",

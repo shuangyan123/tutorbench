@@ -104,6 +104,29 @@ artifact, use `npm run website:build -- -- --evaluation <path> --output
 website/private-dist --locale zh-CN`. The default Pages build never loads that
 path and never emits private evaluation content.
 
+## Home opening letter
+
+A first visit to Home opens a short letter from Teachometry before Home: a
+sealed envelope the visitor opens, a reader-paced letter about three long-term
+hopes for education, and a transition into Home. It is brand writing, not
+evidence, and it says TutorBench cannot yet show learning gains. It is a native
+modal `<dialog>` rendered before the header (`SitePage.prelude`) with a small
+inline script that opens it before first paint only for a first Home visit.
+JavaScript off, reduced motion, storage that cannot be read or written, repeat
+visits, and every other route go straight to the page. Skip and Escape work
+even if `assets/letter.js` never loads, and if it never marks
+`<html data-letter-ready>` the letter closes at `DOMContentLoaded`. Back and
+Forward follow `#letter`, even back to back (each opening is a session settled
+when the dialog closes, so a late `close` event cannot touch a newer letter),
+and a page restored from the back/forward cache shows the letter only when its
+URL asks for it. `scripts/website-letter-checks.mjs` (run by the hit test)
+covers layout at 320-1440 px with doubled text, every line of letter text
+measured as a text `Range`, contrast, history including fast Back/Forward, and
+these failure modes. The only state is `localStorage`
+`teachometry-letter-v1 = "1"`. The Home entry "A letter to learners" and any
+`#letter` link reopen it. `letter.css` and `letter.js` load only on Home. See
+`docs/home-letter-opening.md` for the concept, full copy, and open decisions.
+
 ## Reference-led homepage
 
 The homepage uses the supplied September 2026 art direction: an ivory/forest

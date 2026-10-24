@@ -387,6 +387,8 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   await writeFile(join(outputDirectory, "assets", "styles.css"), stylesheet, "utf8");
   await writeFile(join(outputDirectory, "assets", "site.js"), clientScript, "utf8");
   await copyFile(join(websiteRoot, "src", "home.css"), join(outputDirectory, "assets", "home.css"));
+  await copyFile(join(websiteRoot, "src", "letter.css"), join(outputDirectory, "assets", "letter.css"));
+  await copyFile(join(websiteRoot, "src", "letter.js"), join(outputDirectory, "assets", "letter.js"));
   await copyFile(join(websiteRoot, "src", "benchmark.css"), join(outputDirectory, "assets", "benchmark.css"));
   await copyFile(join(websiteRoot, "src", "methodology.css"), join(outputDirectory, "assets", "methodology.css"));
   await copyFile(join(websiteRoot, "src", "results.css"), join(outputDirectory, "assets", "results.css"));

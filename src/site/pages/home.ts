@@ -6,6 +6,7 @@ import { BLOG_POSTS, type BlogPostSummary } from "./blog.js";
 import type { SiteLocale } from "../i18n.js";
 import { formatPublicationDate, formatCasePositionAriaLabel } from "../public-localization-formatters.js";
 import { publicUiCopy, displayTaxonomyLabel } from "../public-localization.js";
+import { renderHomeLetter, renderHomeLetterEntry } from "./home-letter.js";
 
 const dimensions = [
   ["diagnosis", "Diagnosis", "Whether it identifies the learner’s actual error, gap, or reasoning issue.", "Understands learner thinking", "Did it understand the learner?"],
@@ -119,10 +120,11 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: Si
     title: "Teachometry — Test how AI tutors behave before you ship them.",
     description: "Scenario-based evaluation and regression infrastructure for observable AI tutoring behavior. Teachometry Developer Preview.",
     route: "/",
+    prelude: renderHomeLetter(uiLocale),
     content: `<section class="home-hero"><div class="shell home-hero-grid">
       <div class="home-thesis"><p class="eyebrow">Evidence before deployment</p><h1>Test how AI tutors<br><em>behave</em> before<br><span>you ship them.</span></h1><p class="home-lede">With TutorBench, Teachometry turns authored learning situations into reproducible Tutor Health evaluations: inspect teaching decisions, diagnose concrete failures, and keep the evidence needed to fix and retest them.</p>${renderHomeEntryPoints()}<div class="home-features"><span>${icon("leaf")} Open source</span><span>${icon("book")} Evidence-first</span><span>${icon("adaptation")} Developer Preview</span></div></div>
       <div class="case-walkthrough" data-case-walkthrough data-initial-case="${initialIndex}"><div class="case-controls"><button type="button" aria-label="Previous case" data-case-prev>${icon("left")}</button><button type="button" aria-label="Next case" data-case-next>${icon("right")}</button></div>${cases.cases.map((item, index) => renderCase(item, index, cases.cases.length, index === initialIndex, uiLocale)).join("")}<span class="visually-hidden" aria-live="polite" data-case-announcement></span></div>
-    </div><div class="shell hero-foot"><a class="scroll-cue" href="#dimensions"><span>${icon("arrow")}</span>Scroll to explore</a><p class="handwritten hero-note">Evidence for<br>human-centered AI tutoring.</p></div></section>
+    </div><div class="shell hero-foot">${renderHomeLetterEntry(uiLocale)}<a class="scroll-cue" href="#dimensions"><span>${icon("arrow")}</span>Scroll to explore</a><p class="handwritten hero-note">Evidence for<br>human-centered AI tutoring.</p></div></section>
     ${renderDimensions()}
     <section class="home-data" aria-labelledby="home-data-title">${renderFoliage(["left-near"])}<div class="shell home-data-grid">
       <div class="home-data-statement"><p class="eyebrow">Measurement infrastructure for AI tutoring</p><h2 id="home-data-title">Open data.<br>Transparent evaluation.<br><em>Observable behavior.</em></h2><a class="button data-link" href="/data/">Explore the data ${icon("arrow")}</a></div>
