@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Classroom Does Not Need 30 Robots · Teachometry Journal</title>
+<meta name="description" content="Why one-to-one AI tutoring may need a new classroom interface: paper-like digital writing, private voice channels, supervised mastery checks, and evidence-rich practice.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var root = document.documentElement;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../index.html#dispersion"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../index.html#plates"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html" aria-current="page"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+  <header class="essay-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><a class="issue" href="../index.html"><span class="en">Journal · Essay 2 of 4</span><span class="zh" lang="zh-CN">期刊 · 第 2 篇，共 4 篇</span></a><span class="rule" aria-hidden="true"></span><span><span class="en">Perspective</span><span class="zh" lang="zh-CN">观点</span></span><time datetime="2026-09-28"><span class="en">September 28, 2026</span><span class="zh" lang="zh-CN">2026年9月28日</span></time></p>
+        <h1 class="essay-title"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></h1>
+        <p class="en essay-dek">The future classroom may not need a robot teacher. It may need a private Tutor channel at every desk and a learning surface that can preserve how understanding develops.</p><p class="zh essay-dek" lang="zh-CN">未来课堂可能不需要一个机器人老师，而需要每张课桌都有一条私人的 Tutor 通道，以及一个能够保留“理解如何形成”的学习表面。</p>
+        <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">12 sections · about 7 min</span><span class="zh" lang="zh-CN">12 节 · 约 7 分钟</span></span></p>
+      </div>
+      <figure class="cover-plate">
+        <img src="../../assets/journal/hooks.webp" alt="A classroom coat rail of identical pegs along a painted block wall; one holds a mustard knitted scarf." width="900" height="1100" data-alt-en="A classroom coat rail of identical pegs along a painted block wall; one holds a mustard knitted scarf." data-alt-zh="教室砖墙上一排一模一样的挂钩，其中一个挂着一条芥末黄的针织围巾。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">A row of identical pegs, one scarf. Rendered in Blender.</span><span class="zh" lang="zh-CN">一排一样的挂钩，一条围巾。Blender 渲染。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap essay-body">
+    <nav class="essay-toc" aria-label="On this page">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <ol>
+        <li><a href="#one-robot-still-scales-like-one-teacher"><span class="en">One robot still scales like one teacher</span><span class="zh" lang="zh-CN">一个机器人仍然只能像一个老师那样扩展</span></a></li>
+        <li><a href="#voice-matters-but-classrooms-are-shared-acoustic-spaces"><span class="en">Voice matters, but classrooms are shared acoustic spaces</span><span class="zh" lang="zh-CN">语音很重要，但课堂是共享声学空间</span></a></li>
+        <li><a href="#the-learning-surface-should-feel-more-like-paper-than-a-tablet"><span class="en">The learning surface should feel more like paper than a tablet</span><span class="zh" lang="zh-CN">学习界面应该更像纸，而不是平板电脑</span></a></li>
+        <li><a href="#record-events-instead-of-asking-ai-to-guess-them"><span class="en">Record events instead of asking AI to guess them</span><span class="zh" lang="zh-CN">记录事件，而不是让 AI 去猜</span></a></li>
+        <li><a href="#a-pause-is-an-observation-not-a-diagnosis"><span class="en">A pause is an observation, not a diagnosis</span><span class="zh" lang="zh-CN">停顿是观察，不是诊断</span></a></li>
+        <li><a href="#attempts-need-an-explicit-contract"><span class="en">Attempts need an explicit contract</span><span class="zh" lang="zh-CN">尝试次数需要明确契约</span></a></li>
+        <li><a href="#practice-can-become-the-input-to-the-next-lesson"><span class="en">Practice can become the input to the next lesson</span><span class="zh" lang="zh-CN">练习可以成为下一节课的输入</span></a></li>
+        <li><a href="#let-homework-be-learning-and-move-verification-into-class"><span class="en">Let homework be learning and move verification into class</span><span class="zh" lang="zh-CN">让作业用于学习，把验证移回课堂</span></a></li>
+        <li><a href="#assessment-can-become-a-daily-loop-instead-of-a-distant-event"><span class="en">Assessment can become a daily loop instead of a distant event</span><span class="zh" lang="zh-CN">评估可以成为每日循环，而不是遥远事件</span></a></li>
+        <li><a href="#teachers-become-orchestrators-of-parallel-tutoring"><span class="en">Teachers become orchestrators of parallel tutoring</span><span class="zh" lang="zh-CN">教师变成并行教学的协调者</span></a></li>
+        <li><a href="#the-product-may-be-a-digital-exercise-book-not-another-tablet"><span class="en">The product may be a digital exercise book, not another tablet</span><span class="zh" lang="zh-CN">产品可能是一册数字练习本，而不是另一台平板</span></a></li>
+        <li><a href="#the-larger-question-is-not-how-to-put-ai-into-school"><span class="en">The larger question is not how to put AI into school</span><span class="zh" lang="zh-CN">更大的问题不是如何把 AI 塞进学校</span></a></li>
+      </ol>
+    </nav>
+    <article class="essay-text">
+      <div class="prose">
+        <h2 id="one-robot-still-scales-like-one-teacher"><span class="no">§1</span><span><span class="en">One robot still scales like one teacher</span><span class="zh" lang="zh-CN">一个机器人仍然只能像一个老师那样扩展</span></span></h2>
+        <p class="en first">Embodied AI makes it tempting to imagine the future classroom as a room with a robotic teacher at the front. But replacing a human teacher with one machine does not solve the underlying capacity problem. Thirty learners would still be sharing one public channel of attention.</p><p class="zh first" lang="zh-CN">具身 AI 很容易让人把未来课堂想象成：教室前面站着一个机器人老师。但把人类老师换成一台机器，并没有解决底层的容量问题。三十名学生依然共享同一条公开注意力通道。</p>
+        <p class="en">If AI is going to make one-to-one teaching genuinely scalable, the important change is not that the teacher acquires a body. It is that every learner gains a private instructional channel while the classroom remains a shared social space.</p><p class="zh" lang="zh-CN">如果 AI 真正要让一对一教学可扩展，关键变化不是“老师拥有了一个机器人身体”，而是每个学生都获得一条私人的教学通道，同时课堂继续保持共享的社会空间。</p>
+        <aside class="callout">
+          <p class="kicker"><span class="en">Design question</span><span class="zh" lang="zh-CN">设计问题</span></p>
+          <h3><span class="en">Do not replicate the teacher. Redesign the learning interface.</span><span class="zh" lang="zh-CN">不要复制老师，而要重新设计学习界面。</span></h3>
+          <p class="en">The useful unit may be a private Tutor channel at every desk, not a single embodied system at the front of the room.</p><p class="zh" lang="zh-CN">真正有用的基本单元，可能是每张课桌上一条私人的 Tutor 通道，而不是教室前方的一套具身系统。</p>
+        </aside>
+        <blockquote class="pull"><span class="en">The future classroom may not need thirty robots. It may need thirty private learning channels.</span><span class="zh" lang="zh-CN">未来课堂可能不需要三十个机器人，而需要三十条私人的学习通道。</span></blockquote>
+        <h2 id="voice-matters-but-classrooms-are-shared-acoustic-spaces"><span class="no">§2</span><span><span class="en">Voice matters, but classrooms are shared acoustic spaces</span><span class="zh" lang="zh-CN">语音很重要，但课堂是共享声学空间</span></span></h2>
+        <p class="en">Speech is an unusually efficient interface for tutoring. A learner can ask why a step is wrong, describe uncertainty, or answer a question much faster than by typing. Voice also preserves some of the immediacy of real tutoring.</p><p class="zh" lang="zh-CN">语音是效率很高的教学接口。学生可以比打字更快地追问某一步为什么错、描述自己的不确定，或直接回答问题。语音也保留了一部分真实辅导的即时感。</p>
+        <p class="en">But a classroom with thirty continuous voice conversations would be difficult to concentrate in. The practical answer is probably not voice-only tutoring. Writing and visual work should remain the default channel, with short, low-volume voice exchanges used when speech has a clear advantage.</p><p class="zh" lang="zh-CN">但如果一个教室里持续同时进行三十段语音对话，几乎很难集中注意力。现实答案大概不是“纯语音教学”。书写和视觉工作应当仍是默认通道，只在语音确实有明显优势时使用短时、低音量的语音交流。</p>
+        <p class="en">A near-mouth microphone, push-to-talk interaction, and private audio output could make voice useful without turning every desk into an always-on call.</p><p class="zh" lang="zh-CN">近嘴麦克风、按住说话和私密音频输出，可以让语音发挥作用，同时避免每张课桌都变成一通永远在线的电话。</p>
+        <h2 id="the-learning-surface-should-feel-more-like-paper-than-a-tablet"><span class="no">§3</span><span><span class="en">The learning surface should feel more like paper than a tablet</span><span class="zh" lang="zh-CN">学习界面应该更像纸，而不是平板电脑</span></span></h2>
+        <p class="en">Many classroom tasks are not conversations. Students solve equations, sketch diagrams, annotate text, derive formulas, and work through practice sets. For those activities, handwriting is part of the thinking process.</p><p class="zh" lang="zh-CN">很多课堂任务并不是对话。学生要解方程、画图、批注文本、推导公式、完成练习。对于这些活动，手写本身就是思考过程的一部分。</p>
+        <p class="en">A conventional screen can add friction through scrolling, zooming, small writing areas, glass-like pen feel, notifications, and application switching. A learning device should therefore be optimized for writing first: a large low-distraction surface, a passive stylus, minimal interface chrome, and as little reason as possible to think about the operating system.</p><p class="zh" lang="zh-CN">传统屏幕会通过滚动、缩放、狭小书写区、玻璃笔感、通知和应用切换增加摩擦。因此，学习设备应当首先为书写优化：更大的低干扰表面、被动式触控笔、最少的界面 chrome，并尽可能让学生无需意识到操作系统的存在。</p>
+        <p class="en">The goal is not to make students feel that they are using a computer. The goal is to let them feel that they are doing exercises while the system quietly preserves the structure of the work.</p><p class="zh" lang="zh-CN">目标不是让学生感觉“我正在使用一台电脑”，而是让他们感觉“我正在做练习”，同时系统在后台安静地保留工作结构。</p>
+        <h2 id="record-events-instead-of-asking-ai-to-guess-them"><span class="no">§4</span><span><span class="en">Record events instead of asking AI to guess them</span><span class="zh" lang="zh-CN">记录事件，而不是让 AI 去猜</span></span></h2>
+        <p class="en">The most important architectural choice is to separate facts that the system can know directly from interpretations that require inference. A digital ink engine can know when the pen touched the surface, where it moved, how long a stroke lasted, which tool was active, and which strokes were later erased or undone.</p><p class="zh" lang="zh-CN">最重要的架构选择，是把系统能够直接知道的事实与必须推理才能得到的解释分开。数字墨迹引擎可以直接知道笔何时接触表面、移动到哪里、一个笔画持续多久、当时使用什么工具，以及哪些笔画后来被擦除或撤销。</p>
+        <p class="en">Page and question identity should also be structural whenever possible. If the worksheet is already digital, each question can own a known region and identifier. The Tutor should not need a vision model to rediscover information the document system already possesses.</p><p class="zh" lang="zh-CN">页面与题目身份也应尽可能结构化。如果练习本身已经数字化，每道题都可以拥有已知区域和标识符。Tutor 不应该再依赖视觉模型去重新发现文档系统本来就已经知道的信息。</p>
+        <p class="en">Likewise, the problem statement itself should be structured data. OCR and visual parsing are useful when importing legacy worksheets, but they should not be the permanent representation of a task once the material has entered the learning system.</p><p class="zh" lang="zh-CN">同样，题目文本本身也应当是结构化数据。OCR 和视觉解析在导入传统纸质材料时有价值，但一旦材料进入学习系统，就不应继续把它们当作任务的永久表示。</p>
+        <figure class="fig fig-steps"><ol class="steps"><li><span class="st-l"><span class="en">Ink events</span><span class="zh" lang="zh-CN">墨迹事件</span></span><span class="st-t"><span class="en">strokes, coordinates, timestamps, pressure, erase, undo, and redo.</span><span class="zh" lang="zh-CN">笔画、坐标、时间戳、压力、擦除、撤销与重做。</span></span></li><li><span class="st-l"><span class="en">Document structure</span><span class="zh" lang="zh-CN">文档结构</span></span><span class="st-t"><span class="en">worksheet, page, question, learning objective, and response region.</span><span class="zh" lang="zh-CN">练习、页面、题目、学习目标和作答区域。</span></span></li><li><span class="st-l"><span class="en">Semantic interpretation</span><span class="zh" lang="zh-CN">语义解释</span></span><span class="st-t"><span class="en">recognized expressions, diagrams, written language, and reasoning steps.</span><span class="zh" lang="zh-CN">识别出的表达式、图表、书面语言与推理步骤。</span></span></li><li><span class="st-l"><span class="en">Learning interpretation</span><span class="zh" lang="zh-CN">学习解释</span></span><span class="st-t"><span class="en">progress, repeated error, possible misconception, need for support, and mastery evidence.</span><span class="zh" lang="zh-CN">学习进展、重复错误、可能的错误概念、支持需求与掌握证据。</span></span></li></ol></figure>
+        <h2 id="a-pause-is-an-observation-not-a-diagnosis"><span class="no">§5</span><span><span class="en">A pause is an observation, not a diagnosis</span><span class="zh" lang="zh-CN">停顿是观察，不是诊断</span></span></h2>
+        <p class="en">Rich interaction data creates a new risk: over-interpreting behavior. Thirty seconds without a pen event is a fact. It does not automatically mean that the learner is stuck. The learner may be reading, checking, calculating mentally, or simply thinking.</p><p class="zh" lang="zh-CN">丰富的交互数据会带来一个新风险：过度解释行为。三十秒没有笔事件，是一个事实；它并不自动意味着学生卡住了。学生可能正在阅读、检查、心算，或者只是思考。</p>
+        <p class="en">The same distinction applies to erasing. What matters pedagogically is not that an eraser crossed the screen seven times, but that the learner replaced one mathematical claim with another. Raw events should be preserved, while higher-level interpretations remain revisable.</p><p class="zh" lang="zh-CN">擦除也一样。教学上真正重要的不是橡皮在屏幕上划过了七次，而是学生把一个数学判断替换成了另一个。原始事件应当保留，而更高层的解释必须保持可修订。</p>
+        <p class="en">A stronger stuck signal might combine a long pause, repeated rewriting of the same expression, the same error appearing again, lack of forward progress, and an explicit help request. The system should be able to say what it observed separately from what it inferred.</p><p class="zh" lang="zh-CN">更强的“卡住”信号可以结合长时间停顿、反复改写同一表达式、相同错误再次出现、缺乏前进进展，以及明确的求助请求。系统应当能够把“观察到了什么”和“推断了什么”分开说明。</p>
+        <h2 id="attempts-need-an-explicit-contract"><span class="no">§6</span><span><span class="en">Attempts need an explicit contract</span><span class="zh" lang="zh-CN">尝试次数需要明确契约</span></span></h2>
+        <p class="en">Attempt count sounds objective until a learner edits the same solution repeatedly. One changed digit is not necessarily a new attempt, and a large rewrite may or may not represent a restart.</p><p class="zh" lang="zh-CN">“尝试次数”听起来很客观，直到学生不断编辑同一个答案。改一个数字未必算一次新尝试，大幅改写也未必意味着从头开始。</p>
+        <p class="en">The cleanest first implementation may include a tiny explicit action such as Check or Submit. When the learner commits a solution, the system gets an auditable attempt boundary. More sophisticated segmentation can later infer candidate boundaries from major rewrites, but the raw event history should remain the source record.</p><p class="zh" lang="zh-CN">最清晰的第一版实现，可以加入一个很小的显式动作，例如 Check 或 Submit。当学生提交一个解答时，系统就获得一条可审计的尝试边界。以后可以用更复杂的分段算法从大幅改写中推断候选边界，但原始事件历史仍应保留为源记录。</p>
+        <p class="en">This matters because two learners can end on the same correct answer while producing very different evidence. One may solve independently in thirty seconds. Another may erase two incorrect answers, request a hint, pause for a minute, and then succeed. Final-answer grading treats them as identical; a learning system should not.</p><p class="zh" lang="zh-CN">这很重要，因为两个学生最终得到同一个正确答案，却可能产生完全不同的学习证据。一个人可能三十秒独立完成，另一个人可能擦掉两个错误答案、请求提示、停顿一分钟后才成功。只看最终答案会把他们视为相同，但学习系统不应该这样。</p>
+        <figure class="fig" id="fig1">
+          <div class="exhibit">
+            <div class="ex-col">
+              <p class="en d-who">Learner 1</p><p class="zh d-who" lang="zh-CN">学生甲</p>
+              <ol class="ex-log">
+                <li><span class="en">Solves independently</span><span class="zh" lang="zh-CN">独立完成</span></li>
+                <li class="ex-time"><span class="en">about thirty seconds</span><span class="zh" lang="zh-CN">约三十秒</span></li>
+                <li class="ex-ok"><span class="en">Correct</span><span class="zh" lang="zh-CN">正确</span></li>
+              </ol>
+            </div>
+            <div class="ex-col">
+              <p class="en d-who">Learner 2</p><p class="zh d-who" lang="zh-CN">学生乙</p>
+              <ol class="ex-log">
+                <li class="ex-x"><span class="en">Incorrect answer, erased</span><span class="zh" lang="zh-CN">错误答案，擦掉</span></li>
+                <li class="ex-x"><span class="en">Incorrect answer, erased</span><span class="zh" lang="zh-CN">错误答案，擦掉</span></li>
+                <li><span class="en">Requests a hint</span><span class="zh" lang="zh-CN">请求提示</span></li>
+                <li class="ex-time"><span class="en">pauses for a minute</span><span class="zh" lang="zh-CN">停顿一分钟</span></li>
+                <li class="ex-ok"><span class="en">Correct</span><span class="zh" lang="zh-CN">正确</span></li>
+              </ol>
+            </div>
+            <p class="ex-foot"><span class="en">Final-answer grading: identical</span><span class="zh" lang="zh-CN">只看最终答案：相同</span><span aria-hidden="true">·</span><span class="en">Learning evidence: different</span><span class="zh" lang="zh-CN">学习证据：不同</span></p>
+          </div>
+          <figcaption><b><span class="en">Fig. 1</span><span class="zh" lang="zh-CN">图 1</span></b><span class="en">The two learners described in this section, who end on the same correct answer. Constructed from the essay’s example, not real learner data.</span><span class="zh" lang="zh-CN">本节描述的两位学生，最终答案相同。根据文中例子构造，并非真实学生数据。</span></figcaption>
+        </figure>
+        <h2 id="practice-can-become-the-input-to-the-next-lesson"><span class="no">§7</span><span><span class="en">Practice can become the input to the next lesson</span><span class="zh" lang="zh-CN">练习可以成为下一节课的输入</span></span></h2>
+        <p class="en">Once classroom work is structured as a sequence of questions, attempts, revisions, hints, and outcomes, practice stops being only something to grade. It becomes evidence for planning what the learner should see next.</p><p class="zh" lang="zh-CN">一旦课堂工作被结构化为题目、尝试、修改、提示和结果的序列，练习就不再只是“用来打分的东西”，而会成为决定学生下一步应该看到什么的证据。</p>
+        <p class="en">A score such as 12 out of 15 says relatively little about why three items failed. A richer record can distinguish a stable misconception from a one-off arithmetic slip, a standard form that the learner can solve from a transfer form that still breaks, or a skill that works only after prompting.</p><p class="zh" lang="zh-CN">“15 题做对 12 题”几乎解释不了那三道题为什么错。更丰富的记录可以区分稳定的错误概念和一次性计算失误，也可以区分学生能解决标准题、但迁移题仍会失败，或某项技能只有在提示后才能完成。</p>
+        <p class="en">The next learning set can then be chosen from the actual evidence: a diagnostic example, a targeted representation, a near-transfer problem, an independent problem, and later a retrieval check. Today's exercise becomes part of tomorrow's curriculum.</p><p class="zh" lang="zh-CN">接下来的学习内容可以直接从实际证据中选择：一个诊断例子、一种针对性的表征、一道近迁移题、一道独立题，以及之后的提取练习。今天的练习会成为明天课程的一部分。</p>
+        <h2 id="let-homework-be-learning-and-move-verification-into-class"><span class="no">§8</span><span><span class="en">Let homework be learning and move verification into class</span><span class="zh" lang="zh-CN">让作业用于学习，把验证移回课堂</span></span></h2>
+        <p class="en">Generative AI makes unsupervised homework a weaker source of evidence about independent mastery. Trying to prove that every piece of work completed at home was unaided may become increasingly unrealistic.</p><p class="zh" lang="zh-CN">生成式 AI 让无人监督的家庭作业越来越难以作为“独立掌握”的可靠证据。试图证明每份在家完成的作业都没有得到帮助，会越来越不现实。</p>
+        <p class="en">A more robust design is to separate learning from verification. Outside class, students may use AI, reference material, explanations, and extra practice freely. In class, short supervised checks can establish what the learner can do when those supports are removed.</p><p class="zh" lang="zh-CN">更稳健的设计，是把学习与验证分开。课外可以自由使用 AI、参考资料、解释和额外练习；课堂内通过短时受监督检查，确认移除这些支持后学生真正能独立完成什么。</p>
+        <aside class="callout">
+          <p class="kicker"><span class="en">Classroom loop</span><span class="zh" lang="zh-CN">课堂循环</span></p>
+          <h3><span class="en">Check → learn → transfer → update.</span><span class="zh" lang="zh-CN">检查 → 学习 → 迁移 → 更新。</span></h3>
+          <p class="en">A short independent check can establish the starting point; adaptive tutoring can respond to the evidence; a second independent transfer task can test whether the learning survives when the Tutor is removed.</p><p class="zh" lang="zh-CN">一次短暂的独立检查可以建立起点；自适应教学根据证据做出回应；第二个独立迁移任务再检查移除 Tutor 后，学习是否仍然成立。</p>
+        </aside>
+        <h2 id="assessment-can-become-a-daily-loop-instead-of-a-distant-event"><span class="no">§9</span><span><span class="en">Assessment can become a daily loop instead of a distant event</span><span class="zh" lang="zh-CN">评估可以成为每日循环，而不是遥远事件</span></span></h2>
+        <p class="en">Supervised verification does not require turning every lesson into a traditional exam. A lesson can begin with a short independent check, move into Tutor-supported learning, and end with a new independent transfer problem.</p><p class="zh" lang="zh-CN">受监督验证并不意味着每节课都要变成传统考试。一节课可以从短暂的独立检查开始，中间进入 Tutor 支持的学习，最后以一道新的独立迁移题结束。</p>
+        <figure class="fig" id="fig2">
+          <ol class="lesson">
+            <li><span class="ls-tag"><span class="en">Tutor off</span><span class="zh" lang="zh-CN">不用 Tutor</span></span><span class="ls-name"><span class="en">Short independent check</span><span class="zh" lang="zh-CN">短暂的独立检查</span></span></li>
+            <li class="on"><span class="ls-tag"><span class="en">Tutor on</span><span class="zh" lang="zh-CN">使用 Tutor</span></span><span class="ls-name"><span class="en">Tutor-supported learning</span><span class="zh" lang="zh-CN">Tutor 支持的学习</span></span></li>
+            <li><span class="ls-tag"><span class="en">Tutor off</span><span class="zh" lang="zh-CN">不用 Tutor</span></span><span class="ls-name"><span class="en">New independent transfer problem</span><span class="zh" lang="zh-CN">一道新的独立迁移题</span></span></li>
+          </ol>
+          <figcaption><b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b><span class="en">One lesson as this section describes it: before, intervention, after, inside the normal school day.</span><span class="zh" lang="zh-CN">本节描述的一节课：在正常上课时间里，完成“之前—干预—之后”的完整序列。</span></figcaption>
+        </figure>
+        <p class="en">That structure creates a compact before-intervention-after sequence inside the normal school day. The important evidence is no longer that the student had a successful conversation with an AI. It is that the student can subsequently perform without the AI.</p><p class="zh" lang="zh-CN">这种结构在正常教学日里形成一个紧凑的“干预前—干预—干预后”序列。重要证据不再是学生和 AI 聊得很顺利，而是之后没有 AI 时学生仍然能完成任务。</p>
+        <p class="en">A school-managed device can make these boundaries explicit by switching between Learn, Practice, and Check modes. The student should not be responsible for deciding when outside assistance is allowed.</p><p class="zh" lang="zh-CN">学校管理的设备可以通过 Learn、Practice 和 Check 模式切换，把这些边界明确化。学生不应自己负责决定什么时候允许外部帮助。</p>
+        <h2 id="teachers-become-orchestrators-of-parallel-tutoring"><span class="no">§10</span><span><span class="en">Teachers become orchestrators of parallel tutoring</span><span class="zh" lang="zh-CN">教师变成并行教学的协调者</span></span></h2>
+        <p class="en">None of this requires removing the teacher from the classroom. It changes where scarce human attention is spent. Instead of repeating the same explanation thirty times, the teacher can see where individual Tutors are succeeding, where learners remain stuck, and where a pattern has become a class-wide problem.</p><p class="zh" lang="zh-CN">这一切都不要求把老师移出课堂。改变的是稀缺人类注意力的使用位置。老师不必把同一个解释重复三十遍，而可以看到哪些个体 Tutor 有效、哪些学生仍然卡住，以及什么时候同一种问题已经变成全班性问题。</p>
+        <p class="en">If eight students show the same misconception, the best intervention may be to pause the individualized flow and teach that idea to the room. AI provides parallel attention; the teacher decides when parallelism should stop.</p><p class="zh" lang="zh-CN">如果八名学生出现同一个错误概念，最佳干预可能是暂时停止个性化流程，向全班统一讲解这个概念。AI 提供并行注意力，老师决定什么时候应该停止并行。</p>
+        <p class="en">The classroom therefore becomes a coordinated system: individual Tutor channels for continuous support, supervised evidence for trustworthy learner state, and human intervention for judgment, shared explanation, safety, motivation, and social coordination.</p><p class="zh" lang="zh-CN">于是课堂变成一个协同系统：个体 Tutor 通道负责持续支持，受监督证据负责建立可信学生状态，人类负责判断、共享讲解、安全、动机与社会协调。</p>
+        <h2 id="the-product-may-be-a-digital-exercise-book-not-another-tablet"><span class="no">§11</span><span><span class="en">The product may be a digital exercise book, not another tablet</span><span class="zh" lang="zh-CN">产品可能是一册数字练习本，而不是另一台平板</span></span></h2>
+        <p class="en">Putting these requirements together suggests a different hardware category: a school-managed digital exercise book or instrumented learning surface. It would prioritize a paper-like writing experience, structured worksheets, persistent ink history, short private voice exchanges, and explicit Tutor-enabled and Tutor-disabled modes.</p><p class="zh" lang="zh-CN">把这些要求放在一起，会得到一种不同的硬件类别：学校管理的数字练习本或可记录的学习表面。它优先考虑纸感书写体验、结构化练习、持久墨迹历史、简短私密语音交流，以及明确的 Tutor 开启/关闭模式。</p>
+        <p class="en">It would not need an app store, social notifications, or an unrestricted browser. The most successful version might be a computer that deliberately hides the fact that it is a computer.</p><p class="zh" lang="zh-CN">它不需要应用商店、社交通知或不受限制的浏览器。最成功的版本，可能反而是一台刻意隐藏“自己是电脑”这件事的电脑。</p>
+        <p class="en">Underneath that simple surface, however, the system could preserve a chain from stroke to revision to attempt to evidence to intervention to independent verification. That chain is more interesting than the device itself because it connects tutoring decisions to observable learner progress.</p><p class="zh" lang="zh-CN">但在这个简单表面之下，系统可以保留一条从笔画到修改、尝试、证据、干预再到独立验证的链条。这条链比设备本身更值得关注，因为它把教学决策连接到可观察的学生进展。</p>
+        <h2 id="the-larger-question-is-not-how-to-put-ai-into-school"><span class="no">§12</span><span><span class="en">The larger question is not how to put AI into school</span><span class="zh" lang="zh-CN">更大的问题不是如何把 AI 塞进学校</span></span></h2>
+        <p class="en">If we preserve the old interface, old homework model, and old evidence model, a powerful AI Tutor can still collapse into a convenient answer machine. The deeper opportunity is to redesign the learning environment around individualized instruction and trustworthy evidence.</p><p class="zh" lang="zh-CN">如果我们保留旧界面、旧作业模式和旧证据模式，再强的 AI Tutor 也可能退化成一个方便的答案机器。更深层的机会，是围绕个性化教学和可信证据重新设计学习环境。</p>
+        <p class="en">That means asking different questions: What should the Tutor do now? How much help is appropriate? When should it stop helping? What changed in the learner's work? Can the learner still perform when the Tutor is removed?</p><p class="zh" lang="zh-CN">这意味着要问不同的问题：Tutor 现在该做什么？帮助到什么程度合适？什么时候应该停止帮助？学生的工作发生了什么变化？移除 Tutor 后，学生还能完成吗？</p>
+        <p class="en">The future classroom may not need thirty robots. It may need thirty private learning channels, one coordinated classroom, and a much better account of what it means to have actually learned.</p><p class="zh" lang="zh-CN">未来课堂可能不需要三十个机器人，而需要三十条私人学习通道、一个被良好协调的课堂，以及一套更清楚的“真正学会了意味着什么”的证据体系。</p>
+        <aside class="callout boundary">
+          <p class="kicker"><span class="en">Evidence boundary</span><span class="zh" lang="zh-CN">证据边界</span></p>
+          
+          <p class="en">This essay is a product and classroom-design hypothesis, not a benchmark result. TutorBench does not currently measure handwriting dynamics, infer learner mastery from ink traces, validate this proposed classroom architecture, or establish learning gains from supervised check / Tutor / transfer loops. Those claims require separate prototype, classroom, usability, and learner-outcome evidence.</p><p class="zh" lang="zh-CN">本文提出的是产品与课堂设计假设，不是基准结果。TutorBench 目前并不测量手写动态，不从墨迹轨迹推断学生掌握程度，也没有验证这里提出的课堂架构，或证明“受监督检查 / Tutor / 迁移”循环带来学习增益。这些主张需要独立的原型、课堂、可用性与学习结果证据。</p>
+        </aside>
+      </div>
+    </article>
+  </div>
+
+  <nav class="wrap essay-nav" aria-label="Article navigation">
+    <a class="prev" href="../when-learning-starts-to-feel-like-failure/index.html"><span class="kicker"><span class="en">Previous article</span><span class="zh" lang="zh-CN">上一篇文章</span></span><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a>
+    <a class="all kicker" href="../index.html"><span class="en">Back to all posts</span><span class="zh" lang="zh-CN">返回全部文章</span></a>
+    <a class="next" href="../why-teaching-does-not-scale/index.html"><span class="kicker"><span class="en">Next article</span><span class="zh" lang="zh-CN">下一篇文章</span></span><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a>
+  </nav>
+
+  <section class="wrap issue-row" aria-labelledby="issue-h">
+    <p class="kicker" id="issue-h"><span class="en">The Journal · 4 essays</span><span class="zh" lang="zh-CN">期刊 · 4 篇文章</span></p>
+    <ol class="issue-cards">
+      <li><a href="../when-learning-starts-to-feel-like-failure/index.html"><img src="../../assets/journal/eraser.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 1</span><span class="zh" lang="zh-CN">第 1 篇</span></span><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a></li>
+      <li aria-current="page"><a href="../the-classroom-does-not-need-30-robots/index.html"><img src="../../assets/journal/hooks.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 2 · reading</span><span class="zh" lang="zh-CN">第 2 篇 · 正在读</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a></li>
+      <li><a href="../why-teaching-does-not-scale/index.html"><img src="../../assets/journal/hourglass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 3</span><span class="zh" lang="zh-CN">第 3 篇</span></span><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a></li>
+      <li><a href="../teaching-and-supervision-are-different-jobs/index.html"><img src="../../assets/journal/chalk.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 4</span><span class="zh" lang="zh-CN">第 4 篇</span></span><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../index.html#results"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../index.html#plates"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../index.html#dispersion"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The Journal covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。期刊封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "The Classroom Does Not Need 30 Robots · Teachometry Journal", zh: "课堂不需要 30 个机器人 · Teachometry 期刊" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

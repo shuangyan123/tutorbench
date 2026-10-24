@@ -540,6 +540,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .essays { border-top: 1px solid var(--ink); }
 .essays a { display: grid; gap: 8px; padding: 22px 0 24px; border-bottom: 1px solid var(--hair); transition: padding .3s; }
 .essays a:hover { padding-left: 10px; }
+.essays-all { margin-top: 22px; }
 .e-meta { display: flex; gap: 14px; font: 400 11px/1.4 var(--f-mono); letter-spacing: .08em; color: var(--ink-3); text-transform: uppercase; }
 .essays h3 { font-family: var(--f-display); font-weight: 400; font-size: clamp(26px, 2.4vw, 36px); line-height: 1.05; }
 :root[data-lang="zh"] .essays h3 { font-weight: 600; font-size: clamp(20px, 1.7vw, 25px); line-height: 1.45; }

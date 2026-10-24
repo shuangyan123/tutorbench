@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Why Teaching Does Not Scale · Teachometry Journal</title>
+<meta name="description" content="Why individualized teaching attention is scarce, what private tutoring reveals, and why AI teaching must be measured before it can be trusted.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var root = document.documentElement;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../index.html#dispersion"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../index.html#plates"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html" aria-current="page"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+  <header class="essay-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><a class="issue" href="../index.html"><span class="en">Journal · Essay 3 of 4</span><span class="zh" lang="zh-CN">期刊 · 第 3 篇，共 4 篇</span></a><span class="rule" aria-hidden="true"></span><span><span class="en">Perspective</span><span class="zh" lang="zh-CN">观点</span></span><time datetime="2026-09-17"><span class="en">September 17, 2026</span><span class="zh" lang="zh-CN">2026年9月17日</span></time></p>
+        <h1 class="essay-title"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></h1>
+        <p class="en essay-dek">The fundamental constraint in education is not access to information. It is access to sustained, individualized teaching attention.</p><p class="zh essay-dek" lang="zh-CN">教育最根本的约束不是信息获取，而是持续、个性化教学注意力的获取。</p>
+        <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">6 sections · about 2 min</span><span class="zh" lang="zh-CN">6 节 · 约 2 分钟</span></span></p>
+      </div>
+      <figure class="cover-plate">
+        <img src="../../assets/journal/hourglass.webp" alt="An hourglass on a wooden desk at night, lit by one warm desk lamp." width="900" height="1100" data-alt-en="An hourglass on a wooden desk at night, lit by one warm desk lamp." data-alt-zh="夜里书桌上的一只沙漏，只有一盏暖色台灯照着。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">One lamp, one neck of sand. Rendered in Blender.</span><span class="zh" lang="zh-CN">一盏灯，一道细细的沙颈。Blender 渲染。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap essay-body">
+    <nav class="essay-toc" aria-label="On this page">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <ol>
+        <li><a href="#the-scarce-resource-is-attention"><span class="en">The scarce resource is attention</span><span class="zh" lang="zh-CN">稀缺资源是注意力</span></a></li>
+        <li><a href="#scores-create-a-powerful-external-structure"><span class="en">Scores create a powerful external structure</span><span class="zh" lang="zh-CN">分数构成强大的外部结构</span></a></li>
+        <li><a href="#private-tutoring-reveals-what-families-are-really-buying"><span class="en">Private tutoring reveals what families are really buying</span><span class="zh" lang="zh-CN">私人辅导揭示了家庭真正购买的是什么</span></a></li>
+        <li><a href="#ai-changes-the-cost-structure-only-if-it-can-actually-teach"><span class="en">AI changes the cost structure only if it can actually teach</span><span class="zh" lang="zh-CN">只有真正会教，AI 才能改变成本结构</span></a></li>
+        <li><a href="#the-standard-cannot-be-the-student-got-the-answer"><span class="en">The standard cannot be “the student got the answer”</span><span class="zh" lang="zh-CN">标准不能只是“学生得到了答案”</span></a></li>
+        <li><a href="#why-teachometry-exists"><span class="en">Why Teachometry exists</span><span class="zh" lang="zh-CN">为什么要做 Teachometry</span></a></li>
+      </ol>
+    </nav>
+    <article class="essay-text">
+      <div class="prose">
+        <h2 id="the-scarce-resource-is-attention"><span class="no">§1</span><span><span class="en">The scarce resource is attention</span><span class="zh" lang="zh-CN">稀缺资源是注意力</span></span></h2>
+        <p class="en first">One teacher can explain an idea to a room, but cannot continuously observe every learner, diagnose every misconception, choose a different explanation for each student, verify genuine understanding, and adjust the next task for everyone at once. That is a capacity constraint even when the teacher is excellent and conscientious.</p><p class="zh first" lang="zh-CN">一名老师可以向全班讲解一个概念，但无法持续观察每个学生、诊断每个错误概念、为每个人选择不同解释、验证真实理解，并同时为所有人调整下一项任务。即使老师非常优秀且尽责，这仍然是容量约束。</p>
+        <p class="en">K12 systems therefore work at the level of groups. They need classrooms to remain orderly, curricula to move forward, exams to be administered, and students to cross common thresholds. Individual optimization is desirable, but it competes with the practical requirement to teach many people at the same time.</p><p class="zh" lang="zh-CN">因此，K12 系统通常在群体层面运作。课堂需要保持秩序，课程要继续推进，考试要被组织，学生要跨越共同门槛。个体优化当然理想，但它必须与“同时教很多人”的现实要求竞争。</p>
+        <figure class="fig fig-wide" id="fig1">
+          <img src="../../assets/journal/classroom.webp" alt="An empty classroom in morning sun, seen from the back corner: thirty desks facing one blackboard." width="1800" height="1000" loading="lazy" data-alt-en="An empty classroom in morning sun, seen from the back corner: thirty desks facing one blackboard." data-alt-zh="清晨阳光里的空教室，从后排角落看去：三十张课桌朝向同一块黑板。">
+          <figcaption><b><span class="en">Fig. 1</span><span class="zh" lang="zh-CN">图 1</span></b><span class="en">Thirty desks, one blackboard. The room is built for one person’s attention to be shared. Rendered in Blender.</span><span class="zh" lang="zh-CN">三十张课桌，一块黑板。整间教室的设计，就是让一个人的注意力被大家分着用。Blender 渲染。</span></figcaption>
+        </figure>
+        <h2 id="scores-create-a-powerful-external-structure"><span class="no">§2</span><span><span class="en">Scores create a powerful external structure</span><span class="zh" lang="zh-CN">分数构成强大的外部结构</span></span></h2>
+        <p class="en">Much K12 learning is not purely voluntary. Families and schools use grades, exams, schedules, expectations, and supervision to make learning happen even when a student is not intrinsically interested in the subject. Students who perform well often receive more recognition and confidence; students who repeatedly fall behind can experience the opposite.</p><p class="zh" lang="zh-CN">大量 K12 学习并非完全自愿。家庭和学校通过成绩、考试、日程、期待和监督，让学习即使在学生没有内在兴趣时也能发生。表现好的学生往往获得更多认可与信心；反复落后的学生则可能经历相反过程。</p>
+        <p class="en">This means an education system is doing at least two jobs at once: teaching, and creating an environment in which learning is difficult to avoid. Any serious AI education system has to understand both jobs.</p><p class="zh" lang="zh-CN">这意味着教育系统至少同时承担两项工作：教学，以及创造一个让学习难以被逃避的环境。任何严肃的 AI 教育系统都必须理解这两项工作。</p>
+        <h2 id="private-tutoring-reveals-what-families-are-really-buying"><span class="no">§3</span><span><span class="en">Private tutoring reveals what families are really buying</span><span class="zh" lang="zh-CN">私人辅导揭示了家庭真正购买的是什么</span></span></h2>
+        <figure class="fig fig-margin" id="fig2">
+          <ol class="ledger"><li><span class="en">Dedicated attention</span><span class="zh" lang="zh-CN">专属注意力</span></li><li><span class="en">Direct accountability to the family</span><span class="zh" lang="zh-CN">对家庭的直接责任</span></li><li><span class="en">Supervision of the student</span><span class="zh" lang="zh-CN">对学生的监督</span></li><li><span class="en">Visible progress</span><span class="zh" lang="zh-CN">可见进步</span></li><li><span class="en">A trust signal: credentials, experience, reputation, past results</span><span class="zh" lang="zh-CN">信任信号：资历、经验、口碑或过去结果</span></li></ol>
+          <figcaption><b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b><span class="en">What a family buys with a private tutor besides the explanation itself, as listed in this section.</span><span class="zh" lang="zh-CN">除了讲解本身，家庭请私人教师时还买到了什么（按本节列举）。</span></figcaption>
+        </figure>
+        <p class="en">A private tutor is valuable not only because the tutor may explain a subject well. The product also includes dedicated attention, direct accountability to the family, supervision of the student, visible progress, and a trust signal built from credentials, experience, reputation, or past results.</p><p class="zh" lang="zh-CN">私人教师的价值不只是“讲得好”。这个产品同时包含专属注意力、对家庭的直接责任、对学生的监督、可见进步，以及由资历、经验、口碑或过去结果建立的信任信号。</p>
+        <p class="en">The expensive part is that all of this is tied to a person's time. High-quality one-to-one attention is difficult to distribute broadly because each additional learner requires another block of human labor.</p><p class="zh" lang="zh-CN">昂贵之处在于，这一切都绑定在人类时间上。高质量的一对一注意力很难大规模分配，因为每增加一个学生，就需要增加一块新的人工劳动时间。</p>
+        <h2 id="ai-changes-the-cost-structure-only-if-it-can-actually-teach"><span class="no">§4</span><span><span class="en">AI changes the cost structure only if it can actually teach</span><span class="zh" lang="zh-CN">只有真正会教，AI 才能改变成本结构</span></span></h2>
+        <p class="en">If an AI system can reliably diagnose a learner, select an appropriate explanation, generate practice, detect false mastery, revisit weak knowledge, adapt over time, and verify learning rather than merely produce answers, then individualized teaching attention becomes much more reproducible.</p><p class="zh" lang="zh-CN">如果 AI 系统能够可靠地诊断学生、选择合适解释、生成练习、识别虚假掌握、回访薄弱知识、随时间适应，并验证学习而不是只生成答案，那么个性化教学注意力就会变得更可复制。</p>
+        <aside class="callout">
+          <p class="kicker"><span class="en">Working hypothesis</span><span class="zh" lang="zh-CN">工作假设</span></p>
+          <h3><span class="en">Teaching could become computationally scalable.</span><span class="zh" lang="zh-CN">教学或许可以通过增加计算资源来扩展。</span></h3>
+          <p class="en">Instead of many students sharing one teacher's limited instructional attention, each student could have a persistent teaching system while human attention is reserved for the tasks that still require human presence and responsibility.</p><p class="zh" lang="zh-CN">与其让许多学生共享一名老师有限的教学注意力，每个学生都可以拥有一个持续存在的教学系统，而人类注意力被保留给仍然需要人类在场与负责的任务。</p>
+        </aside>
+        <h2 id="the-standard-cannot-be-the-student-got-the-answer"><span class="no">§5</span><span><span class="en">The standard cannot be “the student got the answer”</span><span class="zh" lang="zh-CN">标准不能只是“学生得到了答案”</span></span></h2>
+        <p class="en">An AI can make a learner look more capable by doing cognitive work on the learner's behalf. That is not the same as learning. The stronger test is whether the student can retain, transfer, and apply the knowledge after the AI is removed.</p><p class="zh" lang="zh-CN">AI 可以通过替学生完成认知工作，让学生看起来更有能力，但这并不等于学习。更强的检验是：移除 AI 后，学生是否仍能保留、迁移并应用知识。</p>
+        <figure class="fig" id="fig3">
+          <div class="dialog">
+            <p class="en d-who">Learner</p><p class="zh d-who" lang="zh-CN">学生</p>
+            <p class="en d-says">I think <b>1/3 + 1/4 = 2/7</b>. I added the top numbers and the bottom numbers. Is that right?</p><p class="zh d-says" lang="zh-CN">我觉得<b>三分之一加四分之一等于七分之二</b>。我把分子相加，分母也相加。这样对吗？</p>
+            <div class="d-pair">
+              <div class="d-reply">
+                <p class="en d-who">Reply A · answers</p><p class="zh d-who" lang="zh-CN">回复 A · 给答案</p>
+                <p class="en d-says">Yes, that's right! Adding the top numbers and the bottom numbers is how you add fractions. You understand it well.</p><p class="zh d-says" lang="zh-CN">对，完全正确！分数相加就是把分子相加、分母相加。你理解得很好。</p>
+              </div>
+              <div class="d-reply d-teach">
+                <p class="en d-who">Reply B · teaches</p><p class="zh d-who" lang="zh-CN">回复 B · 在教</p>
+                <p class="en d-says">You told me exactly how you got 2/7, which helps. Before we decide: is 2/7 bigger or smaller than 1/3 on its own?</p><p class="zh d-says" lang="zh-CN">你把 2/7 是怎么算出来的说得很清楚，这很有帮助。先别急着下结论：2/7 和单独的 1/3 比，是大还是小？</p>
+              </div>
+            </div>
+          </div>
+          <figcaption><b><span class="en">Fig. 3</span><span class="zh" lang="zh-CN">图 3</span></b><span class="en">The same learner message, two replies. Reply A is the constructed exchange from the homepage; Reply B is constructed for this figure. Neither is the output of a real model, and neither is a TutorBench score.</span><span class="zh" lang="zh-CN">同一条学生消息，两种回复。回复 A 是首页使用的构造对话；回复 B 为本图构造。两者都不是真实模型的输出，也都不是 TutorBench 分数。</span></figcaption>
+        </figure>
+        <p class="en">For that reason, AI education should not be trusted because a model sounds intelligent or because it solves benchmark questions. It should be trusted only to the extent that we can show that its teaching changes the learner in durable and useful ways.</p><p class="zh" lang="zh-CN">因此，我们不应因为模型听起来聪明，或者它能解决基准题，就信任 AI 教育。只有在能够证明它的教学以持久且有用的方式改变了学生时，信任才有依据。</p>
+        <h2 id="why-teachometry-exists"><span class="no">§6</span><span><span class="en">Why Teachometry exists</span><span class="zh" lang="zh-CN">为什么要做 Teachometry</span></span></h2>
+        <p class="en">The long-run question is not simply whether an AI can answer correctly. It is whether an AI can take responsibility for progressively larger parts of teaching. That requires measurement at several levels: observable tutoring behavior, actual learning effectiveness, and eventually instructional autonomy over longer periods.</p><p class="zh" lang="zh-CN">长期问题并不只是 AI 能否回答正确，而是它能否逐步承担越来越大的教学责任。这需要在多个层级上测量：可观察教学行为、真实学习有效性，以及最终跨更长时间尺度的教学自主性。</p>
+        <figure class="fig" id="fig4">
+          <ol class="ladder">
+            <li class="now"><span class="l-no"><span class="en">Level 1</span><span class="zh" lang="zh-CN">第 1 层</span></span><span class="l-name"><span class="en">Observable tutoring behaviour</span><span class="zh" lang="zh-CN">可观察教学行为</span></span><span class="l-note"><span class="en">What TutorBench measures today</span><span class="zh" lang="zh-CN">TutorBench 目前测量的层级</span></span></li>
+            <li><span class="l-no"><span class="en">Level 2</span><span class="zh" lang="zh-CN">第 2 层</span></span><span class="l-name"><span class="en">Actual learning effectiveness</span><span class="zh" lang="zh-CN">真实学习有效性</span></span><span class="l-note"><span class="en">Needs separate empirical validation</span><span class="zh" lang="zh-CN">需要另行实证验证</span></span></li>
+            <li><span class="l-no"><span class="en">Level 3</span><span class="zh" lang="zh-CN">第 3 层</span></span><span class="l-name"><span class="en">Instructional autonomy over longer periods</span><span class="zh" lang="zh-CN">跨更长时间尺度的教学自主性</span></span><span class="l-note"><span class="en">Needs separate empirical validation</span><span class="zh" lang="zh-CN">需要另行实证验证</span></span></li>
+          </ol>
+          <figcaption><b><span class="en">Fig. 4</span><span class="zh" lang="zh-CN">图 4</span></b><span class="en">The three levels of measurement named in this section, and where the current benchmark stands.</span><span class="zh" lang="zh-CN">本节提到的三个测量层级，以及当前基准所处的位置。</span></figcaption>
+        </figure>
+        <p class="en">Teachometry exists to turn those claims into testable questions. The goal is not to assume that AI has already replaced the teacher. The goal is to build the evidence needed to know what it can reliably do, for whom, under what conditions, and where human teaching remains necessary.</p><p class="zh" lang="zh-CN">Teachometry 的存在，就是把这些主张变成可检验的问题。目标不是假设 AI 已经替代教师，而是建立证据，弄清它能可靠地做什么、对谁有效、在什么条件下有效，以及哪里仍然需要人类教学。</p>
+        <aside class="callout boundary">
+          <p class="kicker"><span class="en">Evidence boundary</span><span class="zh" lang="zh-CN">证据边界</span></p>
+          
+          <p class="en">This essay is a project thesis, not a benchmark result. The current benchmark evaluates observable tutoring behavior. Long-term learning gain, retention, transfer, autonomous K12 teaching, and workforce effects require separate empirical validation.</p><p class="zh" lang="zh-CN">本文是项目论点，不是基准结果。当前基准评估可观察教学行为。长期学习增益、知识留存、迁移、自主 K12 教学以及劳动力影响都需要独立的经验验证。</p>
+        </aside>
+      </div>
+    </article>
+  </div>
+
+  <nav class="wrap essay-nav" aria-label="Article navigation">
+    <a class="prev" href="../the-classroom-does-not-need-30-robots/index.html"><span class="kicker"><span class="en">Previous article</span><span class="zh" lang="zh-CN">上一篇文章</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a>
+    <a class="all kicker" href="../index.html"><span class="en">Back to all posts</span><span class="zh" lang="zh-CN">返回全部文章</span></a>
+    <a class="next" href="../teaching-and-supervision-are-different-jobs/index.html"><span class="kicker"><span class="en">Next article</span><span class="zh" lang="zh-CN">下一篇文章</span></span><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a>
+  </nav>
+
+  <section class="wrap issue-row" aria-labelledby="issue-h">
+    <p class="kicker" id="issue-h"><span class="en">The Journal · 4 essays</span><span class="zh" lang="zh-CN">期刊 · 4 篇文章</span></p>
+    <ol class="issue-cards">
+      <li><a href="../when-learning-starts-to-feel-like-failure/index.html"><img src="../../assets/journal/eraser.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 1</span><span class="zh" lang="zh-CN">第 1 篇</span></span><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a></li>
+      <li><a href="../the-classroom-does-not-need-30-robots/index.html"><img src="../../assets/journal/hooks.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 2</span><span class="zh" lang="zh-CN">第 2 篇</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a></li>
+      <li aria-current="page"><a href="../why-teaching-does-not-scale/index.html"><img src="../../assets/journal/hourglass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 3 · reading</span><span class="zh" lang="zh-CN">第 3 篇 · 正在读</span></span><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a></li>
+      <li><a href="../teaching-and-supervision-are-different-jobs/index.html"><img src="../../assets/journal/chalk.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 4</span><span class="zh" lang="zh-CN">第 4 篇</span></span><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../index.html#results"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../index.html#plates"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../index.html#dispersion"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The Journal covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。期刊封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Why Teaching Does Not Scale · Teachometry Journal", zh: "为什么教学难以扩展 · Teachometry 期刊" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>
