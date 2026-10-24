@@ -54,13 +54,26 @@
   })();
 
   /* ------------------------------------------------------------ 1 language */
+  function otherLanguagePath(root) {
+    // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+    // folders the page sits below the site root, so the other address is built from this URL alone
+    var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+    var lang = root.getAttribute("data-route-lang");
+    if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+    var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+    var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+    if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+    var rest = depth ? parts.slice(parts.length - depth) : [];
+    var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+    return "/" + path.join("/") + (path.length ? "/" : "");
+  }
   var langListeners = [];
   function setLang(next) {
     // remember the choice, so the next page (and the next visit) opens in it
     try { window.localStorage.setItem("teachometry-lang", next); } catch { /* storage is optional */ }
     // published site: each language has its own URL, so the toggle goes to the other page
-    var alt = root.getAttribute("data-alt-href");
-    if (alt) { location.href = alt + location.hash; return; }
+    var other = otherLanguagePath(root);
+    if (other) { location.href = location.origin + other; return; }
     root.setAttribute("data-lang", next);
     root.lang = next === "zh" ? "zh-CN" : "en";
     try {

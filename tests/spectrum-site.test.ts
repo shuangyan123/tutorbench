@@ -82,10 +82,11 @@ test("each page keeps its route's title, description, robots and canonical metad
   assert.match(home, /<title>Teachometry — Test how AI tutors behave before you ship them\.<\/title>/u);
   assert.match(home, /<meta name="robots" content="index,follow/u);
   assert.match(home, /<link rel="canonical" href="https:\/\/example\.org\/tb\/">/u);
-  assert.match(home, /<html lang="en" data-lang="en" data-route-lang="en" data-alt-href="zh-cn\/">/u);
+  assert.match(home, /<html lang="en" data-lang="en" data-route-lang="en" data-route-depth="0">/u);
   const zhHome = await page("zh-cn/index.html");
-  assert.match(zhHome, /<html lang="zh-CN" data-lang="zh" data-route-lang="zh" data-alt-href="\.\.\/">/u);
+  assert.match(zhHome, /<html lang="zh-CN" data-lang="zh" data-route-lang="zh" data-route-depth="0">/u);
   assert.match(zhHome, /<link rel="canonical" href="https:\/\/example\.org\/tb\/zh-cn\/">/u);
+  assert.match(await page("zh-cn/data/cases/index.html"), /<html lang="zh-CN" data-lang="zh" data-route-lang="zh" data-route-depth="2">/u);
   assert.match(await page("models/[modelId]/index.html"), /<meta name="robots" content="noindex,follow">/u);
 });
 

@@ -19,6 +19,20 @@
 <script>
   // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
   (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
     var root = document.documentElement;
     // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
     var q = new URLSearchParams(location.search).get("lang");
@@ -27,10 +41,10 @@
     var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
     var wantZh = q ? q.indexOf("zh") === 0 : saved ? saved === "zh" : browser.indexOf("zh") === 0;
     // the published site has one URL per language (/zh-cn/...): the build marks each page with
-    // data-route-lang and the other language's address; a Chinese reader landing on an English URL is sent across
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
     var fixed = root.getAttribute("data-route-lang");
-    var alt = root.getAttribute("data-alt-href");
-    if (fixed === "en" && wantZh && alt) location.replace(alt + location.hash);
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    if (other) location.replace(location.origin + other);
     var zh = fixed ? fixed === "zh" : wantZh;
     root.setAttribute("data-lang", zh ? "zh" : "en");
     root.lang = zh ? "zh-CN" : "en";

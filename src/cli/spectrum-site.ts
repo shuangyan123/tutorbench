@@ -135,15 +135,16 @@ function counterpart(output: string): string {
 function renderPage(html: string, context: PageContext, head: string): string {
   const metadata = /<title>[\s\S]*?<meta name="robots" content="[^"]*">/u;
   if (!metadata.test(html)) throw new Error(`Spectrum page ${context.source} has no title/description/robots block.`);
-  const target = cleanPage(counterpart(context.output));
-  const relative = posix.relative(posix.dirname(context.output), target);
-  const alternate = target === "" || target.endsWith("/") ? (relative === "" ? "./" : `${relative}/`) : relative;
+  // how many folders the English page sits below the site root: the page builds the other
+  // language's address from its own URL and this number (see otherLanguagePath in spectrum.js)
+  const english = context.zh ? counterpart(context.output) : context.output;
+  const depth = cleanPage(english).split("/").filter((segment) => segment.length > 0).length;
   const language = context.zh ? "zh" : "en";
   // The 404 page answers at any address, so it switches language in place (browser language or the
   // reader's saved choice) instead of sending the reader to the other language's 404.
   const root = context.absolute
     ? `<html lang="${context.zh ? "zh-CN" : "en"}" data-lang="${language}">`
-    : `<html lang="${context.zh ? "zh-CN" : "en"}" data-lang="${language}" data-route-lang="${language}" data-alt-href="${escapeAttribute(alternate)}">`;
+    : `<html lang="${context.zh ? "zh-CN" : "en"}" data-lang="${language}" data-route-lang="${language}" data-route-depth="${depth}">`;
   if (!/<html lang="en" data-lang="en">/u.test(html)) throw new Error(`Spectrum page ${context.source} has an unexpected <html> tag.`);
   return rewriteUrls(
     html.replace(/<html lang="en" data-lang="en">/u, root).replace(metadata, () => head),
