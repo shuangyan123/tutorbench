@@ -42,7 +42,7 @@ function rel(html, prefix) {
   });
 }
 // homepage anchors that now have a page of their own
-const PAGES = { essays: ["blog/index.html", "journal"], dispersion: ["methodology/index.html", "method"], plates: ["data/cases/index.html", "cases"] };
+const PAGES = { essays: ["blog/index.html", "journal"], dispersion: ["methodology/index.html", "method"], plates: ["data/cases/index.html", "cases"], results: ["leaderboard/index.html", "results"] };
 
 export function frame({ prefix, title, titleZh, description, body, current, css = [], scripts = [] }) {
   let head = INDEX.slice(0, INDEX.indexOf("</head>"));

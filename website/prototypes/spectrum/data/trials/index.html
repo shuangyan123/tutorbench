@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Model Trials — Teachometry</title>
+<meta name="description" content="An audit ledger for future public Teachometry model trial evidence.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<link rel="stylesheet" href="../../results.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var root = document.documentElement;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+  <header class="essay-head tr-head">
+    <div class="wrap">
+      <nav class="cd-crumbs kicker" aria-label="Breadcrumb"><a href="../index.html"><span class="en">Data</span><span class="zh" lang="zh-CN">数据</span></a><span aria-hidden="true">›</span><span aria-current="page"><span class="en">Trials</span><span class="zh" lang="zh-CN">评测记录</span></span></nav>
+      <p class="essay-meta kicker"><span class="issue"><span class="en">Benchmark explorer</span><span class="zh" lang="zh-CN">基准浏览器</span></span><span class="rule" aria-hidden="true"></span><span class="nocase">tutor-eval-v0.2a@0.2a.6</span></p>
+      <h1 class="essay-title"><span class="en">Model Trials</span><span class="zh" lang="zh-CN">模型评测记录</span></h1>
+      <p class="essay-dek"><span class="en">A transparent audit trail.</span><span class="zh" lang="zh-CN">透明的审计轨迹。</span></p>
+      <p class="en hm-desc">Future public trial records will connect model identity, case identity, execution context, Tutor response, evaluator evidence, and sanitized operational metrics.</p><p class="zh hm-desc" lang="zh-CN">未来公开评测记录会连接模型身份、案例身份、执行语境、Tutor 回复、评估器证据和经过清理的运行指标。</p>
+      <dl class="tr-stats"><div><dd>0</dd><dt><span class="en">Public trials</span><span class="zh" lang="zh-CN">公开评测记录</span></dt><small><span class="en">No released runs yet</span><span class="zh" lang="zh-CN">尚无已发布运行</span></small></div><div><dd>0</dd><dt><span class="en">Public model profiles</span><span class="zh" lang="zh-CN">公开模型档案</span></dt><small><span class="en">Reserved</span><span class="zh" lang="zh-CN">预留</span></small></div><div><dd>48</dd><dt><span class="en">Public cases</span><span class="zh" lang="zh-CN">公开案例</span></dt><small>tutor-eval-v0.2a</small></div><div><dd><span class="en">Not available</span><span class="zh" lang="zh-CN">不可用</span></dd><dt><span class="en">Trial publication</span><span class="zh" lang="zh-CN">评测记录发布</span></dt><small><span class="en">Public artifact state</span><span class="zh" lang="zh-CN">公开产物状态</span></small></div></dl>
+      <p class="tr-motto"><span class="en">Shared evidence.<br>Stronger teaching.</span><span class="zh" lang="zh-CN">共享证据，<br>改进教学。</span></p>
+    </div>
+  </header>
+
+  <nav class="wrap tr-tabs kicker" aria-label="Public trial sections"><a href="#trial-ledger" aria-current="true"><span class="en">All trials</span><span class="zh" lang="zh-CN">全部评测记录</span></a><a href="#trial-fields"><span class="en">Fields</span><span class="zh" lang="zh-CN">字段</span></a><a href="../../methodology/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a></nav>
+
+  <section class="wrap rs-sec" id="trial-ledger" aria-labelledby="ledger-title">
+    <p class="kicker"><span class="en">Audit ledger</span><span class="zh" lang="zh-CN">审计 ledger</span></p>
+    <h2 id="ledger-title" class="jx-h2"><span class="en">No row without a public artifact.</span><span class="zh" lang="zh-CN">没有公开产物，就没有记录行。</span></h2>
+    <p class="en jx-p">Each future row will be an addressable evidence record. The current ledger is intentionally empty.</p><p class="zh jx-p" lang="zh-CN">未来每一行都将是一条可寻址的证据记录。当前 ledger 有意保持为空。</p>
+    <div class="tbl-wrap rs-table-wrap" tabindex="0" aria-label="Scrollable public trial ledger">
+      <table class="rs-table tr-ledger"><caption><span class="en">Future public trial ledger</span><span class="zh" lang="zh-CN">未来公开评测记录台账</span></caption>
+        <thead><tr><th scope="col"><span class="en">Trial ID</span><span class="zh" lang="zh-CN">评测记录 ID</span></th><th scope="col"><span class="en">Model ID</span><span class="zh" lang="zh-CN">模型 ID</span></th><th scope="col"><span class="en">Case ID</span><span class="zh" lang="zh-CN">案例 ID</span></th><th scope="col"><span class="en">Run index</span><span class="zh" lang="zh-CN">运行索引</span></th><th scope="col"><span class="en">Evidence status</span><span class="zh" lang="zh-CN">证据状态</span></th></tr></thead>
+        <tbody><tr class="rs-ghost" aria-hidden="true"><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td colspan="5"><div class="rs-empty"><b><span class="en">No public trials yet.</span><span class="zh" lang="zh-CN">目前暂无公开评测记录。</span></b><p><span class="en">No public model trials available yet.</span><span class="zh" lang="zh-CN">目前尚无公开模型评测记录。</span> <span class="en">Check back after public model runs are released.</span><span class="zh" lang="zh-CN">公开模型运行发布后再来查看。</span></p></div></td></tr></tbody>
+      </table>
+    </div>
+    <p class="rs-swipe"><span class="en">The ledger exposes only the public trial summary identity contract: id, modelId, caseId, and runIndex.</span><span class="zh" lang="zh-CN">该台账只公开评测记录摘要身份契约：id、modelId、caseId 和 runIndex。</span></p>
+  </section>
+
+  <section class="wrap rs-sec" id="trial-fields" aria-labelledby="fields-title">
+    <p class="kicker"><span class="en">Future trial schema</span><span class="zh" lang="zh-CN">未来评测记录结构</span></p>
+    <h2 id="fields-title" class="jx-h2"><span class="en">What a trial includes.</span><span class="zh" lang="zh-CN">一条评测记录包含什么。</span></h2>
+    <p class="en jx-p">These families are derived from the current public trial field contract, not from a model run.</p><p class="zh jx-p" lang="zh-CN">这些类别来自当前公开评测记录字段契约，而不是某次模型运行。</p>
+    <ol class="tr-fams"><li><span class="rs-step">1</span><b><span class="en">Identity &amp; execution</span><span class="zh" lang="zh-CN">身份与执行</span></b><p><span class="en">The versioned identities that make a run addressable.</span><span class="zh" lang="zh-CN">让一次运行可被准确寻址的版本化身份。</span></p><ul><li><code>model</code><span><span class="en">Model identity</span><span class="zh" lang="zh-CN">模型身份</span></span></li><li><code>modelVersion</code><span><span class="en">Model version</span><span class="zh" lang="zh-CN">模型版本</span></span></li><li><code>datasetVersion</code><span><span class="en">Dataset version</span><span class="zh" lang="zh-CN">数据集版本</span></span></li><li><code>caseVersion</code><span><span class="en">Case version</span><span class="zh" lang="zh-CN">案例版本</span></span></li><li><code>runIndex</code><span><span class="en">Run index</span><span class="zh" lang="zh-CN">运行索引</span></span></li></ul></li><li><span class="rs-step">2</span><b><span class="en">Generation traceability</span><span class="zh" lang="zh-CN">生成可追踪性</span></b><p><span class="en">The configuration references needed to reproduce generation.</span><span class="zh" lang="zh-CN">复现生成所需的配置引用。</span></p><ul><li><code>generationSpecId</code><span><span class="en">Generation spec ID</span><span class="zh" lang="zh-CN">生成规格 ID</span></span></li><li><code>generationSpecVersion</code><span><span class="en">Generation spec version</span><span class="zh" lang="zh-CN">生成规格版本</span></span></li><li><code>promptVersion</code><span><span class="en">Prompt version</span><span class="zh" lang="zh-CN">Prompt 版本</span></span></li><li><code>promptSha256</code><span><span class="en">Prompt SHA-256</span><span class="zh" lang="zh-CN">Prompt SHA-256</span></span></li></ul></li><li><span class="rs-step">3</span><b><span class="en">Tutor evidence</span><span class="zh" lang="zh-CN">Tutor 证据</span></b><p><span class="en">The complete public Tutor response for the case.</span><span class="zh" lang="zh-CN">该案例完整的公开 Tutor 回复。</span></p><ul><li><code>tutorResponse</code><span><span class="en">Tutor response</span><span class="zh" lang="zh-CN">Tutor 回复</span></span></li></ul></li><li><span class="rs-step">4</span><b><span class="en">Evaluation evidence</span><span class="zh" lang="zh-CN">评测证据</span></b><p><span class="en">Dimension results and failure evidence attached to the response.</span><span class="zh" lang="zh-CN">与回复关联的维度结果和失败证据。</span></p><ul><li><code>correctness</code><span><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></span></li><li><code>diagnosis</code><span><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></span></li><li><code>guidance</code><span><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></span></li><li><code>adaptation</code><span><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></span></li><li><code>actionability</code><span><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></span></li><li><code>rubricResults</code><span><span class="en">Rubric results</span><span class="zh" lang="zh-CN">评分标准结果</span></span></li><li><code>criticalFailures</code><span><span class="en">Critical failures</span><span class="zh" lang="zh-CN">严重失败</span></span></li><li><code>answerLeakage</code><span><span class="en">Answer leakage</span><span class="zh" lang="zh-CN">答案泄露</span></span></li></ul></li><li><span class="rs-step">5</span><b><span class="en">Judge evidence</span><span class="zh" lang="zh-CN">Judge 证据</span></b><p><span class="en">The evaluator identity and prompt version, when published.</span><span class="zh" lang="zh-CN">发布时包含评估器身份与 prompt 版本。</span></p><ul><li><code>judge</code><span><span class="en">Judge</span><span class="zh" lang="zh-CN">Judge</span></span></li><li><code>judgePromptVersion</code><span><span class="en">Judge prompt version</span><span class="zh" lang="zh-CN">Judge prompt 版本</span></span></li></ul></li><li><span class="rs-step">6</span><b><span class="en">Operational metrics</span><span class="zh" lang="zh-CN">运行指标</span></b><p><span class="en">Sanitized run signals kept distinct from pedagogical scores.</span><span class="zh" lang="zh-CN">经过清理的运行信号与教学评分保持分离。</span></p><ul><li><code>tokens</code><span><span class="en">Tokens</span><span class="zh" lang="zh-CN">token 数</span></span></li><li><code>latency</code><span><span class="en">Latency</span><span class="zh" lang="zh-CN">延迟</span></span></li><li><code>cost</code><span><span class="en">Cost</span><span class="zh" lang="zh-CN">成本</span></span></li></ul></li></ol>
+  </section>
+
+  <section class="wrap rs-sec" aria-labelledby="trace-title">
+    <p class="kicker"><span class="en">Traceability chain</span><span class="zh" lang="zh-CN">可追踪链</span></p>
+    <h2 id="trace-title" class="jx-h2"><span class="en">From benchmark to evidence.</span><span class="zh" lang="zh-CN">从基准走向证据。</span></h2>
+    <p class="en jx-p">Trials remain separate from model profiles and leaderboard eligibility. A future record will link these stages without implying a ranking or teaching-effectiveness claim.</p><p class="zh jx-p" lang="zh-CN">评测记录与模型档案、排行榜资格保持分离。未来记录会连接这些阶段，但不会暗示排名或教学有效性主张。</p>
+    <ol class="tr-chain"><li><b><span class="en">Benchmark version</span><span class="zh" lang="zh-CN">基准版本</span></b><small><span class="en">Future public evidence</span><span class="zh" lang="zh-CN">未来公开证据</span></small></li><li><b><span class="en">Model identity</span><span class="zh" lang="zh-CN">模型身份</span></b><small><span class="en">Future public evidence</span><span class="zh" lang="zh-CN">未来公开证据</span></small></li><li><b><span class="en">Trial</span><span class="zh" lang="zh-CN">评测记录</span></b><small><span class="en">Future public evidence</span><span class="zh" lang="zh-CN">未来公开证据</span></small></li><li><b><span class="en">Case</span><span class="zh" lang="zh-CN">案例</span></b><small><span class="en">Future public evidence</span><span class="zh" lang="zh-CN">未来公开证据</span></small></li><li><b><span class="en">Tutor response</span><span class="zh" lang="zh-CN">Tutor 回复</span></b><small><span class="en">Future public evidence</span><span class="zh" lang="zh-CN">未来公开证据</span></small></li><li><b><span class="en">Evaluation evidence</span><span class="zh" lang="zh-CN">评测证据</span></b><small><span class="en">Future public evidence</span><span class="zh" lang="zh-CN">未来公开证据</span></small></li><li><b><span class="en">Sanitized metrics</span><span class="zh" lang="zh-CN">清理后的指标</span></b><small><span class="en">Future public evidence</span><span class="zh" lang="zh-CN">未来公开证据</span></small></li></ol>
+    <aside class="callout boundary tr-rel"><p><span class="en"><b>Keep the surfaces distinct.</b> <a href="../../models/index.html">Models</a> describe published model identity; <a href="../../leaderboard/index.html">Results</a> show rankings only when publication criteria are satisfied; this page is the individual audit ledger.</span><span class="zh" lang="zh-CN"><b>保持各页面职责分离。</b> <a href="../../models/index.html">模型</a>描述已发布模型身份；<a href="../../leaderboard/index.html">结果</a>只有满足发布标准时才展示排名；本页是单条证据的审计 ledger。</span></p></aside>
+  </section>
+
+  <section class="wrap jx-close">
+    <p class="kicker"><span class="en">Public evidence, clearly bounded</span><span class="zh" lang="zh-CN">边界清晰的公开证据</span></p>
+    <h2 class="jx-h2"><span class="en">Evidence you can follow.</span><span class="zh" lang="zh-CN">可以追踪的证据。</span></h2>
+    <p class="en jx-p">Future published results should remain traceable back to versioned cases, model identity, and the evidence that supports each claim.</p><p class="zh jx-p" lang="zh-CN">未来公开结果应始终能够追踪到版本化案例、模型身份以及支撑每项主张的证据。</p>
+    <p class="jx-links"><a href="../../leaderboard/index.html"><span class="en">View the results</span><span class="zh" lang="zh-CN">查看结果</span></a><a href="../../methodology/index.html"><span class="en">Read the methodology</span><span class="zh" lang="zh-CN">阅读方法论</span></a></p>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Model Trials — Teachometry", zh: "模型评测记录 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>
