@@ -1,9 +1,13 @@
-/* Teachometry · Journal (article template). Same magazine as the homepage: shared tokens, bar,
+/* Teachometry · section template (first built for the Journal). Other sections load it and override --lead.
+   Journal (article template). Same magazine as the homepage: shared tokens, bar,
    grid, atmosphere and footer from spectrum.css. Each section gets one gem as its lead colour;
    the Journal is sapphire. */
 :root {
   --lead: #1d47b8;            /* sapphire */
   --lead-deep: #12307f;
+  --lead-soft: rgba(29, 71, 184, .28);
+  --lead-line: rgba(29, 71, 184, .4);
+  --lead-shadow: rgba(18, 48, 127, .45);
   }
 
 .essay-head { position: relative; padding-block: calc(var(--bar-h) + clamp(40px, 7vw, 96px)) clamp(32px, 5vw, 64px); }
@@ -46,7 +50,7 @@ a.issue:hover { color: var(--lead-deep); }
 
 .pull { margin: 2em 0; padding: 0 0 0 26px; border-left: 2px solid var(--lead); font-family: var(--f-display); font-style: italic; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.22; color: var(--ink); max-width: 22em; text-wrap: balance; }
 
-.callout { margin: 2.2em 0; padding: 26px 28px; max-width: 34em; border-radius: 4px; background: rgba(255, 255, 255, .34); border: 1px solid rgba(29, 71, 184, .28); box-shadow: 0 18px 40px -26px rgba(18, 48, 127, .45); }
+.callout { margin: 2.2em 0; padding: 26px 28px; max-width: 34em; border-radius: 4px; background: rgba(255, 255, 255, .34); border: 1px solid var(--lead-soft); box-shadow: 0 18px 40px -26px var(--lead-shadow); }
 .callout h3 { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(24px, 2.2vw, 30px); line-height: 1.15; margin: 8px 0 10px; color: var(--lead-deep); }
 .callout p { margin: 0; font-family: var(--f-text); font-size: 17px; line-height: 1.55; color: var(--ink-2); }
 .callout .kicker { color: var(--lead); }
@@ -73,7 +77,9 @@ a.issue:hover { color: var(--lead-deep); }
 .fig { margin: 2.4em 0; max-width: 34em; }
 .fig figcaption { margin-top: 12px; font-family: var(--f-ui); font-size: 13.5px; line-height: 1.5; color: var(--ink-3); max-width: 40em; }
 .fig figcaption b { font-family: var(--f-mono); font-weight: 500; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--lead); margin-right: 8px; }
-.fig-wide { max-width: none; width: min(980px, calc(100% + 320px)); }
+.essay-text { container-type: inline-size; }
+/* a wide plate breaks out of the measure but never past the column */
+.fig-wide { max-width: none; width: min(980px, 100cqw); }
 .fig-wide img { display: block; width: 100%; height: auto; border-radius: 3px; box-shadow: 0 30px 60px -36px rgba(14, 15, 20, .55); }
 .fig-margin { float: right; clear: right; width: 240px; margin: .3em -290px 1em 24px; }
 .ledger { list-style: none; margin: 0; padding: 0; counter-reset: l; border-top: 1px solid var(--ink); }
@@ -86,7 +92,7 @@ a.issue:hover { color: var(--lead-deep); }
 .d-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
 .d-reply { padding: 16px 18px; border: 1px solid rgba(14, 15, 20, .16); border-radius: 4px; background: rgba(255, 255, 255, .22); }
 .d-reply .d-says { font-size: 15.5px; color: var(--ink-2); }
-.d-teach { border-color: rgba(29, 71, 184, .4); background: rgba(255, 255, 255, .4); }
+.d-teach { border-color: var(--lead-line); background: rgba(255, 255, 255, .4); }
 .d-teach .d-who { color: var(--lead); }
 
 .ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
@@ -100,7 +106,7 @@ a.issue:hover { color: var(--lead-deep); }
 .ladder li.now .l-no, .ladder li.now .l-note { color: var(--lead); }
 .ladder li.now .l-name { color: var(--ink); }
 
-@media (max-width: 1360px) { .fig-margin { float: none; width: auto; max-width: 34em; margin: 2em 0; } .fig-wide { width: 100%; } }
+@media (max-width: 1360px) { .fig-margin { float: none; width: auto; max-width: 34em; margin: 2em 0; } }
 @media (max-width: 620px) {
   .fig-wide { width: auto; margin-inline: calc(-1 * max(var(--gutter), env(safe-area-inset-left, 0px))); }
   .fig-wide img { border-radius: 0; }

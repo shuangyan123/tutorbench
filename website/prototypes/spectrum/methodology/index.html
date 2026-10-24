@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Methodology · Teachometry</title>
+<meta name="description" content="How Teachometry evaluates observable tutoring behavior in structured authored benchmark cases using transparent and reproducible procedures.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../spectrum.css">
+<link rel="stylesheet" href="../journal.css">
+<link rel="stylesheet" href="../method.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var root = document.documentElement;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../index.html#methods" class="nav-tb"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../methodology/index.html" aria-current="page"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../index.html#plates"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+  <header class="essay-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><span class="issue"><span class="en">Our methodology</span><span class="zh" lang="zh-CN">我们的方法论</span></span><span class="rule" aria-hidden="true"></span><span>TutorBench</span><span>tutor-benchmark</span></p>
+        <h1 class="essay-title"><span class="en">How do you measure <em>teaching?</em></span><span class="zh" lang="zh-CN">如何测量<em>教学？</em></span></h1>
+        <p class="en essay-dek">Teachometry evaluates observable tutoring behavior in structured authored benchmark cases using transparent and reproducible evaluation procedures.</p><p class="zh essay-dek" lang="zh-CN">Teachometry 使用透明且可复现的评测流程，在结构化、人工编写的基准案例中评估可观察的教学行为。</p>
+        <p class="essay-byline kicker"><span><span class="en">Transparent</span><span class="zh" lang="zh-CN">透明</span></span><span><span class="en">Research-grounded</span><span class="zh" lang="zh-CN">以研究为基础</span></span><span><span class="en">Openly documented</span><span class="zh" lang="zh-CN">公开记录</span></span></p>
+      </div>
+      <figure class="cover-plate">
+        <img src="../assets/method/gauge-blocks.webp" alt="Steel gauge blocks on a black granite surface plate; four of them are wrung together into one column." width="900" height="1100" data-alt-en="Steel gauge blocks on a black granite surface plate; four of them are wrung together into one column." data-alt-zh="黑色花岗岩平板上的钢制量块，其中四块研合成一根立柱。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">Four steel blocks wrung into one length: 50 + 20 + 1.4 + 1.005 = 72.405 mm. Rendered in Blender.</span><span class="zh" lang="zh-CN">四块钢制量块研合成一段长度：50 + 20 + 1.4 + 1.005 = 72.405 毫米。Blender 渲染。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap essay-body">
+    <nav class="essay-toc" aria-label="On this page">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <ol>
+        <li><a href="#pipeline"><span class="en">The evaluation pipeline</span><span class="zh" lang="zh-CN">评测流程</span></a></li>
+        <li><a href="#dimensions"><span class="en">Five evaluation dimensions</span><span class="zh" lang="zh-CN">五个评测维度</span></a></li>
+        <li><a href="#architecture"><span class="en">From response to result</span><span class="zh" lang="zh-CN">从回复到结果</span></a></li>
+        <li><a href="#scope"><span class="en">What we measure</span><span class="zh" lang="zh-CN">我们测量什么</span></a></li>
+        <li><a href="#status"><span class="en">Methodology status</span><span class="zh" lang="zh-CN">方法论状态</span></a></li>
+        <li><a href="#commitment"><span class="en">Our commitment</span><span class="zh" lang="zh-CN">我们的承诺</span></a></li>
+      </ol>
+    </nav>
+    <article class="essay-text method-text">
+      <div class="prose">
+
+        <h2 id="pipeline"><span class="no">§1</span><span><span class="en">The evaluation pipeline</span><span class="zh" lang="zh-CN">评测流程</span></span></h2>
+        <p class="en first">From a structured case to a benchmark result.</p><p class="zh first" lang="zh-CN">从结构化案例走向基准结果。</p>
+        <figure class="fig fig-wide" id="fig1">
+          <ol class="pipe"><li><span class="p-no">01</span><span class="p-t"><span class="en">Structured case</span><span class="zh" lang="zh-CN">结构化案例</span></span><span class="p-c"><span class="en">Authored scenario with learner profile, goal, and context.</span><span class="zh" lang="zh-CN">包含学生画像、目标与语境的人工编写情境。</span></span></li><li><span class="p-no">02</span><span class="p-t"><span class="en">Tutor response</span><span class="zh" lang="zh-CN">Tutor 回复</span></span><span class="p-c"><span class="en">The response produced for the learner’s structured case.</span><span class="zh" lang="zh-CN">针对结构化学生案例生成的回复。</span></span></li><li><span class="p-no">03</span><span class="p-t"><span class="en">Evaluator evidence</span><span class="zh" lang="zh-CN">评估器证据</span></span><span class="p-c"><span class="en">Evidence from deterministic evaluators and the Semantic Judge.</span><span class="zh" lang="zh-CN">来自确定性评估器和 Semantic Judge 的证据。</span></span></li><li><span class="p-no">04</span><span class="p-t"><span class="en">Atomic rubrics</span><span class="zh" lang="zh-CN">原子化评分标准</span></span><span class="p-c"><span class="en">Fine-grained criteria with explicit scoring levels.</span><span class="zh" lang="zh-CN">带有明确评分等级的细粒度标准。</span></span></li><li><span class="p-no">05</span><span class="p-t"><span class="en">Benchmark result</span><span class="zh" lang="zh-CN">基准结果</span></span><span class="p-c"><span class="en">Category aggregation with documented, comparable outputs.</span><span class="zh" lang="zh-CN">以有记录、可比较的输出进行类别聚合。</span></span></li></ol>
+          <figcaption><b><span class="en">Fig. 1</span><span class="zh" lang="zh-CN">图 1</span></b><span class="en">The five stages, from a structured case to a benchmark result.</span><span class="zh" lang="zh-CN">五个阶段：从结构化案例到基准结果。</span></figcaption>
+        </figure>
+
+        <h2 id="dimensions"><span class="no">§2</span><span><span class="en">Five evaluation dimensions</span><span class="zh" lang="zh-CN">五个评测维度</span></span></h2>
+        <p class="m-deck"><span class="en">Five complementary lenses on tutoring <em>behavior.</em></span><span class="zh" lang="zh-CN">五个互补的教学观察<em>视角。</em></span></p>
+        <p class="en">We evaluate AI tutors across the five score dimensions in the public benchmark artifact, capturing complementary aspects of observable tutoring behavior in structured cases.</p><p class="zh" lang="zh-CN">我们通过公开基准产物中的五个评分维度评估 AI Tutor，覆盖结构化案例中可观察教学行为的不同互补侧面。</p>
+        <figure class="fig fig-wide" id="fig2">
+          <ol class="dims"><li id="dim-correctness">
+            <img class="d-gem" src="../assets/gems/gem-0.webp" alt="" width="96" height="96">
+            <span class="d-no"><span class="en">Dimension 01</span><span class="zh" lang="zh-CN">维度 01</span> · <span class="en">Score lens</span><span class="zh" lang="zh-CN">评分视角</span></span>
+            <span class="d-name"><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></span>
+            <span class="d-desc"><span class="en">Whether the Tutor stays factually and conceptually correct.</span><span class="zh" lang="zh-CN">Tutor 是否在事实与概念层面保持正确。</span></span>
+            <span class="d-lens"><b><span class="en">What we look for</span><span class="zh" lang="zh-CN">我们关注什么</span></b><span class="en">Factual and conceptual accuracy</span><span class="zh" lang="zh-CN">事实与概念准确性</span></span>
+          </li><li id="dim-diagnosis">
+            <img class="d-gem" src="../assets/gems/gem-1.webp" alt="" width="96" height="96">
+            <span class="d-no"><span class="en">Dimension 02</span><span class="zh" lang="zh-CN">维度 02</span> · <span class="en">Score lens</span><span class="zh" lang="zh-CN">评分视角</span></span>
+            <span class="d-name"><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></span>
+            <span class="d-desc"><span class="en">Whether it identifies the learner’s actual error, gap, or reasoning issue.</span><span class="zh" lang="zh-CN">是否识别出学生真实的错误、知识缺口或推理问题。</span></span>
+            <span class="d-lens"><b><span class="en">What we look for</span><span class="zh" lang="zh-CN">我们关注什么</span></b><span class="en">Identifies learner needs and misconceptions</span><span class="zh" lang="zh-CN">识别学生需求与错误概念</span></span>
+          </li><li id="dim-guidance">
+            <img class="d-gem" src="../assets/gems/gem-2.webp" alt="" width="96" height="96">
+            <span class="d-no"><span class="en">Dimension 03</span><span class="zh" lang="zh-CN">维度 03</span> · <span class="en">Score lens</span><span class="zh" lang="zh-CN">评分视角</span></span>
+            <span class="d-name"><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></span>
+            <span class="d-desc"><span class="en">Whether its explanation or hint helps the learner make progress.</span><span class="zh" lang="zh-CN">解释或提示是否帮助学生取得进展。</span></span>
+            <span class="d-lens"><b><span class="en">What we look for</span><span class="zh" lang="zh-CN">我们关注什么</span></b><span class="en">Provides clear, correct, productive guidance</span><span class="zh" lang="zh-CN">提供清晰、正确且能推动学习的引导</span></span>
+          </li><li id="dim-adaptation">
+            <img class="d-gem" src="../assets/gems/gem-3.webp" alt="" width="96" height="96">
+            <span class="d-no"><span class="en">Dimension 04</span><span class="zh" lang="zh-CN">维度 04</span> · <span class="en">Score lens</span><span class="zh" lang="zh-CN">评分视角</span></span>
+            <span class="d-name"><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></span>
+            <span class="d-desc"><span class="en">Whether it changes its help for the learner’s state and context.</span><span class="zh" lang="zh-CN">是否根据学生当前状态与语境调整帮助方式。</span></span>
+            <span class="d-lens"><b><span class="en">What we look for</span><span class="zh" lang="zh-CN">我们关注什么</span></b><span class="en">Adapts to learner state, level, and context</span><span class="zh" lang="zh-CN">根据学生状态、水平与语境进行适应</span></span>
+          </li><li id="dim-actionability">
+            <img class="d-gem" src="../assets/gems/gem-4.webp" alt="" width="96" height="96">
+            <span class="d-no"><span class="en">Dimension 05</span><span class="zh" lang="zh-CN">维度 05</span> · <span class="en">Score lens</span><span class="zh" lang="zh-CN">评分视角</span></span>
+            <span class="d-name"><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></span>
+            <span class="d-desc"><span class="en">Whether it leaves the learner with a clear, executable next step.</span><span class="zh" lang="zh-CN">是否让学生得到清晰且可执行的下一步。</span></span>
+            <span class="d-lens"><b><span class="en">What we look for</span><span class="zh" lang="zh-CN">我们关注什么</span></b><span class="en">Actionable next steps for the learner</span><span class="zh" lang="zh-CN">为学生提供可执行的下一步</span></span>
+          </li></ol>
+          <figcaption><b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b><span class="en">An illustration of complementary lenses, not an evaluator order or a score.</span><span class="zh" lang="zh-CN">这是互补视角的示意，不代表评估器执行顺序，也不是评分。</span></figcaption>
+        </figure>
+        <blockquote class="pull"><span class="en">Different aspects. A more complete picture.</span><span class="zh" lang="zh-CN">不同侧面。形成更完整的图景。</span></blockquote>
+
+        <h2 id="architecture"><span class="no">§3</span><span><span class="en">From response to result</span><span class="zh" lang="zh-CN">从回复到结果</span></span></h2>
+        <p class="m-deck"><span class="en">A transparent <em>evaluation architecture.</em></span><span class="zh" lang="zh-CN">透明的<em>评测架构。</em></span></p>
+        <p class="en">Our evaluation framework combines atomic rubrics, explicit evidence boundaries, and multiple evaluators to support reproducible and auditable results.</p><p class="zh" lang="zh-CN">我们的评测框架结合原子化评分标准、明确的证据边界和多个评估器，以支持可复现、可审计的结果。</p>
+        <p class="m-boundary"><span class="en"><b>Tutor-visible input ends at the response boundary.</b> Evaluator-only annotations stay on the evaluator side.</span><span class="zh" lang="zh-CN"><b>Tutor 可见输入止于回复边界。</b>仅供评估器使用的注释始终保留在评估器一侧。</span></p>
+        <figure class="fig fig-wide" id="fig3">
+          <ol class="arch">
+            <li><span class="ar-t"><span class="en">Structured case</span><span class="zh" lang="zh-CN">结构化案例</span></span><span class="ar-c"><span class="en">Authored scenario with learner context</span><span class="zh" lang="zh-CN">人工编写情境，包含学生语境</span></span></li>
+            <li class="ar-edge"><span class="ar-t"><span class="en">Tutor response</span><span class="zh" lang="zh-CN">Tutor 回复</span></span><span class="ar-c"><span class="en">Tutor-visible interaction</span><span class="zh" lang="zh-CN">Tutor 可见交互</span></span><span class="ar-edge-label" aria-hidden="true"><span class="en">Response boundary</span><span class="zh" lang="zh-CN">回复边界</span></span></li>
+            <li class="ar-ev"><span class="ar-t"><span class="en">Evaluator evidence</span><span class="zh" lang="zh-CN">评估器证据</span></span>
+              <span class="ar-branch"><span><b><span class="en">Deterministic evaluators</span><span class="zh" lang="zh-CN">确定性评估器</span></b><span class="en">observable proxy checks</span><span class="zh" lang="zh-CN">可观察代理检查</span></span><span><b><span class="en">Semantic Judge</span><span class="zh" lang="zh-CN">Semantic Judge</span></b><span class="en">evaluator boundary</span><span class="zh" lang="zh-CN">评估器边界</span></span></span></li>
+            <li><span class="ar-t"><span class="en">Atomic rubrics</span><span class="zh" lang="zh-CN">原子化评分标准</span></span><span class="ar-c"><span class="en">Criteria and scoring levels</span><span class="zh" lang="zh-CN">标准与评分等级</span></span></li>
+            <li><span class="ar-t"><span class="en">Category aggregation</span><span class="zh" lang="zh-CN">类别聚合</span></span><span class="ar-c"><span class="en">Five score dimensions</span><span class="zh" lang="zh-CN">五个评分维度</span></span></li>
+            <li class="ar-end"><span class="ar-t"><span class="en">Benchmark result</span><span class="zh" lang="zh-CN">基准结果</span></span><span class="ar-c"><span class="en">Structured, comparable output</span><span class="zh" lang="zh-CN">结构化、可比较输出</span></span></li>
+          </ol>
+          <figcaption><b><span class="en">Fig. 3</span><span class="zh" lang="zh-CN">图 3</span></b><span class="en">Transparent, reproducible, and auditable. A Judge is an evaluator boundary, not ground truth; unresolved Judge-required evidence remains unresolved and cannot silently become a valid score.</span><span class="zh" lang="zh-CN">透明、可复现、可审计。Judge 是评估器边界，不是参考真值；需要 Judge 而尚未解决的证据必须保持未解决，不能静默变成有效分数。</span></figcaption>
+        </figure>
+
+        <h2 id="scope"><span class="no">§4</span><span><span class="en">What we measure</span><span class="zh" lang="zh-CN">我们测量什么</span></span></h2>
+        <div class="scope">
+          <section class="sc-in">
+            <p class="kicker"><span class="en">What we measure</span><span class="zh" lang="zh-CN">我们测量什么</span></p>
+            <h3><span class="en">Observable tutoring behavior.</span><span class="zh" lang="zh-CN">可观察的教学行为。</span></h3>
+            <p class="en">We focus on what the AI Tutor does and says in the interaction, evaluated through structured rubrics and observable evidence.</p><p class="zh" lang="zh-CN">我们关注 AI Tutor 在交互中实际做了什么、说了什么，并通过结构化评分标准和可观察证据进行评估。</p>
+            <ul><li><b><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></b><span class="en">Factual and conceptual accuracy</span><span class="zh" lang="zh-CN">事实与概念准确性</span></li><li><b><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></b><span class="en">Identifies learner needs and misconceptions</span><span class="zh" lang="zh-CN">识别学生需求与错误概念</span></li><li><b><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></b><span class="en">Provides clear, correct, productive guidance</span><span class="zh" lang="zh-CN">提供清晰、正确且能推动学习的引导</span></li><li><b><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></b><span class="en">Adapts to learner state, level, and context</span><span class="zh" lang="zh-CN">根据学生状态、水平与语境进行适应</span></li><li><b><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></b><span class="en">Actionable next steps for the learner</span><span class="zh" lang="zh-CN">为学生提供可执行的下一步</span></li></ul>
+            <p class="en sc-foot">Case-conditioned evidence, not a claim of general teaching effectiveness.</p><p class="zh sc-foot" lang="zh-CN">这是基于具体案例条件的证据，不是对一般教学有效性的主张。</p>
+          </section>
+          <section class="sc-out">
+            <p class="kicker"><span class="en">What we do not measure</span><span class="zh" lang="zh-CN">我们不测量什么</span></p>
+            <h3><span class="en">Learning outcomes <em>(not yet).</em></span><span class="zh" lang="zh-CN">学习结果<em>（暂时不测）。</em></span></h3>
+            <p class="en">We currently do not measure long-term learning gains or real-world educational outcomes. These require longitudinal studies beyond the scope of this benchmark.</p><p class="zh" lang="zh-CN">我们目前不测量长期学习增益或真实世界教育结果。这些问题需要超出本基准范围的纵向研究。</p>
+            <ul><li><span class="en">Actual long-term learning</span><span class="zh" lang="zh-CN">真实长期学习</span></li><li><span class="en">Knowledge retention over time</span><span class="zh" lang="zh-CN">随时间保持的知识留存</span></li><li><span class="en">Transfer to new contexts</span><span class="zh" lang="zh-CN">迁移到新情境</span></li><li><span class="en">Student satisfaction</span><span class="zh" lang="zh-CN">学生满意度</span></li><li><span class="en">Real classroom outcomes</span><span class="zh" lang="zh-CN">真实课堂结果</span></li></ul>
+          </section>
+        </div>
+
+        <h2 id="status"><span class="no">§5</span><span><span class="en">Methodology status</span><span class="zh" lang="zh-CN">方法论状态</span></span></h2>
+        <p class="m-deck"><span class="en">A research effort <em>in progress.</em></span><span class="zh" lang="zh-CN">一项仍在进行的<em>研究工作。</em></span></p>
+        <p class="en">We are building a rigorous and open evaluation infrastructure. Some components are available now, while others will be developed through future work.</p><p class="zh" lang="zh-CN">我们正在构建严格且开放的评测基础设施。其中一些组件已经可用，另一些仍将在后续工作中完善。</p>
+        <div class="tbl-wrap m-status">
+          <table class="tbl">
+            <caption><b><span class="en">Table 1</span><span class="zh" lang="zh-CN">表 1</span></b><span class="en">Current methodology status</span><span class="zh" lang="zh-CN">当前方法论状态</span></caption>
+            <thead><tr><th scope="col"><span class="en">Component</span><span class="zh" lang="zh-CN">组件</span></th><th scope="col"><span class="en">Status</span><span class="zh" lang="zh-CN">状态</span></th><th scope="col"><span class="en">Notes</span><span class="zh" lang="zh-CN">说明</span></th></tr></thead>
+            <tbody><tr><th scope="row"><span class="en">Calibration infrastructure</span><span class="zh" lang="zh-CN">校准基础设施</span></th><td><span class="st st-ok"><span class="en">Available</span><span class="zh" lang="zh-CN">可用</span></span></td><td><span class="en">Provider-independent contracts and synthetic pipeline fixtures are available.</span><span class="zh" lang="zh-CN">不依赖服务提供方的契约和合成流程 fixture 已可用。</span></td></tr><tr><th scope="row"><span class="en">Community Review infrastructure</span><span class="zh" lang="zh-CN">Community Review 基础设施</span></th><td><span class="st st-ok"><span class="en">Private staging ready</span><span class="zh" lang="zh-CN">私有 staging 已就绪</span></span></td><td><span class="en">Public launch remains blocked; reviewer intake remains closed, and the real Community Review campaign has not started.</span><span class="zh" lang="zh-CN">公开发布仍被阻塞；reviewer intake 仍关闭，真实 Community Review 活动尚未启动。</span></td></tr><tr><th scope="row"><span class="en">Human calibration (P5)</span><span class="zh" lang="zh-CN">人工校准（P5）</span></th><td><span class="st st-wait"><span class="en">Not started</span><span class="zh" lang="zh-CN">尚未开始</span></span></td><td><span class="en">No real human calibration data is claimed.</span><span class="zh" lang="zh-CN">当前不主张存在真实人工校准数据。</span></td></tr><tr><th scope="row"><span class="en">Judge-vs-human validation</span><span class="zh" lang="zh-CN">Judge 与人工对照验证</span></th><td><span class="st st-wait"><span class="en">Not completed</span><span class="zh" lang="zh-CN">尚未完成</span></span></td><td><span class="en">A Judge result is not presented as human-reference validation.</span><span class="zh" lang="zh-CN">Judge 结果不会被呈现为人工参考验证。</span></td></tr><tr><th scope="row"><span class="en">Statistical validation</span><span class="zh" lang="zh-CN">统计验证</span></th><td><span class="st st-wait"><span class="en">Not completed</span><span class="zh" lang="zh-CN">尚未完成</span></span></td><td><span class="en">No statistical validation claim is made for the current benchmark.</span><span class="zh" lang="zh-CN">当前基准不主张已经完成统计验证。</span></td></tr></tbody>
+          </table>
+        </div>
+        <p class="m-links"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/roadmap.md" rel="noreferrer"><span class="en">Read the roadmap</span><span class="zh" lang="zh-CN">阅读路线图</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+
+        <h2 id="commitment"><span class="no">§6</span><span><span class="en">Our commitment</span><span class="zh" lang="zh-CN">我们的承诺</span></span></h2>
+        <p class="m-deck"><span class="en">Transparent enough to challenge.<br><em>Structured enough to reproduce.</em></span><span class="zh" lang="zh-CN">透明到足以被质疑。<br><em>结构清晰，便于复现。</em></span></p>
+        <p class="en">Our methodology, rubrics, and benchmark data are openly available for inspection, feedback, and reuse. We invite the community to evaluate, critique, and build on this work.</p><p class="zh" lang="zh-CN">我们公开方法论、评分标准和基准数据，供检查、反馈与复用。欢迎社区评估、质疑并在此基础上继续建设。</p>
+        <p class="m-links"><a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer"><span class="en">View on GitHub</span><span class="zh" lang="zh-CN">在 GitHub 查看</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a href="../index.html#plates"><span class="en">Explore the benchmark</span><span class="zh" lang="zh-CN">探索基准</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+      </div>
+    </article>
+  </div>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../index.html#results"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../index.html#plates"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+  </div>
+</footer>
+
+<script src="../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Methodology · Teachometry", zh: "方法论 · Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

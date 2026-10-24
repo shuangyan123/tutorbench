@@ -1,0 +1,147 @@
+/* Teachometry · Methodology. Loads after journal.css (the shared section template) and swaps the
+   lead gem to amethyst. Components: the five-stage pipeline, the five dimension lenses, the
+   evaluation architecture, the scope pair and the status table. */
+:root {
+  --lead: #5a2fc0;            /* amethyst */
+  --lead-deep: #3f1f8f;
+  --lead-soft: rgba(90, 47, 192, .26);
+  --lead-line: rgba(90, 47, 192, .42);
+  --lead-shadow: rgba(63, 31, 143, .42);
+}
+
+.method-text .prose > p.first { font-family: var(--f-display); font-style: italic; font-size: clamp(22px, 2vw, 27px); line-height: 1.3; color: var(--ink-2); }
+.method-text .prose > p.first.en::first-letter { float: none; font-size: inherit; line-height: inherit; padding: 0; color: inherit; }
+
+/* a section's one-line thesis */
+.m-deck { margin: 0 0 .7em; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(26px, 2.6vw, 36px); line-height: 1.12; color: var(--ink); text-wrap: balance; max-width: 20em; }
+.m-deck em { font-style: italic; color: var(--lead-deep); }
+
+.m-boundary { margin: 1.6em 0; padding: 16px 20px; max-width: 34em; border: 1px dashed var(--lead-line); border-radius: 4px; font-family: var(--f-text); font-size: 16.5px; line-height: 1.55; color: var(--ink-2); }
+.m-boundary b { font-weight: 600; color: var(--ink); }
+
+.m-links { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 1.6em 0 0; }
+.m-links a { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--lead); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 3px; }
+.m-links a:hover { color: var(--lead-deep); }
+.m-links svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; transition: transform .25s ease; }
+.m-links a:hover svg { transform: translateX(3px); }
+
+/* ---- Fig. 1, the pipeline: five stations on one rule */
+.pipe { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
+.pipe li { position: relative; display: grid; align-content: start; gap: 8px; padding: 18px 18px 20px 0; }
+.pipe li + li { padding-left: 18px; border-left: 1px solid var(--hair); }
+.pipe li::before { content: ""; position: absolute; top: -5px; left: 0; width: 9px; height: 9px; border-radius: 50%; background: var(--bg); border: 1px solid var(--ink); }
+.pipe li + li::before { left: -5px; }
+.pipe li:last-child::before { background: var(--lead); border-color: var(--lead); }
+.p-no { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; color: var(--lead); }
+.p-t { font-family: var(--f-display); font-size: clamp(20px, 1.8vw, 24px); line-height: 1.12; color: var(--ink); text-wrap: balance; }
+.p-c { font-family: var(--f-ui); font-size: 13.5px; line-height: 1.5; color: var(--ink-3); }
+
+/* ---- Fig. 2, five lenses: one cut stone each */
+.dims { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--hair-2); }
+/* subgrid lines the five lenses up row by row: gem, number, name, description, what we look for */
+.dims { grid-template-rows: auto auto auto auto auto; }
+.dims li { display: grid; grid-row: span 5; grid-template-rows: subgrid; gap: 8px; padding: 20px 16px 20px; scroll-margin-top: calc(var(--bar-h) + 24px); }
+.dims li + li { border-left: 1px solid var(--hair); }
+.fig-wide .d-gem { width: 72px; height: 72px; border-radius: 0; box-shadow: none; margin: -4px 0 6px -6px; filter: drop-shadow(0 10px 12px rgba(14, 15, 20, .22)); }
+.d-no { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.d-name { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(24px, 2.1vw, 30px); line-height: 1.05; color: var(--ink); }
+.d-desc { font-family: var(--f-text); font-size: 15.5px; line-height: 1.45; color: var(--ink-2); text-wrap: pretty; }
+.d-lens { display: grid; gap: 3px; padding-top: 10px; border-top: 1px solid var(--lead-soft); font-family: var(--f-ui); font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.d-lens b { font-family: var(--f-mono); font-weight: 500; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--lead); }
+
+/* ---- Fig. 3, the architecture: a column of stages, the response boundary drawn across it */
+.arch { list-style: none; margin: 0; padding: 0 0 0 30px; display: grid; gap: 0; position: relative; max-width: 760px; border-top: 1px solid var(--ink); padding-top: 18px; }
+.arch::before { content: ""; position: absolute; left: 8px; top: 30px; bottom: 26px; width: 1px; background: var(--ink); }
+.arch li { position: relative; display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 4px 24px; align-items: baseline; padding: 12px 0 14px; }
+.arch li::before { content: ""; position: absolute; left: -26px; top: 19px; width: 9px; height: 9px; border-radius: 50%; background: var(--bg); border: 1px solid var(--ink); }
+.ar-t { font-family: var(--f-display); font-size: clamp(21px, 1.9vw, 25px); line-height: 1.15; color: var(--ink); }
+.ar-c { font-family: var(--f-ui); font-size: 14px; line-height: 1.5; color: var(--ink-3); }
+/* the boundary: everything above is what the Tutor sees */
+.arch li.ar-edge { padding-bottom: 30px; }
+.arch li.ar-edge::after {
+  content: ""; position: absolute; left: -30px; right: 0; bottom: 8px; height: 0; border-top: 1px dashed var(--lead);
+}
+.ar-edge-label { position: absolute; right: 0; bottom: 14px; font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--lead); background: transparent; }
+.arch li.ar-ev::before, .arch li.ar-end::before { background: var(--lead); border-color: var(--lead); }
+.ar-branch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ar-branch > span { display: grid; gap: 3px; padding: 10px 12px; border: 1px solid var(--lead-line); border-radius: 4px; background: rgba(255, 255, 255, .3); font-family: var(--f-ui); font-size: 13px; line-height: 1.4; color: var(--ink-3); }
+.ar-branch b { font-family: var(--f-ui); font-weight: 500; font-size: 14.5px; color: var(--ink); }
+.arch li.ar-end .ar-t { color: var(--lead-deep); }
+
+/* ---- §4, what we measure and what we do not */
+.scope { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(14px, 2vw, 24px); width: min(980px, 100cqw); margin: 1.2em 0 0; }
+.scope section { padding: 22px 24px 24px; border-radius: 4px; min-width: 0; }
+.sc-in { border: 1px solid var(--lead-line); background: rgba(255, 255, 255, .36); box-shadow: 0 18px 40px -28px var(--lead-shadow); }
+.sc-out { border: 1px dashed var(--hair-2); }
+.scope .kicker { margin: 0; }
+.sc-in .kicker { color: var(--lead); }
+.scope h3 { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(26px, 2.4vw, 34px); line-height: 1.1; margin: 10px 0 12px; color: var(--ink); text-wrap: balance; }
+.scope h3 em { font-style: italic; color: var(--ink-3); }
+.scope p:not(.kicker) { margin: 0 0 14px; font-family: var(--f-text); font-size: 16.5px; line-height: 1.55; color: var(--ink-2); }
+.scope ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--hair-2); }
+.scope li { display: grid; grid-template-columns: minmax(0, 120px) minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--hair); font-family: var(--f-ui); font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.scope li b { font-weight: 500; color: var(--ink); }
+.sc-out li { grid-template-columns: 18px minmax(0, 1fr); color: var(--ink-3); }
+.sc-out li::before { content: ""; width: 10px; height: 1px; margin-top: .72em; background: var(--ink-3); }
+.scope p.sc-foot { margin: 14px 0 0; font-family: var(--f-ui); font-size: 13px; color: var(--ink-3); }
+
+/* ---- Table 1, status */
+.tbl-wrap { overflow-x: auto; margin: 1.4em 0 0; width: min(980px, 100cqw); }
+.tbl { width: 100%; min-width: 560px; border-collapse: collapse; font-family: var(--f-ui); font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
+.tbl caption { caption-side: top; text-align: left; padding-bottom: 12px; font-size: 13.5px; color: var(--ink-3); }
+.tbl caption b { font-family: var(--f-mono); font-weight: 500; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--lead); margin-right: 8px; }
+.tbl thead th { text-align: left; font-family: var(--f-mono); font-weight: 500; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); padding: 0 16px 10px 0; border-bottom: 1px solid var(--ink); }
+.tbl tbody th, .tbl td { text-align: left; vertical-align: top; padding: 13px 16px 13px 0; border-bottom: 1px solid var(--hair); }
+.tbl tbody th { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: 19px; line-height: 1.2; color: var(--ink); width: 32%; }
+.tbl td:nth-child(2) { width: 22%; white-space: nowrap; }
+.st { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; }
+.st-ok { color: var(--lead-deep); }
+.st-ok::before { background: var(--lead); }
+.st-wait { color: var(--ink-3); }
+.st-wait::before { border: 1px solid var(--ink-3); }
+
+@media (max-width: 960px) {
+  .pipe { grid-template-columns: 1fr; border-top: 0; border-left: 1px solid var(--ink); margin-left: 4px; }
+  .pipe li, .pipe li + li { grid-template-columns: 40px minmax(0, 1fr); column-gap: 8px; padding: 12px 0 14px 18px; border-left: 0; }
+  .pipe li + li { border-top: 1px solid var(--hair); }
+  .pipe li::before, .pipe li + li::before { top: 18px; left: -5px; }
+  .p-no { grid-row: span 2; padding-top: 5px; }
+  .p-c { grid-column: 2; }
+  .dims { grid-template-columns: 1fr; grid-template-rows: none; border-bottom: 0; }
+  .dims li { grid-row: auto; grid-template-columns: 76px minmax(0, 1fr); grid-template-rows: none; column-gap: 16px; row-gap: 6px; padding: 18px 0; border-bottom: 1px solid var(--hair); }
+  .dims li + li { border-left: 0; }
+  .dims li > :not(.d-gem) { grid-column: 2; }
+  .fig-wide .d-gem { grid-row: 1 / span 4; margin: 0; }
+}
+@media (max-width: 620px) {
+  /* text figures keep the gutter; only photographs bleed */
+  .method-text .fig-wide { width: auto; margin-inline: 0; }
+  .method-text .fig-wide figcaption { padding-inline: 0; }
+  .scope { grid-template-columns: 1fr; }
+  .scope section { padding: 18px 18px 20px; }
+  .arch { padding-left: 26px; }
+  .arch li { grid-template-columns: 1fr; }
+  .ar-branch { grid-template-columns: 1fr; }
+  .scope li { grid-template-columns: 1fr; gap: 2px; }
+  .sc-out li { grid-template-columns: 18px minmax(0, 1fr); }
+  /* the status table becomes a list of entries */
+  .tbl { min-width: 0; }
+  .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tbl tbody tr { display: grid; gap: 6px; padding: 14px 0; border-bottom: 1px solid var(--hair); }
+  .tbl tbody th, .tbl td, .tbl td:nth-child(2) { width: auto; padding: 0; border: 0; white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) { .m-links svg { transition: none; } }
+
+/* ---- 简体中文 */
+:root[data-lang="zh"] .method-text .prose > p.first { font-style: normal; font-size: clamp(19px, 1.7vw, 23px); line-height: 1.7; }
+:root[data-lang="zh"] .m-deck { font-weight: 600; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.45; }
+:root[data-lang="zh"] .m-deck em { font-style: normal; }
+:root[data-lang="zh"] .p-t, :root[data-lang="zh"] .ar-t, :root[data-lang="zh"] .d-name { font-weight: 600; line-height: 1.35; }
+:root[data-lang="zh"] .p-t, :root[data-lang="zh"] .ar-t { font-size: clamp(17px, 1.5vw, 20px); }
+:root[data-lang="zh"] .d-name { font-size: clamp(20px, 1.8vw, 24px); }
+:root[data-lang="zh"] .scope h3 { font-weight: 600; font-size: clamp(22px, 2vw, 28px); line-height: 1.4; }
+:root[data-lang="zh"] .scope h3 em { font-style: normal; }
+:root[data-lang="zh"] .scope p, :root[data-lang="zh"] .m-boundary, :root[data-lang="zh"] .d-desc { line-height: 1.8; }
+:root[data-lang="zh"] .tbl tbody th { font-weight: 600; font-size: 16px; line-height: 1.5; }
+:root[data-lang="zh"] .tbl td { line-height: 1.7; }

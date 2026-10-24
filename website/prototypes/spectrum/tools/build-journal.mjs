@@ -3,28 +3,12 @@
 // toggle). Essay text is read from the live site's own source (BLOG_POSTS and SITE_ZH_CN_COPY in the
 // compiled site), so nothing is retyped; only the figures, covers and captions below are new.
 // usage (from the repo root, after `npm run build`): node website/prototypes/spectrum/tools/build-journal.mjs
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
+import { PROTO, REPO, esc, Z, bi, biE, biP, frame, RENDERED } from "./site-kit.mjs";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const PROTO = join(HERE, "..");
-const REPO = join(PROTO, "..", "..", "..");
 const { BLOG_POSTS, articleHeadingId } = await import(join(REPO, "dist/src/site/pages/blog.js"));
-const { SITE_ZH_CN_COPY } = await import(join(REPO, "dist/src/site/locale-copy.js"));
-
-const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-function Z(en) {
-  const zh = SITE_ZH_CN_COPY[en];
-  if (zh === undefined) throw new Error(`No zh-CN copy for: ${en.slice(0, 80)}`);
-  return zh;
-}
-/** inline pair */
-const bi = (en, zh = Z(en)) => `<span class="en">${en}</span><span class="zh" lang="zh-CN">${zh}</span>`;
-const biE = (en, zh = Z(en)) => bi(esc(en), esc(zh));
-/** block pair */
-const biP = (tag, cls, en, zh) => `<${tag} class="en${cls ? " " + cls : ""}">${en}</${tag}><${tag} class="zh${cls ? " " + cls : ""}" lang="zh-CN">${zh}</${tag}>`;
 
 const slug = (p) => p.route.split("/").filter(Boolean).pop();
 const zhWords = (s) => s.replace(/\s/g, "").length;
@@ -35,56 +19,6 @@ function readingTime(p) {
   return { en: Math.max(1, Math.round(en / 230)), zh: Math.max(1, Math.round(zh / 420)) };
 }
 const DATE_ISO = { "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
-
-// ---------------------------------------------------------------- frame from the homepage
-const INDEX = readFileSync(join(PROTO, "index.html"), "utf8");
-const cut = (a, b) => { const i = INDEX.indexOf(a); const j = INDEX.indexOf(b, i); if (i < 0 || j < 0) throw new Error(`frame: ${a}`); return INDEX.slice(i, j + b.length); };
-function rel(html, prefix) {
-  return html.replace(/(href|src)="([^"]*)"/g, (m, attr, v) => {
-    if (/^(https?:|mailto:|data:|\/)/.test(v)) return m;
-    if (v.startsWith("#")) return `${attr}="${prefix}index.html${v === "#top" ? "" : v}"`;
-    return `${attr}="${prefix}${v}"`;
-  });
-}
-function frame({ prefix, title, titleZh, description, body, current }) {
-  let head = INDEX.slice(0, INDEX.indexOf("</head>"));
-  head = head.replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
-    .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(description)}">`)
-    .replace('<link rel="stylesheet" href="spectrum.css">', '<link rel="stylesheet" href="spectrum.css">\n<link rel="stylesheet" href="journal.css">');
-  head = rel(head, prefix);
-  let bar = rel(cut('<header class="bar"', "</header>"), prefix);
-  bar = bar.replace(`<a href="${prefix}index.html#essays">`, `<a href="${prefix}blog/index.html"${current === "journal" ? ' aria-current="page"' : ""}>`);
-  let foot = rel(cut('<footer class="foot"', "</footer>"), prefix);
-  foot = foot.replace(`<a href="${prefix}index.html#essays">`, `<a href="${prefix}blog/index.html">`)
-    .replace("The cover kaleidoscope and gems are rendered in Blender (Cycles).", "The Journal covers and photographs are rendered in Blender (Cycles).")
-    .replace("封面万花筒与宝石由 Blender（Cycles）渲染。", "期刊封面与图版由 Blender（Cycles）渲染。");
-  return `${head}</head>
-<body>
-<a class="skip" href="#main">${bi("Skip to content", "跳到正文")}</a>
-
-${bar}
-
-${body}
-
-${foot}
-
-<script src="${prefix}spectrum.js"></script>
-<script>
-  // bilingual alt text and tab title follow the language toggle
-  (function () {
-    var T = { en: ${JSON.stringify(title)}, zh: ${JSON.stringify(titleZh)} };
-    function apply() {
-      var zh = document.documentElement.getAttribute("data-lang") === "zh";
-      document.title = zh ? T.zh : T.en;
-      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
-    }
-    apply(); document.addEventListener("langchange", apply);
-  })();
-</script>
-</body>
-</html>
-`;
-}
 
 // ---------------------------------------------------------------- covers and figures (design content)
 const COVERS = {
@@ -109,7 +43,6 @@ const COVERS = {
     cap: ["The clock’s shadow and the chalk: two different jobs.", "钟的影子和粉笔：两份不同的工作。"],
   },
 };
-const RENDERED = ["Rendered in Blender.", "Blender 渲染。"];
 
 const ledger = (items) => `<ol class="ledger">${items.map(([en, zh]) => `<li>${bi(esc(en), esc(zh))}</li>`).join("")}</ol>`;
 const plate = (src, w, h, alt) => `<img src="../../assets/journal/${src}" alt="${esc(alt[0])}" width="${w}" height="${h}" loading="lazy" data-alt-en="${esc(alt[0])}" data-alt-zh="${esc(alt[1])}">`;
@@ -275,7 +208,7 @@ ${body.filter(Boolean).join("\n")}
 
 ${issueRow(idx, "../")}
 </main>`;
-  return frame({ prefix: "../../", title: `${p.title} · Teachometry Journal`, titleZh: `${Z(p.title)} · Teachometry 期刊`, description: p.description, body: main, current: "journal" });
+  return frame({ prefix: "../../", title: `${p.title} · Teachometry Journal`, titleZh: `${Z(p.title)} · Teachometry 期刊`, description: p.description, body: main, current: "journal", css: ["journal.css"] });
 }
 
 function issueRow(current, base) {
@@ -339,7 +272,7 @@ ${BLOG_POSTS.map((q, i) => entry(q, i, i === 0)).join("\n")}
     <p class="jx-links"><a href="../index.html#dispersion">${biE("How we measure")}</a><a href="../index.html#plates">${biE("Explore the benchmark")}</a></p>
   </section>
 </main>`;
-  return frame({ prefix: "../", title: "The Journal · Teachometry", titleZh: "期刊 · Teachometry", description: "Long-form notes on AI teaching, measurement, instructional autonomy, and the future structure of education.", body: main, current: "journal" });
+  return frame({ prefix: "../", title: "The Journal · Teachometry", titleZh: "期刊 · Teachometry", description: "Long-form notes on AI teaching, measurement, instructional autonomy, and the future structure of education.", body: main, current: "journal", css: ["journal.css"] });
 }
 
 // ---------------------------------------------------------------- write
