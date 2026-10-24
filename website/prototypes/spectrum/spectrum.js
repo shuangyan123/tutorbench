@@ -56,6 +56,8 @@
   /* ------------------------------------------------------------ 1 language */
   var langListeners = [];
   function setLang(next) {
+    // remember the choice, so the next page (and the next visit) opens in it
+    try { window.localStorage.setItem("teachometry-lang", next); } catch { /* storage is optional */ }
     // published site: each language has its own URL, so the toggle goes to the other page
     var alt = root.getAttribute("data-alt-href");
     if (alt) { location.href = alt + location.hash; return; }

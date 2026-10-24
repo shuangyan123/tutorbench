@@ -19,10 +19,18 @@
   // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
   (function () {
     var root = document.documentElement;
-    // the published site has one URL per language (/zh-cn/...): the build marks each page with data-route-lang
-    var fixed = root.getAttribute("data-route-lang");
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
     var q = new URLSearchParams(location.search).get("lang");
-    var zh = fixed ? fixed === "zh" : q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    var wantZh = q ? q.indexOf("zh") === 0 : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and the other language's address; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var alt = root.getAttribute("data-alt-href");
+    if (fixed === "en" && wantZh && alt) location.replace(alt + location.hash);
+    var zh = fixed ? fixed === "zh" : wantZh;
     root.setAttribute("data-lang", zh ? "zh" : "en");
     root.lang = zh ? "zh-CN" : "en";
     if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
