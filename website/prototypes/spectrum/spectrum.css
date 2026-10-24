@@ -186,7 +186,8 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .hero { position: relative; height: 260vh; overflow: clip; }
 /* the cover sits on the page's own light (body::before), so the eyepiece floats in the haze */
 .hero-stage { position: sticky; top: 0; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate; }
-.seq { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; opacity: 0; transition: opacity 1s ease; }
+.seq { position: absolute; z-index: 1; left: calc(var(--cx, 62%) - var(--d, 70vh) / 2); top: calc(var(--cy, 50%) - var(--d, 70vh) / 2);
+  width: var(--d, 70vh); height: var(--d, 70vh); opacity: 0; transition: opacity 1s ease; }
 .hero[data-cover="on"] .seq { opacity: 1; }
 /* the eyepiece rim: a glass edge and the soft shadow of a lens held up to the light (placed by cover.js) */
 .scope-ring { position: absolute; z-index: 0; left: calc(var(--cx, 62%) - var(--d, 70vh) / 2); top: calc(var(--cy, 50%) - var(--d, 70vh) / 2);
