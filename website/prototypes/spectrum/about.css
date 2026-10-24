@@ -1,15 +1,13 @@
 /* Teachometry · About, Community, Contact and 404. Loads after journal.css (the shared section template).
-   The project pages carry the whole spectrum instead of one gem: the five homepage colours, side by
-   side and blending as on a split-fountain roller. The ink itself stays near-black; the colours appear
-   only as rules, marks and numerals, never as running text. */
+   The project pages belong to no single gem: the interface stays in violet-black ink with hairline
+   rules, and the five dimensions are marked by the homepage's own rendered gems, small, as in the
+   Methodology section. The spectrum itself lives in the covers (the split-fountain proof). */
 :root {
   --lead: #2b2350;            /* the violet-black that type metal takes under the ink */
   --lead-deep: #1b1538;
   --lead-soft: rgba(43, 35, 80, .12);
   --lead-line: rgba(43, 35, 80, .4);
   --lead-shadow: rgba(27, 21, 56, .4);
-  --s0: #f2482a; --s1: #f39a12; --s2: #13a25e; --s3: #2d5cf6; --s4: #7b3ef2;
-  --fountain: linear-gradient(90deg, var(--s0), var(--s1) 25%, var(--s2) 50%, var(--s3) 75%, var(--s4));
   --sheet: rgba(255, 255, 255, .55);
 }
 
@@ -20,10 +18,9 @@
 .ab code, .cm code { font-family: var(--f-mono); font-size: .9em; }
 .ab .essay-title em, .cm .essay-title em, .ct .essay-title em { font-style: italic; }
 
-/* the split-fountain rule: the signature of these pages */
-.fount { display: block; height: 3px; background: var(--fountain); border: 0; margin: 0; }
+/* a kicker led by a hairline, as in the essay heads */
 .fount-k { display: inline-flex; align-items: center; gap: 12px; }
-.fount-k::before { content: ""; width: 40px; height: 3px; background: var(--fountain); }
+.fount-k::before { content: ""; width: 40px; height: 1px; background: var(--ink); }
 
 /* a section row: label column + body, rules between, as in the other sections */
 .ab-row { display: grid; grid-template-columns: minmax(200px, 300px) minmax(0, 1fr); gap: clamp(24px, 5vw, 80px); padding-block: clamp(40px, 5vw, 72px); border-top: 1px solid var(--ink); }
@@ -40,27 +37,21 @@
 .ab-plate img { display: block; width: 100%; height: auto; border-radius: 3px; box-shadow: 0 40px 70px -40px rgba(14, 15, 20, .55), 0 2px 6px rgba(14, 15, 20, .16); }
 .ab-plate figcaption { display: grid; gap: 10px; margin-top: 14px; line-height: 1.5; }
 .ab-plate figcaption b { color: var(--lead); font-weight: 500; }
-.ab-plate .fount { width: min(100%, 220px); }
 
 /* why: Answers ≠ Teaching across the page, then the argument and the five dimensions */
 .ab-why { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); row-gap: clamp(20px, 3vw, 40px); }
 .ab-why-head { grid-column: 1 / -1; }
 .ab-neq { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(48px, 6.4vw, 96px); line-height: .95; letter-spacing: var(--serif-ls, -.015em); margin: 10px 0 0; }
-.ab-neq i { font-style: normal; background: var(--fountain); -webkit-background-clip: text; background-clip: text; color: transparent; padding-inline: .06em; }
+.ab-neq i { font-style: italic; color: var(--lead); padding-inline: .04em; }
 .ab-why-arg > p:not(.ab-quote) { font-family: var(--f-text); font-size: 18px; line-height: 1.62; color: var(--ink-2); max-width: 34em; }
-.ab-quote { margin: 30px 0 0; padding: 4px 0 4px 22px; border-left: 3px solid; border-image: linear-gradient(180deg, var(--s0), var(--s2), var(--s4)) 1; font-family: var(--f-display); font-style: italic; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.25; color: var(--ink); max-width: 26em; }
+.ab-quote { margin: 30px 0 0; padding: 4px 0 4px 22px; border-left: 1px solid var(--ink); font-family: var(--f-display); font-style: italic; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.25; color: var(--ink); max-width: 26em; }
 .ab-dims-intro { font: 400 14.5px/1.55 var(--f-ui); color: var(--ink-3); max-width: 40em; margin: 0 0 18px; }
 .ab-dims { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
-.ab-dims li { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--hair-2); }
+.ab-dims li { display: grid; grid-template-columns: 54px minmax(0, 1fr) 30px; gap: 16px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--hair-2); }
 .ab-dims .n { font: 400 11px/1 var(--f-mono); letter-spacing: .12em; color: var(--ink-3); }
 .ab-dims strong { display: block; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(22px, 2vw, 28px); line-height: 1.1; }
 .ab-dims small { display: block; margin-top: 5px; font: 400 14.5px/1.5 var(--f-ui); color: var(--ink-2); }
-.ab-dims .ink { width: 46px; height: 10px; border-radius: 6px; align-self: center; }
-.ab-dims li:nth-child(1) .ink { background: var(--s0); }
-.ab-dims li:nth-child(2) .ink { background: var(--s1); }
-.ab-dims li:nth-child(3) .ink { background: var(--s2); }
-.ab-dims li:nth-child(4) .ink { background: var(--s3); }
-.ab-dims li:nth-child(5) .ink { background: var(--s4); }
+.ab-dims .gem { width: 30px; height: 30px; align-self: center; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(14, 15, 20, .18)); }
 
 /* position: the adapter boundary, as a composed line */
 .ab-flow { margin: 26px 0 0; border: 1px solid var(--ink); border-radius: 4px; background: var(--sheet); }
@@ -83,11 +74,7 @@
 .ab-principles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
 .ab-principles article { padding: 22px clamp(12px, 1.6vw, 24px) 6px 0; }
 .ab-principles article + article { padding-left: clamp(12px, 1.6vw, 24px); border-left: 1px solid var(--hair-2); }
-.ab-principles .n { display: block; font-family: var(--f-display); font-size: clamp(54px, 5.6vw, 84px); line-height: .9; font-variant-numeric: lining-nums; }
-.ab-principles article:nth-child(1) .n { color: var(--s0); }
-.ab-principles article:nth-child(2) .n { color: #c97a00; }
-.ab-principles article:nth-child(3) .n { color: var(--s2); }
-.ab-principles article:nth-child(4) .n { color: var(--s3); }
+.ab-principles .n { display: block; font-family: var(--f-display); font-size: clamp(54px, 5.6vw, 84px); line-height: .9; font-variant-numeric: lining-nums; color: var(--lead); }
 .ab-principles h3 { margin: 14px 0 8px; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(22px, 2vw, 28px); line-height: 1.08; }
 .ab-principles p { margin: 0; font: 400 15px/1.55 var(--f-ui); color: var(--ink-2); }
 
@@ -115,11 +102,7 @@
 
 .cm-obs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
 .cm-obs li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 12px; padding: 16px 16px 16px 0; border-bottom: 1px solid var(--hair-2); font-family: var(--f-display); font-size: clamp(20px, 1.8vw, 25px); line-height: 1.2; }
-.cm-obs li::before { content: ""; width: 12px; height: 12px; border-radius: 50%; margin-top: .3em; }
-.cm-obs li:nth-child(1)::before { background: var(--s1); }
-.cm-obs li:nth-child(2)::before { background: var(--s4); }
-.cm-obs li:nth-child(3)::before { background: var(--s3); }
-.cm-obs li:nth-child(4)::before { background: var(--s2); }
+.cm-obs li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--ink); margin-top: .5em; }
 .cm-obs, .cm-steps { margin-top: 26px; }
 .cm-app { align-items: start; }
 .cm-note { margin: 22px 0 0; padding-left: 16px; border-left: 2px solid var(--lead-line); font: 400 15px/1.6 var(--f-ui); color: var(--ink-2); max-width: 46em; }
@@ -170,7 +153,7 @@ a.cm-ledger-row:hover strong { color: var(--lead); }
 .cm-neq article { padding: 18px clamp(12px, 1.6vw, 22px) 6px 0; }
 .cm-neq article + article { padding-left: clamp(12px, 1.6vw, 22px); border-left: 1px solid var(--hair-2); }
 .cm-neq h3 { margin: 0 0 10px; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(22px, 2vw, 28px); line-height: 1.08; }
-.cm-neq h3 i { font-style: normal; background: var(--fountain); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cm-neq h3 i { font-style: italic; color: var(--lead); }
 .cm-neq p { margin: 0; font: 400 14.5px/1.55 var(--f-ui); color: var(--ink-2); }
 
 /* ======================================================================= Contact: a colophon */
@@ -193,7 +176,6 @@ a.v:hover { color: var(--lead); }
 /* ======================================================================= 404: an errata slip */
 .nf { padding-block: calc(var(--bar-h) + clamp(40px, 7vw, 96px)) clamp(56px, 8vw, 110px); }
 .nf-slip { position: relative; max-width: 760px; margin-inline: auto; padding: clamp(24px, 4vw, 52px); background: #fbfbfa; color: var(--ink); border-radius: 2px; box-shadow: 0 40px 70px -40px rgba(14, 15, 20, .5), 0 1px 3px rgba(14, 15, 20, .14); transform: rotate(-.6deg); }
-.nf-slip::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--fountain); border-radius: 2px 2px 0 0; }
 .nf-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 18px; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
 .nf-num { display: block; margin: clamp(20px, 3vw, 34px) 0 0; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(96px, 16vw, 200px); line-height: .8; letter-spacing: -.02em; font-variant-numeric: lining-nums; }
 .nf h1 { margin: 18px 0 0; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(30px, 3.6vw, 50px); line-height: 1.05; text-wrap: balance; }
@@ -223,8 +205,8 @@ a.v:hover { color: var(--lead); }
   .ab-principles article + article, .cm-tasks article + article, .cm-neq article + article { padding-left: 0; border-left: 0; }
   .cm-steps { grid-template-columns: minmax(0, 1fr); }
   .cm-steps li:nth-child(2n) { padding-left: 0; border-left: 0; }
-  .ab-dims li { grid-template-columns: 34px minmax(0, 1fr); }
-  .ab-dims .ink { grid-column: 2; width: 34px; height: 6px; order: -1; }
+  .ab-dims li { grid-template-columns: 34px minmax(0, 1fr) 26px; }
+  .ab-dims .gem { width: 26px; height: 26px; }
   .ab-core { grid-template-columns: minmax(0, 1fr); }
   .ab-core > svg { transform: rotate(90deg); }
   .ab-ledger div { grid-template-columns: minmax(0, 1fr); gap: 4px; }

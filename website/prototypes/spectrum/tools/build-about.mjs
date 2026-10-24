@@ -96,7 +96,7 @@ function aboutPage() {
       </div>
       <figure class="ab-plate">
         <img src="../assets/about/press.webp" alt="${esc(ABOUT_COVER[0])}" width="1600" height="960" data-alt-en="${esc(ABOUT_COVER[0])}" data-alt-zh="${esc(ABOUT_COVER[1])}">
-        <figcaption class="kicker"><span class="fount" aria-hidden="true"></span><span><b>${bi("Cover", "封面")}</b> · ${bi(`Set by hand, inked split-fountain: five inks laid side by side on one roller, so each blends into the next across the line, as the five dimensions do across one reply. ${esc(RENDERED[0])}`, `手工排字，分色墨辊上墨：五种墨并排放在同一根墨辊上，在一行字里彼此相融，正如五个维度在同一条回复里相互交织。${esc(RENDERED[1])}`)}</span></figcaption>
+        <figcaption class="kicker"><span><b>${bi("Cover", "封面")}</b> · ${bi(`Set by hand, inked split-fountain: five inks laid side by side on one roller, so each blends into the next across the line, as the five dimensions do across one reply. ${esc(RENDERED[0])}`, `手工排字，分色墨辊上墨：五种墨并排放在同一根墨辊上，在一行字里彼此相融，正如五个维度在同一条回复里相互交织。${esc(RENDERED[1])}`)}</span></figcaption>
       </figure>
     </div>
   </header>
@@ -113,7 +113,7 @@ function aboutPage() {
     <div>
       ${biPE("p", "ab-dims-intro", "The public benchmark keeps these questions separate, so each result remains tied to a case, a dimension, and its observable evidence.")}
       <ol class="ab-dims" ${attr2("aria-label", "Canonical benchmark score dimensions", "标准基准评分维度")}>
-        ${dims.map(([label, desc], i) => `<li><span class="n">0${i + 1}</span><span><strong>${biE(label, Zor(label, DIM_ZH[label]))}</strong><small>${biE(desc)}</small></span><span class="ink" aria-hidden="true"></span></li>`).join("\n        ")}
+        ${dims.map(([label, desc], i) => `<li><span class="n">0${i + 1}</span><span><strong>${biE(label, Zor(label, DIM_ZH[label]))}</strong><small>${biE(desc)}</small></span><img class="gem" src="../assets/gems/gem-${i}.webp" alt="" width="96" height="96" loading="lazy"></li>`).join("\n        ")}
       </ol>
     </div>
   </section>

@@ -165,8 +165,9 @@ notice from the public artifacts and `package.json`. Community keeps every "not 
 form, no waitlist, the future application contract shown as a spec card. Contact shows the email
 as selectable text with a copy button (`about.js`), since mailto links are unreliable in previews.
 
-- Section colour: the whole spectrum (`about.css`). The five homepage colours appear side by side,
-  blending as on a split-fountain roller, only as rules, marks and numerals; type stays near-black.
+- Section colour: no single gem (`about.css`). The interface stays in violet-black ink with hairline
+  rules; the five dimensions are marked by the homepage's rendered gems, as on Methodology. The
+  spectrum lives only in the covers (no multicolour bars or gradient rules, by the user's call).
 - About cover: `render/press.py` (textures and glyph advances from `render/press_tex.py`), one line
   of lead type, ANSWERS ≠ TEACHING (the live page's own headline), set in a composing stick and
   inked split-fountain; its proof in front, the brayer and slab behind. 1600×960.
