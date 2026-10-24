@@ -28,7 +28,7 @@ import { findBrowser, launchBrowser, openPage } from "./website-browser.mjs";
 
 const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp", ".ico": "image/x-icon", ".json": "application/json", ".woff2": "font/woff2" };
 
-function serve(root) {
+export function serve(root) {
   const server = createServer(async (request, response) => {
     let path;
     try { path = decodeURIComponent(new URL(request.url ?? "/", "http://localhost").pathname); }

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Micro-Review — Teachometry</title>
+<meta name="description" content="Try one AI teaching judgment in about 60 seconds. A constructed example, no account or installation needed.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../spectrum.css">
+<link rel="stylesheet" href="../journal.css">
+<link rel="stylesheet" href="../micro.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    var wantZh = q ? q.indexOf("zh") === 0 : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    if (other) location.replace(location.origin + other);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../index.html#methods" class="nav-tb"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu / 菜单"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main" class="mr">
+  <header class="essay-head mr-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><span class="issue"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></span><span class="rule" aria-hidden="true"></span><span><span class="en">≈ 60 s</span><span class="zh" lang="zh-CN">约 60 秒</span></span></p>
+        <h1 class="essay-title"><span class="en">Would this help a student <em>learn?</em></span><span class="zh" lang="zh-CN">这样的回复，能帮助学生<em>学习</em>吗？</span></h1>
+        <p class="en essay-dek">One conversation. One judgment. About 60 seconds.</p><p class="zh essay-dek" lang="zh-CN">读一段对话，做一次判断，约 60 秒。</p>
+        <p class="mr-meta"><span class="en">No account. No installation. No personal details.</span><span class="zh" lang="zh-CN">无需注册，无需安装，无需填写个人信息。</span></p>
+      </div>
+      <figure class="cover-plate">
+        <img src="../assets/micro/selector.webp" alt="A selector knob cut from citrine, set in a knurled steel collar on a blue instrument panel. Its three positions read Basically suitable, Has a teaching problem and Not sure; the pointer rests on an unmarked ring, before any choice." width="900" height="1100" data-alt-en="A selector knob cut from citrine, set in a knurled steel collar on a blue instrument panel. Its three positions read Basically suitable, Has a teaching problem and Not sure; the pointer rests on an unmarked ring, before any choice." data-alt-zh="一枚黄水晶切割的选择旋钮，嵌在滚花钢圈里，装在蓝色仪器面板上。三个档位写着“基本合适”“存在教学问题”“不确定”；指针停在一个空白小圆圈上，还没有做出选择。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">The pointer rests: no judgment yet. Rendered in Blender.</span><span class="zh" lang="zh-CN">指针停在原位：还没有判断。Blender 渲染。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap mr-desk">
+    <section class="mr-read" aria-labelledby="micro-review-example-title">
+      <p class="kicker mr-step"><span class="mr-n">1</span><span class="en">The conversation</span><span class="zh" lang="zh-CN">对话</span></p>
+      <h2 id="micro-review-example-title" class="mr-h2"><span class="en">Read the conversation</span><span class="zh" lang="zh-CN">读一读这段对话</span></h2>
+      <p class="mr-prov"><span class="en">Constructed example · not a real model output</span><span class="zh" lang="zh-CN">构造示例 · 并非真实模型输出</span></p>
+      <ol class="mr-transcript">
+        <li class="mr-turn">
+          <p class="mr-who"><span class="mr-t">T1</span><span class="en">Student</span><span class="zh" lang="zh-CN">学生</span></p>
+          <p class="mr-said"><span class="en">I think <span class="mr-sum" role="math" aria-label="one third plus one quarter equals two sevenths">1/3 + 1/4 = 2/7</span>. I added the top numbers and the bottom numbers. Is that right?</span><span class="zh" lang="zh-CN">我觉得 <span class="mr-sum" role="math" aria-label="三分之一加四分之一等于七分之二">1/3 + 1/4 = 2/7</span>。我把分子相加，分母也相加。这样对吗？</span></p>
+        </li>
+        <li class="mr-turn mr-ai">
+          <p class="mr-who"><span class="mr-t">T2</span><span class="en">AI tutor · constructed reply</span><span class="zh" lang="zh-CN">AI 教师 · 构造回复</span></p>
+          <p class="mr-said"><span class="en">Yes, that's right! Adding the top numbers and the bottom numbers is how you add fractions. You understand it well.</span><span class="zh" lang="zh-CN">对，完全正确！分数相加就是把分子相加、分母相加。你理解得很好。</span></p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="mr-judge" aria-labelledby="mr-judge-label">
+      <p class="kicker mr-step" id="mr-judge-label"><span class="mr-n">2</span><span class="en">Your teaching judgment</span><span class="zh" lang="zh-CN">你的教学判断</span></p>
+      <p class="mr-unavailable" data-micro-review-unavailable><span class="en">Enable JavaScript to choose a judgment and see the analysis. No sign-in is needed.</span><span class="zh" lang="zh-CN">请启用 JavaScript，即可选择判断并查看分析，无需登录。</span></p>
+      <form data-micro-review-form aria-describedby="micro-review-choice-help" hidden>
+        <fieldset>
+          <legend class="mr-h2"><span class="en">How suitable is the AI reply for teaching?</span><span class="zh" lang="zh-CN">这段 AI 回复适合教学吗？</span></legend>
+          <p id="micro-review-choice-help" class="mr-help"><span class="en">Choose one, then see a short analysis.</span><span class="zh" lang="zh-CN">选择一项，再看简短分析。</span></p>
+          <div class="mr-options">
+            <label class="mr-opt"><input type="radio" name="judgment" value="suitable" required><span class="mr-dial" aria-hidden="true">A</span><span class="mr-opt-l"><span class="en">Basically suitable</span><span class="zh" lang="zh-CN">基本合适</span></span></label>
+            <label class="mr-opt"><input type="radio" name="judgment" value="problem" required><span class="mr-dial" aria-hidden="true">B</span><span class="mr-opt-l"><span class="en">Has a teaching problem</span><span class="zh" lang="zh-CN">存在教学问题</span></span></label>
+            <label class="mr-opt"><input type="radio" name="judgment" value="unsure" required><span class="mr-dial" aria-hidden="true">C</span><span class="mr-opt-l"><span class="en">Not sure</span><span class="zh" lang="zh-CN">不确定</span></span></label>
+          </div>
+        </fieldset>
+        <button class="cta cta-ink mr-submit" type="submit"><span class="en">See the analysis</span><span class="zh" lang="zh-CN">查看分析</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+      </form>
+      <p class="mr-status" data-micro-review-status role="status"></p>
+      <span data-micro-review-complete-message hidden><span class="en">Your judgment is shown above. It has not been sent or saved.</span><span class="zh" lang="zh-CN">你的判断已在上方展示，没有发送或保存。</span></span>
+    </section>
+  </div>
+
+  <section class="mr-result" data-micro-review-result aria-labelledby="micro-review-analysis-title" hidden>
+    <div class="wrap mr-result-in">
+      <div class="mr-analysis">
+        <p class="kicker mr-step"><span class="mr-n">3</span><span class="en">A closer look</span><span class="zh" lang="zh-CN">再仔细看看</span></p>
+        <h2 id="micro-review-analysis-title" class="jx-h2" tabindex="-1"><span class="en">There is a teaching problem.</span><span class="zh" lang="zh-CN">这段回复存在教学问题。</span></h2>
+        <p class="en jx-p">The reply praises a misconception instead of helping the student check it. Fractions need a common denominator before adding:</p><p class="zh jx-p" lang="zh-CN">回复肯定了错误理解，没有帮助学生检查。异分母分数相加，需要先通分：</p>
+        <p class="mr-equation"><span class="en" role="math" aria-label="one third plus one quarter equals four twelfths plus three twelfths equals seven twelfths"><span class="mr-frac"><span>1</span><span>3</span></span><i>+</i><span class="mr-frac"><span>1</span><span>4</span></span><i>=</i><span class="mr-frac"><span>4</span><span>12</span></span><i>+</i><span class="mr-frac"><span>3</span><span>12</span></span><i>=</i><span class="mr-frac"><span>7</span><span>12</span></span></span><span class="zh" lang="zh-CN" role="math" aria-label="三分之一加四分之一，等于十二分之四加十二分之三，等于十二分之七"><span class="mr-frac"><span>1</span><span>3</span></span><i>+</i><span class="mr-frac"><span>1</span><span>4</span></span><i>=</i><span class="mr-frac"><span>4</span><span>12</span></span><i>+</i><span class="mr-frac"><span>3</span><span>12</span></span><i>=</i><span class="mr-frac"><span>7</span><span>12</span></span></span></p>
+        <div class="mr-strip" aria-hidden="true"><i class="a"></i><i class="a"></i><i class="a"></i><i class="a"></i><i class="b"></i><i class="b"></i><i class="b"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div>
+        <p class="en jx-p">A better next step: ask the student to imagine one whole split into 12 equal pieces. How many pieces are one third and one quarter? Then guide them to add 4 and 3.</p><p class="zh jx-p" lang="zh-CN">更好的下一步：请学生想象把同一个整体平均分成 12 份。三分之一和四分之一各占几份？再引导学生把 4 份和 3 份相加。</p>
+        <p class="en mr-editorial">This is an explanation written for the demo, not an expert review or a score of you or a model.</p><p class="zh mr-editorial" lang="zh-CN">这是为体验编写的说明，不是专家评审，也不对你或模型评分。</p>
+      </div>
+      <aside class="callout mr-invite" aria-labelledby="micro-review-invitation-title">
+        <h3 id="micro-review-invitation-title"><span class="en">Curious about independent review?</span><span class="zh" lang="zh-CN">想了解独立评审吗？</span></h3>
+        <p class="en">Future independent Reviewers would examine AI teaching with shared criteria. You can stop here, or voluntarily learn about the plan.</p><p class="zh" lang="zh-CN">未来的独立评审员会依据共同标准审视 AI 教学。你可以到此结束，也可以自愿了解 Reviewer 计划。</p>
+        <p class="en">Teachers, education researchers, and others in education are welcome to contact us. For now, we are only discussing interest in participating.</p><p class="zh" lang="zh-CN">欢迎教师、教育研究者及其他教育相关人士主动联系。目前仅交流参与意向。</p>
+        <p class="cx-actions"><a class="cta cta-ink" data-micro-review-contact-link href="../contact/index.html"><span class="en">Contact the project</span><span class="zh" lang="zh-CN">联系项目</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a class="cta cta-line" data-micro-review-reviewer-link href="../community/index.html#community-process"><span class="en">Explore the Reviewer plan</span><span class="zh" lang="zh-CN">了解独立 Reviewer 计划</span></a></p>
+        <p class="en mr-fine">Formal Reviewer applications are not open yet. This demo does not enroll you.</p><p class="zh mr-fine" lang="zh-CN">正式评审员申请尚未开放，本体验不会为你报名。</p>
+      </aside>
+    </div>
+  </section>
+
+  <div class="mr-boundary">
+    <div class="wrap mr-boundary-in">
+      <p class="en">Your choice stays on this page. It is not sent to a server or saved. Reloading starts over.</p><p class="zh" lang="zh-CN">你的选择仅在当前页面展示，不发送到服务器、不保存。刷新后可重新体验。</p>
+      <p class="en">This public demo is separate from Expert Review, benchmark results, and validity research.</p><p class="zh" lang="zh-CN">公开体验独立于正式 Expert Review、评测基准结果和效度研究。</p>
+    </div>
+  </div>
+
+  <nav class="wrap mr-next" aria-labelledby="micro-review-next-title">
+    <h2 id="micro-review-next-title" class="mr-h2"><span class="en">Where to go next</span><span class="zh" lang="zh-CN">接下来可以</span></h2>
+    <ul>
+      <li><a href="../index.html#reproduce" data-micro-review-run-link><b><span class="en">Run a real evaluation with TutorBench</span><span class="zh" lang="zh-CN">使用 TutorBench 运行真实评测</span></b><span class="en">Evaluate your own AI Tutor on your machine. Requires the repository and Node.js.</span><span class="zh" lang="zh-CN">在你自己的环境中评测 AI Tutor，需要仓库源码和 Node.js。</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></li>
+      <li><a href="../methodology/index.html" data-micro-review-methodology-link><b><span class="en">Read the Methodology</span><span class="zh" lang="zh-CN">阅读方法论</span></b><span class="en">How formal TutorBench evaluations are designed and scored.</span><span class="zh" lang="zh-CN">了解正式的 TutorBench 评测如何设计与评分。</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></li>
+    </ul>
+  </nav>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../spectrum.js"></script>
+<script src="../micro.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Micro-Review — Teachometry", zh: "微评审体验 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

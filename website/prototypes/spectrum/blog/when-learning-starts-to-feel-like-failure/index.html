@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>When Learning Starts to Feel Like Failure · Teachometry Journal</title>
+<meta name="description" content="Why students can fall from confusion into disengagement, why distant rewards often fail to restore motivation, and why an AI tutor may need to make learning psychologically safe before it can make it more efficient.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    var wantZh = q ? q.indexOf("zh") === 0 : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    if (other) location.replace(location.origin + other);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html" aria-current="page"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu / 菜单"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <header class="essay-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><a class="issue" href="../index.html"><span class="en">Journal · Essay 1 of 4</span><span class="zh" lang="zh-CN">期刊 · 第 1 篇，共 4 篇</span></a><span class="rule" aria-hidden="true"></span><span><span class="en">Perspective</span><span class="zh" lang="zh-CN">观点</span></span><time datetime="2026-09-30"><span class="en">September 30, 2026</span><span class="zh" lang="zh-CN">2026年9月30日</span></time></p>
+        <h1 class="essay-title"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></h1>
+        <p class="en essay-dek">Students do not always stop caring because they lack ambition. Sometimes learning has become a repeated experience of confusion, exposure, and failure.</p><p class="zh essay-dek" lang="zh-CN">学生停止在乎，并不总是因为缺乏上进心。有时候，学习已经变成了反复经历困惑、暴露和失败。</p>
+        <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">10 sections · about 6 min</span><span class="zh" lang="zh-CN">10 节 · 约 6 分钟</span></span></p>
+      </div>
+      <figure class="cover-plate">
+        <img src="../../assets/journal/eraser.webp" alt="A worn eraser resting on an exercise page whose first attempt has been rubbed out." width="900" height="1100" data-alt-en="A worn eraser resting on an exercise page whose first attempt has been rubbed out." data-alt-zh="一块用旧的橡皮，放在一页练习纸上，纸上第一次的演算已经被擦掉。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">The first attempt, rubbed out. Rendered in Blender.</span><span class="zh" lang="zh-CN">第一次的尝试，被擦掉了。Blender 渲染。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap essay-body">
+    <nav class="essay-toc" aria-label="On this page">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <ol>
+        <li><a href="#a-classroom-has-to-choose-a-starting-point"><span class="en">A classroom has to choose a starting point</span><span class="zh" lang="zh-CN">课堂必须选择一个共同起点</span></a></li>
+        <li><a href="#asking-for-help-has-a-social-cost"><span class="en">Asking for help has a social cost</span><span class="zh" lang="zh-CN">求助本身有社会成本</span></a></li>
+        <li><a href="#repeated-failure-eventually-changes-the-meaning-of-learning"><span class="en">Repeated failure eventually changes the meaning of learning</span><span class="zh" lang="zh-CN">反复失败最终会改变“学习”的意义</span></a></li>
+        <li><a href="#distant-consequences-are-weak-rewards"><span class="en">Distant consequences are weak rewards</span><span class="zh" lang="zh-CN">遥远的结果往往不是强奖励</span></a></li>
+        <li><a href="#the-strongest-reward-may-be-visible-progress"><span class="en">The strongest reward may be visible progress</span><span class="zh" lang="zh-CN">最强的奖励可能是看得见的进步</span></a></li>
+        <li><a href="#i-do-not-understand-should-be-a-valid-input"><span class="en">“I do not understand” should be a valid input</span><span class="zh" lang="zh-CN">“我不懂”应当是一种有效输入</span></a></li>
+        <li><a href="#a-tutor-also-shapes-the-emotional-experience-of-learning"><span class="en">A Tutor also shapes the emotional experience of learning</span><span class="zh" lang="zh-CN">Tutor 也在塑造学习的情绪体验</span></a></li>
+        <li><a href="#ai-education-may-enter-through-the-space-outside-school"><span class="en">AI education may enter through the space outside school</span><span class="zh" lang="zh-CN">AI 教育可能先从学校之外进入</span></a></li>
+        <li><a href="#the-goal-is-not-dependence-on-the-tutor"><span class="en">The goal is not dependence on the Tutor</span><span class="zh" lang="zh-CN">目标不是让学生依赖 Tutor</span></a></li>
+        <li><a href="#education-should-make-progress-perceptible"><span class="en">Education should make progress perceptible</span><span class="zh" lang="zh-CN">教育应该让进步变得可感知</span></a></li>
+      </ol>
+    </nav>
+    <article class="essay-text">
+      <div class="prose">
+        <h2 id="a-classroom-has-to-choose-a-starting-point"><span class="no">§1</span><span><span class="en">A classroom has to choose a starting point</span><span class="zh" lang="zh-CN">课堂必须选择一个共同起点</span></span></h2>
+        <p class="en first">A teacher can explain a new topic, sketch a framework on the board, demonstrate a formula, assign exercises, review the answers, and assign more exercises. None of those actions is inherently poor teaching. Direct explanation, worked examples, practice, and feedback all matter.</p><p class="zh first" lang="zh-CN">老师可以讲解新主题，在黑板上勾勒框架，示范公式，布置练习，讲评答案，再继续布置练习。这些行为本身都不是糟糕的教学。直接讲解、例题、练习和反馈都很重要。</p>
+        <p class="en">The constraint is that a classroom has to perform them for many learners at once. A lesson needs one starting point, one approximate pace, and one sequence even though students do not actually arrive at the same point.</p><p class="zh" lang="zh-CN">真正的约束在于，课堂必须同时面向许多学生完成这些工作。即使学生实际并不处在同一个起点，一节课仍然需要一个共同起点、一种大致相同的节奏和一条统一的教学顺序。</p>
+        <p class="en">One learner may understand every prerequisite. Another may be missing one concept. Another may have stopped understanding two chapters earlier. The class still moves forward, and a small gap can gradually become the learner's entire experience of the subject.</p><p class="zh" lang="zh-CN">一个学生可能已经掌握所有前置知识，另一个可能只缺一个概念，还有一个可能从两章以前就已经跟不上。课堂仍然继续向前，而一个很小的知识缺口会逐渐变成这个学生对整门学科的主要体验。</p>
+        <h2 id="asking-for-help-has-a-social-cost"><span class="no">§2</span><span><span class="en">Asking for help has a social cost</span><span class="zh" lang="zh-CN">求助本身有社会成本</span></span></h2>
+        <p class="en">In theory, a learner who does not understand can ask the teacher. In practice, asking is not free. Raising a hand can mean publicly admitting that everyone else seems to understand something that you do not. Approaching a teacher after class requires crossing a social boundary.</p><p class="zh" lang="zh-CN">理论上，不理解的学生可以向老师提问。现实中，提问并不是零成本的。举手可能意味着公开承认别人似乎都懂了，而自己没有；课后主动找老师，也需要跨过一道社交边界。</p>
+        <p class="en">A learner may worry that the question is too basic, that the teacher is busy, that the explanation will start too far ahead again, or that asking for the fourth time will be embarrassing. Sometimes the learner cannot even describe what is missing.</p><p class="zh" lang="zh-CN">学生可能担心问题太基础、老师太忙、解释又会从太靠后的地方开始，或者第四次再问同一个问题会很尴尬。有时候，学生甚至说不清自己到底缺了什么。</p>
+        <p class="en">A teacher responsible for an entire classroom may not have the time to reconstruct one student's knowledge from the beginning. That is not necessarily a failure of care. It is also a capacity constraint. So the learner stays quiet, and the lesson continues.</p><p class="zh" lang="zh-CN">负责整个班级的老师未必有时间从头重建某个学生的知识结构。这不一定意味着老师不关心，而是容量限制。于是学生保持沉默，课堂继续向前。</p>
+        <h2 id="repeated-failure-eventually-changes-the-meaning-of-learning"><span class="no">§3</span><span><span class="en">Repeated failure eventually changes the meaning of learning</span><span class="zh" lang="zh-CN">反复失败最终会改变“学习”的意义</span></span></h2>
+        <p class="en">At first, the problem may be academic: I do not understand this. After enough repetition, it can become personal: I am bad at this. Then broader: I am bad at learning.</p><p class="zh" lang="zh-CN">一开始，问题可能只在学习上：“我不懂这个。”重复足够多次之后，它可能变成个人判断：“我不擅长这个。”再进一步变成：“我不擅长学习。”</p>
+        <p class="en">A student who repeatedly listens without understanding, attempts problems without success, receives poor grades, or is mocked for falling behind is not experiencing learning as progress. Learning becomes associated with confusion, exposure, boredom, and failure.</p><p class="zh" lang="zh-CN">一个学生如果反复听不懂、做题总失败、成绩不断变差，或者因为落后而被嘲笑，他体验到的学习就不是进步，而会逐渐与困惑、暴露、无聊和失败绑定在一起。</p>
+        <p class="en">From the outside, the eventual response may look like indifference. But disengagement can also be a protective response to repeated experiences in which effort does not appear to change the outcome. Saying I never cared anyway can be easier than saying I cared, tried, and still failed.</p><p class="zh" lang="zh-CN">从外部看，最终表现出来的可能像是不在乎。但脱离学习也可能是一种保护性反应：当一次又一次的经历都告诉学生“努力似乎并不能改变结果”时，说“反正我从来就不在乎”往往比承认“我在乎过、努力过，但还是失败了”更容易。</p>
+        <figure class="fig fig-steps"><ol class="steps"><li><span class="st-l"><span class="en">Confusion</span><span class="zh" lang="zh-CN">困惑</span></span><span class="st-t"><span class="en">a concept or prerequisite is not understood.</span><span class="zh" lang="zh-CN">某个概念或前置知识没有掌握。</span></span></li><li><span class="st-l"><span class="en">Silence</span><span class="zh" lang="zh-CN">沉默</span></span><span class="st-t"><span class="en">asking for help feels socially expensive or difficult to formulate.</span><span class="zh" lang="zh-CN">求助的社交成本太高，或者难以准确表达问题。</span></span></li><li><span class="st-l"><span class="en">Accumulation</span><span class="zh" lang="zh-CN">累积</span></span><span class="st-t"><span class="en">new material is built on top of unresolved gaps.</span><span class="zh" lang="zh-CN">新知识不断叠加在尚未解决的缺口之上。</span></span></li><li><span class="st-l"><span class="en">Failure</span><span class="zh" lang="zh-CN">失败</span></span><span class="st-t"><span class="en">practice increasingly produces evidence of being behind rather than evidence of progress.</span><span class="zh" lang="zh-CN">练习越来越像是在证明自己落后，而不是证明自己在进步。</span></span></li><li><span class="st-l"><span class="en">Withdrawal</span><span class="zh" lang="zh-CN">退出</span></span><span class="st-t"><span class="en">avoiding the task becomes easier than repeatedly testing a painful prediction.</span><span class="zh" lang="zh-CN">逃避任务，比反复验证一个令人痛苦的预期更容易。</span></span></li></ol></figure>
+        <h2 id="distant-consequences-are-weak-rewards"><span class="no">§4</span><span><span class="en">Distant consequences are weak rewards</span><span class="zh" lang="zh-CN">遥远的结果往往不是强奖励</span></span></h2>
+        <p class="en">Education often responds with long-range incentives: study now to enter a better school, earn stronger qualifications, and find a better job. Those consequences can matter, but they are distant and abstract.</p><p class="zh" lang="zh-CN">教育常常用长期激励来回应：现在学习，是为了进入更好的学校、获得更好的资格、找到更好的工作。这些结果当然重要，但它们遥远而抽象。</p>
+        <p class="en">The learner's immediate experience is much closer: I am sitting here now. I do not understand this problem now. Everyone else seems ahead of me now. I am going to fail the next exercise now.</p><p class="zh" lang="zh-CN">学生眼前的体验却近得多：我现在就坐在这里；我现在就不懂这道题；别人现在看起来都比我快；我现在就要做错下一道练习。</p>
+        <p class="en">When learning itself produces almost no positive feedback, increasingly severe descriptions of the future may stop working. The learner needs evidence in the present that effort can produce change.</p><p class="zh" lang="zh-CN">当学习本身几乎不提供正反馈时，再严厉地描述未来后果也可能逐渐失效。学生需要的是当下的证据：努力真的能带来变化。</p>
+        <h2 id="the-strongest-reward-may-be-visible-progress"><span class="no">§5</span><span><span class="en">The strongest reward may be visible progress</span><span class="zh" lang="zh-CN">最强的奖励可能是看得见的进步</span></span></h2>
+        <p class="en">Positive reinforcement in education does not have to mean badges, points, streaks, praise animations, or gamification. A more powerful reward can be simpler: I can do something now that I could not do twenty minutes ago.</p><p class="zh" lang="zh-CN">教育中的正向强化不一定意味着徽章、积分、连续打卡、夸奖动画或游戏化。更有力的奖励可以更简单：二十分钟前我还不会的东西，现在我会了。</p>
+        <p class="en">Suppose a learner is failing quadratic-function problems. Instead of repeating the whole chapter, a tutor discovers that the real gap is an earlier understanding of how parameters change a graph. The tutor goes back, rebuilds that prerequisite, tries a near variation, asks the learner to explain it, and then returns to the original problem.</p><p class="zh" lang="zh-CN">假设一个学生总是做不好二次函数题。Tutor 不是把整章再讲一遍，而是发现真正的缺口来自更早的知识：学生没有理解参数如何改变图像。于是 Tutor 回退一步，重建这个前置概念，尝试一道相近变式，让学生自己解释，再回到原题。</p>
+        <figure class="fig fig-wide" id="fig1">
+          <img src="../../assets/journal/graphpaper.webp" alt="Graph paper with pencil parabolas y = ax² for a = 1/2, 1 and 2, a rubbed-out attempt, and the same curve shifted along the axis; a cedar pencil lies across the sheet." width="1800" height="1000" loading="lazy" data-alt-en="Graph paper with pencil parabolas y = ax² for a = 1/2, 1 and 2, a rubbed-out attempt, and the same curve shifted along the axis; a cedar pencil lies across the sheet." data-alt-zh="方格纸上用铅笔画的抛物线 y = ax²（a = 1/2、1、2），一条被擦掉的尝试，以及沿坐标轴平移后的同一条曲线；一支杉木铅笔横放在纸上。">
+          <figcaption><b><span class="en">Fig. 1</span><span class="zh" lang="zh-CN">图 1</span></b><span class="en">The example from this section, worked on paper: how the parameter a changes y = ax², then the same curve moved along the axis. Rendered in Blender.</span><span class="zh" lang="zh-CN">本节的例子在纸上的样子：参数 a 如何改变 y = ax² 的图像，再把同一条曲线沿坐标轴平移。Blender 渲染。</span></figcaption>
+        </figure>
+        <p class="en">Something that previously looked impossible now has a path through it. The important change is not one correct answer. It is the learner's prediction about difficulty: I do not understand no longer has to mean I probably never will.</p><p class="zh" lang="zh-CN">原本看起来完全不可能的题，现在出现了一条可以走通的路径。真正重要的变化不只是得到一个正确答案，而是学生对“困难”的预测发生了变化：“我现在不懂”不再自动等于“我大概永远也不会懂”。</p>
+        <aside class="callout">
+          <p class="kicker"><span class="en">Learning signal</span><span class="zh" lang="zh-CN">学习信号</span></p>
+          <h3><span class="en">Progress should be perceptible to the learner.</span><span class="zh" lang="zh-CN">进步应当能够被学生自己感知。</span></h3>
+          <p class="en">A system can make small gains visible without pretending every attempt deserves praise. The useful signal is evidence that effort, diagnosis, and the right amount of support changed what the learner can do.</p><p class="zh" lang="zh-CN">系统可以让微小进步变得可见，而不必假装每次尝试都值得表扬。真正有用的信号，是有证据表明：努力、诊断和恰当程度的支持，改变了学生能够做到的事情。</p>
+        </aside>
+        <h2 id="i-do-not-understand-should-be-a-valid-input"><span class="no">§6</span><span><span class="en">“I do not understand” should be a valid input</span><span class="zh" lang="zh-CN">“我不懂”应当是一种有效输入</span></span></h2>
+        <p class="en">This may be where AI tutoring has an unusually important advantage. A learner should be able to say: I have no idea. You started too far ahead. I do not understand what that symbol means. You already explained it three times and I still do not get it.</p><p class="zh" lang="zh-CN">这可能正是 AI 教学一个非常重要的优势。学生应该能够直接说：我完全不会。你讲得太靠后了。我不知道这个符号是什么意思。你已经解释三次了，我还是没懂。</p>
+        <blockquote class="pull"><span class="en">The first promise of AI education may be a place where saying “I do not understand” carries almost no social cost.</span><span class="zh" lang="zh-CN">AI 教育最早能够兑现的承诺，也许是创造一个说“我不懂”几乎没有社会成本的地方。</span></blockquote>
+        <p class="en">The system should not become impatient, interpret repeated questions as disrespect, or require the learner to perform confidence before receiving help. Instead, it can move backwards until it finds a stable starting point.</p><p class="zh" lang="zh-CN">系统不应该变得不耐烦，不应该把重复提问理解成不尊重，也不应该要求学生先表现得自信才配得到帮助。它应当持续向前置知识回退，直到找到一个稳定的起点。</p>
+        <p class="en">Personalization is therefore deeper than changing a mathematics problem so that it mentions a student's favourite sport. The important question is: where is this learner's actual starting point?</p><p class="zh" lang="zh-CN">因此，个性化远不只是把数学题里的例子换成学生喜欢的运动。真正重要的问题是：这个学生真实的起点在哪里？</p>
+        <figure class="fig fig-steps"><ol class="steps"><li><span class="st-l"><span class="en">Current problem</span><span class="zh" lang="zh-CN">当前问题</span></span><span class="st-t"><span class="en">locate the step where progress stopped.</span><span class="zh" lang="zh-CN">找到学习进展停止的那一步。</span></span></li><li><span class="st-l"><span class="en">Prerequisite</span><span class="zh" lang="zh-CN">前置知识</span></span><span class="st-t"><span class="en">test the concept or skill that step depends on.</span><span class="zh" lang="zh-CN">检查这一步依赖的概念或技能。</span></span></li><li><span class="st-l"><span class="en">Starting point</span><span class="zh" lang="zh-CN">起点</span></span><span class="st-t"><span class="en">move backward until the learner can work reliably.</span><span class="zh" lang="zh-CN">持续回退，直到学生能够稳定完成任务。</span></span></li><li><span class="st-l"><span class="en">Rebuild</span><span class="zh" lang="zh-CN">重建</span></span><span class="st-t"><span class="en">advance again with small checks and fading support.</span><span class="zh" lang="zh-CN">通过小步检查和逐渐淡出的支持重新向前。</span></span></li><li><span class="st-l"><span class="en">Transfer</span><span class="zh" lang="zh-CN">迁移</span></span><span class="st-t"><span class="en">verify that the learner can use the idea without the same scaffold.</span><span class="zh" lang="zh-CN">确认学生在没有同样脚手架时也能使用这个概念。</span></span></li></ol></figure>
+        <h2 id="a-tutor-also-shapes-the-emotional-experience-of-learning"><span class="no">§7</span><span><span class="en">A Tutor also shapes the emotional experience of learning</span><span class="zh" lang="zh-CN">Tutor 也在塑造学习的情绪体验</span></span></h2>
+        <p class="en">An educational AI that only knows how to provide explanations is incomplete. Sometimes the correct next action is not another explanation. A learner may arrive frustrated, ashamed, angry, anxious about an exam, or convinced that further effort is pointless.</p><p class="zh" lang="zh-CN">一个只会提供解释的教育 AI 是不完整的。有时候，正确的下一步不是再解释一次。学生可能带着挫败、羞耻、愤怒、考试焦虑来到这里，甚至已经认定继续努力毫无意义。</p>
+        <p class="en">Patience is instructional. Allowing mistakes is instructional. Reducing shame around not knowing is instructional. Helping someone turn I am stupid into we found the specific thing that is missing is instructional.</p><p class="zh" lang="zh-CN">耐心本身具有教学意义。允许犯错具有教学意义。降低“不知道”的羞耻感具有教学意义。帮助一个人把“我很笨”改写成“我们找到了具体缺失的那一块”，同样具有教学意义。</p>
+        <p class="en">That does not mean an AI tutor should pretend to be a therapist. Ordinary learning frustration and emotional support are different from serious mental-health crises, abuse, severe bullying, or risk of self-harm. Those situations require clear safeguarding boundaries and appropriate human support. AI can be a low-friction first point of contact without becoming a closed final point of contact.</p><p class="zh" lang="zh-CN">这并不意味着 AI Tutor 应该假装自己是治疗师。普通的学习挫败与情绪支持，和严重心理危机、虐待、严重霸凌或自伤风险不是一回事。后者需要清晰的安全边界和合适的人类支持。AI 可以成为低摩擦的第一接触点，但不应成为封闭的最终接触点。</p>
+        <h2 id="ai-education-may-enter-through-the-space-outside-school"><span class="no">§8</span><span><span class="en">AI education may enter through the space outside school</span><span class="zh" lang="zh-CN">AI 教育可能先从学校之外进入</span></span></h2>
+        <p class="en">AI education may not enter the classroom first. A classroom is an institutional environment, so introducing an AI Tutor immediately raises questions about teacher roles, school policy, devices, privacy, assessment, safety, classroom management, and responsibility.</p><p class="zh" lang="zh-CN">AI 教育未必会首先进入课堂。课堂是制度化环境，引入 AI Tutor 会立刻带来关于教师角色、学校政策、设备、隐私、评估、安全、课堂管理和责任的问题。</p>
+        <p class="en">Outside the classroom, the first proposition can be much simpler: here is somewhere you can ask the questions you were afraid to ask. Students can use it after school, families can observe whether it helps, and learners can become familiar with individualized tutoring before a school has to redesign the classroom around it.</p><p class="zh" lang="zh-CN">在课堂之外，第一个产品命题可以简单得多：这里有一个地方，你可以问那些原本不敢问的问题。学生可以课后使用，家庭可以观察它是否有帮助，学生也可以在学校真正围绕它重构课堂之前，先熟悉个性化教学。</p>
+        <p class="en">A plausible adoption path is private learning support, then structured after-school tutoring, then teacher-visible support, then supervised school use, and only later deeper classroom integration. Acceptance can grow from repeated useful experience rather than from claims about transforming education.</p><p class="zh" lang="zh-CN">一种合理的采用路径可能是：先做私人学习支持，再做结构化课后辅导，再到教师可见的支持，然后进入受监督的校内使用，最后才是更深度的课堂整合。接受度可以来自一次次真实有用的体验，而不是来自“改变教育”的宏大主张。</p>
+        <h2 id="the-goal-is-not-dependence-on-the-tutor"><span class="no">§9</span><span><span class="en">The goal is not dependence on the Tutor</span><span class="zh" lang="zh-CN">目标不是让学生依赖 Tutor</span></span></h2>
+        <p class="en">There is an obvious danger. A system that always makes the learner feel better by doing difficult work for them can produce pleasant interactions without producing learning.</p><p class="zh" lang="zh-CN">这里有一个明显风险：如果系统总是替学生完成困难工作来让学生感觉更好，它可能制造愉快的交互，却没有制造真实学习。</p>
+        <p class="en">Support therefore has to preserve agency. The Tutor should help the learner re-enter the task, not permanently remove the task. The important progression is: I cannot do this; I can do this with help; I can do this with less help; I can do this alone; I can use it somewhere new.</p><p class="zh" lang="zh-CN">因此，支持必须保留学生的主动性。Tutor 应当帮助学生重新进入任务，而不是永久把任务拿走。真正重要的进展是：我做不到；在帮助下我能做到；减少帮助后我也能做到；我可以独立做到；我还能在新的地方使用它。</p>
+        <figure class="fig" id="fig2">
+          <ol class="ladder rise">
+            <li><span class="l-no">01</span><span class="l-name"><span class="en">I cannot do this</span><span class="zh" lang="zh-CN">我做不到</span></span></li><li><span class="l-no">02</span><span class="l-name"><span class="en">I can do this with help</span><span class="zh" lang="zh-CN">在帮助下我能做到</span></span></li><li><span class="l-no">03</span><span class="l-name"><span class="en">I can do this with less help</span><span class="zh" lang="zh-CN">减少帮助后我也能做到</span></span></li><li><span class="l-no">04</span><span class="l-name"><span class="en">I can do this alone</span><span class="zh" lang="zh-CN">我可以独立做到</span></span></li><li class="now"><span class="l-no">05</span><span class="l-name"><span class="en">I can use it somewhere new</span><span class="zh" lang="zh-CN">我还能在新的地方使用它</span></span></li>
+          </ol>
+          <figcaption><b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b><span class="en">The progression named in this section. Support fades at each step; the task stays with the learner.</span><span class="zh" lang="zh-CN">本节提到的进展顺序。每往上一步，帮助就少一些；任务始终留在学生手里。</span></figcaption>
+        </figure>
+        <p class="en">The success condition is not that the student enjoys talking to the AI. It is that the student increasingly needs the AI less for things they have already learned.</p><p class="zh" lang="zh-CN">成功标准不是学生喜欢和 AI 聊天，而是对于已经学会的内容，学生越来越不需要 AI。</p>
+        <h2 id="education-should-make-progress-perceptible"><span class="no">§10</span><span><span class="en">Education should make progress perceptible</span><span class="zh" lang="zh-CN">教育应该让进步变得可感知</span></span></h2>
+        <p class="en">A scalable AI Tutor could eventually diagnose misconceptions, select exercises, adapt explanations, monitor practice, preserve evidence of mastery, and coordinate with teachers. But one of its earliest contributions may be simpler.</p><p class="zh" lang="zh-CN">一个可扩展的 AI Tutor 最终也许能够诊断错误概念、选择练习、调整解释、监控练习、保留掌握证据并与教师协同。但它最早带来的价值可能更简单。</p>
+        <p class="en">It can create a learning environment in which ignorance is not embarrassing, help is consistently available, starting points can differ, and progress is small enough to be noticed.</p><p class="zh" lang="zh-CN">它可以创造一种学习环境：不知道并不丢人，帮助随时可得，每个人可以从不同起点开始，而进步小到足以被自己看见。</p>
+        <p class="en">For a learner who has spent years experiencing education mainly as evidence of failure, that may be where learning begins again.</p><p class="zh" lang="zh-CN">对于一个多年把教育主要体验成“失败证据”的学生来说，学习也许正是从这里重新开始。</p>
+        <aside class="callout boundary">
+          <p class="kicker"><span class="en">Evidence boundary</span><span class="zh" lang="zh-CN">证据边界</span></p>
+          
+          <p class="en">This essay presents a product and educational hypothesis, not a benchmark result or clinical claim. TutorBench does not currently establish that AI tutoring reduces school disengagement, improves student mental health, restores motivation, or produces long-term academic gains. Those questions require learner studies, longitudinal evidence, appropriate safeguarding, and human-subject research beyond current Tutor Health evaluation.</p><p class="zh" lang="zh-CN">本文提出的是产品与教育假设，不是基准结果或临床主张。TutorBench 目前并不能证明 AI 教学减少学生脱离学校、改善心理健康、恢复学习动机或产生长期学业增益。这些问题需要学生研究、纵向证据、适当的安全保障，以及超出当前 Tutor Health 评测范围的人类受试研究。</p>
+        </aside>
+      </div>
+    </article>
+  </div>
+
+  <nav class="wrap essay-nav" aria-label="Article navigation">
+    <span></span>
+    <a class="all kicker" href="../index.html"><span class="en">Back to all posts</span><span class="zh" lang="zh-CN">返回全部文章</span></a>
+    <a class="next" href="../the-classroom-does-not-need-30-robots/index.html"><span class="kicker"><span class="en">Next article</span><span class="zh" lang="zh-CN">下一篇文章</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a>
+  </nav>
+
+  <section class="wrap issue-row" aria-labelledby="issue-h">
+    <p class="kicker" id="issue-h"><span class="en">The Journal · 4 essays</span><span class="zh" lang="zh-CN">期刊 · 4 篇文章</span></p>
+    <ol class="issue-cards">
+      <li aria-current="page"><a href="../when-learning-starts-to-feel-like-failure/index.html"><img src="../../assets/journal/eraser.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 1 · reading</span><span class="zh" lang="zh-CN">第 1 篇 · 正在读</span></span><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a></li>
+      <li><a href="../the-classroom-does-not-need-30-robots/index.html"><img src="../../assets/journal/hooks.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 2</span><span class="zh" lang="zh-CN">第 2 篇</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a></li>
+      <li><a href="../why-teaching-does-not-scale/index.html"><img src="../../assets/journal/hourglass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 3</span><span class="zh" lang="zh-CN">第 3 篇</span></span><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a></li>
+      <li><a href="../teaching-and-supervision-are-different-jobs/index.html"><img src="../../assets/journal/chalk.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 4</span><span class="zh" lang="zh-CN">第 4 篇</span></span><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "When Learning Starts to Feel Like Failure · Teachometry Journal", zh: "当学习开始让人感到失败 · Teachometry 期刊" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

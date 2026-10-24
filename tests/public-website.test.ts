@@ -796,8 +796,14 @@ test("static website build emits the public artifact files and route shell", asy
       .filter((name): name is string => typeof name === "string" && name.endsWith(".html"));
     for (const htmlFile of generatedHtmlFiles) {
       const html = await readFile(join(outputDirectory, htmlFile), "utf8");
-      assert.equal((html.match(/<footer class="home-footer">/g) ?? []).length, 1, `Public page must use the canonical footer: ${htmlFile}`);
-      assert.doesNotMatch(html, /<footer class="site-footer">/u, `Public page must not fall back to the legacy footer: ${htmlFile}`);
+      // /spectrum/ is the static, noindex preview of the homepage redesign, copied as-is from
+      // website/prototypes/spectrum; it carries its own footer until it replaces the generated homepage.
+      if (htmlFile.replaceAll("\\", "/").startsWith("spectrum/")) {
+        assert.match(html, /<meta name="robots" content="noindex">/u, `Spectrum preview must stay out of search: ${htmlFile}`);
+      } else {
+        assert.equal((html.match(/<footer class="home-footer">/g) ?? []).length, 1, `Public page must use the canonical footer: ${htmlFile}`);
+        assert.doesNotMatch(html, /<footer class="site-footer">/u, `Public page must not fall back to the legacy footer: ${htmlFile}`);
+      }
       for (const match of html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/gu)) {
         const source = match[1];
         assert.ok(source !== undefined);

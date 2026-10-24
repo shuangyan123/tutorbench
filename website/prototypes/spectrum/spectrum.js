@@ -1,0 +1,296 @@
+/* global window, document, navigator, history, location, performance, requestAnimationFrame, setTimeout, IntersectionObserver, URL, CustomEvent */
+/* Teachometry · Spectrum — prototype interactions.
+   1) 语言切换  2) 顶栏状态  3) 封面见 cover.js  4) 分光滚动叙事  5) 图版架  5b) 光谱签名与图 4  6) 进场与复制 */
+(function () {
+  "use strict";
+
+  var root = document.documentElement;
+  var reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function reduced() { return reduceQuery.matches || root.getAttribute("data-motion") === "reduce"; }
+  function lang() { return root.getAttribute("data-lang") === "zh" ? "zh" : "en"; }
+
+  /* ------------------------------------------------------------ 0 a new page opens at its top
+     Some preview hosts carry the previous page's scroll position across a link. A new page starts at
+     the top; a #anchor and the back/forward buttons keep their own position. */
+  (function () {
+    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    if ((nav && nav.type === "back_forward") || (location.hash && location.hash.length > 1)) return;
+    var touched = false;   // once the reader scrolls, leave the page where they put it
+    ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) { window.addEventListener(t, function () { touched = true; }, { once: true, passive: true }); });
+    function toTop() {
+      if (touched || (location.hash && location.hash.length > 1)) return;
+      var before = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      // when the host page scrolls instead of this frame, bring the frame's top into view as well
+      if (window.self !== window.top) { try { root.scrollIntoView({ block: "start", behavior: "instant" }); } catch { /* ignore */ } }
+      root.style.scrollBehavior = before;
+    }
+    toTop();
+    window.addEventListener("load", function () { toTop(); setTimeout(toTop, 60); }, { once: true });
+  })();
+
+  /* ------------------------------------------------------------ 0b site menu */
+  (function () {
+    var btn = document.querySelector("[data-menu-toggle]");
+    var menu = document.querySelector("[data-menu]");
+    if (!btn || !menu) return;
+    // mark the page we are on
+    var here = location.pathname.replace(/index\.html$/, "");
+    Array.prototype.forEach.call(menu.querySelectorAll("a[href]"), function (a) {
+      if (a.hash || a.origin !== location.origin) return;
+      if (a.pathname.replace(/index\.html$/, "") === here) a.setAttribute("aria-current", "page");
+    });
+    function set(open, focusBack) {
+      menu.hidden = !open;
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) { var first = menu.querySelector("a"); if (first) first.focus({ preventScroll: true }); }
+      else if (focusBack) btn.focus({ preventScroll: true });
+    }
+    btn.addEventListener("click", function () { set(menu.hidden); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) set(false, true); });
+    document.addEventListener("click", function (e) { if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) set(false); });
+    menu.addEventListener("click", function (e) { if (e.target.closest("a")) set(false); });
+  })();
+
+  /* ------------------------------------------------------------ 1 language */
+  function otherLanguagePath(root) {
+    // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+    // folders the page sits below the site root, so the other address is built from this URL alone
+    var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+    var lang = root.getAttribute("data-route-lang");
+    if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+    var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+    var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+    if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+    var rest = depth ? parts.slice(parts.length - depth) : [];
+    var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+    return "/" + path.join("/") + (path.length ? "/" : "");
+  }
+  var langListeners = [];
+  function setLang(next) {
+    // remember the choice, so the next page (and the next visit) opens in it
+    try { window.localStorage.setItem("teachometry-lang", next); } catch { /* storage is optional */ }
+    // published site: each language has its own URL, so the toggle goes to the other page
+    var other = otherLanguagePath(root);
+    if (other) { location.href = location.origin + other; return; }
+    root.setAttribute("data-lang", next);
+    root.lang = next === "zh" ? "zh-CN" : "en";
+    try {
+      var url = new URL(location.href);
+      url.searchParams.set("lang", next);
+      history.replaceState(null, "", url);
+    } catch { /* 预览环境可能不允许改地址，忽略 */ }
+    langListeners.forEach(function (fn) { fn(next); });
+    document.dispatchEvent(new CustomEvent("langchange", { detail: next }));
+  }
+  var toggle = document.querySelector("[data-lang-toggle]");
+  if (toggle) toggle.addEventListener("click", function () { setLang(lang() === "zh" ? "en" : "zh"); });
+
+  /* ------------------------------------------------------------ 2 bar */
+  var bar = document.querySelector("[data-bar]");
+  function updateBar() {
+    if (!bar) return;
+    if (window.scrollY > 24) bar.setAttribute("data-scrolled", ""); else bar.removeAttribute("data-scrolled");
+  }
+
+  /* ------------------------------------------------------------ 3 cover: see cover.js (Blender frames) */
+
+  /* ------------------------------------------------------------ 4 dispersion (figure stays, readings scroll) */
+  var disp = document.querySelector("[data-disp]");
+  var dispWide = window.matchMedia("(min-width: 961px) and (min-height: 600px)");
+  var fig2 = disp ? disp.querySelector("[data-fig2]") : null;
+  var labels = disp ? disp.querySelectorAll(".proof-scale li") : [];
+  var readings = disp ? disp.querySelectorAll(".reading") : [];
+  function dispMode() {
+    if (!disp) return;
+    disp.setAttribute("data-mode", dispWide.matches ? "scrolly" : "static");
+    updateDisp();
+  }
+  function mark(list, idx) {
+    Array.prototype.forEach.call(list, function (el, i) {
+      if (i === idx) el.setAttribute("data-active", ""); else el.removeAttribute("data-active");
+      if (i < idx) el.setAttribute("data-lit", ""); else el.removeAttribute("data-lit");
+    });
+  }
+  function updateDisp() {
+    if (!disp) return;
+    if (disp.getAttribute("data-mode") !== "scrolly") { mark(labels, -1); mark(readings, -1); if (fig2) fig2.removeAttribute("data-active"); return; }
+    var line = window.innerHeight * .58, idx = 0;
+    Array.prototype.forEach.call(readings, function (el, i) { if (el.getBoundingClientRect().top < line) idx = i; });
+    mark(labels, idx); mark(readings, idx);
+    if (fig2) fig2.setAttribute("data-active", String(idx));
+  }
+
+  /* ------------------------------------------------------------ 5 specimen shelf */
+  var SUBJ = {
+    mathematics: ["Mathematics", "数学"], programming: ["Programming", "编程"], science: ["Science", "科学"],
+    history_or_social_studies: ["History & social studies", "历史与社会"], language: ["Language", "语言"]
+  };
+  var LEVEL = {
+    beginner: ["Beginner", "入门"], elementary: ["Elementary", "小学低年级"], "upper-elementary": ["Upper elementary", "小学高年级"],
+    "middle-school": ["Middle school", "初中"], secondary: ["Secondary", "高中"]
+  };
+  var STATE = {
+    conceptual_misconception: ["Conceptual misconception", "概念误解"], procedural_error: ["Procedural error", "步骤错误"],
+    overconfident_incorrect: ["Overconfident, incorrect", "自信但有错"], partial_understanding: ["Partial understanding", "部分理解"],
+    novice: ["Novice", "初学"], stuck_without_attempt: ["Stuck, no attempt yet", "卡住，尚未尝试"],
+    uncertain_but_correct: ["Correct but unsure", "做对了但不确定"], correct_answer_wrong_reasoning: ["Right answer, wrong reasoning", "答案对，推理错"]
+  };
+  var T = {
+    all: ["All", "全部"], state: ["Learner state", "学生状态"], no: ["Plate", "图版"],
+    count: function (n, total) { return lang() === "zh" ? ("显示 " + n + " / " + total + " 个情境 · 每个都有中英两版，共 48 个案例") : ("Showing " + n + " of " + total + " situations · each in English and 简体中文, 48 cases"); }
+  };
+  function L(pair) { return pair ? pair[lang() === "zh" ? 1 : 0] : ""; }
+  var shelf = document.querySelector("[data-shelf]");
+  var filters = document.querySelector("[data-filters]");
+  var countEl = document.querySelector("[data-shelf-count]");
+  var current = "all";
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  function renderShelf() {
+    if (!shelf || !window.SPECIMENS) return;
+    var all = window.SPECIMENS;
+    var counts = {}; all.forEach(function (s) { counts[s.subject] = (counts[s.subject] || 0) + 1; });
+    var keys = Object.keys(SUBJ).filter(function (k) { return counts[k]; });
+    filters.setAttribute("aria-label", lang() === "zh" ? "按学科筛选" : "Filter by subject");
+    filters.innerHTML = ["all"].concat(keys).map(function (k) {
+      var label = k === "all" ? L(T.all) : L(SUBJ[k]);
+      var n = k === "all" ? all.length : counts[k];
+      return '<button type="button" class="chip" data-subj="' + k + '" aria-pressed="' + (k === current) + '">' + esc(label) + "<b>" + n + "</b></button>";
+    }).join("");
+    var list = all.filter(function (s) { return current === "all" || s.subject === current; });
+    var lk = lang() === "zh" ? "zh" : "en";
+    shelf.setAttribute("aria-label", lang() === "zh" ? "公开案例" : "Public cases");
+    shelf.innerHTML = list.map(function (s) {
+      var v = s[lk] || s.en;
+      var idx = all.indexOf(s) + 1;
+      return '<li class="spec">' +
+        '<p class="spec-meta"><span class="no">' + L(T.no) + " " + String(idx).padStart(2, "0") + "</span><span>" + esc(L(SUBJ[s.subject])) + " · " + esc(L(LEVEL[s.level]) || s.level) + "</span></p>" +
+        "<h3>" + esc(v.topic) + "</h3>" +
+        '<blockquote lang="' + (lk === "zh" ? "zh-CN" : "en") + '">' + esc(v.msg) + "</blockquote>" +
+        '<p class="spec-state">' + esc(L(T.state)) + " · <b>" + esc(L(STATE[s.state]) || s.state) + "</b></p>" +
+        sigBlock(s) +
+        "</li>";
+    }).join("");
+    if (countEl) countEl.textContent = T.count(list.length, all.length);
+  }
+  if (filters) filters.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-subj]"); if (!b) return;
+    current = b.getAttribute("data-subj"); renderShelf(); shelf.scrollTo({ left: 0, behavior: reduced() ? "auto" : "smooth" });
+  });
+  function shelfStep(dir) {
+    if (!shelf) return;
+    var card = shelf.querySelector(".spec"); var w = card ? card.getBoundingClientRect().width + 22 : 400;
+    shelf.scrollBy({ left: dir * w * (window.innerWidth > 900 ? 2 : 1), behavior: reduced() ? "auto" : "smooth" });
+  }
+  var prev = document.querySelector("[data-shelf-prev]"), next = document.querySelector("[data-shelf-next]");
+  if (prev) prev.addEventListener("click", function () { shelfStep(-1); });
+  if (next) next.addEventListener("click", function () { shelfStep(1); });
+  function navLabels() {
+    if (prev) prev.setAttribute("aria-label", lang() === "zh" ? "上一组" : "Previous");
+    if (next) next.setAttribute("aria-label", lang() === "zh" ? "下一组" : "Next");
+  }
+
+  /* ------------------------------------------------------------ 5b spectral signatures (signature.js) */
+  var SIG = window.Signature;
+  var LAMBDA = ["λ1", "λ2", "λ3", "λ4", "λ5"];
+  function capList(caps) {
+    return caps.map(function (c) { return SIG.name(c, lang()); }).join(lang() === "zh" ? "、" : ", ");
+  }
+  function sigBlock(s) {
+    if (!SIG || !s.caps) return "";
+    var zh = lang() === "zh";
+    var bs = SIG.bands(s.caps).map(function (b) { return '<b style="color:var(--c' + b + ')">' + LAMBDA[b] + "</b>"; }).join(" ");
+    var label = (zh ? "光谱签名：这道题测 " : "Spectral signature. This case measures ") + capList(s.caps) + (zh ? "。未评分。" : ". Not scored.");
+    return '<div class="spec-sig" role="img" aria-label="' + esc(label) + '">' + SIG.svg(s.caps, { h: 34 }) +
+      '<p class="sig-foot" aria-hidden="true"><span>' + bs + " · " + s.caps.length + (zh ? " 条谱线" : " lines") + "</span><em>" + (zh ? "未评分" : "not scored") + "</em></p></div>";
+  }
+
+  // Fig. 4 — the atlas: all 24 situations as line spectra, plus the summed spectrum of all 48 cases
+  var atlas = document.querySelector("[data-atlas]");
+  var atlasCounts = {};
+  function renderAtlas() {
+    if (!atlas || !SIG || !window.SPECIMENS) return;
+    var zh = lang() === "zh", all = window.SPECIMENS, lk = zh ? "zh" : "en";
+    atlasCounts = {};
+    all.forEach(function (s) { s.caps.forEach(function (c) { atlasCounts[c] = (atlasCounts[c] || 0) + 2; }); }); // each situation = 2 cases
+    var max = 0; Object.keys(atlasCounts).forEach(function (k) { max = Math.max(max, atlasCounts[k]); });
+    var weights = {}; Object.keys(atlasCounts).forEach(function (k) { weights[k] = atlasCounts[k] / max; });
+    var order = Object.keys(SUBJ);
+    var rows = all.map(function (s, i) { return { s: s, i: i }; }).sort(function (a, b) {
+      return (order.indexOf(a.s.subject) - order.indexOf(b.s.subject)) || (a.i - b.i);
+    });
+    var head = '<div class="atlas-head" aria-hidden="true"><span class="a-lab"></span><span class="a-bands">' +
+      SIG.BANDS.map(function (b, bi) { return '<span style="--n:' + b.caps.length + ";--c:var(--c" + bi + ");--bead:var(--bead" + bi + ')"><i></i><b>' + LAMBDA[bi] + "</b> " + (zh ? b.zh : b.en) + "</span>"; }).join("") + "</span></div>";
+    var last = "";
+    var body = rows.map(function (r) {
+      var s = r.s, v = s[lk] || s.en, sub = "";
+      if (s.subject !== last) { last = s.subject; sub = '<li class="a-sub" aria-hidden="true">' + esc(L(SUBJ[s.subject])) + "</li>"; }
+      return sub + '<li class="a-row"><span class="a-lab"><span class="a-no">' + String(r.i + 1).padStart(2, "0") + '</span><span class="a-t">' + esc(v.topic) + "</span></span>" +
+        '<span class="a-sig" role="img" aria-label="' + esc((zh ? "图版 " : "Plate ") + (r.i + 1) + "：" + capList(s.caps)) + '">' + SIG.svg(s.caps, { h: 16 }) + "</span></li>";
+    }).join("");
+    var sum = '<li class="a-row a-sum"><span class="a-lab"><span class="a-no">Σ</span><span class="a-t">' + (zh ? "全部 48 个案例" : "All 48 cases") + "</span></span>" +
+      '<span class="a-sig" role="img" aria-label="' + (zh ? "所有案例叠加后的光谱：线越粗，测这项能力的案例越多" : "Summed spectrum of all cases: the thicker the line, the more cases measure that capability") + '">' + SIG.svg(null, { h: 30, weights: weights, ticks: false, cls: "sig-sum" }) + "</span></li>";
+    atlas.querySelector("[data-atlas-body]").innerHTML = head + '<ol class="atlas-rows">' + body + sum + '</ol><i class="a-cursor" aria-hidden="true"></i>';
+    atlasRead(-1);
+  }
+  function atlasRead(slot) {
+    var out = atlas.querySelector("[data-atlas-read]"); if (!out) return;
+    var zh = lang() === "zh";
+    if (slot < 0) {
+      out.innerHTML = zh ? "把指针移到谱线上，看它是哪一项能力。" : "Point at a line to see which capability it is.";
+      atlas.removeAttribute("data-hover"); return;
+    }
+    var a = SIG.AXIS[slot], b = SIG.BANDS[a.band], n = atlasCounts[a.cap] || 0;
+    out.innerHTML = '<b style="color:var(--c' + a.band + ')">' + LAMBDA[a.band] + " " + (zh ? b.zh : b.en) + "</b> · " + esc(SIG.name(a.cap, lang())) + " · " +
+      (zh ? n + " / 48 个案例" : n + " of 48 cases");
+    atlas.setAttribute("data-hover", "");
+  }
+  if (atlas) atlas.addEventListener("pointermove", function (e) {
+    var svg = e.target.closest && e.target.closest(".a-sig");
+    var bodyEl = atlas.querySelector("[data-atlas-body]");
+    var cur = atlas.querySelector(".a-cursor");
+    if (!svg || !cur) { atlasRead(-1); return; }
+    var r = svg.getBoundingClientRect(), br = bodyEl.getBoundingClientRect();
+    var slot = Math.max(0, Math.min(SIG.AXIS.length - 1, Math.floor((e.clientX - r.left) / r.width * SIG.AXIS.length)));
+    cur.style.left = (r.left - br.left + (slot + 0.5) * r.width / SIG.AXIS.length) + "px";
+    cur.style.top = "0px";
+    atlasRead(slot);
+  });
+  if (atlas) atlas.addEventListener("pointerleave", function () { atlasRead(-1); });
+
+  /* ------------------------------------------------------------ 6 reveal + copy */
+  var reveals = document.querySelectorAll("[data-reveal], .rail");
+  if ("IntersectionObserver" in window && !reduced()) {
+    var io = new IntersectionObserver(function (ents) {
+      ents.forEach(function (en) { if (en.isIntersecting) { en.target.setAttribute("data-in", ""); io.unobserve(en.target); } });
+    }, { rootMargin: "0px 0px -12% 0px" });
+    Array.prototype.forEach.call(reveals, function (el) { io.observe(el); });
+  } else {
+    Array.prototype.forEach.call(reveals, function (el) { el.setAttribute("data-in", ""); });
+  }
+  var copyBtn = document.querySelector("[data-copy]");
+  if (copyBtn) copyBtn.addEventListener("click", function () {
+    var code = document.querySelector("[data-term] code");
+    var text = code ? code.textContent.split("\n").filter(function (l) { return l.trim().indexOf("#") !== 0; }).join("\n") : "";
+    var done = function () {
+      var en = copyBtn.querySelector(".en"), zh = copyBtn.querySelector(".zh");
+      if (en) en.textContent = "Copied"; if (zh) zh.textContent = "已复制";
+      setTimeout(function () { if (en) en.textContent = "Copy"; if (zh) zh.textContent = "复制"; }, 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done); else done();
+  });
+
+  /* ------------------------------------------------------------ wiring */
+  langListeners.push(renderShelf, renderAtlas, navLabels);
+  var ticking = false;
+  window.addEventListener("scroll", function () {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(function () { ticking = false; updateBar(); updateDisp(); });
+  }, { passive: true });
+  window.addEventListener("resize", function () { dispMode(); updateBar(); });
+  if (dispWide.addEventListener) dispWide.addEventListener("change", dispMode);
+  if (reduceQuery.addEventListener) reduceQuery.addEventListener("change", dispMode);
+
+  renderShelf(); renderAtlas(); navLabels(); dispMode(); updateBar();
+})();

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Evidence Matrix — Teachometry</title>
+<meta name="description" content="A public case-by-model evidence matrix reserved for versioned Teachometry trial artifacts.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<link rel="stylesheet" href="../../cases.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    var wantZh = q ? q.indexOf("zh") === 0 : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    if (other) location.replace(location.origin + other);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../data/cases/index.html" aria-current="page"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu / 菜单"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <header class="essay-head hm-head">
+    <div class="wrap">
+      <nav class="cd-crumbs kicker" aria-label="Breadcrumb"><a href="../cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a><span aria-hidden="true">›</span><span aria-current="page"><span class="en">Evidence Matrix</span><span class="zh" lang="zh-CN">证据矩阵</span></span></nav>
+      <p class="essay-meta kicker"><span class="issue"><span class="en">Benchmark explorer</span><span class="zh" lang="zh-CN">基准浏览器</span></span><span class="rule" aria-hidden="true"></span><span class="nocase">tutor-eval-v0.2a@0.2a.6</span></p>
+      <h1 class="essay-title"><span class="en">Evidence <em>Matrix</em></span><span class="zh" lang="zh-CN">证据矩阵</span></h1>
+      <p class="essay-dek"><span class="en">See the landscape at a glance.</span><span class="zh" lang="zh-CN">一眼看清整体图景。</span></p>
+      <p class="en hm-desc">The matrix will connect public benchmark cases with versioned public model runs and their trial evidence. Today, no public model trials are available yet.</p><p class="zh hm-desc" lang="zh-CN">该矩阵未来会把公开基准案例与版本化公开模型运行及其评测记录证据连接起来。目前尚无公开模型评测记录。</p>
+      <dl class="hm-stats"><div><dd>0</dd><dt><span class="en">Public model trials</span><span class="zh" lang="zh-CN">公开模型评测记录</span></dt><small><span class="en">No trials yet</span><span class="zh" lang="zh-CN">暂无评测记录</span></small></div><div><dd>0</dd><dt><span class="en">Public model profiles</span><span class="zh" lang="zh-CN">公开模型档案</span></dt><small><span class="en">Reserved</span><span class="zh" lang="zh-CN">预留</span></small></div><div><dd>48</dd><dt><span class="en">Public cases</span><span class="zh" lang="zh-CN">公开案例</span></dt><small><span class="en">tutor-eval-v0.2a dataset</span><span class="zh" lang="zh-CN">tutor-eval-v0.2a 数据集</span></small></div><div><dd>5</dd><dt><span class="en">Evaluation dimensions</span><span class="zh" lang="zh-CN">评测维度</span></dt><small><span class="en">Correctness · Diagnosis · Guidance · Adaptation · Actionability</span><span class="zh" lang="zh-CN">正确性 · 诊断能力 · 引导能力 · 适应能力 · 可执行性</span></small></div></dl>
+    </div>
+  </header>
+
+  <div class="wrap hm-body">
+    <section id="matrix" aria-labelledby="matrix-title">
+      <p class="kicker"><span class="en">Case × model-run structure</span><span class="zh" lang="zh-CN">案例 × 模型运行结构</span></p>
+      <h2 id="matrix-title" class="jx-h2"><span class="en">A reserved observatory for public evidence.</span><span class="zh" lang="zh-CN">为公开证据预留的观察台。</span></h2>
+      <p class="en jx-p">Rows are real public cases. Columns are reserved for versioned model runs; each future populated cell will trace to a public trial detail record.</p><p class="zh jx-p" lang="zh-CN">行是真实公开案例，列为版本化模型运行预留；未来每个有内容的单元格都将可追踪到公开评测记录详情。</p>
+      <aside class="callout boundary hm-empty"><h3><span class="en">No public model trials available yet.</span><span class="zh" lang="zh-CN">目前尚无公开模型评测记录。</span></h3><p class="en">No public model trials available yet. The matrix layout, dimensions, and case structure are defined and ready.</p><p class="zh" lang="zh-CN">目前尚无公开模型评测记录。 矩阵布局、维度和案例结构已定义并准备就绪。</p></aside>
+      <div class="tbl-wrap hm-wrap" tabindex="0" aria-label="Scrollable evidence matrix">
+        <table class="hm-matrix">
+          <caption><span class="en">Case identity rows and versioned public model-run columns</span><span class="zh" lang="zh-CN">案例身份行与版本化公开模型运行列</span></caption>
+          <thead><tr><th scope="col"><span class="en">Public cases ↓</span><span class="zh" lang="zh-CN">公开案例 ↓</span></th><th scope="col"><span class="en">Versioned public model runs →</span><span class="zh" lang="zh-CN">版本化公开模型运行 →</span></th></tr>
+          <tr><th scope="col"><span class="en">Case identity</span><span class="zh" lang="zh-CN">案例身份</span></th><th scope="col" class="hm-res"><span class="en">No public model runs</span><span class="zh" lang="zh-CN">暂无公开模型运行</span></th></tr></thead>
+          <tbody><tr><th scope="row"><a href="../cases/correct-answer-wrong-reasoning-001/index.html"><code>correct-answer-wrong-reasoning-001</code></a></th><td><div class="hm-row"><span class="hm-cells" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="hm-cell-t"><span class="en">No public run</span><span class="zh" lang="zh-CN">尚无公开运行</span></span><small><span class="en">Trial-linked evidence reserved</span><span class="zh" lang="zh-CN">为评测记录关联证据预留</span></small></div></td></tr><tr><th scope="row"><a href="../cases/correct-answer-wrong-reasoning-001-zh-CN/index.html"><code>correct-answer-wrong-reasoning-001-zh-CN</code></a></th><td><div class="hm-row"><span class="hm-cells" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="hm-cell-t"><span class="en">No public run</span><span class="zh" lang="zh-CN">尚无公开运行</span></span><small><span class="en">Trial-linked evidence reserved</span><span class="zh" lang="zh-CN">为评测记录关联证据预留</span></small></div></td></tr><tr><th scope="row"><a href="../cases/fraction-misconception-001/index.html"><code>fraction-misconception-001</code></a></th><td><div class="hm-row"><span class="hm-cells" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="hm-cell-t"><span class="en">No public run</span><span class="zh" lang="zh-CN">尚无公开运行</span></span><small><span class="en">Trial-linked evidence reserved</span><span class="zh" lang="zh-CN">为评测记录关联证据预留</span></small></div></td></tr><tr><th scope="row"><a href="../cases/fraction-misconception-001-zh-CN/index.html"><code>fraction-misconception-001-zh-CN</code></a></th><td><div class="hm-row"><span class="hm-cells" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="hm-cell-t"><span class="en">No public run</span><span class="zh" lang="zh-CN">尚无公开运行</span></span><small><span class="en">Trial-linked evidence reserved</span><span class="zh" lang="zh-CN">为评测记录关联证据预留</span></small></div></td></tr><tr><th scope="row"><a href="../cases/full-solution-check-001/index.html"><code>full-solution-check-001</code></a></th><td><div class="hm-row"><span class="hm-cells" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="hm-cell-t"><span class="en">No public run</span><span class="zh" lang="zh-CN">尚无公开运行</span></span><small><span class="en">Trial-linked evidence reserved</span><span class="zh" lang="zh-CN">为评测记录关联证据预留</span></small></div></td></tr><tr class="hm-more"><th scope="row">…</th><td><span class="en">43 more public case identities in the artifact</span><span class="zh" lang="zh-CN">产物中还有 43 个公开案例标识</span></td></tr></tbody>
+        </table>
+      </div>
+      <p class="en hm-note">Rows are public case identities. Cells remain neutral until a versioned public model run and its trial artifact exist.</p><p class="zh hm-note" lang="zh-CN">每一行代表公开案例身份。在版本化公开模型运行及其评测记录产物出现之前，单元格保持中性。</p>
+    </section>
+
+    <section id="dimensions" aria-labelledby="dimensions-title">
+      <p class="kicker"><span class="en">Evaluation dimensions</span><span class="zh" lang="zh-CN">评测维度</span></p>
+      <h2 id="dimensions-title" class="jx-h2"><span class="en">Five lenses for future evidence.</span><span class="zh" lang="zh-CN">未来证据的五个观察视角。</span></h2>
+      <p class="en jx-p">Each dimension defines a future trial-linked view of observable tutoring behavior. None is scored on this page today.</p><p class="zh jx-p" lang="zh-CN">每个维度都定义了一个未来与评测记录关联的可观察教学行为视图。当前页面不会为任何维度评分。</p>
+      <ol class="hm-dims"><li><img src="../../assets/gems/gem-0.webp" alt="" width="96" height="96"><b><span class="en">Correctness</span><span class="zh" lang="zh-CN">正确性</span></b><span><span class="en">Right or wrong information</span><span class="zh" lang="zh-CN">信息是否正确</span></span></li><li><img src="../../assets/gems/gem-1.webp" alt="" width="96" height="96"><b><span class="en">Diagnosis</span><span class="zh" lang="zh-CN">诊断能力</span></b><span><span class="en">Understanding learner needs</span><span class="zh" lang="zh-CN">是否理解学生需求</span></span></li><li><img src="../../assets/gems/gem-2.webp" alt="" width="96" height="96"><b><span class="en">Guidance</span><span class="zh" lang="zh-CN">引导能力</span></b><span><span class="en">Quality of next steps</span><span class="zh" lang="zh-CN">下一步质量</span></span></li><li><img src="../../assets/gems/gem-3.webp" alt="" width="96" height="96"><b><span class="en">Adaptation</span><span class="zh" lang="zh-CN">适应能力</span></b><span><span class="en">Responsiveness to learner state</span><span class="zh" lang="zh-CN">对学生状态的响应</span></span></li><li><img src="../../assets/gems/gem-4.webp" alt="" width="96" height="96"><b><span class="en">Actionability</span><span class="zh" lang="zh-CN">可执行性</span></b><span><span class="en">Usability and follow-through</span><span class="zh" lang="zh-CN">可用性与后续执行</span></span></li></ol>
+    </section>
+
+    <aside class="hm-source" aria-labelledby="source-title">
+      <p class="kicker"><span class="en">Data source</span><span class="zh" lang="zh-CN">数据来源</span></p>
+      <h2 id="source-title" class="cd-h2"><span class="en">Public artifact contract</span><span class="zh" lang="zh-CN">公开产物契约</span></h2>
+      <p class="en">Built from versioned public artifacts only. The website does not call a Judge or run a model in the browser.</p><p class="zh" lang="zh-CN">只由版本化公开产物构建。网站不会在浏览器中调用 Judge 或运行模型。</p>
+      <dl class="cd-facts"><div><dt><span class="en">Dataset</span><span class="zh" lang="zh-CN">数据集</span></dt><dd><code>tutor-eval-v0.2a@0.2a.6</code></dd></div><div><dt><span class="en">Public cases</span><span class="zh" lang="zh-CN">公开案例</span></dt><dd>48</dd></div><div><dt><span class="en">Trial publication</span><span class="zh" lang="zh-CN">评测记录发布</span></dt><dd><span class="en">Not available</span><span class="zh" lang="zh-CN">不可用</span></dd></div><div><dt><span class="en">Artifact schema</span><span class="zh" lang="zh-CN">产物结构</span></dt><dd>1</dd></div></dl>
+    </aside>
+  </div>
+
+  <section class="wrap jx-close">
+    <p class="kicker"><span class="en">Public evidence, clearly bounded</span><span class="zh" lang="zh-CN">边界清晰的公开证据</span></p>
+    <h2 class="jx-h2"><span class="en">From data to deeper understanding.</span><span class="zh" lang="zh-CN">从数据走向更深入的理解。</span></h2>
+    <p class="en jx-p">Explore the public cases and methodology while the evidence matrix remains intentionally unpopulated.</p><p class="zh jx-p" lang="zh-CN">在证据矩阵仍有意保持空白时，可以先探索公开案例与方法论。</p>
+    <p class="jx-links"><a href="../cases/index.html"><span class="en">Explore the cases</span><span class="zh" lang="zh-CN">探索案例</span></a><a href="../../methodology/index.html"><span class="en">Read the methodology</span><span class="zh" lang="zh-CN">阅读方法论</span></a></p>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Evidence Matrix — Teachometry", zh: "证据矩阵 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

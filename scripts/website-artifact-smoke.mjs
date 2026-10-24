@@ -63,6 +63,16 @@ const requiredFiles = [
   "public-data/cases.json",
   "public-data/models.json",
   "public-data/trials.json",
+  // the published Spectrum site (website/prototypes/spectrum)
+  "spectrum.css",
+  "spectrum.js",
+  "cover.js",
+  "assets/cover/K_000.webp",
+  "assets/cover-m/K_000.webp",
+  "assets/logo/favicon.svg",
+  "zh-cn/models/[modelId]/index.html",
+  "data/trials/[trialId]/index.html",
+  "zh-cn/data/trials/[trialId]/index.html",
 ];
 const forbiddenContent = [
   /OPENAI_API_KEY/i,

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Community — Teachometry</title>
+<meta name="description" content="Learn why future structured human review may help validate Teachometry's evaluation method. Applications are not open yet.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../spectrum.css">
+<link rel="stylesheet" href="../journal.css">
+<link rel="stylesheet" href="../about.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    var wantZh = q ? q.indexOf("zh") === 0 : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    if (other) location.replace(location.origin + other);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../index.html#methods" class="nav-tb"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu / 菜单"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main" class="cm">
+  <header class="essay-head cm-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><span class="issue"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></span><span class="rule" aria-hidden="true"></span><span><span class="en">Structured human review</span><span class="zh" lang="zh-CN">结构化人工评审</span></span></p>
+        <h1 class="essay-title" id="community-title"><span class="en">A stronger evaluation system</span><span class="zh" lang="zh-CN">更强的评测系统</span> <em><span class="en">is a shared effort.</span><span class="zh" lang="zh-CN">需要共同完成。</span></em></h1>
+        <p class="en ab-lede">Teachometry is building an open benchmark for observable AI tutoring behavior. Some judgments cannot be validated reliably through deterministic checks or an LLM Judge alone, so future structured human review is part of the research program.</p><p class="zh ab-lede" lang="zh-CN">Teachometry 正在构建一个面向可观察 AI 教学行为的开放基准。有些判断无法仅靠确定性检查或 LLM Judge 可靠验证，因此未来的结构化人工评审会成为研究计划中的一种证据来源。</p>
+        <p class="cx-actions"><a class="cta cta-ink" href="#community-process"><span class="en">Explore how participation will work</span><span class="zh" lang="zh-CN">了解未来参与方式</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a class="cta cta-line" href="../methodology/index.html"><span class="en">Read the methodology</span><span class="zh" lang="zh-CN">阅读方法论</span></a></p>
+        <p class="cm-status" role="status"><strong><span class="en">Applications not open yet</span><span class="zh" lang="zh-CN">参与申请暂未开放</span></strong><span><span class="en">Future participation would initially be invite-only.</span><span class="zh" lang="zh-CN">未来参与初期将采用受邀制。</span></span></p>
+      </div>
+      <figure class="cover-plate">
+        <img src="../assets/community/glasses.webp" alt="Three pairs of reading glasses on one printed review card for the public case correct-answer-wrong-reasoning-001: black acetate standing open, its lenses magnifying the student’s message “I know 3 x 4 is 12 because 3 + 4 = 7, and then I add 5 more to get 12.”; a gold wire pair and a tortoiseshell pair folded beside it. The five dimension boxes on the card are all empty." width="900" height="1100" data-alt-en="Three pairs of reading glasses on one printed review card for the public case correct-answer-wrong-reasoning-001: black acetate standing open, its lenses magnifying the student’s message “I know 3 x 4 is 12 because 3 + 4 = 7, and then I add 5 more to get 12.”; a gold wire pair and a tortoiseshell pair folded beside it. The five dimension boxes on the card are all empty." data-alt-zh="三副老花镜放在同一张打印的评审卡上，卡上是公开案例 correct-answer-wrong-reasoning-001：一副黑色板材眼镜打开立着，镜片放大了学生的话“I know 3 x 4 is 12 because 3 + 4 = 7, and then I add 5 more to get 12.”；一副金丝眼镜和一副玳瑁眼镜折起放在一旁。卡上五个维度的方框都还空着。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">Different perspectives. Stronger evidence. Rendered in Blender.</span><span class="zh" lang="zh-CN">不同视角，更有力的证据。Blender 渲染。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <section class="wrap ab-row" aria-labelledby="community-why-title">
+    <div>
+      <p class="kicker"><span class="en">Why human review</span><span class="zh" lang="zh-CN">为什么需要人工评审</span></p>
+      <p class="ab-side-note"><span class="en">Different perspectives.<br><em>Stronger evidence.</em></span><span class="zh" lang="zh-CN">不同视角，<br><em>更有力的证据。</em></span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="community-why-title"><span class="en">Teaching quality is more than a correct answer.</span><span class="zh" lang="zh-CN">教学质量不只是答案是否正确。</span></h2>
+      <p class="en jx-p">TutorBench evaluates whether a Tutor identifies the learner's difficulty, provides a useful next step, adapts to learner state and context, and behaves appropriately as a Tutor. Some of that work depends on context and judgment.</p><p class="zh jx-p" lang="zh-CN">TutorBench 评估 Tutor 是否识别学生的困难、提供合适的下一步、根据学生状态和语境调整帮助，并以合适的方式完成 Tutor 的工作。其中一些行为依赖语境和判断。</p>
+      <ul class="cm-obs">
+        <li><span class="en">Identifies the learner's difficulty</span><span class="zh" lang="zh-CN">识别学生的困难</span></li>
+        <li><span class="en">Provides a useful next step</span><span class="zh" lang="zh-CN">提供合适的下一步</span></li>
+        <li><span class="en">Adapts to learner state and context</span><span class="zh" lang="zh-CN">根据学生状态和语境调整</span></li>
+        <li><span class="en">Behaves appropriately as a Tutor</span><span class="zh" lang="zh-CN">以合适的方式完成 Tutor 的工作</span></li>
+      </ul>
+      <p class="en cm-note">Deterministic evaluators and an LLM Judge alone cannot establish every aspect reliably. Human review is a future evidence source — not automatic ground truth.</p><p class="zh cm-note" lang="zh-CN">确定性评估器和单独的 LLM Judge 无法可靠建立全部这些判断。人工评审会是未来的一种证据来源，而不是自动产生的参考真值。</p>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="community-tasks-title">
+    <div>
+      <p class="kicker"><span class="en">Future reviewer tasks</span><span class="zh" lang="zh-CN">未来评审任务</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="community-tasks-title"><span class="en">A clear process for each review.</span><span class="zh" lang="zh-CN">每次评审都遵循清晰的流程。</span></h2>
+      <p class="en jx-p">If the program opens, reviewers would work from the same visible task, criteria, and submission contract. These are future tasks, not current openings.</p><p class="zh jx-p" lang="zh-CN">如果项目开放，参与者会根据同一份可见任务、评审标准和提交契约工作。这些是未来任务，不是当前招聘或开放岗位。</p>
+      <div class="cm-tasks">
+        <article><span class="n">01</span><h3><span class="en">Read</span><span class="zh" lang="zh-CN">阅读</span></h3><p class="en">Read an AI Tutor response and the evaluation task</p><p class="zh" lang="zh-CN">阅读 AI Tutor 的回答和评审任务</p><span class="cm-tag"><span class="en">Future task · not an open role</span><span class="zh" lang="zh-CN">未来任务 · 不是开放岗位</span></span></article>
+        <article><span class="n">02</span><h3><span class="en">Judge</span><span class="zh" lang="zh-CN">判断</span></h3><p class="en">Judge the response using the provided criteria</p><p class="zh" lang="zh-CN">按提供的标准进行判断</p><span class="cm-tag"><span class="en">Future task · not an open role</span><span class="zh" lang="zh-CN">未来任务 · 不是开放岗位</span></span></article>
+        <article><span class="n">03</span><h3><span class="en">Submit</span><span class="zh" lang="zh-CN">提交</span></h3><p class="en">Submit a structured review</p><p class="zh" lang="zh-CN">提交结构化评审</p><span class="cm-tag"><span class="en">Future task · not an open role</span><span class="zh" lang="zh-CN">未来任务 · 不是开放岗位</span></span></article>
+        <article><span class="n">04</span><h3><span class="en">Qualify</span><span class="zh" lang="zh-CN">资格验证</span></h3><p class="en">Complete a short qualification step before reviewing real assignments</p><p class="zh" lang="zh-CN">在评审真实任务前完成简短的资格验证</p><span class="cm-tag"><span class="en">Future task · not an open role</span><span class="zh" lang="zh-CN">未来任务 · 不是开放岗位</span></span></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="community-application-title">
+    <div>
+      <p class="kicker"><span class="en">Future application contract</span><span class="zh" lang="zh-CN">未来申请契约</span></p>
+    </div>
+    <div class="ab-head-grid cm-app">
+      <div>
+        <h2 class="jx-h2" id="community-application-title"><span class="en">What we expect to ask when applications open</span><span class="zh" lang="zh-CN">开放申请后预计会询问什么</span></h2>
+        <p class="en jx-p">The first application contract is intentionally small: one contact email, a preferred review language, a short motivation, optional relevant experience, and a coarse availability category.</p><p class="zh jx-p" lang="zh-CN">首版申请数据契约会刻意保持精简：一个用于未来邀请的联系邮箱、偏好的评审语言、简短动机、可选的相关经验，以及大致可参与的时间范围。</p>
+      </div>
+      <div class="cm-contract">
+        <div class="cm-contract-top"><span class="kicker"><span class="en">Future contract</span><span class="zh" lang="zh-CN">未来契约</span></span><code>community-review-application</code></div>
+        <ul><li><span class="en">One contact email for a future invitation</span><span class="zh" lang="zh-CN">用于未来邀请的一个联系邮箱</span></li><li><span class="en">Preferred review language</span><span class="zh" lang="zh-CN">偏好的评审语言</span></li><li><span class="en">A short motivation for participating</span><span class="zh" lang="zh-CN">参与原因的简短说明</span></li><li><span class="en">Optional relevant experience summary</span><span class="zh" lang="zh-CN">可选的相关经验概述</span></li><li><span class="en">Approximate availability category</span><span class="zh" lang="zh-CN">可参与时间档位</span></li></ul>
+        <p class="en cm-closed">Applications are not open yet. This section describes a future contract, not a form.</p><p class="zh cm-closed" lang="zh-CN">当前尚未开放申请。本节说明未来的申请数据约定，不是申请表。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" id="community-process" aria-labelledby="community-process-title">
+    <div>
+      <p class="kicker"><span class="en">How participation could work</span><span class="zh" lang="zh-CN">未来参与方式</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="community-process-title"><span class="en">From application to blind review.</span><span class="zh" lang="zh-CN">从申请到盲评任务。</span></h2>
+      <p class="en jx-p">Participation would initially be invite-only. Submitting an application in the future would not automatically create a reviewer account.</p><p class="zh jx-p" lang="zh-CN">初期参与将采用受邀制。未来提交申请不会自动创建 reviewer 账号。</p>
+      <ol class="cm-steps">
+        <li><span class="n">1</span><h3><span class="en">Application</span><span class="zh" lang="zh-CN">提交申请</span></h3><p class="en">Share the future application fields.</p><p class="zh" lang="zh-CN">填写未来申请字段。</p></li>
+        <li><span class="n">2</span><h3><span class="en">Manual review</span><span class="zh" lang="zh-CN">人工审核</span></h3><p class="en">A manual eligibility and fit review.</p><p class="zh" lang="zh-CN">进行人工资格与匹配审核。</p></li>
+        <li><span class="n">3</span><h3><span class="en">Invitation</span><span class="zh" lang="zh-CN">收到邀请</span></h3><p class="en">An invite-only next step.</p><p class="zh" lang="zh-CN">进入受邀制的下一步。</p></li>
+        <li><span class="n">4</span><h3><span class="en">Consent</span><span class="zh" lang="zh-CN">阅读并确认参与说明</span></h3><p class="en">Confirm the review boundaries.</p><p class="zh" lang="zh-CN">确认评审边界与参与说明。</p></li>
+        <li><span class="n">5</span><h3><span class="en">Qualification</span><span class="zh" lang="zh-CN">资格验证</span></h3><p class="en">Complete the eligibility gate.</p><p class="zh" lang="zh-CN">完成参与资格门槛。</p></li>
+        <li><span class="n">6</span><h3><span class="en">Blind review</span><span class="zh" lang="zh-CN">盲评任务</span></h3><p class="en">Review real assignments blind.</p><p class="zh" lang="zh-CN">对真实任务进行盲评。</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="community-status-title">
+    <div>
+      <p class="kicker"><span class="en">Current status</span><span class="zh" lang="zh-CN">当前状态</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="community-status-title"><span class="en">Available now. Not open yet.</span><span class="zh" lang="zh-CN">现在可了解，参与尚未开放。</span></h2>
+      <p class="en jx-p">Public information is open. Applications, reviewer intake, the real Community Review campaign, and P5 human calibration are not open or not started.</p><p class="zh jx-p" lang="zh-CN">公开信息已经开放；参与申请、reviewer intake、真实 Community Review 和 P5 人工校准目前尚未开放或尚未开始。</p>
+      <div class="cm-ledgers">
+        <section class="cm-ledger" aria-labelledby="community-available-title">
+          <p class="kicker"><span class="en">Available now</span><span class="zh" lang="zh-CN">现在可做</span></p>
+          <h3 id="community-available-title"><span class="en">Explore the public work.</span><span class="zh" lang="zh-CN">先了解公开工作。</span></h3>
+          <p class="en">The benchmark, cases, methodology, repository, and project updates are available to inspect today.</p><p class="zh" lang="zh-CN">benchmark、案例、方法论、代码仓库和项目更新目前都可以公开查看。</p>
+          <div class="cm-ledger-rows">
+            <a class="cm-ledger-row" href="../data/cases/index.html"><strong><span class="en">Browse benchmark cases</span><span class="zh" lang="zh-CN">浏览 benchmark 案例</span></strong><small><span class="en">Inspect public cases and their authored context.</span><span class="zh" lang="zh-CN">查看公开案例及其作者提供的语境。</span></small><span class="st st-open"><span class="en">Available</span><span class="zh" lang="zh-CN">已开放</span></span></a>
+            <a class="cm-ledger-row" href="../methodology/index.html"><strong><span class="en">Read Methodology</span><span class="zh" lang="zh-CN">阅读方法论</span></strong><small><span class="en">See what the benchmark measures and does not measure.</span><span class="zh" lang="zh-CN">了解当前 benchmark 测量什么、不测量什么。</span></small><span class="st st-open"><span class="en">Available</span><span class="zh" lang="zh-CN">已开放</span></span></a>
+            <a class="cm-ledger-row" href="../data/index.html"><strong><span class="en">Explore the benchmark</span><span class="zh" lang="zh-CN">探索 benchmark</span></strong><small><span class="en">Review public artifacts and coverage boundaries.</span><span class="zh" lang="zh-CN">查看公开产物和覆盖边界。</span></small><span class="st st-open"><span class="en">Available</span><span class="zh" lang="zh-CN">已开放</span></span></a>
+            <a class="cm-ledger-row" href="https://github.com/shuangyan123/tutorbench" rel="noreferrer"><strong><span class="en">View GitHub repository</span><span class="zh" lang="zh-CN">查看 GitHub 仓库</span></strong><small><span class="en">Inspect the source, contracts, and roadmap.</span><span class="zh" lang="zh-CN">检查源代码、契约和 roadmap。</span></small><span class="st st-open"><span class="en">Available</span><span class="zh" lang="zh-CN">已开放</span></span></a>
+          </div>
+        </section>
+        <section class="cm-ledger" aria-labelledby="community-not-open-title">
+          <p class="kicker"><span class="en">Not open yet</span><span class="zh" lang="zh-CN">尚未开放</span></p>
+          <h3 id="community-not-open-title"><span class="en">Research participation remains closed.</span><span class="zh" lang="zh-CN">研究参与仍处于关闭状态。</span></h3>
+          <p class="en">No public intake or live reviewer program is running. No dates are promised.</p><p class="zh" lang="zh-CN">当前没有公开 intake，也没有正在运行的 reviewer 项目；不承诺具体日期。</p>
+          <div class="cm-ledger-rows">
+            <div class="cm-ledger-row"><strong><span class="en">Public information</span><span class="zh" lang="zh-CN">公开参与说明</span></strong><small><span class="en">Open</span><span class="zh" lang="zh-CN">已开放</span></small><span class="st st-open"><span class="en">Open</span><span class="zh" lang="zh-CN">已开放</span></span></div>
+            <div class="cm-ledger-row"><strong><span class="en">Applications and reviewer intake</span><span class="zh" lang="zh-CN">参与申请与 reviewer intake</span></strong><small><span class="en">Public intake is not open.</span><span class="zh" lang="zh-CN">公开 intake 尚未开放。</span></small><span class="st st-pending"><span class="en">Not open</span><span class="zh" lang="zh-CN">尚未开放</span></span></div>
+            <div class="cm-ledger-row"><strong><span class="en">Real Community Review campaign</span><span class="zh" lang="zh-CN">真实 Community Review</span></strong><small><span class="en">Not started.</span><span class="zh" lang="zh-CN">尚未启动。</span></small><span class="st st-planned"><span class="en">Not started</span><span class="zh" lang="zh-CN">尚未启动</span></span></div>
+            <div class="cm-ledger-row"><strong><span class="en">P5 human calibration</span><span class="zh" lang="zh-CN">P5 人工校准</span></strong><small><span class="en">Not started.</span><span class="zh" lang="zh-CN">尚未开始。</span></small><span class="st st-planned"><span class="en">Not started</span><span class="zh" lang="zh-CN">尚未开始</span></span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="community-evidence-title">
+    <div>
+      <p class="kicker"><span class="en">Evidence boundary</span><span class="zh" lang="zh-CN">证据边界</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="community-evidence-title"><span class="en">Human review adds evidence. It does not create ground truth.</span><span class="zh" lang="zh-CN">人工评审增加证据，但不会创造参考真值。</span></h2>
+      <p class="en jx-p">Early Community Review would help improve and validate the evaluation method. Each distinction keeps future human evidence proportionate to what it can actually show.</p><p class="zh jx-p" lang="zh-CN">早期 Community Review 会用于改进和验证评测方法。明确这些边界，才能让未来的人类证据与它实际能够说明的内容保持一致。</p>
+      <div class="cm-neq">
+        <article><h3><span class="en">Evidence first</span><span class="zh" lang="zh-CN">证据先于结论</span></h3><p class="en">Human judgments become structured evidence tied to visible tasks and criteria.</p><p class="zh" lang="zh-CN">人工判断会成为与可见任务和标准绑定的结构化证据。</p></article>
+        <article><h3><span class="en">Agreement <i>≠</i> correctness</span><span class="zh" lang="zh-CN">一致性 <i>≠</i> 正确性</span></h3><p class="en">Inter-reviewer agreement can indicate consistency; agreement alone does not prove a judgment is correct.</p><p class="zh" lang="zh-CN">评审者之间的一致性可以说明稳定程度，但一致性本身不能证明判断正确。</p></article>
+        <article><h3><span class="en">Qualification <i>≠</i> calibration</span><span class="zh" lang="zh-CN">资格验证 <i>≠</i> 校准</span></h3><p class="en">Passing qualification determines eligibility to review; it does not establish calibrated human-reference performance.</p><p class="zh" lang="zh-CN">通过资格验证只说明具备参与评审的条件，不等于建立了校准的人类参考表现。</p></article>
+        <article><h3><span class="en">Human review <i>≠</i> gold standard</span><span class="zh" lang="zh-CN">人工评审 <i>≠</i> 金标准</span></h3><p class="en">Early Community Review is a method-validation input, not an automatic Human Reference or ground truth.</p><p class="zh" lang="zh-CN">早期 Community Review 是验证方法的输入，不会自动成为 Human Reference 或参考真值。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" aria-labelledby="community-principles-title">
+    <div>
+      <p class="kicker"><span class="en">Shared principles</span><span class="zh" lang="zh-CN">共同原则</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="community-principles-title"><span class="en">A healthier research culture for AI tutoring.</span><span class="zh" lang="zh-CN">为 AI 教学建立更健康的研究文化。</span></h2>
+      <p class="en jx-p">Observable evidence, transparent methods, context, and multiple perspectives keep claims proportionate.</p><p class="zh jx-p" lang="zh-CN">可观察证据、透明方法、语境和多元视角，让研究结论保持与证据相称。</p>
+      <div class="ab-principles">
+        <article><span class="n">01</span><h3><span class="en">Evidence before claims</span><span class="zh" lang="zh-CN">证据先于主张</span></h3><p class="en">Observable evidence comes before conclusions.</p><p class="zh" lang="zh-CN">先有可观察证据，再形成结论。</p></article>
+        <article><span class="n">02</span><h3><span class="en">Transparent methods</span><span class="zh" lang="zh-CN">方法保持透明</span></h3><p class="en">Tasks, rubrics, and evaluation procedures should remain inspectable.</p><p class="zh" lang="zh-CN">任务、评分标准和评测流程应当保持可检查。</p></article>
+        <article><span class="n">03</span><h3><span class="en">Context matters</span><span class="zh" lang="zh-CN">语境很重要</span></h3><p class="en">Tutoring judgments depend on learner state and instructional context.</p><p class="zh" lang="zh-CN">教学判断依赖学生状态和教学语境。</p></article>
+        <article><span class="n">04</span><h3><span class="en">Multiple perspectives</span><span class="zh" lang="zh-CN">保留多种视角</span></h3><p class="en">Human review can expose blind spots without being treated as infallible.</p><p class="zh" lang="zh-CN">人工评审可以暴露自动化评测的盲点，但不应被视为绝对正确。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="jx-close" aria-labelledby="community-closing-title">
+    <div class="wrap">
+      <p class="kicker fount-k"><span class="en">Follow the work</span><span class="zh" lang="zh-CN">关注项目</span></p>
+      <h2 id="community-closing-title" class="jx-h2"><span class="en">Be part of what comes next.</span><span class="zh" lang="zh-CN">成为下一步的一部分。</span></h2>
+      <p class="en jx-p">Applications are not open yet. Follow the project for future Community Review announcements and inspect the public benchmark in the meantime. This page has no application form, waitlist, or reviewer login.</p><p class="zh jx-p" lang="zh-CN">当前尚未开放申请。请关注项目未来的 Community Review 公告，同时先查看公开 benchmark。本页面没有申请表、候补名单或 reviewer 登录入口。</p>
+      <p class="cx-actions"><a class="cta cta-ink" href="https://github.com/shuangyan123/tutorbench" rel="noreferrer"><span class="en">Follow the repository on GitHub</span><span class="zh" lang="zh-CN">在 GitHub 关注仓库</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a><a class="cta cta-line" href="../data/index.html"><span class="en">Explore the benchmark</span><span class="zh" lang="zh-CN">查看 benchmark</span></a><a class="text-link" href="../methodology/index.html"><span class="en">Read methodology</span><span class="zh" lang="zh-CN">阅读方法论</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Community — Teachometry", zh: "社区 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

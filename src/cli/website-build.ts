@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -22,6 +22,7 @@ import {
   type ReviewTranslationLookup,
 } from "../review-translation/index.js";
 import {
+  normalizeSiteBasePath,
   renderPage,
   siteLocaleRoute,
   TUTORBENCH_BRAND_ASSET_PATHS,
@@ -73,6 +74,7 @@ import {
   renderWhenLearningStartsToFeelLikeFailurePage,
   renderWhyTeachingDoesNotScalePage,
 } from "../site/pages/blog.js";
+import { installSpectrumSite, isSpectrumSiteFile } from "./spectrum-site.js";
 
 const websiteRoot = resolve(process.cwd(), "website");
 const defaultOutputDirectory = resolve(websiteRoot, "dist");
@@ -99,6 +101,12 @@ export interface BuildOptions {
   readonly evaluationPath?: string;
   /** Optional local-only review translation sidecar for the private audit build. */
   readonly reviewTranslationPath?: string;
+  /**
+   * Which public site to publish. "legacy" (the default for library callers) writes the generated
+   * pages and keeps the redesign as a noindex preview at /spectrum/; "spectrum" publishes the
+   * redesign at every existing route. Private audit builds always use the generated pages.
+   */
+  readonly site?: "legacy" | "spectrum";
 }
 
 interface RoutePage {
@@ -183,6 +191,18 @@ async function writeDiscoveryFiles(
   );
 }
 
+/** Generated pages kept in memory, by output path, when the redesign is published in their place. */
+type PageSink = Map<string, string>;
+
+async function emitPage(outputDirectory: string, outputPath: string, html: string, sink: PageSink | undefined): Promise<void> {
+  if (sink !== undefined) {
+    sink.set(outputPath.slice(outputDirectory.length + 1).replaceAll("\\", "/"), html);
+    return;
+  }
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, html, "utf8");
+}
+
 async function writePage(
   outputDirectory: string,
   page: SitePage,
@@ -191,13 +211,14 @@ async function writePage(
   basePath: string | undefined,
   locale: SiteLocale,
   localizedRoutes: boolean,
+  sink?: PageSink,
 ): Promise<void> {
   const outputPath = pageOutputPath(
     outputDirectory,
     localizedRoutes ? siteLocaleRoute(page.route, locale) : page.route,
   );
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(
+  await emitPage(
+    outputDirectory,
     outputPath,
     renderPage(page, {
       benchmark: artifacts.benchmark,
@@ -206,7 +227,7 @@ async function writePage(
       locale,
       localizedRoutes,
     }),
-    "utf8",
+    sink,
   );
 }
 
@@ -224,6 +245,24 @@ interface LocalAuditBuildData {
   readonly artifact: TutorEvaluationAuditArtifact;
   readonly dataset: Awaited<ReturnType<typeof loadTutorEvalDataset>>;
   readonly reviewTranslation?: ReviewTranslationArtifact;
+}
+
+// The Spectrum redesign. The public build publishes it at every route (see spectrum-site.ts); the
+// legacy build keeps it as a noindex preview at /spectrum/. Render scripts, tools and the unused
+// earlier cover sequences stay in the repository only.
+const spectrumPrototypeRoot = join(websiteRoot, "prototypes", "spectrum");
+
+async function copySpectrumPreview(outputDirectory: string): Promise<void> {
+  const entries = await readdir(spectrumPrototypeRoot, { recursive: true, withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    const sourcePath = join(entry.parentPath, entry.name);
+    const relativePath = sourcePath.slice(spectrumPrototypeRoot.length + 1).replaceAll("\\", "/");
+    if (!isSpectrumSiteFile(relativePath)) continue;
+    const destination = join(outputDirectory, "spectrum", relativePath);
+    await mkdir(dirname(destination), { recursive: true });
+    await copyFile(sourcePath, destination);
+  }
 }
 
 function routePages(
@@ -376,6 +415,12 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
     await copyFile(join(websiteRoot, "src", "assets", asset), destination);
   }
   await copyBrandAssets(outputDirectory);
+  const publishSpectrum = options.evaluationPath === undefined && options.site === "spectrum";
+  // generated pages are rendered either way: the redesign takes each route's metadata from them
+  const legacyPages: PageSink | undefined = publishSpectrum ? new Map() : undefined;
+  if (options.evaluationPath === undefined && !publishSpectrum) {
+    await copySpectrumPreview(outputDirectory);
+  }
   await writeJson(outputDirectory, "benchmark.json", artifacts.benchmark);
   await writeJson(outputDirectory, "cases.json", artifacts.cases);
   await writeJson(outputDirectory, "models.json", artifacts.models);
@@ -398,6 +443,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
         options.basePath,
         buildLocale,
         !isPrivateBuild,
+        legacyPages,
       );
     }
 
@@ -417,6 +463,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
         options.basePath,
         buildLocale,
         !isPrivateBuild,
+        legacyPages,
       );
     }
 
@@ -428,8 +475,8 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
       !isPrivateBuild && buildLocale === "zh-CN"
         ? join(outputDirectory, "zh-cn", "404.html")
         : join(outputDirectory, "404.html");
-    await mkdir(dirname(notFoundPath), { recursive: true });
-    await writeFile(
+    await emitPage(
+      outputDirectory,
       notFoundPath,
       renderPage(renderNotFoundPage(artifacts), {
         benchmark: artifacts.benchmark,
@@ -438,8 +485,17 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
         locale: buildLocale,
         localizedRoutes: !isPrivateBuild,
       }),
-      "utf8",
+      legacyPages,
     );
+  }
+
+  if (legacyPages !== undefined) {
+    await installSpectrumSite({
+      prototypeRoot: spectrumPrototypeRoot,
+      outputDirectory,
+      basePath: normalizeSiteBasePath(options.basePath),
+      legacyPages,
+    });
   }
 
   await writeDiscoveryFiles(
@@ -509,8 +565,11 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
   }
   const siteUrl = process.env.TUTOR_BENCHMARK_SITE_URL?.trim() || undefined;
   const basePath = process.env.TUTOR_BENCHMARK_SITE_BASE_PATH?.trim() || undefined;
+  // The public site is the Spectrum redesign; TUTOR_BENCHMARK_SITE=legacy builds the generated pages.
+  const site = process.env.TUTOR_BENCHMARK_SITE?.trim() === "legacy" ? "legacy" : "spectrum";
   const routeCount = await buildWebsite({
     outputDirectory,
+    site,
     locale: resolveSiteLocale(localeArgument),
     ...(evaluationArgument === undefined
       ? {}
@@ -523,6 +582,7 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
   });
   console.log(`Built Tutor Benchmark website: ${outputDirectory}`);
   console.log(`Routes: ${routeCount}`);
+  console.log(`Public site: ${evaluationArgument === undefined ? site : "legacy (private audit build)"}`);
   console.log(
     evaluationArgument === undefined
       ? `UI locales: ${SITE_LOCALES.join(", ")}`
