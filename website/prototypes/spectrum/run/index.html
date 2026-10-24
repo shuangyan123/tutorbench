@@ -10,12 +10,42 @@
 <link rel="icon" href="../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../fonts.css" media="print" data-fonts>
+<noscript><link rel="stylesheet" href="../fonts.css"></noscript>
 <link rel="stylesheet" href="../spectrum.css">
 <link rel="stylesheet" href="../journal.css">
 <link rel="stylesheet" href="../run.css">
+<script>
+  // Web fonts (fonts.css). On a reader's first visit the page paints at once in their own fonts and
+  // the site's fonts are fetched right after that first paint, so a slow connection never waits for
+  // text. Once the fonts are cached the next pages ask for them up front, as an ordinary stylesheet.
+  (function () {
+    var link = document.querySelector("link[data-fonts]");
+    if (!link) return;
+    var KEY = "teachometry-fonts";
+    var done = false;
+    function use() {
+      if (done) return;
+      done = true;
+      link.media = "all";
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+        try { window.localStorage.setItem(KEY, "1"); } catch (e) { /* storage is optional */ }
+      });
+    }
+    var cached = null;
+    try { cached = window.localStorage.getItem(KEY); } catch (e) { /* storage is optional */ }
+    var paint = window.PerformanceObserver && PerformanceObserver.supportedEntryTypes &&
+      PerformanceObserver.supportedEntryTypes.indexOf("paint") >= 0;
+    if (cached || !paint) { use(); return; }
+    var observer = new PerformanceObserver(function (list) {
+      if (list.getEntriesByName("first-contentful-paint").length) { observer.disconnect(); use(); }
+    });
+    observer.observe({ type: "paint", buffered: true });
+    // a page opened in a background tab does not paint until it is shown
+    window.setTimeout(function () { if (document.visibilityState === "visible") use(); }, 3000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") window.setTimeout(use, 3000); });
+  })();
+</script>
 <script>
   // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
   (function () {
@@ -68,7 +98,7 @@
 <a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
 
 <header class="bar" data-bar>
-  <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106" fetchpriority="high"></a>
   <nav class="nav" aria-label="Primary">
     <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
     <a href="../index.html#methods" class="nav-tb"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
@@ -78,7 +108,7 @@
   </nav>
   <div class="bar-end">
     <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu / 菜单"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
-    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+    <button class="lang" type="button" data-lang-toggle aria-label="中 / EN · Switch language / 切换语言">
       <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
     </button>
     <a class="run-btn" href="../run/index.html" aria-current="page"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
@@ -316,9 +346,9 @@ node dist/src/cli/tutorbench.js evaluate \
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
-        <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84" loading="lazy" decoding="async"></p>
         <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
-        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16" loading="lazy" decoding="async"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
       </div>
       <nav aria-label="Footer">
         <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
@@ -345,7 +375,7 @@ node dist/src/cli/tutorbench.js evaluate \
         <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
       </div>
     </div>
-    <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204" loading="lazy" decoding="async">
     <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
   </div>
 </footer>

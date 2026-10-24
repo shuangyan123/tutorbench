@@ -58,6 +58,43 @@ async function shippedFiles(prototypeRoot: string): Promise<string[]> {
 
 const cleanPage = (path: string): string => path.replace(/(^|\/)index\.html$/u, "$1");
 
+/**
+ * Drops the comments and spare whitespace from a stylesheet (the sources are commented in two
+ * languages). Strings are kept as written; every other run of whitespace becomes one space, and the
+ * spaces next to braces and semicolons go.
+ */
+export function minifyCss(css: string): string {
+  let out = "";
+  let index = 0;
+  while (index < css.length) {
+    const char = css[index] ?? "";
+    if (char === "/" && css[index + 1] === "*") {
+      const end = css.indexOf("*/", index + 2);
+      index = end < 0 ? css.length : end + 2;
+      out += " ";
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      let end = index + 1;
+      while (end < css.length && css[end] !== char) end += css[end] === "\\" ? 2 : 1;
+      out += css.slice(index, end + 1);
+      index = end + 1;
+      continue;
+    }
+    out += /\s/u.test(char) ? " " : char;
+    index += 1;
+  }
+  // only touch the text between strings, so a space inside a quoted value is never removed
+  return out
+    .split(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/u)
+    .map((part, position) => position % 2 === 1 ? part : part
+      .replace(/ {2,}/gu, " ")
+      .replace(/ ?([{};]) ?/gu, "$1")
+      .replace(/;\}/gu, "}"))
+    .join("")
+    .trim() + "\n";
+}
+
 interface PageContext {
   /** the page's path in the prototype */
   readonly source: string;
@@ -188,7 +225,8 @@ export async function installSpectrumSite(options: SpectrumSiteOptions): Promise
     const destination = join(outputDirectory, file);
     if (await exists(destination)) throw new Error(`Spectrum asset ${file} would replace an existing site file.`);
     await mkdir(dirname(destination), { recursive: true });
-    await copyFile(join(prototypeRoot, file), destination);
+    if (file.endsWith(".css")) await writeFile(destination, minifyCss(await readFile(join(prototypeRoot, file), "utf8")), "utf8");
+    else await copyFile(join(prototypeRoot, file), destination);
   }
 
   for (const source of pages) {

@@ -4,6 +4,7 @@ import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
+import { minifyCss } from "../src/cli/spectrum-site.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
 // generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
@@ -133,4 +134,40 @@ test("product facts stay on the published pages", async () => {
   assert.match(contact, /https:\/\/x\.com\/1Shuangyan36877/u);
   assert.match(await page("leaderboard/index.html"), /No calibrated public model runs yet\./u);
   assert.match(await page("zh-cn/micro-review/index.html"), /<html lang="zh-CN"/u);
+});
+
+const PROTOTYPE = join(process.cwd(), "website", "prototypes", "spectrum");
+
+async function prototypeText(directory = PROTOTYPE, prefix = ""): Promise<string> {
+  let text = "";
+  for (const entry of await readdir(join(directory, prefix), { withFileTypes: true })) {
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      if (relative !== "render" && relative !== "tools") text += await prototypeText(directory, relative);
+    } else if (/\.(?:html|js|css)$/u.test(entry.name) && relative !== "journal-sample.html") {
+      text += await readFile(join(directory, relative), "utf8");
+    }
+  }
+  return text;
+}
+
+test("the site serves its own fonts, and they cover every Chinese character on the pages", async () => {
+  for (const file of await htmlFiles(spectrum)) {
+    assert.doesNotMatch(await page(file), /fonts\.(?:googleapis|gstatic)\.com/u, file);
+  }
+  const fonts = await page("fonts.css");
+  const sources = [...fonts.matchAll(/url\(([^)]+)\)/gu)].map((match) => match[1] ?? "");
+  assert.ok(sources.length >= 10);
+  for (const source of sources) assert.ok(await isFile(join(spectrum, source)), `fonts.css: ${source} is missing`);
+  // tools/build-fonts.py cuts the Chinese faces to the characters in the pages; rerun it when this fails
+  const covered = new Set(await readFile(join(PROTOTYPE, "assets", "fonts", "cjk-coverage.txt"), "utf8"));
+  const missing = [...new Set(await prototypeText())].filter((char) => (char.codePointAt(0) ?? 0) >= 0x2e80 && !covered.has(char));
+  assert.deepEqual(missing, [], "run: python3 website/prototypes/spectrum/tools/build-fonts.py");
+});
+
+test("published stylesheets are minified without changing strings or selectors", () => {
+  assert.equal(
+    minifyCss('a  { color : red ; /* note */ background: url("data:x;a  b") }\n@media (max-width: 4px) {\n  .a > .b, .c { x: calc(1px + 2px); }\n}\n'),
+    'a{color : red;background: url("data:x;a  b")}@media (max-width: 4px){.a > .b, .c{x: calc(1px + 2px)}}\n',
+  );
 });
