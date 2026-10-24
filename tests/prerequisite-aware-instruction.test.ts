@@ -92,5 +92,7 @@ test("contrived unsupported misconception reference cannot bypass evidence valid
   unknown.evaluatorReferenceState.misconceptions = [
     { statement: "Unobserved misconception", evidenceLearnerTurns: [2] },
   ];
-  assert.throws(() => parseTutorScenarioSuiteVNext(invalid), (error: unknown) =>\n    error instanceof Error && "code" in error && error.code === "tutor_scenario_vnext_invalid",\n  );
+  assert.throws(() => parseTutorScenarioSuiteVNext(invalid), (error: unknown) =>
+    error instanceof Error && "code" in error && error.code === "tutor_scenario_vnext_invalid",
+  );
 });
