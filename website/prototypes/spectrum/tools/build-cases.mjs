@@ -1,6 +1,7 @@
 // Builds the Cases section of the Spectrum prototype, in English and 简体中文 on one page each:
 //   data/cases/index.html          the case library (search, eight filters, sort, two views, pages)
 //   data/cases/<id>/index.html     one case file per public case (48), matching the live routes
+//   data/index.html                the benchmark overview: snapshot, three ways in, dataset coverage
 //   data/heatmap/index.html        the evidence matrix, still reserved: no public model runs exist
 // It mirrors renderCasesPage / renderCaseDetailPage / renderHeatmapPage in src/site/pages/data.ts and
 // reads the same public artifacts. Interface strings go through the live SITE_ZH_CN_COPY; case content
@@ -136,7 +137,7 @@ function libraryPage(cover) {
     <p class="kicker">${biE("Our commitment")}</p>
     <h2 class="jx-h2">${bi("Open cases<br><em>for better learning.</em>", `${esc(Z("Open cases"))}<br><em>${esc(Z("for better learning."))}</em>`)}</h2>
     ${biPE("p", "jx-p", "These authored public development cases are released for research, education, and community use. Together, they can help us build more transparent and effective AI tutoring systems.")}
-    <p class="jx-links"><a href="../heatmap/index.html">${biE("Evidence Matrix")}</a><a href="${GITHUB}" rel="noreferrer">${biE("View on GitHub")}</a></p>
+    <p class="jx-links"><a href="../index.html">${bi(esc("Benchmark"), esc(Z("Benchmark")))}</a><a href="../heatmap/index.html">${biE("Evidence Matrix")}</a><a href="${GITHUB}" rel="noreferrer">${biE("View on GitHub")}</a></p>
   </section>
 </main>`;
   void example;
@@ -296,6 +297,98 @@ function heatmapPage() {
   return frame({ prefix: "../../", title: "Evidence Matrix — Teachometry", titleZh: `${Z("Evidence Matrix")} — Teachometry`, description: "A public case-by-model evidence matrix reserved for versioned Teachometry trial artifacts.", body, current: "cases", css: ["journal.css", "cases.css"] });
 }
 
+// ---------------------------------------------------------------- the benchmark overview (/data/)
+// the live zh site leaves these few labels in English; our own zh fills the gap
+const ZH_GAP = { Subjects: "学科", Capabilities: "能力", Heatmap: "热图", "Open data": "开放数据", "Research-oriented": "面向研究", "Community-driven": "社区驱动", "Disclosure policies": "披露政策" };
+const share = (n, total) => (total === 0 ? 0 : Math.round((n / total) * 100));
+const sorted = (counts) => Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "en"));
+const valueLabel = (v) => (v === "en" ? "English" : v === "zh-CN" ? "简体中文" : null);
+const labelBi = (v) => (valueLabel(v) ? esc(valueLabel(v)) : tax(v));
+function distribution(title, counts, total, multi = false) {
+  const rows = sorted(counts);
+  const row = ([k, n], other = false) => `<li><span class="bx-k">${other ? bi("Others", esc(L.publicUiCopy("Others", "zh-CN"))) : labelBi(k)}</span><span class="bx-bar" aria-hidden="true"><i style="width:${share(n, total)}%"></i></span><span class="bx-n">${n} <small>(${share(n, total)}%)</small></span></li>`;
+  const top = rows.length > 5 ? rows.slice(0, 4) : rows, rest = rows.slice(top.length);
+  const other = !multi && rest.length ? row(["", rest.reduce((t, r) => t + r[1], 0)], true) : "";
+  const unit = multi && title === "Capabilities" ? "capability tags" : "categories";
+  return `<article class="bx-dist"><h3><span>${bi(esc(title), esc(Zor(title, ZH_GAP[title])))}</span><b>${rows.length}</b><small>${biE(unit)}</small></h3>
+          <ul>${top.map((r) => row(r)).join("")}${other}</ul>${rest.length ? `<details><summary>${bi(esc(F.formatCoverageExpansion(title, rows.length, "en")), esc(F.formatCoverageExpansion(title, rows.length, "zh-CN")))}</summary><ul>${rows.map((r) => row(r)).join("")}</ul></details>` : ""}
+          <p class="bx-den">${bi(esc(F.formatCoverageDenominator(total, multi, "en")), esc(F.formatCoverageDenominator(total, multi, "zh-CN")))}</p></article>`;
+}
+function benchmarkPage() {
+  const c = benchmark.coverage, dims = benchmark.dimensions.score;
+  if (benchmark.schemaVersion !== 1 || JSON.stringify(dims) !== JSON.stringify(["correctness", "diagnosis", "guidance", "adaptation", "actionability"])) throw new Error("benchmark schema changed: review the presentation");
+  const subjects = sorted(c.casesBySubject), locales = sorted(c.casesByLocale);
+  const facts = [[c.caseCount, "Authored cases", "Public scenarios"], [dims.length, "Evaluation dimensions", "Versioned rubric schema"], [subjects.length, "Subjects", "Authored subject areas"], [Object.keys(c.casesByCapabilityTag).length, "Capabilities", "Tutoring taxonomy tags"]];
+  const cell = (subj, l) => { const n = ALL.filter((x) => x.metadata.subject === subj && loc(x) === l).length; const max = Math.max(...subjects.map(([s]) => ALL.filter((x) => x.metadata.subject === s && loc(x) === l).length)); return `<td><span class="bx-dot" style="--s:${max ? (0.35 + 0.65 * n / max).toFixed(2) : 0}" aria-hidden="true"></span>${n}</td>`; };
+  const trialNote = bi(esc(L.publicUiCopy(trials.notice, "en")), esc(L.publicUiCopy(trials.notice, "zh-CN")));
+  const entries = [
+    ["Cases", "Explore the cases", bi(esc(F.formatAuthoredScenarios(c.caseCount, "en")), esc(F.formatAuthoredScenarios(c.caseCount, "zh-CN"))), "cases/index.html", "View all cases", false],
+    ["Heatmap", "See the big picture", biE("Explore the case × model-run matrix as public results become available. Compare outcomes with their evaluation context."), "heatmap/index.html", "Open heatmap", true],
+    ["Trials", "Track evaluation runs", biE("Inspect published model runs, Tutor responses, and rubric evidence as they become available. Designed for transparency and reproducibility."), "trials/index.html", "View trial status", true],
+  ];
+  const body = `<main id="main">
+  <header class="essay-head bx-head">
+    <div class="wrap bx-head-grid">
+      <div>
+        <p class="essay-meta kicker"><span class="issue">${biE("The Teachometry benchmark")}</span><span class="rule" aria-hidden="true"></span><span class="nocase">${esc(`${c.datasetId}@${c.datasetVersion}`)}</span></p>
+        <h1 class="essay-title">${bi("The benchmark,<br>made <em>observable.</em>", `${esc(Z("The benchmark,"))}${esc(Z("made"))}<br><em>${esc(Z("observable."))}</em>`)}</h1>
+        ${biPE("p", "essay-dek", "Teachometry turns complex tutoring behavior into a structured, transparent benchmark. Explore authored cases, rubrics, and evaluation structure to understand how AI tutors diagnose, guide, adapt, and support learners in realistic scenarios.")}
+        <p class="cx-actions"><a class="cta cta-ink" href="cases/index.html">${biE("Browse Cases")} ${ARROW}</a><a class="cta cta-line" href="../methodology/index.html">${biE("Read the Methodology")}</a></p>
+        <p class="bx-tags kicker">${["Open data", "Research-oriented", "Community-driven"].map((t) => `<span>${bi(esc(t), esc(Zor(t, ZH_GAP[t])))}</span>`).join("")}</p>
+      </div>
+      <aside class="bx-snap" aria-labelledby="snapshot-title">
+        <p class="bx-snap-head kicker"><span id="snapshot-title">${biE("Dataset snapshot")}</span><span>${biE("Public development set")}</span></p>
+        <dl class="bx-facts">${facts.map(([n, k, note]) => `<div><dt>${bi(esc(k), esc(Zor(k, ZH_GAP[k])))}</dt><dd>${n}</dd><small>${biE(note)}</small></div>`).join("")}</dl>
+        <table class="bx-matrix"><caption class="kicker">${biE("Subject × locale · authored case counts")}</caption>
+          <thead><tr><th scope="col">${biE("Subject")}</th>${locales.map(([l]) => `<th scope="col">${esc(valueLabel(l) ?? l)}</th>`).join("")}</tr></thead>
+          <tbody>${subjects.map(([s]) => `<tr><th scope="row">${tax(s)}</th>${locales.map(([l]) => cell(s, l)).join("")}</tr>`).join("")}</tbody></table>
+        <p class="bx-note">${biE("Darker dots = a larger share of that subject. Counts, not model scores.")} <a class="text-link" href="#benchmark-taxonomies">${biE("View all coverage")} ${ARROW}</a></p>
+      </aside>
+    </div>
+  </header>
+
+  <section class="wrap bx-explore" aria-labelledby="explore-title">
+    <p class="kicker">${biE("Explore the benchmark")}</p>
+    <h2 id="explore-title" class="jx-h2">${bi("Three ways<br>to <em>explore.</em>", `${esc(Z("Three ways"))}${esc(Z("to"))}<br><em>${esc(Z("explore."))}</em>`)}</h2>
+    ${biPE("p", "jx-p", "Access cases, evaluation structure, and future results. Each entry point offers a different perspective on the same benchmark.")}
+    <ol class="bx-entries">${entries.map(([name, title, copy, href, action, reserved], i) => `<li><a href="${href}"><span class="bx-no">0${i + 1}</span><span class="kicker">${bi(esc(name), esc(Zor(name, ZH_GAP[name])))}</span><b>${biE(title)}</b><span class="bx-copy">${copy}</span>${reserved ? `<span class="bx-reserved">${trialNote}</span>` : ""}<span class="cx-view">${biE(action)} ${ARROW}</span></a></li>`).join("")}</ol>
+  </section>
+
+  <section class="wrap bx-coverage" id="benchmark-taxonomies" aria-labelledby="coverage-title">
+    <div class="bx-cov-intro">
+      <p class="kicker">${biE("Data coverage")}</p>
+      <h2 id="coverage-title" class="jx-h2">${bi("A diverse set of<br><em>realistic scenarios.</em>", `${esc(Z("A diverse set of"))}<br><em>${esc(Z("realistic scenarios."))}</em>`)}</h2>
+      ${biPE("p", "jx-p", "The benchmark spans authored subjects, learner contexts, and tutoring capabilities, with structured evaluation criteria.")}
+      <p class="bx-ver kicker"><span class="nocase">${esc(`${c.datasetId}@${c.datasetVersion}`)}</span><br>${bi(esc(F.formatRubricStatus(c.rubricCount, benchmark.statusLabel, "en")), esc(F.formatRubricStatus(c.rubricCount, benchmark.statusLabel, "zh-CN")))}</p>
+      <a class="text-link" href="cases/index.html">${biE("Explore all cases")} ${ARROW}</a>
+    </div>
+    <div class="bx-dists">
+      ${distribution("Subjects", c.casesBySubject, c.caseCount)}
+      ${distribution("Learner levels", c.casesByLearnerLevel, c.caseCount)}
+      ${distribution("Student states", c.casesByStudentState, c.caseCount)}
+      ${distribution("Capabilities", c.casesByCapabilityTag, c.caseCount, true)}
+      <details class="bx-more"><summary>${bi(esc(F.formatCoverageGroups(Object.keys(c.casesByLearningTask).length, Object.keys(c.casesByLocale).length, "en")), esc(F.formatCoverageGroups(Object.keys(c.casesByLearningTask).length, Object.keys(c.casesByLocale).length, "zh-CN")))}</summary>
+        <div class="bx-dists">
+        ${distribution("Learning tasks", c.casesByLearningTask, c.caseCount)}
+        ${distribution("Locales", c.casesByLocale, c.caseCount)}
+        ${distribution("Evaluation dimensions", c.casesByCategory, c.caseCount, true)}
+        </div>
+        <p class="bx-den">${bi(esc(F.formatCoverageVersion(benchmark.benchmarkVersion, benchmark.schemaVersion, "en")), esc(F.formatCoverageVersion(benchmark.benchmarkVersion, benchmark.schemaVersion, "zh-CN")))}</p>
+        <p class="bx-den">${bi("Disclosure policies", esc(Zor("Disclosure policies", ZH_GAP["Disclosure policies"])))}： ${Object.entries(c.casesByDisclosurePolicy).map(([k, n]) => `${tax(k)}: ${n}`).join(" · ")}</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="wrap jx-close">
+    <p class="kicker">${biE("Open & reproducible")}</p>
+    <h2 class="jx-h2">${biE("Transparent by design.")}</h2>
+    ${biPE("p", "jx-p", "Public development cases and evaluation criteria are open for inspection. Public case artifacts exclude evaluator-only answers and rubrics. Coverage describes the authored dataset, not teaching effectiveness or learning outcomes.")}
+    <p class="jx-links"><a href="${GITHUB}" rel="noreferrer">${biE("View on GitHub")}</a><a href="${GITHUB}/tree/main/docs" rel="noreferrer">${biE("Read the data documentation")}</a></p>
+  </section>
+</main>`;
+  return frame({ prefix: "../", title: "Benchmark — Teachometry", titleZh: `${Z("Benchmark")} — Teachometry`, description: "Explore authored cases, public dataset coverage, and transparent evaluation structure.", body, current: "cases", css: ["journal.css", "cases.css"] });
+}
+
 // ---------------------------------------------------------------- write
 const COVER = {
   file: "catalogue.webp",
@@ -306,4 +399,5 @@ const out = (rel, html) => { const f = join(PROTO, rel); mkdirSync(join(f, "..")
 out("data/cases/index.html", libraryPage(COVER));
 ALL.forEach((c, i) => out(`data/cases/${c.id}/index.html`, detailPage(c, i)));
 out("data/heatmap/index.html", heatmapPage());
-process.stdout.write(`cases: library + ${TOTAL} case files + evidence matrix\n`);
+out("data/index.html", benchmarkPage());
+process.stdout.write(`cases: benchmark overview + library + ${TOTAL} case files + evidence matrix\n`);
