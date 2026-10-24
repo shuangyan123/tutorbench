@@ -100,7 +100,7 @@ test("every link and asset in every page resolves inside the published site", as
   const files = await htmlFiles(spectrum);
   let checked = 0;
   for (const file of files) {
-    const html = (await page(file)).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gu, (script) => script.replace(/>[\s\S]*<\/script>$/u, "></script>"));
+    const html = (await page(file)).replace(/(<script\b[^>]*>)[\s\S]*?<\/script[^>]*>/giu, "$1</script>");
     const urls = [...html.matchAll(/\s(?:href|src)="([^"]*)"/gu)].map((match) => match[1] ?? "");
     for (const srcset of html.matchAll(/\ssrcset="([^"]*)"/gu)) {
       urls.push(...(srcset[1] ?? "").split(",").map((candidate) => candidate.trim().split(/\s+/u)[0] ?? ""));

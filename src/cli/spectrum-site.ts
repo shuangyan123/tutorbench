@@ -95,9 +95,9 @@ function mapUrl(value: string, context: PageContext): string {
 function rewriteUrls(html: string, context: PageContext): string {
   // inline scripts build markup from strings: rewrite a <script> element's own tag, never its body
   return html
-    .split(/(<script\b[^>]*>[\s\S]*?<\/script>)/u)
+    .split(/(<script\b[^>]*>[\s\S]*?<\/script[^>]*>)/iu)
     .map((part, index) => index % 2 === 1
-      ? part.replace(/^<script\b[^>]*>/u, (tag) => rewriteAttributes(tag, context))
+      ? part.replace(/^<script\b[^>]*>/iu, (tag) => rewriteAttributes(tag, context))
       : rewriteAttributes(part, context))
     .join("");
 }
