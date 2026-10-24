@@ -109,3 +109,15 @@
   .d-pair { grid-template-columns: 1fr; }
   .ladder li:nth-child(n) { margin-left: 0; }
 }
+
+/* ---- the issue: four essays, each with its own cover ---- */
+.issue-row { padding-block: 28px 72px; border-top: 1px solid var(--ink); }
+.issue-cards { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(14px, 2vw, 28px); }
+.issue-cards a { display: grid; gap: 8px; color: var(--ink); text-decoration: none; }
+.issue-cards img { width: 100%; height: auto; aspect-ratio: 9 / 11; object-fit: cover; border-radius: 3px; box-shadow: 0 22px 40px -28px rgba(14, 15, 20, .6); transition: transform .3s ease; }
+.issue-cards a:hover img { transform: translateY(-3px); }
+.issue-cards .t { font-family: var(--f-display); font-size: clamp(18px, 1.6vw, 22px); line-height: 1.15; text-wrap: balance; }
+.issue-cards li[aria-current] .kicker { color: var(--lead); }
+.issue-cards li[aria-current] img { outline: 1px solid var(--lead); outline-offset: 4px; }
+@media (max-width: 760px) { .issue-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { .issue-cards img { transition: none; } }
