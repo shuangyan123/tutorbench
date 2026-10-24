@@ -161,6 +161,27 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .run-btn { height: 32px; padding: 0 13px 0 15px; border-radius: 999px; background: var(--ink); color: var(--bg); display: inline-flex; align-items: center; gap: 8px; font: 500 12.5px/1 var(--f-ui); white-space: nowrap; }
 .run-btn svg, .cta svg, .text-link svg, .shelf-nav svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
+/* the site menu: every section, from any page, at any width */
+.menu-btn { height: 32px; padding: 0 12px 0 13px; border-radius: 999px; border: 1px solid var(--hair-2); background: rgba(255, 255, 255, .4); display: inline-flex; align-items: center; gap: 9px; font: 500 12.5px/1 var(--f-ui); color: var(--ink); cursor: pointer; }
+.menu-btn i { position: relative; width: 13px; height: 7px; border-block: 1.4px solid currentColor; transition: transform .25s, border-color .25s; }
+.menu-btn[aria-expanded="true"] { background: rgba(255, 255, 255, .75); border-color: var(--ink); }
+.menu-btn[aria-expanded="true"] i { height: 0; border-bottom: 0; transform: translateY(3px); }
+.menu-btn:focus-visible, .lang:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.menu { position: absolute; left: 0; right: 0; top: 100%; max-height: calc(100svh - var(--bar-h)); overflow-y: auto; overscroll-behavior: contain;
+  background: #d5ddef;
+  border-bottom: 1px solid var(--ink); box-shadow: 0 40px 60px -40px rgba(14, 15, 20, .35); padding-block: clamp(20px, 3vw, 36px) clamp(28px, 4vw, 48px); }
+.menu[hidden] { display: none; }
+.menu-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px clamp(24px, 4vw, 56px); }
+.menu-col { display: grid; align-content: start; min-width: 0; }
+.menu-col .kicker { margin: 0 0 8px; }
+.menu-col a { display: block; padding: 9px 0 8px; border-bottom: 1px solid var(--hair-2); font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(22px, 2.1vw, 30px); line-height: 1.1; color: var(--ink); transition: padding .2s, color .2s; }
+.menu-col a:first-of-type { border-top: 1px solid var(--ink); }
+.menu-col a:hover { padding-left: 6px; }
+.menu-col a[aria-current="page"] { font-style: italic; }
+.menu-col a[aria-current="page"]::after { content: " ·"; color: var(--ink-3); }
+@media (max-width: 720px) { .menu-grid { grid-template-columns: minmax(0, 1fr); } .menu-col a { font-size: 22px; } }
+@media (max-width: 400px) { .menu-btn { padding: 0 10px; gap: 7px; } .bar-end { gap: 6px; } .lang { padding: 0 9px; } .run-btn { padding: 0 10px 0 12px; } }
+
 /* ---------------------------------------------------------------- cover · the work */
 .hero { position: relative; height: 260vh; overflow: clip; }
 /* the cover sits on the page's own light (body::before), so the eyepiece floats in the haze */
@@ -736,3 +757,6 @@ html { scrollbar-width: thin; scrollbar-color: rgba(43, 35, 80, .34) transparent
 ::-webkit-scrollbar-thumb { background: rgba(43, 35, 80, .3); border: 3px solid transparent; border-radius: 999px; background-clip: padding-box; }
 ::-webkit-scrollbar-thumb:hover { background-color: rgba(43, 35, 80, .55); }
 pre, .tbl-wrap { scrollbar-width: thin; scrollbar-color: rgba(43, 35, 80, .3) transparent; }
+
+@media (max-width: 400px) { .wordmark img { height: 18px; } .bar { column-gap: 10px; } }
+@media (max-width: 360px) { .menu-btn { width: 34px; padding: 0; justify-content: center; } .menu-btn > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }

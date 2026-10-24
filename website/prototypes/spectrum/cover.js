@@ -44,21 +44,36 @@
   F[0] = first;
   first.addEventListener("load", function () { hero.setAttribute("data-cover", "on"); });
   first.addEventListener("error", function () { hero.setAttribute("data-cover", "off"); });
-  // load every 4th frame first so the whole scroll is covered early, then fill in between
+  // Only the still frame loads with the page. The rest of the sequence (about 29 MB on large
+  // screens, 15 MB on phones) waits until the reader shows they will scroll: a light warm-up of the
+  // first few frames after the page settles, then every 4th frame so the whole scroll is covered
+  // early, then the frames in between. With reduced motion or Save-Data nothing more is fetched.
   var queue = [];
   [4, 2, 1].forEach(function (step) {
     for (var j = 0; j < N; j += step) if (queue.indexOf(j) < 0 && j !== 0) queue.push(j);
   });
-  (function pump() {
-    var n = 0;
-    while (queue.length && n < 4) {
-      var k = queue.shift(); n++;
+  var conn = window.navigator && window.navigator.connection;
+  var saveData = !!(conn && conn.saveData);
+  var limit = 0, inflight = 0;
+  function pump() {
+    while (queue.length && inflight < 4 && limit > 0) {
+      var k = queue.shift(); inflight++; limit--;
       var im = img(DIR + SEQ + pad(k) + ".webp");
       F[k] = im;
-      im.addEventListener("load", function () { setTimeout(pump, 0); });
-      im.addEventListener("error", function () { setTimeout(pump, 0); });
+      var next = function () { inflight--; setTimeout(pump, 0); };
+      im.addEventListener("load", next);
+      im.addEventListener("error", next);
     }
-  })();
+  }
+  function allow(n) { if (reduced() || saveData) return; limit = Math.max(limit, n); pump(); }
+  var INTENT = ["wheel", "touchmove", "keydown", "scroll"];
+  function intent() {
+    if (reduced() || saveData) return;
+    INTENT.forEach(function (t) { window.removeEventListener(t, intent); });
+    allow(Infinity);
+  }
+  INTENT.forEach(function (t) { window.addEventListener(t, intent, { passive: true }); });
+  window.addEventListener("load", function () { setTimeout(function () { allow(6); }, 1200); });
 
   // nearest decoded frames around a float index
   function around(x) {

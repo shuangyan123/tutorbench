@@ -30,6 +30,29 @@
     window.addEventListener("load", function () { toTop(); setTimeout(toTop, 60); }, { once: true });
   })();
 
+  /* ------------------------------------------------------------ 0b site menu */
+  (function () {
+    var btn = document.querySelector("[data-menu-toggle]");
+    var menu = document.querySelector("[data-menu]");
+    if (!btn || !menu) return;
+    // mark the page we are on
+    var here = location.pathname.replace(/index\.html$/, "");
+    Array.prototype.forEach.call(menu.querySelectorAll("a[href]"), function (a) {
+      if (a.hash || a.origin !== location.origin) return;
+      if (a.pathname.replace(/index\.html$/, "") === here) a.setAttribute("aria-current", "page");
+    });
+    function set(open, focusBack) {
+      menu.hidden = !open;
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) { var first = menu.querySelector("a"); if (first) first.focus({ preventScroll: true }); }
+      else if (focusBack) btn.focus({ preventScroll: true });
+    }
+    btn.addEventListener("click", function () { set(menu.hidden); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) set(false, true); });
+    document.addEventListener("click", function (e) { if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) set(false); });
+    menu.addEventListener("click", function (e) { if (e.target.closest("a")) set(false); });
+  })();
+
   /* ------------------------------------------------------------ 1 language */
   var langListeners = [];
   function setLang(next) {
