@@ -13,7 +13,11 @@ export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
 /** the live site's own Chinese for an English string; throws rather than letting a gap through */
 export function Z(en) {
   const zh = SITE_ZH_CN_COPY[en];
-  if (zh === undefined) throw new Error(`No zh-CN copy for: ${en.slice(0, 80)}`);
+  if (zh === undefined) {
+    // ZLIST=1 lists every gap in one run instead of stopping at the first
+    if (globalThis.process?.env.ZLIST) { (globalThis.__zmiss ??= new Set()).add(en); return `⟦${en}⟧`; }
+    throw new Error(`No zh-CN copy for: ${en.slice(0, 80)}`);
+  }
   return zh;
 }
 /** inline pair (already-escaped HTML) */
@@ -23,6 +27,8 @@ export const biE = (en, zh = Z(en)) => bi(esc(en), esc(zh));
 /** block pair */
 export const biP = (tag, cls, en, zh) => `<${tag} class="en${cls ? " " + cls : ""}">${en}</${tag}><${tag} class="zh${cls ? " " + cls : ""}" lang="zh-CN">${zh}</${tag}>`;
 export const biPE = (tag, cls, en, zh = Z(en)) => biP(tag, cls, esc(en), esc(zh));
+/** the live Chinese when the site has it, otherwise our own (for strings the live site leaves untranslated) */
+export const Zor = (en, zh) => SITE_ZH_CN_COPY[en] ?? zh;
 
 export const RENDERED = ["Rendered in Blender.", "Blender 渲染。"];
 
@@ -36,9 +42,9 @@ function rel(html, prefix) {
   });
 }
 // homepage anchors that now have a page of their own
-const PAGES = { essays: ["blog/index.html", "journal"], dispersion: ["methodology/index.html", "method"] };
+const PAGES = { essays: ["blog/index.html", "journal"], dispersion: ["methodology/index.html", "method"], plates: ["data/cases/index.html", "cases"] };
 
-export function frame({ prefix, title, titleZh, description, body, current, css = [] }) {
+export function frame({ prefix, title, titleZh, description, body, current, css = [], scripts = [] }) {
   let head = INDEX.slice(0, INDEX.indexOf("</head>"));
   head = head.replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
     .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(description)}">`)
@@ -63,7 +69,7 @@ ${body}
 ${foot}
 
 <script src="${prefix}spectrum.js"></script>
-<script>
+${scripts.map((js) => `<script src="${prefix}${js}"></script>\n`).join("")}<script>
   // bilingual alt text and tab title follow the language toggle
   (function () {
     var T = { en: ${JSON.stringify(title)}, zh: ${JSON.stringify(titleZh)} };

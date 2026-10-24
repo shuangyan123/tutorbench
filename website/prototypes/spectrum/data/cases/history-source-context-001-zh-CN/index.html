@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>一手史料与历史语境 — Teachometry</title>
+<meta name="description" content="Public TutorEval case history-source-context-001-zh-CN: 解释在解读一手史料前，为什么要关注作者和写作背景。">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../../spectrum.css">
+<link rel="stylesheet" href="../../../journal.css">
+<link rel="stylesheet" href="../../../cases.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var root = document.documentElement;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../../index.html"><img src="../../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../../index.html#methods" class="nav-tb"><img src="../../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../../data/cases/index.html" aria-current="page"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+  <header class="essay-head cd-head">
+    <div class="wrap">
+      <nav class="cd-crumbs kicker" aria-label="Breadcrumb"><a href="../index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a><span aria-hidden="true">›</span><a href="../index.html#case-library"><span class="en">Case Library</span><span class="zh" lang="zh-CN">案例库</span></a><span aria-hidden="true">›</span><span aria-current="page" class="nocase">history-source-context-001-zh-CN</span></nav>
+      <div class="cd-head-grid">
+        <div>
+          <p class="essay-meta kicker"><span class="issue"><span class="en">History Or Social Studies</span><span class="zh" lang="zh-CN">历史或社会研究</span></span><span class="rule" aria-hidden="true"></span><span class="nocase">history-source-context-001-zh-CN</span><span class="nocase">zh-CN</span></p>
+          <h1 class="essay-title cd-title" lang="zh-CN">一手史料与历史语境</h1>
+          <p class="essay-dek cd-dek" lang="zh-CN">学生知道事件发生的日期，但还不了解作者的立场和写作背景。 解释在解读一手史料前，为什么要关注作者和写作背景。</p>
+          <p class="cd-twin kicker"><span><span class="en">Same situation, other language</span><span class="zh" lang="zh-CN">同一情境，另一种语言</span></span><a href="../history-source-context-001/index.html"><code>history-source-context-001</code> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+        </div>
+        <aside class="cd-public">
+          <p class="kicker"><span class="en">Public case</span><span class="zh" lang="zh-CN">公开案例</span></p>
+          <p class="en">This authored case is part of the public Teachometry development set. It is designed for research and evaluation, not a real classroom or user record.</p><p class="zh" lang="zh-CN">这个人工编写案例属于 Teachometry 公开开发集，用于研究与评测，而不是真实课堂或用户记录。</p>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap cd-body">
+    <aside class="cd-dossier" aria-labelledby="dossier-title">
+      <h2 id="dossier-title" class="kicker"><span class="en">Case dossier</span><span class="zh" lang="zh-CN">案例档案</span></h2>
+      <dl class="cd-facts"><div><dt><span class="en">Case ID</span><span class="zh" lang="zh-CN">案例 ID</span></dt><dd><code>history-source-context-001-zh-CN</code></dd></div><div><dt><span class="en">Dataset</span><span class="zh" lang="zh-CN">数据集</span></dt><dd><code>tutor-eval-v0.2a@0.2a.6</code></dd></div><div><dt><span class="en">Version</span><span class="zh" lang="zh-CN">版本</span></dt><dd>1.0.0</dd></div><div><dt><span class="en">Subject</span><span class="zh" lang="zh-CN">学科</span></dt><dd><span class="en">History Or Social Studies</span><span class="zh" lang="zh-CN">历史或社会研究</span></dd></div><div><dt><span class="en">Topic</span><span class="zh" lang="zh-CN">主题</span></dt><dd lang="zh-CN">一手史料与历史语境</dd></div><div><dt><span class="en">Locale</span><span class="zh" lang="zh-CN">语言</span></dt><dd>zh-CN</dd></div><div><dt><span class="en">Learner level</span><span class="zh" lang="zh-CN">学生水平</span></dt><dd><span class="en">Secondary</span><span class="zh" lang="zh-CN">中学</span></dd></div><div><dt><span class="en">Task difficulty</span><span class="zh" lang="zh-CN">任务难度</span></dt><dd>3 / 5</dd></div><div><dt><span class="en">Pedagogical difficulty</span><span class="zh" lang="zh-CN">教学难度</span></dt><dd>3 / 5</dd></div><div><dt><span class="en">Student state</span><span class="zh" lang="zh-CN">学生状态</span></dt><dd><span class="en">Novice</span><span class="zh" lang="zh-CN">初学者</span></dd></div><div><dt><span class="en">Disclosure policy</span><span class="zh" lang="zh-CN">披露策略</span></dt><dd><span class="en">No Answer</span><span class="zh" lang="zh-CN">不提供答案</span></dd></div></dl>
+    </aside>
+    <section class="cd-context" aria-labelledby="context-title">
+      <h2 id="context-title" class="cd-h2"><span class="en">Tutor-visible context and conversation</span><span class="zh" lang="zh-CN">Tutor 可见语境与对话</span></h2>
+      <p class="en cd-sub">The following context is available to the tutor in this case.</p><p class="zh cd-sub" lang="zh-CN">在本案例中，以下语境对 Tutor 可见。</p>
+      <div class="cd-problem"><p class="kicker"><span class="en">Problem context</span><span class="zh" lang="zh-CN">题目语境</span></p><p lang="zh-CN">学生知道事件发生的日期，但还不了解作者的立场和写作背景。</p></div>
+      <ol class="cd-transcript" aria-label="Tutor-visible conversation"><li class="cd-turn cd-now"><p class="cd-who kicker"><b><span class="en">Student</span><span class="zh" lang="zh-CN">学生</span></b><span><span class="en">Current message</span><span class="zh" lang="zh-CN">当前消息</span></span></p><p class="cd-says" lang="zh-CN">同一件事为什么会被两份史料写得不一样？</p></li></ol><p class="cd-note"><span class="en">There is no prior conversation. This case starts with the current student message.</span><span class="zh" lang="zh-CN">此前没有对话。本案例从当前学生消息开始。</span></p>
+      <p class="en cd-input-note">This case file presents tutor-visible input context. It is not a generated trial, model response, or evaluation result.</p><p class="zh cd-input-note" lang="zh-CN">此案例文件展示 Tutor 可见的输入语境；它不是生成的评测记录、模型回复或评测结果。</p>
+    </section>
+    <aside class="cd-notes" aria-label="Case annotations">
+      <section><h2 class="kicker"><span class="en">Learning objective</span><span class="zh" lang="zh-CN">学习目标</span></h2><p class="cd-objective" lang="zh-CN">解释在解读一手史料前，为什么要关注作者和写作背景。</p></section>
+      <section><h2 class="kicker"><span class="en">Student profile</span><span class="zh" lang="zh-CN">学生画像</span></h2><dl class="cd-profile"><div><dt><span class="en">Learner level</span><span class="zh" lang="zh-CN">学生水平</span></dt><dd><span class="en">高中阶段</span><span class="zh" lang="zh-CN">高中阶段</span></dd></div><div><dt><span class="en">Goal</span><span class="zh" lang="zh-CN">目标</span></dt><dd lang="zh-CN">理解一手史料</dd></div><div><dt><span class="en">Known concepts</span><span class="zh" lang="zh-CN">已知概念</span></dt><dd lang="zh-CN">事件发生的时间顺序</dd></div></dl></section>
+      <section><h2 class="kicker"><span class="en">Capability focus</span><span class="zh" lang="zh-CN">能力重点</span></h2><ul class="cd-caps"><li><span class="en">Conceptual Correctness</span><span class="zh" lang="zh-CN">概念正确性</span></li><li><span class="en">Prior Knowledge Adaptation</span><span class="zh" lang="zh-CN">依据已有知识调整</span></li><li><span class="en">Explanation Depth Adaptation</span><span class="zh" lang="zh-CN">解释深度适应</span></li><li><span class="en">Productive Question</span><span class="zh" lang="zh-CN">有效提问</span></li></ul></section>
+      <section><h2 class="kicker"><span class="en">Case notes</span><span class="zh" lang="zh-CN">案例说明</span></h2><p class="en">This case is an authored, structured scenario from the public Teachometry development set. It is not a real classroom record.</p><p class="zh" lang="zh-CN">这是 Teachometry 公开开发集中的人工编写、结构化情境，不是真实课堂记录。</p></section>
+    </aside>
+    <section class="cd-boundary" aria-labelledby="boundary-title">
+      <div><h2 id="boundary-title" class="cd-h2"><span class="en">Public boundary</span><span class="zh" lang="zh-CN">公开边界</span></h2><p class="en">To ensure a fair and transparent benchmark, only tutor-visible information is publicly released.</p><p class="zh" lang="zh-CN">为确保基准公平透明，只公开 Tutor 可见的信息。</p></div>
+      <div><p class="kicker"><span class="en">Not included in the public case file:</span><span class="zh" lang="zh-CN">公开案例文件不包含：</span></p><ul class="cd-excl"><li><span class="en">Ground truth answers</span><span class="zh" lang="zh-CN">参考真值答案</span></li><li><span class="en">Full evaluation rubrics</span><span class="zh" lang="zh-CN">完整评测评分标准</span></li><li><span class="en">Known-misconception annotations</span><span class="zh" lang="zh-CN">已知错误概念注释</span></li><li><span class="en">Evaluator-only evidence</span><span class="zh" lang="zh-CN">仅供评估器使用的证据</span></li><li><span class="en">Hidden challenge details</span><span class="zh" lang="zh-CN">隐藏挑战细节</span></li><li><span class="en">Any private or non-public data</span><span class="zh" lang="zh-CN">任何私有或非公开数据</span></li></ul></div>
+    </section>
+  </div>
+
+  <nav class="wrap essay-nav" aria-label="More cases">
+    <a class="prev" href="../history-source-context-001/index.html"><span class="kicker"><span class="en">Previous case</span><span class="zh" lang="zh-CN">上一个案例</span></span><span class="t"><code>history-source-context-001</code></span></a>
+    <a class="all kicker" href="../index.html#case-library"><span class="en">All cases</span><span class="zh" lang="zh-CN">全部案例</span></a>
+    <a class="next" href="../language-evidence-argument-001/index.html"><span class="kicker"><span class="en">Next case</span><span class="zh" lang="zh-CN">下一个案例</span></span><span class="t"><code>language-evidence-argument-001</code></span></a>
+  </nav>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../../index.html#reproduce"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../../index.html#results"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+  </div>
+</footer>
+
+<script src="../../../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "一手史料与历史语境 — Teachometry", zh: "一手史料与历史语境 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>
