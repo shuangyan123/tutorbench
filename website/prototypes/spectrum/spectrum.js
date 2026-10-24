@@ -1,4 +1,4 @@
-/* global window, document, navigator, history, location, requestAnimationFrame, setTimeout, IntersectionObserver, URL, CustomEvent */
+/* global window, document, navigator, history, location, performance, requestAnimationFrame, setTimeout, IntersectionObserver, URL, CustomEvent */
 /* Teachometry · Spectrum — prototype interactions.
    1) 语言切换  2) 顶栏状态  3) 封面见 cover.js  4) 分光滚动叙事  5) 图版架  5b) 光谱签名与图 4  6) 进场与复制 */
 (function () {
@@ -8,6 +8,27 @@
   var reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   function reduced() { return reduceQuery.matches || root.getAttribute("data-motion") === "reduce"; }
   function lang() { return root.getAttribute("data-lang") === "zh" ? "zh" : "en"; }
+
+  /* ------------------------------------------------------------ 0 a new page opens at its top
+     Some preview hosts carry the previous page's scroll position across a link. A new page starts at
+     the top; a #anchor and the back/forward buttons keep their own position. */
+  (function () {
+    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    if ((nav && nav.type === "back_forward") || (location.hash && location.hash.length > 1)) return;
+    var touched = false;   // once the reader scrolls, leave the page where they put it
+    ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) { window.addEventListener(t, function () { touched = true; }, { once: true, passive: true }); });
+    function toTop() {
+      if (touched || (location.hash && location.hash.length > 1)) return;
+      var before = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      // when the host page scrolls instead of this frame, bring the frame's top into view as well
+      if (window.self !== window.top) { try { root.scrollIntoView({ block: "start", behavior: "instant" }); } catch { /* ignore */ } }
+      root.style.scrollBehavior = before;
+    }
+    toTop();
+    window.addEventListener("load", function () { toTop(); setTimeout(toTop, 60); }, { once: true });
+  })();
 
   /* ------------------------------------------------------------ 1 language */
   var langListeners = [];

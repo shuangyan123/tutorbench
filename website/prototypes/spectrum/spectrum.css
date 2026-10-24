@@ -728,3 +728,11 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 :root[data-display="didone"] .pq p { font-family: var(--f-serif), serif; font-optical-sizing: auto; }
 :root[data-display="didone"][data-lang="zh"] .display, :root[data-display="didone"][data-lang="zh"] .h2, :root[data-display="didone"][data-lang="zh"] .pp-line {
   font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 600; letter-spacing: 0; }
+
+/* scrollbars: a thin ink-violet thumb on the misty ground, no track */
+html { scrollbar-width: thin; scrollbar-color: rgba(43, 35, 80, .34) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(43, 35, 80, .3); border: 3px solid transparent; border-radius: 999px; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: rgba(43, 35, 80, .55); }
+pre, .tbl-wrap { scrollbar-width: thin; scrollbar-color: rgba(43, 35, 80, .3) transparent; }
