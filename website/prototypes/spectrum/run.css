@@ -126,8 +126,10 @@
 
 /* ====================================================================== Docs */
 .dc-head { position: relative; padding-top: var(--bar-h); }
-.dc-band { margin: 0; height: clamp(150px, 35vw, 460px); overflow: hidden; border-bottom: 1px solid var(--ink); }
-.dc-band img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+.dc-band { position: relative; margin: 0; height: clamp(150px, 35vw, 460px); overflow: hidden; border-bottom: 1px solid var(--ink); }
+.dc-band figcaption { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: 12px; max-width: min(560px, calc(100% - 32px)); padding: 6px 10px; border-radius: 3px; background: rgba(240, 244, 248, .82); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); line-height: 1.45; }
+.dc-band figcaption b { color: var(--lead); font-weight: 500; }
+.dc-band img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
 .dc-head-in { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(24px, 5vw, 80px); align-items: end; padding-block: clamp(32px, 4vw, 56px) clamp(20px, 2.6vw, 32px); }
 .dc-head-in > * { min-width: 0; }
 .dc-head .essay-title { font-size: clamp(48px, 7vw, 108px); }
@@ -263,6 +265,9 @@
   .rn-steps li { padding: 16px 0; }
   .dc-neq article { padding-right: 0; }
   .dc-head-in, .dc-index-head { grid-template-columns: 1fr; }
+  .dc-band { overflow: visible; height: auto; border-bottom: 0; }
+  .dc-band img { height: 180px; border-bottom: 1px solid var(--ink); }
+  .dc-band figcaption { position: static; max-width: none; margin: 10px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); padding: 0; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
   .dc-trace { text-align: left; }
   .dc-trace br { display: none; }
   .dc-status { white-space: normal; }

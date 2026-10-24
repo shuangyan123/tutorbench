@@ -315,7 +315,7 @@ function docsPage() {
   const T = DOC_COUNT_TEMPLATES;
   const body = `<main id="main" class="dc docs-page">
   <header class="dc-head">
-    <figure class="dc-band" aria-hidden="true"><img src="../assets/run/labels.webp" alt="" width="1600" height="560"></figure>
+    <figure class="dc-band"><img src="../assets/run/tracing.webp" alt="" width="1600" height="560"><figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc("Vellum over the repository’s own docs/quickstart.md, its structure traced in pencil: a map, not a replacement. " + RENDERED[0]), esc("硫酸纸蒙在仓库自己的 docs/quickstart.md 上，用铅笔描出它的结构：是地图，不是替代。" + RENDERED[1]))}</figcaption></figure>
     <div class="wrap dc-head-in">
       <div class="dc-head-copy">
         <p class="essay-meta kicker"><span class="issue">${biE("Documentation")}</span><span class="rule" aria-hidden="true"></span><span>${INDEX.length} ${bi("references", "条参考资料")}</span></p>

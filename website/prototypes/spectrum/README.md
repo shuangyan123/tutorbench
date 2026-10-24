@@ -147,8 +147,12 @@ line and attributes (aria-label, placeholder) carry both languages and follow th
 - Section colour: clear crystal (`run.css`); a glass slate `--lead` for text, pale glass for fills.
 - Cover: `render/tubes.py` (labels from `render/tubes_labels.py`), four test tubes of clear water in
   an aluminium rack, each labelled with one of the four public case IDs the live Run page lists.
-  The Docs band is the same scene seen head-on at the labels (`CAM=0.0,-0.2,0.108 TGT=0,0,0.104
-  FOCUS=0,-0.008,0.105 LENS=55 FSTOP=5.6`, 1600×560).
+- Docs band: `render/vellum.py` (textures from `render/vellum_tex.py`), a sheet of vellum laid over
+  a printed page of the repository's own `docs/quickstart.md`, its structure traced in pencil and
+  numbered in the margin: the site as a map over the source documents, not a replacement. Its own
+  concept, not a second view of the Run tubes. Published frame: `VEIL=0.72 CURL=3
+  PENCIL=0.05,0.0,0.0042 PENROT=160 KEY=4 FILL=1.5 SKY=0.2 CAM=0.03,-0.17,0.22 TGT=0.0,0.065,0
+  FOCUS=0,0.07,0`, 1600×560 at 160 spp.
 - The bar's Run button, the footer's Run link and a new footer Docs link point at the pages; the
   homepage §7 Reproduce links to the Run page.
 
