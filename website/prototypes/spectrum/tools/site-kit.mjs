@@ -42,7 +42,7 @@ function rel(html, prefix) {
   });
 }
 // homepage anchors that now have a page of their own
-const PAGES = { essays: ["blog/index.html", "journal"], dispersion: ["methodology/index.html", "method"], plates: ["data/cases/index.html", "cases"], results: ["leaderboard/index.html", "results"] };
+const PAGES = { essays: ["blog/index.html", "journal"], dispersion: ["methodology/index.html", "method"], plates: ["data/cases/index.html", "cases"], results: ["leaderboard/index.html", "results"], reproduce: ["run/index.html", "run"] };
 
 export function frame({ prefix, title, titleZh, description, body, current, css = [], scripts = [] }) {
   let head = INDEX.slice(0, INDEX.indexOf("</head>"));
@@ -56,6 +56,7 @@ export function frame({ prefix, title, titleZh, description, body, current, css 
     bar = bar.replace(`<a href="${prefix}index.html#${anchor}">`, `<a href="${prefix}${page}"${current === key ? ' aria-current="page"' : ""}>`);
     foot = foot.replace(`<a href="${prefix}index.html#${anchor}">`, `<a href="${prefix}${page}">`);
   }
+  bar = bar.replace(`<a class="run-btn" href="${prefix}index.html#reproduce">`, `<a class="run-btn" href="${prefix}run/index.html"${current === "run" ? ' aria-current="page"' : ""}>`);
   foot = foot.replace("The cover kaleidoscope and gems are rendered in Blender (Cycles).", "The section covers and photographs are rendered in Blender (Cycles).")
     .replace("封面万花筒与宝石由 Blender（Cycles）渲染。", "各栏目封面与图版由 Blender（Cycles）渲染。");
   return `${head}</head>

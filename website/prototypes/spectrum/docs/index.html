@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Docs — Teachometry</title>
+<meta name="description" content="Repository documentation for TutorBench setup, benchmark contracts, execution workflows, evidence boundaries, and governance.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400..600;1,400..600&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<link rel="stylesheet" href="../spectrum.css">
+<link rel="stylesheet" href="../journal.css">
+<link rel="stylesheet" href="../run.css">
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    var zh = q ? q.indexOf("zh") === 0 : (navigator.language || "").toLowerCase().indexOf("zh") === 0;
+    var root = document.documentElement;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../index.html#methods" class="nav-tb"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="lang" type="button" data-lang-toggle aria-label="Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+</header>
+
+<main id="main" class="dc docs-page">
+  <header class="dc-head">
+    <figure class="dc-band" aria-hidden="true"><img src="../assets/run/labels.webp" alt="" width="1600" height="560"></figure>
+    <div class="wrap dc-head-in">
+      <div class="dc-head-copy">
+        <p class="essay-meta kicker"><span class="issue"><span class="en">Documentation</span><span class="zh" lang="zh-CN">文档</span></span><span class="rule" aria-hidden="true"></span><span>19 <span class="en">references</span><span class="zh" lang="zh-CN">条参考资料</span></span></p>
+        <h1 class="essay-title" id="docs-title"><span class="en">Documentation</span><span class="zh" lang="zh-CN">文档</span></h1>
+        <p class="en essay-dek">Reference, setup, CLI, artifacts, and evaluation workflows.</p><p class="zh essay-dek" lang="zh-CN">参考资料、安装、CLI、产物和评测工作流。</p>
+        <p class="en dc-head-note">Navigate TutorBench’s versioned repository guides and public reference surfaces.</p><p class="zh dc-head-note" lang="zh-CN">浏览 TutorBench 版本化仓库指南和公开参考页面。</p>
+      </div>
+      <p class="dc-trace" aria-hidden="true"><span class="en">Evidence<br>you can<br><em>trace.</em></span><span class="zh" lang="zh-CN">证据可以<em>追踪。</em></span></p>
+    </div>
+    <div class="wrap">
+      <div class="dc-controls">
+        <form class="dc-search" role="search" aria-label="Search documentation" data-aria-label-en="Search documentation" data-aria-label-zh="搜索文档">
+          <label for="docs-search-input" class="visually-hidden"><span class="en">Search documentation</span><span class="zh" lang="zh-CN">搜索文档</span></label>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4L14 14"/></svg>
+          <input id="docs-search-input" type="search" data-doc-search placeholder="Search documentation…" data-placeholder-en="Search documentation…" data-placeholder-zh="搜索文档…" autocomplete="off">
+          <button type="reset" data-doc-search-clear aria-label="Clear documentation search" data-aria-label-en="Clear documentation search" data-aria-label-zh="清除文档搜索" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button>
+        </form>
+        <div class="dc-filters" role="group" aria-label="Filter documentation by category" data-aria-label-en="Filter documentation by category" data-aria-label-zh="按类别筛选文档">
+          <button type="button" data-doc-category="all" aria-pressed="true"><span class="en">All docs</span><span class="zh" lang="zh-CN">全部文档</span></button><button type="button" data-doc-category="getting-started" aria-pressed="false"><span class="en">Getting Started</span><span class="zh" lang="zh-CN">开始使用</span></button><button type="button" data-doc-category="benchmark-data" aria-pressed="false"><span class="en">Benchmark &amp; Data</span><span class="zh" lang="zh-CN">基准与数据</span></button><button type="button" data-doc-category="execution-evidence" aria-pressed="false"><span class="en">Execution &amp; Evidence</span><span class="zh" lang="zh-CN">执行与证据</span></button><button type="button" data-doc-category="human-review" aria-pressed="false"><span class="en">Human Review</span><span class="zh" lang="zh-CN">人工评审</span></button><button type="button" data-doc-category="governance" aria-pressed="false"><span class="en">Governance</span><span class="zh" lang="zh-CN">治理</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap dc-work" aria-label="Documentation center">
+    <details class="dc-mnav"><summary><span class="en">Browse documentation navigation</span><span class="zh" lang="zh-CN">浏览文档导航</span></summary><nav aria-label="Mobile documentation navigation" data-aria-label-en="Mobile documentation navigation" data-aria-label-zh="移动端文档导航"><section class="dc-nav-g"><h2 class="kicker"><span class="en">Getting Started</span><span class="zh" lang="zh-CN">开始使用</span></h2><ul><li><a href="#overview" aria-current="page"><span class="en">Overview</span><span class="zh" lang="zh-CN">概览</span></a></li><li><a href="#quickstart"><span class="en">Quickstart</span><span class="zh" lang="zh-CN">Quickstart</span></a></li><li><a href="../run/index.html"><span class="en">Run TutorBench</span><span class="zh" lang="zh-CN">运行 TutorBench</span></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/README.md" rel="noreferrer"><span class="en">README</span><span class="zh" lang="zh-CN">README</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li></ul></section><section class="dc-nav-g"><h2 class="kicker"><span class="en">Benchmark &amp; Data</span><span class="zh" lang="zh-CN">基准与数据</span></h2><ul><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/tutor-eval-v0.2a.md" rel="noreferrer"><span class="en">TutorEval 0.2A</span><span class="zh" lang="zh-CN">TutorEval 0.2A</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/tutor-eval-v0.4a.md" rel="noreferrer"><span class="en">Portable response corpus</span><span class="zh" lang="zh-CN">Portable response corpus</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a></li><li><a href="../data/index.html"><span class="en">Public benchmark</span><span class="zh" lang="zh-CN">公开基准</span></a></li><li><a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a></li></ul></section><section class="dc-nav-g"><h2 class="kicker"><span class="en">Execution &amp; Evidence</span><span class="zh" lang="zh-CN">执行与证据</span></h2><ul><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/real-model-baselines.md" rel="noreferrer"><span class="en">Real-model baselines</span><span class="zh" lang="zh-CN">Real-model baselines</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="../run/index.html"><span class="en">Run workflows</span><span class="zh" lang="zh-CN">运行工作流</span></a></li><li><a href="../models/index.html"><span class="en">Models registry</span><span class="zh" lang="zh-CN">模型登记目录</span></a></li><li><a href="../leaderboard/index.html"><span class="en">Results status</span><span class="zh" lang="zh-CN">结果状态</span></a></li></ul></section><section class="dc-nav-g"><h2 class="kicker"><span class="en">Human Review</span><span class="zh" lang="zh-CN">人工评审</span></h2><ul><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/community-review-protocol.md" rel="noreferrer"><span class="en">Community Review protocol</span><span class="zh" lang="zh-CN">Community Review 协议</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/community-review-application-gate.md" rel="noreferrer"><span class="en">Participation application gate</span><span class="zh" lang="zh-CN">Participation application gate</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="../community/index.html"><span class="en">Community status</span><span class="zh" lang="zh-CN">社区状态</span></a></li></ul></section><section class="dc-nav-g"><h2 class="kicker"><span class="en">Governance</span><span class="zh" lang="zh-CN">治理</span></h2><ul><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/roadmap.md" rel="noreferrer"><span class="en">Roadmap</span><span class="zh" lang="zh-CN">路线图</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/licensing.md" rel="noreferrer"><span class="en">Licensing</span><span class="zh" lang="zh-CN">许可</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/CONTRIBUTING.md" rel="noreferrer"><span class="en">Contributing</span><span class="zh" lang="zh-CN">贡献指南</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/SECURITY.md" rel="noreferrer"><span class="en">Security</span><span class="zh" lang="zh-CN">安全</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li></ul></section></nav></details>
+    <nav class="dc-side" aria-label="Documentation navigation" data-aria-label-en="Documentation navigation" data-aria-label-zh="文档导航"><section class="dc-nav-g"><h2 class="kicker"><span class="en">Getting Started</span><span class="zh" lang="zh-CN">开始使用</span></h2><ul><li><a href="#overview" aria-current="page"><span class="en">Overview</span><span class="zh" lang="zh-CN">概览</span></a></li><li><a href="#quickstart"><span class="en">Quickstart</span><span class="zh" lang="zh-CN">Quickstart</span></a></li><li><a href="../run/index.html"><span class="en">Run TutorBench</span><span class="zh" lang="zh-CN">运行 TutorBench</span></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/README.md" rel="noreferrer"><span class="en">README</span><span class="zh" lang="zh-CN">README</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li></ul></section><section class="dc-nav-g"><h2 class="kicker"><span class="en">Benchmark &amp; Data</span><span class="zh" lang="zh-CN">基准与数据</span></h2><ul><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/tutor-eval-v0.2a.md" rel="noreferrer"><span class="en">TutorEval 0.2A</span><span class="zh" lang="zh-CN">TutorEval 0.2A</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/tutor-eval-v0.4a.md" rel="noreferrer"><span class="en">Portable response corpus</span><span class="zh" lang="zh-CN">Portable response corpus</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a></li><li><a href="../data/index.html"><span class="en">Public benchmark</span><span class="zh" lang="zh-CN">公开基准</span></a></li><li><a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a></li></ul></section><section class="dc-nav-g"><h2 class="kicker"><span class="en">Execution &amp; Evidence</span><span class="zh" lang="zh-CN">执行与证据</span></h2><ul><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/real-model-baselines.md" rel="noreferrer"><span class="en">Real-model baselines</span><span class="zh" lang="zh-CN">Real-model baselines</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="../run/index.html"><span class="en">Run workflows</span><span class="zh" lang="zh-CN">运行工作流</span></a></li><li><a href="../models/index.html"><span class="en">Models registry</span><span class="zh" lang="zh-CN">模型登记目录</span></a></li><li><a href="../leaderboard/index.html"><span class="en">Results status</span><span class="zh" lang="zh-CN">结果状态</span></a></li></ul></section><section class="dc-nav-g"><h2 class="kicker"><span class="en">Human Review</span><span class="zh" lang="zh-CN">人工评审</span></h2><ul><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/community-review-protocol.md" rel="noreferrer"><span class="en">Community Review protocol</span><span class="zh" lang="zh-CN">Community Review 协议</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/community-review-application-gate.md" rel="noreferrer"><span class="en">Participation application gate</span><span class="zh" lang="zh-CN">Participation application gate</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="../community/index.html"><span class="en">Community status</span><span class="zh" lang="zh-CN">社区状态</span></a></li></ul></section><section class="dc-nav-g"><h2 class="kicker"><span class="en">Governance</span><span class="zh" lang="zh-CN">治理</span></h2><ul><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/roadmap.md" rel="noreferrer"><span class="en">Roadmap</span><span class="zh" lang="zh-CN">路线图</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/licensing.md" rel="noreferrer"><span class="en">Licensing</span><span class="zh" lang="zh-CN">许可</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/CONTRIBUTING.md" rel="noreferrer"><span class="en">Contributing</span><span class="zh" lang="zh-CN">贡献指南</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li><li><a href="https://github.com/shuangyan123/tutorbench/blob/main/SECURITY.md" rel="noreferrer"><span class="en">Security</span><span class="zh" lang="zh-CN">安全</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></li></ul></section></nav>
+
+    <article class="dc-content">
+      <p class="dc-crumbs kicker" aria-label="Breadcrumb" data-aria-label-en="Breadcrumb" data-aria-label-zh="面包屑导航"><a href="index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a><span aria-hidden="true">›</span><span><span class="en">Reference center</span><span class="zh" lang="zh-CN">参考中心</span></span></p>
+
+      <section class="dc-sec" id="overview" aria-labelledby="overview-title">
+        <p class="dc-kick kicker"><span class="en">Getting Started / Overview</span><span class="zh" lang="zh-CN">开始使用 / 概览</span></p>
+        <h2 id="overview-title" class="jx-h2"><span class="en">Overview</span><span class="zh" lang="zh-CN">概览</span></h2>
+        <p class="en jx-p">TutorBench is provider-neutral measurement infrastructure for observable AI tutoring behavior. This page maps the public Teachometry surface to the repository contracts and guides that define setup, execution, artifacts, and interpretation.</p><p class="zh jx-p" lang="zh-CN">TutorBench 是用于测量可观察 AI 教学行为、独立于服务提供方的基础设施。本页把 Teachometry 的公开页面映射到定义安装、执行、产物与解释方式的仓库契约和指南。</p>
+        <p class="en dc-boundary-line">The website is a map into the repository’s existing contracts and guides. It does not replace the source documentation.</p><p class="zh dc-boundary-line" lang="zh-CN">网站只是仓库既有契约与指南的入口地图，并不替代源文档。</p>
+        <dl class="dc-facts">
+          <div><dt><span class="en">Canonical snapshot</span><span class="zh" lang="zh-CN">标准快照</span></dt><dd><code>tutor-eval-v0.2a@0.2a.6</code></dd></div>
+          <div><dt><span class="en">Public cases</span><span class="zh" lang="zh-CN">公开案例</span></dt><dd class="dc-num">48</dd></div>
+          <div><dt><span class="en">Score dimensions</span><span class="zh" lang="zh-CN">评分维度</span></dt><dd><span class="en">Correctness · Diagnosis · Guidance · Adaptation · Actionability</span><span class="zh" lang="zh-CN">正确性 · 诊断能力 · 引导能力 · 适应能力 · 可执行性</span></dd></div>
+        </dl>
+        <div class="dc-entries">
+          <a class="dc-entry" href="#quickstart"><b><span class="en">Set up</span><span class="zh" lang="zh-CN">安装配置</span></b><span class="en">Start with the real five-minute path.</span><span class="zh" lang="zh-CN">从真正的五分钟路径开始。</span><em><span class="en">Open Quickstart</span><span class="zh" lang="zh-CN">打开 Quickstart</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></em></a>
+          <a class="dc-entry" href="../run/index.html"><b><span class="en">Run evaluations</span><span class="zh" lang="zh-CN">运行评测</span></b><span class="en">Choose the workflow that matches your evidence.</span><span class="zh" lang="zh-CN">选择与你的证据需求匹配的工作流。</span><em><span class="en">Open Run</span><span class="zh" lang="zh-CN">打开运行页面</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></em></a>
+          <a class="dc-entry" href="https://github.com/shuangyan123/tutorbench/blob/main/docs/tutor-eval-v0.4a.md" rel="noreferrer"><b><span class="en">Work with artifacts</span><span class="zh" lang="zh-CN">使用产物</span></b><span class="en">Understand packets, corpora, and replay.</span><span class="zh" lang="zh-CN">理解 packet、corpus 与 replay。</span><em><span class="en">Read 0.4A guide</span><span class="zh" lang="zh-CN">阅读 0.4A 指南</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></em></a>
+          <a class="dc-entry" href="../methodology/index.html"><b><span class="en">Understand results</span><span class="zh" lang="zh-CN">理解结果</span></b><span class="en">Read the method before interpreting output.</span><span class="zh" lang="zh-CN">解释输出前先阅读方法。</span><em><span class="en">Read methodology</span><span class="zh" lang="zh-CN">阅读方法论</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></em></a>
+        </div>
+      </section>
+
+      <section class="dc-sec" id="quickstart" aria-labelledby="quickstart-title">
+        <p class="dc-kick kicker"><span class="en">Getting Started / Quickstart</span><span class="zh" lang="zh-CN">开始使用 / Quickstart</span></p>
+        <h2 id="quickstart-title" class="jx-h2"><span class="en">Quickstart</span><span class="zh" lang="zh-CN">Quickstart</span></h2>
+        <p class="en jx-p">Install the repository with Node 24, then run a deterministic local demonstration without provider credentials or network access.</p><p class="zh jx-p" lang="zh-CN">使用 Node 24 安装仓库，然后在无需服务提供方凭据或网络访问的情况下运行确定性的本地演示。</p>
+        <p class="dc-runtime"><span class="kicker"><span class="en">Runtime requirement</span><span class="zh" lang="zh-CN">运行时要求</span></span><b>Node 24</b><code>&gt;=24 &lt;25</code></p>
+        <p class="rn-channel" data-release-channel-boundary><span class="en">Current workflows use the Node 24 repository source. Published npm 0.1.0 requires Node 22 and includes Quickstart, but has no Tutor Health CLI or API. <a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/docs/release.md#installation-channels" rel="noreferrer">Check release channels and API boundaries <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></span><span class="zh" lang="zh-CN">当前工作流使用 Node 24 的仓库源码。已发布 npm 0.1.0 要求 Node 22，包含 Quickstart，但没有 Tutor Health CLI 或 API。<a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/docs/release.md#installation-channels" rel="noreferrer">查看发行渠道与 API 边界 <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></span></p>
+        <div class="dc-codes">
+          <div class="term dc-term"><div class="term-bar"><span></span><span></span><span></span><p>Repository main · Node 24</p><span class="dc-lang">bash</span></div>
+<pre><code>git clone https://github.com/shuangyan123/tutorbench.git
+cd tutorbench
+npm ci
+npm run quickstart</code></pre></div>
+          <div class="term dc-term"><div class="term-bar"><span></span><span></span><span></span><p>Published 0.1.0 · Node 22</p><span class="dc-lang">bash</span></div>
+<pre><code>npm install tutor-benchmark@0.1.0
+npx --no-install tutorbench quickstart</code></pre></div>
+        </div>
+        <p class="callout dc-callout"><span class="en"><strong>Provider-free, network-free, Judge-free.</strong> Quickstart uses four fixed development/smoke cases from <code>tutor-eval-v0.1@0.1</code>. It is not the canonical scoring cohort, produces no official benchmark score, and is not leaderboard eligible.</span><span class="zh" lang="zh-CN"><strong>无需服务提供方、无需网络、无需 Judge。</strong>Quickstart 使用来自以下数据集的四个固定开发/冒烟案例：<code>tutor-eval-v0.1@0.1</code>。它不是标准评分案例组，不会产生正式基准分数，也不具备排行榜资格。</span></p>
+      </section>
+
+      <section class="dc-sec" id="documentation-index" aria-labelledby="documentation-index-title">
+        <div class="dc-index-head">
+          <div>
+            <p class="dc-kick kicker"><span class="en">Reference map</span><span class="zh" lang="zh-CN">参考地图</span></p>
+            <h2 id="documentation-index-title" class="jx-h2"><span class="en">Documentation index</span><span class="zh" lang="zh-CN">文档索引</span></h2>
+            <p class="en jx-p">A curated route into the current repository. GitHub links open the source file; site links open the corresponding public surface.</p><p class="zh jx-p" lang="zh-CN">这是通往当前仓库的一组精选入口。GitHub 链接打开源文件，站内链接打开对应公开页面。</p>
+          </div>
+          <p class="dc-status kicker" data-doc-status data-tpl-all-en="Showing {count} references" data-tpl-all-zh="显示 {count} 条参考资料" data-tpl-f-en="Showing {visible} of {count} references" data-tpl-f-zh="显示 {visible} / {count} 条参考资料" aria-live="polite"><span class="en">Showing 19 references</span><span class="zh" lang="zh-CN">显示 19 条参考资料</span></p>
+        </div>
+        <div class="dc-grid">
+      <article class="dc-card" data-doc-entry data-doc-category="getting-started" data-doc-search="README Repository orientation, architecture, privacy, benchmark integrity, and current project boundaries. Getting Started README 仓库导览、架构、隐私、基准完整性与当前项目边界。 开始使用 README.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/README.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">01</span><span class="dc-card-cat"><span class="en">Getting Started</span><span class="zh" lang="zh-CN">开始使用</span></span></span>
+        <b><span class="en">README</span><span class="zh" lang="zh-CN">README</span></b><span class="en dc-card-sum">Repository orientation, architecture, privacy, benchmark integrity, and current project boundaries.</span><span class="zh dc-card-sum" lang="zh-CN">仓库导览、架构、隐私、基准完整性与当前项目边界。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>README.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="getting-started" data-doc-search="TutorBench Quickstart The provider-free, network-free, Judge-free five-minute development demonstration. Getting Started TutorBench Quickstart 无需服务提供方、网络和 Judge 的五分钟开发演示。 开始使用 docs/quickstart.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/quickstart.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">02</span><span class="dc-card-cat"><span class="en">Getting Started</span><span class="zh" lang="zh-CN">开始使用</span></span></span>
+        <b><span class="en">TutorBench Quickstart</span><span class="zh" lang="zh-CN">TutorBench Quickstart</span></b><span class="en dc-card-sum">The provider-free, network-free, Judge-free five-minute development demonstration.</span><span class="zh dc-card-sum" lang="zh-CN">无需服务提供方、网络和 Judge 的五分钟开发演示。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/quickstart.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="getting-started" data-doc-search="Run TutorBench Public entry point for the Quickstart, benchmark, Tutor adapters, and evidence workflows. Getting Started 运行 TutorBench Quickstart、基准、Tutor 适配器与证据工作流的公开入口。 开始使用 /run/"><a href="../run/index.html">
+        <span class="dc-card-top"><span class="dc-card-no">03</span><span class="dc-card-cat"><span class="en">Getting Started</span><span class="zh" lang="zh-CN">开始使用</span></span></span>
+        <b><span class="en">Run TutorBench</span><span class="zh" lang="zh-CN">运行 TutorBench</span></b><span class="en dc-card-sum">Public entry point for the Quickstart, benchmark, Tutor adapters, and evidence workflows.</span><span class="zh dc-card-sum" lang="zh-CN">Quickstart、基准、Tutor 适配器与证据工作流的公开入口。</span>
+        <small class="dc-card-src">Teachometry · <span data-source-content>/run/</span></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="benchmark-data" data-doc-search="TutorEval 0.2A Synthetic case design, five observable-behavior dimensions, rubric semantics, and disclosure boundaries. Benchmark &amp; Data TutorEval 0.2A 合成案例设计、五个可观察行为维度、评分标准语义与披露边界。 基准与数据 docs/tutor-eval-v0.2a.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/tutor-eval-v0.2a.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">04</span><span class="dc-card-cat"><span class="en">Benchmark &amp; Data</span><span class="zh" lang="zh-CN">基准与数据</span></span></span>
+        <b><span class="en">TutorEval 0.2A</span><span class="zh" lang="zh-CN">TutorEval 0.2A</span></b><span class="en dc-card-sum">Synthetic case design, five observable-behavior dimensions, rubric semantics, and disclosure boundaries.</span><span class="zh dc-card-sum" lang="zh-CN">合成案例设计、五个可观察行为维度、评分标准语义与披露边界。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/tutor-eval-v0.2a.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="benchmark-data" data-doc-search="Portable response corpus The generate → freeze → evaluate → annotate → calibrate lifecycle and portable corpus contract. Benchmark &amp; Data Portable response corpus generate → freeze → evaluate → annotate → calibrate 生命周期与可移植语料契约。 基准与数据 docs/tutor-eval-v0.4a.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/tutor-eval-v0.4a.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">05</span><span class="dc-card-cat"><span class="en">Benchmark &amp; Data</span><span class="zh" lang="zh-CN">基准与数据</span></span></span>
+        <b><span class="en">Portable response corpus</span><span class="zh" lang="zh-CN">Portable response corpus</span></b><span class="en dc-card-sum">The generate → freeze → evaluate → annotate → calibrate lifecycle and portable corpus contract.</span><span class="zh dc-card-sum" lang="zh-CN">generate → freeze → evaluate → annotate → calibrate 生命周期与可移植语料契约。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/tutor-eval-v0.4a.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="benchmark-data" data-doc-search="Methodology How the public benchmark evaluates observable tutoring behavior and where evidence remains limited. Benchmark &amp; Data 方法论 公开基准如何评估可观察教学行为，以及证据仍受哪些限制。 基准与数据 /methodology/"><a href="../methodology/index.html">
+        <span class="dc-card-top"><span class="dc-card-no">06</span><span class="dc-card-cat"><span class="en">Benchmark &amp; Data</span><span class="zh" lang="zh-CN">基准与数据</span></span></span>
+        <b><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></b><span class="en dc-card-sum">How the public benchmark evaluates observable tutoring behavior and where evidence remains limited.</span><span class="zh dc-card-sum" lang="zh-CN">公开基准如何评估可观察教学行为，以及证据仍受哪些限制。</span>
+        <small class="dc-card-src">Teachometry · <span data-source-content>/methodology/</span></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="benchmark-data" data-doc-search="Public benchmark A public view into the versioned dataset, coverage, and disclosure-safe benchmark artifacts. Benchmark &amp; Data 公开基准 查看版本化数据集、覆盖情况与符合披露安全边界的基准产物。 基准与数据 /data/"><a href="../data/index.html">
+        <span class="dc-card-top"><span class="dc-card-no">07</span><span class="dc-card-cat"><span class="en">Benchmark &amp; Data</span><span class="zh" lang="zh-CN">基准与数据</span></span></span>
+        <b><span class="en">Public benchmark</span><span class="zh" lang="zh-CN">公开基准</span></b><span class="en dc-card-sum">A public view into the versioned dataset, coverage, and disclosure-safe benchmark artifacts.</span><span class="zh dc-card-sum" lang="zh-CN">查看版本化数据集、覆盖情况与符合披露安全边界的基准产物。</span>
+        <small class="dc-card-src">Teachometry · <span data-source-content>/data/</span></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="benchmark-data" data-doc-search="Cases Browse the authored public cases without exposing evaluator-only answers or rubrics. Benchmark &amp; Data 案例 浏览人工编写公开案例，同时不暴露仅供评估器使用的答案或评分标准。 基准与数据 /data/cases/"><a href="../data/cases/index.html">
+        <span class="dc-card-top"><span class="dc-card-no">08</span><span class="dc-card-cat"><span class="en">Benchmark &amp; Data</span><span class="zh" lang="zh-CN">基准与数据</span></span></span>
+        <b><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></b><span class="en dc-card-sum">Browse the authored public cases without exposing evaluator-only answers or rubrics.</span><span class="zh dc-card-sum" lang="zh-CN">浏览人工编写公开案例，同时不暴露仅供评估器使用的答案或评分标准。</span>
+        <small class="dc-card-src">Teachometry · <span data-source-content>/data/cases/</span></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="execution-evidence" data-doc-search="Real-model baselines Separate Product Tutor and canonical model collection paths, with private preliminary evidence semantics. Execution &amp; Evidence Real-model baselines 区分产品 Tutor 与标准模型采集路径，并保留私有初步证据语义。 执行与证据 docs/real-model-baselines.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/real-model-baselines.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">09</span><span class="dc-card-cat"><span class="en">Execution &amp; Evidence</span><span class="zh" lang="zh-CN">执行与证据</span></span></span>
+        <b><span class="en">Real-model baselines</span><span class="zh" lang="zh-CN">Real-model baselines</span></b><span class="en dc-card-sum">Separate Product Tutor and canonical model collection paths, with private preliminary evidence semantics.</span><span class="zh dc-card-sum" lang="zh-CN">区分产品 Tutor 与标准模型采集路径，并保留私有初步证据语义。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/real-model-baselines.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="execution-evidence" data-doc-search="Models registry The public model surface and its reserved evidence contract; no calibrated public profiles are implied. Execution &amp; Evidence 模型登记目录 公开模型页面及其预留证据契约；不暗示已经存在校准后的公开档案。 执行与证据 /models/"><a href="../models/index.html">
+        <span class="dc-card-top"><span class="dc-card-no">10</span><span class="dc-card-cat"><span class="en">Execution &amp; Evidence</span><span class="zh" lang="zh-CN">执行与证据</span></span></span>
+        <b><span class="en">Models registry</span><span class="zh" lang="zh-CN">模型登记目录</span></b><span class="en dc-card-sum">The public model surface and its reserved evidence contract; no calibrated public profiles are implied.</span><span class="zh dc-card-sum" lang="zh-CN">公开模型页面及其预留证据契约；不暗示已经存在校准后的公开档案。</span>
+        <small class="dc-card-src">Teachometry · <span data-source-content>/models/</span></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="execution-evidence" data-doc-search="Results status Readiness and evidence status for public results, without inventing ranking rows or scores. Execution &amp; Evidence 结果状态 展示公开结果的准备度与证据状态，不虚构排名行或分数。 执行与证据 /leaderboard/"><a href="../leaderboard/index.html">
+        <span class="dc-card-top"><span class="dc-card-no">11</span><span class="dc-card-cat"><span class="en">Execution &amp; Evidence</span><span class="zh" lang="zh-CN">执行与证据</span></span></span>
+        <b><span class="en">Results status</span><span class="zh" lang="zh-CN">结果状态</span></b><span class="en dc-card-sum">Readiness and evidence status for public results, without inventing ranking rows or scores.</span><span class="zh dc-card-sum" lang="zh-CN">展示公开结果的准备度与证据状态，不虚构排名行或分数。</span>
+        <small class="dc-card-src">Teachometry · <span data-source-content>/leaderboard/</span></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="execution-evidence" data-doc-search="Frozen corpus semantic replay Versioned replay boundaries for validating frozen evidence without silently changing its meaning. Execution &amp; Evidence 冻结语料语义重放 用于验证冻结证据的版本化重放边界，不静默改变证据含义。 执行与证据 docs/frozen-corpus-semantic-replay.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/frozen-corpus-semantic-replay.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">12</span><span class="dc-card-cat"><span class="en">Execution &amp; Evidence</span><span class="zh" lang="zh-CN">执行与证据</span></span></span>
+        <b><span class="en">Frozen corpus semantic replay</span><span class="zh" lang="zh-CN">冻结语料语义重放</span></b><span class="en dc-card-sum">Versioned replay boundaries for validating frozen evidence without silently changing its meaning.</span><span class="zh dc-card-sum" lang="zh-CN">用于验证冻结证据的版本化重放边界，不静默改变证据含义。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/frozen-corpus-semantic-replay.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="human-review" data-doc-search="Community Review protocol P3 contracts, blindness, qualification boundaries, freeze semantics, agreement limits, and P4 deployment-readiness status. Human Review Community Review 协议 P3 契约、盲法、资格边界、冻结语义、一致性限制与 P4 部署准备状态。 人工评审 docs/community-review-protocol.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/community-review-protocol.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">13</span><span class="dc-card-cat"><span class="en">Human Review</span><span class="zh" lang="zh-CN">人工评审</span></span></span>
+        <b><span class="en">Community Review protocol</span><span class="zh" lang="zh-CN">Community Review 协议</span></b><span class="en dc-card-sum">P3 contracts, blindness, qualification boundaries, freeze semantics, agreement limits, and P4 deployment-readiness status.</span><span class="zh dc-card-sum" lang="zh-CN">P3 契约、盲法、资格边界、冻结语义、一致性限制与 P4 部署准备状态。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/community-review-protocol.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="human-review" data-doc-search="Participation application gate The closed-to-open launch checklist and application contract; public application and reviewer intake remain closed. Human Review Participation application gate 从关闭到开放的发布检查表与申请契约；公开申请和 reviewer intake 仍关闭。 人工评审 docs/community-review-application-gate.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/community-review-application-gate.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">14</span><span class="dc-card-cat"><span class="en">Human Review</span><span class="zh" lang="zh-CN">人工评审</span></span></span>
+        <b><span class="en">Participation application gate</span><span class="zh" lang="zh-CN">Participation application gate</span></b><span class="en dc-card-sum">The closed-to-open launch checklist and application contract; public application and reviewer intake remain closed.</span><span class="zh dc-card-sum" lang="zh-CN">从关闭到开放的发布检查表与申请契约；公开申请和 reviewer intake 仍关闭。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/community-review-application-gate.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="human-review" data-doc-search="Community status Public participation information without an application form, reviewer login, or live campaign claim. Human Review 社区状态 公开参与信息，但不提供申请表、reviewer 登录或正在进行活动的主张。 人工评审 /community/"><a href="../community/index.html">
+        <span class="dc-card-top"><span class="dc-card-no">15</span><span class="dc-card-cat"><span class="en">Human Review</span><span class="zh" lang="zh-CN">人工评审</span></span></span>
+        <b><span class="en">Community status</span><span class="zh" lang="zh-CN">社区状态</span></b><span class="en dc-card-sum">Public participation information without an application form, reviewer login, or live campaign claim.</span><span class="zh dc-card-sum" lang="zh-CN">公开参与信息，但不提供申请表、reviewer 登录或正在进行活动的主张。</span>
+        <small class="dc-card-src">Teachometry · <span data-source-content>/community/</span></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="governance" data-doc-search="Roadmap The current phase map for benchmark, Judge, Tutor integration, review, and public product work. Governance 路线图 当前基准、Judge、Tutor 集成、评审与公开产品工作的阶段地图。 治理 docs/roadmap.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/roadmap.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">16</span><span class="dc-card-cat"><span class="en">Governance</span><span class="zh" lang="zh-CN">治理</span></span></span>
+        <b><span class="en">Roadmap</span><span class="zh" lang="zh-CN">路线图</span></b><span class="en dc-card-sum">The current phase map for benchmark, Judge, Tutor integration, review, and public product work.</span><span class="zh dc-card-sum" lang="zh-CN">当前基准、Judge、Tutor 集成、评审与公开产品工作的阶段地图。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/roadmap.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="governance" data-doc-search="Licensing Separate software, authored benchmark-content, and TutorBench brand licensing scopes. Governance 许可 区分软件、人工编写基准内容与 TutorBench 品牌的许可范围。 治理 docs/licensing.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/docs/licensing.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">17</span><span class="dc-card-cat"><span class="en">Governance</span><span class="zh" lang="zh-CN">治理</span></span></span>
+        <b><span class="en">Licensing</span><span class="zh" lang="zh-CN">许可</span></b><span class="en dc-card-sum">Separate software, authored benchmark-content, and TutorBench brand licensing scopes.</span><span class="zh dc-card-sum" lang="zh-CN">区分软件、人工编写基准内容与 TutorBench 品牌的许可范围。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>docs/licensing.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="governance" data-doc-search="Contributing Contribution categories, local quality gates, benchmark-content proposals, and evidence boundaries. Governance 贡献指南 贡献类别、本地质量门槛、基准内容提案与证据边界。 治理 CONTRIBUTING.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/CONTRIBUTING.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">18</span><span class="dc-card-cat"><span class="en">Governance</span><span class="zh" lang="zh-CN">治理</span></span></span>
+        <b><span class="en">Contributing</span><span class="zh" lang="zh-CN">贡献指南</span></b><span class="en dc-card-sum">Contribution categories, local quality gates, benchmark-content proposals, and evidence boundaries.</span><span class="zh dc-card-sum" lang="zh-CN">贡献类别、本地质量门槛、基准内容提案与证据边界。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>CONTRIBUTING.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+      <article class="dc-card" data-doc-entry data-doc-category="governance" data-doc-search="Security The public Developer Preview security policy and its current reporting boundary. Governance 安全 公开 Developer Preview 安全政策及其当前报告边界。 治理 SECURITY.md"><a href="https://github.com/shuangyan123/tutorbench/blob/main/SECURITY.md" rel="noreferrer">
+        <span class="dc-card-top"><span class="dc-card-no">19</span><span class="dc-card-cat"><span class="en">Governance</span><span class="zh" lang="zh-CN">治理</span></span></span>
+        <b><span class="en">Security</span><span class="zh" lang="zh-CN">安全</span></b><span class="en dc-card-sum">The public Developer Preview security policy and its current reporting boundary.</span><span class="zh dc-card-sum" lang="zh-CN">公开 Developer Preview 安全政策及其当前报告边界。</span>
+        <small class="dc-card-src">GitHub · <span data-source-content>SECURITY.md</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></small>
+      </a></article>
+        </div>
+        <p class="dc-empty" data-doc-empty role="status" hidden><span class="en">No documentation matches this search and category.</span><span class="zh" lang="zh-CN">没有符合当前搜索与分类条件的文档。</span></p>
+      </section>
+
+      <section class="dc-sec" id="evidence-boundaries" aria-labelledby="evidence-title">
+        <p class="dc-kick kicker"><span class="en">Interpretation boundaries</span><span class="zh" lang="zh-CN">解释边界</span></p>
+        <h2 id="evidence-title" class="jx-h2"><span class="en">Read the evidence carefully.</span><span class="zh" lang="zh-CN">请谨慎阅读证据。</span></h2>
+        <p class="en jx-p">These distinctions keep a useful development surface from making claims the repository does not support.</p><p class="zh jx-p" lang="zh-CN">这些区分可以避免一个有用的开发页面做出仓库并不支持的主张。</p>
+        <div class="dc-neq">
+          <article><h3><span class="en">Quickstart <i>≠</i> official benchmark score</span><span class="zh" lang="zh-CN">Quickstart <i>≠</i> 正式基准分数</span></h3><p class="en">It is a deterministic development/smoke demonstration, not calibrated benchmark evidence.</p><p class="zh" lang="zh-CN">它是确定性的开发/冒烟演示，不是经过校准的基准证据。</p></article>
+          <article><h3><span class="en">Collection <i>≠</i> publication</span><span class="zh" lang="zh-CN">采集 <i>≠</i> 发布</span></h3><p class="en">Product Tutor and canonical model corpora remain preliminary unless publication requirements are met.</p><p class="zh" lang="zh-CN">在满足发布要求之前，产品 Tutor 和标准模型语料都仍属于初步材料。</p></article>
+          <article><h3><span class="en">Judge <i>≠</i> ground truth</span><span class="zh" lang="zh-CN">Judge <i>≠</i> 参考真值</span></h3><p class="en">A Judge is an evaluator boundary. Unresolved criteria stay unresolved when required evidence is unavailable.</p><p class="zh" lang="zh-CN">Judge 是一个评估器边界。当所需证据不可用时，未解决的标准必须继续保持未解决。</p></article>
+          <article><h3><span class="en">Human review <i>≠</i> automatic gold standard</span><span class="zh" lang="zh-CN">人工评审 <i>≠</i> 自动金标准</span></h3><p class="en">Human evidence can strengthen the method without becoming unquestionable ground truth.</p><p class="zh" lang="zh-CN">人工证据可以增强方法，但不会自动成为不可质疑的参考真值。</p></article>
+        </div>
+      </section>
+
+      <section class="dc-sec dc-gov" id="governance" aria-labelledby="governance-title">
+        <p class="dc-kick kicker"><span class="en">Governance &amp; contribution</span><span class="zh" lang="zh-CN">治理与贡献</span></p>
+        <h2 id="governance-title" class="jx-h2"><span class="en">Defined boundaries for an open repository.</span><span class="zh" lang="zh-CN">为开放仓库定义清晰边界。</span></h2>
+        <p class="en jx-p">Software, authored benchmark content, and the TutorBench name have deliberately separate scopes. Contributions can propose software, cases, rubrics, methodology, documentation, adapters, website changes, and calibration/audit infrastructure.</p><p class="zh jx-p" lang="zh-CN">软件、人工编写的基准内容和 TutorBench 名称被刻意划分为不同范围。贡献可以涉及软件、案例、评分标准、方法论、文档、适配器、网站改动，以及校准/审计基础设施。</p>
+        <p class="dc-status-note"><span class="en"><strong>Community status:</strong> public participation information is available; public applications, reviewer intake, and a real Community Review campaign have not started.</span><span class="zh" lang="zh-CN"><strong>社区状态：</strong>公开参与说明已经可用；公开申请、reviewer intake 和真实 Community Review 活动尚未开始。</span></p>
+        <dl class="dc-lic">
+          <div><dt class="kicker"><span class="en">Software</span><span class="zh" lang="zh-CN">软件</span></dt><dd><b><span class="en">Apache-2.0</span><span class="zh" lang="zh-CN">Apache-2.0</span></b><a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/LICENSE" rel="noreferrer"><span class="en">Read LICENSE</span><span class="zh" lang="zh-CN">阅读 LICENSE</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></dd></div>
+          <div><dt class="kicker"><span class="en">Benchmark content (authored)</span><span class="zh" lang="zh-CN">基准内容（人工编写）</span></dt><dd><b><span class="en">CC BY 4.0</span><span class="zh" lang="zh-CN">CC BY 4.0</span></b><a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/LICENSES/CC-BY-4.0.txt" rel="noreferrer"><span class="en">Read content license</span><span class="zh" lang="zh-CN">阅读内容许可</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></dd></div>
+          <div><dt class="kicker"><span class="en">Name &amp; visual assets</span><span class="zh" lang="zh-CN">名称与视觉资产</span></dt><dd><b><span class="en">TutorBench Brand Policy</span><span class="zh" lang="zh-CN">TutorBench Brand Policy</span></b><a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/LICENSES/BRAND-POLICY.md" rel="noreferrer"><span class="en">Read brand policy</span><span class="zh" lang="zh-CN">阅读品牌政策</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></dd></div>
+        </dl>
+        <p class="dc-gov-links"><a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/docs/licensing.md" rel="noreferrer"><span class="en">Licensing scope</span><span class="zh" lang="zh-CN">许可范围</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a><a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/CONTRIBUTING.md" rel="noreferrer"><span class="en">Contributing</span><span class="zh" lang="zh-CN">贡献指南</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a><a class="text-link" href="https://github.com/shuangyan123/tutorbench/blob/main/SECURITY.md" rel="noreferrer"><span class="en">Security Policy</span><span class="zh" lang="zh-CN">安全政策</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a></p>
+        <p class="en dc-fine">The Security Policy does not enable GitHub Private Vulnerability Reporting and does not invent a private reporting address.</p><p class="zh dc-fine" lang="zh-CN">当前 Security Policy 未启用 GitHub Private Vulnerability Reporting，也不会虚构一个私有报告地址。</p>
+      </section>
+
+      <section class="dc-sec" id="next-steps" aria-labelledby="next-steps-title">
+        <p class="dc-kick kicker"><span class="en">Continue the reference path</span><span class="zh" lang="zh-CN">继续沿参考路径深入</span></p>
+        <h2 id="next-steps-title" class="jx-h2"><span class="en">Next steps</span><span class="zh" lang="zh-CN">下一步</span></h2>
+        <p class="en jx-p">Move from orientation to the repository surface that matches your question.</p><p class="zh jx-p" lang="zh-CN">从概览进入与你的问题最匹配的仓库页面。</p>
+        <div class="dc-entries">
+          <a class="dc-entry" href="../run/index.html"><b><span class="en">Run TutorBench</span><span class="zh" lang="zh-CN">运行 TutorBench</span></b><span class="en">Start with the provider-free path.</span><span class="zh" lang="zh-CN">先从无需服务提供方的路径开始。</span><em><span class="en">Open Run</span><span class="zh" lang="zh-CN">打开运行页面</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></em></a>
+          <a class="dc-entry" href="../methodology/index.html"><b><span class="en">Read methodology</span><span class="zh" lang="zh-CN">阅读方法论</span></b><span class="en">Understand dimensions and evaluator boundaries.</span><span class="zh" lang="zh-CN">理解维度与评估器边界。</span><em><span class="en">Read methodology</span><span class="zh" lang="zh-CN">阅读方法论</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></em></a>
+          <a class="dc-entry" href="../data/index.html"><b><span class="en">Browse public data</span><span class="zh" lang="zh-CN">浏览公开数据</span></b><span class="en">Inspect cases and public artifact context.</span><span class="zh" lang="zh-CN">检查案例与公开产物语境。</span><em><span class="en">Open benchmark</span><span class="zh" lang="zh-CN">打开基准</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></em></a>
+          <a class="dc-entry" href="https://github.com/shuangyan123/tutorbench" rel="noreferrer"><b><span class="en">Browse repository docs</span><span class="zh" lang="zh-CN">浏览仓库文档</span></b><span class="en">Read the versioned source guides.</span><span class="zh" lang="zh-CN">阅读版本化源指南。</span><em><span class="en">View GitHub</span><span class="zh" lang="zh-CN">查看 GitHub</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></em></a>
+        </div>
+      </section>
+    </article>
+
+    <aside class="dc-toc" aria-label="On this page" data-aria-label-en="On this page" data-aria-label-zh="本页内容">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <nav><a href="#overview" aria-current="true"><span class="en">Overview</span><span class="zh" lang="zh-CN">概览</span></a><a href="#quickstart"><span class="en">Quickstart</span><span class="zh" lang="zh-CN">Quickstart</span></a><a href="#documentation-index"><span class="en">Documentation index</span><span class="zh" lang="zh-CN">文档索引</span></a><a href="#evidence-boundaries"><span class="en">Evidence boundaries</span><span class="zh" lang="zh-CN">证据边界</span></a><a href="#governance"><span class="en">Governance</span><span class="zh" lang="zh-CN">治理</span></a><a href="#next-steps"><span class="en">Next steps</span><span class="zh" lang="zh-CN">下一步</span></a></nav>
+      <div class="dc-toc-note"><b><span class="en">Reference, not replacement.</span><span class="zh" lang="zh-CN">作为参考，而不是替代。</span></b><p class="en">Source files remain the authority for contracts, commands, and status.</p><p class="zh" lang="zh-CN">契约、命令和状态仍以源文件为准。</p></div>
+    </aside>
+  </div>
+
+  <section class="jx-close dc-close" aria-labelledby="docs-closing-title">
+    <div class="wrap">
+      <p class="kicker"><span class="en">Still looking?</span><span class="zh" lang="zh-CN">还在寻找？</span></p>
+      <h2 id="docs-closing-title" class="jx-h2"><span class="en">Find more in the guides, methodology, or repository.</span><span class="zh" lang="zh-CN">可继续在指南、方法论或仓库中查找。</span></h2>
+      <p class="cx-actions"><a class="cta cta-line" href="https://github.com/shuangyan123/tutorbench" rel="noreferrer"><span class="en">Browse repository docs</span><span class="zh" lang="zh-CN">浏览仓库文档</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11l6-6M6 5h5v5"/></svg></a><a class="cta cta-ink" href="../run/index.html"><span class="en">Run TutorBench</span><span class="zh" lang="zh-CN">运行 TutorBench</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond, Newsreader, Geist and Geist Mono; Chinese in Noto Serif SC and Noto Sans SC. The section covers and photographs are rendered in Blender (Cycles).</span><span class="zh" lang="zh-CN">英文排印使用 Cormorant Garamond、Newsreader、Geist 与 Geist Mono；中文使用思源宋体与思源黑体。各栏目封面与图版由 Blender（Cycles）渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0 · Design prototype, not the live site</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0 · 设计原型，不是线上网站</span></p>
+  </div>
+</footer>
+
+<script src="../spectrum.js"></script>
+<script src="../run.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Docs — Teachometry", zh: "文档 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>
