@@ -196,13 +196,15 @@
   }
 
   // the shown position eases towards the scroll position, and neighbouring frames are blended,
-  // so a fast flick still plays through the frames instead of jumping
+  // so a fast flick still plays through the frames instead of jumping. The easing is slow on
+  // purpose: when the reader stops, the chamber keeps turning for about a second, like a real one
+  // let go of.
   var p = 0, shown = 0, last = 0, raf = 0;
   function frame(now) {
     raf = 0;
     var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016; last = now;
     var target = smooth(0, 0.86, p) * (N - 1);
-    shown = reduced() ? target : shown + (target - shown) * Math.min(1, dt * 12);
+    shown = reduced() ? target : shown + (target - shown) * Math.min(1, dt * 3.2);
     if (Math.abs(target - shown) < 0.002) shown = target;
     var to = Math.round(target), from = Math.round(shown);
     if (to !== at[1] || from !== at[0]) { at = [from, to]; settle(); }
