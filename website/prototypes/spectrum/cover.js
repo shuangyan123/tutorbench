@@ -33,18 +33,24 @@
 
   var N = 120, SEQ = "K_";
   // Each frame is fetched once and kept compressed (about 15 MB for the phone set, 29 MB for the
-  // large one). Only the frames near the reader's place in the scroll are kept decoded, as bitmaps
-  // decoded off the main thread at the size they are drawn. Decoding all 120 would take half a
-  // gigabyte or more, so the browser used to drop decoded frames and decode them again in the middle
-  // of a scroll, which is what made the cover stutter.
+  // large one). Decoding all 120 would take half a gigabyte or more, so the browser used to drop
+  // decoded frames and decode them again in the middle of a scroll, which made the cover stutter.
+  // Instead frames are decoded off the main thread, at the size they are drawn, into two sets:
+  // - every STEP-th frame across the whole turn, kept for good: a fast scroll (a mouse wheel moves
+  //   about ten frames a notch, faster than frames can be decoded) always has a frame close by,
+  //   and the frames in between are blended;
+  // - every frame near the reader's place, decoded as the scroll arrives there.
   var blobs = new Array(N), bmps = new Array(N), bmpSize = new Array(N), pending = new Array(N);
   var SRC = small ? 1000 : 1400;  // the frames' own pixel size
   var size = 0;                   // the pixel size frames are decoded at: the eyepiece on screen
   var R = 8;                      // frames kept decoded on each side of the reader's place
+  var STEP = 4;                   // the spacing of the frames kept for good
   var at = [0, 0];                // the frame shown, and the frame the scroll is heading to
   var decoding = 0;
+  var WORKERS = Math.max(2, Math.min(4, ((window.navigator && window.navigator.hardwareConcurrency) || 4) - 1));
   function ready(k) { return !!bmps[k]; }
-  function near(k) { return k === 0 || Math.abs(k - at[0]) <= R || Math.abs(k - at[1]) <= R; }
+  function kept(k) { return k % STEP === 0 || k === N - 1; }
+  function near(k) { return kept(k) || Math.abs(k - at[0]) <= R || Math.abs(k - at[1]) <= R; }
   function drop(bm) { if (bm && bm.close) bm.close(); }
   function toBitmap(blob, px) {
     if (window.createImageBitmap) {
@@ -77,14 +83,17 @@
       settle();
     });
   }
-  // free the frames out of reach, then decode the ones near the reader, closest first
+  // free the frames out of reach, then decode: the frames near the reader closest first, then the
+  // frames kept for good, closest first
   function settle() {
     if (!size) return;
     for (var k = 1; k < N; k++) if (bmps[k] && !near(k)) { drop(bmps[k]); bmps[k] = null; }
-    var order = [0];
-    for (var d = 0; d <= R; d++) [at[1] + d, at[1] - d, at[0] + d, at[0] - d].forEach(function (j) { if (j > 0 && j < N && order.indexOf(j) < 0) order.push(j); });
-    for (var i = 0; i < order.length && decoding < 2; i++) {
-      var j = order[i];
+    var order = [0], d, j;
+    function add(n) { if (n > 0 && n < N && order.indexOf(n) < 0) order.push(n); }
+    for (d = 0; d <= R; d++) { add(at[1] + d); add(at[1] - d); add(at[0] + d); add(at[0] - d); }
+    for (d = 0; d < N; d++) { if (kept(at[1] + d)) add(at[1] + d); if (kept(at[1] - d)) add(at[1] - d); }
+    for (var i = 0; i < order.length && decoding < WORKERS; i++) {
+      j = order[i];
       if (blobs[j] && !pending[j] && (!bmps[j] || bmpSize[j] !== size)) start(j);
     }
   }
@@ -123,13 +132,18 @@
   INTENT.forEach(function (t) { window.addEventListener(t, intent, { passive: true }); });
   window.addEventListener("load", function () { setTimeout(function () { allow(6); }, 1200); });
 
-  // nearest decoded frames around a float index
+  // the nearest decoded frames on each side of a float index, looking no further than the spacing
+  // of the frames kept for good: a frame from elsewhere in the turn is never shown in its place
+  // (null: nothing close is decoded yet, so the picture already drawn stays)
   function around(x) {
-    var a = Math.floor(x), b = Math.ceil(x);
-    while (a > 0 && !ready(a)) a--;
-    while (b < N - 1 && !ready(b)) b++;
-    if (!ready(b)) b = a;
-    return { a: bmps[a], b: bmps[b], f: b === a ? 0 : (x - a) / (b - a), gap: b - a };
+    var lo = Math.floor(x), hi = Math.ceil(x), a = lo, b = hi;
+    while (a >= 0 && lo - a <= STEP && !ready(a)) a--;
+    while (b < N && b - hi <= STEP && !ready(b)) b++;
+    var okA = a >= 0 && lo - a <= STEP && ready(a), okB = b < N && b - hi <= STEP && ready(b);
+    if (!okA && !okB) return null;
+    if (!okA) a = b;
+    if (!okB) b = a;
+    return { a: bmps[a], b: bmps[b], f: b === a ? 0 : (x - a) / (b - a) };
   }
 
   var dpr = 1, narrow = false, CX = 0, CY = 0, D = 0;
@@ -161,8 +175,14 @@
     var want = Math.min(SRC, px);
     if (want !== size) {
       size = want;
-      // keep about 64 MB of decoded frames: 8–12 on each side on phones, fewer for the large set
-      R = Math.max(6, Math.min(12, Math.floor(64e6 / (size * size * 4 * 2))));
+      var mb = size * size * 4;
+      // the frames near the reader: about 64 MB, 6–12 on each side
+      R = Math.max(6, Math.min(12, Math.floor(64e6 / (mb * 2))));
+      // the frames kept for good: about 100 MB on phones, 150 MB on larger screens
+      // (every 3rd frame for a phone eyepiece, every 4th for a laptop, every 7th at the full 1400px)
+      var budget = small ? 100e6 : 150e6;
+      STEP = 2;
+      while (STEP < 8 && Math.ceil(N / STEP) * mb > budget) STEP++;
       settle();
     }
     kick();
@@ -176,22 +196,26 @@
   }
 
   // the shown position eases towards the scroll position, and neighbouring frames are blended,
-  // so a fast flick still plays through the frames instead of jumping
+  // so a fast flick still plays through the frames instead of jumping. The easing is slow on
+  // purpose: when the reader stops, the chamber keeps turning for about a second, like a real one
+  // let go of.
   var p = 0, shown = 0, last = 0, raf = 0;
   function frame(now) {
     raf = 0;
     var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016; last = now;
     var target = smooth(0, 0.86, p) * (N - 1);
-    shown = reduced() ? target : shown + (target - shown) * Math.min(1, dt * 12);
+    shown = reduced() ? target : shown + (target - shown) * Math.min(1, dt * 3.2);
     if (Math.abs(target - shown) < 0.002) shown = target;
     var to = Math.round(target), from = Math.round(shown);
     if (to !== at[1] || from !== at[0]) { at = [from, to]; settle(); }
     var s = around(shown);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.globalAlpha = 1;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    draw1(s.a, 1);
-    if (s.gap <= 2 && s.f > 0.02) draw1(s.b, s.f);
+    if (s) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      draw1(s.a, 1);
+      if (s.f > 0.02) draw1(s.b, s.f);
+    }
     if (readF) readF.textContent = pad(Math.round(shown) + 1);
     if (shown !== target) raf = requestAnimationFrame(frame); else last = 0;
   }

@@ -183,7 +183,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 @media (max-width: 400px) { .menu-btn { padding: 0 10px; gap: 7px; } .bar-end { gap: 6px; } .lang { padding: 0 9px; } .run-btn { padding: 0 10px 0 12px; } }
 
 /* ---------------------------------------------------------------- cover · the work */
-.hero { position: relative; height: 260vh; overflow: clip; }
+.hero { position: relative; height: 460vh; overflow: clip; }  /* the turn takes about three screens of scroll */
 /* the cover sits on the page's own light (body::before), so the eyepiece floats in the haze */
 .hero-stage { position: sticky; top: 0; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate; }
 .seq { position: absolute; z-index: 1; left: calc(var(--cx, 62%) - var(--d, 70vh) / 2); top: calc(var(--cy, 50%) - var(--d, 70vh) / 2);
@@ -218,7 +218,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 
 .hero-stage::before { content: none; }
 .hero-copy, .hero-hint, .seq-read { transition: opacity .3s linear; }
-.hero-copy, .hero-hint { opacity: calc(1 - var(--p, 0) * 6) !important; }
+.hero-copy, .hero-hint { opacity: calc(1 - var(--p, 0) * 13.5) !important; }  /* gone after the same ~27vh of scroll as before the cover grew */
 .hero-hint { z-index: 2; }
 .hero[data-narrow] .seq-read { display: none; }
 
