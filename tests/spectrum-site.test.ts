@@ -4,7 +4,7 @@ import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
-import { minifyCss } from "../src/cli/spectrum-site.js";
+import { minifyCss, shareCardFor, withShareImage } from "../src/cli/spectrum-site.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
 // generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
@@ -170,4 +170,48 @@ test("published stylesheets are minified without changing strings or selectors",
     minifyCss('a  { color : red ; /* note */ background: url("data:x;a  b") }\n@media (max-width: 4px) {\n  .a > .b, .c { x: calc(1px + 2px); }\n}\n'),
     'a{color : red;background: url("data:x;a  b")}@media (max-width: 4px){.a > .b, .c{x: calc(1px + 2px)}}\n',
   );
+});
+
+test("every page shares its own section's preview card, in its own language", async () => {
+  const card = async (page: string): Promise<string> => {
+    const html = await readFile(join(spectrum, page), "utf8");
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image">/u, page);
+    const image = /<meta property="og:image" content="([^"]+)">/u.exec(html)?.[1];
+    assert.ok(image, `${page} has no og:image`);
+    assert.equal(/<meta name="twitter:image" content="([^"]+)">/u.exec(html)?.[1], image, page);
+    assert.ok(image.startsWith(`${SITE_URL}/assets/share/`), image);
+    assert.ok(await isFile(join(spectrum, image.slice(SITE_URL.length + 1))), `${image} is not published`);
+    return image.slice(image.lastIndexOf("/") + 1);
+  };
+  assert.equal(await card("index.html"), "home-en.jpg");
+  assert.equal(await card("zh-cn/index.html"), "home-zh.jpg");
+  assert.equal(await card("methodology/index.html"), "methodology-en.jpg");
+  assert.equal(await card("zh-cn/blog/why-teaching-does-not-scale/index.html"), "essay-scale-zh.jpg");
+  assert.equal(await card("data/cases/fraction-misconception-001/index.html"), "cases-en.jpg");
+  assert.equal(await card("zh-cn/models/[modelId]/index.html"), "models-zh.jpg");
+  assert.equal(await card("404.html"), "home-en.jpg");
+});
+
+test("share cards: longest route prefix wins, and no site URL means no image", () => {
+  const cards = [{ id: "home", routes: [""] }, { id: "data", routes: ["data/"] }, { id: "cases", routes: ["data/cases/"] }];
+  assert.equal(shareCardFor(cards, "data/cases/x/index.html"), "cases");
+  assert.equal(shareCardFor(cards, "data/index.html"), "data");
+  assert.equal(shareCardFor(cards, "about/index.html"), "home");
+  const head = '<title>T</title>\n<meta name="twitter:card" content="summary">';
+  assert.equal(withShareImage(head, "assets/share/home-en.jpg", ""), head);
+});
+
+test("an old page's own preview image is replaced by the card, not doubled", () => {
+  const head = [
+    '<meta property="og:url" content="https://example.org/tb/blog/x/">',
+    '<meta property="og:image" content="https://example.org/tb/assets/old.webp">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:description" content="d">',
+    '<meta name="twitter:image" content="https://example.org/tb/assets/old.webp">',
+  ].join("\n");
+  const out = withShareImage(head, "assets/share/essay-en.jpg", "/tb");
+  assert.doesNotMatch(out, /old\.webp/u);
+  assert.equal(out.match(/og:image"/gu)?.length, 1);
+  assert.equal(out.match(/twitter:image"/gu)?.length, 1);
+  assert.match(out, /content="https:\/\/example\.org\/tb\/assets\/share\/essay-en\.jpg"/u);
 });
