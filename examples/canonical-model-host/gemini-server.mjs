@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { parseCanonicalHostSessionToken, requestRejection, rejectRequest } from "./request-security.mjs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -40,6 +41,7 @@ export function readConfiguration(environment = process.env) {
     throw new CanonicalHostConfigurationError("GEMINI_MODEL must be an explicit versioned Gemini model ID.");
   }
   return {
+    sessionToken: parseCanonicalHostSessionToken(environment.CANONICAL_MODEL_HOST_TOKEN),
     apiKey: requiredEnvironment("GEMINI_API_KEY", environment),
     model,
     timeoutMs: integerEnvironment("GEMINI_TIMEOUT_MS", environment, 60_000, 1, MAX_TIMEOUT_MS),
@@ -262,6 +264,10 @@ async function handleRequest(request, response, client, configuration) {
 
 // fetch 注入仅用于离线测试；CLI 不提供重定向上游地址或切换 Vertex 的配置。
 export async function startServer(configuration, fetchImplementation) {
+  const sessionToken = parseCanonicalHostSessionToken(configuration.sessionToken);
+  if (sessionToken === configuration.apiKey) {
+    throw new CanonicalHostConfigurationError("Host session capability must differ from the Provider credential.");
+  }
   const client = new GoogleGenAI({
     apiKey: configuration.apiKey,
     vertexai: false,
@@ -273,6 +279,8 @@ export async function startServer(configuration, fetchImplementation) {
     },
   });
   const server = createServer((request, response) => {
+    const rejection = requestRejection(request, sessionToken);
+    if (rejection) { rejectRequest(request, response, rejection); return; }
     void handleRequest(request, response, client, configuration).catch(() => {
       diagnostic(configuration, "host", "unknown", "canonical_host_failed");
       if (!response.headersSent) sendJson(response, 500, { error: "canonical_host_failed" });

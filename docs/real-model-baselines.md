@@ -1,5 +1,12 @@
 # Real-model baseline collection
 
+> Local canonical Provider hosts now require a fresh
+> `CANONICAL_MODEL_HOST_TOKEN` shared by Host and collector through their parent
+> environment. Live `collect-model` requires it; dry-run does not. Programmatic
+> canonical clients pass `sessionToken`. Product Tutor HTTP authentication,
+> packet identity, generation controls and scoring are unchanged.
+> See [Host authorization and lifecycle](../examples/canonical-model-host/README.md#local-provider-host-authorization-nv-02).
+
 For the fail-closed path from a completed canonical model corpus and
 evaluation artifact to a reviewed preliminary public bundle, see
 [Public Evidence Publication Pipeline v1](public-evidence-publication.md).
