@@ -3,10 +3,13 @@ import type { PoolConfig } from "pg";
 
 import { InMemoryCommunityReviewRepository } from "./in-memory-repository.js";
 import {
+  loadApplicationWithdrawalSnapshot,
   loadPersistenceSnapshot,
+  persistApplicationWithdrawalSnapshot,
   persistPersistenceSnapshot,
 } from "./postgres-codec.js";
 import type {
+  ApplicationWithdrawalTransaction,
   CommunityReviewPersistence,
   CommunityReviewPersistenceTransaction,
 } from "./persistence.js";
@@ -95,6 +98,39 @@ export class PostgreSQLCommunityReviewRepository implements CommunityReviewPersi
       const result = await local.transaction(callback);
       const after = local.snapshot();
       await persistPersistenceSnapshot(client, before, after);
+      await client.query("COMMIT");
+      return structuredClone(result);
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async applicationWithdrawalTransaction<T>(
+    applicationId: string,
+    callback: (transaction: ApplicationWithdrawalTransaction) => Promise<T> | T,
+  ): Promise<T> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query("SET LOCAL lock_timeout = '5s'");
+      await client.query("SET LOCAL statement_timeout = '5s'");
+      const before = await loadApplicationWithdrawalSnapshot(client, applicationId);
+      const local = new InMemoryCommunityReviewRepository(before);
+      let deleteContact = false;
+      const result = await local.transaction((transaction) => callback({
+        getCommunityReviewApplication: (id) => transaction.getCommunityReviewApplication(id),
+        updateCommunityReviewApplication: (record) => transaction.updateCommunityReviewApplication(record),
+        deleteCommunityReviewApplicationContact: (id) => {
+          transaction.deleteCommunityReviewApplicationContact(id);
+          deleteContact = true;
+        },
+        insertCommunityReviewApplicationAuditEvent: (record) => transaction.insertCommunityReviewApplicationAuditEvent(record),
+      }));
+      // 与旧事务同样复用领域校验；行锁覆盖凭据检查、脱敏、审计和提交。
+      await persistApplicationWithdrawalSnapshot(client, applicationId, before, local.snapshot(), deleteContact);
       await client.query("COMMIT");
       return structuredClone(result);
     } catch (error) {

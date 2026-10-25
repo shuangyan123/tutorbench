@@ -354,6 +354,7 @@ export async function handleCommunityReviewApiRequest(
         return applicationIntake.withdrawApplication({
           applicationId: match[1]!,
           withdrawalCredential: requiredString(input, "credential"),
+          sourceKey,
         });
       },
     },
