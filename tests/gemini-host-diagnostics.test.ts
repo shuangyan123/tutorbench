@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import assert from "node:assert/strict";
 import type { Server } from "node:http";
 import { resolve } from "node:path";
@@ -12,8 +13,12 @@ import { buildTutorExecutionPacketFile } from "../src/contracts/index.js";
 import { buildTutorBaselineGenerationSpec, loadTutorBaselinePrompt } from "../src/corpus/index.js";
 import { loadTutorEvalDataset } from "../src/datasets/index.js";
 
+const sessionToken = randomBytes(32).toString("hex");
+const hostHeaders = { "content-type": "application/json", authorization: "Bearer " + sessionToken };
+
 interface Configuration {
   readonly apiKey: string;
+  readonly sessionToken: string;
   readonly model: string;
   readonly timeoutMs: number;
   readonly port: number;
@@ -30,7 +35,7 @@ const { readConfiguration, startServer } = await import(
 // 全部是合成哨兵；SDK 唯一网络入口被替换，绝不读取进程中的真实凭证。
 const sensitive = "synthetic-key secret-prompt hidden-thought secret-signature provider-message " +
   "Proxy-Authorization: Basic secret-proxy rawPayload https://proxy-user:proxy-pass@proxy.invalid/?key=secret-query";
-const environment = { GEMINI_API_KEY: "synthetic-key", GEMINI_MODEL: "gemini-2.5-flash", CANONICAL_MODEL_HOST_PORT: "0" };
+const environment = { GEMINI_API_KEY: "synthetic-key", GEMINI_MODEL: "gemini-2.5-flash", CANONICAL_MODEL_HOST_PORT: "0", CANONICAL_MODEL_HOST_TOKEN: sessionToken };
 const validResponse = {
   candidates: [{ finishReason: "STOP", content: { role: "model", parts: [
     { thought: true, text: sensitive, thoughtSignature: sensitive }, { text: "Visible answer." },
@@ -89,7 +94,7 @@ async function fixture(t: TestContext, options: {
     packet.cases[0]!.messages.map((message, index) => index === 0 ? message : { ...message, content: sensitive }),
   }] };
   const send = async (body: unknown = requestPacket, raw?: string) => {
-    const response = await fetch(endpoint, { method: "POST", body: raw ?? JSON.stringify(body) });
+    const response = await fetch(endpoint, { method: "POST", headers: hostHeaders, body: raw ?? JSON.stringify(body) });
     return { status: response.status, body: await response.json() as unknown };
   };
   const assertLogs = (expected: ReturnType<typeof event>[]) => {
@@ -144,7 +149,7 @@ test("Gemini local request and packet rejects log no input and make zero SDK cal
       assert.deepEqual(await host.send({ prompt: sensitive }), { status: 400, body: { error: "tutor_execution_packet_invalid" } });
       assert.equal((await host.send(undefined, `{${sensitive}`)).status, 400);
       assert.equal((await host.send(undefined, sensitive + "x".repeat(2_000_001 - sensitive.length))).status, 413);
-      assert.equal((await fetch(`${host.endpoint}?${sensitive}`)).status, 404);
+      assert.equal((await fetch(`${host.endpoint}?${sensitive}`, { headers: hostHeaders })).status, 404);
       const packet = buildTutorExecutionPacketFile(host.dataset, [host.dataset.cases[0]!], host.generationSpec, host.promptAsset);
       assert.equal((await host.send({ ...packet, generationSpec: { ...packet.generationSpec, temperature: 0 } })).status, 422);
       const messages = packet.cases[0]!.messages;
@@ -211,7 +216,7 @@ test("Gemini SDK JSON and response-validation failures log only bounded codes", 
 test("Gemini opted-in failure diagnostics stay outside the collector report and corpus", async (t) => {
   const host = await fixture(t, { flag: "1", status: 404, body: { error: { message: sensitive } } });
   const collection = await collectCanonicalTutorModel({
-    host: createHttpTutorExecutionHost({ endpoint: host.endpoint }), dataset: host.dataset,
+    host: createHttpTutorExecutionHost({ endpoint: host.endpoint, sessionToken }), dataset: host.dataset,
     selectedCases: [host.dataset.cases[0]!], promptAsset: host.promptAsset, generationSpec: host.generationSpec,
     tutorDescriptor: { provider: "synthetic-gemini-fixture", model: environment.GEMINI_MODEL,
       promptId: host.generationSpec.prompt.id, promptVersion: host.generationSpec.prompt.version },

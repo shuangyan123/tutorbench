@@ -6,12 +6,15 @@ import {
   type TutorTurnMetrics,
   type TutorTurnOutput,
 } from "../contracts/index.js";
+import { parseCanonicalHostSessionToken } from "../transport/canonical-host-session.js";
 import { readBoundedJson } from "../transport/response-body.js";
 
 export const DEFAULT_HTTP_TUTOR_EXECUTION_HOST_TIMEOUT_MS = 30_000 as const;
 
 export interface HttpTutorExecutionHostOptions {
   readonly endpoint: string;
+  /** Explicit Host capability; never inferred from Provider credentials or environment. */
+  readonly sessionToken?: string;
   readonly timeoutMs?: number;
 }
 
@@ -237,10 +240,21 @@ async function nonSuccessCode(
 export class HttpTutorExecutionHost {
   readonly endpoint: string;
   readonly timeoutMs: number;
+  readonly #sessionToken: string | undefined;
 
   constructor(options: HttpTutorExecutionHostOptions) {
     this.endpoint = validateEndpoint(options.endpoint);
     this.timeoutMs = validateTimeout(options.timeoutMs);
+    this.#sessionToken = options.sessionToken === undefined ? undefined : parseCanonicalHostSessionToken(options.sessionToken);
+    if (this.#sessionToken !== undefined) {
+      const target = new URL(this.endpoint);
+      if (target.search || target.hash ||
+          (target.protocol !== "https:" && !["127.0.0.1", "localhost", "[::1]"].includes(target.hostname))) {
+        throw new HttpTutorExecutionHostConfigurationError(
+          "Host session credentials require HTTPS or loopback HTTP, without URL query or fragment.",
+        );
+      }
+    }
   }
 
   async execute(packet: TutorExecutionPacketFile): Promise<TutorExecutionHostResult> {
@@ -258,9 +272,11 @@ export class HttpTutorExecutionHost {
         response = await fetch(this.endpoint, {
           method: "POST",
           headers: {
+            ...(this.#sessionToken === undefined ? {} : { authorization: "Bearer " + this.#sessionToken }),
             accept: "application/json",
             "content-type": "application/json",
           },
+          ...(this.#sessionToken === undefined ? {} : { redirect: "error" as const }),
           body: JSON.stringify(canonicalPacket),
           signal: controller.signal,
         });

@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
@@ -24,6 +25,7 @@ function runCli(args: readonly string[]): Promise<CliResult> {
   return new Promise((resolveResult, reject) => {
     const child = spawn(process.execPath, [cliPath, ...args], {
       cwd: process.cwd(),
+      env: { ...process.env, CANONICAL_MODEL_HOST_TOKEN: randomBytes(32).toString("hex") },
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stdout = "";
