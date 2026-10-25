@@ -62,6 +62,10 @@ null cost because this adapter does not invent pricing.
 
 ## Failure semantics
 
+Judge transports enforce [upstream HTTP response byte budgets](upstream-http-response-limits.md)
+before SDK/JSON buffering, including non-success responses. Compatible
+Chat Completions providers use the same bounded byte reader.
+
 Refusal, incomplete output, failed response status, empty output, malformed
 JSON, and schema-invalid output are Judge execution failures. They do not
 become a Tutor `FAIL`. The stable mapping is:

@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import OpenAI from "openai";
 
 import { parseTutorExecutionPacketFile } from "../../dist/src/contracts/index.js";
+import { createBoundedFetch, ResponseBodyLimitError } from "../../dist/src/transport/response-body.js";
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 9001;
@@ -81,7 +82,7 @@ function validateBaseUrl(environment) {
   return parsed.toString().replace(/\/$/u, "");
 }
 
-function readConfiguration(environment = process.env) {
+export function readConfiguration(environment = process.env) {
   return {
     apiKey: requiredEnvironment("OPENAI_API_KEY", environment),
     model: requiredEnvironment("OPENAI_MODEL", environment),
@@ -185,7 +186,10 @@ async function executePacket(client, packet, model, timeoutMs) {
       maxRetries: 0,
       timeout: timeoutMs,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof ResponseBodyLimitError) {
+      throw new CanonicalHostRequestError("provider_response_invalid");
+    }
     throw new CanonicalHostRequestError("provider_request_failed");
   }
 
@@ -275,12 +279,13 @@ async function handleRequest(request, response, client, configuration) {
   }
 }
 
-async function startServer(configuration) {
+export async function startServer(configuration, fetchImplementation) {
   const client = new OpenAI({
     apiKey: configuration.apiKey,
     baseURL: configuration.baseURL,
     maxRetries: 0,
     timeout: configuration.timeoutMs,
+    fetch: createBoundedFetch(fetchImplementation),
   });
   const server = createServer((request, response) => {
     void handleRequest(request, response, client, configuration).catch(() => {

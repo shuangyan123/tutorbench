@@ -89,10 +89,8 @@ function responseBody(
     total_tokens: 18,
   },
   finishReason: string | null = "stop",
-): { readonly status: number; json(): Promise<unknown> } {
-  return {
-    status: 200,
-    json: async () => ({
+): Response {
+  return new Response(JSON.stringify({
       id: "provider-response-secret",
       choices: [{
         message: {
@@ -103,14 +101,13 @@ function responseBody(
       }],
       usage,
       rawProviderPayload: "must not persist",
-    }),
-  };
+  }), { headers: { "content-type": "application/json" } });
 }
 
 function makeFetch(
   respond: (call: number, url: string, init: Parameters<ChatCompletionsFetch>[1]) => Promise<{
     readonly status: number;
-    json(): Promise<unknown>;
+    readonly body: Response["body"];
   }>,
 ): { readonly fetch: ChatCompletionsFetch; readonly calls: number[] } {
   const calls: number[] = [];
@@ -431,7 +428,7 @@ test("DeepSeek fails closed for malformed, non-JSON, incomplete, and schema-inva
       ...promptOptions,
       apiKey: "test-key",
       fetch: async () => (content.length === 0
-        ? { status: 200, json: async () => ({ choices: [{ message: {} }] }) }
+        ? new Response(JSON.stringify({ choices: [{ message: {} }] }))
         : responseBody(content)),
     });
     await assert.rejects(
@@ -504,7 +501,7 @@ test("Chat Completions unknown finish reasons remain parseable when content is v
 test("DeepSeek retries bounded transient 429/5xx but not non-transient 4xx", async () => {
   const transient = makeFetch(async (call) => {
     if (call === 1) {
-      return { status: 429, json: async () => ({ error: "secret" }) };
+      return new Response(JSON.stringify({ error: "secret" }), { status: 429 });
     }
     return responseBody(validResult("deepseek-provider-case-001"));
   });
@@ -522,7 +519,7 @@ test("DeepSeek retries bounded transient 429/5xx but not non-transient 4xx", asy
 
   const serverFailure = makeFetch(async (call) => {
     if (call === 1) {
-      return { status: 503, json: async () => ({ error: "secret" }) };
+      return new Response(JSON.stringify({ error: "secret" }), { status: 503 });
     }
     return responseBody(validResult("deepseek-provider-case-001"));
   });
@@ -535,10 +532,9 @@ test("DeepSeek retries bounded transient 429/5xx but not non-transient 4xx", asy
   await serverRetried.evaluateWithMetrics(buildTutorEvalJudgeInput(makeCase(), "Response."));
   assert.equal(serverFailure.calls.length, 2);
 
-  const clientFailure = makeFetch(async () => ({
-    status: 400,
-    json: async () => ({ error: "raw provider secret" }),
-  }));
+  const clientFailure = makeFetch(async () => new Response(
+    JSON.stringify({ error: "raw provider secret" }), { status: 400 },
+  ));
   const nonRetried = createDeepSeekJudge({
     ...promptOptions,
     apiKey: "test-key",

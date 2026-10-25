@@ -57,6 +57,10 @@ recorded_model requires canonical model collection
 
 ## Canonical model evidence
 
+Both collection paths and the bundled model hosts enforce streaming
+[upstream HTTP response byte budgets](upstream-http-response-limits.md).
+Oversized responses fail their case without truncation or a replacement call.
+
 `tutorbench collect-model` is the only path that can write
 `recorded_model` provenance and `baseline-native-default` generation identity:
 

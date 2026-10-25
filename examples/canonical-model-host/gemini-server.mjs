@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { ApiError, GoogleGenAI } from "@google/genai";
 
 import { parseTutorExecutionPacketFile } from "../../dist/src/contracts/index.js";
+import { createBoundedFetch, ResponseBodyLimitError } from "../../dist/src/transport/response-body.js";
 
 const MAX_REQUEST_BYTES = 2_000_000;
 const MAX_TIMEOUT_MS = 2_147_483_647;
@@ -146,7 +147,7 @@ function providerErrorCode(error) {
   if (error?.status === 429) return "provider_rate_limited";
   if (Number.isInteger(error?.status) && error.status >= 500) return "provider_server_error";
   if (Number.isInteger(error?.status) && error.status >= 400) return "provider_http_error";
-  if (error instanceof SyntaxError) return "provider_response_invalid";
+  if (error instanceof SyntaxError || error instanceof ResponseBodyLimitError) return "provider_response_invalid";
   return "provider_request_failed";
 }
 
@@ -268,7 +269,7 @@ export async function startServer(configuration, fetchImplementation) {
       baseUrl: "https://generativelanguage.googleapis.com",
       apiVersion: "v1beta",
       retryOptions: { attempts: 1 },
-      ...(fetchImplementation === undefined ? {} : { fetch: fetchImplementation }),
+      fetch: createBoundedFetch(fetchImplementation),
     },
   });
   const server = createServer((request, response) => {
