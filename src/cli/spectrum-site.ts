@@ -32,7 +32,8 @@ const REDIRECTS: Readonly<Record<string, string>> = {
 
 export function isSpectrumSiteFile(relativePath: string): boolean {
   const [top] = relativePath.split("/");
-  if (top === "render" || top === "tools") return false;
+  // blender-venv is a local, gitignored render environment, never part of the site
+  if (top === "render" || top === "tools" || top === "blender-venv") return false;
   if (relativePath === "README.md" || relativePath === "journal-sample.html") return false;
   // only the K_ cover sequence is used; earlier cover renders stay in the repository
   return !/^assets\/cover\/(?!K_)/.test(relativePath);

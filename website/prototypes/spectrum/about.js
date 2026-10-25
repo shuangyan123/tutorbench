@@ -45,7 +45,7 @@
   if (!fig) return;
   var video = fig.querySelector("video"), sub = fig.querySelector(".ab-sub"), play = fig.querySelector("[data-play]");
   var cues = [];
-  try { cues = JSON.parse(fig.getAttribute("data-cues") || "[]"); } catch (e) { cues = []; }
+  try { cues = JSON.parse(fig.getAttribute("data-cues") || "[]"); } catch { cues = []; }
   var zh = function () { return document.documentElement.getAttribute("data-lang") === "zh"; };
   var small = window.matchMedia && window.matchMedia("(max-width: 700px)").matches;
   if (small && video.getAttribute("data-poster-m")) video.setAttribute("poster", video.getAttribute("data-poster-m"));
@@ -80,8 +80,8 @@
   video.addEventListener("timeupdate", function () { draw(false); });
   video.addEventListener("seeked", function () { draw(true); });
   ["fullscreenchange", "webkitfullscreenchange"].forEach(function (ev) { document.addEventListener(ev, tracks); });
-  video.addEventListener("webkitbeginfullscreen", function () { setTimeout(tracks, 0); });
-  video.addEventListener("webkitendfullscreen", function () { setTimeout(tracks, 0); });
+  video.addEventListener("webkitbeginfullscreen", function () { window.setTimeout(tracks, 0); });
+  video.addEventListener("webkitendfullscreen", function () { window.setTimeout(tracks, 0); });
   document.addEventListener("langchange", function () { draw(true); tracks(); });
   tracks();
 })();
