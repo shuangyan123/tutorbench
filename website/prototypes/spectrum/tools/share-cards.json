@@ -24,19 +24,19 @@
       "art": { "kind": "plate", "file": "assets/method/gauge-blocks.webp" } },
     { "id": "benchmark", "routes": ["data/"], "source": "data/index.html", "lead": "c2", "gems": [2],
       "kicker": [["The Teachometry benchmark", "Teachometry 基准"], ["tutor-eval-v0.2a", "tutor-eval-v0.2a"]],
-      "art": { "kind": "plate", "file": "assets/cases/catalogue.webp" } },
+      "art": { "kind": "plate", "file": "assets/cases/benchmark.webp" } },
     { "id": "cases", "routes": ["data/cases/"], "source": "data/cases/index.html", "lead": "c2", "gems": [2],
       "kicker": [["Case library", "案例库"], ["tutor-eval-v0.2a", "tutor-eval-v0.2a"]],
-      "art": { "kind": "plate", "file": "assets/cases/catalogue.webp", "position": "30% 50%" } },
+      "art": { "kind": "plate", "file": "assets/cases/catalogue.webp" } },
     { "id": "heatmap", "routes": ["data/heatmap/"], "source": "data/heatmap/index.html", "lead": "c2", "gems": [2],
       "kicker": [["Cases", "案例"], ["Evidence Matrix", "证据矩阵"]],
-      "art": { "kind": "plate", "file": "assets/cases/catalogue.webp", "position": "70% 50%" } },
+      "art": { "kind": "plate", "file": "assets/cases/seedtray.webp" } },
     { "id": "results", "routes": ["leaderboard/"], "source": "leaderboard/index.html", "lead": "c0", "gems": [0],
       "kicker": [["Results", "结果"], ["tutor-eval-v0.2a", "tutor-eval-v0.2a"]],
       "art": { "kind": "plate", "file": "assets/results/sealed.webp" } },
     { "id": "models", "routes": ["models/"], "source": "models/index.html", "lead": "c0", "gems": [0],
       "kicker": [["Results", "结果"], ["Models", "模型"]],
-      "art": { "kind": "plate", "file": "assets/results/sealed.webp", "position": "62% 50%" } },
+      "art": { "kind": "plate", "file": "assets/results/cloche.webp" } },
     { "id": "micro-review", "routes": ["micro-review/"], "source": "micro-review/index.html", "lead": "c1", "gems": [1],
       "kicker": [["Micro-Review", "微评审体验"], ["≈ 60 s", "约 60 秒"]],
       "art": { "kind": "plate", "file": "assets/micro/selector.webp" } },
@@ -54,6 +54,6 @@
       "art": { "kind": "plate", "file": "assets/community/glasses.webp" } },
     { "id": "contact", "routes": ["contact/"], "source": "contact/index.html", "lead": "ink", "gems": [0, 1, 2, 3, 4],
       "kicker": [["Contact", "联系"], ["Teachometry", "Teachometry"]],
-      "art": { "kind": "plate", "wide": true, "file": "assets/about/press.webp", "position": "40% 50%" } }
+      "art": { "kind": "plate", "file": "assets/about/letterbox.webp" } }
   ]
 }
