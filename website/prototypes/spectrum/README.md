@@ -37,6 +37,12 @@ kept but not shown. Dimension markers are five Blender cut gems (`assets/gems/`,
 `render/gems.py`): ruby oval, citrine pear, emerald step cut, sapphire cushion, amethyst trillion,
 each rendered in three IOR passes for fire. The earlier glass beads (`assets/beads/`) show with `#beads`. Two GPT photographs open §2 and §3 as framed
 plates, captioned as generated illustrations.
+Link previews. Every page shares a 1200×630 card (`assets/share/<id>-en.jpg` / `-zh.jpg`): the
+page's own headline in the site's type on the page light, beside its section's Blender cover. The
+cards and the routes each one covers are listed in `tools/share-cards.json`; the build adds
+`og:image` / `twitter:image` (large card) to every page from it. After changing a headline or a
+cover, re-render with `node website/prototypes/spectrum/tools/build-share-cards.mjs [id ...]`.
+
 Fonts and speed. The site serves its own fonts (`fonts.css`, `assets/fonts/`, all SIL OFL): the
 same Google Fonts files, limited to the weights the pages use and cut to the characters they contain
 (the Chinese faces hold only the ~1,100 characters on the pages). `tools/build-fonts.py` rebuilds
