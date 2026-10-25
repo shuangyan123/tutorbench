@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import type { PoolConfig } from "pg";
 
+import { validateCommunityReviewDatabaseUrl } from "./config.js";
 import { InMemoryCommunityReviewRepository } from "./in-memory-repository.js";
 import {
   loadApplicationWithdrawalSnapshot,
@@ -50,6 +51,7 @@ export class PostgreSQLCommunityReviewRepository implements CommunityReviewPersi
       if (options.connectionString === undefined || options.connectionString.trim().length === 0) {
         throw new Error("A PostgreSQL connection string is required.");
       }
+      validateCommunityReviewDatabaseUrl(options.connectionString);
       this.pool = new Pool({
         ...(options.poolConfig ?? {}),
         connectionString: options.connectionString,
