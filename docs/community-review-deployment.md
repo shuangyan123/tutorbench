@@ -203,6 +203,27 @@ The application limiter is process-local and transient; it is not a global
 multi-instance control. External edge abuse protection remains a separate hard
 launch blocker until an approved control is actually configured and tested.
 
+### Withdrawal resource boundary (TB-SEC-02)
+
+Application withdrawal remains available in `CLOSED` and `PAUSED`. Before any
+database connection is acquired, a separate transient withdrawal budget permits
+30 requests per source per minute, 120 requests total per minute, and at most
+four in-flight withdrawals per service instance. Excess requests return the
+existing `application_rate_limited` HTTP 429 response without queueing for a
+connection. These budgets count invalid credentials and retries, use HMAC-derived
+source keys, do not consume the new-application budget, and reset with the
+process. They do not replace the external edge or distributed abuse-control gate.
+
+PostgreSQL withdrawals lock only the target application by primary key. They
+do not acquire the service-wide advisory lock or read a service-wide snapshot.
+Credential verification, free-text redaction, contact deletion, and the audit
+insert commit in one transaction. Existing snapshot writers lock application
+rows before reading their snapshot, so they serialize with the same target row
+without overwriting a committed withdrawal. The withdrawal transaction applies
+five-second lock and statement deadlines; an error rolls back all changes and
+releases the admission slot. Successful retries return the existing tombstone
+without another audit event, and idempotency mappings remain intact.
+
 For a container deployment, build
 `services/community-review-service/Dockerfile`. It uses Node 24 bookworm slim, excludes
 repository metadata and private data, creates the material mount, and runs as

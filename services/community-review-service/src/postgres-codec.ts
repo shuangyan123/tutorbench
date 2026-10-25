@@ -33,6 +33,7 @@ import type {
   SealedBatchPayloadReferenceRecord,
 } from "./persistence.js";
 import { CommunityReviewServiceError } from "./errors.js";
+import { emptyCommunityReviewPersistenceSnapshot } from "./persistence.js";
 
 type DatabaseRow = { readonly [column: string]: unknown };
 
@@ -138,6 +139,35 @@ function applicationFromRow(row: DatabaseRow): CommunityReviewApplicationRecord 
     ...(purgedAt === undefined ? {} : { purgedAt }),
     ...(withdrawalCredentialDigest === undefined ? {} : { withdrawalCredentialDigest }),
   };
+}
+
+export async function loadApplicationWithdrawalSnapshot(
+  client: PoolClient,
+  applicationId: string,
+): Promise<CommunityReviewPersistenceSnapshot> {
+  // 仅锁定目标申请；不获取服务全局锁，也不读取联系方式或其他评审数据。
+  const result = await client.query<DatabaseRow>(
+    "SELECT * FROM community_review_applications WHERE application_id = $1 FOR UPDATE",
+    [applicationId],
+  );
+  return {
+    ...emptyCommunityReviewPersistenceSnapshot(),
+    applications: result.rows.map(applicationFromRow),
+  };
+}
+
+export async function persistApplicationWithdrawalSnapshot(
+  client: PoolClient,
+  applicationId: string,
+  before: CommunityReviewPersistenceSnapshot,
+  after: CommunityReviewPersistenceSnapshot,
+  deleteContact: boolean,
+): Promise<void> {
+  await persistApplications(client, before.applications, after.applications);
+  if (deleteContact) {
+    await client.query("DELETE FROM community_review_application_contacts WHERE application_id = $1", [applicationId]);
+  }
+  await persistApplicationAudits(client, before.applicationAuditEvents, after.applicationAuditEvents);
 }
 
 function applicationContactFromRow(row: DatabaseRow): CommunityReviewApplicationContactRecord {

@@ -33,6 +33,7 @@ import type {
 const DAY_MS = 24 * 60 * 60 * 1000;
 const APPLICATION_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/u;
 const IDEMPOTENCY_KEY_PATTERN = /^[\x21-\x7e]{1,128}$/u;
+const WITHDRAWAL_MAX_CONCURRENT_REQUESTS = 4;
 
 export const COMMUNITY_REVIEW_APPLICATION_PENDING_RETENTION_DAYS = 90;
 export const COMMUNITY_REVIEW_APPLICATION_DECISION_RETENTION_DAYS = 30;
@@ -131,6 +132,8 @@ export interface CommunityReviewApplicationIntakeServiceOptions {
   readonly auditEventIdGenerator?: () => string;
   readonly retention?: CommunityReviewApplicationRetentionPolicy;
   readonly rateLimiter?: ApplicationSubmissionRateLimiter;
+  readonly withdrawalRateLimiter?: ApplicationSubmissionRateLimiter;
+  readonly withdrawalGlobalRateLimiter?: ApplicationSubmissionRateLimiter;
 }
 
 export interface CommunityReviewApplicationReceipt {
@@ -320,6 +323,9 @@ export class CommunityReviewApplicationIntakeService {
   private readonly auditEventIdGenerator: () => string;
   private readonly retention: Required<CommunityReviewApplicationRetentionPolicy>;
   private readonly rateLimiter: ApplicationSubmissionRateLimiter;
+  private readonly withdrawalRateLimiter: ApplicationSubmissionRateLimiter;
+  private readonly withdrawalGlobalRateLimiter: ApplicationSubmissionRateLimiter;
+  private withdrawalsInFlight = 0;
 
   constructor(
     private readonly persistence: CommunityReviewPersistence,
@@ -343,6 +349,15 @@ export class CommunityReviewApplicationIntakeService {
     this.rateLimiter = options.rateLimiter ?? new ApplicationSubmissionRateLimiter({
       maximumRequests: 30,
       windowMs: 60_000,
+    });
+    this.withdrawalRateLimiter = options.withdrawalRateLimiter ?? new ApplicationSubmissionRateLimiter({
+      maximumRequests: 30,
+      windowMs: 60_000,
+    });
+    this.withdrawalGlobalRateLimiter = options.withdrawalGlobalRateLimiter ?? new ApplicationSubmissionRateLimiter({
+      maximumRequests: 120,
+      windowMs: 60_000,
+      maximumEntries: 1,
     });
   }
 
@@ -505,35 +520,47 @@ export class CommunityReviewApplicationIntakeService {
   async withdrawApplication(input: {
     readonly applicationId: string;
     readonly withdrawalCredential: string;
+    readonly sourceKey?: string;
   }): Promise<CommunityReviewApplicationWithdrawalResult> {
     assertApplicationId(input.applicationId);
     assertWithdrawalCredential(input.withdrawalCredential);
-    return this.persistence.transaction((transaction) => {
-      const record = transaction.getCommunityReviewApplication(input.applicationId);
-      if (record === undefined || record.withdrawalCredentialDigest === undefined ||
-        !equalDigest(record.withdrawalCredentialDigest, digest(input.withdrawalCredential))) {
-        throw new CommunityReviewServiceError("application_withdrawal_not_authorized");
-      }
-      if (record.lifecycle === "WITHDRAWN" || record.lifecycle === "PURGED") {
-        return {
-          applicationId: record.applicationId,
-          lifecycle: record.lifecycle,
-          ...(record.withdrawnAt === undefined ? {} : { withdrawnAt: record.withdrawnAt }),
+    // 在 pool.connect() 之前拒绝超额请求；轮换来源也不能突破进程总量和并发上限。
+    if (this.withdrawalsInFlight >= WITHDRAWAL_MAX_CONCURRENT_REQUESTS) {
+      throw new CommunityReviewServiceError("application_rate_limited");
+    }
+    this.withdrawalRateLimiter.assertAllowed(input.sourceKey ?? "unknown");
+    this.withdrawalGlobalRateLimiter.assertAllowed("application-withdrawal");
+    this.withdrawalsInFlight += 1;
+    try {
+      return await this.persistence.applicationWithdrawalTransaction(input.applicationId, (transaction) => {
+        const record = transaction.getCommunityReviewApplication(input.applicationId);
+        if (record === undefined || record.withdrawalCredentialDigest === undefined ||
+          !equalDigest(record.withdrawalCredentialDigest, digest(input.withdrawalCredential))) {
+          throw new CommunityReviewServiceError("application_withdrawal_not_authorized");
+        }
+        if (record.lifecycle === "WITHDRAWN" || record.lifecycle === "PURGED") {
+          return {
+            applicationId: record.applicationId,
+            lifecycle: record.lifecycle,
+            ...(record.withdrawnAt === undefined ? {} : { withdrawnAt: record.withdrawnAt }),
+          };
+        }
+        const withdrawnAt = timestampOrThrow(this.now());
+        const { motivation: _motivation, experienceSummary: _experienceSummary, ...withoutFreeText } = record;
+        const updated: CommunityReviewApplicationRecord = {
+          ...withoutFreeText,
+          lifecycle: "WITHDRAWN",
+          updatedAt: withdrawnAt,
+          withdrawnAt,
         };
-      }
-      const withdrawnAt = timestampOrThrow(this.now());
-      const { motivation: _motivation, experienceSummary: _experienceSummary, ...withoutFreeText } = record;
-      const updated: CommunityReviewApplicationRecord = {
-        ...withoutFreeText,
-        lifecycle: "WITHDRAWN",
-        updatedAt: withdrawnAt,
-        withdrawnAt,
-      };
-      transaction.updateCommunityReviewApplication(updated);
-      transaction.deleteCommunityReviewApplicationContact(record.applicationId);
-      this.audit(transaction, "application_withdrawn", record.applicationId, withdrawnAt);
-      return { applicationId: record.applicationId, lifecycle: "WITHDRAWN", withdrawnAt };
-    });
+        transaction.updateCommunityReviewApplication(updated);
+        transaction.deleteCommunityReviewApplicationContact(record.applicationId);
+        this.audit(transaction, "application_withdrawn", record.applicationId, withdrawnAt);
+        return { applicationId: record.applicationId, lifecycle: "WITHDRAWN", withdrawnAt };
+      });
+    } finally {
+      this.withdrawalsInFlight -= 1;
+    }
   }
 
   async purgeExpired(asOf?: string): Promise<CommunityReviewApplicationPurgeResult> {
@@ -559,7 +586,7 @@ export class CommunityReviewApplicationIntakeService {
   }
 
   private audit(
-    transaction: CommunityReviewPersistenceTransaction,
+    transaction: Pick<CommunityReviewPersistenceTransaction, "insertCommunityReviewApplicationAuditEvent">,
     eventType: CommunityReviewApplicationAuditEventRecord["eventType"],
     applicationId: string,
     occurredAt: string,
@@ -613,6 +640,7 @@ export class CommunityReviewApplicationIntakeApplicationService {
   async withdrawApplication(input: {
     readonly applicationId: string;
     readonly withdrawalCredential: string;
+    readonly sourceKey?: string;
   }): Promise<CommunityReviewApplicationWithdrawalResult> {
     return this.intake.withdrawApplication(input);
   }

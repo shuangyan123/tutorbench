@@ -44,6 +44,10 @@ const syntheticFixture = {
   notCommunityReviewEvidence: true as const,
 };
 const guideFingerprint = communityReviewFingerprint({ guideText: "Synthetic PG integration guide." });
+function serviceError(code: CommunityReviewServiceError["code"]): (error: unknown) => boolean {
+  return (error: unknown): boolean => error instanceof CommunityReviewServiceError && error.code === code;
+}
+
 const tasks: CommunityReviewVisibleTask[] = [
   parseCommunityReviewVisibleTask({
     caseId: "pg-case",
@@ -777,6 +781,94 @@ const postgresSuite = describe("Community Review PostgreSQL adapter", { skip: !p
       [created.receipt.applicationId],
     );
     assert.equal(rows.rows[0]?.count, "1");
+  });
+  async function withdrawalFixture(prefix: string) {
+    let audits = 0;
+    const options = {
+      clock: () => "2026-01-01T00:00:00.000Z",
+      applicationIdGenerator: () => prefix,
+      withdrawalCredentialGenerator: () => `${prefix}-${"x".repeat(40)}`,
+      auditEventIdGenerator: () => `${prefix}-audit-${++audits}`,
+    };
+    const open = new CommunityReviewApplicationIntakeService(activeRepository(), { ...options, intakeState: "OPEN" });
+    const created = await open.submitApplication({ application: applicationInput(), idempotencyKey: prefix });
+    const closed = new CommunityReviewApplicationIntakeService(activeRepository(), { ...options, intakeState: "CLOSED" });
+    const input = {
+      applicationId: created.receipt.applicationId,
+      withdrawalCredential: created.receipt.withdrawalCredential!,
+    };
+    return { open, closed, input, options };
+  }
+
+  test("TB-SEC-02 PostgreSQL CLOSED withdrawal is atomic and concurrent retries append one audit", async () => {
+    const setup = await withdrawalFixture("pg-wd-atomic");
+    await assert.rejects(setup.closed.withdrawApplication({ ...setup.input, withdrawalCredential: "bad".repeat(16) }),
+      serviceError("application_withdrawal_not_authorized"));
+    const results = await Promise.all(Array.from({ length: 4 }, () => setup.closed.withdrawApplication(setup.input)));
+    for (const result of results) assert.deepEqual(result, results[0]);
+    const state = await activeRepository().transaction((transaction) => ({
+      application: transaction.getCommunityReviewApplication(setup.input.applicationId),
+      contact: transaction.getCommunityReviewApplicationContact(setup.input.applicationId),
+      audits: transaction.listCommunityReviewApplicationAuditEvents(setup.input.applicationId),
+    }));
+    assert.equal(state.application?.lifecycle, "WITHDRAWN");
+    assert.equal(state.application?.motivation, undefined);
+    assert.equal(state.application?.experienceSummary, undefined);
+    assert.equal(state.contact, undefined);
+    assert.equal(state.audits.filter((event) => event.eventType === "application_withdrawn").length, 1);
+    const retry = await setup.open.submitApplication({ application: applicationInput(), idempotencyKey: "pg-wd-atomic" });
+    assert.equal(retry.created, false);
+    assert.equal(retry.receipt.withdrawalCredential, undefined);
+  });
+
+  test("TB-SEC-02 PostgreSQL withdrawal serializes with snapshot-based operator decisions", async () => {
+    const setup = await withdrawalFixture("pg-wd-decision");
+    const [withdrawal, decision] = await Promise.allSettled([
+      setup.closed.withdrawApplication(setup.input),
+      setup.open.recordDecision({ applicationId: setup.input.applicationId, decision: "INVITED" }),
+    ]);
+    assert.equal(withdrawal.status, "fulfilled");
+    if (decision.status === "rejected") assert.ok(serviceError("application_not_active")(decision.reason));
+    const state = await setup.open.getApplicationForOperator(setup.input.applicationId);
+    assert.equal(state.lifecycle, "WITHDRAWN");
+    assert.equal(state.motivation, undefined);
+    assert.equal(state.contact, undefined);
+    assert.equal(state.decision, decision.status === "fulfilled" ? "INVITED" : "PENDING");
+  });
+
+  test("TB-SEC-02 PostgreSQL withdrawal and retention purge preserve one terminal redaction", async () => {
+    const setup = await withdrawalFixture("pg-wd-purge");
+    const [withdrawal] = await Promise.all([
+      setup.closed.withdrawApplication(setup.input),
+      setup.open.purgeExpired("2026-04-02T00:00:00.000Z"),
+    ]);
+    const state = await activeRepository().transaction((transaction) => ({
+      application: transaction.getCommunityReviewApplication(setup.input.applicationId),
+      contact: transaction.getCommunityReviewApplicationContact(setup.input.applicationId),
+      audits: transaction.listCommunityReviewApplicationAuditEvents(setup.input.applicationId),
+    }));
+    assert.ok(state.application?.lifecycle === "WITHDRAWN" || state.application?.lifecycle === "PURGED");
+    assert.equal(withdrawal.lifecycle, state.application.lifecycle);
+    assert.equal(state.application.motivation, undefined);
+    assert.equal(state.contact, undefined);
+    assert.equal(state.audits.filter((event) =>
+      event.eventType === "application_withdrawn" || event.eventType === "application_purged").length, 1);
+  });
+
+  test("TB-SEC-02 PostgreSQL audit failure rolls back application and contact changes", async () => {
+    const setup = await withdrawalFixture("pg-wd-rollback");
+    const conflicting = new CommunityReviewApplicationIntakeService(activeRepository(), {
+      ...setup.options,
+      intakeState: "CLOSED",
+      auditEventIdGenerator: () => "pg-wd-rollback-audit-1",
+    });
+    await assert.rejects(conflicting.withdrawApplication(setup.input), (error: unknown) =>
+      typeof error === "object" && error !== null && "code" in error && error.code === "23505");
+    const state = await setup.open.getApplicationForOperator(setup.input.applicationId);
+    assert.equal(state.lifecycle, "ACTIVE");
+    assert.equal(state.motivation, "Synthetic PostgreSQL application motivation.");
+    assert.equal(state.contact?.contactValue, "postgres.applicant@example.invalid");
+    assert.equal((await setup.closed.withdrawApplication(setup.input)).lifecycle, "WITHDRAWN");
   });
 });
 

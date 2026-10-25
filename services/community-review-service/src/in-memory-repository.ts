@@ -44,6 +44,7 @@ import type {
   CommunityReviewSubmission,
 } from "../../../src/contracts/community-review.js";
 import type {
+  ApplicationWithdrawalTransaction,
   AcceptedSubmissionRecord,
   CommunityReviewApplicationAuditEventRecord,
   CommunityReviewApplicationContactRecord,
@@ -2009,6 +2010,13 @@ export class InMemoryCommunityReviewRepository implements CommunityReviewPersist
       disclosures: [...this.state.disclosures.values()].map(copy),
       evidenceAuditEvents: [...this.state.evidenceAuditEvents.values()].map(copy),
     };
+  }
+
+  applicationWithdrawalTransaction<T>(
+    _applicationId: string,
+    callback: (transaction: ApplicationWithdrawalTransaction) => Promise<T> | T,
+  ): Promise<T> {
+    return this.transaction(callback);
   }
 
   async transaction<T>(
