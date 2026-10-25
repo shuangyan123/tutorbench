@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import { oversizedResponse } from "./helpers/upstream-response.js";
 
 import {
   createHttpTutor,
@@ -348,6 +349,23 @@ test("HTTP Tutor keeps one external case failure isolated from later cases", asy
   } finally {
     await server.close();
   }
+});
+
+test("HTTP Tutor isolates an oversized case and continues with the next case", async (context) => {
+  const fixture = oversizedResponse({ text: "synthetic" });
+  let calls = 0;
+  context.mock.method(globalThis, "fetch", async () => {
+    calls += 1;
+    return calls === 1 ? fixture.response : new Response(JSON.stringify({ text: "A useful next step." }));
+  });
+  const result = await runTutorBenchmark({
+    tutor: createHttpTutor({ id: "bounded-http-tutor", endpoint: "https://synthetic.invalid" }),
+    dataset: twoCaseDataset(), runId: "bounded-http-run",
+  });
+  assert.deepEqual(result.caseResults.map((item) => item.status), ["error", "passed"]);
+  assert.equal(calls, 2);
+  assert.equal(fixture.cancelled(), true);
+  assert.equal(fixture.reads(), 123);
 });
 
 test("HTTP Tutor rejects invalid JSON, invalid output, and invalid metrics", async () => {

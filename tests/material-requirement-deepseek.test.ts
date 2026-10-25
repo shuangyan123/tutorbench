@@ -33,10 +33,8 @@ function responseBody(
     completion_tokens: 40,
     total_tokens: 140,
   },
-): { readonly status: number; json(): Promise<unknown> } {
-  return {
-    status: 200,
-    json: async () => ({
+): Response {
+  return new Response(JSON.stringify({
       id: "provider-response-secret",
       choices: [{
         message: {
@@ -47,8 +45,7 @@ function responseBody(
       }],
       usage,
       rawProviderPayload: "must not persist",
-    }),
-  };
+  }), { headers: { "content-type": "application/json" } });
 }
 
 function materialJudgeOptions(
@@ -253,7 +250,7 @@ test("Material DeepSeek retries transient transport failures and bounds non-tran
     async () => {
       calls += 1;
       if (calls === 1) {
-        return { status: 429, json: async () => ({}) };
+        return new Response("{}", { status: 429 });
       }
       return responseBody(validAtomicResult(fixtureCase));
     },
@@ -266,7 +263,7 @@ test("Material DeepSeek retries transient transport failures and bounds non-tran
   const nonTransient = createDeepSeekMaterialRequirementJudge(materialJudgeOptions(
     async () => {
       calls += 1;
-      return { status: 400, json: async () => ({}) };
+      return new Response("{}", { status: 400 });
     },
   ));
   await assert.rejects(

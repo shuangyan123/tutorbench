@@ -6,6 +6,7 @@ import {
   type TutorTurnMetrics,
   type TutorTurnOutput,
 } from "../contracts/index.js";
+import { readBoundedJson } from "../transport/response-body.js";
 
 export const DEFAULT_HTTP_TUTOR_EXECUTION_HOST_TIMEOUT_MS = 30_000 as const;
 
@@ -197,9 +198,10 @@ const stableProviderErrorCodes: Readonly<
 
 async function nonSuccessCode(
   response: Response,
+  signal: AbortSignal,
 ): Promise<HttpTutorExecutionHostRequestErrorCode> {
   try {
-    const body = asRecord(await response.json());
+    const body = asRecord(await readBoundedJson(response, signal));
     const providerCode = body?.error;
     if (typeof providerCode === "string") {
       const stableCode = stableProviderErrorCodes[providerCode];
@@ -276,13 +278,13 @@ export class HttpTutorExecutionHost {
       }
       if (!response.ok) {
         throw new HttpTutorExecutionHostRequestError(
-          await nonSuccessCode(response),
+          await nonSuccessCode(response, controller.signal),
           "Canonical Tutor execution host returned a non-success status.",
         );
       }
       let body: unknown;
       try {
-        body = await response.json();
+        body = await readBoundedJson(response, controller.signal);
       } catch {
         throw new HttpTutorExecutionHostRequestError(
           "invalid_json",

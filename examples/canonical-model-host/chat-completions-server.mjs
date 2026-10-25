@@ -3,12 +3,12 @@ import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
 import { parseTutorExecutionPacketFile } from "../../dist/src/contracts/index.js";
+import { cancelResponseBody, createBoundedFetch, ResponseBodyLimitError } from "../../dist/src/transport/response-body.js";
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 9001;
 const DEFAULT_TIMEOUT_MS = 60_000;
 const MAX_REQUEST_BYTES = 2_000_000;
-const MAX_RESPONSE_BYTES = 8_000_000;
 
 class CanonicalHostRequestError extends Error {
   constructor(code) {
@@ -159,7 +159,7 @@ function validateBaseUrl(environment, authMode) {
   return parsed.toString().replace(/\/+$/u, "");
 }
 
-function readConfiguration(environment = process.env) {
+export function readConfiguration(environment = process.env) {
   const authMode = authModeEnvironment(environment);
   return {
     authMode,
@@ -254,9 +254,6 @@ function responseText(body, configuration) {
 
 async function readUpstreamJson(response) {
   const text = await response.text();
-  if (Buffer.byteLength(text, "utf8") > MAX_RESPONSE_BYTES) {
-    throw new CanonicalHostRequestError("provider_response_invalid");
-  }
   try {
     return JSON.parse(text);
   } catch {
@@ -264,14 +261,14 @@ async function readUpstreamJson(response) {
   }
 }
 
-async function executePacket(packet, configuration) {
+async function executePacket(packet, configuration, fetchImplementation) {
   const requestBody = JSON.stringify(requestForPacket(packet, configuration));
   const controller = new AbortController();
   const timeoutHandle = setTimeout(() => controller.abort(), configuration.timeoutMs);
   const startedAt = performance.now();
   let response;
   try {
-    response = await fetch(`${configuration.baseUrl}${configuration.apiPath}`, {
+    response = await fetchImplementation(`${configuration.baseUrl}${configuration.apiPath}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -283,6 +280,7 @@ async function executePacket(packet, configuration) {
       signal: controller.signal,
     });
     if (response.status < 200 || response.status >= 300) {
+      cancelResponseBody(response);
       throw new CanonicalHostRequestError(providerStatusCode(response.status));
     }
     const body = await readUpstreamJson(response);
@@ -301,6 +299,9 @@ async function executePacket(packet, configuration) {
   } catch (error) {
     if (error instanceof CanonicalHostRequestError) {
       throw error;
+    }
+    if (error instanceof ResponseBodyLimitError) {
+      throw new CanonicalHostRequestError("provider_response_invalid");
     }
     if (error?.name === "AbortError") {
       throw new CanonicalHostRequestError("provider_request_timeout");
@@ -335,7 +336,7 @@ function sendJson(response, statusCode, body) {
   response.end(JSON.stringify(body));
 }
 
-async function handleRequest(request, response, configuration) {
+async function handleRequest(request, response, configuration, fetchImplementation) {
   if (request.method !== "POST" || request.url !== "/generate") {
     sendJson(response, 404, { error: "not_found" });
     return;
@@ -354,7 +355,7 @@ async function handleRequest(request, response, configuration) {
     return;
   }
   try {
-    sendJson(response, 200, await executePacket(packet, configuration));
+    sendJson(response, 200, await executePacket(packet, configuration, fetchImplementation));
   } catch (error) {
     const code = error instanceof CanonicalHostRequestError
       ? error.code
@@ -374,9 +375,10 @@ async function handleRequest(request, response, configuration) {
   }
 }
 
-async function startServer(configuration) {
+export async function startServer(configuration, fetchImplementation) {
+  const fetcher = createBoundedFetch(fetchImplementation);
   const server = createServer((request, response) => {
-    void handleRequest(request, response, configuration).catch(() => {
+    void handleRequest(request, response, configuration, fetcher).catch(() => {
       if (!response.headersSent) {
         sendJson(response, 500, { error: "canonical_host_failed" });
       }

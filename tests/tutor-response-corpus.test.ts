@@ -299,9 +299,7 @@ test("a selected frozen case can use the DeepSeek Judge without re-calling Tutor
           readonly rubrics: readonly { readonly id: string }[];
         };
       };
-      return {
-        status: 200,
-        json: async () => ({
+      return new Response(JSON.stringify({
           choices: [{
             message: {
               content: JSON.stringify({
@@ -319,8 +317,7 @@ test("a selected frozen case can use the DeepSeek Judge without re-calling Tutor
             },
           }],
           usage: { prompt_tokens: 20, completion_tokens: 10, total_tokens: 30 },
-        }),
-      };
+      }), { headers: { "content-type": "application/json" } });
     },
   });
   const result = await runTutorResponseCorpus({

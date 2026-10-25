@@ -1,4 +1,5 @@
 import { isTutorTurnOutput, type TutorTurnInput, type TutorTurnMetrics, type TutorTurnOutput, type TutorUnderTest } from "../contracts/index.js";
+import { cancelResponseBody, readBoundedJson } from "../transport/response-body.js";
 
 export const DEFAULT_HTTP_TUTOR_TIMEOUT_MS = 30_000 as const;
 
@@ -158,6 +159,7 @@ export class HttpTutor implements TutorUnderTest {
       }
 
       if (!response.ok) {
+        cancelResponseBody(response);
         throw new HttpTutorRequestError(
           "HTTP Tutor returned a non-success status.",
         );
@@ -165,7 +167,7 @@ export class HttpTutor implements TutorUnderTest {
 
       let body: unknown;
       try {
-        body = await response.json();
+        body = await readBoundedJson(response, controller.signal);
       } catch {
         throw new HttpTutorRequestError("HTTP Tutor returned invalid JSON.");
       }
