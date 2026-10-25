@@ -70,6 +70,79 @@ const ABOUT_COVER = [
   `一行铅字 ANSWERS ≠ TEACHING 排在钢制排字手托里，字面上着五种颜色的墨。前面是从这行字拓下的样张，颜色沿着一行字渐次相融；后面，墨辊停在玻璃墨台上，墨台上滚开的是同样的五种墨。`,
 ];
 
+/* the vision: a 42 s film (render/film/) and the letter it is cut from. The film never plays on its own;
+   the subtitles are page text following the site language (and WebVTT tracks for fullscreen). */
+const FILM_CUES = JSON.parse(readFileSync(join(PROTO, "render/film/cues.json"), "utf8")); // [start, end, zh, en] seconds
+const LETTER = {
+  salutation: ["Dear learner,", "亲爱的学习者："],
+  open: [
+    ["We believe everyone deserves a chance at the best education. Not the most expensive. Not the most exclusive. The kind that begins where you are, and stays with you until you understand.",
+      "我们相信，每个人都应该有机会，享有最好的教育。不是最昂贵的，也不是最难进入的，而是从你所在的地方出发，一直陪你走到真正明白的那一种。"],
+    ["This is a letter about the future we hope to help build. It holds three hopes.",
+      "这封信，关于我们希望一起去往的未来。信里装着三个愿望。"],
+  ],
+  hopes: [
+    [["I", "一"], ["Ask freely.", "自由地提问"],
+      ["Think of a question you kept to yourself: because it seemed too simple, because everyone else seemed to get it already, because the way you saw it was different. We hope for a future where that question is welcome. Asked as many times as you need, at your own pace, in your own words.",
+        "也许你曾把一个问题咽了回去：怕它太简单，怕别人早就懂了，怕自己想得和大家不一样。我们希望有这样一个未来：那个问题会被认真接住。你可以问很多遍，按自己的节奏，用自己的话。"]],
+    [["II", "二"], ["Explore because you want to.", "主动地探索"],
+      ["So much learning still runs on pressure: the next exam, the next deadline, someone watching over your shoulder. We hope for learning that runs on something quieter, and stronger: the wish to understand. Curiosity that is noticed, fed, and followed wherever it leads.",
+        "太多学习仍然靠压力推动：下一场考试，下一个截止日期，一双盯着你的眼睛。我们期待另一种力量，更安静，也更持久，那就是想要弄明白的好奇。它被看见，被呵护，被认真回应，并带你走向更远的地方。"]],
+    [["III", "三"], ["Dare to make something new.", "大胆地创造"],
+      ["Education should not end at remembering what is already known, finding the expected answer, finishing the standard task. We hope everyone gets the chance to form a view of their own, to ask the question no one has asked yet, and to try making something that does not exist.",
+        "教育不该止步于记住已知、找到标准答案、完成规定动作。我们希望每个人都有机会形成自己的看法，提出还没有人问过的问题，去尝试做出世界上还没有的东西。"]],
+  ],
+  honest: ["These are long hopes. We have not reached them, and we will not pretend that we have.", "这些是很长远的愿望。我们还没有抵达，也不会假装已经抵达。"],
+  close: [
+    ["So we are starting somewhere smaller, and more careful: learning to see clearly what good teaching looks like. TutorBench is that start. It studies how to observe, evaluate, and improve the way AI teaches, one authored case at a time. It cannot yet show that anyone learns more because of it. It can help us look closely, and honestly.",
+      "所以，我们从更小、也更需要严谨的一步开始：先学会看清，什么是好的教学。TutorBench 就是这一步。它研究如何观察、评估并改进 AI 的教学，从一个个精心编写的案例做起。它还不能证明有人因此学得更好，但它能帮我们看得更仔细，也更诚实。"],
+    ["We will keep writing as we learn. Until then, keep asking.", "我们会一边学，一边继续写下去。在那之前，请继续提问。"],
+  ],
+  sign: ["— Teachometry", "—— Teachometry"],
+  ps: ["P.S. If this letter leaves you with a question, ask us. That is rather the point.", "附言：如果这封信让你想问点什么，欢迎来问我们。毕竟，这正是重点。"],
+};
+const FILM_ALT = [
+  "A 42-second silent film in six shots: a dandelion clock backlit in violet-blue mist; one seed letting go; seeds drifting; a seed touching still water and sending out rings; the focus finding one seed's crown; the clock again, with a gap where seeds have left. Every line in it is from the letter below.",
+  "一部 42 秒的无声短片，共六个镜头：雾蓝紫色里逆光的一朵蒲公英；一颗种子松开；许多种子在空中飘；一颗种子落在静水上，涟漪散开；焦点落到一颗种子的冠毛上；再回到那朵蒲公英，它少了一角。片中的每一句话都出自下面这封信。",
+];
+const PLAY = `<svg viewBox="0 0 22 24" aria-hidden="true"><path d="M3 2v20l17-10z"/></svg>`;
+
+function visionSection() {
+  const p = ([en, zh], cls = "") => `<p${cls ? ` class="${cls}"` : ""}>${bi(esc(en), esc(zh))}</p>`;
+  return `<section class="ab-vision" id="letter" aria-labelledby="about-letter-title">
+    <div class="wrap">
+      <div class="ab-vision-head">
+        <p class="kicker fount-k">${bi("A letter to learners", "致每一个正在学习的人")}</p>
+        <h2 class="ab-neq" id="about-letter-title">${bi("Keep <i>asking.</i>", "请继续<i>提问。</i>")}</h2>
+      </div>
+      <figure class="ab-reel" data-film data-cues="${esc(JSON.stringify(FILM_CUES))}">
+        <div class="ab-screen">
+          <video preload="none" playsinline poster="../assets/about/vision-poster.webp" data-poster-m="../assets/about/vision-poster-m.webp" width="1920" height="1080" aria-describedby="about-film-desc" ${attr2("aria-label", "Film: Keep asking", "短片：请继续提问")}>
+            <source src="../assets/about/vision.webm" type='video/webm; codecs="av01.0.08M.10"'>
+            <source src="../assets/about/vision.mp4" type="video/mp4">
+            <track kind="subtitles" srclang="en" label="English" src="../assets/about/vision.en.vtt">
+            <track kind="subtitles" srclang="zh-CN" label="中文" src="../assets/about/vision.zh.vtt">
+          </video>
+          <p class="ab-sub" aria-hidden="true"></p>
+          <button type="button" class="ab-play" data-play ${attr2("aria-label", "Play the film (42 seconds, no sound)", "播放短片（42 秒，无声）")}><span>${PLAY}</span></button>
+        </div>
+        <figcaption class="kicker"><span><b>${bi("Film", "短片")}</b> · ${bi(`42 seconds · silent · plays only when you press it. Every line is from the letter below. ${esc(RENDERED[0])}`, `42 秒 · 无声 · 按下才播放。片中每一句都出自下面这封信。${esc(RENDERED[1])}`)}</span><span class="visually-hidden" id="about-film-desc">${bi(esc(FILM_ALT[0]), esc(FILM_ALT[1]))}</span></figcaption>
+      </figure>
+      <div class="ab-letter" id="about-letter-body">
+        ${p(LETTER.salutation, "ab-letter-salute")}
+        ${LETTER.open.map((x) => p(x)).join("\n        ")}
+        <ol class="ab-hopes">
+          ${LETTER.hopes.map(([n, h, t]) => `<li><span class="n">${bi(n[0], n[1])}</span><h3>${bi(esc(h[0]), esc(h[1]))}</h3>${p(t)}</li>`).join("\n          ")}
+        </ol>
+        ${p(LETTER.honest, "ab-letter-honest")}
+        ${LETTER.close.map((x) => p(x)).join("\n        ")}
+        ${p(LETTER.sign, "ab-letter-sign")}
+        <p class="ab-letter-ps">${bi(esc(LETTER.ps[0]).replace("ask us", `<a href="../contact/index.html">ask us</a>`), esc(LETTER.ps[1]).replace("欢迎来问我们", `<a href="../contact/index.html">欢迎来问我们</a>`))}</p>
+      </div>
+    </div>
+  </section>`;
+}
+
 function aboutPage() {
   const modelStatus = models.available
     ? [formatPublicCount(models.entries.length, "modelRuns", "en"), formatPublicCount(models.entries.length, "modelRuns", "zh-CN")]
@@ -152,6 +225,8 @@ function aboutPage() {
     </div>
   </section>
 
+  ${visionSection()}
+
   <section class="wrap ab-row" aria-labelledby="about-status-title">
     <div>
       <p class="kicker">${biE("Where we are now")}</p>
@@ -185,7 +260,7 @@ function aboutPage() {
     </div>
   </section>
 </main>`;
-  return frame({ prefix: "../", title: "About — Teachometry", titleZh: Z("About — Teachometry"), description: "Teachometry measures observable AI tutoring behavior, not merely whether a model produces a correct answer.", body, current: "about", css: ["journal.css", "about.css"] });
+  return frame({ prefix: "../", title: "About — Teachometry", titleZh: Z("About — Teachometry"), description: "Teachometry measures observable AI tutoring behavior, not merely whether a model produces a correct answer.", body, current: "about", css: ["journal.css", "about.css"], scripts: ["about.js"] });
 }
 
 function boundaryList(items) {

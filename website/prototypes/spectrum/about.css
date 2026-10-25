@@ -218,3 +218,43 @@ html[data-lang="zh"] .ab .essay-title em, html[data-lang="zh"] .cm .essay-title 
 html[data-lang="zh"] .ab-side-note em, html[data-lang="zh"] .ab-quote { font-style: normal; }
 html[data-lang="zh"] .ab .essay-title em, html[data-lang="zh"] .cm .essay-title em, html[data-lang="zh"] .ct .essay-title em { color: var(--lead); }
 html[data-lang="zh"] .ab-head .essay-title { font-size: clamp(40px, 6.4vw, 96px); line-height: 1.08; }
+
+/* ===================================================== About · the vision film and the letter */
+.ab-vision { padding-block: clamp(48px, 6vw, 96px); border-top: 1px solid var(--ink); }
+.ab-vision-head { display: grid; gap: 10px; margin-bottom: clamp(24px, 3vw, 40px); }
+.ab-reel { margin: 0; }
+.ab-screen { position: relative; aspect-ratio: 16 / 9; max-width: 100%; overflow: hidden; background: var(--frame); border: clamp(6px, .8vw, 12px) solid var(--frame); border-radius: 3px; box-shadow: 0 40px 70px -40px rgba(14, 15, 20, .55), 0 2px 6px rgba(14, 15, 20, .16); }
+.ab-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: var(--frame); }
+.ab-screen video::cue { font-family: var(--f-text); background: rgba(14, 15, 20, .35); color: #fff; }
+.ab-sub { position: absolute; left: 0; right: 0; bottom: 15%; margin: 0; padding: 0 8%; text-align: center; color: #fff; font: 400 clamp(14px, 2vw, 24px)/1.45 var(--f-text); letter-spacing: .02em; text-shadow: 0 1px 14px rgba(20, 18, 40, .6), 0 0 2px rgba(20, 18, 40, .35); pointer-events: none; opacity: 0; transition: opacity .6s ease; text-wrap: balance; }
+.ab-sub:lang(zh-CN) { font-family: "Noto Serif SC", "Songti SC", serif; letter-spacing: .06em; }
+.ab-sub.on { opacity: 1; }
+.ab-play { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; }
+.ab-play[hidden] { display: none; }
+.ab-play span { display: grid; place-items: center; width: clamp(60px, 7vw, 84px); aspect-ratio: 1; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .85); background: rgba(30, 31, 36, .2); transition: transform .3s ease, background .3s ease; }
+.ab-play svg { width: 34%; height: auto; fill: currentColor; stroke: none; margin-left: 6%; }
+.ab-play:hover span, .ab-play:focus-visible span { transform: scale(1.06); background: rgba(30, 31, 36, .34); }
+.ab-play:focus-visible { outline: 2px solid #fff; outline-offset: -8px; }
+.ab-reel figcaption { margin-top: 14px; line-height: 1.5; max-width: 72em; }
+.ab-reel figcaption b { color: var(--lead); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .ab-sub, .ab-play span { transition: none; } }
+
+/* the letter itself, one column at reading width, set like correspondence */
+.ab-letter { max-width: 36em; margin: clamp(40px, 5vw, 72px) auto 0; font-family: var(--f-text); font-size: clamp(18px, 1.4vw, 20px); line-height: 1.7; color: var(--ink-2); }
+.ab-letter p { margin: 0 0 1.05em; text-wrap: pretty; }
+.ab-letter-salute { font-family: var(--f-display); font-style: italic; font-size: 1.45em; color: var(--ink); }
+.ab-hopes { list-style: none; margin: 1.6em 0; padding: 0; border-top: 1px solid var(--hair-2); }
+.ab-hopes li { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); column-gap: 14px; padding: 1.1em 0 .2em; border-bottom: 1px solid var(--hair-2); }
+.ab-hopes .n { grid-row: span 2; font: 400 12px/2.4 var(--f-mono); letter-spacing: .14em; color: var(--lead); }
+.ab-hopes h3 { margin: 0 0 .35em; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(24px, 2.2vw, 30px); line-height: 1.15; color: var(--ink); }
+.ab-letter-honest { padding-left: 18px; border-left: 1px solid var(--ink); font-style: italic; color: var(--ink); }
+.ab-letter-sign { margin-top: 1.6em; font-family: var(--f-display); font-size: 1.5em; color: var(--ink); text-align: right; }
+.ab-letter-ps { font: 400 15px/1.6 var(--f-ui); color: var(--ink-3); }
+.ab-letter a { color: var(--lead); text-underline-offset: 3px; }
+@media (max-width: 700px) {
+  .ab-sub { bottom: 18%; }
+  .ab-hopes li { grid-template-columns: 2.4em minmax(0, 1fr); }
+}
+
+/* Chinese numerals 一二三 are thin strokes: give them the display face and room so they read as numbers, not dashes. */
+html[data-lang="zh"] .ab-hopes .n { font: 400 clamp(20px, 1.8vw, 24px)/1.5 var(--f-display); letter-spacing: 0; }
