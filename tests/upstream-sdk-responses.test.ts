@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { randomBytes } from "node:crypto";
 import type { Server } from "node:http";
 import { resolve } from "node:path";
 import { test, type TestContext } from "node:test";
@@ -84,12 +85,14 @@ async function hostModule(name: string): Promise<HostModule> {
 
 async function startHost(context: TestContext, name: string, fixture: ReturnType<typeof oversizedResponse>) {
   const module = await hostModule(name);
+  const sessionToken = randomBytes(32).toString("hex");
   const environment = {
     OPENAI_API_KEY: "synthetic-key", OPENAI_MODEL: "synthetic-model", OPENAI_TIMEOUT_MS: "2000",
     TUTOR_MODEL_API_KEY: "synthetic-key", TUTOR_MODEL: "synthetic-model", TUTOR_MODEL_TIMEOUT_MS: "2000",
     TUTOR_MODEL_BASE_URL: "https://synthetic.invalid/v1",
     GEMINI_API_KEY: "synthetic-key", GEMINI_MODEL: "gemini-2.5-flash", GEMINI_TIMEOUT_MS: "2000",
     CANONICAL_MODEL_HOST_PORT: "0",
+    CANONICAL_MODEL_HOST_TOKEN: sessionToken,
   };
   let calls = 0;
   const logs: unknown[][] = [];
@@ -105,7 +108,7 @@ async function startHost(context: TestContext, name: string, fixture: ReturnType
   const address = server.address();
   assert.ok(address !== null && typeof address !== "string");
   const response = await fetch(`http://127.0.0.1:${address.port}/generate`, {
-    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(packet),
+    method: "POST", headers: { "content-type": "application/json", authorization: "Bearer " + sessionToken }, body: JSON.stringify(packet),
   });
   const result: unknown = await response.json();
   assert.doesNotMatch(JSON.stringify({ result, logs }), /synthetic-private-body|synthetic-key/);

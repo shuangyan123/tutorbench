@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { parseCanonicalHostSessionToken, requestRejection, rejectRequest } from "./request-security.mjs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
@@ -84,6 +85,7 @@ function validateBaseUrl(environment) {
 
 export function readConfiguration(environment = process.env) {
   return {
+    sessionToken: parseCanonicalHostSessionToken(environment.CANONICAL_MODEL_HOST_TOKEN),
     apiKey: requiredEnvironment("OPENAI_API_KEY", environment),
     model: requiredEnvironment("OPENAI_MODEL", environment),
     baseURL: validateBaseUrl(environment),
@@ -280,6 +282,10 @@ async function handleRequest(request, response, client, configuration) {
 }
 
 export async function startServer(configuration, fetchImplementation) {
+  const sessionToken = parseCanonicalHostSessionToken(configuration.sessionToken);
+  if (sessionToken === configuration.apiKey) {
+    throw new CanonicalHostConfigurationError("Host session capability must differ from the Provider credential.");
+  }
   const client = new OpenAI({
     apiKey: configuration.apiKey,
     baseURL: configuration.baseURL,
@@ -288,6 +294,8 @@ export async function startServer(configuration, fetchImplementation) {
     fetch: createBoundedFetch(fetchImplementation),
   });
   const server = createServer((request, response) => {
+    const rejection = requestRejection(request, sessionToken);
+    if (rejection) { rejectRequest(request, response, rejection); return; }
     void handleRequest(request, response, client, configuration).catch(() => {
       if (!response.headersSent) {
         sendJson(response, 500, { error: "canonical_host_failed" });

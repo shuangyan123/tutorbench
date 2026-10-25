@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { parseCanonicalHostSessionToken, requestRejection, rejectRequest } from "./request-security.mjs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
@@ -162,6 +163,7 @@ function validateBaseUrl(environment, authMode) {
 export function readConfiguration(environment = process.env) {
   const authMode = authModeEnvironment(environment);
   return {
+    sessionToken: parseCanonicalHostSessionToken(environment.CANONICAL_MODEL_HOST_TOKEN),
     authMode,
     ...(authMode === "bearer"
       ? { apiKey: requiredEnvironment("TUTOR_MODEL_API_KEY", environment) }
@@ -376,8 +378,14 @@ async function handleRequest(request, response, configuration, fetchImplementati
 }
 
 export async function startServer(configuration, fetchImplementation) {
+  const sessionToken = parseCanonicalHostSessionToken(configuration.sessionToken);
+  if (sessionToken === configuration.apiKey) {
+    throw new CanonicalHostConfigurationError("Host session capability must differ from the Provider credential.");
+  }
   const fetcher = createBoundedFetch(fetchImplementation);
   const server = createServer((request, response) => {
+    const rejection = requestRejection(request, sessionToken);
+    if (rejection) { rejectRequest(request, response, rejection); return; }
     void handleRequest(request, response, configuration, fetcher).catch(() => {
       if (!response.headersSent) {
         sendJson(response, 500, { error: "canonical_host_failed" });
