@@ -33,10 +33,28 @@ function networkFamily(address: string): CommunityReviewNetworkFamily | undefine
   return family === 4 ? "ipv4" : family === 6 ? "ipv6" : undefined;
 }
 
+/** Normalize equivalent address spellings before matching networks and deriving source keys. */
 function normalizeNetworkAddress(address: string | undefined): string {
   if (address === undefined) return "unknown";
   const trimmed = address.trim();
-  return networkFamily(trimmed) === undefined ? "unknown" : trimmed.toLowerCase();
+  const family = networkFamily(trimmed);
+  if (family === "ipv4") return trimmed;
+  if (family !== "ipv6") return "unknown";
+  try {
+    const normalized = new URL(`http://[${trimmed}]/`).hostname.slice(1, -1);
+    // Node may report an IPv4 client as an IPv4-mapped IPv6 socket peer.
+    // Unify that form only when the embedded address is an actual IPv4 value.
+    if (normalized.startsWith("::ffff:")) {
+      const groups = normalized.slice("::ffff:".length).split(":");
+      if (groups.length === 2 && groups.every((group) => /^[0-9a-f]{1,4}$/u.test(group))) {
+        const number = (Number.parseInt(groups[0]!, 16) * 65536) + Number.parseInt(groups[1]!, 16);
+        return [24, 16, 8, 0].map((shift) => (number >>> shift) & 255).join(".");
+      }
+    }
+    return normalized;
+  } catch {
+    return "unknown";
+  }
 }
 
 function singleHeader(request: IncomingMessage, name: string): string | null | undefined {
@@ -69,7 +87,7 @@ export function parseTrustedProxyNetworks(raw: string | undefined): readonly Com
     }
     const prefixLength = Number(prefixText);
     const maximum = family === "ipv4" ? 32 : 128;
-    if (!Number.isSafeInteger(prefixLength) || prefixLength < 0 || prefixLength > maximum) {
+    if (!Number.isSafeInteger(prefixLength) || prefixLength === 0 || prefixLength > maximum) {
       throw new Error("invalid trusted proxy network");
     }
     const normalized = `${family}:${address.toLowerCase()}/${prefixLength}`;
@@ -150,7 +168,7 @@ function parseForwardedForValue(raw: string): string | undefined {
   return undefined;
 }
 
-function parseForwardedHeader(value: string): string | undefined {
+function parseForwardedHeader(value: string): readonly string[] | undefined {
   if (Buffer.byteLength(value, "utf8") > MAX_FORWARDED_HEADER_BYTES) return undefined;
   const elements = value.split(",").map((element) => element.trim());
   if (elements.length === 0 || elements.length > MAX_FORWARDED_HOPS || elements.some((element) => element.length === 0)) {
@@ -166,16 +184,31 @@ function parseForwardedHeader(value: string): string | undefined {
     if (address === undefined) return undefined;
     addresses.push(address);
   }
-  return addresses[0];
+  return addresses;
 }
 
-function parseXForwardedFor(value: string): string | undefined {
+function parseXForwardedFor(value: string): readonly string[] | undefined {
   if (Buffer.byteLength(value, "utf8") > MAX_FORWARDED_HEADER_BYTES) return undefined;
   const addresses = value.split(",").map((item) => item.trim());
   if (addresses.length === 0 || addresses.length > MAX_FORWARDED_HOPS || addresses.some((item) => networkFamily(item) === undefined)) {
     return undefined;
   }
-  return addresses[0]!.toLowerCase();
+  return addresses;
+}
+
+/** Follow only configured trusted hops, starting at the actual socket peer. */
+function verifiedForwardingSource(
+  peer: string,
+  chain: readonly string[],
+  networks: readonly CommunityReviewTrustedProxyNetwork[],
+): string {
+  const isTrusted = trustedProxyMatcher(networks);
+  let current = peer;
+  for (let index = chain.length - 1; index >= 0 && isTrusted(current); index -= 1) {
+    current = normalizeNetworkAddress(chain[index]);
+    if (current === "unknown") return peer;
+  }
+  return current;
 }
 
 /** Resolve a network address without trusting forwarding headers by default. */
@@ -192,9 +225,16 @@ export function resolveClientNetworkAddress(
   if (forwarded === null || xForwardedFor === null || xRealIp === null) return peer;
   const supplied = [forwarded, xForwardedFor, xRealIp].filter((value): value is string => value !== undefined);
   if (supplied.length !== 1) return peer;
-  if (forwarded !== undefined) return parseForwardedHeader(forwarded) ?? peer;
-  if (xForwardedFor !== undefined) return parseXForwardedFor(xForwardedFor) ?? peer;
-  return networkFamily(xRealIp!) === undefined ? peer : xRealIp!.toLowerCase();
+  if (forwarded !== undefined) {
+    const chain = parseForwardedHeader(forwarded);
+    return chain === undefined ? peer : verifiedForwardingSource(peer, chain, networks);
+  }
+  if (xForwardedFor !== undefined) {
+    const chain = parseXForwardedFor(xForwardedFor);
+    return chain === undefined ? peer : verifiedForwardingSource(peer, chain, networks);
+  }
+  // A single X-Real-IP value does not prove that a proxy overwrote caller input.
+  return peer;
 }
 
 function applicationCorsEndpoint(route: string): { readonly method: "POST"; readonly headers: string } | undefined {

@@ -38,11 +38,29 @@ bounded, validated network allowlist. No Railway CIDR is hardcoded or inferred
 from a provider log sample.
 
 Trusted-proxy mode accepts one unambiguous, bounded forwarding representation:
-an IP-only `Forwarded` chain, an IP-only `X-Forwarded-For` chain, or one
-`X-Real-IP` value. Conflicting, duplicated, malformed, oversized, or
+an IP-only `Forwarded` chain or an IP-only `X-Forwarded-For` chain.
+Starting at the actual socket peer, it walks the chain right-to-left only
+through explicitly trusted CIDRs and selects the first untrusted hop. Any
+left-side client-supplied prefix beyond that boundary is ignored. A lone
+`X-Real-IP` is **not** accepted as source identity: without an independently
+verified overwrite-only proxy contract its provenance cannot be established,
+so it falls back to the socket peer. Deployments that previously relied only
+on `X-Real-IP` may group separate callers into a shared peer rate-limit bucket;
+verify the ingress forwarding contract before enabling trusted-proxy mode.
+Equivalent IPv6 spellings and IPv4-mapped IPv6 addresses are canonicalized
+before source limiting. A trusted-proxy CIDR covering all addresses
+(`0.0.0.0/0` or `::/0`) is rejected during configuration rather than treating
+untrusted client hops as proxies. Other broad CIDRs require operator review.
+Conflicting, duplicated, malformed, oversized, or
 obfuscated values safely fall back to the connecting peer. Host and forwarded
 host headers are not used for authentication, authorization, redirects,
 applicant identity, or origin configuration.
+
+NV-01 was reproduced offline when a trusted appending proxy retained a
+caller-controlled left prefix. The trust-chain fix does not establish the
+current Railway forwarding behavior, deployed revision or proxy CIDRs.
+Production applicability remains **NEEDS VERIFICATION**, and the public
+application launch gate remains blocked.
 
 The application limiter derives a fixed-length HMAC key with a random
 process-local salt. The raw network address is not stored in the limiter map,
