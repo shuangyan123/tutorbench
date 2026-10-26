@@ -177,6 +177,8 @@ test("exposure configuration rejects wildcards and insecure production origins",
   assert.deepEqual(parseTrustedProxyNetworks(undefined), []);
   assert.deepEqual(parseApplicationCorsOrigins(undefined, true), []);
   assert.throws(() => parseTrustedProxyNetworks("proxy.example.invalid/32"));
+  assert.throws(() => parseTrustedProxyNetworks("0.0.0.0/0"));
+  assert.throws(() => parseTrustedProxyNetworks("::/0"));
   assert.throws(() => parseApplicationCorsOrigins("*", true));
   assert.throws(() => parseApplicationCorsOrigins("http://apply.example.invalid", true));
   assert.deepEqual(parseApplicationCorsOrigins("https://apply.example.invalid/", true), [
