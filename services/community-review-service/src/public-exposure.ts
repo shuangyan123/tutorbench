@@ -87,7 +87,7 @@ export function parseTrustedProxyNetworks(raw: string | undefined): readonly Com
     }
     const prefixLength = Number(prefixText);
     const maximum = family === "ipv4" ? 32 : 128;
-    if (!Number.isSafeInteger(prefixLength) || prefixLength < 0 || prefixLength > maximum) {
+    if (!Number.isSafeInteger(prefixLength) || prefixLength === 0 || prefixLength > maximum) {
       throw new Error("invalid trusted proxy network");
     }
     const normalized = `${family}:${address.toLowerCase()}/${prefixLength}`;
