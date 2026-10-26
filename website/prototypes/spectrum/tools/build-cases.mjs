@@ -11,7 +11,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import process from "node:process";
 import { join } from "node:path";
-import { PROTO, REPO, esc, Z, Zor, bi, biE, biPE, frame, RENDERED } from "./site-kit.mjs";
+import { PROTO, REPO, esc, Z, Zor, bi, biE, biPE, frame } from "./site-kit.mjs";
 
 const L = await import(join(REPO, "dist/src/site/public-localization.js"));
 const F = await import(join(REPO, "dist/src/site/public-localization-formatters.js"));
@@ -97,7 +97,7 @@ function libraryPage(cover) {
       </div>
       <figure class="cover-plate">
         <img src="../../assets/cases/${cover.file}" alt="${esc(cover.alt[0])}" width="900" height="1100" data-alt-en="${esc(cover.alt[0])}" data-alt-zh="${esc(cover.alt[1])}">
-        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc(cover.cap[0] + " " + RENDERED[0]), esc(cover.cap[1] + RENDERED[1]))}</figcaption>
+        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc(cover.cap[0]), esc(cover.cap[1]))}</figcaption>
       </figure>
     </div>
   </header>

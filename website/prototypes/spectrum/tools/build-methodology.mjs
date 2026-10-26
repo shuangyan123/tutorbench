@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import process from "node:process";
 import { join } from "node:path";
-import { PROTO, REPO, esc, Z, bi, biE, biPE, frame, RENDERED } from "./site-kit.mjs";
+import { PROTO, REPO, esc, Z, bi, biE, biPE, frame } from "./site-kit.mjs";
 
 const benchmark = JSON.parse(readFileSync(join(REPO, "website/dist/public-data/benchmark.json"), "utf8"));
 const GITHUB = "https://github.com/shuangyan123/tutorbench";
@@ -141,7 +141,7 @@ const main = `<main id="main">
       </div>
       <figure class="cover-plate">
         <img src="../assets/method/gauge-blocks.webp" alt="Steel gauge blocks on a black granite surface plate; four of them are wrung together into one column." width="900" height="1100" data-alt-en="Steel gauge blocks on a black granite surface plate; four of them are wrung together into one column." data-alt-zh="黑色花岗岩平板上的钢制量块，其中四块研合成一根立柱。">
-        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc("Four steel blocks wrung into one length: 50 + 20 + 1.4 + 1.005 = 72.405 mm. " + RENDERED[0]), esc("四块钢制量块研合成一段长度：50 + 20 + 1.4 + 1.005 = 72.405 毫米。" + RENDERED[1]))}</figcaption>
+        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc("Four steel blocks wrung into one length: 50 + 20 + 1.4 + 1.005 = 72.405 mm."), esc("四块钢制量块研合成一段长度：50 + 20 + 1.4 + 1.005 = 72.405 毫米。"))}</figcaption>
       </figure>
     </div>
   </header>

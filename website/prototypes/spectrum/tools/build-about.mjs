@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import process from "node:process";
 import { join } from "node:path";
-import { PROTO, REPO, esc, Z, Zor, bi, biE, biPE, frame, RENDERED } from "./site-kit.mjs";
+import { PROTO, REPO, esc, Z, Zor, bi, biE, biPE, frame } from "./site-kit.mjs";
 
 const { formatPublicCount } = await import(join(REPO, "dist/src/site/public-localization-formatters.js"));
 const { publicArtifactNotice } = await import(join(REPO, "dist/src/site/public-localization.js"));
@@ -126,7 +126,7 @@ function visionSection() {
           <p class="ab-sub" aria-hidden="true"></p>
           <button type="button" class="ab-play" data-play ${attr2("aria-label", "Play the film (42 seconds, no sound)", "播放短片（42 秒，无声）")}><span>${PLAY}</span></button>
         </div>
-        <figcaption class="kicker"><span><b>${bi("Film", "短片")}</b> · ${bi(`42 seconds · silent · plays only when you press it. Every line is from the letter below. ${esc(RENDERED[0])}`, `42 秒 · 无声 · 按下才播放。片中每一句都出自下面这封信。${esc(RENDERED[1])}`)}</span><span class="visually-hidden" id="about-film-desc">${bi(esc(FILM_ALT[0]), esc(FILM_ALT[1]))}</span></figcaption>
+        <figcaption class="kicker"><span><b>${bi("Film", "短片")}</b> · ${bi(`42 seconds, silent. Every line is from the letter below.`, `42 秒，无声。片中每一句都出自下面这封信。`)}</span><span class="visually-hidden" id="about-film-desc">${bi(esc(FILM_ALT[0]), esc(FILM_ALT[1]))}</span></figcaption>
       </figure>
       <div class="ab-letter" id="about-letter-body">
         ${p(LETTER.salutation, "ab-letter-salute")}
@@ -169,7 +169,7 @@ function aboutPage() {
       </div>
       <figure class="ab-plate">
         <img src="../assets/about/press.webp" alt="${esc(ABOUT_COVER[0])}" width="1600" height="960" data-alt-en="${esc(ABOUT_COVER[0])}" data-alt-zh="${esc(ABOUT_COVER[1])}">
-        <figcaption class="kicker"><span><b>${bi("Cover", "封面")}</b> · ${bi(`Set by hand, inked split-fountain: five inks laid side by side on one roller, so each blends into the next across the line, as the five dimensions do across one reply. ${esc(RENDERED[0])}`, `手工排字，分色墨辊上墨：五种墨并排放在同一根墨辊上，在一行字里彼此相融，正如五个维度在同一条回复里相互交织。${esc(RENDERED[1])}`)}</span></figcaption>
+        <figcaption class="kicker"><span><b>${bi("Cover", "封面")}</b> · ${bi(`Five inks on one roller, blending across the line as the five dimensions do across one reply.`, `五种墨在同一根墨辊上，沿着一行字彼此相融，正如五个维度在同一条回复里交织。`)}</span></figcaption>
       </figure>
     </div>
   </header>
@@ -299,7 +299,7 @@ function communityPage() {
       </div>
       <figure class="cover-plate">
         <img src="../assets/community/glasses.webp" alt="${esc(COMMUNITY_COVER[0])}" width="900" height="1100" data-alt-en="${esc(COMMUNITY_COVER[0])}" data-alt-zh="${esc(COMMUNITY_COVER[1])}">
-        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(`${esc(siteText("en", "communityEcosystemNoteOne"))} ${esc(siteText("en", "communityEcosystemNoteTwo"))} ${esc(RENDERED[0])}`, `${esc(siteText("zh-CN", "communityEcosystemNoteOne"))}${esc(siteText("zh-CN", "communityEcosystemNoteTwo"))}${esc(RENDERED[1])}`)}</figcaption>
+        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(`${esc(siteText("en", "communityEcosystemNoteOne"))} ${esc(siteText("en", "communityEcosystemNoteTwo"))}`, `${esc(siteText("zh-CN", "communityEcosystemNoteOne"))}${esc(siteText("zh-CN", "communityEcosystemNoteTwo"))}`)}</figcaption>
       </figure>
     </div>
   </header>
