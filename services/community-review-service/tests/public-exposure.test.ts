@@ -73,6 +73,50 @@ test("trusted proxy forwarding is strict, bounded, and conflict-safe", () => {
   ), "127.0.0.1");
 });
 
+test("NV-01: trusted proxy chain ignores untrusted prefixes and stops at first untrusted hop", () => {
+  const networks = parseTrustedProxyNetworks("127.0.0.1/32,192.0.2.10/32");
+  for (const header of ["x-forwarded-for", "forwarded"] as const) {
+    const encode = (addresses: readonly string[]) =>
+      header === "forwarded" ? addresses.map((address) => `for=${address}`).join(", ") : addresses.join(", ");
+    assert.equal(resolveClientNetworkAddress(
+      request("127.0.0.1", "POST", { [header]: encode(["198.51.100.200", "198.51.100.4"]) }),
+      networks,
+    ), "198.51.100.4");
+    assert.equal(resolveClientNetworkAddress(
+      request("127.0.0.1", "POST", { [header]: encode(["198.51.100.200", "198.51.100.4", "192.0.2.10"]) }),
+      networks,
+    ), "198.51.100.4");
+  }
+});
+
+test("NV-01: direct mode, malformed chains, and ambiguous X-Real-IP fail conservatively", () => {
+  const trusted = parseTrustedProxyNetworks("127.0.0.1/32");
+  assert.equal(resolveClientNetworkAddress(
+    request("127.0.0.1", "POST", { "x-real-ip": "198.51.100.45" }),
+    trusted,
+  ), "127.0.0.1");
+  assert.equal(resolveClientNetworkAddress(
+    request("127.0.0.1", "POST", { "x-forwarded-for": "198.51.100.7,garbage" }),
+    trusted,
+  ), "127.0.0.1");
+  assert.equal(resolveClientNetworkAddress(
+    request("203.0.113.9", "POST", { "x-forwarded-for": "198.51.100.7" }),
+    trusted,
+  ), "203.0.113.9");
+});
+
+test("NV-01: equivalent IPv6 and IPv4-mapped addresses produce one source identity", () => {
+  const trusted = parseTrustedProxyNetworks("127.0.0.1/32");
+  const from = (value: string) => resolveClientNetworkAddress(
+    request("127.0.0.1", "POST", { "x-forwarded-for": value }), trusted,
+  );
+  assert.equal(from("2001:0DB8:0:0:0:0:0:1"), from("2001:db8::1"));
+  assert.equal(from("::ffff:192.0.2.1"), from("192.0.2.1"));
+  assert.equal(resolveClientNetworkAddress(
+    request("::ffff:127.0.0.1", "POST", { "x-forwarded-for": "198.51.100.9" }), trusted,
+  ), "198.51.100.9");
+});
+
 test("CORS policy is exact, application-only, and disabled by an empty allowlist", () => {
   const disabled = { allowedOrigins: [], maxAgeSeconds: 300 } as const;
   assert.deepEqual(
