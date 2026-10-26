@@ -48,7 +48,10 @@ so it falls back to the socket peer. Deployments that previously relied only
 on `X-Real-IP` may group separate callers into a shared peer rate-limit bucket;
 verify the ingress forwarding contract before enabling trusted-proxy mode.
 Equivalent IPv6 spellings and IPv4-mapped IPv6 addresses are canonicalized
-before source limiting. Conflicting, duplicated, malformed, oversized, or
+before source limiting. A trusted-proxy CIDR covering all addresses
+(`0.0.0.0/0` or `::/0`) is rejected during configuration rather than treating
+untrusted client hops as proxies. Other broad CIDRs require operator review.
+Conflicting, duplicated, malformed, oversized, or
 obfuscated values safely fall back to the connecting peer. Host and forwarded
 host headers are not used for authentication, authorization, redirects,
 applicant identity, or origin configuration.
