@@ -12,6 +12,15 @@
 //     ("N/A" / "不适用", one line each), caption, footer and controls inside
 //     their own boxes without overlapping, across widths, text sizes, case
 //     switching and keyboard tab changes.
+//   - the Home opening letter (scripts/website-letter-checks.mjs): layout and
+//     real hits at 320-1440 px with normal and doubled text, every line of
+//     letter text measured as a text Range, contrast, first and repeat
+//     visits, Skip, Escape, keyboard, a full read, the Home entry,
+//     Back/Forward (also back to back, with late close events), the
+//     back/forward cache, a missing letter.js, full storage, reduced motion;
+//     without JavaScript Home is reachable directly.
+// The header, homepage-path and case-card checks model a returning visitor (the
+// letter already delivered), because the letter is a separate one-time layer.
 // Scenarios cover 1024/1100/1440 px, English and zh-CN, and a 200% text
 // simulation (every element's computed font size doubled), where the homepage
 // buttons used to overlap and the 1024 px header placed About/Blog under the
@@ -25,6 +34,7 @@ import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { findBrowser, launchBrowser, openPage } from "./website-browser.mjs";
+import { runLetterChecks } from "./website-letter-checks.mjs";
 
 const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp", ".ico": "image/x-icon", ".json": "application/json", ".woff2": "font/woff2" };
 
@@ -47,6 +57,9 @@ export function serve(root) {
   });
   return new Promise((done, fail) => { server.once("error", fail); server.listen(0, "127.0.0.1", () => done(server)); });
 }
+
+const LETTER_KEY = "teachometry-letter-v1";
+const RETURNING_VISITOR = `try { localStorage.setItem(${JSON.stringify(LETTER_KEY)}, "1"); } catch { /* storage is optional */ }`;
 
 // --- Functions below run inside the page (serialised with Function#toString). ---
 /* global document, getComputedStyle, innerWidth, innerHeight, requestAnimationFrame */
@@ -180,6 +193,20 @@ function focusFirstTab() {
   return true;
 }
 
+// A letter control owns the centre and the points just inside each edge.
+function letterControlProbe(selector) {
+  const el = document.querySelector(selector);
+  if (!el) return { count: 0, problems: [`${selector} missing`] };
+  const r = el.getBoundingClientRect();
+  const points = [["center", r.left + r.width / 2, r.top + r.height / 2], ["left", r.left + 4, r.top + r.height / 2], ["right", r.right - 4, r.top + r.height / 2], ["top", r.left + r.width / 2, r.top + 3], ["bottom", r.left + r.width / 2, r.bottom - 3]];
+  const problems = [];
+  for (const [name, x, y] of points) {
+    const hit = document.elementFromPoint(x, y);
+    if (!(hit === el || el.contains(hit))) problems.push(`${selector} @${name} -> ${hit?.outerHTML.slice(0, 60) ?? "nothing"}`);
+  }
+  return { count: points.length, problems };
+}
+
 async function locateTarget(selector, index) {
   const pointsOf = (r) => [["center", r.left + r.width / 2, r.top + r.height / 2], ["left", r.left + 4, r.top + r.height / 2], ["right", r.right - 4, r.top + r.height / 2], ["top", r.left + r.width / 2, r.top + 3], ["bottom", r.left + r.width / 2, r.bottom - 3]];
   const el = [...document.querySelectorAll(selector)].filter((x) => x.getBoundingClientRect().width > 0)[index];
@@ -217,11 +244,13 @@ export async function runHitTest(directory, executable = findBrowser()) {
   const errors = [];
   const diagnostics = new Set();
   let checks = 0;
+  let letter = null;
   try {
     server = await serve(directory);
     browser = await launchBrowser(executable);
     const origin = `http://127.0.0.1:${server.address().port}`;
     const page = await openPage(browser);
+    const { identifier: returningVisitor } = await page.send("Page.addScriptToEvaluateOnNewDocument", { source: RETURNING_VISITOR });
     // Header: every visible control owns its own points, on several pages.
     for (const width of [1023, 1024, 1100, 1440]) {
       await page.viewport(width, 900);
@@ -287,8 +316,20 @@ export async function runHitTest(directory, executable = findBrowser()) {
         checks += 1;
       }
     }
+    // Home opening letter (scripts/website-letter-checks.mjs), from a first visit on.
+    await page.send("Page.removeScriptToEvaluateOnNewDocument", { identifier: returningVisitor });
+    letter = await runLetterChecks(page, origin, failures, diagnostics);
+
     // 无脚本时必须使用可完整阅读的静态布局，而非猜测多行 Header 的高度。
     await page.setJavaScriptEnabled(false);
+    for (const home of ["/", "/zh-cn/"]) {
+      await page.viewport(1440, 900);
+      await page.goto(origin + home);
+      const { count, problems } = await page.call(letterControlProbe, ".home-actions a.button-primary");
+      checks += count;
+      problems.forEach((problem) => failures.push(`no-JS ${home}: ${problem}`));
+      if (await page.evaluate("getComputedStyle(document.querySelector('.home-letter-entry')).display") !== "none") failures.push(`no-JS ${home}: letter entry must stay hidden`);
+    }
     for (const width of [1100, 1101, 1200]) {
       await page.viewport(width, 700);
       for (const path of ["/methodology/", "/zh-cn/methodology/"]) {
@@ -314,13 +355,16 @@ export async function runHitTest(directory, executable = findBrowser()) {
   }
   if (errors.length) throw new AggregateError(errors, "Website hit test or cleanup failed");
   for (const note of diagnostics) console.warn(`Diagnostic: ${note}`);
+  if (letter) {
+    console.log(`Letter checks: ${letter.assertions} assertions, ${letter.hitPoints} elementFromPoint hit points, ${letter.clicks} real mouse clicks, ${letter.keys} key presses; ${letter.raceRuns} fast Back/Forward runs and ${letter.heldCloseEvents} close events delivered late on purpose; back/forward cache: ${letter.bfcache}.`);
+  }
 
   if (failures.length > 0) {
     console.error(`Website hit test failed (${failures.length}):`);
     failures.forEach((failure) => console.error(`  - ${failure}`));
     throw new Error(`Website hit test failed (${failures.length})`);
   }
-  console.log(`Website hit test passed: ${checks} controls and clicks checked.`);
+  console.log(`Website hit test passed: ${checks} header, homepage-path, case-card and no-JavaScript checks (hit points, click destinations and layout probes), plus the letter checks above.`);
 }
 
 if (resolve(process.argv[1] ?? "") === fileURLToPath(import.meta.url)) {

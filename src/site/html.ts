@@ -60,6 +60,8 @@ export interface SitePage {
   readonly description: string;
   readonly route: string;
   readonly content: string;
+  /** Markup placed before the header, such as Home's opening letter dialog. */
+  readonly prelude?: string;
   readonly seo?: SitePageSeo;
 }
 
@@ -719,6 +721,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/styles.css"))}">
     ${isTeachometryPage || isMicroReviewPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/teachometry.css"))}">${isMicroReviewPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/micro-review.css"))}"><script src="${escapeHtml(sitePath(basePath, "/assets/micro-review.js"))}" defer></script>` : ""}` : ""}
     ${usesHomeStyles ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/home.css"))}">` : ""}
+    ${page.route === "/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/letter.css"))}">` : ""}
     ${page.route === "/data/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/benchmark.css"))}">` : ""}
     ${page.route === "/methodology/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/methodology.css"))}">` : ""}
     ${page.route === "/leaderboard/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/results.css"))}">` : ""}
@@ -735,8 +738,10 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${isNotFoundPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/not-found.css"))}">` : ""}
     ${isTeachometryPage ? `<script type="speculationrules">{"prerender":[{"source":"document","where":{"selector_matches":"a[href^='/']"},"eagerness":"moderate"}]}</script>` : ""}
     <script src="${escapeHtml(sitePath(basePath, "/assets/site.js"))}" defer></script>
+    ${page.route === "/" ? `<script src="${escapeHtml(sitePath(basePath, "/assets/letter.js"))}" defer></script>` : ""}
   </head>
   <body${bodyClass}>
+    ${page.prelude ?? ""}
     <a class="skip-link" href="#main-content">Skip to content</a>
     ${renderHeader(page.route, basePath, locale, localizedRoutes)}
     <main id="main-content">${page.content}</main>
