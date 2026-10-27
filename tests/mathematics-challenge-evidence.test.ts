@@ -25,7 +25,7 @@ test("20 mathematics checkpoints parse and evidence covers every authored learne
   validateMathChallengeCoverage(evidence, suite);
   const dataset = tutorScenarioSuiteToTutorEvalDataset(suite);
   assert.equal(dataset.cases.length, 20);
-  assert.equal(new Set(dataset.cases.map(x => x.id)).size, 6);
+  assert.equal(new Set(dataset.cases.map(x => x.id)).size, 20);
   for (const scenario of suite.scenarios) {
     assert.equal(scenario.decisionPoints.length, 1);
     assert.equal(scenario.decisionPoints[0]?.evaluationCriteria.length, 2);
