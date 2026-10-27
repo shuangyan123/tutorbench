@@ -1,0 +1,522 @@
+{
+  "schemaVersion": 1,
+  "id": "mathematics-knowledge-map-v0.1",
+  "version": "0.1.0",
+  "status": "author-proposed-uncalibrated",
+  "scope": "School mathematics through selected introductory university topics; proposed instructional prerequisites are not mandatory curriculum sequence or an ability hierarchy.",
+  "sources": [
+    {
+      "label": "PISA 2022 mathematics framework",
+      "url": "https://www.oecd.org/en/publications/pisa-2022-assessment-and-analytical-framework_dfe0bf9c-en/full-report/component-3.html",
+      "use": "Four content-phenomenon families and distinction between content and mathematical processes."
+    },
+    {
+      "label": "TIMSS 2023 mathematics framework",
+      "url": "https://timssandpirls.bc.edu/timss2023/frameworks/index.html",
+      "use": "Grade-relative content domains and knowing/applying/reasoning cognition; not a global difficulty scale."
+    }
+  ],
+  "domains": [
+    {
+      "id": "number-quantity",
+      "label": "Numbers, quantities and proportional reasoning",
+      "pisaContent": "quantity"
+    },
+    {
+      "id": "algebra-equations",
+      "label": "Algebra and equations",
+      "pisaContent": "change-and-relationships"
+    },
+    {
+      "id": "functions",
+      "label": "Functions and change",
+      "pisaContent": "change-and-relationships"
+    },
+    {
+      "id": "geometry",
+      "label": "Geometry and spatial reasoning",
+      "pisaContent": "space-and-shape"
+    },
+    {
+      "id": "discrete-probability",
+      "label": "Counting and probability",
+      "pisaContent": "uncertainty-and-data"
+    },
+    {
+      "id": "statistics",
+      "label": "Statistics and data interpretation",
+      "pisaContent": "uncertainty-and-data"
+    },
+    {
+      "id": "proof-structures",
+      "label": "Proof, logic and generalization",
+      "pisaContent": "cross-cutting"
+    },
+    {
+      "id": "advanced-mathematics",
+      "label": "Introductory calculus and linear algebra",
+      "pisaContent": "cross-cutting"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "units-whole",
+      "domainId": "number-quantity",
+      "label": "Whole and unit reference",
+      "stage": "primary",
+      "prerequisiteIds": [],
+      "commonMisconception": "Changing the reference whole while comparing or combining fractions"
+    },
+    {
+      "id": "integers-operations",
+      "domainId": "number-quantity",
+      "label": "Integer operations",
+      "stage": "primary",
+      "prerequisiteIds": [],
+      "commonMisconception": "Applying a sign rule without checking the operation"
+    },
+    {
+      "id": "fractions-units",
+      "domainId": "number-quantity",
+      "label": "Fractional units and denominators",
+      "stage": "primary",
+      "prerequisiteIds": [
+        "units-whole"
+      ],
+      "commonMisconception": "Adding numerator and denominator independently"
+    },
+    {
+      "id": "fraction-equivalence",
+      "domainId": "number-quantity",
+      "label": "Equivalent fractions and shared units",
+      "stage": "primary",
+      "prerequisiteIds": [
+        "fractions-units",
+        "integers-operations"
+      ],
+      "commonMisconception": "Treating unequal-size parts as directly additive"
+    },
+    {
+      "id": "ratios",
+      "domainId": "number-quantity",
+      "label": "Ratios and proportional relationships",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "fractions-units"
+      ],
+      "commonMisconception": "Confusing ratio with additive difference"
+    },
+    {
+      "id": "percent-base",
+      "domainId": "number-quantity",
+      "label": "Percent as a fraction of a base",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "ratios"
+      ],
+      "commonMisconception": "Using the wrong reference base after a change"
+    },
+    {
+      "id": "successive-changes",
+      "domainId": "number-quantity",
+      "label": "Successive multiplicative changes",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "percent-base"
+      ],
+      "commonMisconception": "Assuming successive equal percentage changes cancel"
+    },
+    {
+      "id": "variable-symbols",
+      "domainId": "algebra-equations",
+      "label": "Variables, expressions and equivalence",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "integers-operations"
+      ],
+      "commonMisconception": "Treating = as a command rather than an invariant"
+    },
+    {
+      "id": "linear-equations",
+      "domainId": "algebra-equations",
+      "label": "Linear equations and inverse operations",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "variable-symbols"
+      ],
+      "commonMisconception": "Changing one side without preserving equality"
+    },
+    {
+      "id": "polynomial-factorization",
+      "domainId": "algebra-equations",
+      "label": "Expansion and factorization",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "variable-symbols"
+      ],
+      "commonMisconception": "Memorizing structure without justifying valid transformations"
+    },
+    {
+      "id": "rational-domain",
+      "domainId": "algebra-equations",
+      "label": "Rational expressions and excluded values",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "polynomial-factorization",
+        "linear-equations"
+      ],
+      "commonMisconception": "Cancelling a zero factor and admitting an excluded root"
+    },
+    {
+      "id": "inequality-signs",
+      "domainId": "algebra-equations",
+      "label": "Inequality transformations and signs",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "linear-equations"
+      ],
+      "commonMisconception": "Multiplying by a negative number without reversing direction"
+    },
+    {
+      "id": "quadratic-discriminant",
+      "domainId": "algebra-equations",
+      "label": "Quadratic roots and discriminant",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "polynomial-factorization"
+      ],
+      "commonMisconception": "Mistaking existence of real roots for an extra sign condition"
+    },
+    {
+      "id": "root-sign-conditions",
+      "domainId": "algebra-equations",
+      "label": "Positive and negative root conditions",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "quadratic-discriminant",
+        "inequality-signs"
+      ],
+      "commonMisconception": "Confusing necessary and sufficient root constraints"
+    },
+    {
+      "id": "coordinate-graph",
+      "domainId": "functions",
+      "label": "Coordinate graphs",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "variable-symbols"
+      ],
+      "commonMisconception": "Reading the horizontal value as the output"
+    },
+    {
+      "id": "function-definition",
+      "domainId": "functions",
+      "label": "Functions as mappings and domains",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "coordinate-graph"
+      ],
+      "commonMisconception": "Assuming every symbolic expression accepts all real inputs"
+    },
+    {
+      "id": "function-composition",
+      "domainId": "functions",
+      "label": "Function composition and domain restrictions",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "function-definition",
+        "rational-domain"
+      ],
+      "commonMisconception": "Checking only the outer expression and ignoring inner domain"
+    },
+    {
+      "id": "inverse-functions",
+      "domainId": "functions",
+      "label": "Inverse functions and one-to-one restrictions",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "function-definition"
+      ],
+      "commonMisconception": "Assuming inverse exists globally without restriction"
+    },
+    {
+      "id": "exponential-laws",
+      "domainId": "functions",
+      "label": "Exponential expressions and growth",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "function-definition",
+        "polynomial-factorization"
+      ],
+      "commonMisconception": "Using linear rather than multiplicative growth"
+    },
+    {
+      "id": "logarithm-inequalities",
+      "domainId": "functions",
+      "label": "Logarithm domain, base and inequality direction",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "exponential-laws",
+        "inequality-signs"
+      ],
+      "commonMisconception": "Ignoring domain or reversal for base in (0,1)"
+    },
+    {
+      "id": "limits-continuity",
+      "domainId": "functions",
+      "label": "Limits and continuity",
+      "stage": "university-intro",
+      "prerequisiteIds": [
+        "function-composition"
+      ],
+      "commonMisconception": "Inferring a limit solely from substitution in an undefined expression"
+    },
+    {
+      "id": "length-area",
+      "domainId": "geometry",
+      "label": "Measurements of length and area",
+      "stage": "primary",
+      "prerequisiteIds": [
+        "units-whole"
+      ],
+      "commonMisconception": "Confusing a linear scale factor with an area factor"
+    },
+    {
+      "id": "angles-triangles",
+      "domainId": "geometry",
+      "label": "Angles and triangle properties",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "length-area"
+      ],
+      "commonMisconception": "Assuming a diagram proves a property"
+    },
+    {
+      "id": "similarity-scale",
+      "domainId": "geometry",
+      "label": "Similarity, length and area scale",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "angles-triangles",
+        "ratios"
+      ],
+      "commonMisconception": "Applying similarity ratio directly to areas"
+    },
+    {
+      "id": "pythagoras",
+      "domainId": "geometry",
+      "label": "Right triangle and distance",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "angles-triangles"
+      ],
+      "commonMisconception": "Assuming a theorem's conditions without checking right angles"
+    },
+    {
+      "id": "coordinate-geometry",
+      "domainId": "geometry",
+      "label": "Lines, circles and coordinate constraints",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "coordinate-graph",
+        "pythagoras",
+        "quadratic-discriminant"
+      ],
+      "commonMisconception": "Confusing passing through a point with tangency"
+    },
+    {
+      "id": "trigonometry",
+      "domainId": "geometry",
+      "label": "Trigonometric definitions and geometry",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "similarity-scale",
+        "pythagoras"
+      ],
+      "commonMisconception": "Using right-triangle identities outside their scope"
+    },
+    {
+      "id": "counting-principle",
+      "domainId": "discrete-probability",
+      "label": "Multiplication, permutations and unordered choices",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "integers-operations"
+      ],
+      "commonMisconception": "Double counting indistinguishable arrangements"
+    },
+    {
+      "id": "combinations",
+      "domainId": "discrete-probability",
+      "label": "Combinations and counting without order",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "counting-principle",
+        "fractions-units"
+      ],
+      "commonMisconception": "Treating ordered draws as unordered without adjusting counts"
+    },
+    {
+      "id": "probability-events",
+      "domainId": "discrete-probability",
+      "label": "Events and equally likely sample spaces",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "fractions-units",
+        "counting-principle"
+      ],
+      "commonMisconception": "Using a denominator that excludes eligible outcomes"
+    },
+    {
+      "id": "conditional-events",
+      "domainId": "discrete-probability",
+      "label": "Conditional probability and restricted sample spaces",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "probability-events",
+        "combinations"
+      ],
+      "commonMisconception": "Using unconditional frequency after conditioning"
+    },
+    {
+      "id": "bayes-base-rate",
+      "domainId": "discrete-probability",
+      "label": "Base rates and inverse conditional probability",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "conditional-events"
+      ],
+      "commonMisconception": "Confusing P(test+|condition) with P(condition|test+)"
+    },
+    {
+      "id": "sequences-recursive",
+      "domainId": "proof-structures",
+      "label": "Sequences and recurrences",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "variable-symbols",
+        "exponential-laws"
+      ],
+      "commonMisconception": "Mistaking several terms for a general recurrence proof"
+    },
+    {
+      "id": "logic-quantifiers",
+      "domainId": "proof-structures",
+      "label": "Quantifiers, cases and counterexamples",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "variable-symbols"
+      ],
+      "commonMisconception": "Using one favorable example as proof of a universal claim"
+    },
+    {
+      "id": "mathematical-induction",
+      "domainId": "proof-structures",
+      "label": "Induction base and step",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "sequences-recursive",
+        "logic-quantifiers"
+      ],
+      "commonMisconception": "Performing inductive step without proving base"
+    },
+    {
+      "id": "inequality-proofs",
+      "domainId": "proof-structures",
+      "label": "Inequality proof and equality cases",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "inequality-signs",
+        "logic-quantifiers"
+      ],
+      "commonMisconception": "Using positive-only AM-GM for negative inputs"
+    },
+    {
+      "id": "statistics-weighted",
+      "domainId": "statistics",
+      "label": "Weighted averages and aggregation",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "percent-base"
+      ],
+      "commonMisconception": "Taking an unweighted average across unequal denominators"
+    },
+    {
+      "id": "statistics-conditioning",
+      "domainId": "statistics",
+      "label": "Subgroup rates and Simpson's paradox",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "statistics-weighted",
+        "conditional-events"
+      ],
+      "commonMisconception": "Treating pooled rates as comparable without checking group mix"
+    },
+    {
+      "id": "statistics-variability",
+      "domainId": "statistics",
+      "label": "Variation and distributions",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "statistics-weighted"
+      ],
+      "commonMisconception": "Comparing means without spread or sample sizes"
+    },
+    {
+      "id": "statistics-inference",
+      "domainId": "statistics",
+      "label": "Sampling and inference limitations",
+      "stage": "university-intro",
+      "prerequisiteIds": [
+        "statistics-variability",
+        "conditional-events"
+      ],
+      "commonMisconception": "Treating association as evidence of causality"
+    },
+    {
+      "id": "derivatives-rate",
+      "domainId": "advanced-mathematics",
+      "label": "Derivatives and local rates of change",
+      "stage": "university-intro",
+      "prerequisiteIds": [
+        "limits-continuity",
+        "polynomial-factorization"
+      ],
+      "commonMisconception": "Treating f'=0 as a complete global optimization procedure"
+    },
+    {
+      "id": "optimization-boundary",
+      "domainId": "advanced-mathematics",
+      "label": "Optimization and domain endpoints",
+      "stage": "university-intro",
+      "prerequisiteIds": [
+        "derivatives-rate",
+        "inequality-signs"
+      ],
+      "commonMisconception": "Ignoring boundaries or differentiability exceptions"
+    },
+    {
+      "id": "systems-equations",
+      "domainId": "advanced-mathematics",
+      "label": "Linear systems and consistency",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "linear-equations"
+      ],
+      "commonMisconception": "Assuming every pair of equations has a unique solution"
+    },
+    {
+      "id": "linear-algebra-rank",
+      "domainId": "advanced-mathematics",
+      "label": "Rank, dependence and consistency",
+      "stage": "university-intro",
+      "prerequisiteIds": [
+        "systems-equations",
+        "variable-symbols"
+      ],
+      "commonMisconception": "Ignoring linear dependence and inconsistent right-hand sides"
+    }
+  ],
+  "caseMappings": [],
+  "notes": "Case mappings are linked to independently validated task evidence; unmapped nodes mean untested coverage, not absence of a skill from mathematics."
+}
