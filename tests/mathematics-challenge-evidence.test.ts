@@ -40,16 +40,18 @@ test("six mathematics checkpoints parse and evidence covers every authored learn
   }
 });
 
+type MutableEvidence = { tasks: Array<{ anticipatedChallenge: unknown; cohort?: string; scenarioIds: string[] }> };
+
 test("challenge evidence rejects invented precision, missing fields, duplicates and untracked cases", async () => {
   const { suite, evidence } = await assets();
-  const invalid = structuredClone(evidence) as unknown as Record<string, any>;
-  invalid.tasks[0].anticipatedChallenge = 4;
+  const invalid = structuredClone(evidence) as unknown as MutableEvidence;
+  invalid.tasks[0]!.anticipatedChallenge = 4;
   assert.throws(() => parseMathChallengeEvidence(invalid), /math_challenge_evidence_invalid/);
-  const missing = structuredClone(evidence) as unknown as Record<string, any>;
-  delete missing.tasks[0].cohort;
+  const missing = structuredClone(evidence) as unknown as MutableEvidence;
+  delete missing.tasks[0]!.cohort;
   assert.throws(() => parseMathChallengeEvidence(missing), /math_challenge_evidence_invalid/);
-  const duplicate = structuredClone(evidence) as unknown as Record<string, any>;
-  duplicate.tasks[1].scenarioIds.push(duplicate.tasks[0].scenarioIds[0]);
+  const duplicate = structuredClone(evidence) as unknown as MutableEvidence;
+  duplicate.tasks[1]!.scenarioIds.push(duplicate.tasks[0]!.scenarioIds[0]!);
   assert.throws(() => parseMathChallengeEvidence(duplicate), /math_challenge_evidence_duplicate_scenario/);
   const mismatch = structuredClone(evidence) as unknown as typeof evidence;
   const edited = { ...mismatch, tasks: mismatch.tasks.map((t, i) => i === 0 ? { ...t, scenarioIds: t.scenarioIds.slice(1) } : t) };
