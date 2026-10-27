@@ -8,6 +8,8 @@ export interface MathematicsKnowledgeDomain {
   readonly id: string;
   readonly label: string;
   readonly pisaContent: PisaContentArea;
+  /** Distinguish OECD content labels from TutorBench-only extension labels. */
+  readonly classificationSource?: "pisa-content" | "tutorbench-internal";
 }
 export interface MathematicsKnowledgeNode {
   readonly id: string;
@@ -71,8 +73,11 @@ export function parseMathematicsKnowledgeMap(value: unknown): MathematicsKnowled
   const domains = new Set<string>();
   for (const value of root.domains) {
     const d = asRecord(value);
-    if (!d || !exact(d, ["id", "label", "pisaContent"]) || !validText(d.id) ||
+    if (!d || !(exact(d, ["id", "label", "pisaContent"]) ||
+        exact(d, ["id", "label", "pisaContent", "classificationSource"])) || !validText(d.id) ||
       !validText(d.label) || !pisaAreas.has(d.pisaContent as PisaContentArea) ||
+      (d.classificationSource !== undefined &&
+        d.classificationSource !== (d.pisaContent === "cross-cutting" ? "tutorbench-internal" : "pisa-content")) ||
       domains.has(d.id)) throw new Error("mathematics_knowledge_domain_invalid");
     domains.add(d.id);
   }
