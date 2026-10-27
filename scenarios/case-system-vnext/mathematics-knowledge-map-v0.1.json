@@ -224,8 +224,7 @@
       "label": "Function composition and domain restrictions",
       "stage": "upper-secondary",
       "prerequisiteIds": [
-        "function-definition",
-        "rational-domain"
+        "function-definition"
       ],
       "commonMisconception": "Checking only the outer expression and ignoring inner domain"
     },
@@ -447,8 +446,7 @@
       "label": "Subgroup rates and Simpson's paradox",
       "stage": "upper-secondary",
       "prerequisiteIds": [
-        "statistics-weighted",
-        "conditional-events"
+        "statistics-weighted"
       ],
       "commonMisconception": "Treating pooled rates as comparable without checking group mix"
     },
