@@ -157,3 +157,11 @@
 ## 国内考研与国际考试版图（2026-10 增补）
 
 最新的[考研数学（一）（二）（三）与国外主要数学考试中文版对照](mathematics-global-exam-systems-zh-cn-v0.2.md)，按官方考试机构及考试年份列明 2027考研数学、SAT、AQA GCSE、Cambridge IGCSE/AS-A Level、IB AA/AI、AP Calculus、GRE Quant 和 GMAT Quant/Data Insights。它们在一个可扩展的知识底座上运行**独立考试配置**，不得混用难度、计算器政策、题型或正式分值。详见 `scenarios/case-system-vnext/mathematics-exam-alignment-v0.1.json`。
+
+
+## 六、结构审查修订（2026-10-27）
+
+- 每个节点增加 `prerequisiteEvidence: "author-hypothesis"`，明确 61 条边均是编辑者提出的候选先修关系，绝不可据此自动诊断真实学生的知识缺陷。未来区分必需、有益及替代策略时，应先增加独立关系注册表与证据，不得把旧边默认为已验证的必需前提。
+- `limits-continuity` 的实验性学段标签与 `derivatives-rate` 对齐为高中阶段，仅指初步直观的极限与连续性概念。严格的大学实分析不在本节点范围内；不同考试的官方学段仍由各自课程配置决定。
+- 当前 `cross-cutting` 是 TutorBench 的内部辅助类别，并非 PISA 官方第五种数学内容类型。后续正式课程映射应分离官方内容分类与项目内部学科类别。
+- 本轮不追加未核实的课标节点，也不改动 20 个可执行案例的数学答案、评测条件和历史评分。
