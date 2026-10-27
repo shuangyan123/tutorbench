@@ -133,3 +133,16 @@ test("prerequisite hypotheses are never accepted as validated mastery evidence",
     for (const parent of node.prerequisiteIds)
       assert.ok(stages.get(nodes.get(parent)!.stage)! <= stages.get(node.stage)!);
 });
+
+test("cross-cutting is a TutorBench category, not an OECD PISA fifth content area", async () => {
+  const { graph } = await load();
+  assert.ok(graph.domains.every(domain =>
+    domain.classificationSource === (domain.pisaContent === "cross-cutting"
+      ? "tutorbench-internal" : "pisa-content")));
+  const invalid = structuredClone(graph) as unknown as {
+    domains: Array<{ pisaContent: string; classificationSource: string }>;
+  };
+  const extension = invalid.domains.find(domain => domain.pisaContent === "cross-cutting")!;
+  extension.classificationSource = "pisa-content";
+  assert.throws(() => parseMathematicsKnowledgeMap(invalid), /mathematics_knowledge_domain_invalid/);
+});
