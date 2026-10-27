@@ -135,3 +135,5 @@ inverse functions, trigonometry, limits, statistical inference,
 variance/distribution interpretation, and proof by counterexample independent
 of inequality exercises. Any further expansion should begin with the
 mathematics gap, not with an arbitrary number of added prompts.
+
+- 域分类新增 `classificationSource` 显式标识：官方 PISA 四大数学内容类别标为 `pisa-content`；`cross-cutting` 仅标为 `tutorbench-internal`。保留已有 `pisaContent` 字段与稳定 ID，以减少本次修复对旧读取方的破坏；后续大版本可将该字段拆成规范结构。
