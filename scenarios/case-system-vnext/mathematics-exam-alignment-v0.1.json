@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "id": "mathematics-exam-alignment-v0.1",
+  "version": "0.1.0",
+  "status": "author-proposed-unverified",
+  "purpose": "Overlay official exam constraints and locally interpreted mathematical tasks onto the knowledge map; do not replace prerequisite concepts or treat mapped tutoring checkpoints as authentic exam items.",
+  "profiles": [
+    {
+      "id": "cn-zhongkao-math-general",
+      "nameZh": "中国初中学业水平考试（中考数学）通用参考",
+      "examYear": 2026,
+      "region": "unspecified",
+      "scopeNote": "全国课程标准是范围依据，具体试卷结构、分值、考试时长与细目需按省/市当年公布的要求覆写；不能把本通用参考称为某地官方命题蓝图。",
+      "sources": [
+        {
+          "label": "教育部：义务教育课程标准（2022年版）",
+          "url": "https://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html",
+          "sourceKind": "official_curriculum",
+          "published": "2022-04-21"
+        },
+        {
+          "label": "教育部：关于做好2022年中考命题工作的通知",
+          "url": "https://www.moe.gov.cn/srcsite/A06/s3321/202204/t20220406_614237.html",
+          "sourceKind": "official_exam_guidance",
+          "published": "2022-04-06"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "中考题量、题型和时长不是全国统一常量，需落实到指定地区与年份。"
+      },
+      "modules": [
+        {
+          "id": "number-algebra",
+          "labelZh": "数与代数",
+          "nodeIds": [
+            "fractions-units",
+            "fraction-equivalence",
+            "ratios",
+            "percent-base",
+            "successive-changes",
+            "linear-equations",
+            "rational-domain",
+            "inequality-signs",
+            "quadratic-discriminant",
+            "function-definition"
+          ],
+          "caseIds": [
+            "mc-fraction-units",
+            "mc-percent-reversal",
+            "mc-rational-domain"
+          ],
+          "examRelevance": "curriculum-inferred"
+        },
+        {
+          "id": "geometry",
+          "labelZh": "图形与几何",
+          "nodeIds": [
+            "length-area",
+            "angles-triangles",
+            "similarity-scale",
+            "pythagoras",
+            "coordinate-geometry"
+          ],
+          "caseIds": [
+            "mc-similarity-area"
+          ],
+          "examRelevance": "curriculum-inferred"
+        },
+        {
+          "id": "statistics-probability",
+          "labelZh": "统计与概率",
+          "nodeIds": [
+            "statistics-weighted",
+            "probability-events",
+            "counting-principle"
+          ],
+          "caseIds": [],
+          "examRelevance": "curriculum-inferred"
+        },
+        {
+          "id": "integrated-practice",
+          "labelZh": "综合与实践",
+          "nodeIds": [
+            "ratios",
+            "percent-base",
+            "coordinate-graph",
+            "function-definition"
+          ],
+          "caseIds": [
+            "mc-percent-reversal"
+          ],
+          "examRelevance": "curriculum-inferred"
+        }
+      ],
+      "capacities": [
+        "conceptual-understanding",
+        "multi-step-reasoning",
+        "representation",
+        "transfer",
+        "written-justification"
+      ],
+      "examStrategyNote": "兼顾毕业与升学功能，基础、综合、探究、规范表述均需覆盖；不能用大量偏题怪题替代课程要求。",
+      "authoringGaps": [
+        "当地当年的数学试卷说明和考试时长未锁定",
+        "综合与实践、作图与三维几何案例仍不足",
+        "现有案例多为教学对话而非模拟中考真题"
+      ]
+    },
+    {
+      "id": "cn-gaokao-math-national-2026",
+      "nameZh": "中国普通高校招生全国统一考试（高考数学）2026全国卷参考",
+      "examYear": 2026,
+      "region": "national-paper-reference",
+      "scopeNote": "基于普通高中数学课程标准和2026年全国卷评析；地区、卷别与选考内容要区分。不是全国各省卷题型与分值的统一蓝图。",
+      "sources": [
+        {
+          "label": "教育部：普通高中课程方案和课程标准（2017年版2020年修订）",
+          "url": "https://www.moe.gov.cn/srcsite/A26/s8001/202006/t20200603_462199.html",
+          "sourceKind": "official_curriculum",
+          "published": "2020-06-03"
+        },
+        {
+          "label": "教育部：2026年高考命题特点",
+          "url": "https://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/2026/2026_zt08/mtbd/202606/t20260608_1439853.html",
+          "sourceKind": "official_exam_analysis",
+          "published": "2026-06-08"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "2026全国卷评析涉及19题等当年具体结构；不将单年题量硬编码为跨年通用约束，细节应按卷别和当年数据核验。"
+      },
+      "modules": [
+        {
+          "id": "functions-algebra",
+          "labelZh": "函数、方程与不等式",
+          "nodeIds": [
+            "quadratic-discriminant",
+            "root-sign-conditions",
+            "function-definition",
+            "function-composition",
+            "logarithm-inequalities",
+            "derivatives-rate",
+            "optimization-boundary"
+          ],
+          "caseIds": [
+            "mc-quadratic-condition",
+            "mc-quadratic-prerequisite",
+            "mc-quadratic-transfer",
+            "mc-composition-domain",
+            "mc-logarithm-base",
+            "mc-endpoint-optimization"
+          ],
+          "examRelevance": "curriculum-inferred"
+        },
+        {
+          "id": "geometry-algebra",
+          "labelZh": "几何与代数",
+          "nodeIds": [
+            "coordinate-geometry",
+            "trigonometry",
+            "pythagoras",
+            "similarity-scale",
+            "systems-equations"
+          ],
+          "caseIds": [
+            "mc-circle-tangency"
+          ],
+          "examRelevance": "curriculum-inferred"
+        },
+        {
+          "id": "probability-statistics",
+          "labelZh": "概率与统计",
+          "nodeIds": [
+            "conditional-events",
+            "combinations",
+            "statistics-weighted",
+            "statistics-variability"
+          ],
+          "caseIds": [
+            "mc-conditional-normalization",
+            "mc-conditional-prerequisite",
+            "mc-conditional-transfer"
+          ],
+          "examRelevance": "curriculum-inferred"
+        },
+        {
+          "id": "mathematical-reasoning",
+          "labelZh": "数学推理与探究",
+          "nodeIds": [
+            "logic-quantifiers",
+            "sequences-recursive",
+            "inequality-proofs",
+            "mathematical-induction"
+          ],
+          "caseIds": [
+            "mc-induction-recurrence",
+            "mc-amgm-domain"
+          ],
+          "examRelevance": "curriculum-inferred"
+        }
+      ],
+      "capacities": [
+        "conceptual-understanding",
+        "multi-step-reasoning",
+        "strategy-selection",
+        "novel-context-transfer",
+        "written-justification",
+        "calculation-efficiency"
+      ],
+      "examStrategyNote": "紧扣必修与选择性必修，强调基础结构、主干知识、分类讨论、多想少算与多路径论证；不以大学数学或竞赛偏怪题制造伪高难度。",
+      "authoringGaps": [
+        "集合、向量、复数、空间几何、随机变量和数学建模尚缺足够节点或题目",
+        "多问递进综合题没有连续对话级的充分覆盖",
+        "没有基于具体省份/全国卷别和当年真题统计进行权重校准"
+      ]
+    },
+    {
+      "id": "cn-guokao-aptitude-2027",
+      "nameZh": "2027年度国家公务员考试行测：数量关系与资料分析",
+      "examYear": 2027,
+      "region": "national",
+      "scopeNote": "基于2027年公共科目考试大纲（院校转发全文），仅覆盖行测数学相关部分；不宣称占比和单题时长均有官方固定值。",
+      "sources": [
+        {
+          "label": "2027年度国家公务员公共科目笔试考试大纲（院校转载）",
+          "url": "https://jy.slu.edu.cn/2026/1014/c557a58735/page.htm",
+          "sourceKind": "institution_republication",
+          "published": "2026-10-14"
+        },
+        {
+          "label": "2027年度国考公告（政府转载）",
+          "url": "https://shanghai.chinatax.gov.cn/tax/xxgk/rsxx/202610/t481763.html",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-10-13"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": 120,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "120分钟是整个行政职业能力测验的时限，不是数学模块专用时限；数量关系、资料分析的数量与配分未在本工程确定。"
+      },
+      "modules": [
+        {
+          "id": "quantitative-reasoning",
+          "labelZh": "数量关系（数字推理、数学运算）",
+          "nodeIds": [
+            "integers-operations",
+            "ratios",
+            "percent-base",
+            "successive-changes",
+            "linear-equations",
+            "sequences-recursive",
+            "counting-principle",
+            "probability-events"
+          ],
+          "caseIds": [
+            "mc-percent-reversal",
+            "mc-conditional-normalization"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "data-interpretation",
+          "labelZh": "资料分析（文字、表格、统计图）",
+          "nodeIds": [
+            "ratios",
+            "percent-base",
+            "successive-changes",
+            "statistics-weighted",
+            "statistics-variability"
+          ],
+          "caseIds": [
+            "mc-percent-reversal"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "data-extraction",
+        "quantity-relationships",
+        "estimation-and-check",
+        "strategy-selection",
+        "time-allocation",
+        "calculation-efficiency"
+      ],
+      "examStrategyNote": "强调正确、可解释的速算与选项校核；备考阶段可补前置概念，模拟考试阶段不得用提示代替考生独立作答。",
+      "authoringGaps": [
+        "需新增专门的基期/现期、增长率、增长量、比重、平均数、倍数、图表联合比较案例",
+        "仍无真实考试图表、选项干扰项及时间压力的组合案例",
+        "现有中学数学案例只是知识支持，不是已证实符合2027国考题型样本"
+      ]
+    }
+  ]
+}
