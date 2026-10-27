@@ -1503,7 +1503,7 @@
         ]
       },
       "teachingPolicy": {
-        "disclosure": "partial_solution"
+        "disclosure": "full_solution_allowed"
       },
       "decisionPoints": [
         {
@@ -1772,7 +1772,7 @@
         ]
       },
       "teachingPolicy": {
-        "disclosure": "partial_solution"
+        "disclosure": "full_solution_allowed"
       },
       "decisionPoints": [
         {
