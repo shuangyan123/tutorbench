@@ -118,3 +118,18 @@ test("mathematical reference sanity checks cover lower, secondary and university
   assert.deepEqual([-2, -1, 1, 2].map(f), [-2, 2, -2, 2]);
   assert.notEqual(2 * 3, 7);
 });
+
+test("prerequisite hypotheses are never accepted as validated mastery evidence", async () => {
+  const { graph } = await load();
+  assert.ok(graph.nodes.every(node => node.prerequisiteEvidence === "author-hypothesis"));
+  const invalid = structuredClone(graph) as unknown as {
+    nodes: Array<{ prerequisiteEvidence?: string }>;
+  };
+  invalid.nodes[0]!.prerequisiteEvidence = "validated";
+  assert.throws(() => parseMathematicsKnowledgeMap(invalid), /mathematics_knowledge_node_invalid/);
+  const stages = new Map(["primary", "lower-secondary", "upper-secondary", "university-intro"].map((id, i) => [id, i]));
+  const nodes = new Map(graph.nodes.map(node => [node.id, node]));
+  for (const node of graph.nodes)
+    for (const parent of node.prerequisiteIds)
+      assert.ok(stages.get(nodes.get(parent)!.stage)! <= stages.get(node.stage)!);
+});
