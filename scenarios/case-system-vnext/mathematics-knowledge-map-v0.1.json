@@ -3,7 +3,7 @@
   "id": "mathematics-knowledge-map-v0.1",
   "version": "0.1.0",
   "status": "author-proposed-uncalibrated",
-  "scope": "Proposed school mathematics coverage through selected introductory university topics; secondary derivatives belong in school electives in some curricula. Candidate edges are NOT mandatory learning order or KST-validated prerequisite relations.",
+  "scope": "Proposed school mathematics coverage through selected introductory university topics; secondary derivatives belong in school electives in some curricula. Candidate edges are NOT mandatory learning order or KST-validated prerequisite relations. Stage labels are broad authoring contexts, not universal curriculum order. The limits-and-continuity node labels introductory intuitive treatment in this pilot, not rigorous university real analysis.",
   "sources": [
     {
       "label": "PISA 2022 mathematics framework",
@@ -85,7 +85,8 @@
       "label": "Whole and unit reference",
       "stage": "primary",
       "prerequisiteIds": [],
-      "commonMisconception": "Changing the reference whole while comparing or combining fractions"
+      "commonMisconception": "Changing the reference whole while comparing or combining fractions",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "integers-operations",
@@ -93,7 +94,8 @@
       "label": "Integer operations",
       "stage": "primary",
       "prerequisiteIds": [],
-      "commonMisconception": "Applying a sign rule without checking the operation"
+      "commonMisconception": "Applying a sign rule without checking the operation",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "fractions-units",
@@ -103,7 +105,8 @@
       "prerequisiteIds": [
         "units-whole"
       ],
-      "commonMisconception": "Adding numerator and denominator independently"
+      "commonMisconception": "Adding numerator and denominator independently",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "fraction-equivalence",
@@ -114,7 +117,8 @@
         "fractions-units",
         "integers-operations"
       ],
-      "commonMisconception": "Treating unequal-size parts as directly additive"
+      "commonMisconception": "Treating unequal-size parts as directly additive",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "ratios",
@@ -124,7 +128,8 @@
       "prerequisiteIds": [
         "fractions-units"
       ],
-      "commonMisconception": "Confusing ratio with additive difference"
+      "commonMisconception": "Confusing ratio with additive difference",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "percent-base",
@@ -134,7 +139,8 @@
       "prerequisiteIds": [
         "ratios"
       ],
-      "commonMisconception": "Using the wrong reference base after a change"
+      "commonMisconception": "Using the wrong reference base after a change",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "successive-changes",
@@ -144,7 +150,8 @@
       "prerequisiteIds": [
         "percent-base"
       ],
-      "commonMisconception": "Assuming successive equal percentage changes cancel"
+      "commonMisconception": "Assuming successive equal percentage changes cancel",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "variable-symbols",
@@ -154,7 +161,8 @@
       "prerequisiteIds": [
         "integers-operations"
       ],
-      "commonMisconception": "Treating = as a command rather than an invariant"
+      "commonMisconception": "Treating = as a command rather than an invariant",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "linear-equations",
@@ -164,7 +172,8 @@
       "prerequisiteIds": [
         "variable-symbols"
       ],
-      "commonMisconception": "Changing one side without preserving equality"
+      "commonMisconception": "Changing one side without preserving equality",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "polynomial-factorization",
@@ -174,7 +183,8 @@
       "prerequisiteIds": [
         "variable-symbols"
       ],
-      "commonMisconception": "Memorizing structure without justifying valid transformations"
+      "commonMisconception": "Memorizing structure without justifying valid transformations",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "rational-domain",
@@ -185,7 +195,8 @@
         "polynomial-factorization",
         "linear-equations"
       ],
-      "commonMisconception": "Cancelling a zero factor and admitting an excluded root"
+      "commonMisconception": "Cancelling a zero factor and admitting an excluded root",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "inequality-signs",
@@ -195,7 +206,8 @@
       "prerequisiteIds": [
         "linear-equations"
       ],
-      "commonMisconception": "Multiplying by a negative number without reversing direction"
+      "commonMisconception": "Multiplying by a negative number without reversing direction",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "quadratic-discriminant",
@@ -205,7 +217,8 @@
       "prerequisiteIds": [
         "polynomial-factorization"
       ],
-      "commonMisconception": "Mistaking existence of real roots for an extra sign condition"
+      "commonMisconception": "Mistaking existence of real roots for an extra sign condition",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "root-sign-conditions",
@@ -216,7 +229,8 @@
         "quadratic-discriminant",
         "inequality-signs"
       ],
-      "commonMisconception": "Confusing necessary and sufficient root constraints"
+      "commonMisconception": "Confusing necessary and sufficient root constraints",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "coordinate-graph",
@@ -226,7 +240,8 @@
       "prerequisiteIds": [
         "variable-symbols"
       ],
-      "commonMisconception": "Reading the horizontal value as the output"
+      "commonMisconception": "Reading the horizontal value as the output",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "function-definition",
@@ -236,7 +251,8 @@
       "prerequisiteIds": [
         "coordinate-graph"
       ],
-      "commonMisconception": "Assuming every symbolic expression accepts all real inputs"
+      "commonMisconception": "Assuming every symbolic expression accepts all real inputs",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "function-composition",
@@ -246,7 +262,8 @@
       "prerequisiteIds": [
         "function-definition"
       ],
-      "commonMisconception": "Checking only the outer expression and ignoring inner domain"
+      "commonMisconception": "Checking only the outer expression and ignoring inner domain",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "inverse-functions",
@@ -256,7 +273,8 @@
       "prerequisiteIds": [
         "function-definition"
       ],
-      "commonMisconception": "Assuming inverse exists globally without restriction"
+      "commonMisconception": "Assuming inverse exists globally without restriction",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "exponential-laws",
@@ -267,7 +285,8 @@
         "function-definition",
         "polynomial-factorization"
       ],
-      "commonMisconception": "Using linear rather than multiplicative growth"
+      "commonMisconception": "Using linear rather than multiplicative growth",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "logarithm-inequalities",
@@ -278,17 +297,19 @@
         "exponential-laws",
         "inequality-signs"
       ],
-      "commonMisconception": "Ignoring domain or reversal for base in (0,1)"
+      "commonMisconception": "Ignoring domain or reversal for base in (0,1)",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "limits-continuity",
       "domainId": "functions",
       "label": "Limits and continuity",
-      "stage": "university-intro",
+      "stage": "upper-secondary",
       "prerequisiteIds": [
         "function-composition"
       ],
-      "commonMisconception": "Inferring a limit solely from substitution in an undefined expression"
+      "commonMisconception": "Inferring a limit solely from substitution in an undefined expression",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "length-area",
@@ -298,7 +319,8 @@
       "prerequisiteIds": [
         "units-whole"
       ],
-      "commonMisconception": "Confusing a linear scale factor with an area factor"
+      "commonMisconception": "Confusing a linear scale factor with an area factor",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "angles-triangles",
@@ -308,7 +330,8 @@
       "prerequisiteIds": [
         "length-area"
       ],
-      "commonMisconception": "Assuming a diagram proves a property"
+      "commonMisconception": "Assuming a diagram proves a property",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "similarity-scale",
@@ -319,7 +342,8 @@
         "angles-triangles",
         "ratios"
       ],
-      "commonMisconception": "Applying similarity ratio directly to areas"
+      "commonMisconception": "Applying similarity ratio directly to areas",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "pythagoras",
@@ -329,7 +353,8 @@
       "prerequisiteIds": [
         "angles-triangles"
       ],
-      "commonMisconception": "Assuming a theorem's conditions without checking right angles"
+      "commonMisconception": "Assuming a theorem's conditions without checking right angles",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "coordinate-geometry",
@@ -341,7 +366,8 @@
         "pythagoras",
         "quadratic-discriminant"
       ],
-      "commonMisconception": "Confusing passing through a point with tangency"
+      "commonMisconception": "Confusing passing through a point with tangency",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "trigonometry",
@@ -352,7 +378,8 @@
         "similarity-scale",
         "pythagoras"
       ],
-      "commonMisconception": "Using right-triangle identities outside their scope"
+      "commonMisconception": "Using right-triangle identities outside their scope",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "counting-principle",
@@ -362,7 +389,8 @@
       "prerequisiteIds": [
         "integers-operations"
       ],
-      "commonMisconception": "Double counting indistinguishable arrangements"
+      "commonMisconception": "Double counting indistinguishable arrangements",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "combinations",
@@ -373,7 +401,8 @@
         "counting-principle",
         "fractions-units"
       ],
-      "commonMisconception": "Treating ordered draws as unordered without adjusting counts"
+      "commonMisconception": "Treating ordered draws as unordered without adjusting counts",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "probability-events",
@@ -384,7 +413,8 @@
         "fractions-units",
         "counting-principle"
       ],
-      "commonMisconception": "Using a denominator that excludes eligible outcomes"
+      "commonMisconception": "Using a denominator that excludes eligible outcomes",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "conditional-events",
@@ -395,7 +425,8 @@
         "probability-events",
         "combinations"
       ],
-      "commonMisconception": "Using unconditional frequency after conditioning"
+      "commonMisconception": "Using unconditional frequency after conditioning",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "bayes-base-rate",
@@ -405,7 +436,8 @@
       "prerequisiteIds": [
         "conditional-events"
       ],
-      "commonMisconception": "Confusing P(test+|condition) with P(condition|test+)"
+      "commonMisconception": "Confusing P(test+|condition) with P(condition|test+)",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "sequences-recursive",
@@ -416,7 +448,8 @@
         "variable-symbols",
         "exponential-laws"
       ],
-      "commonMisconception": "Mistaking several terms for a general recurrence proof"
+      "commonMisconception": "Mistaking several terms for a general recurrence proof",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "logic-quantifiers",
@@ -426,7 +459,8 @@
       "prerequisiteIds": [
         "variable-symbols"
       ],
-      "commonMisconception": "Using one favorable example as proof of a universal claim"
+      "commonMisconception": "Using one favorable example as proof of a universal claim",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "mathematical-induction",
@@ -437,7 +471,8 @@
         "sequences-recursive",
         "logic-quantifiers"
       ],
-      "commonMisconception": "Performing inductive step without proving base"
+      "commonMisconception": "Performing inductive step without proving base",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "inequality-proofs",
@@ -448,7 +483,8 @@
         "inequality-signs",
         "logic-quantifiers"
       ],
-      "commonMisconception": "Using positive-only AM-GM for negative inputs"
+      "commonMisconception": "Using positive-only AM-GM for negative inputs",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "statistics-weighted",
@@ -458,7 +494,8 @@
       "prerequisiteIds": [
         "percent-base"
       ],
-      "commonMisconception": "Taking an unweighted average across unequal denominators"
+      "commonMisconception": "Taking an unweighted average across unequal denominators",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "statistics-conditioning",
@@ -468,7 +505,8 @@
       "prerequisiteIds": [
         "statistics-weighted"
       ],
-      "commonMisconception": "Treating pooled rates as comparable without checking group mix"
+      "commonMisconception": "Treating pooled rates as comparable without checking group mix",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "statistics-variability",
@@ -478,7 +516,8 @@
       "prerequisiteIds": [
         "statistics-weighted"
       ],
-      "commonMisconception": "Comparing means without spread or sample sizes"
+      "commonMisconception": "Comparing means without spread or sample sizes",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "statistics-inference",
@@ -489,7 +528,8 @@
         "statistics-variability",
         "conditional-events"
       ],
-      "commonMisconception": "Treating association as evidence of causality"
+      "commonMisconception": "Treating association as evidence of causality",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "derivatives-rate",
@@ -500,7 +540,8 @@
         "limits-continuity",
         "polynomial-factorization"
       ],
-      "commonMisconception": "Treating f'=0 as a complete global optimization procedure"
+      "commonMisconception": "Treating f'=0 as a complete global optimization procedure",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "optimization-boundary",
@@ -511,7 +552,8 @@
         "derivatives-rate",
         "inequality-signs"
       ],
-      "commonMisconception": "Ignoring boundaries or differentiability exceptions"
+      "commonMisconception": "Ignoring boundaries or differentiability exceptions",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "systems-equations",
@@ -521,7 +563,8 @@
       "prerequisiteIds": [
         "linear-equations"
       ],
-      "commonMisconception": "Assuming every pair of equations has a unique solution"
+      "commonMisconception": "Assuming every pair of equations has a unique solution",
+      "prerequisiteEvidence": "author-hypothesis"
     },
     {
       "id": "linear-algebra-rank",
@@ -532,7 +575,8 @@
         "systems-equations",
         "variable-symbols"
       ],
-      "commonMisconception": "Ignoring linear dependence and inconsistent right-hand sides"
+      "commonMisconception": "Ignoring linear dependence and inconsistent right-hand sides",
+      "prerequisiteEvidence": "author-hypothesis"
     }
   ],
   "caseMappings": [
