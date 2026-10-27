@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { parseAcademicStructure, validateAcademicStructureReferences } from "../src/contracts/academic-structure.js";
+import { parseAcademicStructure, validateAcademicStructureReferences, validateAcademicStructureRegistryReferences } from "../src/contracts/academic-structure.js";
 import { parseMathematicsKnowledgeMap } from "../src/contracts/mathematics-knowledge-map.js";
 import { parseMathematicsExamAlignment } from "../src/contracts/mathematics-exam-alignment.js";
 
@@ -78,4 +78,48 @@ test("each examination profile has its own reviewer guide; no Chinese default fo
     if (!entry.profileId.startsWith("cn-"))
       assert.notEqual(entry.primaryLocale, "zh-CN");
   }
+});
+
+test("non-mathematics examinations may reference independent knowledge registries", async () => {
+  const structure = parseAcademicStructure(await loadJson("academic-structure-v0.1.json"));
+  const graph = parseMathematicsKnowledgeMap(await loadJson("mathematics-knowledge-map-v0.1.json"));
+  const exams = parseMathematicsExamAlignment(await loadJson("mathematics-exam-alignment-v0.1.json"));
+  const extended = structuredClone(structure) as unknown as {
+    disciplineSystems: Array<{ id: string; disciplineIds: string[] }>;
+    disciplines: Array<{ id: string; labelZh: string; labelEn: string; systemId: string; knowledgeSystemIds: string[] }>;
+    knowledgeSystems: Array<{ id: string; labelZh: string; labelEn: string; disciplineId: string; registryPath: string; coverage: { domains: number; nodes: number }; status: string }>;
+    examSystems: Array<{ id: string; labelZh: string; labelEn: string; profileIds: string[]; knowledgeSystemIds: string[]; status: string }>;
+  };
+  extended.disciplineSystems.find(system => system.id === "natural-sciences")!.disciplineIds.push("physics");
+  extended.disciplines.push({
+    id: "physics", labelZh: "物理", labelEn: "Physics",
+    systemId: "natural-sciences", knowledgeSystemIds: ["physics-map-v0.1"],
+  });
+  extended.knowledgeSystems.push({
+    id: "physics-map-v0.1", labelZh: "物理知识", labelEn: "Physics knowledge",
+    disciplineId: "physics", registryPath: "test/physics.json",
+    coverage: { domains: 2, nodes: 5 }, status: "author-proposed",
+  });
+  extended.examSystems.push({
+    id: "physics-exam", labelZh: "物理考试", labelEn: "Physics examination",
+    profileIds: ["physics-exam-2026"], knowledgeSystemIds: ["physics-map-v0.1"],
+    status: "author-proposed-alignment",
+  });
+  const parsed = parseAcademicStructure(extended);
+  const registries = [
+    { id: graph.id, domains: graph.domains.length, nodes: graph.nodes.length },
+    { id: "physics-map-v0.1", domains: 2, nodes: 5 },
+  ];
+  const profileIds = [...exams.profiles.map(profile => profile.id), "physics-exam-2026"];
+  assert.doesNotThrow(() => validateAcademicStructureRegistryReferences(parsed, registries, profileIds));
+  const wrong = registries.map(x => ({ ...x }));
+  wrong[1]!.nodes = 6;
+  assert.throws(
+    () => validateAcademicStructureRegistryReferences(parsed, wrong, profileIds),
+    /academic_structure_knowledge_coverage_mismatch/,
+  );
+  assert.throws(
+    () => validateAcademicStructureRegistryReferences(parsed, registries, profileIds.slice(1)),
+    /academic_structure_exam_profile_mismatch/,
+  );
 });
