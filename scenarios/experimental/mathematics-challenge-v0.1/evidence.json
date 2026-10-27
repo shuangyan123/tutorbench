@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "id": "mathematics-challenge-evidence-v0.1",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "author-proposed-uncalibrated",
   "suiteId": "mathematics-challenge-v0.1",
-  "note": "Content depth is an authoring descriptor, not an observed item difficulty; challenge is a hypothesis relative to the stated cohort and prerequisites.",
+  "note": "Cognitive demand, curriculum stage and author-anticipated challenge are separate descriptors, not student-tested difficulty metrics. Each task maps to a proposed mathematics prerequisite graph.",
   "tasks": [
     {
       "id": "quadratic-positive-roots",
@@ -58,6 +58,350 @@
         "mc-conditional-normalization",
         "mc-conditional-prerequisite",
         "mc-conditional-transfer"
+      ]
+    },
+    {
+      "id": "fraction-unit-repair",
+      "cohort": "upper primary learners working with unlike denominators",
+      "targetPrerequisites": [
+        "meaning of fractional units",
+        "equivalent fractions"
+      ],
+      "mathematicalPractice": [
+        "representation",
+        "reasoning"
+      ],
+      "cognitiveDemand": "unit-alignment",
+      "anticipatedChallenge": "low",
+      "challengeRationale": "Requires keeping the referent whole fixed and rewriting unequal-sized parts as common units.",
+      "verifiedResult": "2/3 + 1/4 = 8/12 + 3/12 = 11/12; 3/7 is incorrect.",
+      "validAlternativeMethods": [
+        "area or strip model with common twelfths",
+        "equivalent-fraction arithmetic"
+      ],
+      "risk": "Correcting the number without repairing the student's unit model.",
+      "scenarioIds": [
+        "mc-fraction-units"
+      ]
+    },
+    {
+      "id": "successive-percentage-base",
+      "cohort": "lower secondary learners studying percent changes",
+      "targetPrerequisites": [
+        "percent as multiplier",
+        "multiplicative change of base"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "representation"
+      ],
+      "cognitiveDemand": "track-changing-baseline",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "The second relative change applies to the new amount, not the original base.",
+      "verifiedResult": "Starting at 200, a 20% increase yields 240, then a 20% decrease gives 192: 96% of the starting amount, a net 4% decrease.",
+      "validAlternativeMethods": [
+        "multiplier method 1.2×0.8",
+        "stepwise numerical example"
+      ],
+      "risk": "Treating equal percentage changes as inverse additive effects.",
+      "scenarioIds": [
+        "mc-percent-reversal"
+      ]
+    },
+    {
+      "id": "rational-equation-excluded-root",
+      "cohort": "secondary learners solving rational equations",
+      "targetPrerequisites": [
+        "factoring difference of squares",
+        "nonzero denominator condition"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "justification"
+      ],
+      "cognitiveDemand": "track-equivalence-and-domain",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "Cancelling a factor is only equivalent where the denominator is defined; the apparent solution is excluded.",
+      "verifiedResult": "(x^2-1)/(x-1)=2 requires x!=1. Simplifying gives x+1=2 and candidate x=1, excluded. The equation has no solution.",
+      "validAlternativeMethods": [
+        "domain check before cancellation",
+        "substitute candidate into original expression"
+      ],
+      "risk": "Accepting an excluded root after a valid-looking algebraic cancellation.",
+      "scenarioIds": [
+        "mc-rational-domain"
+      ]
+    },
+    {
+      "id": "function-composition-domains",
+      "cohort": "secondary learners studying composite functions and radicals",
+      "targetPrerequisites": [
+        "domain of square-root functions",
+        "composition of functions",
+        "solving x^2 >= 1"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "representation"
+      ],
+      "cognitiveDemand": "nested-domain-constraints",
+      "anticipatedChallenge": "high",
+      "challengeRationale": "Requires preserving inner and outer domain restrictions; the two composition orders have different domains.",
+      "verifiedResult": "f(x)=sqrt(x-1), g(x)=x^2. Domain of f∘g is (-infinity,-1] U [1,infinity); domain of g∘f is [1,infinity).",
+      "validAlternativeMethods": [
+        "inequality constraints for each composition",
+        "evaluate inner function then outer function"
+      ],
+      "risk": "Losing the negative-x branch in f(g(x)) or assuming domain is commutative.",
+      "scenarioIds": [
+        "mc-composition-domain"
+      ]
+    },
+    {
+      "id": "decreasing-logarithm-inequality",
+      "cohort": "secondary learners studying logarithmic inequalities",
+      "targetPrerequisites": [
+        "logarithm domain restriction",
+        "decreasing logarithms for bases between 0 and 1"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "justification"
+      ],
+      "cognitiveDemand": "coordinate-domain-and-monotonicity",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "Combines the logarithm domain and decreasing monotonicity, with strict inequality at the endpoint.",
+      "verifiedResult": "log_(1/2)(x-1)>-1 iff 0<x-1<2, so 1<x<3.",
+      "validAlternativeMethods": [
+        "graph of decreasing logarithm",
+        "exponential inverse and domain check"
+      ],
+      "risk": "Using increasing-monotonicity inequality direction or forgetting x>1.",
+      "scenarioIds": [
+        "mc-logarithm-base"
+      ]
+    },
+    {
+      "id": "similar-geometry-area-scale",
+      "cohort": "lower secondary learners studying similar triangles",
+      "targetPrerequisites": [
+        "similarity scale factor",
+        "triangle area formula"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "representation"
+      ],
+      "cognitiveDemand": "differentiate-linear-and-area-scale",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "Similarity affects two independent linear dimensions in an area measure.",
+      "verifiedResult": "If corresponding sides have scale 3/2, areas have scale (3/2)^2=9/4, not 3/2.",
+      "validAlternativeMethods": [
+        "side-base-height reasoning",
+        "coordinate enlargement or unit-square tiling"
+      ],
+      "risk": "Accepting a linear factor as the area factor.",
+      "scenarioIds": [
+        "mc-similarity-area"
+      ]
+    },
+    {
+      "id": "circle-line-tangency-constraint",
+      "cohort": "upper secondary learners using coordinate geometry and circle-line intersections",
+      "targetPrerequisites": [
+        "circle equation",
+        "intersection multiplicity",
+        "quadratic discriminant"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "justification"
+      ],
+      "cognitiveDemand": "distinguish-incidence-and-tangency",
+      "anticipatedChallenge": "high",
+      "challengeRationale": "Every line in the family meets a fixed circle point; only one slope yields a single intersection.",
+      "verifiedResult": "Circle x^2+y^2=25 and line y=mx+5 give x((1+m^2)x+10m)=0. Distinct intersections unless m=0, when x=0 is a double root; tangency iff m=0.",
+      "validAlternativeMethods": [
+        "intersection equation/discriminant",
+        "radius perpendicular to tangent at (0,5)"
+      ],
+      "risk": "Mistaking a line through a circle point for a tangent without checking the second intersection.",
+      "scenarioIds": [
+        "mc-circle-tangency"
+      ]
+    },
+    {
+      "id": "permutations-with-indistinguishable-objects",
+      "cohort": "secondary learners studying counting with repeated symbols",
+      "targetPrerequisites": [
+        "permutations",
+        "counting outcomes versus physical objects"
+      ],
+      "mathematicalPractice": [
+        "representation",
+        "reasoning"
+      ],
+      "cognitiveDemand": "avoid-duplicate-counting",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "Physical tiles can differ without making resulting letter strings distinct; category counts matter.",
+      "verifiedResult": "Choosing and ordering 3 tiles from A,A,B,B gives exactly AAB, ABA, BAA, ABB, BAB, BBA: 6 distinct length-3 strings.",
+      "validAlternativeMethods": [
+        "enumerate multiset cases",
+        "count 3 arrangements for each of AAB and ABB"
+      ],
+      "risk": "Applying 4P3 counts distinct tiles as distinct letters, overcounting visible results.",
+      "scenarioIds": [
+        "mc-repeated-symbols"
+      ]
+    },
+    {
+      "id": "base-rate-inverse-probability",
+      "cohort": "upper secondary learners familiar with conditional probability",
+      "targetPrerequisites": [
+        "frequency tables",
+        "conditional probability",
+        "base rates"
+      ],
+      "mathematicalPractice": [
+        "representation",
+        "reasoning"
+      ],
+      "cognitiveDemand": "reverse-conditioning-with-base-rate",
+      "anticipatedChallenge": "high",
+      "challengeRationale": "The screening sensitivity is not the posterior defect rate because nondefective items dominate the population.",
+      "verifiedResult": "Defect prior=0.01, sensitivity=0.90, false positive=0.05; P(defect | positive)=0.009/(0.009+0.0495)=2/13 (~15.38%).",
+      "validAlternativeMethods": [
+        "10000-item frequency table (90 true positives and 495 false positives)",
+        "Bayes ratio"
+      ],
+      "risk": "Equating P(positive|defect)=90% with P(defect|positive).",
+      "scenarioIds": [
+        "mc-bayes-base-rate"
+      ]
+    },
+    {
+      "id": "simpson-paradox-unequal-mixtures",
+      "cohort": "secondary or introductory statistics learners comparing stratified success rates",
+      "targetPrerequisites": [
+        "rate denominators",
+        "weighted totals",
+        "subgroup conditioning"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "representation"
+      ],
+      "cognitiveDemand": "explain-aggregation-reversal",
+      "anticipatedChallenge": "high",
+      "challengeRationale": "Within-stratum comparisons reverse after pooling because strategies have very different group weights.",
+      "verifiedResult": "Small group A 9/10 vs B 80/100; large group A 20/100 vs B 1/10. A wins within both groups (90%>80%, 20%>10%) yet pooled A=29/110 (~26.4%) < B=81/110 (~73.6%) due to unequal group mixtures.",
+      "validAlternativeMethods": [
+        "within-group and pooled rates",
+        "weighted averaging by group sizes"
+      ],
+      "risk": "Claiming subgroup advantage guarantees pooled advantage or that pooled comparison alone determines a fair treatment effect.",
+      "scenarioIds": [
+        "mc-simpson-aggregation"
+      ]
+    },
+    {
+      "id": "recurrence-mathematical-induction",
+      "cohort": "advanced secondary learners beginning proof by induction",
+      "targetPrerequisites": [
+        "exponential expressions",
+        "recursion",
+        "induction base and step"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "justification"
+      ],
+      "cognitiveDemand": "from-examples-to-general-proof",
+      "anticipatedChallenge": "high",
+      "challengeRationale": "A formula can fit initial examples but still require induction to justify every positive integer n.",
+      "verifiedResult": "a_1=1, a_(n+1)=2a_n+1 yields a_n=2^n-1. Base n=1:1. If a_k=2^k-1, then a_(k+1)=2(2^k-1)+1=2^(k+1)-1.",
+      "validAlternativeMethods": [
+        "induction",
+        "transform b_n=a_n+1 to geometric sequence"
+      ],
+      "risk": "Treating checks n=1,2,3 as a proof for every n or over-explaining despite partial valid work.",
+      "scenarioIds": [
+        "mc-induction-recurrence"
+      ]
+    },
+    {
+      "id": "inequality-conditions-and-counterexample",
+      "cohort": "upper secondary learners using AM-GM and universal quantifiers",
+      "targetPrerequisites": [
+        "AM-GM for positive terms",
+        "negative reciprocal signs",
+        "counterexamples"
+      ],
+      "mathematicalPractice": [
+        "justification",
+        "reasoning"
+      ],
+      "cognitiveDemand": "proof-applicability-and-quantifiers",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "A valid inequality on x>0 is falsely generalized to every nonzero real x.",
+      "verifiedResult": "For x>0, x+1/x >= 2 with equality at x=1 by AM-GM. For x<0, x+1/x <= -2, so x=-1 gives -2<2: statement for all x≠0 is false.",
+      "validAlternativeMethods": [
+        "counterexample x=-1",
+        "(x-1)^2/x sign analysis"
+      ],
+      "risk": "Rewarding a proof applied outside its domain or hiding the equality case.",
+      "scenarioIds": [
+        "mc-amgm-domain"
+      ]
+    },
+    {
+      "id": "closed-interval-optimization-endpoints",
+      "cohort": "introductory calculus learners optimizing polynomial functions on closed intervals",
+      "targetPrerequisites": [
+        "polynomial derivative",
+        "stationary points",
+        "closed interval extrema"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "justification"
+      ],
+      "cognitiveDemand": "critical-points-and-boundaries",
+      "anticipatedChallenge": "high",
+      "challengeRationale": "Two stationary points and two endpoints must all be considered, including ties; interior derivative-zero is not sufficient.",
+      "verifiedResult": "For f(x)=x^3-3x on [-2,2], f'(x)=3x²-3, critical x=±1; f(-2)=-2,f(-1)=2,f(1)=-2,f(2)=2. Global maxima 2 at x=-1 and x=2; minima -2 at x=-2 and x=1.",
+      "validAlternativeMethods": [
+        "derivative sign/endpoint table",
+        "monotonic interval analysis with endpoint evaluation"
+      ],
+      "risk": "Announcing a unique maximum from f'=0 while neglecting endpoint ties.",
+      "scenarioIds": [
+        "mc-endpoint-optimization"
+      ]
+    },
+    {
+      "id": "linear-system-consistency-versus-rank",
+      "cohort": "introductory linear algebra learners interpreting linear systems",
+      "targetPrerequisites": [
+        "two-variable linear systems",
+        "dependent coefficient rows",
+        "augmented matrices"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "justification"
+      ],
+      "cognitiveDemand": "compare-coefficient-and-augmented-constraints",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "Dependent coefficients alone do not guarantee infinitely many solutions; the right-hand sides may conflict.",
+      "verifiedResult": "System x+2y=3 and 2x+4y=7 is inconsistent (doubling first gives 2x+4y=6, not 7); coefficient rank=1 and augmented rank=2.",
+      "validAlternativeMethods": [
+        "double first equation and compare constants",
+        "compare coefficient and augmented ranks"
+      ],
+      "risk": "Equating determinant zero with infinitely many solutions instead of zero or infinitely many.",
+      "scenarioIds": [
+        "mc-linear-dependence"
       ]
     }
   ]
