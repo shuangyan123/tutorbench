@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "mathematics-exam-alignment-v0.1",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "author-proposed-unverified",
-  "purpose": "Overlay official exam constraints and locally interpreted mathematical tasks onto the knowledge map; do not replace prerequisite concepts or treat mapped tutoring checkpoints as authentic exam items.",
+  "purpose": "Domestic (Chinese middle/high school, 2027 postgraduate Maths I/II/III and public-service aptitude) and international qualification/admissions exam-specific overlay over the proposed knowledge graph. Use the issuing body's exam-year syllabus. Module links are authored approximations, not official item blueprints or observed student outcomes.",
   "profiles": [
     {
       "id": "cn-zhongkao-math-general",
@@ -298,6 +298,1039 @@
         "需新增专门的基期/现期、增长率、增长量、比重、平均数、倍数、图表联合比较案例",
         "仍无真实考试图表、选项干扰项及时间压力的组合案例",
         "现有中学数学案例只是知识支持，不是已证实符合2027国考题型样本"
+      ]
+    },
+    {
+      "id": "cn-kaoyan-math-1-2027",
+      "nameZh": "2027 全国硕士招生考试：数学（一）",
+      "examYear": 2027,
+      "region": "China national unified examination",
+      "scopeNote": "2027年数学（一）的考试类型独立于数学（二）（三），需要以2027正式大纲逐条核对章节、考点和考查要求；目前是纲要层级的初步映射，不能声称已完成全覆盖。",
+      "sources": [
+        {
+          "label": "高等教育出版社：《2027年全国硕士研究生招生考试数学考试大纲》（教育部教育考试院）",
+          "url": "https://www.hep.com.cn/book/show/2097490366090555393",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-09-29"
+        },
+        {
+          "label": "教育部：《2027年全国硕士研究生招生工作管理规定》",
+          "url": "https://www.moe.gov.cn/srcsite/A15/moe_778/s3261/202609/t20260923_1451734.html",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-09-21"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": 180,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "calculus",
+          "labelZh": "高等数学（函数、极限、微分及积分等；节点待扩充）",
+          "nodeIds": [
+            "function-definition",
+            "limits-continuity",
+            "derivatives-rate",
+            "optimization-boundary"
+          ],
+          "caseIds": [
+            "mc-endpoint-optimization"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "linear-algebra",
+          "labelZh": "线性代数",
+          "nodeIds": [
+            "systems-equations",
+            "linear-algebra-rank"
+          ],
+          "caseIds": [
+            "mc-linear-dependence"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "probability-statistics",
+          "labelZh": "概率论与数理统计",
+          "nodeIds": [
+            "probability-events",
+            "conditional-events",
+            "combinations",
+            "statistics-inference"
+          ],
+          "caseIds": [
+            "mc-conditional-normalization"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "symbolic-calculation",
+        "multi-step-reasoning",
+        "written-justification",
+        "strategy-selection"
+      ],
+      "examStrategyNote": "不以高中解题套路代替高等数学的积分、多元运算与理论解释；要考虑答题完整性和选拔性。",
+      "authoringGaps": [
+        "当前知识图谱缺少积分、多元微积分、无穷级数、矩阵及线性映射等细粒度节点",
+        "按2027年大纲核对每个节点是否属于数学（一）的要求",
+        "没有正式大纲条款逐条绑定与当年真题分析"
+      ]
+    },
+    {
+      "id": "cn-kaoyan-math-2-2027",
+      "nameZh": "2027 全国硕士招生考试：数学（二）",
+      "examYear": 2027,
+      "region": "China national unified examination",
+      "scopeNote": "数学（二）不应继承数学（一）的概率统计覆盖；确切微积分及线代考点须以正式2027大纲为准。",
+      "sources": [
+        {
+          "label": "高等教育出版社：《2027年全国硕士研究生招生考试数学考试大纲》（教育部教育考试院）",
+          "url": "https://www.hep.com.cn/book/show/2097490366090555393",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-09-29"
+        },
+        {
+          "label": "教育部：《2027年全国硕士研究生招生工作管理规定》",
+          "url": "https://www.moe.gov.cn/srcsite/A15/moe_778/s3261/202609/t20260923_1451734.html",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-09-21"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": 180,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "calculus",
+          "labelZh": "高等数学（按数学二大纲范围）",
+          "nodeIds": [
+            "function-definition",
+            "limits-continuity",
+            "derivatives-rate",
+            "optimization-boundary"
+          ],
+          "caseIds": [
+            "mc-endpoint-optimization"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "linear-algebra",
+          "labelZh": "线性代数（按数学二大纲范围）",
+          "nodeIds": [
+            "systems-equations",
+            "linear-algebra-rank"
+          ],
+          "caseIds": [
+            "mc-linear-dependence"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "symbolic-calculation",
+        "multi-step-reasoning",
+        "written-justification"
+      ],
+      "examStrategyNote": "检查考纲范围、完整计算与步骤证明；不得把概率论作为数学（二）必考模块。",
+      "authoringGaps": [
+        "高等数学与线代章节需要2027大纲逐项核对",
+        "现有知识图谱缺少定积分、不定积分及多元相关的课程细节"
+      ]
+    },
+    {
+      "id": "cn-kaoyan-math-3-2027",
+      "nameZh": "2027 全国硕士招生考试：数学（三）",
+      "examYear": 2027,
+      "region": "China national unified examination",
+      "scopeNote": "数学（三）包括面向相应经济管理等专业方向的高等数学、线性代数与概率统计，但范围与数学（一）不同，不能套用同一模板。",
+      "sources": [
+        {
+          "label": "高等教育出版社：《2027年全国硕士研究生招生考试数学考试大纲》（教育部教育考试院）",
+          "url": "https://www.hep.com.cn/book/show/2097490366090555393",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-09-29"
+        },
+        {
+          "label": "教育部：《2027年全国硕士研究生招生工作管理规定》",
+          "url": "https://www.moe.gov.cn/srcsite/A15/moe_778/s3261/202609/t20260923_1451734.html",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-09-21"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": 180,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "calculus",
+          "labelZh": "微积分与经济数量关系（按数学三大纲范围）",
+          "nodeIds": [
+            "function-definition",
+            "limits-continuity",
+            "derivatives-rate",
+            "optimization-boundary"
+          ],
+          "caseIds": [
+            "mc-endpoint-optimization"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "linear-algebra",
+          "labelZh": "线性代数",
+          "nodeIds": [
+            "systems-equations",
+            "linear-algebra-rank"
+          ],
+          "caseIds": [
+            "mc-linear-dependence"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "probability-statistics",
+          "labelZh": "概率论与数理统计",
+          "nodeIds": [
+            "conditional-events",
+            "probability-events",
+            "statistics-inference"
+          ],
+          "caseIds": [
+            "mc-conditional-normalization"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "mathematical-modeling",
+        "multi-step-reasoning",
+        "calculation-accuracy",
+        "written-justification"
+      ],
+      "examStrategyNote": "强调计算与建模的合法条件，切勿将经济应用题标签误认为实际考试大纲来源。",
+      "authoringGaps": [
+        "2027正式大纲需要逐条核验",
+        "经济应用与积分、多元微分、随机变量等案例明显不足"
+      ]
+    },
+    {
+      "id": "us-sat-math-digital-2026",
+      "nameZh": "美国 Digital SAT 数学（2026）",
+      "examYear": 2026,
+      "region": "United States / International SAT",
+      "scopeNote": "四个内容领域来自 College Board；不把 SAT 与 AP 或任何特定美国州的毕业考试视为同一考试。",
+      "sources": [
+        {
+          "label": "College Board: Digital SAT Math content domains",
+          "url": "https://international.collegeboard.org/toolkit/sat-policy/understanding-sat/format-digital-content-scoring",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        },
+        {
+          "label": "College Board: SAT Math test overview",
+          "url": "https://satsuite.collegeboard.org/sat/whats-on-the-test/math/overview",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "algebra",
+          "labelZh": "Algebra 代数",
+          "nodeIds": [
+            "linear-equations",
+            "variable-symbols",
+            "systems-equations"
+          ],
+          "caseIds": [
+            "mc-linear-dependence"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "advanced-math",
+          "labelZh": "Advanced Math 高阶代数",
+          "nodeIds": [
+            "quadratic-discriminant",
+            "function-definition",
+            "polynomial-factorization"
+          ],
+          "caseIds": [
+            "mc-quadratic-condition"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "data-analysis",
+          "labelZh": "Problem Solving and Data Analysis 问题解决与数据分析",
+          "nodeIds": [
+            "ratios",
+            "percent-base",
+            "statistics-weighted"
+          ],
+          "caseIds": [
+            "mc-percent-reversal"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "geometry-trig",
+          "labelZh": "Geometry and Trigonometry 几何与三角",
+          "nodeIds": [
+            "angles-triangles",
+            "pythagoras",
+            "trigonometry"
+          ],
+          "caseIds": [
+            "mc-similarity-area"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "algebraic-fluency",
+        "quantitative-modeling",
+        "data-interpretation",
+        "problem-solving"
+      ],
+      "examStrategyNote": "按照数字化考试的内容领域评估数学表征、计算与理由；SAT 不考大学微积分。",
+      "authoringGaps": [
+        "未独立建立 SAT 多项选择、学生填空与模块自适应情境",
+        "当前图谱缺少三角与几何多样题型"
+      ]
+    },
+    {
+      "id": "uk-gcse-aqa-math-8300-2026",
+      "nameZh": "英国 AQA GCSE Mathematics 8300（2026）",
+      "examYear": 2026,
+      "region": "England / AQA specification 8300",
+      "scopeNote": "GCSE 有 Foundation 与 Higher 两层，应保持层级边界；其他考试局 (如 Edexcel/OCR) 不能直接继承 AQA 的细则。",
+      "sources": [
+        {
+          "label": "AQA GCSE Mathematics (8300) specification and assessment tiers",
+          "url": "https://www.aqa.org.uk/subjects/mathematics/gcse/mathematics-8300/specification/specification-at-a-glance",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        },
+        {
+          "label": "UK DfE: GCSE Mathematics subject content and assessment objectives",
+          "url": "https://www.gov.uk/government/publications/gcse-mathematics-subject-content-and-assessment-objectives",
+          "sourceKind": "official_curriculum",
+          "published": "2013-11-01"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "number-ratio",
+          "labelZh": "数与比、比例、变化率",
+          "nodeIds": [
+            "integers-operations",
+            "fractions-units",
+            "ratios",
+            "percent-base",
+            "successive-changes"
+          ],
+          "caseIds": [
+            "mc-percent-reversal",
+            "mc-fraction-units"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "algebra",
+          "labelZh": "代数",
+          "nodeIds": [
+            "linear-equations",
+            "quadratic-discriminant",
+            "inequality-signs"
+          ],
+          "caseIds": [
+            "mc-quadratic-condition"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "geometry",
+          "labelZh": "几何与度量",
+          "nodeIds": [
+            "length-area",
+            "similarity-scale",
+            "pythagoras"
+          ],
+          "caseIds": [
+            "mc-similarity-area"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "data",
+          "labelZh": "概率统计",
+          "nodeIds": [
+            "probability-events",
+            "statistics-weighted"
+          ],
+          "caseIds": [
+            "mc-conditional-normalization"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "problem-solving",
+        "reasoning",
+        "procedural-fluency",
+        "written-working"
+      ],
+      "examStrategyNote": "题目可分计算器与非计算器，且必须对 Foundation/Higher 的覆盖单独审查。",
+      "authoringGaps": [
+        "缺少按 Foundation/Higher 层级划分的逐条条款映射",
+        "缺少对应真实题型和非计算器限制的任务"
+      ]
+    },
+    {
+      "id": "intl-cambridge-igcse-0580-2026",
+      "nameZh": "Cambridge IGCSE Mathematics 0580（2025–2027考纲，2026考试）",
+      "examYear": 2026,
+      "region": "Cambridge International",
+      "scopeNote": "0580 的 Core 与 Extended 应分别映射；2028–2030新考纲已发布但不可混作2026现行要求。",
+      "sources": [
+        {
+          "label": "Cambridge International IGCSE Mathematics (0580) syllabuses for examination in 2025–2027",
+          "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-mathematics-0580/",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        },
+        {
+          "label": "Cambridge IGCSE Mathematics endorsed resources and Core/Extended description",
+          "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-mathematics-0580/endorsed-resources/",
+          "sourceKind": "official_curriculum",
+          "published": null
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "number-algebra",
+          "labelZh": "Number / Algebra",
+          "nodeIds": [
+            "fractions-units",
+            "ratios",
+            "linear-equations",
+            "quadratic-discriminant"
+          ],
+          "caseIds": [
+            "mc-fraction-units",
+            "mc-quadratic-condition"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "geometry-mensuration",
+          "labelZh": "Geometry / Mensuration / Trigonometry",
+          "nodeIds": [
+            "angles-triangles",
+            "similarity-scale",
+            "trigonometry"
+          ],
+          "caseIds": [
+            "mc-similarity-area"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "statistics-probability",
+          "labelZh": "Statistics / Probability",
+          "nodeIds": [
+            "statistics-weighted",
+            "probability-events"
+          ],
+          "caseIds": [
+            "mc-conditional-normalization"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "reasoning",
+        "non-calculator-calculation",
+        "calculator-use",
+        "mathematical-communication"
+      ],
+      "examStrategyNote": "保留 Core/Extended 与非计算器试卷差异，不能用计算器熟练度取代概念理解。",
+      "authoringGaps": [
+        "知识图谱尚未区分 Core/Extended 内容子集",
+        "缺少无计算器题目与正式答题格式"
+      ]
+    },
+    {
+      "id": "intl-cambridge-alevel-9709-2026",
+      "nameZh": "Cambridge AS & A Level Mathematics 9709（2026–2027考纲）",
+      "examYear": 2026,
+      "region": "Cambridge International",
+      "scopeNote": "从 Pure Mathematics、Mechanics、Probability & Statistics 中选择课程/考试组合；不是每位考生考全部模块。2028–2030大纲已公开，需要按考试年份切换。",
+      "sources": [
+        {
+          "label": "Cambridge International AS & A Level Mathematics (9709) 2026–2027 syllabus; 2028–2030 published for future exams",
+          "url": "https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-international-as-and-a-level-mathematics-9709/",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        },
+        {
+          "label": "Cambridge: Mathematics 9709 2026–2027 syllabus PDF",
+          "url": "https://www.cambridgeinternational.org/Images/697427-2026-2027-syllabus.pdf",
+          "sourceKind": "official_curriculum",
+          "published": "2025-02-01"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "pure",
+          "labelZh": "Pure Mathematics 纯数学",
+          "nodeIds": [
+            "function-definition",
+            "trigonometry",
+            "derivatives-rate",
+            "optimization-boundary"
+          ],
+          "caseIds": [
+            "mc-endpoint-optimization",
+            "mc-logarithm-base"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "mechanics",
+          "labelZh": "Mechanics 力学中的数学",
+          "nodeIds": [
+            "trigonometry",
+            "systems-equations"
+          ],
+          "caseIds": [],
+          "examRelevance": "curriculum-inferred"
+        },
+        {
+          "id": "probability-statistics",
+          "labelZh": "Probability & Statistics",
+          "nodeIds": [
+            "combinations",
+            "probability-events",
+            "statistics-variability"
+          ],
+          "caseIds": [
+            "mc-conditional-normalization"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "modeling",
+        "reasoning",
+        "calculus",
+        "applied-problem-solving"
+      ],
+      "examStrategyNote": "记录 9709 的试卷/可选模块路径，不为所有考生强制配置力学或统计；也不应把 9709 与英国本土 A-level 考试局完全等同。",
+      "authoringGaps": [
+        "缺少力学运动/向量与分布相关知识节点",
+        "试卷组合及2028后课程需要后续逐项映射"
+      ]
+    },
+    {
+      "id": "intl-ib-dp-math-aa-2026",
+      "nameZh": "IB DP Mathematics AA SL / HL（现行课程，2026）",
+      "examYear": 2026,
+      "region": "International Baccalaureate / DP",
+      "scopeNote": "分析与方法 AA 分 SL/HL；IB 已发布2029首次评估的新课程，不能提前当作2026考纲。",
+      "sources": [
+        {
+          "label": "IB Diploma Mathematics: AA/AI SL/HL, current final assessment 2028",
+          "url": "https://ibo.org/programmes/diploma-programme/curriculum/mathematics/",
+          "sourceKind": "official_curriculum",
+          "published": "2026-09-17"
+        },
+        {
+          "label": "IB Diploma mathematics curriculum update and first assessment 2029",
+          "url": "https://ibo.org/university-admission/latest-curriculum-updates/dp-mathematics-analysis-and-approaches-updates/",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-04-03"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "functions-algebra",
+          "labelZh": "Algebra and Functions",
+          "nodeIds": [
+            "function-definition",
+            "inverse-functions",
+            "logarithm-inequalities"
+          ],
+          "caseIds": [
+            "mc-composition-domain"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "geometry-trig",
+          "labelZh": "Geometry and Trigonometry",
+          "nodeIds": [
+            "trigonometry",
+            "coordinate-geometry"
+          ],
+          "caseIds": [
+            "mc-circle-tangency"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "calculus",
+          "labelZh": "Calculus",
+          "nodeIds": [
+            "limits-continuity",
+            "derivatives-rate",
+            "optimization-boundary"
+          ],
+          "caseIds": [
+            "mc-endpoint-optimization"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "probability-statistics",
+          "labelZh": "Statistics and Probability",
+          "nodeIds": [
+            "conditional-events",
+            "statistics-variability"
+          ],
+          "caseIds": [
+            "mc-conditional-normalization"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "symbolic-reasoning",
+        "justification",
+        "technology-appropriate-method",
+        "mathematical-exploration"
+      ],
+      "examStrategyNote": "AA重视分析推理，并记录 SL/HL 分层与允许技术工具的边界；不自行推断可用/不可用计算器的卷别。",
+      "authoringGaps": [
+        "未与IB AA SL/HL当前课纲逐细目匹配",
+        "新课程（first assessment 2029）需独立版本"
+      ]
+    },
+    {
+      "id": "intl-ib-dp-math-ai-2026",
+      "nameZh": "IB DP Mathematics AI SL / HL（现行课程，2026）",
+      "examYear": 2026,
+      "region": "International Baccalaureate / DP",
+      "scopeNote": "应用与解释 AI 分 SL/HL；与 AA 的课程目标与评测侧重不同，不能当作只是一套更简单的数学题。",
+      "sources": [
+        {
+          "label": "IB Diploma Mathematics: AA/AI SL/HL, current final assessment 2028",
+          "url": "https://ibo.org/programmes/diploma-programme/curriculum/mathematics/",
+          "sourceKind": "official_curriculum",
+          "published": "2026-09-17"
+        },
+        {
+          "label": "IB Diploma mathematics curriculum update and first assessment 2029",
+          "url": "https://ibo.org/university-admission/latest-curriculum-updates/dp-mathematics-analysis-and-approaches-updates/",
+          "sourceKind": "official_exam_guidance",
+          "published": "2026-04-03"
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "model-functions",
+          "labelZh": "Functions, Modeling and Technology",
+          "nodeIds": [
+            "function-definition",
+            "exponential-laws",
+            "percent-base"
+          ],
+          "caseIds": [
+            "mc-percent-reversal"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "statistics",
+          "labelZh": "Statistics, Probability and Interpretation",
+          "nodeIds": [
+            "statistics-weighted",
+            "statistics-conditioning",
+            "conditional-events"
+          ],
+          "caseIds": [
+            "mc-simpson-aggregation"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "calculus-geometry",
+          "labelZh": "Geometry and Applied Calculus",
+          "nodeIds": [
+            "coordinate-geometry",
+            "derivatives-rate"
+          ],
+          "caseIds": [
+            "mc-endpoint-optimization"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "interpretation",
+        "real-world-modeling",
+        "data-literacy",
+        "technology-use"
+      ],
+      "examStrategyNote": "评价工具支持下的数学建模、解释和合理性检查，而不仅仅是算出数值；遵守 SL/HL 区别。",
+      "authoringGaps": [
+        "尚无带真实情境与计算技术的AI任务样例",
+        "2029新课纲需另起版本"
+      ]
+    },
+    {
+      "id": "us-ap-calculus-ab-2027",
+      "nameZh": "美国 AP Calculus AB（2027年5月考试）",
+      "examYear": 2027,
+      "region": "College Board / AP",
+      "scopeNote": "2027年的考试时长与选择题数量已调整，不能沿用2026题量；内容描述按2026–27 CED。",
+      "sources": [
+        {
+          "label": "College Board: AP Calculus BC 2026–27 clarification and 2027 exam update",
+          "url": "https://apcentral.collegeboard.org/courses/ap-calculus-bc",
+          "sourceKind": "official_curriculum",
+          "published": null
+        },
+        {
+          "label": "College Board: AP Calculus AB/BC course and exam update effective Fall 2026",
+          "url": "https://apcentral.collegeboard.org/media/pdf/ap-calculus-ab-bc-course-and-exam-description-clarifications-effective-fall-2026.pdf",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "limits-differentiation",
+          "labelZh": "Limits, Continuity and Derivatives",
+          "nodeIds": [
+            "limits-continuity",
+            "derivatives-rate",
+            "optimization-boundary"
+          ],
+          "caseIds": [
+            "mc-endpoint-optimization"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "integration",
+          "labelZh": "Integration and Differential Equations",
+          "nodeIds": [
+            "derivatives-rate"
+          ],
+          "caseIds": [],
+          "examRelevance": "curriculum-inferred"
+        }
+      ],
+      "capacities": [
+        "analytic-graphical-numeric-reasoning",
+        "mathematical-justification",
+        "calculus-procedures"
+      ],
+      "examStrategyNote": "重点区分解题过程、函数图像/表格/语言表征与计算器条件。",
+      "authoringGaps": [
+        "当前44节点严重缺少积分及微分方程",
+        "2027新版试卷题数和时长未录入"
+      ]
+    },
+    {
+      "id": "us-ap-calculus-bc-2027",
+      "nameZh": "美国 AP Calculus BC（2027年5月考试）",
+      "examYear": 2027,
+      "region": "College Board / AP",
+      "scopeNote": "BC包括AB内容，并额外覆盖参数/极坐标/向量值函数、无穷级数等；2027考试形式按新版，不能复用旧规则。",
+      "sources": [
+        {
+          "label": "College Board: AP Calculus BC 2026–27 clarification and 2027 exam update",
+          "url": "https://apcentral.collegeboard.org/courses/ap-calculus-bc",
+          "sourceKind": "official_curriculum",
+          "published": null
+        },
+        {
+          "label": "College Board: AP Calculus AB/BC course and exam update effective Fall 2026",
+          "url": "https://apcentral.collegeboard.org/media/pdf/ap-calculus-ab-bc-course-and-exam-description-clarifications-effective-fall-2026.pdf",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "ab-core",
+          "labelZh": "AB Core: Limits, Derivatives, Integration",
+          "nodeIds": [
+            "limits-continuity",
+            "derivatives-rate",
+            "optimization-boundary"
+          ],
+          "caseIds": [
+            "mc-endpoint-optimization"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "additional-bc",
+          "labelZh": "BC Extensions: Series, Polar, Parametric",
+          "nodeIds": [
+            "sequences-recursive",
+            "trigonometry"
+          ],
+          "caseIds": [],
+          "examRelevance": "curriculum-inferred"
+        }
+      ],
+      "capacities": [
+        "calculus",
+        "series-reasoning",
+        "multi-representation-justification"
+      ],
+      "examStrategyNote": "不能用简单求导案例代表BC完整覆盖，必须补级数与参数化等知识节点。",
+      "authoringGaps": [
+        "当前图谱缺乏级数、积分、参数方程等BC考点",
+        "2027更改的具体题量/用时待结构化核验"
+      ]
+    },
+    {
+      "id": "intl-gre-general-quant-2026",
+      "nameZh": "GRE General Test Quantitative Reasoning（2026）",
+      "examYear": 2026,
+      "region": "ETS / GRE General",
+      "scopeNote": "GRE Quant主要为算术、代数、几何、数据分析；官方明确不考三角函数、微积分、推断统计与构造证明，不能从国内考研数学直接继承知识模块。",
+      "sources": [
+        {
+          "label": "ETS: GRE General Test Quantitative Reasoning content",
+          "url": "https://www.ets.org/gre/test-takers/general-test/prepare/content/quantitative-reasoning.html",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        },
+        {
+          "label": "ETS: GRE General Test quantitative content and structure",
+          "url": "https://www.ets.org/gre/score-users/about/general-test/content-structure.html",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "arithmetic",
+          "labelZh": "Arithmetic",
+          "nodeIds": [
+            "integers-operations",
+            "fractions-units",
+            "ratios",
+            "percent-base"
+          ],
+          "caseIds": [
+            "mc-percent-reversal"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "algebra",
+          "labelZh": "Algebra",
+          "nodeIds": [
+            "linear-equations",
+            "quadratic-discriminant",
+            "function-definition"
+          ],
+          "caseIds": [
+            "mc-quadratic-condition"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "geometry",
+          "labelZh": "Geometry",
+          "nodeIds": [
+            "angles-triangles",
+            "similarity-scale",
+            "pythagoras"
+          ],
+          "caseIds": [
+            "mc-similarity-area"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "data",
+          "labelZh": "Data Analysis",
+          "nodeIds": [
+            "statistics-weighted",
+            "statistics-variability",
+            "probability-events"
+          ],
+          "caseIds": [
+            "mc-conditional-normalization"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "quantitative-comparison",
+        "problem-solving",
+        "data-interpretation",
+        "estimation"
+      ],
+      "examStrategyNote": "重点是基础知识的定量推理与选项比较，非高等数学内容深度。",
+      "authoringGaps": [
+        "缺少GRE Quantitative Comparison特有题型与自填题",
+        "限时与计算器情境尚未纳入"
+      ]
+    },
+    {
+      "id": "intl-gmat-quant-data-2026",
+      "nameZh": "GMAT Exam：Quantitative Reasoning & Data Insights（2026）",
+      "examYear": 2026,
+      "region": "GMAC / GMAT Exam",
+      "scopeNote": "GMAT 数学不等于GRE Quant；Quantitative Reasoning 目前强调算术、初等代数和解题，且该部分不允许计算器；Data Insights 可使用屏幕计算器。",
+      "sources": [
+        {
+          "label": "GMAC: GMAT Exam quantitative and Data Insights sections",
+          "url": "https://www.mba.com/exams/gmat-exam/about/exam-content",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        },
+        {
+          "label": "GMAC: GMAT Exam structure",
+          "url": "https://www.mba.com/exams/gmat-exam/about/exam-structure",
+          "sourceKind": "official_exam_guidance",
+          "published": null
+        }
+      ],
+      "examFormat": {
+        "timedExam": true,
+        "minutes": null,
+        "questionCount": null,
+        "pointWeightsKnown": false,
+        "formatNotes": "题型、分值、题量与计算器规定应参照该考试当年官方文件；本层不生成没有核实的配分权重。"
+      },
+      "modules": [
+        {
+          "id": "quantitative",
+          "labelZh": "Quantitative Reasoning / Problem Solving",
+          "nodeIds": [
+            "integers-operations",
+            "linear-equations",
+            "ratios",
+            "percent-base"
+          ],
+          "caseIds": [
+            "mc-percent-reversal"
+          ],
+          "examRelevance": "outline-supported"
+        },
+        {
+          "id": "data-insights",
+          "labelZh": "Data Insights / Sufficiency and Multiple Sources",
+          "nodeIds": [
+            "statistics-weighted",
+            "statistics-conditioning",
+            "ratios"
+          ],
+          "caseIds": [
+            "mc-simpson-aggregation"
+          ],
+          "examRelevance": "outline-supported"
+        }
+      ],
+      "capacities": [
+        "data-sufficiency",
+        "multi-source-reasoning",
+        "quantitative-logic",
+        "efficiency"
+      ],
+      "examStrategyNote": "记录 Data Sufficiency 是信息充分性判断而非单纯解方程；计算器权限要按 section 分开。",
+      "authoringGaps": [
+        "缺少 Data Sufficiency、Two-Part Analysis 与跨表资料形式",
+        "当前数学案例不能视为GMAT官方样本"
       ]
     }
   ]
