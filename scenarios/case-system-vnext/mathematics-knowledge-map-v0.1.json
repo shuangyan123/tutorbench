@@ -40,42 +40,50 @@
     {
       "id": "number-quantity",
       "label": "Numbers, quantities and proportional reasoning",
-      "pisaContent": "quantity"
+      "pisaContent": "quantity",
+      "classificationSource": "pisa-content"
     },
     {
       "id": "algebra-equations",
       "label": "Algebra and equations",
-      "pisaContent": "change-and-relationships"
+      "pisaContent": "change-and-relationships",
+      "classificationSource": "pisa-content"
     },
     {
       "id": "functions",
       "label": "Functions and change",
-      "pisaContent": "change-and-relationships"
+      "pisaContent": "change-and-relationships",
+      "classificationSource": "pisa-content"
     },
     {
       "id": "geometry",
       "label": "Geometry and spatial reasoning",
-      "pisaContent": "space-and-shape"
+      "pisaContent": "space-and-shape",
+      "classificationSource": "pisa-content"
     },
     {
       "id": "discrete-probability",
       "label": "Counting and probability",
-      "pisaContent": "uncertainty-and-data"
+      "pisaContent": "uncertainty-and-data",
+      "classificationSource": "pisa-content"
     },
     {
       "id": "statistics",
       "label": "Statistics and data interpretation",
-      "pisaContent": "uncertainty-and-data"
+      "pisaContent": "uncertainty-and-data",
+      "classificationSource": "pisa-content"
     },
     {
       "id": "proof-structures",
       "label": "Proof, logic and generalization",
-      "pisaContent": "cross-cutting"
+      "pisaContent": "cross-cutting",
+      "classificationSource": "tutorbench-internal"
     },
     {
       "id": "advanced-mathematics",
       "label": "Introductory calculus and linear algebra",
-      "pisaContent": "cross-cutting"
+      "pisaContent": "cross-cutting",
+      "classificationSource": "tutorbench-internal"
     }
   ],
   "nodes": [
