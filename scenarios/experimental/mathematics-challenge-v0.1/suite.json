@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
   "id": "mathematics-challenge-v0.1",
-  "version": "0.1.0",
-  "title": "Mathematics Challenge: Prerequisite and Conditional Reasoning (Experimental)",
-  "description": "Six synthetic checkpoints across two problem structures and three evidenced learner states each. Uncalibrated non-canonical pilot; no confidential partner or student data, no validated item difficulty or learner gains.",
+  "version": "0.2.0",
+  "title": "Mathematics Knowledge Coverage and Reasoning Challenge (Experimental)",
+  "description": "20 synthetic mathematics Tutor scenarios across 16 task structures from foundational number sense to introductory university mathematics. Experimental, uncalibrated and unregistered; not a learner study or a representative mathematics difficulty scale.",
   "healthTaxonomyVersion": "0.1.0",
   "scenarios": [
     {
@@ -781,6 +781,1892 @@
                 ],
                 "regressionTargets": [
                   "mc-conditional-transfer/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-fraction-units",
+        "version": "0.1.0",
+        "title": "fraction unit repair",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (fraction-unit-repair); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "fraction unit repair",
+        "learningObjective": "Correct the unlike-unit addition and explain that 2/3 and 8/12 represent the same amount, linking one-third to four twelfths rather than just presenting a rule.",
+        "learnerLevel": "upper-primary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "equal parts of the same whole"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Adds unlike fractional units and denominator labels separately.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I got 2/3 + 1/4 = 3/7. When you say use the same-sized pieces, I don't understand how a third can turn into twelfths. Don't just tell me a trick."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "partial_solution"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-fraction-units",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Correct the unlike-unit addition and explain that 2/3 and 8/12 represent the same amount, linking one-third to four twelfths rather than just presenting a rule.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-fraction-units-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Reject 3/7 and correctly explain that addition requires common-sized fractional units.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_fraction_units_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Reject 3/7 and correctly explain that addition requires common-sized fractional units.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Reject 3/7 and correctly explain that addition requires common-sized fractional units."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-fraction-units/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-fraction-units-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Use a unit-preserving representation or conversion justified from the known whole rather than simply directing the learner to memorize cross multiplication.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_fraction_units_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Use a unit-preserving representation or conversion justified from the known whole rather than simply directing the learner to memorize cross multiplication.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Use a unit-preserving representation or conversion justified from the known whole rather than simply directing the learner to memorize cross multiplication."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-fraction-units/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-percent-reversal",
+        "version": "0.1.0",
+        "title": "successive percentage base",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (successive-percentage-base); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "successive percentage base",
+        "learningObjective": "Preserve the student's percent calculation ability and focus attention on the second change being calculated from the new price, without disclosing the final price.",
+        "learnerLevel": "lower-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "percent of a number"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Treats equal percentage changes applied to different bases as cancelling additively.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "A product costs 200. It goes up 20% and then down 20%. I said it must be back to 200 because the changes cancel. I can calculate 20% of 200, so what is wrong with my reasoning?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-percent-reversal",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Preserve the student's percent calculation ability and focus attention on the second change being calculated from the new price, without disclosing the final price.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-percent-reversal-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Identify that the second 20% refers to the increased price and cannot cancel the first 20% change.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_percent_reversal_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Identify that the second 20% refers to the increased price and cannot cancel the first 20% change.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Identify that the second 20% refers to the increased price and cannot cancel the first 20% change."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-percent-reversal/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-percent-reversal-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Provide a concise executable next step to determine the intermediate price then use it as the second percentage base without revealing the final price.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_percent_reversal_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Provide a concise executable next step to determine the intermediate price then use it as the second percentage base without revealing the final price.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Provide a concise executable next step to determine the intermediate price then use it as the second percentage base without revealing the final price."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-percent-reversal/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-rational-domain",
+        "version": "0.1.0",
+        "title": "rational equation excluded root",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (rational-equation-excluded-root); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "rational equation excluded root",
+        "learningObjective": "Preserve the valid cancellation for x not equal to 1 but explain the original denominator forbids the only candidate, so there is no solution; do not call the student's algebra wholly incorrect.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "difference of squares",
+          "linear equations"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Assumes cancelling a factor preserves an expression's domain at its zeros.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "For (x^2 - 1)/(x - 1) = 2, I cancelled x-1, got x+1=2, so x=1. The algebra is correct. Is 1 the solution?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-rational-domain",
+          "turnIndex": 1,
+          "expectedDecision": "protect_learning_integrity",
+          "expectedBehavior": "Preserve the valid cancellation for x not equal to 1 but explain the original denominator forbids the only candidate, so there is no solution; do not call the student's algebra wholly incorrect.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-rational-domain-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "State that x=1 is excluded by the original denominator and the original equation has no solution.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_rational_domain_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: State that x=1 is excluded by the original denominator and the original equation has no solution.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: State that x=1 is excluded by the original denominator and the original equation has no solution."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-rational-domain/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-rational-domain-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Identify exactly where the domain condition must be retained while acknowledging the correct conditional cancellation step.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_rational_domain_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Identify exactly where the domain condition must be retained while acknowledging the correct conditional cancellation step.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Identify exactly where the domain condition must be retained while acknowledging the correct conditional cancellation step."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-rational-domain/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-composition-domain",
+        "version": "0.1.0",
+        "title": "function composition domains",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (function-composition-domains); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "function composition domains",
+        "learningObjective": "Distinguish the domain constraints: f(g(x)) needs x²≥1, which includes negative inputs; g(f(x)) requires x≥1. Do not give the full interval notation when only a pointer is requested.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "square-root nonnegativity",
+          "function composition"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Assumes two compositions with different inner constraints have identical domains.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "Let f(x)=sqrt(x-1) and g(x)=x^2. I wrote f(g(x))=sqrt(x^2-1) and g(f(x))=x-1, so both must have domain x>=1. Is that definitely correct? I only want a pointer."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-composition-domain",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Distinguish the domain constraints: f(g(x)) needs x²≥1, which includes negative inputs; g(f(x)) requires x≥1. Do not give the full interval notation when only a pointer is requested.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-composition-domain-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Correctly identify that x²≥1 includes values x≤-1 as well as x≥1, unlike g(f(x)).",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_composition_domain_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Correctly identify that x²≥1 includes values x≤-1 as well as x≥1, unlike g(f(x)).",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Correctly identify that x²≥1 includes values x≤-1 as well as x≥1, unlike g(f(x))."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-composition-domain/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-composition-domain-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Respect the bounded hint request, directing the learner to check the inner and outer admissibility separately without presenting both final domain sets.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_composition_domain_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Respect the bounded hint request, directing the learner to check the inner and outer admissibility separately without presenting both final domain sets.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Respect the bounded hint request, directing the learner to check the inner and outer admissibility separately without presenting both final domain sets."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-composition-domain/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-logarithm-base",
+        "version": "0.1.0",
+        "title": "decreasing logarithm inequality",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (decreasing-logarithm-inequality); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "decreasing logarithm inequality",
+        "learningObjective": "Remind that log base 1/2 decreases, so comparing logarithms reverses the argument relation, and also ask about x-1>0. Do not disclose the final interval.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "logarithm base restrictions",
+          "solve basic inequalities"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Treats a base between 0 and 1 as an increasing logarithmic function.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I solved log base 1/2 of (x-1) > -1 by writing x-1 > 2, so x>3. I can't see why my inequality direction might be wrong. Please hint first."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-logarithm-base",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Remind that log base 1/2 decreases, so comparing logarithms reverses the argument relation, and also ask about x-1>0. Do not disclose the final interval.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-logarithm-base-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Flag that log base 1/2 is decreasing, so the student's x-1>2 condition is incorrect.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_logarithm_base_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Flag that log base 1/2 is decreasing, so the student's x-1>2 condition is incorrect.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Flag that log base 1/2 is decreasing, so the student's x-1>2 condition is incorrect."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-logarithm-base/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-logarithm-base-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Give a hint about both monotonicity and logarithm domain without immediately stating the final solution set.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_logarithm_base_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Give a hint about both monotonicity and logarithm domain without immediately stating the final solution set.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Give a hint about both monotonicity and logarithm domain without immediately stating the final solution set."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-logarithm-base/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-similarity-area",
+        "version": "0.1.0",
+        "title": "similar geometry area scale",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (similar-geometry-area-scale); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "similar geometry area scale",
+        "learningObjective": "Repair the linear-versus-area misconception using base and height each scaling by 3/2, or an equivalent image, and show why the resulting area ratio is 9:4.",
+        "learnerLevel": "lower-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "triangle similarity",
+          "area = base times height / 2"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Confuses a linear similarity factor with a two-dimensional area scale.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "Two similar triangles have corresponding side lengths in the ratio 3:2. I wrote that their areas are also in the ratio 3:2 because a bigger triangle just scales up. How can I check whether that is right without memorizing a new formula?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "partial_solution"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-similarity-area",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Repair the linear-versus-area misconception using base and height each scaling by 3/2, or an equivalent image, and show why the resulting area ratio is 9:4.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-similarity-area-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Correctly derive area ratio 9:4 and explain why both base and height scale.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_similarity_area_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Correctly derive area ratio 9:4 and explain why both base and height scale.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Correctly derive area ratio 9:4 and explain why both base and height scale."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-similarity-area/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-similarity-area-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Connect the calculation to the learner's known triangle area formula instead of requiring a memorized area-scale rule.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_similarity_area_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Connect the calculation to the learner's known triangle area formula instead of requiring a memorized area-scale rule.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Connect the calculation to the learner's known triangle area formula instead of requiring a memorized area-scale rule."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-similarity-area/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-circle-tangency",
+        "version": "0.1.0",
+        "title": "circle line tangency constraint",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (circle-line-tangency-constraint); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "circle line tangency constraint",
+        "learningObjective": "Help the learner distinguish intersection from tangency by checking whether the line has a second intersection with the circle, or whether it is perpendicular to the radius. Do not reveal the slope.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "circle x^2+y^2=r^2",
+          "line slope",
+          "quadratic equations"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Treats passing through a boundary point as sufficient for tangency.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "On x^2+y^2=25, the family y=m*x+5 always goes through the top point (0,5). I claimed every value of m makes a tangent because the line touches that point. What am I missing? Please don't tell me m yet."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-circle-tangency",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Help the learner distinguish intersection from tangency by checking whether the line has a second intersection with the circle, or whether it is perpendicular to the radius. Do not reveal the slope.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-circle-tangency-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Make clear that passing through (0,5) alone does not guarantee tangency and the line must have only one geometric intersection there.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_circle_tangency_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Make clear that passing through (0,5) alone does not guarantee tangency and the line must have only one geometric intersection there.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Make clear that passing through (0,5) alone does not guarantee tangency and the line must have only one geometric intersection there."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-circle-tangency/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-circle-tangency-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Give an executable algebraic or geometric check preserving the student's request not to reveal the slope.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_circle_tangency_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Give an executable algebraic or geometric check preserving the student's request not to reveal the slope.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Give an executable algebraic or geometric check preserving the student's request not to reveal the slope."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-circle-tangency/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-repeated-symbols",
+        "version": "0.1.0",
+        "title": "permutations with indistinguishable objects",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (permutations-with-indistinguishable-objects); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "permutations with indistinguishable objects",
+        "learningObjective": "Explain the distinction between physical tile selections and distinct resulting strings, separate the AAB and ABB compositions, and justify that there are six unique strings.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "multiplication rule",
+          "3-position strings"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Treats physically distinct duplicate-letter tiles as distinct string outcomes.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I have four tiles labelled A, A, B, B. Choose three without replacement and arrange them. I said there are 4*3*2 = 24 different 3-letter strings. The tiles are physically different, so surely each choice counts? Check my reasoning."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "partial_solution"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-repeated-symbols",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Explain the distinction between physical tile selections and distinct resulting strings, separate the AAB and ABB compositions, and justify that there are six unique strings.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-repeated-symbols-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Identify the overcounting and state that there are exactly six distinct possible three-letter strings.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_repeated_symbols_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Identify the overcounting and state that there are exactly six distinct possible three-letter strings.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Identify the overcounting and state that there are exactly six distinct possible three-letter strings."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-repeated-symbols/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-repeated-symbols-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Relate the correction to indistinguishable symbol outcomes using a concrete enumeration or disjoint case split rather than an unexplained factorial formula.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_repeated_symbols_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Relate the correction to indistinguishable symbol outcomes using a concrete enumeration or disjoint case split rather than an unexplained factorial formula.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Relate the correction to indistinguishable symbol outcomes using a concrete enumeration or disjoint case split rather than an unexplained factorial formula."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-repeated-symbols/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-bayes-base-rate",
+        "version": "0.1.0",
+        "title": "base rate inverse probability",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (base-rate-inverse-probability); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "base rate inverse probability",
+        "learningObjective": "Use 10,000 items: 100 defective, 9,900 sound; 90 true positives and 495 false positives; among 585 positive items the defective fraction is 90/585=2/13, not 90%.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "conditional probability",
+          "percent frequencies"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Confuses P(positive | defective) with P(defective | positive).",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "In a factory, 1% of items are defective. A test flags 90% of defective items and 5% of nondefective ones. An item tests positive. I said its chance of being defective is 90%. Can you show how the base rate matters using a group of 10,000 items?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-bayes-base-rate",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Use 10,000 items: 100 defective, 9,900 sound; 90 true positives and 495 false positives; among 585 positive items the defective fraction is 90/585=2/13, not 90%.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-bayes-base-rate-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Correctly derive P(defect | positive)=90/585=2/13 using the stated sensitivity, false-positive rate and 1% base rate.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_bayes_base_rate_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Correctly derive P(defect | positive)=90/585=2/13 using the stated sensitivity, false-positive rate and 1% base rate.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Correctly derive P(defect | positive)=90/585=2/13 using the stated sensitivity, false-positive rate and 1% base rate."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-bayes-base-rate/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-bayes-base-rate-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Explain why the conditioning denominator is all positive tests, including false positives, in the learner's requested 10,000-item representation.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_bayes_base_rate_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Explain why the conditioning denominator is all positive tests, including false positives, in the learner's requested 10,000-item representation.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Explain why the conditioning denominator is all positive tests, including false positives, in the learner's requested 10,000-item representation."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-bayes-base-rate/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-simpson-aggregation",
+        "version": "0.1.0",
+        "title": "simpson paradox unequal mixtures",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (simpson-paradox-unequal-mixtures); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "simpson paradox unequal mixtures",
+        "learningObjective": "Compute within-group and pooled rates correctly and explain the reversal from uneven group composition; clarify the aggregate figures do not by themselves establish causal superiority of either method.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "percent and proportions",
+          "weighted means"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Assumes group-level higher rates must imply a higher pooled rate.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "Method A worked 9/10 times in group 1 and 20/100 in group 2. Method B worked 80/100 in group 1 and 1/10 in group 2. A is better in each group, but my friend says B is better overall. Surely one of us made a math mistake. Please check carefully."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-simpson-aggregation",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Compute within-group and pooled rates correctly and explain the reversal from uneven group composition; clarify the aggregate figures do not by themselves establish causal superiority of either method.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-simpson-aggregation-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Explain how A can outperform B in both groups while pooled A=29/110 and B=81/110, with correct denominators and no invented causal claim.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_simpson_aggregation_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Explain how A can outperform B in both groups while pooled A=29/110 and B=81/110, with correct denominators and no invented causal claim.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Explain how A can outperform B in both groups while pooled A=29/110 and B=81/110, with correct denominators and no invented causal claim."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-simpson-aggregation/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-simpson-aggregation-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Help the learner identify differing group weights as the key structural reason rather than dismissing either calculation as a mistake.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_simpson_aggregation_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Help the learner identify differing group weights as the key structural reason rather than dismissing either calculation as a mistake.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Help the learner identify differing group weights as the key structural reason rather than dismissing either calculation as a mistake."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-simpson-aggregation/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-induction-recurrence",
+        "version": "0.1.0",
+        "title": "recurrence mathematical induction",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (recurrence-mathematical-induction); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "recurrence mathematical induction",
+        "learningObjective": "Preserve the correct conjecture, explicitly separate numerical checks from general proof, and guide substituting the induction hypothesis a_k=2^k-1 into a_(k+1)=2a_k+1 without finishing the complete induction.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "powers of two",
+          "sequences",
+          "algebraic substitution"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Treats a few verified terms as sufficient proof for all positive integers.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 2,
+        "failedAttempts": 1,
+        "priorHints": [
+          "What must be shown to cover every positive integer n?"
+        ],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I have a_1=1 and a_(n+1)=2a_n+1. The first terms 1,3,7 made me guess a_n=2^n-1. I've checked n=1,2,3 so I think it is proved."
+          },
+          {
+            "role": "assistant",
+            "content": "The pattern looks promising. What must be shown to cover every positive integer n?"
+          },
+          {
+            "role": "user",
+            "content": "I think I need an induction step, but I don't know what to substitute for a_k when computing a_(k+1). Give me a precise hint, not the entire proof."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-induction-recurrence",
+          "turnIndex": 2,
+          "expectedDecision": "escalate_support",
+          "expectedBehavior": "Preserve the correct conjecture, explicitly separate numerical checks from general proof, and guide substituting the induction hypothesis a_k=2^k-1 into a_(k+1)=2a_k+1 without finishing the complete induction.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-induction-recurrence-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Distinguish pattern checks from a general proof, and keep the induction hypothesis and recurrence mathematically consistent.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_induction_recurrence_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Distinguish pattern checks from a general proof, and keep the induction hypothesis and recurrence mathematically consistent.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Distinguish pattern checks from a general proof, and keep the induction hypothesis and recurrence mathematically consistent."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-induction-recurrence/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-induction-recurrence-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Escalate from a vague prompt to the specific substitution needed after the prior hint failed, while honoring the hint-only request.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_induction_recurrence_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Escalate from a vague prompt to the specific substitution needed after the prior hint failed, while honoring the hint-only request.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Escalate from a vague prompt to the specific substitution needed after the prior hint failed, while honoring the hint-only request."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-induction-recurrence/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-amgm-domain",
+        "version": "0.1.0",
+        "title": "inequality conditions and counterexample",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (inequality-conditions-and-counterexample); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "inequality conditions and counterexample",
+        "learningObjective": "Preserve the valid result for x>0, give an explicit negative counterexample (x=-1), state the positivity requirement for AM-GM and equality at x=1; do not characterize all original reasoning as invalid.",
+        "learnerLevel": "upper-secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "AM-GM for positive reals",
+          "reciprocal expressions"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Applies nonnegative-domain AM-GM to negative values of x.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I proved x + 1/x >= 2 using AM-GM. I wrote 'for every real x except 0' because the expression exists there. My teacher says the proof's domain is wrong. But doesn't AM-GM always work?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-amgm-domain",
+          "turnIndex": 1,
+          "expectedDecision": "protect_learning_integrity",
+          "expectedBehavior": "Preserve the valid result for x>0, give an explicit negative counterexample (x=-1), state the positivity requirement for AM-GM and equality at x=1; do not characterize all original reasoning as invalid.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-amgm-domain-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "State that the universal x≠0 claim is false, show x=-1 counterexample, and correctly restrict x+1/x>=2 to x>0 with equality at 1.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_amgm_domain_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: State that the universal x≠0 claim is false, show x=-1 counterexample, and correctly restrict x+1/x>=2 to x>0 with equality at 1.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: State that the universal x≠0 claim is false, show x=-1 counterexample, and correctly restrict x+1/x>=2 to x>0 with equality at 1."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-amgm-domain/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-amgm-domain-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Localize the failed premise (positivity of both AM-GM terms) and preserve the valid positive-domain proof.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_amgm_domain_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Localize the failed premise (positivity of both AM-GM terms) and preserve the valid positive-domain proof.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Localize the failed premise (positivity of both AM-GM terms) and preserve the valid positive-domain proof."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-amgm-domain/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-endpoint-optimization",
+        "version": "0.1.0",
+        "title": "closed interval optimization endpoints",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (closed-interval-optimization-endpoints); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "closed interval optimization endpoints",
+        "learningObjective": "Acknowledge the valid critical points and ask the learner to check f(-2),f(2) and compare all four candidates, without re-teaching differentiation or disclosing final extrema.",
+        "learnerLevel": "university-intro"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "derivative of polynomials",
+          "solve 3x²-3=0"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Assumes all global extrema of a closed interval occur only where the derivative vanishes, and overlooks tied endpoints.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "For f(x)=x^3-3x on [-2,2], I set f'(x)=0 and found x=-1,1. I called x=-1 the unique global maximum and x=1 the unique global minimum. What's wrong with my conclusion? I can evaluate a polynomial myself, so don't repeat derivative basics."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-endpoint-optimization",
+          "turnIndex": 1,
+          "expectedDecision": "fade_support",
+          "expectedBehavior": "Acknowledge the valid critical points and ask the learner to check f(-2),f(2) and compare all four candidates, without re-teaching differentiation or disclosing final extrema.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-endpoint-optimization-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Identify that the endpoints must also be evaluated and can tie the interior extrema, invalidating 'unique'.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_endpoint_optimization_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Identify that the endpoints must also be evaluated and can tie the interior extrema, invalidating 'unique'.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Identify that the endpoints must also be evaluated and can tie the interior extrema, invalidating 'unique'."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-endpoint-optimization/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-endpoint-optimization-2",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Preserve the correct derivative work and supply a focused endpoint-comparison hint rather than a full derivative lesson or final answer.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_endpoint_optimization_2",
+                "title": "Mathematics adaptation mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Preserve the correct derivative work and supply a focused endpoint-comparison hint rather than a full derivative lesson or final answer.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Preserve the correct derivative work and supply a focused endpoint-comparison hint rather than a full derivative lesson or final answer."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-endpoint-optimization/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-linear-dependence",
+        "version": "0.1.0",
+        "title": "linear system consistency versus rank",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Synthetic mathematics knowledge-coverage checkpoint (linear-system-consistency-versus-rank); author-proposed and non-canonical.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "linear system consistency versus rank",
+        "learningObjective": "Compare the doubled first equation 2x+4y=6 against 2x+4y=7 and conclude inconsistency, distinguishing singular from compatible underdetermined systems.",
+        "learnerLevel": "university-intro"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "determinant and rank basics",
+          "linear systems"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Infers infinite solutions from a singular coefficient matrix without checking consistency.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "engagement": "steady",
+        "masteryState": "developing"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "The matrix for x+2y=3, 2x+4y=7 has determinant zero. That means the two equations depend on each other, so I said the system has infinitely many solutions. I am not sure why the answer key says no solutions."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-linear-dependence",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Compare the doubled first equation 2x+4y=6 against 2x+4y=7 and conclude inconsistency, distinguishing singular from compatible underdetermined systems.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-linear-dependence-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Conclude the system has no solution since 2(x+2y)=6 conflicts with 2x+4y=7; singularity alone does not imply infinitely many solutions.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_linear_dependence_1",
+                "title": "Mathematics correctness mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Conclude the system has no solution since 2(x+2y)=6 conflicts with 2x+4y=7; singularity alone does not imply infinitely many solutions.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Conclude the system has no solution since 2(x+2y)=6 conflicts with 2x+4y=7; singularity alone does not imply infinitely many solutions."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-linear-dependence/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-linear-dependence-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Explain the mismatch using a minimal familiar row comparison before abstract rank terminology, while allowing rank as an alternative justification.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_linear_dependence_2",
+                "title": "Mathematics guidance mismatch",
+                "severity": "minor",
+                "observedBehavior": "Tutor did not satisfy this scoped observable requirement: Explain the mismatch using a minimal familiar row comparison before abstract rank terminology, while allowing rank as an alternative justification.",
+                "diagnosis": "Observed tutoring response deviated from authored mathematical or instructional reference; no learner gain is inferred.",
+                "impact": "The learner may receive an inaccurate mathematical constraint or an inappropriate next step.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may not condition its answer on demonstrated mathematical reasoning and the requested assistance level.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Inspect the learner's exact utterance and this criterion: Explain the mismatch using a minimal familiar row comparison before abstract rank terminology, while allowing rank as an alternative justification."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Keep valid intermediate reasoning and align mathematical precision and disclosure with the observed gap."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-linear-dependence/next-response"
                 ],
                 "confidence": 0.55
               }
