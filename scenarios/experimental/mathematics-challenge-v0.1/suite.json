@@ -1,0 +1,793 @@
+{
+  "schemaVersion": 3,
+  "id": "mathematics-challenge-v0.1",
+  "version": "0.1.0",
+  "title": "Mathematics Challenge: Prerequisite and Conditional Reasoning (Experimental)",
+  "description": "Six synthetic checkpoints across two problem structures and three evidenced learner states each. Uncalibrated non-canonical pilot; no confidential partner or student data, no validated item difficulty or learner gains.",
+  "healthTaxonomyVersion": "0.1.0",
+  "scenarios": [
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-quadratic-condition",
+        "version": "0.1.0",
+        "title": "Quadratic parameter: real roots are not necessarily positive",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Author-owned synthetic paired-state mathematics teaching checkpoint. Not a calibrated item: Distinguish two distinct real roots from two distinct positive real roots while preserving a valid discriminant calculation.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "parameterized quadratic equations",
+        "learningObjective": "Distinguish two distinct real roots from two distinct positive real roots while preserving a valid discriminant calculation.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "quadratic discriminant",
+          "Vieta's sum and product of roots"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Treats a positive discriminant as sufficient for two positive roots.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "masteryState": "developing",
+        "engagement": "steady"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "For x^2 - 2a*x + a + 2 = 0, I found that the discriminant is positive when a < -1 or a > 2. I concluded these all give two different positive roots. Is that enough? Please give me a hint rather than the range."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-quadratic-condition",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Acknowledge the correct discriminant interval but distinguish distinct real roots from positive roots; invite the learner to check the signs of root sum and product using a familiar method without disclosing the final range.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-quadratic-condition-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Do not assert that the positive-discriminant interval alone guarantees two positive roots; identify that positivity imposes another condition.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_quadratic_condition_correctness",
+                "title": "Experimental math checkpoint: correctness",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Do not assert that the positive-discriminant interval alone guarantees two positive roots; identify that positivity imposes another condition.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Do not assert that the positive-discriminant interval alone guarantees two positive roots; identify that positivity imposes another condition."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-quadratic-condition/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-quadratic-condition-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Honor the hint-only request by directing attention to root signs, sum and product or an equally valid method, without giving the final parameter range.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_quadratic_condition_guidance",
+                "title": "Experimental math checkpoint: guidance",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Honor the hint-only request by directing attention to root signs, sum and product or an equally valid method, without giving the final parameter range.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Honor the hint-only request by directing attention to root signs, sum and product or an equally valid method, without giving the final parameter range."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-quadratic-condition/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-quadratic-prerequisite",
+        "version": "0.1.0",
+        "title": "Quadratic parameter: explain an unfamiliar prerequisite",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Author-owned synthetic paired-state mathematics teaching checkpoint. Not a calibrated item: Connect the signs of roots to a mathematically accessible representation without assuming familiarity with Vieta's formulas.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "parameterized quadratic equations",
+        "learningObjective": "Connect the signs of roots to a mathematically accessible representation without assuming familiarity with Vieta's formulas.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "quadratic discriminant",
+          "factoring simple quadratics"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [],
+        "confidence": 0.35,
+        "masteryState": "developing",
+        "engagement": "steady"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "For x^2 - 2a*x + a + 2 = 0, I can check the discriminant, but I do not know what teachers mean by 'sum and product of the roots'. How can that tell us whether both roots are positive?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-quadratic-prerequisite",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Define root sum and product accessibly, e.g. by expanding (x-r1)(x-r2), and connect the signs to both-positive roots; an equivalent accessible graphical argument is acceptable. Do not treat an unexpressed misconception as fact.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-quadratic-prerequisite-1",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Explain why the coefficients encode the root sum and product, or supply a prerequisite-accessible equivalent explanation, before applying sign conditions.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_quadratic_prerequisite_guidance",
+                "title": "Experimental math checkpoint: guidance",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Explain why the coefficients encode the root sum and product, or supply a prerequisite-accessible equivalent explanation, before applying sign conditions.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Explain why the coefficients encode the root sum and product, or supply a prerequisite-accessible equivalent explanation, before applying sign conditions."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-quadratic-prerequisite/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-quadratic-prerequisite-2",
+              "category": "diagnosis",
+              "dimension": "learner_diagnosis",
+              "criterion": "Respond to the explicitly missing terminology without claiming the learner lacks other unobserved algebra knowledge.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_quadratic_prerequisite_diagnosis",
+                "title": "Experimental math checkpoint: diagnosis",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Respond to the explicitly missing terminology without claiming the learner lacks other unobserved algebra knowledge.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Respond to the explicitly missing terminology without claiming the learner lacks other unobserved algebra knowledge."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-quadratic-prerequisite/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-quadratic-transfer",
+        "version": "0.1.0",
+        "title": "Quadratic parameter: validate and extend sound reasoning",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Author-owned synthetic paired-state mathematics teaching checkpoint. Not a calibrated item: Confirm a sound sign-based reasoning chain and adapt it for a related root-sign condition without restarting the entire solution.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "parameterized quadratic equations",
+        "learningObjective": "Confirm a sound sign-based reasoning chain and adapt it for a related root-sign condition without restarting the entire solution.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "quadratic discriminant",
+          "Vieta's sum and product of roots",
+          "inequalities"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [],
+        "confidence": 0.8,
+        "masteryState": "near_mastery",
+        "engagement": "steady"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I checked discriminant > 0, root sum 2a > 0, and root product a + 2 > 0. The intersection is a > 2. Is that correct? Instead of explaining all the basics again, how would I adapt the conditions if the roots had to be negative?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed",
+        "mastery": {
+          "independentSuccessesToConfirm": 2
+        }
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-quadratic-transfer",
+          "turnIndex": 1,
+          "expectedDecision": "fade_support",
+          "expectedBehavior": "Confirm the correct result a>2 and the role of all three strict conditions, preserve the learner's valid reasoning and guide the negative-roots transfer using discriminant>0, sum<0, product>0 (or equivalent) without unnecessary remedial explanation.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-quadratic-transfer-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Confirm that a > 2 is the exact range for two distinct positive real roots and use strict signs consistently for the negative-root variation.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_quadratic_transfer_correctness",
+                "title": "Experimental math checkpoint: correctness",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Confirm that a > 2 is the exact range for two distinct positive real roots and use strict signs consistently for the negative-root variation.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Confirm that a > 2 is the exact range for two distinct positive real roots and use strict signs consistently for the negative-root variation."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-quadratic-transfer/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-quadratic-transfer-2",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Build on the demonstrated three-condition method, moving to negative roots without re-teaching the already evidenced quadratic fundamentals.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_quadratic_transfer_adaptation",
+                "title": "Experimental math checkpoint: adaptation",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Build on the demonstrated three-condition method, moving to negative roots without re-teaching the already evidenced quadratic fundamentals.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Build on the demonstrated three-condition method, moving to negative roots without re-teaching the already evidenced quadratic fundamentals."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-quadratic-transfer/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-conditional-normalization",
+        "version": "0.1.0",
+        "title": "Conditional probability: change the sample space",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Author-owned synthetic paired-state mathematics teaching checkpoint. Not a calibrated item: Recognize that conditioning on at least one red draw changes the relevant sample space.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "sampling without replacement and conditional probability",
+        "learningObjective": "Recognize that conditioning on at least one red draw changes the relevant sample space.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "probability of sequential draws without replacement"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "Treats the unconditional two-red probability as the conditional probability despite the extra information.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ],
+        "confidence": 0.55,
+        "masteryState": "developing",
+        "engagement": "steady"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "There are 5 red and 4 blue balls. We draw 2 without replacement and are told at least one is red. I calculated (5/9)*(4/8) for both red. Is that enough for the probability *given at least one red*? Please do not tell me the final fraction."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-conditional-normalization",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Make the distinction between unconditional and conditional probability actionable by asking what the given event removes from the sample space; do not reveal the final conditional fraction.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-conditional-normalization-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Distinguish the unconditional probability of two red draws from its probability conditional on at least one red; do not endorse the unconditional product as the answer.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_conditional_normalization_correctness",
+                "title": "Experimental math checkpoint: correctness",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Distinguish the unconditional probability of two red draws from its probability conditional on at least one red; do not endorse the unconditional product as the answer.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Distinguish the unconditional probability of two red draws from its probability conditional on at least one red; do not endorse the unconditional product as the answer."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-conditional-normalization/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-conditional-normalization-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Give an executable hint about restricting or normalizing the sample space without revealing the final conditional probability.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_conditional_normalization_guidance",
+                "title": "Experimental math checkpoint: guidance",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Give an executable hint about restricting or normalizing the sample space without revealing the final conditional probability.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Give an executable hint about restricting or normalizing the sample space without revealing the final conditional probability."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-conditional-normalization/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-conditional-prerequisite",
+        "version": "0.1.0",
+        "title": "Conditional probability: count without combination notation",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Author-owned synthetic paired-state mathematics teaching checkpoint. Not a calibrated item: Explain unordered pair counting using concrete groups instead of unexplained binomial notation.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "sampling without replacement and conditional probability",
+        "learningObjective": "Explain unordered pair counting using concrete groups instead of unexplained binomial notation.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "multiplication principle",
+          "pairs without regard to order"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [],
+        "confidence": 0.3,
+        "masteryState": "developing",
+        "engagement": "steady"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "With 5 red and 4 blue balls, two are drawn without replacement. We know at least one is red. Someone says there are 30 possible unordered pairs left. I do not know nCr or combinations yet. How can I understand why 30 is right?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-conditional-prerequisite",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Count red-blue pairs as 5*4=20 and red-red pairs as 5*4/2=10, explaining unordered pairs in plain language; use that to justify 30 without presupposing nCr notation.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-conditional-prerequisite-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Justify the 30 unordered eligible pairs with 20 mixed pairs and 10 red-red pairs (or an equivalent non-formula count).",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_conditional_prerequisite_correctness",
+                "title": "Experimental math checkpoint: correctness",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Justify the 30 unordered eligible pairs with 20 mixed pairs and 10 red-red pairs (or an equivalent non-formula count).",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Justify the 30 unordered eligible pairs with 20 mixed pairs and 10 red-red pairs (or an equivalent non-formula count)."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-conditional-prerequisite/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-conditional-prerequisite-2",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Do not rely on unexplained nCr notation after the learner explicitly says it is unfamiliar; explain the counting prerequisite accessibly.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_conditional_prerequisite_guidance",
+                "title": "Experimental math checkpoint: guidance",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Do not rely on unexplained nCr notation after the learner explicitly says it is unfamiliar; explain the counting prerequisite accessibly.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Do not rely on unexplained nCr notation after the learner explicitly says it is unfamiliar; explain the counting prerequisite accessibly."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-conditional-prerequisite/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "mc-conditional-transfer",
+        "version": "0.1.0",
+        "title": "Conditional probability: fade support for transfer",
+        "suiteId": "mathematics-challenge-v0.1"
+      },
+      "description": "Author-owned synthetic paired-state mathematics teaching checkpoint. Not a calibrated item: Move from a correct two-draw conditional sample space to a new three-draw set-up without supplying the requested independent calculation.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "sampling without replacement and conditional probability",
+        "learningObjective": "Move from a correct two-draw conditional sample space to a new three-draw set-up without supplying the requested independent calculation.",
+        "learnerLevel": "secondary"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": [
+          "combinations",
+          "conditional probability",
+          "sampling without replacement"
+        ]
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [],
+        "confidence": 0.8,
+        "masteryState": "near_mastery",
+        "engagement": "steady"
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "For 2 draws, I counted 10 all-red pairs out of 30 pairs with at least one red, so the conditional probability is 1/3. If we draw 3 balls instead, can you give me the plan for constructing the new conditional probability, but not the numerical answer?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only",
+        "mastery": {
+          "independentSuccessesToConfirm": 2
+        }
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "mc-conditional-transfer",
+          "turnIndex": 1,
+          "expectedDecision": "fade_support",
+          "expectedBehavior": "Confirm the correct two-draw result and encourage a reusable numerator/denominator set-up for three draws: all-red triples over all triples minus all-blue triples, without evaluating the new numerical probability.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "mc-conditional-transfer-1",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Confirm 10/30=1/3 for two draws and specify that three-draw numerator and denominator count consistent unordered triple events.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_conditional_transfer_correctness",
+                "title": "Experimental math checkpoint: correctness",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Confirm 10/30=1/3 for two draws and specify that three-draw numerator and denominator count consistent unordered triple events.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Confirm 10/30=1/3 for two draws and specify that three-draw numerator and denominator count consistent unordered triple events."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-conditional-transfer/next-response"
+                ],
+                "confidence": 0.55
+              }
+            },
+            {
+              "rubricId": "mc-conditional-transfer-2",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Respect demonstrated competence and the request for a plan, not a numerical answer; avoid rebuilding elementary probability from scratch.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "mc_conditional_transfer_adaptation",
+                "title": "Experimental math checkpoint: adaptation",
+                "severity": "minor",
+                "observedBehavior": "The response fails this authored criterion: Respect demonstrated competence and the request for a plan, not a numerical answer; avoid rebuilding elementary probability from scratch.",
+                "diagnosis": "This synthetic checkpoint tests a bounded mathematical and pedagogical requirement; this finding is not evidence of learner outcomes.",
+                "impact": "The learner could receive incorrect mathematical support or a mismatched level of scaffolding.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The response may not use the learner's expressed reasoning and prerequisite evidence to choose its next action.",
+                    "confidence": 0.35
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review learner-visible evidence against the single criterion: Respect demonstrated competence and the request for a plan, not a numerical answer; avoid rebuilding elementary probability from scratch."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Match mathematical correction, assistance level, and any disclosure restriction to the learner's current request."
+                  }
+                ],
+                "regressionTargets": [
+                  "mc-conditional-transfer/next-response"
+                ],
+                "confidence": 0.55
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
