@@ -17,14 +17,14 @@ async function assets() {
     evidence: parseMathChallengeEvidence(JSON.parse(evidenceText) as unknown) };
 }
 
-test("six mathematics checkpoints parse and evidence covers every authored learner state", async () => {
+test("20 mathematics checkpoints parse and evidence covers every authored learner state", async () => {
   const { suite, evidence } = await assets();
-  assert.equal(suite.scenarios.length, 6);
-  assert.equal(evidence.tasks.length, 2);
+  assert.equal(suite.scenarios.length, 20);
+  assert.equal(evidence.tasks.length, 16);
   assert.equal(evidence.status, "author-proposed-uncalibrated");
   validateMathChallengeCoverage(evidence, suite);
   const dataset = tutorScenarioSuiteToTutorEvalDataset(suite);
-  assert.equal(dataset.cases.length, 6);
+  assert.equal(dataset.cases.length, 20);
   assert.equal(new Set(dataset.cases.map(x => x.id)).size, 6);
   for (const scenario of suite.scenarios) {
     assert.equal(scenario.decisionPoints.length, 1);
