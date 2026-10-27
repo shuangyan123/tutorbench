@@ -26,8 +26,27 @@ async function load() {
 test("exam profiles link supported teaching cases without claiming exam authenticity", async () => {
   const { graph, suite, exam } = await load();
   assert.equal(exam.status, "author-proposed-unverified");
-  assert.deepEqual(exam.profiles.map(p => p.id),
+  assert.equal(exam.profiles.length, 16);
+  assert.equal(new Set(exam.profiles.map(p => p.id)).size, 16);
+  assert.deepEqual(exam.profiles.slice(0, 3).map(p => p.id),
     ["cn-zhongkao-math-general", "cn-gaokao-math-national-2026", "cn-guokao-aptitude-2027"]);
+  for (const id of ["cn-kaoyan-math-1-2027", "cn-kaoyan-math-2-2027",
+    "cn-kaoyan-math-3-2027", "us-sat-math-digital-2026",
+    "uk-gcse-aqa-math-8300-2026", "intl-cambridge-igcse-0580-2026",
+    "intl-cambridge-alevel-9709-2026", "intl-ib-dp-math-aa-2026",
+    "intl-ib-dp-math-ai-2026", "us-ap-calculus-ab-2027",
+    "us-ap-calculus-bc-2027", "intl-gre-general-quant-2026",
+    "intl-gmat-quant-data-2026"]) assert.ok(exam.profiles.some(p => p.id === id));
+  const math2 = exam.profiles.find(p => p.id === "cn-kaoyan-math-2-2027");
+  assert.ok(math2);
+  assert.ok(math2.modules.every(m => m.id !== "probability-statistics"));
+  const gre = exam.profiles.find(p => p.id === "intl-gre-general-quant-2026");
+  assert.ok(gre);
+  assert.ok(gre.modules.every(m => !m.nodeIds.includes("derivatives-rate")));
+  const ib = exam.profiles.find(p => p.id === "intl-ib-dp-math-aa-2026");
+  assert.ok(ib);
+  assert.equal(ib.examYear, 2026);
+  assert.ok(exam.profiles.some(p => p.sources.some(s => s.published === null)));
   validateMathematicsExamCoverage(exam, graph, suite);
   assert.equal(exam.profiles[0]?.examFormat.minutes, null);
   assert.equal(exam.profiles[1]?.examFormat.minutes, null);
