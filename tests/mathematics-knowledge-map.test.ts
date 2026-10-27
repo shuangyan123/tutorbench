@@ -105,7 +105,8 @@ test("mathematical reference sanity checks cover lower, secondary and university
       if (i !== j && j !== k && i !== k) strings.add(tiles[i]! + tiles[j]! + tiles[k]!);
   assert.equal(strings.size, 6);
   assert.equal(90 / (90 + 495), 2 / 13);
-  assert.ok(9 / 10 > 80 / 100 && 20 / 100 > 1 / 10);
+  assert.equal(9 / 10 > 80 / 100, true);
+  assert.equal(20 / 100 > 1 / 10, true);
   assert.ok(29 / 110 < 81 / 110);
   for (let n = 1; n <= 10; n++) {
     let a = 1;
