@@ -128,22 +128,55 @@ export function parseAcademicStructure(value: unknown): AcademicStructure {
   return parsed;
 }
 
-/** The same knowledge reference may be shared by many exams; no exam owns the knowledge graph. */
+/** Compact, independently verified registry facts for any knowledge system. */
+export interface AcademicKnowledgeRegistrySummary {
+  readonly id: string;
+  readonly domains: number;
+  readonly nodes: number;
+}
+
+/** Verify every registered subject and exam without assuming that all exams are mathematics. */
+export function validateAcademicStructureRegistryReferences(
+  structure: AcademicStructure,
+  registries: readonly AcademicKnowledgeRegistrySummary[],
+  examProfileIds: readonly string[],
+): void {
+  const registeredKnowledge = new Map(registries.map(registry => [registry.id, registry]));
+  if (registeredKnowledge.size !== registries.length ||
+    registeredKnowledge.size !== structure.knowledgeSystems.length)
+    throw new Error("academic_structure_knowledge_registry_mismatch");
+  for (const knowledge of structure.knowledgeSystems) {
+    const actual = registeredKnowledge.get(knowledge.id);
+    if (!actual)
+      throw new Error("academic_structure_knowledge_registry_mismatch");
+    if (!Number.isInteger(actual.domains) || !Number.isInteger(actual.nodes) ||
+      actual.domains < 1 || actual.nodes < 1 ||
+      knowledge.coverage.domains !== actual.domains ||
+      knowledge.coverage.nodes !== actual.nodes)
+      throw new Error("academic_structure_knowledge_coverage_mismatch");
+  }
+  if (!unique(examProfileIds))
+    throw new Error("academic_structure_exam_profile_mismatch");
+  const profiles = new Set(examProfileIds);
+  const references = structure.examSystems.flatMap(exam => exam.profileIds);
+  if (!unique(references) || references.length !== profiles.size ||
+    references.some(id => !profiles.has(id)))
+    throw new Error("academic_structure_exam_profile_mismatch");
+  // An exam may reference one or more registered knowledge systems, including
+  // systems outside mathematics. parseAcademicStructure checks those IDs.
+}
+
+/** Backward-compatible adapter for the existing mathematics-only pilot. */
 export function validateAcademicStructureReferences(
   structure: AcademicStructure,
   map: MathematicsKnowledgeMap,
   examAlignment: MathematicsExamAlignment,
+  additionalKnowledgeRegistries: readonly AcademicKnowledgeRegistrySummary[] = [],
 ): void {
-  const mapped = structure.knowledgeSystems.filter(k => k.id === map.id);
-  if (mapped.length !== 1 || mapped[0]!.coverage.domains !== map.domains.length ||
-    mapped[0]!.coverage.nodes !== map.nodes.length)
-    throw new Error("academic_structure_knowledge_coverage_mismatch");
-  const registered = new Set(examAlignment.profiles.map(p => p.id));
-  const referenced = structure.examSystems.flatMap(e => e.profileIds);
-  if (!unique(referenced) || referenced.length !== registered.size ||
-    referenced.some(id => !registered.has(id)))
-    throw new Error("academic_structure_exam_profile_mismatch");
-  for (const e of structure.examSystems)
-    if (!e.knowledgeSystemIds.includes(map.id))
-      throw new Error("academic_structure_exam_knowledge_mismatch");
+  validateAcademicStructureRegistryReferences(
+    structure,
+    [{ id: map.id, domains: map.domains.length, nodes: map.nodes.length },
+      ...additionalKnowledgeRegistries],
+    examAlignment.profiles.map(profile => profile.id),
+  );
 }
