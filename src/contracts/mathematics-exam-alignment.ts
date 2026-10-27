@@ -7,7 +7,7 @@ export interface MathematicsExamSource {
   readonly url: string;
   readonly sourceKind: "official_curriculum" | "official_exam_guidance" |
     "official_exam_analysis" | "institution_republication";
-  readonly published: string;
+  readonly published: string | null;
 }
 export interface MathematicsExamModule {
   readonly id: string;
@@ -79,8 +79,9 @@ export function parseMathematicsExamAlignment(input: unknown): MathematicsExamAl
     for (const item of raw.sources) {
       if (!rec(item) || !keys(item, ["label", "url", "sourceKind", "published"]) ||
         !text(item.label) || !text(item.url) || !item.url.startsWith("https://") ||
-        !kinds.has(String(item.sourceKind)) || !text(item.published) ||
-        !/^\d{4}-\d{2}-\d{2}$/.test(item.published))
+        !kinds.has(String(item.sourceKind)) ||
+        (item.published !== null && (!text(item.published) ||
+          !/^\d{4}-\d{2}-\d{2}$/.test(item.published))))
         throw new Error("mathematics_exam_source_invalid");
     }
     const format = raw.examFormat;
