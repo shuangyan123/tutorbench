@@ -2420,7 +2420,7 @@
         "subject": "mathematics",
         "topic": "closed interval optimization endpoints",
         "learningObjective": "Acknowledge the valid critical points and ask the learner to check f(-2),f(2) and compare all four candidates, without re-teaching differentiation or disclosing final extrema.",
-        "learnerLevel": "university-intro"
+        "learnerLevel": "upper-secondary / university-intro"
       },
       "tutorVisibleContext": {
         "knownConcepts": [
