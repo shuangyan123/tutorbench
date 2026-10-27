@@ -3,7 +3,7 @@
   "id": "mathematics-knowledge-map-v0.1",
   "version": "0.1.0",
   "status": "author-proposed-uncalibrated",
-  "scope": "School mathematics through selected introductory university topics; proposed instructional prerequisites are not mandatory curriculum sequence or an ability hierarchy.",
+  "scope": "Proposed school mathematics coverage through selected introductory university topics; secondary derivatives belong in school electives in some curricula. Candidate edges are NOT mandatory learning order or KST-validated prerequisite relations.",
   "sources": [
     {
       "label": "PISA 2022 mathematics framework",
@@ -14,6 +14,26 @@
       "label": "TIMSS 2023 mathematics framework",
       "url": "https://timssandpirls.bc.edu/timss2023/frameworks/index.html",
       "use": "Grade-relative content domains and knowing/applying/reasoning cognition; not a global difficulty scale."
+    },
+    {
+      "label": "China Compulsory Education Mathematics Curriculum Standards (2022)",
+      "url": "https://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html",
+      "use": "Primary and lower-secondary content-strand scope only; no per-node clause or prerequisite is certified from this citation."
+    },
+    {
+      "label": "China General High School Mathematics Curriculum Standards (2017, revised 2020)",
+      "url": "https://www.moe.gov.cn/srcsite/A26/s8001/202006/t20200603_462199.html",
+      "use": "Secondary core/elective curriculum scope and grade-context review; no per-node mapping or empirical mastery claims."
+    },
+    {
+      "label": "Common Core State Standards for Mathematics",
+      "url": "https://www.thecorestandards.org/Math/Content/HSM/",
+      "use": "Secondary cross-curriculum comparison; conceptual categories and practices, not universal grade order."
+    },
+    {
+      "label": "Knowledge Space Theory (Doignon and Falmagne)",
+      "url": "https://escholarship.org/uc/item/94b9x5sw",
+      "use": "Research precedent for multiple possible knowledge-state and learning-path structures; current edges are author-proposed and are NOT a constructed or validated knowledge space."
     }
   ],
   "domains": [
@@ -475,7 +495,7 @@
       "id": "derivatives-rate",
       "domainId": "advanced-mathematics",
       "label": "Derivatives and local rates of change",
-      "stage": "university-intro",
+      "stage": "upper-secondary",
       "prerequisiteIds": [
         "limits-continuity",
         "polynomial-factorization"
@@ -486,7 +506,7 @@
       "id": "optimization-boundary",
       "domainId": "advanced-mathematics",
       "label": "Optimization and domain endpoints",
-      "stage": "university-intro",
+      "stage": "upper-secondary",
       "prerequisiteIds": [
         "derivatives-rate",
         "inequality-signs"
