@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "id": "mathematics-challenge-evidence-v0.1",
+  "version": "0.1.0",
+  "status": "author-proposed-uncalibrated",
+  "suiteId": "mathematics-challenge-v0.1",
+  "note": "Content depth is an authoring descriptor, not an observed item difficulty; challenge is a hypothesis relative to the stated cohort and prerequisites.",
+  "tasks": [
+    {
+      "id": "quadratic-positive-roots",
+      "cohort": "secondary learners who have studied quadratic equations",
+      "targetPrerequisites": [
+        "discriminant",
+        "Vieta's identities",
+        "sign logic of two real roots"
+      ],
+      "mathematicalPractice": [
+        "reasoning",
+        "justification"
+      ],
+      "cognitiveDemand": "integrate-conditions",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "Several individually familiar strict conditions must be combined and an unjustified sufficient-condition shortcut avoided.",
+      "verifiedResult": "For x^2 - 2ax + a + 2 = 0, two distinct positive real roots iff a > 2. The discriminant condition alone is a < -1 or a > 2; root sum 2a > 0, product a+2 > 0.",
+      "validAlternativeMethods": [
+        "Vieta and discriminant",
+        "sign analysis of roots using quadratic formula"
+      ],
+      "risk": "An answer-only comparison may overlook whether the learner understands necessity versus sufficiency.",
+      "scenarioIds": [
+        "mc-quadratic-condition",
+        "mc-quadratic-prerequisite",
+        "mc-quadratic-transfer"
+      ]
+    },
+    {
+      "id": "conditional-two-red",
+      "cohort": "secondary learners beginning conditional probability",
+      "targetPrerequisites": [
+        "unordered counting",
+        "sample-space restriction",
+        "draws without replacement"
+      ],
+      "mathematicalPractice": [
+        "representation",
+        "reasoning"
+      ],
+      "cognitiveDemand": "conditional-sample-space-construction",
+      "anticipatedChallenge": "moderate",
+      "challengeRationale": "Requires distinguishing unconditional from conditioned events, then representing the eligible unordered pairs consistently.",
+      "verifiedResult": "From 5 red and 4 blue without replacement, P(both red | at least one red)=C(5,2)/(C(9,2)-C(4,2))=10/30=1/3. For 3 draws the analogous numerator C(5,3), denominator C(9,3)-C(4,3).",
+      "validAlternativeMethods": [
+        "unordered pair enumeration",
+        "probability ratio using sequential events"
+      ],
+      "risk": "A numerical answer can be correct while denominator reasoning or the conditioning interpretation remains unsupported.",
+      "scenarioIds": [
+        "mc-conditional-normalization",
+        "mc-conditional-prerequisite",
+        "mc-conditional-transfer"
+      ]
+    }
+  ]
+}
