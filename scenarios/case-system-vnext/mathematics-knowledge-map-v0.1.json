@@ -517,6 +517,110 @@
       "commonMisconception": "Ignoring linear dependence and inconsistent right-hand sides"
     }
   ],
-  "caseMappings": [],
+  "caseMappings": [
+    {
+      "taskId": "quadratic-positive-roots",
+      "nodeIds": [
+        "quadratic-discriminant",
+        "root-sign-conditions"
+      ]
+    },
+    {
+      "taskId": "conditional-two-red",
+      "nodeIds": [
+        "combinations",
+        "conditional-events"
+      ]
+    },
+    {
+      "taskId": "fraction-unit-repair",
+      "nodeIds": [
+        "fractions-units",
+        "fraction-equivalence"
+      ]
+    },
+    {
+      "taskId": "successive-percentage-base",
+      "nodeIds": [
+        "percent-base",
+        "successive-changes"
+      ]
+    },
+    {
+      "taskId": "rational-equation-excluded-root",
+      "nodeIds": [
+        "rational-domain"
+      ]
+    },
+    {
+      "taskId": "function-composition-domains",
+      "nodeIds": [
+        "function-composition"
+      ]
+    },
+    {
+      "taskId": "decreasing-logarithm-inequality",
+      "nodeIds": [
+        "logarithm-inequalities"
+      ]
+    },
+    {
+      "taskId": "similar-geometry-area-scale",
+      "nodeIds": [
+        "similarity-scale"
+      ]
+    },
+    {
+      "taskId": "circle-line-tangency-constraint",
+      "nodeIds": [
+        "coordinate-geometry"
+      ]
+    },
+    {
+      "taskId": "permutations-with-indistinguishable-objects",
+      "nodeIds": [
+        "counting-principle",
+        "combinations"
+      ]
+    },
+    {
+      "taskId": "base-rate-inverse-probability",
+      "nodeIds": [
+        "bayes-base-rate"
+      ]
+    },
+    {
+      "taskId": "simpson-paradox-unequal-mixtures",
+      "nodeIds": [
+        "statistics-conditioning"
+      ]
+    },
+    {
+      "taskId": "recurrence-mathematical-induction",
+      "nodeIds": [
+        "sequences-recursive",
+        "mathematical-induction"
+      ]
+    },
+    {
+      "taskId": "inequality-conditions-and-counterexample",
+      "nodeIds": [
+        "inequality-proofs",
+        "logic-quantifiers"
+      ]
+    },
+    {
+      "taskId": "closed-interval-optimization-endpoints",
+      "nodeIds": [
+        "optimization-boundary"
+      ]
+    },
+    {
+      "taskId": "linear-system-consistency-versus-rank",
+      "nodeIds": [
+        "linear-algebra-rank"
+      ]
+    }
+  ],
   "notes": "Case mappings are linked to independently validated task evidence; unmapped nodes mean untested coverage, not absence of a skill from mathematics."
 }
