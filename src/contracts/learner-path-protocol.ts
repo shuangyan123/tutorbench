@@ -139,15 +139,17 @@ export function parseLearnerPathProtocol(value: unknown): LearnerPathProtocol {
   ) throw new Error("learner_path_invalid_pathways");
 
   const plan = value.observationPlan;
-  if (!isRecord(plan) ||
-    !hasOnly(plan, ["tutorObservable", "learnerOutcomeCheckpoints", "costs",
+  if (!isRecord(plan)) throw new Error("learner_path_invalid_plan");
+  const selectedCheckpoints = plan.learnerOutcomeCheckpoints;
+  const selectedCosts = plan.costs;
+  if (!hasOnly(plan, ["tutorObservable", "learnerOutcomeCheckpoints", "costs",
       "missingDataRule", "useIndependentAssessments", "feedbackPolicy"]) ||
     !isTextList(plan.tutorObservable) ||
-    !isTextList(plan.learnerOutcomeCheckpoints) ||
-    checkpoints.some(x => !plan.learnerOutcomeCheckpoints.includes(x)) ||
-    plan.learnerOutcomeCheckpoints.length !== checkpoints.length ||
-    !isTextList(plan.costs) || plan.costs.length !== costNames.length ||
-    costNames.some(x => !plan.costs.includes(x)) ||
+    !isTextList(selectedCheckpoints) ||
+    checkpoints.some(x => !selectedCheckpoints.includes(x)) ||
+    selectedCheckpoints.length !== checkpoints.length ||
+    !isTextList(selectedCosts) || selectedCosts.length !== costNames.length ||
+    costNames.some(x => !selectedCosts.includes(x)) ||
     plan.missingDataRule !== "unknown_not_zero" ||
     plan.useIndependentAssessments !== true || !isText(plan.feedbackPolicy)
   ) throw new Error("learner_path_invalid_plan");
