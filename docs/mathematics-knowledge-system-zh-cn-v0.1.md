@@ -153,3 +153,7 @@
 ## 考试导向配置（2026-10 增补）
 
 数学内容范围与考试考查目标应分别建模。现有知识图谱保持稳定；针对中考、高考及国考行测的考试要求、时间条件、知识映射与具体缺口，见 [考试导向数学案例设计中文版](mathematics-exam-oriented-zh-cn-v0.1.md)。对应结构化配置位于 `scenarios/case-system-vnext/mathematics-exam-alignment-v0.1.json`。考试配置不是官方真题蓝图，也不修改历史 TutorEval 评分。
+
+## 国内考研与国际考试版图（2026-10 增补）
+
+最新的[考研数学（一）（二）（三）与国外主要数学考试中文版对照](mathematics-global-exam-systems-zh-cn-v0.2.md)，按官方考试机构及考试年份列明 2027考研数学、SAT、AQA GCSE、Cambridge IGCSE/AS-A Level、IB AA/AI、AP Calculus、GRE Quant 和 GMAT Quant/Data Insights。它们在一个可扩展的知识底座上运行**独立考试配置**，不得混用难度、计算器政策、题型或正式分值。详见 `scenarios/case-system-vnext/mathematics-exam-alignment-v0.1.json`。
