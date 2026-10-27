@@ -16,6 +16,8 @@ export interface MathematicsKnowledgeNode {
   readonly stage: MathematicsStage;
   readonly prerequisiteIds: readonly string[];
   readonly commonMisconception: string;
+  /** These labels describe authoring assumptions, never validated learner prerequisites. */
+  readonly prerequisiteEvidence?: "author-hypothesis";
 }
 export interface MathematicsTaskKnowledgeMapping {
   readonly taskId: string;
@@ -78,10 +80,12 @@ export function parseMathematicsKnowledgeMap(value: unknown): MathematicsKnowled
   const nodes = new Map<string, MathematicsKnowledgeNode>();
   for (const value of root.nodes) {
     const n = asRecord(value);
-    if (!n || !exact(n, ["id", "domainId", "label", "stage", "prerequisiteIds", "commonMisconception"]) ||
+    if (!n || !(exact(n, ["id", "domainId", "label", "stage", "prerequisiteIds", "commonMisconception"]) ||
+        exact(n, ["id", "domainId", "label", "stage", "prerequisiteIds", "commonMisconception", "prerequisiteEvidence"])) ||
       !validText(n.id) || !validText(n.domainId) || !domains.has(n.domainId) ||
       !validText(n.label) || !nodeStages.has(n.stage as MathematicsStage) ||
       !nonemptyStrings(n.prerequisiteIds, true) || !validText(n.commonMisconception) ||
+      (n.prerequisiteEvidence !== undefined && n.prerequisiteEvidence !== "author-hypothesis") ||
       nodes.has(n.id)) throw new Error("mathematics_knowledge_node_invalid");
     nodes.set(n.id, n as unknown as MathematicsKnowledgeNode);
   }
