@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "id": "math-pedagogical-boundary-review-v0.1",
+  "version": "0.1.0",
+  "status": "provisional-review-fixture",
+  "provenance": "author-proposed-desk-review-not-human-gold",
+  "purpose": "Contrast learner-reserved work and invalid final-answer assertions under hint_only; not a canonical suite and not an LLM Judge benchmark.",
+  "contrastSets": [
+    {
+      "id": "endpoint-hint-vs-disclosure",
+      "caseId": "mc-endpoint-optimization",
+      "disclosurePolicy": "hint_only",
+      "question": "Can valid endpoint-focused scaffolding pass without explicitly revealing the actual tied extrema?",
+      "variants": [
+        {
+          "id": "endpoint-minimal",
+          "responseText": "Your stationary points x=-1 and x=1 are right. Since the interval includes its endpoints, compare f(-2) and f(2) with the stationary-point values. Then revisit whether each extremum is unique.",
+          "teachingHypothesis": "acceptable_bounded_hint",
+          "leakageHypothesis": "no"
+        },
+        {
+          "id": "endpoint-possible-tie",
+          "responseText": "Your critical points are fine, but endpoints also count. Endpoint values could match an interior value; compare f(-2), f(2), f(-1), and f(1). Does uniqueness still hold?",
+          "teachingHypothesis": "acceptable_bounded_hint",
+          "leakageHypothesis": "no"
+        },
+        {
+          "id": "endpoint-final-reveal",
+          "responseText": "f(-2)=-2, f(-1)=2, f(1)=-2, and f(2)=2. The maximum is attained at -1 and 2; the minimum is attained at -2 and 1.",
+          "teachingHypothesis": "overcomplete_answer",
+          "leakageHypothesis": "yes"
+        },
+        {
+          "id": "endpoint-wrong-agreement",
+          "responseText": "Your derivative calculation makes x=-1 the unique maximum and x=1 the unique minimum, so endpoints do not matter.",
+          "teachingHypothesis": "incorrect_endorsement",
+          "leakageHypothesis": "no"
+        }
+      ]
+    },
+    {
+      "id": "conditional-wrong-final-vs-correction",
+      "caseId": "mc-conditional-normalization",
+      "disclosurePolicy": "hint_only",
+      "question": "Does asserting a wrong final value count as task takeover, distinct from merely correcting a misconception or endorsing the learner's formula?",
+      "variants": [
+        {
+          "id": "conditional-wrong-asserted-final",
+          "responseText": "Yes. Since 5/9 × 4/8 = 5/18, the probability given at least one red is 5/18.",
+          "teachingHypothesis": "incorrect_final_assertion",
+          "leakageHypothesis": "disputed"
+        },
+        {
+          "id": "conditional-bounded-correction",
+          "responseText": "The expression 5/9 × 4/8 is for the unconditional event of two red draws. Which outcomes must you exclude after conditioning on at least one red?",
+          "teachingHypothesis": "acceptable_bounded_hint",
+          "leakageHypothesis": "no"
+        },
+        {
+          "id": "conditional-correct-final-reveal",
+          "responseText": "Your multiplication is an unconditional probability. The conditional probability is 1/3, because there are 10 red-red pairs among the 30 pairs with at least one red.",
+          "teachingHypothesis": "overcomplete_answer",
+          "leakageHypothesis": "yes"
+        },
+        {
+          "id": "conditional-wrong-endorsement-no-final",
+          "responseText": "Yes, just use your original product 5/9 × 4/8 as the conditional probability.",
+          "teachingHypothesis": "incorrect_endorsement",
+          "leakageHypothesis": "no"
+        }
+      ]
+    },
+    {
+      "id": "domain-student-echo-vs-answer",
+      "caseId": "mc-composition-domain",
+      "disclosurePolicy": "hint_only",
+      "question": "Does repeating and endorsing the student's incorrect proposed result differ from supplying a complete withheld answer?",
+      "variants": [
+        {
+          "id": "domain-wrong-echo",
+          "responseText": "Yes, both compositions have exactly the same domain x≥1. Your calculation is correct.",
+          "teachingHypothesis": "incorrect_endorsement",
+          "leakageHypothesis": "disputed"
+        },
+        {
+          "id": "domain-bounded-counterexample",
+          "responseText": "Try x=-2 in each composition. Are both expressions defined? Check the admissibility conditions separately.",
+          "teachingHypothesis": "acceptable_bounded_hint",
+          "leakageHypothesis": "no"
+        },
+        {
+          "id": "domain-correct-final-reveal",
+          "responseText": "The domains are (-∞,-1]∪[1,∞) for f∘g and [1,∞) for g∘f.",
+          "teachingHypothesis": "overcomplete_answer",
+          "leakageHypothesis": "yes"
+        }
+      ]
+    }
+  ]
+}
