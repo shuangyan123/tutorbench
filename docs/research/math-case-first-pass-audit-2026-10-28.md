@@ -231,3 +231,43 @@ node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek `
 ```
 
 **成本与证据边界：** 此命令会对所选 4 条样本再次发起付费 Judge 调用；先使用当前项目的 `DEEPSEEK_JUDGE_MAX_ATTEMPTS=1` 限制重试。分类器自身的无网络测试可在 CI 内完成，但在下一次真实调用前，不应声称根因已经查明。修复前 R-01/R-02 rubric 暂不变更，R-03 预期标签等待人工审查。
+
+
+## 10. 结构性失败定位与实验性 Prompt v0.9.1（2026-10-28）
+
+第三次仅选 `mc-conditional-normalization / wrong-diagnosis` 的定向调用，使用用户上传的 `math-rubric-probe-diagnostic.json`。确切记录：
+
+| 属性 | 观测 |
+| --- | --- |
+| Judge | `deepseek/deepseek-flash`，`tutor-eval-pedagogy-judge-system@0.9` |
+| 调用 | 1 / 1 |
+| 有效 Judge 结果 | 0 / 1 |
+| 输出形状阶段 | `judge_schema_invalid` |
+| 结构错误代码 | `factual_error_item_invalid` |
+
+这意味着模型产出了可解析的结构化 JSON，且 `factualErrors` 至少一个元素**不满足现有契约**。具体的缺失描述、不合法严重度等子类尚无本轮证据，不推断原始模型文本。此结果并不提供正确教学评分，也不是 DeepSeek 将错误回答判为 PASS。
+
+**代码对照定位：** `src/contracts/tutor-eval-validation.ts` 的 `parseJudgeFactualError` 要求元素具有非空 `description` 和 `minor|major|critical` `severity`。冻结的 `prompts/tutor-eval-pedagogy-judge-system-v0.9.md` 却仅给出 `"factualErrors": []` 的输出例子，未解释非空对象结构。这是一个具体、可操作的**提示语与契约说明不完整**的假设，不排除模型仍会产生无效项。
+
+**隔离的实验性改进：**
+- 新增 [v0.9.1 实验提示](../../prompts/tutor-eval-pedagogy-judge-system-v0.9.1.md)：原有评分原则及严格事实验证保持不变，只在输出契约段补充非空 `factualErrors` 对象形状、允许的严重度和无错误时空数组示例。示例使用与本实验无关的运算，避免泄漏 `wrong-diagnosis` 的预期结论。
+- 原 `v0.9` **保持原样、仍是默认 Prompt**；正式全局 Judge、原评分器及 20 个实验案例均不变。
+- 数学诊断脚本添加显式 `--judge-prompt-version 0.9.1`，且仍可选 `--diagnose-invalid`。
+- 安全结构诊断细分 `factual_error_description_invalid` / `factual_error_severity_invalid`，仍然**不保存原始响应、具体字段值或隐藏推理**。
+- 加入离线测试：两版本非输出段保持一致；新提示包含规范示例；默认与显式选择可区分；缺密钥时阻止真实请求。
+
+**后续最小验证**（新 DeepSeek 调用需要用户明确选择，会产生费用）：
+
+```powershell
+git fetch origin
+git switch --detach origin/audit/math-case-first-pass-20261028
+npm run build
+node scripts/math-rubric-counterexample-probe.mjs --dry-run `
+  --judge-prompt-version 0.9.1 --variant wrong-diagnosis
+node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek `
+  --judge-prompt-version 0.9.1 --diagnose-invalid `
+  --variant wrong-diagnosis `
+  --output artifacts/math-rubric-probe-v091-diagnostic.json
+```
+
+验收先看能否取得合法结构化评分，随后**独立**检查教学标签与关键事实错误判断，再考虑其余三个不可用样本。即使 1/1 成功也不能断言 v0.9.1 修复了全部无效样本或提升了评分准确率；必须保留与 v0.9 相同模型和样本的有界对照，不能混合两个 Prompt 版本的结果作单一准确率。
