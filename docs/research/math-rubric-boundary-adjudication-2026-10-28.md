@@ -59,3 +59,50 @@ For this reason, the review fixture now carries **11 author-proposed counterfact
 4. Report output availability separately from rubric-label agreement, critical-failure adjudication, repeatability, and any learner outcomes.
 
 No additional DeepSeek API calls are necessary for this desk review.
+
+
+## C. Eleven-response provisional adjudication (authoritative output still unchanged)
+
+This is an **analytical recommendation**, not an independent professional educator decision. The versioned, non-canonical review table lives in
+[`math-pedagogical-boundary-shadow-adjudication-v0.1.json`](../../fixtures/judge/math-pedagogical-boundary-shadow-adjudication-v0.1.json).
+Its labels are never passed to the public benchmark or live TutorEval judge. It references the eleven original contrast responses without editing them.
+
+The two statuses in each row correspond to the case's existing rubric order; only the first endpoint row's judgment is expressly based on the **candidate learner-work-preserving interpretation**, not a retroactive claim that the current wording is unambiguous.
+
+| Task/response | Provisional two-rubric status | Answer leakage? | Additional critical-failure candidates (not calibrated) |
+| --- | --- | --- | --- |
+| Endpoint `endpoint-minimal` | PASS / PASS (shadow interpretation) | No | None |
+| Endpoint `endpoint-possible-tie` | PASS / PASS (shadow interpretation) | No | None |
+| Endpoint `endpoint-final-reveal` | PASS / FAIL | Yes | `answer_leakage` |
+| Endpoint `endpoint-wrong-agreement` | FAIL / FAIL | No | `incorrect_diagnosis`, `severe_factual_error` |
+| Conditional `conditional-wrong-asserted-final` | FAIL / FAIL | Provisional yes (low confidence) | `incorrect_diagnosis`, `severe_factual_error`, `answer_leakage` |
+| Conditional `conditional-bounded-correction` | PASS / PASS | No | None |
+| Conditional `conditional-correct-final-reveal` | PASS / FAIL | Yes | `answer_leakage` |
+| Conditional `conditional-wrong-endorsement-no-final` | FAIL / FAIL | No | `incorrect_diagnosis`, `severe_factual_error` |
+| Domain `domain-wrong-echo` | FAIL / FAIL | No | `incorrect_diagnosis`, `severe_factual_error` |
+| Domain `domain-bounded-counterexample` | PASS / PASS | No | None |
+| Domain `domain-correct-final-reveal` | PASS / FAIL | Yes | `answer_leakage` |
+
+### Scope of an incorrect final-answer assertion
+
+This desk review proposes a narrow behavioral decision rule **for subsequent independent assessment**:
+
+1. Under `hint_only`, distinguish newly giving an answer **as the task's final result** from repeating/assessing a student's already-proposed expression. The latter can be incorrect, but does not automatically complete additional learner-reserved work.
+2. If the Tutor computes a new numerical result and asserts that it is the final answer, this may constitute prohibited answer completion **even if numerically incorrect**. This interpretation treats `answer_leakage` as the disclosure of a purported completed answer, **not necessarily leakage of the correct ground-truth answer**.
+3. The independently observable factual error remains separately assessable as `severe_factual_error` or a failed correctness rubric. Never infer that an incorrect final statement has revealed the *correct* withheld fraction.
+4. The `conditional-wrong-asserted-final` example is **low-confidence and expert review required**. Its existing source text names the student's own `5/9 × 4/8` expression and expands that arithmetic into `5/18`. Whether this counts as *new material result production* or merely a redundant explanation of the student's proposal is a genuine ambiguity. Do not silently promote this tentative leakage recommendation to global policy.
+5. Avoid counting the same takeover twice as both `answer_leakage` and `student_task_takeover`. If experts instead restrict leakage to true final results, evaluate whether a new type or existing task-takeover type is appropriate, without relaxing the factual-error finding.
+
+**Priority:** Expertly decide the correct scope for the wrong-final example before changing a Judge instruction or rubric. Inspect a contrast that removes the new arithmetic (`conditional-wrong-endorsement-no-final`) and a contrast that gives the correct complete result (`conditional-correct-final-reveal`) rather than overfitting one output.
+
+### Endpoint criterion after desk review
+
+Under `hint_only`, requiring the Tutor to state the actual equality of endpoint and stationary-point values conflicts with the stated learner objective. Both a minimal endpoint-comparison hint and a hint mentioning *possible ties* should be accepted if they direct comparison and prompt a uniqueness check. The existing rubric's material clauses permit a stricter PARTIAL interpretation; **an isolated shadow rewrite would be more faithful to learner work, but no rubric has been changed**.
+
+This review deliberately distinguishes (a) source rubric compliance, (b) pedagogically defensible alternative response, (c) critical-failure construct, and (d) model execution availability. Their denominators and validation status must not be collapsed into one benchmark accuracy number.
+
+### Regression and adoption boundaries
+
+The associated provider-free test verifies that the eleven shadow annotations match the original eleven contrasts, reference real `hint_only` cases, use legal rubric labels and critical-failure names, and remain marked `requiresIndependentExpertReview`. It does **not** prove any semantic judgment is correct or make these labels executable gold; no live Judge call, prompt change, or canonical dataset update is involved.
+
+**Release gate:** a subject-matter educator should first adjudicate the two ambiguity boundaries, then any revised criterion or policy should be separately versioned, stress-tested for false positives and false negatives, and reported against the untouched baseline.
