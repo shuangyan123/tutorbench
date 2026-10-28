@@ -8,7 +8,6 @@ import { tutorScenarioSuiteToTutorEvalDataset } from "../src/datasets/real-world
 import { parseTutorResponseCorpus } from "../src/contracts/tutor-response-corpus-validation.js";
 import { deriveTutorResponseId } from "../src/corpus/identity.js";
 
-const root = new URL("../../", import.meta.url);
 const fixturePath = new URL("../../fixtures/judge/math-rubric-counterexamples-v0.1.json", import.meta.url);
 const suitePath = new URL("../../scenarios/experimental/mathematics-challenge-v0.1/suite.json", import.meta.url);
 
