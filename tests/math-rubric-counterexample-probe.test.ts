@@ -106,6 +106,16 @@ test("probe dry-run validates without a Judge and explicit live mode fails close
     "--variant", "wrong-endorsement",
   ], { cwd: process.cwd(), encoding: "utf8", env: safeEnv });
   assert.match(targeted, /VALIDATED: 3 cases, 4 synthetic responses, 0 Judge calls/u);
+  const versioned = execFileSync(process.execPath, [
+    command, "--dry-run", "--judge-prompt-version", "0.9.1",
+    "--variant", "wrong-diagnosis",
+  ], { cwd: process.cwd(), encoding: "utf8", env: safeEnv });
+  assert.match(versioned, /VALIDATED: 1 cases, 1 synthetic responses, 0 Judge calls\. Judge prompt 0\.9\.1\./u);
+  const badVersion = spawnSync(process.execPath, [
+    command, "--dry-run", "--judge-prompt-version", "0.10",
+  ], { cwd: process.cwd(), encoding: "utf8", env: safeEnv });
+  assert.notEqual(badVersion.status, 0);
+  assert.match(badVersion.stderr, /Allowed --judge-prompt-version values/u);
   const unknown = spawnSync(process.execPath, [
     command, "--dry-run", "--variant", "no-such-variant",
   ], { cwd: process.cwd(), encoding: "utf8", env: safeEnv });
@@ -147,9 +157,27 @@ test("redacted provider diagnostics detect schema defects without retaining mode
   const diagnosis = classifyMathJudgeEnvelope(envelope(JSON.stringify(malformed)), "test-math", ids);
   assert.equal(diagnosis.phase, "judge_schema_invalid");
   assert.ok(diagnosis.issues?.includes("factual_error_item_invalid"));
+  assert.ok(diagnosis.issues?.includes("factual_error_description_invalid"));
   assert.doesNotMatch(JSON.stringify(diagnosis), /Wrong result|Contradicts the concept/u);
   const omitted = classifyMathJudgeEnvelope(envelope(JSON.stringify({
     ...valid, insufficientInformation: undefined,
   })), "test-math", ids);
   assert.ok(omitted.issues?.includes("insufficient_information_invalid"));
+  const noSeverity = classifyMathJudgeEnvelope(envelope(JSON.stringify({
+    ...valid, factualErrors: [{ description: "Incorrect factor" }],
+  })), "test-math", ids);
+  assert.ok(noSeverity.issues?.includes("factual_error_severity_invalid"));
+});
+
+test("v0.9.1 is an isolated output-shape clarification, while v0.9 remains frozen", async () => {
+  const oldPrompt = await readFile(new URL("../../prompts/tutor-eval-pedagogy-judge-system-v0.9.md", import.meta.url), "utf8");
+  const newPrompt = await readFile(new URL("../../prompts/tutor-eval-pedagogy-judge-system-v0.9.1.md", import.meta.url), "utf8");
+  const beforeContract = (text: string) => text.slice(0, text.indexOf("## Output contract"))
+    .replace("# TutorEval Pedagogy Judge — System Prompt v0.9.1 (experimental output-shape clarification)",
+      "# TutorEval Pedagogy Judge — System Prompt v0.9");
+  assert.equal(beforeContract(newPrompt), beforeContract(oldPrompt));
+  assert.match(newPrompt, /"factualErrors": \[/u);
+  assert.match(newPrompt, /"description": "The Tutor incorrectly says/u);
+  assert.match(newPrompt, /"severity": "major"/u);
+  assert.match(newPrompt, /If there are no supported factual/u);
 });
