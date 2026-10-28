@@ -202,3 +202,32 @@ node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek `
 
 任何额外输出诊断都应优先记录**结构化、非秘密的错误种类和模型配置**；不得随意记录原始密钥、隐藏推理或完整供应商请求体。先复测与归类，再决定是否改 Judge 提示、输出格式处理或实验 rubric。
 
+
+
+## 9. 第二次定向回放结果与结构化输出诊断（2026-10-28）
+
+**用户上传的复测报告：** `math-rubric-probe-retry.json`；相同 fixture、`deepseek-flash` 与 Judge prompt `v0.9`，仅选择 `wrong-agreement`（两道）、`wrong-diagnosis`、`wrong-endorsement`。
+
+- 计划 / 已执行 Judge 调用：4 / 4；
+- 有效评分：0 / 4；
+- 不可用：4 / 4，均为 `judge_result_invalid`；
+- 四条在第一次实验中也均返回该错误；这四个固定回答跨两轮合计 **8 / 8 次不可用**。
+- `disagreementCount=0` **不代表答对**；这里没有任何有效评分可对比。
+
+这支持“固定错误回答样本存在可重复的 Judge 输出契约/解析可用性问题”，但**无法仅凭这两个报告判定**究竟是无效 JSON、缺失字段、非法 rubric 状态、不支持的 factual error 对象，还是 null final content。没有证据表明模型“将四个错误回答评为 PASS”。
+
+为避免再次盲目付费重跑，本 PR 加入独立的、仅实验使用的 `--diagnose-invalid` 模式和 [输出形状分类模块](../../scripts/math-rubric-probe-response-diagnostics.mjs)。它在内存里观察服务商响应的副本，仅输出有限的结构标签（如 `final_content_json_invalid`、`factual_error_item_invalid`、`rubric_status_invalid`、`final_content_missing`），不落盘原始响应、用户内容、API Key、完整 prompt 或隐藏推理。不修改 Judge 评分器、正式契约或 canonical case。
+
+首先运行编译和离线验证；若需要第三次有针对性的模型请求，再明确启用：
+
+```powershell
+npm run build
+node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek `
+  --diagnose-invalid `
+  --variant wrong-agreement `
+  --variant wrong-diagnosis `
+  --variant wrong-endorsement `
+  --output artifacts/math-rubric-probe-diagnostic.json
+```
+
+**成本与证据边界：** 此命令会对所选 4 条样本再次发起付费 Judge 调用；先使用当前项目的 `DEEPSEEK_JUDGE_MAX_ATTEMPTS=1` 限制重试。分类器自身的无网络测试可在 CI 内完成，但在下一次真实调用前，不应声称根因已经查明。修复前 R-01/R-02 rubric 暂不变更，R-03 预期标签等待人工审查。
