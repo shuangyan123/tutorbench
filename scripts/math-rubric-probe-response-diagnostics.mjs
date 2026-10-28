@@ -51,8 +51,15 @@ function shapeIssues(value, caseId, rubricIds) {
   if (!Array.isArray(value.factualErrors)) {
     issues.push("factual_errors_missing");
   } else for (const error of value.factualErrors) {
-    if (!isRecord(error) || !nonempty(error.description) ||
-      !severities.has(error.severity)) issues.push("factual_error_item_invalid");
+    if (!isRecord(error)) { issues.push("factual_error_item_invalid"); continue; }
+    if (!nonempty(error.description)) {
+      issues.push("factual_error_item_invalid");
+      issues.push("factual_error_description_invalid");
+    }
+    if (!severities.has(error.severity)) {
+      issues.push("factual_error_item_invalid");
+      issues.push("factual_error_severity_invalid");
+    }
   }
   if (typeof value.insufficientInformation !== "boolean")
     issues.push("insufficient_information_invalid");
