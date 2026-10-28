@@ -111,9 +111,45 @@ test("probe dry-run validates without a Judge and explicit live mode fails close
   ], { cwd: process.cwd(), encoding: "utf8", env: safeEnv });
   assert.notEqual(unknown.status, 0);
   assert.match(unknown.stderr, /Unknown fixture variant/u);
+  const dryDiagnostic = spawnSync(process.execPath, [command, "--dry-run", "--diagnose-invalid"], {
+    cwd: process.cwd(), encoding: "utf8", env: safeEnv,
+  });
+  assert.notEqual(dryDiagnostic.status, 0);
+  assert.match(dryDiagnostic.stderr, /requires --judge-deepseek/u);
   const blocked = spawnSync(process.execPath, [command, "--judge-deepseek"], {
     cwd: process.cwd(), encoding: "utf8", env: safeEnv,
   });
   assert.notEqual(blocked.status, 0);
   assert.match(blocked.stderr, /requires locally configured DEEPSEEK_API_KEY/u);
+});
+
+
+test("redacted provider diagnostics detect schema defects without retaining model text", async () => {
+  const moduleUrl = new URL("../../scripts/math-rubric-probe-response-diagnostics.mjs", import.meta.url).href;
+  const { classifyMathJudgeEnvelope } = await import(moduleUrl) as {
+    classifyMathJudgeEnvelope: (
+      value: unknown, caseId: string, rubrics: string[],
+    ) => { phase: string; issues?: string[] };
+  };
+  const ids = ["test-math-1", "test-math-2"];
+  const valid = {
+    schemaVersion: 1, caseId: "test-math",
+    rubricResults: ids.map(id => ({ rubricId: id, result: "FAIL", evidence: "Contradicts the concept." })),
+    criticalFailures: [], factualErrors: [], insufficientInformation: false,
+  };
+  const envelope = (content: unknown): unknown => ({
+    choices: [{ finish_reason: "stop", message: { content } }],
+  });
+  assert.equal(classifyMathJudgeEnvelope(envelope(JSON.stringify(valid)), "test-math", ids).phase, "valid_judge_schema");
+  assert.equal(classifyMathJudgeEnvelope(envelope("{bad json}"), "test-math", ids).phase, "final_content_json_invalid");
+  assert.equal(classifyMathJudgeEnvelope(envelope(null), "test-math", ids).phase, "final_content_missing");
+  const malformed = { ...valid, factualErrors: [{ error: "Wrong result", severity: "major" }] };
+  const diagnosis = classifyMathJudgeEnvelope(envelope(JSON.stringify(malformed)), "test-math", ids);
+  assert.equal(diagnosis.phase, "judge_schema_invalid");
+  assert.ok(diagnosis.issues?.includes("factual_error_item_invalid"));
+  assert.doesNotMatch(JSON.stringify(diagnosis), /Wrong result|Contradicts the concept/u);
+  const omitted = classifyMathJudgeEnvelope(envelope(JSON.stringify({
+    ...valid, insufficientInformation: undefined,
+  })), "test-math", ids);
+  assert.ok(omitted.issues?.includes("insufficient_information_invalid"));
 });
