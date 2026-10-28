@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "mathematics-knowledge-map-v0.1",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "status": "author-proposed-uncalibrated",
-  "scope": "Proposed school mathematics coverage through selected introductory university topics; secondary derivatives belong in school electives in some curricula. Candidate edges are NOT mandatory learning order or KST-validated prerequisite relations. Stage labels are broad authoring contexts, not universal curriculum order. The limits-and-continuity node labels introductory intuitive treatment in this pilot, not rigorous university real analysis.",
+  "scope": "Proposed school mathematics coverage through selected introductory university topics; secondary derivatives belong in school electives in some curricula. Candidate edges are NOT mandatory learning order or KST-validated prerequisite relations. Stage labels are broad authoring contexts, not universal curriculum order. The limits-and-continuity node labels introductory intuitive treatment in this pilot, not rigorous university real analysis. Schema v2 preserves legacy node IDs and prerequisiteIds as authoring hints; typed edge records and alternativePaths do not imply a single necessary instructional order. Curriculum-specific stages can be overlaid only with explicit mapping status.",
   "sources": [
     {
       "label": "PISA 2022 mathematics framework",
@@ -76,14 +76,14 @@
     {
       "id": "proof-structures",
       "label": "Proof, logic and generalization",
-      "pisaContent": "cross-cutting",
-      "classificationSource": "tutorbench-internal"
+      "classificationSource": "tutorbench-internal",
+      "internalCategory": "cross-cutting-practice"
     },
     {
       "id": "advanced-mathematics",
       "label": "Introductory calculus and linear algebra",
-      "pisaContent": "cross-cutting",
-      "classificationSource": "tutorbench-internal"
+      "classificationSource": "tutorbench-internal",
+      "internalCategory": "advanced-topics"
     }
   ],
   "nodes": [
@@ -692,5 +692,475 @@
       ]
     }
   ],
-  "notes": "Case mappings are linked to independently validated task evidence; unmapped nodes mean untested coverage, not absence of a skill from mathematics."
+  "notes": "Case mappings are linked to independently validated task evidence; unmapped nodes mean untested coverage, not absence of a skill from mathematics.",
+  "knowledgeRelations": [
+    {
+      "fromNodeId": "units-whole",
+      "toNodeId": "fractions-units",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "fractions-units",
+      "toNodeId": "fraction-equivalence",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "integers-operations",
+      "toNodeId": "fraction-equivalence",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "fractions-units",
+      "toNodeId": "ratios",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "ratios",
+      "toNodeId": "percent-base",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "percent-base",
+      "toNodeId": "successive-changes",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "integers-operations",
+      "toNodeId": "variable-symbols",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "linear-equations",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "polynomial-factorization",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "polynomial-factorization",
+      "toNodeId": "rational-domain",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "linear-equations",
+      "toNodeId": "rational-domain",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "linear-equations",
+      "toNodeId": "inequality-signs",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "polynomial-factorization",
+      "toNodeId": "quadratic-discriminant",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "quadratic-discriminant",
+      "toNodeId": "root-sign-conditions",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "inequality-signs",
+      "toNodeId": "root-sign-conditions",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "coordinate-graph",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "coordinate-graph",
+      "toNodeId": "function-definition",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "function-definition",
+      "toNodeId": "function-composition",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "function-definition",
+      "toNodeId": "inverse-functions",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "function-definition",
+      "toNodeId": "exponential-laws",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "polynomial-factorization",
+      "toNodeId": "exponential-laws",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "exponential-laws",
+      "toNodeId": "logarithm-inequalities",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "inequality-signs",
+      "toNodeId": "logarithm-inequalities",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "function-composition",
+      "toNodeId": "limits-continuity",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "units-whole",
+      "toNodeId": "length-area",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "length-area",
+      "toNodeId": "angles-triangles",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "angles-triangles",
+      "toNodeId": "similarity-scale",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "ratios",
+      "toNodeId": "similarity-scale",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "angles-triangles",
+      "toNodeId": "pythagoras",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "coordinate-graph",
+      "toNodeId": "coordinate-geometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "pythagoras",
+      "toNodeId": "coordinate-geometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "quadratic-discriminant",
+      "toNodeId": "coordinate-geometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "similarity-scale",
+      "toNodeId": "trigonometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "pythagoras",
+      "toNodeId": "trigonometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "integers-operations",
+      "toNodeId": "counting-principle",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "counting-principle",
+      "toNodeId": "combinations",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "fractions-units",
+      "toNodeId": "combinations",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "fractions-units",
+      "toNodeId": "probability-events",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "counting-principle",
+      "toNodeId": "probability-events",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "probability-events",
+      "toNodeId": "conditional-events",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "combinations",
+      "toNodeId": "conditional-events",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "conditional-events",
+      "toNodeId": "bayes-base-rate",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "sequences-recursive",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "exponential-laws",
+      "toNodeId": "sequences-recursive",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "logic-quantifiers",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "sequences-recursive",
+      "toNodeId": "mathematical-induction",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "logic-quantifiers",
+      "toNodeId": "mathematical-induction",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "inequality-signs",
+      "toNodeId": "inequality-proofs",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "logic-quantifiers",
+      "toNodeId": "inequality-proofs",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "percent-base",
+      "toNodeId": "statistics-weighted",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "statistics-weighted",
+      "toNodeId": "statistics-conditioning",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "statistics-weighted",
+      "toNodeId": "statistics-variability",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "statistics-variability",
+      "toNodeId": "statistics-inference",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "conditional-events",
+      "toNodeId": "statistics-inference",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "limits-continuity",
+      "toNodeId": "derivatives-rate",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "polynomial-factorization",
+      "toNodeId": "derivatives-rate",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "derivatives-rate",
+      "toNodeId": "optimization-boundary",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "inequality-signs",
+      "toNodeId": "optimization-boundary",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "linear-equations",
+      "toNodeId": "systems-equations",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "systems-equations",
+      "toNodeId": "linear-algebra-rank",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "linear-algebra-rank",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    }
+  ],
+  "alternativePaths": [
+    {
+      "id": "conditional-enumeration",
+      "targetNodeId": "conditional-events",
+      "nodeIds": [
+        "probability-events",
+        "counting-principle"
+      ],
+      "description": "Count equally likely outcomes directly without invoking combination formulas.",
+      "evidenceStatus": "author-hypothesis"
+    },
+    {
+      "id": "conditional-combinations",
+      "targetNodeId": "conditional-events",
+      "nodeIds": [
+        "probability-events",
+        "combinations"
+      ],
+      "description": "Count unordered eligible outcomes with combination methods.",
+      "evidenceStatus": "author-hypothesis"
+    },
+    {
+      "id": "function-table-rule",
+      "targetNodeId": "function-definition",
+      "nodeIds": [
+        "variable-symbols"
+      ],
+      "description": "Introduce inputs and outputs through a rule or a mapping table without a coordinate graph.",
+      "evidenceStatus": "author-hypothesis"
+    },
+    {
+      "id": "function-graph",
+      "targetNodeId": "function-definition",
+      "nodeIds": [
+        "coordinate-graph"
+      ],
+      "description": "Introduce a function using coordinate representations and graphs.",
+      "evidenceStatus": "author-hypothesis"
+    }
+  ],
+  "curriculumStageMappings": []
 }
