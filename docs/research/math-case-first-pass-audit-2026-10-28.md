@@ -271,3 +271,45 @@ node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek `
 ```
 
 验收先看能否取得合法结构化评分，随后**独立**检查教学标签与关键事实错误判断，再考虑其余三个不可用样本。即使 1/1 成功也不能断言 v0.9.1 修复了全部无效样本或提升了评分准确率；必须保留与 v0.9 相同模型和样本的有界对照，不能混合两个 Prompt 版本的结果作单一准确率。
+
+
+## 11. v0.9.1 首次真实回放：先恢复可用性（2026-10-28）
+
+**数据来源：** 用户于 2026-10-28 提供的本地 `math-rubric-probe-v091-diagnostic.json` 及 PowerShell 运行输出。观察报告本身为脱敏派生结果，无模型原始输出或逐 token 日志。所评估对象是作者编写的**固定负面 Tutor 回答**，不是 DeepSeek 作为 Tutor 的答题结果，也不代表学生的实际学习表现。
+
+| 对照条件 | 模型 | Judge prompt | 案例 / 回答 | 单次响应可用性 | Rubric 判断 |
+| --- | --- | --- | --- | --- | --- |
+| 原始 13 条中对应样本 | `deepseek-flash` | `0.9` | `mc-conditional-normalization / wrong-diagnosis` | 不可用，`judge_result_invalid` | 无 |
+| 四条定向重试中对应样本 | `deepseek-flash` | `0.9` | 同上 | 不可用，`judge_result_invalid` | 无 |
+| 定向结构诊断 | `deepseek-flash` | `0.9` | 同上 | 不可用，`factual_error_item_invalid` | 无 |
+| **首次实验性格式澄清回放** | **`deepseek-flash`** | **`0.9.1`** | **同上** | **可用，`valid_judge_schema`** | **两项 FAIL** |
+
+最新一次计划和实际 Judge 调用均为 **1**；有效 **1**、不可用 **0**、与作者假设标签分歧 **0**。`mc-conditional-normalization-1` 和 `mc-conditional-normalization-2` 实测均为 `FAIL`，与作者预期一致。Judge 另外记录：
+
+- `incorrect_diagnosis`，`major`：Tutor 将正确的无条件第二次红球概率 `4/8` 误诊成算术错误，遗漏“至少一颗红球”的条件化问题。
+- `severe_factual_error`，`major`：Tutor 错称在 5 红 4 蓝中已抽走一颗红球后第二次红球概率应为 `3/8`，正确是 `4/8`。
+
+**结论层级：**
+1. **已观察到的事实：** 对同一固定 `wrong-diagnosis` 样本，v0.9 三次无法取得有效结果；v0.9.1 首次得到合法结果及两项符合作者假设的 FAIL。
+2. **受支持的解释：** v0.9.1 的 `factualErrors` 非空项结构说明**可能**改善有事实错误的回答在输出契约上的兼容性。本轮未存储无效输出的具体原文，因此不能证明旧版究竟缺哪个字段；模型随机性等因素也尚未排除。
+3. **尚未验证：** 其余三个错误样本在 v0.9.1 是否可用、重复调用稳定性、不同模型的行为、两项 critical failure 的严重度人工一致性、独立专家评审与真实教学效度。标签“完全一致”仅相对于未校准的作者预期。
+
+**处置建议：** 不修改原始 20 个数学案例、已冻结 v0.9、评分规则或 `factualErrors` 的严格校验。将 v0.9.1 继续限定为实验版本。在一次对照中先让其余 3 条固定错误样本接受新提示验证，保留输出形状诊断与可用率分母；即使成功也需要后续重复和独立人工复核，才能考虑推广。
+
+**下一步低成本命令（非自动执行，需用户显式选择并在本地使用凭证，产生费用）：**
+
+```powershell
+node scripts/math-rubric-counterexample-probe.mjs --dry-run `
+  --judge-prompt-version 0.9.1 `
+  --variant wrong-agreement `
+  --variant wrong-endorsement
+# 3 cases / 3 responses / 0 Judge calls
+
+node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek `
+  --judge-prompt-version 0.9.1 --diagnose-invalid `
+  --variant wrong-agreement `
+  --variant wrong-endorsement `
+  --output artifacts/math-rubric-probe-v091-remaining.json
+```
+
+`wrong-agreement` 出现在两个案例中，因此该筛选共有 3 条 Tutor 回答。此记录未把本次单点的“可用性修复”冒充总体的“准确率提升”或“统计显著性”。
