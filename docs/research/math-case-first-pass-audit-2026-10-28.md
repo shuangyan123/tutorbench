@@ -134,3 +134,33 @@
 **设计有效性：** 识别两项 P1 的潜在提示公平性风险与四项 P2 的诊断、报告或解释边界；仍需模型/Judge 对照回放才能确定真实误判。
 
 **合并规则：** 本记录可单独审阅；任何对可执行实验案例或评分规则的实质修改，都应另行审查并经过回归测试。此记录本身不应被误当作已完成案例专家认证。
+
+
+## 7. 固定评分反例语料与真实 Judge 回放入口
+
+**实现：** [13 条反例样本](../../fixtures/judge/math-rubric-counterexamples-v0.1.json)、[诊断回放脚本](../../scripts/math-rubric-counterexample-probe.mjs)、[离线回归测试](../../tests/math-rubric-counterexample-probe.test.ts)。
+
+- `R-01`（复合函数定义域）4 条：最小有效反例、正确定义域约束提示、错误认同、过度完整解答。
+- `R-02`（闭区间极值）4 条：最小端点提示、四点比较提示、错误唯一性结论、直接给全部极值。
+- `R-03`（条件概率）5 条：保留正确无条件计算的两种提示、错误诊断、错误条件答案、过度泄漏答案。
+- 13 条各标注两项 rubric 的作者预期 `PASS`/`FAIL`；这些标签仅是**诊断假设**，不构成人工校准金标准或 Judge 正确率。
+
+本仓库已有 Judge 运行器可复用，未创建第二套评分引擎，也未直接修改现有 20 个案例的 rubric。执行方式（先安装依赖并编译）：
+
+```powershell
+npm ci
+npm run build
+node scripts/math-rubric-counterexample-probe.mjs --dry-run
+```
+
+离线模式输出 `VALIDATED: 3 cases, 13 synthetic responses, 0 Judge calls.`，只说明数据与回放接口通过结构验证，**不是 13 次 Judge 判分**。
+
+若用户决定执行真实调用，需自行在本地安全配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_JUDGE_MODEL`，再明确选择：
+
+```powershell
+node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek --output artifacts/math-rubric-probe.json
+```
+
+该命令最多按 13 条样本分别发起 Judge 评测（不调用 Tutor 模型）；报告将区分 `available`、`unavailable`、与作者预期一致或不一致，保存各 rubric 的观测标签和必要诊断证据。报告生成前不推测 Judge 结果；未获得实际回放前，R-01/R-02 保持“潜在评分风险”，不能宣布误判已复现。
+
+**验证门槛：** 先检查结构与 CI，再人工复核每条正反例是否符合学习者意图，最后在同一个固定 Judge prompt/model 版本下重复运行，记录分歧与不可用情况。每次修改 rubric 必须保留原文、变更原因与回归对照，不得将 Judge 可用性失败算成数学或教学能力 FAIL。
