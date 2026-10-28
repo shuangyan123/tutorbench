@@ -177,7 +177,7 @@ test("v0.9.1 is an isolated output-shape clarification, while v0.9 remains froze
       "# TutorEval Pedagogy Judge — System Prompt v0.9");
   assert.equal(beforeContract(newPrompt), beforeContract(oldPrompt));
   assert.match(newPrompt, /"factualErrors": \[/u);
-  assert.match(newPrompt, /"description": "The Tutor incorrectly says/u);
+  assert.match(newPrompt, /"description": "The Tutor incorrectly states/u);
   assert.match(newPrompt, /"severity": "major"/u);
   assert.match(newPrompt, /If there are no supported factual/u);
 });
