@@ -166,11 +166,11 @@ function knowledgeSection() {
   // five families of new stones, grouped the way the map groups its domains (PISA's four content
   // areas, then TutorBench's own domains); same stone within a family, a different cut per domain
   const FAMILIES = [
-    { key: "quantity", en: "Quantity", zh: "数量", stone: ["Morganite", "摩根石"] },
-    { key: "change-and-relationships", en: "Change and relationships", zh: "变化与关系", stone: ["Aquamarine", "海蓝宝"] },
-    { key: "space-and-shape", en: "Space and shape", zh: "空间与形状", stone: ["Tanzanite", "坦桑石"] },
-    { key: "uncertainty-and-data", en: "Uncertainty and data", zh: "不确定性与数据", stone: ["Kunzite", "紫锂辉石"] },
-    { key: "internal", en: "TutorBench’s own domains", zh: "TutorBench 自设领域", stone: ["Rock crystal", "水晶"] },
+    { key: "quantity", en: "Quantity", zh: "数量" },
+    { key: "change-and-relationships", en: "Change and relationships", zh: "变化与关系" },
+    { key: "space-and-shape", en: "Space and shape", zh: "空间与形状" },
+    { key: "uncertainty-and-data", en: "Uncertainty and data", zh: "不确定性与数据" },
+    { key: "internal", en: "TutorBench’s own domains", zh: "TutorBench 自设领域" },
   ];
   const famOf = (d) => (d.classificationSource === "pisa-content" ? d.pisaContent : "internal");
   for (const d of kmap.domains) if (!FAMILIES.some((f) => f.key === famOf(d))) throw new Error(`domain ${d.id} has no gem family`);
@@ -186,8 +186,8 @@ function knowledgeSection() {
   };
   const index = `<div class="km">
             <p class="km-meta kicker">${bi(`${KM.domains} domains · ${KM.nodes} nodes · ${KM.relations} candidate relations · ${KM.cases} cases on ${KM.tasks} task structures`, `${KM.domains} 个领域 · ${KM.nodes} 个节点 · ${KM.relations} 条候选关系 · ${KM.cases} 个案例，${KM.tasks} 种任务结构`)}</p>
-            <p class="km-key" aria-hidden="true"><span class="km-on">${gemD(kmap.domains[0], 64)}${bi("linked to an authored case, in its domain’s stone", "已有对应案例，用所属领域的宝石标记")}</span><span class="km-off"><i></i>${bi("no case yet", "暂无案例")}</span></p>
-            ${FAMILIES.map((f) => `<section class="km-fam"><p class="km-f kicker">${bi(esc(f.en), esc(f.zh))}<span>${bi(esc(f.stone[0]), esc(f.stone[1]))}</span></p>
+            <p class="km-key" aria-hidden="true"><span class="km-on">${gemD(kmap.domains[0], 64)}${bi("linked to an authored case", "已有对应案例")}</span><span class="km-off"><i></i>${bi("no case yet", "暂无案例")}</span></p>
+            ${FAMILIES.map((f) => `<section class="km-fam"><p class="km-f kicker">${bi(esc(f.en), esc(f.zh))}</p>
             <ol class="km-rows">${kmap.domains.filter((d) => famOf(d) === f.key).map(row).join("")}</ol></section>`).join("\n            ")}
           </div>`;
 
@@ -206,8 +206,8 @@ function knowledgeSection() {
         <h3 class="m-sub">${bi("The map behind the cases", "案例背后的知识图谱")}</h3>
         ${P(`The knowledge map arranges school mathematics, and a first slice of introductory university topics, into ${KM.domains} domains and ${KM.nodes} nodes. Each case is linked only to the nodes it actually exercises, so the map also shows plainly where no case exists yet. Those gaps are kept visible on purpose: we would rather add a case where the mathematics needs one than add cases to fill a grid.`,
             `知识图谱把中小学数学，以及一小部分大学入门内容，整理成 ${KM.domains} 个领域、${KM.nodes} 个节点。每个案例只关联它真正考查的节点，所以图谱也清楚地显示哪里还没有案例。这些空白是有意保留的：我们宁愿在数学上确实需要的地方补案例，也不为了填满表格而凑数。`)}
-        ${fig("fig-wide", index, `${KM.linked} of ${KM.nodes} nodes are linked to at least one authored case. This is case-design coverage: it shows where cases exist, not how any tutor performed on them. The domains are grouped as the map groups them, by PISA’s four content areas and then TutorBench’s own; each group has its own stone, cut differently for each domain.`,
-          `${KM.nodes} 个节点中有 ${KM.linked} 个关联了至少一个案例。这是案例设计的覆盖情况：它说明哪里有案例，不代表任何导师在这些知识上的表现。领域按图谱自身的分组排列，先是 PISA 的四类数学内容，再是 TutorBench 自设的领域；每组一种宝石，组内每个领域换一种切工。`)}
+        ${fig("fig-wide", index, `${KM.linked} of ${KM.nodes} nodes are linked to at least one authored case. This is case-design coverage: it shows where cases exist, not how any tutor performed on them. The domains are grouped as the map groups them: PISA’s four content areas, then TutorBench’s own.`,
+          `${KM.nodes} 个节点中有 ${KM.linked} 个关联了至少一个案例。这是案例设计的覆盖情况：它说明哪里有案例，不代表任何导师在这些知识上的表现。领域按图谱自身的分组排列：先是 PISA 的四类数学内容，再是 TutorBench 自设的领域。`)}
         <div class="m-not">
           <p class="kicker">${bi("What the map is not", "这张图谱不是什么")}</p>
           <ul>

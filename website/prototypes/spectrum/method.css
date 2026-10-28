@@ -192,7 +192,6 @@
 .km img { width: 16px; height: 16px; flex: none; filter: drop-shadow(0 2px 2px rgba(14, 15, 20, .25)); }
 .km-fam + .km-fam { margin-top: 6px; }
 .km-f { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; margin: 0; padding: 18px 0 8px; border-bottom: 1px solid var(--hair-2); color: var(--ink); }
-.km-f > span:last-child { font-family: var(--f-display); font-style: italic; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink-3); }
 .km i { display: inline-block; flex: none; width: 7px; height: 7px; margin: 0 4px; border-radius: 50%; border: 1px solid var(--ink-3); }
 .km-rows { list-style: none; margin: 0; padding: 0; }
 .km-rows > li { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 8px 28px; padding: 14px 0 15px; border-bottom: 1px solid var(--hair); }
@@ -234,7 +233,6 @@
 :root[data-lang="zh"] .kc-n { font-size: clamp(18px, 1.5vw, 21px); }
 :root[data-lang="zh"] .kc-verdict { font-size: clamp(20px, 1.8vw, 25px); }
 :root[data-lang="zh"] .km-d { font-size: 16.5px; }
-:root[data-lang="zh"] .km-f > span:last-child { font-style: normal; font-family: var(--f-ui); font-size: 13px; }
 :root[data-lang="zh"] .kc-says { font-style: normal; font-family: "Noto Serif SC", var(--f-text); font-size: clamp(16.5px, 1.3vw, 18.5px); line-height: 1.85; }
 :root[data-lang="zh"] .kc-dl dd, :root[data-lang="zh"] .kc-crit li, :root[data-lang="zh"] .m-not li, :root[data-lang="zh"] .kc .kc-why { line-height: 1.8; }
 :root[data-lang="zh"] .m-deck, :root[data-lang="zh"] .kc, :root[data-lang="zh"] .km, :root[data-lang="zh"] .m-not { text-align: left; }
