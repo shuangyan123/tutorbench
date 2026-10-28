@@ -211,7 +211,7 @@ test("English reviewer guide stages stay synchronized with the graph", async () 
     "../../docs/math-locales/mathematics-knowledge-review-en.md", import.meta.url), "utf8");
   const lines = guide.split("\n");
   for (const node of graph.nodes) {
-    const prefix = "| \`" + node.id + "\` |";
+    const prefix = '| `' + node.id + '` |';
     const matches = lines.filter(line => line.startsWith(prefix));
     assert.equal(matches.length, 1, "Expected one guide row for " + node.id);
     assert.equal(matches[0]!.split("|")[3]!.trim(), node.stage,
