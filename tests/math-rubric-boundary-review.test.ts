@@ -140,7 +140,9 @@ test("provisional semantic adjudication covers each contrast exactly once withou
     seen.add(key);
     const scenario = suite.scenarios.find(x => x.identity.id === review.caseId);
     assert.ok(scenario, "unknown scenario " + review.caseId);
-    assert.equal(review.shadowRubricResults.length, scenario.decisionPoints[0].evaluationCriteria.length);
+    const decisionPoint = scenario.decisionPoints[0];
+    assert.ok(decisionPoint, "missing decision point for " + review.caseId);
+    assert.equal(review.shadowRubricResults.length, decisionPoint.evaluationCriteria.length);
     assert.ok(review.shadowRubricResults.every(x => allowedRubrics.has(x)));
     assert.ok(["existing", "shadow-learner-work"].includes(review.criteriaBasis));
     assert.ok(["yes", "no"].includes(review.answerLeakageRecommendation));
