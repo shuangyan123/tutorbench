@@ -92,3 +92,69 @@ test("boundary hypotheses distinguish wrong final assertions, corrected hints, a
   assert.equal(variant("domain-student-echo-vs-answer", "domain-wrong-echo").leakageHypothesis, "disputed");
   // These are author-proposed hypotheses: this test does not call a Judge or establish semantic validity.
 });
+
+
+test("provisional semantic adjudication covers each contrast exactly once without becoming expert gold", async () => {
+  const source = await jsonFile<ReviewFixture>("fixtures/judge/math-pedagogical-boundary-review-v0.1.json");
+  const suite = await jsonFile<{ scenarios: Array<Scenario & {
+    decisionPoints: Array<{ evaluationCriteria: Array<{ rubricId: string }> }>;
+  }> }>("scenarios/experimental/mathematics-challenge-v0.1/suite.json");
+  const shadow = await jsonFile<{
+    schemaVersion: number;
+    id: string;
+    status: string;
+    calibrationStatus: string;
+    reviewAuthority: string;
+    sourceFixture: string;
+    scopeNotes: string[];
+    reviews: Array<{
+      caseId: string;
+      variantId: string;
+      shadowRubricResults: string[];
+      criteriaBasis: string;
+      answerLeakageRecommendation: string;
+      criticalFailureCandidates: string[];
+      confidence: string;
+      rationale: string;
+      requiresIndependentExpertReview: boolean;
+    }>;
+  }>("fixtures/judge/math-pedagogical-boundary-shadow-adjudication-v0.1.json");
+  assert.equal(shadow.schemaVersion, 1);
+  assert.equal(shadow.id, "math-pedagogical-boundary-shadow-adjudication-v0.1");
+  assert.equal(shadow.status, "provisional-desk-review-only");
+  assert.equal(shadow.calibrationStatus, "uncalibrated");
+  assert.match(shadow.reviewAuthority, /not-independent-expert/u);
+  assert.ok(shadow.scopeNotes.some(x => /not human gold/u.test(x)));
+  assert.equal(shadow.sourceFixture, "fixtures/judge/math-pedagogical-boundary-review-v0.1.json");
+  const keys = new Set(source.contrastSets.flatMap(group => group.variants.map(v => group.caseId + ":" + v.id)));
+  const seen = new Set<string>();
+  const allowedRubrics = new Set(["PASS", "PARTIAL", "FAIL"]);
+  const allowedCritical = new Set([
+    "severe_factual_error", "misconception_reinforcement", "incorrect_diagnosis",
+    "answer_leakage", "student_task_takeover", "critical_misconception_ignored", "instruction_violation",
+  ]);
+  for (const review of shadow.reviews) {
+    const key = review.caseId + ":" + review.variantId;
+    assert.ok(keys.has(key), "review refers to unknown contrast " + key);
+    assert.ok(!seen.has(key), "duplicate adjudication " + key);
+    seen.add(key);
+    const scenario = suite.scenarios.find(x => x.identity.id === review.caseId);
+    assert.ok(scenario, "unknown scenario " + review.caseId);
+    assert.equal(review.shadowRubricResults.length, scenario.decisionPoints[0].evaluationCriteria.length);
+    assert.ok(review.shadowRubricResults.every(x => allowedRubrics.has(x)));
+    assert.ok(["existing", "shadow-learner-work"].includes(review.criteriaBasis));
+    assert.ok(["yes", "no"].includes(review.answerLeakageRecommendation));
+    assert.ok(review.criticalFailureCandidates.every(x => allowedCritical.has(x)));
+    assert.equal(new Set(review.criticalFailureCandidates).size, review.criticalFailureCandidates.length);
+    assert.equal(review.criticalFailureCandidates.includes("answer_leakage"), review.answerLeakageRecommendation === "yes");
+    assert.ok(["low", "moderate", "high"].includes(review.confidence));
+    assert.ok(review.rationale.trim().length >= 50);
+    assert.equal(review.requiresIndependentExpertReview, true);
+  }
+  assert.equal(seen.size, keys.size);
+  assert.equal(seen.size, 11);
+  const shadowBasis = shadow.reviews.filter(x => x.criteriaBasis === "shadow-learner-work");
+  assert.deepEqual(shadowBasis.map(x => x.variantId).sort(), ["endpoint-minimal", "endpoint-possible-tie"]);
+  assert.equal(shadow.reviews.find(x => x.variantId === "conditional-wrong-asserted-final")?.confidence, "low");
+  // This is a structural check of research annotations, not a semantic Judge validation.
+});
