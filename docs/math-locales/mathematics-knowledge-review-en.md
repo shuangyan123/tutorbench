@@ -1,4 +1,4 @@
-# International English mathematics knowledge review — v0.1
+# International English mathematics knowledge review — v0.2
 
 **Purpose:** a plain-English audit of TutorBench's **mathematics knowledge system**, not a translation of Chinese exam standards. Stable knowledge IDs are shared across local examination profiles, but syllabus coverage, assessment conditions, language and marking requirements are not shared automatically.
 
@@ -9,7 +9,7 @@
 3. **Knowledge system:** eight authored mathematics domains, 44 concept nodes, candidate prerequisite relationships and misconception prompts.
 4. **Examination system:** issuing body + exam/course + applicable year, tier/route and questions, as a **many-to-many reference** to the knowledge system, not a child that owns or duplicates its mathematics.
 
-See [four-layer architecture review](../academic-structure-zh-cn-v0.1.md) and the [exam-specific localisation hub](README.md).
+See [four-layer academic registry](../../scenarios/case-system-vnext/academic-structure-v0.1.json) and the [exam-specific localisation hub](README.md).
 
 ## The research and curriculum sources are different kinds of evidence
 
@@ -58,7 +58,7 @@ For any real examination, always use its issuing body's **specific syllabus and 
 | `inverse-functions` | Inverse functions and one-to-one restrictions | upper-secondary | `function-definition` | Not yet |
 | `exponential-laws` | Exponential expressions and growth | upper-secondary | `function-definition`, `polynomial-factorization` | Not yet |
 | `logarithm-inequalities` | Logarithm domain, base and inequality direction | upper-secondary | `exponential-laws`, `inequality-signs` | Yes |
-| `limits-continuity` | Limits and continuity | university-intro | `function-composition` | Not yet |
+| `limits-continuity` | Limits and continuity | upper-secondary | `function-composition` | Not yet |
 
 ### Geometry and spatial reasoning
 
@@ -123,3 +123,22 @@ For any real examination, always use its issuing body's **specific syllabus and 
 - [Mathematics knowledge graph](../../scenarios/case-system-vnext/mathematics-knowledge-map-v0.1.json)
 - [Examination alignment registry](../../scenarios/case-system-vnext/mathematics-exam-alignment-v0.1.json)
 - [Four-layer academic structure registry](../../scenarios/case-system-vnext/academic-structure-v0.1.json)
+
+
+## Schema v2 and evidence limits (2026-10-28)
+
+The canonical graph JSON now uses schema version 2. Its 61 edge records are separately
+typed as `helpful` and `author-hypothesis`; these are *not* mandatory prerequisites
+or diagnoses of a learner's knowledge state. The `alternativePaths` records
+demonstrate multiple strategies for conditional probability and function introduction,
+not empirically validated teaching routes.
+
+The four official PISA content categories remain in `pisaContent`. TutorBench's
+proof/cross-cutting and advanced topic groupings are held only in
+`internalCategory`, not misrepresented as an additional PISA category.
+
+The graph-wide `stage` is a provisional authoring label. The introductory
+`limits-continuity` node is now tagged `upper-secondary`, consistent with its
+role as a suggested background for `derivatives-rate`; it does not describe
+formal university-level real analysis. The new `curriculumStageMappings` registry
+is empty until exam-specific, source-backed mappings can be reviewed.
