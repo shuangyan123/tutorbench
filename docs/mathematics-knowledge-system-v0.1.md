@@ -136,4 +136,24 @@ variance/distribution interpretation, and proof by counterexample independent
 of inequality exercises. Any further expansion should begin with the
 mathematics gap, not with an arbitrary number of added prompts.
 
-- 域分类新增 `classificationSource` 显式标识：官方 PISA 四大数学内容类别标为 `pisa-content`；`cross-cutting` 仅标为 `tutorbench-internal`。保留已有 `pisaContent` 字段与稳定 ID，以减少本次修复对旧读取方的破坏；后续大版本可将该字段拆成规范结构。
+## 7. Schema v2: typed evidence and curriculum overlays
+
+The graph data uses `schemaVersion: 2` while the parser retains support for
+legacy v1 records. All 61 previously authored node links are represented as
+individual `knowledgeRelations` entries with the type `helpful` and evidence
+status `author-hypothesis`. This does not claim necessary prerequisites or
+learner-calibrated cognitive dependencies.
+
+Four example `alternativePaths` represent two candidate instructional
+approaches for conditional probability and two for introducing function
+correspondence. None are validated routes for a particular student.
+
+The `curriculumStageMappings` array is intentionally empty until a syllabus
+and its year can be verified clause by clause; global node stages only indicate
+possible authoring contexts. PISA's four official content areas remain in the
+`pisaContent` field, while TutorBench-only categories have their own
+`internalCategory` field.
+
+The 20 synthetic scenarios, their mathematical references and evaluator criteria
+are unchanged by this graph migration. These changes are not a claim of official
+exam coverage, educational effectiveness or empirical difficulty calibration.
