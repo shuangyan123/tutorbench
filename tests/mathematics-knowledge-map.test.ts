@@ -203,3 +203,19 @@ test("v2 PISA content and TutorBench internal domains are disjoint", async () =>
   assert.ok(official.every(domain => domain.pisaContent !== "cross-cutting" && !domain.internalCategory));
   assert.ok(internal.every(domain => domain.pisaContent === undefined && !!domain.internalCategory));
 });
+
+
+test("English reviewer guide stages stay synchronized with the graph", async () => {
+  const { graph } = await load();
+  const guide = await readFile(new URL(
+    "../../docs/math-locales/mathematics-knowledge-review-en.md", import.meta.url), "utf8");
+  const lines = guide.split("\n");
+  for (const node of graph.nodes) {
+    const prefix = "| \`" + node.id + "\` |";
+    const matches = lines.filter(line => line.startsWith(prefix));
+    assert.equal(matches.length, 1, "Expected one guide row for " + node.id);
+    assert.equal(matches[0]!.split("|")[3]!.trim(), node.stage,
+      "Stage drift in reviewer guide for " + node.id);
+  }
+  assert.ok(guide.includes("../../scenarios/case-system-vnext/academic-structure-v0.1.json"));
+});
