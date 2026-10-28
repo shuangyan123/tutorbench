@@ -386,7 +386,7 @@ An example of a nonempty factual error array is:
 
 ```json
 "factualErrors": [
-  { "description": "The Tutor incorrectly says that four remaining red balls become three.", "severity": "major" }
+  { "description": "The Tutor incorrectly states that 3 × 4 = 11.", "severity": "major" }
 ]
 ```
 
