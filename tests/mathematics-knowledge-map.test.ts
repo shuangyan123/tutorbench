@@ -24,6 +24,8 @@ async function load() {
 
 test("proposed math knowledge graph is acyclic and traces all executable task structures", async () => {
   const { graph, evidence, suite } = await load();
+  assert.equal(graph.schemaVersion, 2);
+  assert.equal(graph.knowledgeRelations?.length, 61);
   assert.equal(graph.domains.length, 8);
   assert.equal(graph.nodes.length, 44);
   assert.equal(graph.status, "author-proposed-uncalibrated");
@@ -145,4 +147,59 @@ test("cross-cutting is a TutorBench category, not an OECD PISA fifth content are
   const extension = invalid.domains.find(domain => domain.pisaContent === "cross-cutting")!;
   extension.classificationSource = "pisa-content";
   assert.throws(() => parseMathematicsKnowledgeMap(invalid), /mathematics_knowledge_domain_invalid/);
+});
+
+test("v2 relationship records preserve all legacy edges and reject unsupported required claims", async () => {
+  const { graph } = await load();
+  const relationships = graph.knowledgeRelations!;
+  const all = new Set(graph.nodes.flatMap(node => node.prerequisiteIds.map(id => id + "=>" + node.id)));
+  assert.deepEqual(new Set(relationships.map(edge => edge.fromNodeId + "=>" + edge.toNodeId)), all);
+  assert.ok(relationships.every(edge => edge.relationType === "helpful" &&
+    edge.evidenceStatus === "author-hypothesis" && edge.sourceRefs.length === 0));
+  const claim = structuredClone(graph) as unknown as {
+    knowledgeRelations: Array<{ relationType: string; evidenceStatus: string }>;
+  };
+  claim.knowledgeRelations[0]!.relationType = "necessary";
+  assert.throws(() => parseMathematicsKnowledgeMap(claim), /mathematics_knowledge_relation_invalid/);
+  const missing = structuredClone(graph) as unknown as { knowledgeRelations: unknown[] };
+  missing.knowledgeRelations.pop();
+  assert.throws(() => parseMathematicsKnowledgeMap(missing), /mathematics_knowledge_relation_coverage_mismatch/);
+});
+
+test("v2 alternative learning paths and curriculum stages remain explicit and unverified", async () => {
+  const { graph } = await load();
+  assert.equal(graph.alternativePaths?.length, 4);
+  assert.deepEqual([...new Set(graph.alternativePaths!.map(path => path.targetNodeId))].sort(),
+    ["conditional-events", "function-definition"]);
+  assert.deepEqual(graph.curriculumStageMappings, []);
+  const legacy = structuredClone(graph) as unknown as Record<string, unknown>;
+  legacy.schemaVersion = 1;
+  delete legacy.knowledgeRelations;
+  delete legacy.alternativePaths;
+  delete legacy.curriculumStageMappings;
+  legacy.domains = (graph.domains.map(domain => ({
+    id: domain.id, label: domain.label,
+    pisaContent: domain.pisaContent ?? "cross-cutting",
+    classificationSource: domain.classificationSource,
+  })));
+  assert.equal(parseMathematicsKnowledgeMap(legacy).schemaVersion, 1);
+  const invalid = structuredClone(graph) as unknown as {
+    curriculumStageMappings: Array<{ curriculumId: string; nodeId: string; stage: string;
+      mappingStatus: string; sourceRefs: string[] }>;
+  };
+  invalid.curriculumStageMappings.push({
+    curriculumId: "sample", nodeId: "derivatives-rate", stage: "upper-secondary",
+    mappingStatus: "source-verified", sourceRefs: [],
+  });
+  assert.throws(() => parseMathematicsKnowledgeMap(invalid), /mathematics_knowledge_curriculum_stage_invalid/);
+});
+
+test("v2 PISA content and TutorBench internal domains are disjoint", async () => {
+  const { graph } = await load();
+  const official = graph.domains.filter(domain => domain.classificationSource === "pisa-content");
+  const internal = graph.domains.filter(domain => domain.classificationSource === "tutorbench-internal");
+  assert.equal(official.length, 6);
+  assert.equal(internal.length, 2);
+  assert.ok(official.every(domain => domain.pisaContent !== "cross-cutting" && !domain.internalCategory));
+  assert.ok(internal.every(domain => domain.pisaContent === undefined && !!domain.internalCategory));
 });
