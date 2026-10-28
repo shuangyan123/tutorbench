@@ -165,3 +165,16 @@
 - `limits-continuity` 的实验性学段标签与 `derivatives-rate` 对齐为高中阶段，仅指初步直观的极限与连续性概念。严格的大学实分析不在本节点范围内；不同考试的官方学段仍由各自课程配置决定。
 - 当前 `cross-cutting` 是 TutorBench 的内部辅助类别，并非 PISA 官方第五种数学内容类型。后续正式课程映射应分离官方内容分类与项目内部学科类别。
 - 本轮不追加未核实的课标节点，也不改动 20 个可执行案例的数学答案、评测条件和历史评分。
+
+
+## 七、关系模型与课程映射修订 v0.2（2026-10-28）
+
+本图谱 JSON 已升级为 schemaVersion 2，并保留稳定知识 ID、原有 61 条候选边以及 16 种任务结构到 22 个知识节点的映射。旧版 v1 仍可由解析器读取；新版本数据使用以下分层字段：
+
+- `knowledgeRelations`：逐边记录 `fromNodeId`、`toNodeId`、`relationType`、`evidenceStatus` 和 `sourceRefs`。迁移后的全部 61 条关系当前均为 `helpful` + `author-hypothesis`，**不表示已证实的必要学习条件**。经作者假设的关系不允许直接声称为 `necessary`。
+- `alternativePaths`：存放不同的候选教学路径；当前条件概率示范枚举与组合两条路径，函数概念示范规则表格与坐标图两条路径。这是数据表达能力示例，并非真实学生的学习轨迹或已验证的学习效果。
+- `curriculumStageMappings`：为不同课程版本分别记录学段、证据和来源。当前为空，表示还没有完成逐课程逐节点审核；保留节点 `stage` 仅作为实验性写作背景，**不得默认为全球课程的官方学段**。
+- `pisaContent`：新版本仅包含 PISA 四类官方内容映射；证明与高等数学等项目内部领域使用 `internalCategory`，不再把 `cross-cutting` 当作 PISA 第五类。
+- `prerequisiteIds` 与 `prerequisiteEvidence`：为兼容既有文档及读取方暂时保留，依据逐边关系表进行一致性检查；未来移除前应先完成所有读取方迁移。
+
+未改变数学题目、参考答案、Judge 评分或既有考试配置 ID。课程阶段及先修关系仍需课程原文、专家审阅和学习数据分层认证。
