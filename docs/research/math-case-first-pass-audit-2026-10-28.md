@@ -164,3 +164,41 @@ node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek --output arti
 该命令最多按 13 条样本分别发起 Judge 评测（不调用 Tutor 模型）；报告将区分 `available`、`unavailable`、与作者预期一致或不一致，保存各 rubric 的观测标签和必要诊断证据。报告生成前不推测 Judge 结果；未获得实际回放前，R-01/R-02 保持“潜在评分风险”，不能宣布误判已复现。
 
 **验证门槛：** 先检查结构与 CI，再人工复核每条正反例是否符合学习者意图，最后在同一个固定 Judge prompt/model 版本下重复运行，记录分歧与不可用情况。每次修改 rubric 必须保留原文、变更原因与回归对照，不得将 Judge 可用性失败算成数学或教学能力 FAIL。
+
+
+## 8. DeepSeek 实际回放：第一次固定样本试验（2026-10-28）
+
+**证据来源：** 使用者提供的本地 `math-rubric-probe.json` 派生统计。原始文件含已筛选的结构化观察，并**不包含 API 原文或无效输出的原始内容**；没有独立留存原始模型响应，不应猜测具体解析失败原因。
+
+**已确认元数据：** `deepseek/deepseek-flash`、`tutor-eval-pedagogy-judge-system@0.9`、`math-rubric-counterexamples-v0.1@0.1.0`。13 条 Judge 调用记录、9 条有效、4 条不可用（均为 `judge_result_invalid`）、9 条有效中 8 条与作者预期全项一致，1 条有评分分歧。成功评估的 18 个 rubric 判断中 17 个与作者预期一致；这只是诊断性一致比例，不是 Judge 准确率或人工标注一致率。
+
+| 案例 | 正确简短提示 | 正确引导提示 | 错误回答探针 | 完整答案接管 |
+| --- | --- | --- | --- | --- |
+| `mc-composition-domain` | 双 PASS | 双 PASS | `judge_result_invalid`，不可用 | 正确性 PASS、指导 FAIL、major answer_leakage |
+| `mc-endpoint-optimization` | 双 PASS | 双 PASS | `judge_result_invalid`，不可用 | 正确性 PASS、适应性 FAIL、major answer_leakage |
+| `mc-conditional-normalization` | 双 PASS | 双 PASS | 两条均 `judge_result_invalid`，不可用 | 正确性 PARTIAL、指导 FAIL、major answer_leakage |
+
+**R-01 / R-02：** 两种不同正确提示都得到完整 PASS，原先担忧的“最小提示被误扣”**本轮未复现**，不应在此时更改 rubrics；仍需不同模型或重复运行做稳定性测试。
+
+**R-03：** 失配发生在 `answer-takeover` 的正确性：作者预期 PASS，Judge 给 PARTIAL；指导 FAIL 和 major `answer_leakage` 均符合预期。其候选回答给出了正确条件概率却没有明确承认并解释学生原先的无条件计算，因此 PARTIAL 可能是有根据的；应首先人工重审作者预期，不得直接宣称 Judge 错判。
+
+**优先处理的可用性问题：** 4 条专门设计的错误回答全部失败，并且错误代码相同（`judge_result_invalid`）。这造成定向的失败样本盲区：没有合法 Judge 结果就**不能**把这些回答记为 FAIL，更不能仅凭“均失败”判断模型的错误诊断能力。究竟是缺少字段、无效枚举、文本格式还是其他解析不一致，当前报告无法细分。
+
+**下一步最省成本的复验：** PR 内测试脚本已添加 `--variant` 重复筛选，仅回放上述 4 条：
+
+```powershell
+npm run build
+node scripts/math-rubric-counterexample-probe.mjs --dry-run `
+  --variant wrong-agreement `
+  --variant wrong-diagnosis `
+  --variant wrong-endorsement
+# 验证应为 3 cases, 4 synthetic responses, 0 Judge calls
+node scripts/math-rubric-counterexample-probe.mjs --judge-deepseek `
+  --variant wrong-agreement `
+  --variant wrong-diagnosis `
+  --variant wrong-endorsement `
+  --output artifacts/math-rubric-probe-retry.json
+```
+
+任何额外输出诊断都应优先记录**结构化、非秘密的错误种类和模型配置**；不得随意记录原始密钥、隐藏推理或完整供应商请求体。先复测与归类，再决定是否改 Judge 提示、输出格式处理或实验 rubric。
+
