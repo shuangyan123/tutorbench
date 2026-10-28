@@ -145,3 +145,90 @@
 :root[data-lang="zh"] .scope p, :root[data-lang="zh"] .m-boundary, :root[data-lang="zh"] .d-desc { line-height: 1.8; }
 :root[data-lang="zh"] .tbl tbody th { font-weight: 600; font-size: 16px; line-height: 1.5; }
 :root[data-lang="zh"] .tbl td { line-height: 1.7; }
+
+/* ---- §2, why we evaluate this way: one case followed from knowledge node to evaluation decision,
+   then the knowledge map's case-design coverage. Type and hairlines only; the plate is the picture. */
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.m-sub { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(24px, 2.2vw, 30px); line-height: 1.15; margin: 2.2em 0 .5em; color: var(--ink); }
+.fig-plate img { aspect-ratio: 16 / 10; }
+
+.kc { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.25fr) minmax(0, 1fr); border-top: 1px solid var(--ink); }
+.kc > li { position: relative; min-width: 0; display: grid; align-content: start; gap: 12px; padding: 18px 20px 22px 0; }
+.kc > li + li { padding-left: 20px; border-left: 1px solid var(--hair); }
+.kc > li + li::before { content: ""; position: absolute; top: 24px; left: -5px; width: 9px; height: 9px; border-top: 1px solid var(--ink); border-right: 1px solid var(--ink); transform: rotate(45deg); background: var(--bg); }
+.kc p, .kc dl, .kc dd, .kc blockquote, .kc ul { margin: 0; }
+.kc-step { display: flex; gap: 10px; align-items: baseline; font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+.kc-step > span:first-child { color: var(--lead); }
+.kc-domain { font-family: var(--f-ui); font-size: 13px; line-height: 1.4; color: var(--ink-3); }
+.kc code { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .02em; color: var(--ink-3); }
+.kc-domain code { color: var(--lead-deep); }
+.kc-pair { display: grid; gap: 6px; padding: 4px 0 2px; }
+.kc-n { display: grid; gap: 2px; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(21px, 1.8vw, 25px); line-height: 1.12; color: var(--ink); text-wrap: balance; }
+.kc-rel { font-family: var(--f-ui); font-size: 15px; line-height: 1; color: var(--lead); padding-left: 2px; }
+.kc-dl { display: grid; gap: 10px; }
+.kc-dl > div { display: grid; gap: 2px; }
+.kc-dl dt, .kc-side { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.kc-dl dd { font-family: var(--f-ui); font-size: 14px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.kc-node .kc-dl { padding-top: 12px; border-top: 1px solid var(--hair); }
+.kc-says { padding: 2px 0 2px 16px; border-left: 2px solid var(--lead-line); font-family: var(--f-display); font-style: italic; font-size: clamp(19px, 1.55vw, 22px); line-height: 1.38; color: var(--ink); text-wrap: pretty; }
+.kc-sides { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--hair); }
+.kc-sides > div { display: grid; align-content: start; gap: 10px; padding: 12px 14px 0 0; }
+/* the response boundary: the tutor's side ends at the dashed line */
+.kc-eval { padding-left: 14px !important; border-left: 1px dashed var(--lead); }
+.kc-eval .kc-side { color: var(--lead); }
+.kc-decision { background: linear-gradient(180deg, rgba(255, 255, 255, .42), rgba(255, 255, 255, .12)); box-shadow: 0 22px 44px -34px var(--lead-shadow); padding-right: 20px !important; }
+.kc-verdict { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(24px, 2.1vw, 30px); line-height: 1.08; color: var(--lead-deep); }
+.kc-crit { list-style: none; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--hair); }
+.kc-crit li { display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 10px; row-gap: 2px; padding: 11px 0; border-bottom: 1px solid var(--hair); font-family: var(--f-ui); font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.kc-crit img { grid-row: span 2; width: 26px; height: 26px; margin-top: 1px; filter: drop-shadow(0 4px 5px rgba(14, 15, 20, .22)); }
+.kc-cat { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
+.kc .kc-why { font-family: var(--f-text); font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+
+/* the map: eight domains, every node set in type; a small amethyst where a case exists */
+.km { border-top: 1px solid var(--ink); }
+.km-meta { margin: 0; padding: 12px 0 0; color: var(--ink-2); }
+.km-key { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 8px 0 6px; font-family: var(--f-ui); font-size: 12.5px; color: var(--ink-3); }
+.km-key > span { display: inline-flex; align-items: center; gap: 7px; }
+.km img { width: 15px; height: 15px; flex: none; filter: drop-shadow(0 2px 2px rgba(14, 15, 20, .25)); }
+.km i { display: inline-block; flex: none; width: 7px; height: 7px; margin: 0 4px; border-radius: 50%; border: 1px solid var(--ink-3); }
+.km-rows { list-style: none; margin: 0; padding: 0; }
+.km-rows > li { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 8px 28px; padding: 14px 0 15px; border-bottom: 1px solid var(--hair); }
+.km-d { margin: 0; display: grid; gap: 4px; align-content: start; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: 19px; line-height: 1.2; color: var(--ink); }
+.km-n { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; color: var(--lead); }
+.km-rows ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 7px 20px; align-content: start; }
+.km-rows ul li { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-ui); font-size: 14px; line-height: 1.35; }
+.km-rows li.on { color: var(--ink); }
+.km-rows li.off { color: var(--ink-3); }
+
+.m-not { margin: 1.8em 0 0; padding: 18px 22px 8px; max-width: 40em; border: 1px dashed var(--lead-line); border-radius: 4px; }
+.m-not .kicker { margin: 0 0 8px; color: var(--lead); }
+.m-not ul { list-style: none; margin: 0; padding: 0; }
+.m-not li { padding: 10px 0 12px; border-top: 1px solid var(--hair); font-family: var(--f-text); font-size: 15.5px; line-height: 1.55; color: var(--ink-2); }
+.m-not li b { font-weight: 600; color: var(--ink); }
+
+@media (max-width: 1360px) and (min-width: 961px) {
+  /* the middle column is too narrow for two sides: stack them, boundary drawn across */
+  .kc-sides { grid-template-columns: 1fr; }
+  .kc-eval { padding-left: 0 !important; margin-top: 12px; border-left: 0; border-top: 1px dashed var(--lead); }
+}
+@media (max-width: 960px) {
+  .kc { grid-template-columns: 1fr; }
+  .kc > li, .kc > li + li { padding: 18px 0 20px; border-left: 0; }
+  .kc > li + li { border-top: 1px solid var(--hair); }
+  .kc > li + li::before { top: -5px; left: 18px; transform: rotate(135deg); }
+  .kc-decision { padding-inline: 16px !important; }
+}
+@media (max-width: 620px) {
+  .kc-sides { grid-template-columns: 1fr; }
+  .kc-sides > div { padding-right: 0; }
+  .kc-eval { padding-left: 0 !important; margin-top: 12px; border-left: 0; border-top: 1px dashed var(--lead); }
+  .km-rows > li { grid-template-columns: 1fr; }
+  .m-not { padding: 14px 16px 4px; }
+}
+:root[data-lang="zh"] .m-sub, :root[data-lang="zh"] .kc-n, :root[data-lang="zh"] .km-d, :root[data-lang="zh"] .kc-verdict { font-weight: 600; line-height: 1.4; }
+:root[data-lang="zh"] .kc-n { font-size: clamp(18px, 1.5vw, 21px); }
+:root[data-lang="zh"] .kc-verdict { font-size: clamp(20px, 1.8vw, 25px); }
+:root[data-lang="zh"] .km-d { font-size: 16.5px; }
+:root[data-lang="zh"] .kc-says { font-style: normal; font-family: "Noto Serif SC", var(--f-text); font-size: clamp(16.5px, 1.3vw, 18.5px); line-height: 1.85; }
+:root[data-lang="zh"] .kc-dl dd, :root[data-lang="zh"] .kc-crit li, :root[data-lang="zh"] .m-not li, :root[data-lang="zh"] .kc .kc-why { line-height: 1.8; }
+:root[data-lang="zh"] .m-deck, :root[data-lang="zh"] .kc, :root[data-lang="zh"] .km, :root[data-lang="zh"] .m-not { text-align: left; }
