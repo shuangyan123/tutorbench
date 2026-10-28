@@ -16,10 +16,10 @@ import { runTutorResponseCorpus } from "../dist/src/runner/tutor-response-corpus
 import { createJudgeIfRequested } from "../dist/src/cli/tutorbench-evaluate.js";
 
 function help() {
-  console.log(`Usage: node scripts/math-rubric-counterexample-probe.mjs [--dry-run | --judge-deepseek] [--output <path>]
+  console.log(`Usage: node scripts/math-rubric-counterexample-probe.mjs [--dry-run | --judge-deepseek] [--variant <id> ...] [--output <path>]
 
 Defaults to --dry-run, with zero model calls.
---judge-deepseek requires DEEPSEEK_API_KEY and DEEPSEEK_JUDGE_MODEL in the local process.
+--judge-deepseek requires DEEPSEEK_API_KEY and DEEPSEEK_JUDGE_MODEL in the local process.\n--variant <id> may repeat; select fixture response variants by stable ID.
 Runs the existing TutorEval Pedagogy Judge on fixed synthetic responses, not a Tutor model.
 Expected labels are author hypotheses, not human gold. A mismatch is a diagnostic result,
 not a calibrated Judge accuracy estimate. No canonical dataset/rubric is changed.`);
@@ -28,11 +28,18 @@ not a calibrated Judge accuracy estimate. No canonical dataset/rubric is changed
 function parseArgs(args) {
   let live = false;
   let output;
+  const variantIds = [];
   for (let i = 0; i < args.length; i++) {
     const x = args[i];
     if (x === "--help" || x === "-h") return { help: true };
     if (x === "--judge-deepseek") { live = true; continue; }
     if (x === "--dry-run") { live = false; continue; }
+    if (x === "--variant") {
+      const id = args[++i];
+      if (!id || id.startsWith("--") || variantIds.includes(id)) throw new Error("--variant must specify a distinct fixture variant ID");
+      variantIds.push(id);
+      continue;
+    }
     if (x === "--output") {
       if (!args[i + 1]) throw new Error("--output needs a file path");
       output = resolve(args[++i]);
@@ -40,7 +47,7 @@ function parseArgs(args) {
     }
     throw new Error("Unknown option: " + x);
   }
-  return { help: false, live, output };
+  return { help: false, live, output, variantIds };
 }
 
 function assertFixture(fixture, dataset) {
@@ -107,7 +114,13 @@ async function main() {
   const fixture = JSON.parse(fixtureText);
   assertFixture(fixture, dataset);
   const date = "2026-10-28T00:00:00.000Z";
-  const prepared = fixture.cases.map(group => ({ group, ...caseCorpus(dataset, group, date) }));
+  const allVariantIds = new Set(fixture.cases.flatMap(group => group.variants.map(v => v.id)));
+  if (opts.variantIds.some(id => !allVariantIds.has(id)))
+    throw new Error("Unknown fixture variant: " + opts.variantIds.filter(id => !allVariantIds.has(id)).join(", "));
+  const selectedGroups = fixture.cases.map(group => ({ ...group,
+    variants: opts.variantIds.length ? group.variants.filter(v => opts.variantIds.includes(v.id)) : group.variants,
+  })).filter(group => group.variants.length);
+  const prepared = selectedGroups.map(group => ({ group, ...caseCorpus(dataset, group, date) }));
   const count = prepared.reduce((sum, p) => sum + p.group.variants.length, 0);
   if (!opts.live) {
     console.log(`VALIDATED: ${prepared.length} cases, ${count} synthetic responses, 0 Judge calls.`);
@@ -153,6 +166,7 @@ async function main() {
     provenance: fixture.provenance, calibrationStatus: "uncalibrated",
     judge: { provider: judge.provider, model: judge.model, promptId: judge.promptId,
       promptVersion: judge.promptVersion },
+    selectedVariantIds: opts.variantIds,
     plannedJudgeCalls: count, actualJudgeCalls,
     availableCount: available.length, unavailableCount: unavailable.length,
     disagreementCount: disagreements.length,
