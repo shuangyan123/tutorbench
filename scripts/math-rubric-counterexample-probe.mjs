@@ -24,10 +24,10 @@ import { readBoundedJson } from "../dist/src/transport/response-body.js";
 import { classifyMathJudgeEnvelope } from "./math-rubric-probe-response-diagnostics.mjs";
 
 function help() {
-  console.log(`Usage: node scripts/math-rubric-counterexample-probe.mjs [--dry-run | --judge-deepseek] [--variant <id> ...] [--diagnose-invalid] [--output <path>]
+  console.log(`Usage: node scripts/math-rubric-counterexample-probe.mjs [--dry-run | --judge-deepseek] [--variant <id> ...] [--diagnose-invalid] [--judge-prompt-version 0.9|0.9.1] [--output <path>]
 
 Defaults to --dry-run, with zero model calls.
---judge-deepseek requires DEEPSEEK_API_KEY and DEEPSEEK_JUDGE_MODEL in the local process.\n--variant <id> may repeat; select fixture response variants by stable ID.\n--diagnose-invalid collects ONLY allow-listed structural categories (no raw provider content).
+--judge-deepseek requires DEEPSEEK_API_KEY and DEEPSEEK_JUDGE_MODEL in the local process.\n--variant <id> may repeat; select fixture response variants by stable ID.\n--diagnose-invalid collects ONLY allow-listed structural categories (no raw provider content).\n--judge-prompt-version 0.9.1 opts in to the EXPERIMENTAL factualErrors output-shape clarification; default remains 0.9.
 Runs the existing TutorEval Pedagogy Judge on fixed synthetic responses, not a Tutor model.
 Expected labels are author hypotheses, not human gold. A mismatch is a diagnostic result,
 not a calibrated Judge accuracy estimate. No canonical dataset/rubric is changed.`);
@@ -37,6 +37,7 @@ function parseArgs(args) {
   let live = false;
   let output;
   let diagnoseInvalid = false;
+  let judgePromptVersion = "0.9";
   const variantIds = [];
   for (let i = 0; i < args.length; i++) {
     const x = args[i];
@@ -44,6 +45,12 @@ function parseArgs(args) {
     if (x === "--judge-deepseek") { live = true; continue; }
     if (x === "--dry-run") { live = false; continue; }
     if (x === "--diagnose-invalid") { diagnoseInvalid = true; continue; }
+    if (x === "--judge-prompt-version") {
+      const v = args[++i];
+      if (v !== "0.9" && v !== "0.9.1") throw new Error("Allowed --judge-prompt-version values: 0.9 or 0.9.1");
+      judgePromptVersion = v;
+      continue;
+    }
     if (x === "--variant") {
       const id = args[++i];
       if (!id || id.startsWith("--") || variantIds.includes(id)) throw new Error("--variant must specify a distinct fixture variant ID");
@@ -58,7 +65,7 @@ function parseArgs(args) {
     throw new Error("Unknown option: " + x);
   }
   if (diagnoseInvalid && !live) throw new Error("--diagnose-invalid requires --judge-deepseek");
-  return { help: false, live, output, variantIds, diagnoseInvalid };
+  return { help: false, live, output, variantIds, diagnoseInvalid, judgePromptVersion };
 }
 
 function assertFixture(fixture, dataset) {
@@ -134,10 +141,10 @@ async function main() {
   const prepared = selectedGroups.map(group => ({ group, ...caseCorpus(dataset, group, date) }));
   const count = prepared.reduce((sum, p) => sum + p.group.variants.length, 0);
   if (!opts.live) {
-    console.log(`VALIDATED: ${prepared.length} cases, ${count} synthetic responses, 0 Judge calls.`);
+    console.log(`VALIDATED: ${prepared.length} cases, ${count} synthetic responses, 0 Judge calls. Judge prompt ${opts.judgePromptVersion}.`);
     if (opts.output) {
       const data = { schemaVersion: 1, status: "fixture_validated_only", fixtureId: fixture.id,
-        calibrationStatus: "uncalibrated", numberOfCases: prepared.length,
+        calibrationStatus: "uncalibrated", judgePromptVersion: opts.judgePromptVersion, numberOfCases: prepared.length,
         plannedJudgeCalls: count, actualJudgeCalls: 0,
         observedJudgeResults: [], limitations: ["No Judge was called: no semantic agreement is measurable."] };
       await mkdir(dirname(opts.output), { recursive: true });
@@ -148,12 +155,16 @@ async function main() {
   if (!process.env.DEEPSEEK_API_KEY?.trim() || !process.env.DEEPSEEK_JUDGE_MODEL?.trim())
     throw new Error("--judge-deepseek requires locally configured DEEPSEEK_API_KEY and DEEPSEEK_JUDGE_MODEL");
   const responseShapeDiagnostics = [];
-  let judge = await createJudgeIfRequested(false, true, false);
-  if (opts.diagnoseInvalid) {
+  let judge = opts.judgePromptVersion === "0.9" && !opts.diagnoseInvalid
+    ? await createJudgeIfRequested(false, true, false)
+    : undefined;
+  if (opts.diagnoseInvalid || opts.judgePromptVersion === "0.9.1") {
     // Mirrors createJudgeIfRequested's DeepSeek options. This diagnostic mode
     // does not alter scoring; it inspects an in-memory clone of each response.
     const env = readDeepSeekJudgeEnvironment();
-    const prompt = await loadTutorEvalPedagogyJudgePrompt();
+    const prompt = opts.judgePromptVersion === "0.9"
+      ? await loadTutorEvalPedagogyJudgePrompt()
+      : await readFile(resolve("prompts/tutor-eval-pedagogy-judge-system-v0.9.1.md"), "utf8");
     const knownTexts = new Map(selectedGroups.flatMap(group => group.variants.map(variant => [
       [group.caseId, variant.responseText].join("\\u0000"),
       { caseId: group.caseId, variantId: variant.id, rubricIds: group.rubricIds },
@@ -196,14 +207,15 @@ async function main() {
       model: env.model,
       prompt,
       promptId: TUTOR_EVAL_PEDAGOGY_JUDGE_PROMPT_ID,
-      promptVersion: TUTOR_EVAL_PEDAGOGY_JUDGE_PROMPT_VERSION,
+      promptVersion: opts.judgePromptVersion === "0.9.1"
+        ? "0.9.1" : TUTOR_EVAL_PEDAGOGY_JUDGE_PROMPT_VERSION,
       ...(env.temperature === undefined ? {} : { temperature: env.temperature }),
       thinkingMode: env.thinkingMode,
       ...(env.reasoningEffort === undefined ? {} : { reasoningEffort: env.reasoningEffort }),
       maxOutputTokens: env.maxOutputTokens,
       timeoutMs: env.timeoutMs,
       maxAttempts: env.maxAttempts,
-      fetch: diagnosticFetch,
+      ...(opts.diagnoseInvalid ? { fetch: diagnosticFetch } : {}),
     });
     judge = { ...direct.descriptor, evaluate: direct.evaluate,
       evaluateWithMetrics: direct.evaluateWithMetrics };
