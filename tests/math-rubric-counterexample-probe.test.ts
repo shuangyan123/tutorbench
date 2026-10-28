@@ -99,6 +99,18 @@ test("probe dry-run validates without a Judge and explicit live mode fails close
     cwd: process.cwd(), encoding: "utf8", env: safeEnv,
   });
   assert.match(output, /VALIDATED: 3 cases, 13 synthetic responses, 0 Judge calls/u);
+  const targeted = execFileSync(process.execPath, [
+    command, "--dry-run",
+    "--variant", "wrong-agreement",
+    "--variant", "wrong-diagnosis",
+    "--variant", "wrong-endorsement",
+  ], { cwd: process.cwd(), encoding: "utf8", env: safeEnv });
+  assert.match(targeted, /VALIDATED: 3 cases, 4 synthetic responses, 0 Judge calls/u);
+  const unknown = spawnSync(process.execPath, [
+    command, "--dry-run", "--variant", "no-such-variant",
+  ], { cwd: process.cwd(), encoding: "utf8", env: safeEnv });
+  assert.notEqual(unknown.status, 0);
+  assert.match(unknown.stderr, /Unknown fixture variant/u);
   const blocked = spawnSync(process.execPath, [command, "--judge-deepseek"], {
     cwd: process.cwd(), encoding: "utf8", env: safeEnv,
   });
