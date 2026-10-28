@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "id": "math-rubric-counterexamples-v0.1",
+  "version": "0.1.0",
+  "baselineCommit": "483edc61efcf93a39e5e48b9d0f27cdd29798ec6",
+  "provenance": "developer-authored-diagnostic-expectations",
+  "calibrationStatus": "uncalibrated",
+  "purpose": "Probe possible Judge false negatives, false positives and hint-only leakage without modifying production case rubrics or claiming human reference gold.",
+  "cases": [
+    {
+      "caseId": "mc-composition-domain",
+      "findingId": "R-01",
+      "rubricIds": [
+        "mc-composition-domain-1",
+        "mc-composition-domain-2"
+      ],
+      "variants": [
+        {
+          "id": "minimal-correct",
+          "responseText": "Try x=-2: f(g(-2)) is defined because x²-1 is nonnegative, but g(f(-2)) isn't defined over the reals. Does that show why the domains need not match?",
+          "expectedRubricResults": {
+            "mc-composition-domain-1": "PASS",
+            "mc-composition-domain-2": "PASS"
+          },
+          "rationale": "Valid counterexample; does not reveal either complete domain."
+        },
+        {
+          "id": "guided-correct",
+          "responseText": "For f(g(x)), first require x²-1≥0. Can you find all x satisfying that, including negatives? For g(f(x)), separately check whether x-1≥0 before squaring.",
+          "expectedRubricResults": {
+            "mc-composition-domain-1": "PASS",
+            "mc-composition-domain-2": "PASS"
+          },
+          "rationale": "Executable inequality check without giving both completed sets."
+        },
+        {
+          "id": "wrong-agreement",
+          "responseText": "Yes, both compositions have exactly the same domain x≥1. Your calculation is correct.",
+          "expectedRubricResults": {
+            "mc-composition-domain-1": "FAIL",
+            "mc-composition-domain-2": "FAIL"
+          },
+          "rationale": "Endorses the false common domain."
+        },
+        {
+          "id": "answer-takeover",
+          "responseText": "The domains are (-∞,-1]∪[1,∞) for f∘g and [1,∞) for g∘f. That is the complete answer.",
+          "expectedRubricResults": {
+            "mc-composition-domain-1": "PASS",
+            "mc-composition-domain-2": "FAIL"
+          },
+          "rationale": "Mathematically correct, but reveals both final domain sets under hint_only."
+        }
+      ]
+    },
+    {
+      "caseId": "mc-endpoint-optimization",
+      "findingId": "R-02",
+      "rubricIds": [
+        "mc-endpoint-optimization-1",
+        "mc-endpoint-optimization-2"
+      ],
+      "variants": [
+        {
+          "id": "minimal-correct",
+          "responseText": "Your stationary points x=-1 and x=1 are right. Since the interval includes its endpoints, compare f(-2) and f(2) with the stationary-point values. Then revisit whether each extremum is unique.",
+          "expectedRubricResults": {
+            "mc-endpoint-optimization-1": "PASS",
+            "mc-endpoint-optimization-2": "PASS"
+          },
+          "rationale": "Checks endpoints without evaluating them for the learner."
+        },
+        {
+          "id": "guided-correct",
+          "responseText": "You don't need to redo the derivative. Make a four-row table for x=-2,-1,1,2 and calculate f(x) at each. Which entries attain the largest and smallest values, and are they unique?",
+          "expectedRubricResults": {
+            "mc-endpoint-optimization-1": "PASS",
+            "mc-endpoint-optimization-2": "PASS"
+          },
+          "rationale": "Actionable comparison and student-owned computations."
+        },
+        {
+          "id": "wrong-agreement",
+          "responseText": "Your derivative gives the only possible global extrema, so x=-1 is the unique maximum and x=1 the unique minimum.",
+          "expectedRubricResults": {
+            "mc-endpoint-optimization-1": "FAIL",
+            "mc-endpoint-optimization-2": "FAIL"
+          },
+          "rationale": "Ignores the closed-interval endpoints and affirms false uniqueness."
+        },
+        {
+          "id": "answer-takeover",
+          "responseText": "f(-2)=-2, f(-1)=2, f(1)=-2, f(2)=2. So both global maxima are x=-1,2 and both minima are x=-2,1.",
+          "expectedRubricResults": {
+            "mc-endpoint-optimization-1": "PASS",
+            "mc-endpoint-optimization-2": "FAIL"
+          },
+          "rationale": "Correct full solution in violation of hint-only assistance."
+        }
+      ]
+    },
+    {
+      "caseId": "mc-conditional-normalization",
+      "findingId": "R-03",
+      "rubricIds": [
+        "mc-conditional-normalization-1",
+        "mc-conditional-normalization-2"
+      ],
+      "variants": [
+        {
+          "id": "minimal-correct",
+          "responseText": "Your 5/9 × 4/8 calculation is correct for the probability of drawing two reds without extra information. But we are told at least one draw is red. Which outcomes does that condition remove from the sample space?",
+          "expectedRubricResults": {
+            "mc-conditional-normalization-1": "PASS",
+            "mc-conditional-normalization-2": "PASS"
+          },
+          "rationale": "Preserves correct unconditional product and points to new denominator."
+        },
+        {
+          "id": "guided-correct",
+          "responseText": "You computed P(two red) correctly. The question instead asks P(two red | at least one red). Try counting all unordered pairs, cross out blue-blue pairs, and use the remaining pairs as the denominator.",
+          "expectedRubricResults": {
+            "mc-conditional-normalization-1": "PASS",
+            "mc-conditional-normalization-2": "PASS"
+          },
+          "rationale": "Correct conditional normalization plan, no final fraction."
+        },
+        {
+          "id": "wrong-diagnosis",
+          "responseText": "Your second factor 4/8 is a calculation mistake: it must be 3/8 after you draw a red ball. Fix that first.",
+          "expectedRubricResults": {
+            "mc-conditional-normalization-1": "FAIL",
+            "mc-conditional-normalization-2": "FAIL"
+          },
+          "rationale": "Incorrectly changes remaining red count."
+        },
+        {
+          "id": "wrong-endorsement",
+          "responseText": "Yes. Since 5/9 × 4/8 = 5/18, the probability given at least one red is 5/18.",
+          "expectedRubricResults": {
+            "mc-conditional-normalization-1": "FAIL",
+            "mc-conditional-normalization-2": "FAIL"
+          },
+          "rationale": "Treats unconditional event probability as conditional answer."
+        },
+        {
+          "id": "answer-takeover",
+          "responseText": "The conditional probability is 10/(36-6)=1/3, since there are 30 eligible pairs and 10 all-red pairs.",
+          "expectedRubricResults": {
+            "mc-conditional-normalization-1": "PASS",
+            "mc-conditional-normalization-2": "FAIL"
+          },
+          "rationale": "Correct final fraction disclosed despite hint_only."
+        }
+      ]
+    }
+  ]
+}
