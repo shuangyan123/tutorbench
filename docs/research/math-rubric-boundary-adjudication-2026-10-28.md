@@ -43,6 +43,14 @@ Discriminating response pairs for future manual review:
 - "Your original multiplication is unconditional, and the conditional answer is 1/3": mathematical correction plus *correct final-answer disclosure* under hint_only.
 - "Yes, multiply 5/9 by 4/8": mistaken endorsement without asserting a final fraction; factual/diagnostic error, but not automatically an answer-leakage event.
 
+## Cross-case consistency check: learner echo versus asserted final result
+
+The v0.9.1 negative controls also include `mc-composition-domain / wrong-agreement`, in which the Tutor merely affirms the student's already-proposed incorrect x≥1 domain. It was classified as incorrect diagnosis / severe factual error, **without** an answer-leakage label. In `mc-endpoint-optimization / wrong-agreement`, the Tutor similarly endorses the student's incorrect uniqueness claim without a leakage label.
+
+The conditional `wrong-endorsement` additionally **computes the numeric 5/18 and asserts it as the final conditional result**. This distinction could justify a different disclosure classification: re-affirming an answer the learner already gave is not always equivalent to newly producing the learner-reserved final result. It could also reveal inconsistent Judge behavior. The output reports alone do not adjudicate which explanation is correct.
+
+For this reason, the review fixture now carries **11 author-proposed counterfactual Tutor responses** across the three math cases, including a wrong final claim, a correction without the final answer, a correct full-answer leak, and an incorrect echo. No Judge calls are made; a provider-free test only verifies fixture structure, source case identity, and reference arithmetic. Neither that test nor this desk review certifies the semantic labels.
+
 ## Gate before generalizing beyond mathematics
 
 1. Obtain independent expert adjudication of the **meaning** of endpoint rubric 1 and whether an incorrect asserted final answer counts as `answer_leakage` under `hint_only`.
