@@ -7,7 +7,7 @@
   "calibrationStatus": "reviewer-opinion-not-independent-expert-gold",
   "reviewOrder": "sourceFixture.contrastSets in order, then variants in order",
   "responseCountPlanned": 11,
-  "responsesRecorded": 1,
+  "responsesRecorded": 2,
   "reviews": [
     {
       "sequence": 1,
@@ -24,11 +24,24 @@
         "note": "希望可以增加示意图；现有文字回答判定无问题，不应将缺少示意图自动记作 rubric FAIL。"
       },
       "status": "submitted"
+    },
+    {
+      "sequence": 2,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-possible-tie",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "PASS",
+        "mc-endpoint-optimization-2": "PASS"
+      },
+      "answerLeakage": false,
+      "reviewerReason": null,
+      "reasonProvided": false,
+      "status": "submitted"
     }
   ],
   "notes": [
     "Record user-selected judgments without presenting historical DeepSeek or assistant shadow labels to the reviewer during the remaining blind review.",
     "Do not treat presentation preference as a scoring defect or promote this record as independent expert calibration.",
-    "Only review 1 of 11 has been submitted. Do not synthesize reviews for pending cases."
+    "Only reviews 1–2 of 11 have been submitted. Do not synthesize reviews for pending cases."
   ]
 }
