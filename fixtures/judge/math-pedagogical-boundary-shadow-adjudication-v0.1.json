@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "id": "math-pedagogical-boundary-shadow-adjudication-v0.1",
+  "version": "0.1.0",
+  "status": "provisional-desk-review-only",
+  "calibrationStatus": "uncalibrated",
+  "reviewAuthority": "assistant-analytical-review-not-independent-expert",
+  "sourceFixture": "fixtures/judge/math-pedagogical-boundary-review-v0.1.json",
+  "sourceSuite": "scenarios/experimental/mathematics-challenge-v0.1/suite.json",
+  "sourcePrompt": "prompts/tutor-eval-pedagogy-judge-system-v0.9.1.md",
+  "scopeNotes": [
+    "Provisional semantic recommendations; not human gold labels or observed model Judge results.",
+    "First two endpoint rubrics PASS under a proposed learner-work-preserving shadow interpretation, not a change to current original rubric wording.",
+    "A wrong newly asserted final result may be answer leakage by task-ownership semantics, but it is NOT disclosure of the correct answer; independent expert review required.",
+    "Critical failure candidates indicate potential types; severity, multi-label policy, and construct boundaries remain uncalibrated.",
+    "Do not feed these provisional judgments into public benchmark, production scoring, or accuracy metrics."
+  ],
+  "reviews": [
+    {
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-minimal",
+      "shadowRubricResults": [
+        "PASS",
+        "PASS"
+      ],
+      "criteriaBasis": "shadow-learner-work",
+      "answerLeakageRecommendation": "no",
+      "criticalFailureCandidates": [],
+      "confidence": "high",
+      "rationale": "The hint confirms correct stationary points, assigns endpoint comparison, and asks the learner to reconsider uniqueness. It preserves discovery of the actual ties.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-possible-tie",
+      "shadowRubricResults": [
+        "PASS",
+        "PASS"
+      ],
+      "criteriaBasis": "shadow-learner-work",
+      "answerLeakageRecommendation": "no",
+      "criticalFailureCandidates": [],
+      "confidence": "high",
+      "rationale": "Possible ties are mentioned without computing or stating the actual maxima/minima; the task remains for the learner.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-final-reveal",
+      "shadowRubricResults": [
+        "PASS",
+        "FAIL"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "yes",
+      "criticalFailureCandidates": [
+        "answer_leakage"
+      ],
+      "confidence": "high",
+      "rationale": "All four values and the complete extrema are supplied despite hint_only.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-wrong-agreement",
+      "shadowRubricResults": [
+        "FAIL",
+        "FAIL"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "no",
+      "criticalFailureCandidates": [
+        "incorrect_diagnosis",
+        "severe_factual_error"
+      ],
+      "confidence": "high",
+      "rationale": "The Tutor validates an incorrect unique-extremum conclusion and omits the endpoint check; no new complete answer is given.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-wrong-asserted-final",
+      "shadowRubricResults": [
+        "FAIL",
+        "FAIL"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "yes",
+      "criticalFailureCandidates": [
+        "incorrect_diagnosis",
+        "severe_factual_error",
+        "answer_leakage"
+      ],
+      "confidence": "low",
+      "rationale": "The Tutor computes 5/18 and asserts it is the final conditional probability despite the student's no-final-fraction request. It is an incorrect claimed final result, NOT leakage of the true 1/3. Whether answer_leakage covers a false claimed final result needs expert confirmation.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-bounded-correction",
+      "shadowRubricResults": [
+        "PASS",
+        "PASS"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "no",
+      "criticalFailureCandidates": [],
+      "confidence": "high",
+      "rationale": "It distinguishes the unconditional product from the requested conditional probability and leaves sample-space normalization to the learner.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-correct-final-reveal",
+      "shadowRubricResults": [
+        "PASS",
+        "FAIL"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "yes",
+      "criticalFailureCandidates": [
+        "answer_leakage"
+      ],
+      "confidence": "high",
+      "rationale": "It correctly identifies conditionalization but gives the reserved correct final fraction and full denominator calculation.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-wrong-endorsement-no-final",
+      "shadowRubricResults": [
+        "FAIL",
+        "FAIL"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "no",
+      "criticalFailureCandidates": [
+        "incorrect_diagnosis",
+        "severe_factual_error"
+      ],
+      "confidence": "moderate",
+      "rationale": "It positively endorses the unconditional product for the conditional question but does not independently compute and assert a new final numeric fraction.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-wrong-echo",
+      "shadowRubricResults": [
+        "FAIL",
+        "FAIL"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "no",
+      "criticalFailureCandidates": [
+        "incorrect_diagnosis",
+        "severe_factual_error"
+      ],
+      "confidence": "moderate",
+      "rationale": "It repeats and approves the student's preexisting wrong x>=1 proposal; no distinct learner-reserved result is newly produced.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-bounded-counterexample",
+      "shadowRubricResults": [
+        "PASS",
+        "PASS"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "no",
+      "criticalFailureCandidates": [],
+      "confidence": "high",
+      "rationale": "Testing x=-2 exposes the omitted negative branch and leaves complete domain determination to the learner.",
+      "requiresIndependentExpertReview": true
+    },
+    {
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-correct-final-reveal",
+      "shadowRubricResults": [
+        "PASS",
+        "FAIL"
+      ],
+      "criteriaBasis": "existing",
+      "answerLeakageRecommendation": "yes",
+      "criticalFailureCandidates": [
+        "answer_leakage"
+      ],
+      "confidence": "high",
+      "rationale": "Correct full domains are disclosed despite the learner requesting a pointer only.",
+      "requiresIndependentExpertReview": true
+    }
+  ]
+}
