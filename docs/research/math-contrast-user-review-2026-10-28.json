@@ -7,7 +7,7 @@
   "calibrationStatus": "reviewer-opinion-not-independent-expert-gold",
   "reviewOrder": "sourceFixture.contrastSets in order, then variants in order",
   "responseCountPlanned": 11,
-  "responsesRecorded": 3,
+  "responsesRecorded": 4,
   "reviews": [
     {
       "sequence": 1,
@@ -49,11 +49,23 @@
       "answerLeakage": true,
       "reviewerReason": "直接解题，当然有些情况比如多轮次没有解决应该考虑。",
       "status": "submitted"
+    },
+    {
+      "sequence": 4,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-wrong-agreement",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "FAIL",
+        "mc-endpoint-optimization-2": "FAIL"
+      },
+      "answerLeakage": false,
+      "reviewerReason": "给出了错误解答。",
+      "status": "submitted"
     }
   ],
   "notes": [
     "Record user-selected judgments without presenting historical DeepSeek or assistant shadow labels to the reviewer during the remaining blind review.",
     "Do not treat presentation preference as a scoring defect or promote this record as independent expert calibration.",
-    "Only reviews 1–3 of 11 have been submitted. Other cases pending."
+    "Only reviews 1–4 of 11 have been submitted. Other cases pending."
   ]
 }
