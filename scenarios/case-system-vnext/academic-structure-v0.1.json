@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "id": "tutorbench-academic-structure-v0.1",
+  "version": "0.1.0",
+  "status": "experimental-authoring",
+  "description": "Organise discipline families -> disciplines -> knowledge systems -> exam-system overlays. Exam systems reference knowledge systems many-to-many; classifications are an editorial navigation aid, not a normative global ontology.",
+  "disciplineSystems": [
+    {
+      "id": "formal-sciences",
+      "labelZh": "形式科学",
+      "labelEn": "Formal sciences",
+      "disciplineIds": [
+        "mathematics"
+      ]
+    },
+    {
+      "id": "natural-sciences",
+      "labelZh": "自然科学",
+      "labelEn": "Natural sciences",
+      "disciplineIds": []
+    },
+    {
+      "id": "humanities",
+      "labelZh": "人文科学",
+      "labelEn": "Humanities",
+      "disciplineIds": []
+    },
+    {
+      "id": "social-sciences",
+      "labelZh": "社会科学",
+      "labelEn": "Social sciences",
+      "disciplineIds": []
+    },
+    {
+      "id": "engineering-and-technology",
+      "labelZh": "工程与技术",
+      "labelEn": "Engineering and technology",
+      "disciplineIds": []
+    }
+  ],
+  "disciplines": [
+    {
+      "id": "mathematics",
+      "labelZh": "数学",
+      "labelEn": "Mathematics",
+      "systemId": "formal-sciences",
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ]
+    }
+  ],
+  "knowledgeSystems": [
+    {
+      "id": "mathematics-knowledge-map-v0.1",
+      "labelZh": "数学知识体系（实验性）",
+      "labelEn": "Mathematics knowledge map (experimental)",
+      "disciplineId": "mathematics",
+      "registryPath": "scenarios/case-system-vnext/mathematics-knowledge-map-v0.1.json",
+      "coverage": {
+        "domains": 8,
+        "nodes": 44
+      },
+      "status": "author-proposed"
+    }
+  ],
+  "examSystems": [
+    {
+      "id": "cn-school-admissions",
+      "labelZh": "中国中学阶段升学考试",
+      "labelEn": "Chinese school admissions examinations",
+      "profileIds": [
+        "cn-zhongkao-math-general",
+        "cn-gaokao-math-national-2026"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "cn-postgraduate-exams",
+      "labelZh": "中国研究生招生考试",
+      "labelEn": "Chinese postgraduate entrance examinations",
+      "profileIds": [
+        "cn-kaoyan-math-1-2027",
+        "cn-kaoyan-math-2-2027",
+        "cn-kaoyan-math-3-2027"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "cn-civil-service",
+      "labelZh": "中国国家公务员考试",
+      "labelEn": "Chinese civil-service examinations",
+      "profileIds": [
+        "cn-guokao-aptitude-2027"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "us-college-admissions",
+      "labelZh": "美国本科入学考试",
+      "labelEn": "US undergraduate admissions",
+      "profileIds": [
+        "us-sat-math-digital-2026"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "us-ap",
+      "labelZh": "美国大学先修课程考试",
+      "labelEn": "US Advanced Placement examinations",
+      "profileIds": [
+        "us-ap-calculus-ab-2027",
+        "us-ap-calculus-bc-2027"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "uk-gcse",
+      "labelZh": "英国 GCSE",
+      "labelEn": "UK GCSE mathematics",
+      "profileIds": [
+        "uk-gcse-aqa-math-8300-2026"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "cambridge-international",
+      "labelZh": "剑桥国际课程考试",
+      "labelEn": "Cambridge International examinations",
+      "profileIds": [
+        "intl-cambridge-igcse-0580-2026",
+        "intl-cambridge-alevel-9709-2026"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "ib-dp",
+      "labelZh": "IB 大学预科数学",
+      "labelEn": "IB Diploma Programme mathematics",
+      "profileIds": [
+        "intl-ib-dp-math-aa-2026",
+        "intl-ib-dp-math-ai-2026"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "gre-general",
+      "labelZh": "GRE 普通考试",
+      "labelEn": "GRE General Test",
+      "profileIds": [
+        "intl-gre-general-quant-2026"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    },
+    {
+      "id": "gmat",
+      "labelZh": "GMAT 考试",
+      "labelEn": "GMAT Exam",
+      "profileIds": [
+        "intl-gmat-quant-data-2026"
+      ],
+      "knowledgeSystemIds": [
+        "mathematics-knowledge-map-v0.1"
+      ],
+      "status": "author-proposed-alignment"
+    }
+  ]
+}
