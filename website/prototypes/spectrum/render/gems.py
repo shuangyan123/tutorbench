@@ -18,6 +18,26 @@ STONES = [
     ("sapphire", "cushion", (0.08, 0.22, 0.95), 1.77, 0.018, 2.6),
     ("amethyst", "trillion", (0.72, 0.28, 0.92), 1.55, 0.013, 1.4),
 ]
+# GEMSET=domains: the Methodology knowledge map's eight mathematics domains, as five families of new,
+# paler stones (so they never read as the five dimension gems). The families follow the map's own
+# grouping: PISA's four content areas, plus TutorBench's internal domains. Within a family the stone
+# is the same and the cut and shade change per domain.
+#   quantity            morganite      peach-pink    number                       round
+#   change & relations  aquamarine     sea blue      algebra / functions          step / oval
+#   space & shape       tanzanite      blue-violet   geometry                     asscher
+#   uncertainty & data  kunzite        lilac pink    probability / statistics     marquise / baguette
+#   internal            rock crystal   clear, smoky  proof / calculus + algebra   cushion / pear
+if os.environ.get("GEMSET") == "domains":
+    STONES = [
+        ("number-quantity", "round", (1.0, 0.62, 0.55), 1.59, 0.014, 0.9),
+        ("algebra-equations", "step", (0.42, 0.82, 0.92), 1.58, 0.014, 1.1),
+        ("functions", "oval", (0.55, 0.88, 0.95), 1.58, 0.014, 0.8),
+        ("geometry", "asscher", (0.60, 0.50, 0.96), 1.69, 0.016, 1.1),
+        ("discrete-probability", "marquise", (0.95, 0.60, 0.88), 1.66, 0.015, 1.0),
+        ("statistics", "baguette", (0.90, 0.68, 0.92), 1.66, 0.015, 0.8),
+        ("proof-structures", "cushion", (0.97, 0.97, 0.99), 1.54, 0.013, 0.2),
+        ("advanced-mathematics", "pear", (0.80, 0.74, 0.70), 1.54, 0.013, 0.9),
+    ]
 
 if sys.argv[1] == "--combine":
     from PIL import Image
@@ -35,7 +55,9 @@ a = sys.argv[1:]; OUT = os.path.abspath(a[0]); S = int(a[1]) if len(a) > 1 else 
 def outline(cut, t):
     """Girdle outline, t in [0, 1): a point on the stone's plan, longest axis along x."""
     th = 2 * math.pi * t; c, s = math.cos(th), math.sin(th)
+    if cut == "round": return 0.86 * c, 0.86 * s
     if cut == "oval": return 1.0 * c, 0.74 * s
+    if cut == "marquise": return 1.0 * c, math.copysign(0.5 * (1 - c * c) ** 0.9, s)
     if cut == "pear": return 1.0 * c, 0.78 * s * math.sqrt((1 - c) / 2) ** 0.85 * 1.06
     if cut == "cushion":
         p = 0.55   # superellipse, a square with softened corners
@@ -72,6 +94,7 @@ def brilliant(cut, n=16, h=0.3, d=0.86):
 
 def step(w=1.0, l=0.72, corner=0.2):
     """Emerald cut: a cut-corner rectangle, terraced in steps above and below, with a keel culet."""
+    keel_x = 0.22 * w if l < w else 0.02
     def ring(k, z, keel=False):
         cw, cl = w * k, l * k if not keel else 0.0
         cc = corner * k
@@ -87,7 +110,7 @@ def step(w=1.0, l=0.72, corner=0.2):
             bm.faces.new((A[i], B[i], B[(i + 1) % 8], A[(i + 1) % 8]))
     # keel: the last ring closes to a short ridge
     kl = rings[-1]; z = -0.7
-    e1 = bm.verts.new((0.22, 0, z)); e2 = bm.verts.new((-0.22, 0, z))
+    e1 = bm.verts.new((keel_x, 0, z)); e2 = bm.verts.new((-keel_x, 0, z))
     for i in range(8):
         x0 = kl[i].co.x; x1 = kl[(i + 1) % 8].co.x
         ea = e1 if x0 >= 0 else e2; eb = e1 if x1 >= 0 else e2
@@ -95,7 +118,8 @@ def step(w=1.0, l=0.72, corner=0.2):
     return bm
 
 def stone(cut):
-    bm = step() if cut == "step" else brilliant(cut)
+    STEPS = {"step": {}, "asscher": dict(w=0.84, l=0.84, corner=0.26), "baguette": dict(w=1.0, l=0.4, corner=0.03)}
+    bm = step(**STEPS[cut]) if cut in STEPS else brilliant(cut)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     me = bpy.data.meshes.new(cut); bm.to_mesh(me); bm.free()
     o = bpy.data.objects.new(cut, me); bpy.context.scene.collection.objects.link(o)
