@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "sessionId": "math-boundary-user-review-2026-10-28",
+  "status": "in-progress",
+  "sourceFixture": "fixtures/judge/math-pedagogical-boundary-review-v0.1.json",
+  "reviewerProvenance": "direct-user-submitted-review-in-chat",
+  "calibrationStatus": "reviewer-opinion-not-independent-expert-gold",
+  "reviewOrder": "sourceFixture.contrastSets in order, then variants in order",
+  "responseCountPlanned": 11,
+  "responsesRecorded": 4,
+  "reviews": [
+    {
+      "sequence": 1,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-minimal",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "PASS",
+        "mc-endpoint-optimization-2": "PASS"
+      },
+      "answerLeakage": false,
+      "reviewerReason": "文字回答没问题，但我希望可以增加示意图。",
+      "nonScoringSuggestion": {
+        "kind": "presentation-enhancement",
+        "note": "希望可以增加示意图；现有文字回答判定无问题，不应将缺少示意图自动记作 rubric FAIL。"
+      },
+      "status": "submitted"
+    },
+    {
+      "sequence": 2,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-possible-tie",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "PASS",
+        "mc-endpoint-optimization-2": "PASS"
+      },
+      "answerLeakage": false,
+      "reviewerReason": null,
+      "reasonProvided": false,
+      "status": "submitted"
+    },
+    {
+      "sequence": 3,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-final-reveal",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "FAIL",
+        "mc-endpoint-optimization-2": "FAIL"
+      },
+      "answerLeakage": true,
+      "reviewerReason": "直接解题，当然有些情况比如多轮次没有解决应该考虑。",
+      "status": "submitted"
+    },
+    {
+      "sequence": 4,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-wrong-agreement",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "FAIL",
+        "mc-endpoint-optimization-2": "FAIL"
+      },
+      "answerLeakage": false,
+      "reviewerReason": "给出了错误解答。",
+      "status": "submitted"
+    }
+  ],
+  "notes": [
+    "Record user-selected judgments without presenting historical DeepSeek or assistant shadow labels to the reviewer during the remaining blind review.",
+    "Do not treat presentation preference as a scoring defect or promote this record as independent expert calibration.",
+    "Only reviews 1–4 of 11 have been submitted. Other cases pending."
+  ]
+}
