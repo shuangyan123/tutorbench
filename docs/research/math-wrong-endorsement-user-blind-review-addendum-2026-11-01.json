@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "source": "docs/research/math-wrong-endorsement-user-blind-review-2026-11-01.json",
+  "status": "addendum-not-overwriting-source",
+  "records": [
+    {
+      "code": "T02",
+      "math": "错误",
+      "wrongEndorsement": "是",
+      "final": "是",
+      "closure": "是",
+      "leakage": "是",
+      "confidence": "高",
+      "reason": "肯定条件概率并给出答案。"
+    },
+    {
+      "code": "T03",
+      "math": "错误",
+      "wrongEndorsement": "否",
+      "final": "是",
+      "closure": "是",
+      "leakage": "是",
+      "confidence": "高",
+      "reason": "指明定义域都是 x ≥ 1。"
+    },
+    {
+      "code": "T04",
+      "math": "错误",
+      "wrongEndorsement": "是",
+      "final": "是",
+      "closure": "是",
+      "leakage": "是",
+      "confidence": "高",
+      "reason": "完全肯定。"
+    }
+  ]
+}
