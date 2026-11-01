@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import assert from "node:assert/strict";
 import { spawn, type ChildProcess } from "node:child_process";
 import { once } from "node:events";
@@ -16,6 +17,9 @@ import {
   loadTutorBaselinePrompt,
 } from "../src/corpus/index.js";
 import { loadTutorEvalDataset } from "../src/datasets/index.js";
+
+const sessionToken = randomBytes(32).toString("hex");
+const hostHeaders = { "content-type": "application/json", authorization: "Bearer " + sessionToken };
 
 interface FakeProvider {
   readonly baseURL: string;
@@ -82,6 +86,7 @@ async function startHost(baseURL: string): Promise<HostProcess> {
         OPENAI_BASE_URL: baseURL,
         OPENAI_TIMEOUT_MS: "2000",
         CANONICAL_MODEL_HOST_PORT: "0",
+        CANONICAL_MODEL_HOST_TOKEN: sessionToken,
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -147,6 +152,7 @@ async function startChatCompletionsHost(
           : "false",
         TUTOR_MODEL_TIMEOUT_MS: "2000",
         CANONICAL_MODEL_HOST_PORT: "0",
+        CANONICAL_MODEL_HOST_TOKEN: sessionToken,
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -225,7 +231,7 @@ test("OpenAI canonical host forwards exact messages and baseline controls", asyn
     const executionPacket = await packet();
     const response = await fetch(host.endpoint, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: hostHeaders,
       body: JSON.stringify(executionPacket),
     });
     assert.equal(response.status, 200);
@@ -286,7 +292,7 @@ test("OpenAI canonical host preserves a provider refusal as Tutor-visible text",
   try {
     const response = await fetch(host.endpoint, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: hostHeaders,
       body: JSON.stringify(await packet()),
     });
     assert.equal(response.status, 200);
@@ -305,7 +311,7 @@ test("OpenAI canonical host fails provider errors without retrying", async () =>
   try {
     const response = await fetch(host.endpoint, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: hostHeaders,
       body: JSON.stringify(await packet()),
     });
     assert.equal(response.status, 502);
@@ -330,7 +336,7 @@ test("generic Chat Completions canonical host supports no-auth loopback provider
   try {
     const response = await fetch(host.endpoint, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: hostHeaders,
       body: JSON.stringify(await packet()),
     });
     assert.equal(response.status, 200);
@@ -358,6 +364,7 @@ test("generic Chat Completions canonical host rejects no-auth non-loopback provi
         TUTOR_MODEL_API_PATH: "/chat/completions",
         TUTOR_MODEL_MAX_OUTPUT_TOKENS_FIELD: "max_tokens",
         CANONICAL_MODEL_HOST_PORT: "0",
+        CANONICAL_MODEL_HOST_TOKEN: sessionToken,
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -388,7 +395,7 @@ test("generic Chat Completions canonical host forwards visible messages and stri
     const executionPacket = await packet();
     const response = await fetch(host.endpoint, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: hostHeaders,
       body: JSON.stringify(executionPacket),
     });
     assert.equal(response.status, 200);
@@ -423,7 +430,7 @@ test("generic Chat Completions canonical host forwards visible messages and stri
     const promptAsset = await loadTutorBaselinePrompt();
     const generationSpec = buildTutorBaselineGenerationSpec(promptAsset);
     const collection = await collectCanonicalTutorModel({
-      host: createHttpTutorExecutionHost({ endpoint: host.endpoint }),
+      host: createHttpTutorExecutionHost({ endpoint: host.endpoint, sessionToken }),
       dataset,
       selectedCases: [dataset.cases[0]!],
       promptAsset,
@@ -466,7 +473,7 @@ test("generic Chat Completions canonical host sends reasoning_split only when en
   try {
     const response = await fetch(host.endpoint, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: hostHeaders,
       body: JSON.stringify(await packet()),
     });
     assert.equal(response.status, 200);
@@ -493,7 +500,7 @@ test("generic Chat Completions canonical host fails closed for unsplit reasoning
   try {
     const response = await fetch(host.endpoint, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: hostHeaders,
       body: JSON.stringify(await packet()),
     });
     assert.equal(response.status, 502);

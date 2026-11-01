@@ -199,7 +199,7 @@ function canonicalHttpUrl(raw: string, allowInsecureHttp: boolean): string {
   return parsed.href;
 }
 
-function databaseUrl(raw: string | undefined): string | undefined {
+export function validateCommunityReviewDatabaseUrl(raw: string | undefined): string | undefined {
   if (raw === undefined) return undefined;
   let parsed: URL;
   try {
@@ -207,8 +207,14 @@ function databaseUrl(raw: string | undefined): string | undefined {
   } catch {
     throw new CommunityReviewConfigurationError("database_invalid");
   }
+  // pg 会让 URL 参数覆盖显式 ssl 对象。按解码后的参数名拒绝整个 TLS 参数族，
+  // 包括重复、大小写变体及 libpq 兼容开关，保证应用配置是唯一 TLS 策略来源。
+  const hasTlsOptions = [...parsed.searchParams.keys()].some((key) => {
+    const name = key.toLowerCase();
+    return name.startsWith("ssl") || name.startsWith("tls") || name === "uselibpqcompat";
+  });
   if ((parsed.protocol !== "postgres:" && parsed.protocol !== "postgresql:") ||
-    parsed.hostname.length === 0 || parsed.hash !== "" || parsed.searchParams.has("sslmode")) {
+    parsed.hostname.length === 0 || parsed.hash !== "" || hasTlsOptions) {
     throw new CommunityReviewConfigurationError("database_invalid");
   }
   return raw;
@@ -449,7 +455,9 @@ export function loadCommunityReviewConfig(
 
   const dbRequired = storage === "postgres" && (command === "migrate" || command === "readiness" ||
     command === "serve" || environment === "production");
-  const configuredDatabaseUrl = databaseUrl(value(env, "COMMUNITY_REVIEW_DATABASE_URL") ?? value(env, "DATABASE_URL"));
+  const configuredDatabaseUrl = validateCommunityReviewDatabaseUrl(
+    value(env, "COMMUNITY_REVIEW_DATABASE_URL") ?? value(env, "DATABASE_URL"),
+  );
   if (dbRequired && configuredDatabaseUrl === undefined) {
     throw new CommunityReviewConfigurationError("database_required");
   }

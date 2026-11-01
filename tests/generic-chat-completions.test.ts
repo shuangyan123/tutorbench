@@ -54,9 +54,7 @@ function validResult(caseId: string): string {
 }
 
 function responseBody(content: string, finishReason = "stop") {
-  return {
-    status: 200,
-    json: async () => ({
+  return new Response(JSON.stringify({
       choices: [{
         message: {
           content,
@@ -69,8 +67,7 @@ function responseBody(content: string, finishReason = "stop") {
       }],
       usage: { prompt_tokens: 10, completion_tokens: 8, total_tokens: 18 },
       provider_payload: "must not persist",
-    }),
-  };
+  }), { headers: { "content-type": "application/json" } });
 }
 
 const baseOptions = {
@@ -188,8 +185,8 @@ test("generic Chat Completions Judge fails closed for missing key, malformed out
 
   for (const fetch of [
     async () => responseBody("not-json"),
-    async () => ({ status: 401, json: async () => ({ error: "secret" }) }),
-    async () => ({ status: 200, json: async () => ({ choices: [{ message: {} }] }) }),
+    async () => new Response(JSON.stringify({ error: "secret" }), { status: 401 }),
+    async () => new Response(JSON.stringify({ choices: [{ message: {} }] })),
   ] satisfies readonly ChatCompletionsFetch[]) {
     const judge = createChatCompletionsJudge({
       ...baseOptions,

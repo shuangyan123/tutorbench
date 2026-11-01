@@ -32,7 +32,8 @@ const REDIRECTS: Readonly<Record<string, string>> = {
 
 export function isSpectrumSiteFile(relativePath: string): boolean {
   const [top] = relativePath.split("/");
-  if (top === "render" || top === "tools") return false;
+  // blender-venv is a local, gitignored render environment, never part of the site
+  if (top === "render" || top === "tools" || top === "blender-venv") return false;
   if (relativePath === "README.md" || relativePath === "journal-sample.html") return false;
   // only the K_ cover sequence is used; earlier cover renders stay in the repository
   return !/^assets\/cover\/(?!K_)/.test(relativePath);
@@ -57,6 +58,43 @@ async function shippedFiles(prototypeRoot: string): Promise<string[]> {
 }
 
 const cleanPage = (path: string): string => path.replace(/(^|\/)index\.html$/u, "$1");
+
+/**
+ * Drops the comments and spare whitespace from a stylesheet (the sources are commented in two
+ * languages). Strings are kept as written; every other run of whitespace becomes one space, and the
+ * spaces next to braces and semicolons go.
+ */
+export function minifyCss(css: string): string {
+  let out = "";
+  let index = 0;
+  while (index < css.length) {
+    const char = css[index] ?? "";
+    if (char === "/" && css[index + 1] === "*") {
+      const end = css.indexOf("*/", index + 2);
+      index = end < 0 ? css.length : end + 2;
+      out += " ";
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      let end = index + 1;
+      while (end < css.length && css[end] !== char) end += css[end] === "\\" ? 2 : 1;
+      out += css.slice(index, end + 1);
+      index = end + 1;
+      continue;
+    }
+    out += /\s/u.test(char) ? " " : char;
+    index += 1;
+  }
+  // only touch the text between strings, so a space inside a quoted value is never removed
+  return out
+    .split(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/u)
+    .map((part, position) => position % 2 === 1 ? part : part
+      .replace(/ {2,}/gu, " ")
+      .replace(/ ?([{};]) ?/gu, "$1")
+      .replace(/;\}/gu, "}"))
+    .join("")
+    .trim() + "\n";
+}
 
 interface PageContext {
   /** the page's path in the prototype */
@@ -128,6 +166,56 @@ function legacyHead(html: string, key: string): string {
 
 const escapeAttribute = (value: string): string => value.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
 
+/** A link preview card (tools/share-cards.json): the routes it covers, longest prefix wins. */
+interface ShareCard {
+  readonly id: string;
+  readonly routes: readonly string[];
+}
+
+export function shareCardFor(cards: readonly ShareCard[], englishOutput: string): string {
+  const route = cleanPage(englishOutput);
+  let best: { id: string; length: number } | undefined;
+  for (const card of cards) {
+    for (const prefix of card.routes) {
+      const matches = prefix === "" || prefix.endsWith("/") ? route.startsWith(prefix) : route === prefix;
+      if (matches && (best === undefined || prefix.length > best.length)) best = { id: card.id, length: prefix.length };
+    }
+  }
+  if (best === undefined) throw new Error(`No share card covers ${englishOutput}.`);
+  return best.id;
+}
+
+/**
+ * Adds the page's preview card to its sharing metadata: og:image and twitter:image, with a large
+ * card instead of the plain summary. Preview images need an absolute address, so a build without a
+ * site URL (no og:url) leaves the metadata as it is.
+ */
+export function withShareImage(head: string, image: string, basePath: string): string {
+  const pageUrl = /<meta property="og:url" content="([^"]+)">/u.exec(head)?.[1];
+  if (pageUrl === undefined) return head;
+  const src = `${new URL(pageUrl).origin}${basePath}/${image}`;
+  const title = /<meta property="og:title" content="([^"]*)">/u.exec(head)?.[1] ?? "Teachometry";
+  const tags = [
+    `<meta property="og:image" content="${escapeAttribute(src)}">`,
+    '<meta property="og:image:type" content="image/jpeg">',
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    `<meta property="og:image:alt" content="${title}">`,
+    `<meta name="twitter:image" content="${escapeAttribute(src)}">`,
+    `<meta name="twitter:image:alt" content="${title}">`,
+  ].join("\n");
+  // the old pages' own image tags (some essays point at an old illustration) give way to the card
+  const card = head
+    .split("\n")
+    .filter((line) => !/^<meta (?:property="og:image|name="twitter:image)/u.test(line))
+    .join("\n")
+    .replace('<meta name="twitter:card" content="summary">', '<meta name="twitter:card" content="summary_large_image">');
+  const anchor = /<meta name="twitter:description" content="[^"]*">/u.exec(card);
+  if (anchor === null) return `${card}\n${tags}`;
+  const end = anchor.index + anchor[0].length;
+  return `${card.slice(0, end)}\n${tags}${card.slice(end)}`;
+}
+
 function counterpart(output: string): string {
   return output.startsWith(ZH_PREFIX) ? output.slice(ZH_PREFIX.length) : `${ZH_PREFIX}${output}`;
 }
@@ -174,6 +262,13 @@ export async function installSpectrumSite(options: SpectrumSiteOptions): Promise
   const { prototypeRoot, outputDirectory, basePath, legacyPages } = options;
   const files = await shippedFiles(prototypeRoot);
   const pages = new Set(files.filter((file) => file.endsWith(".html")));
+  const { cards } = JSON.parse(await readFile(join(prototypeRoot, "tools/share-cards.json"), "utf8")) as { cards: ShareCard[] };
+  for (const card of cards) {
+    for (const language of ["en", "zh"]) {
+      const image = `assets/share/${card.id}-${language}.jpg`;
+      if (!files.includes(image)) throw new Error(`Share card ${image} is missing: run tools/build-share-cards.mjs.`);
+    }
+  }
   const written = new Set<string>();
   const write = async (output: string, content: string): Promise<void> => {
     if (written.has(output)) throw new Error(`Spectrum site writes ${output} twice.`);
@@ -188,7 +283,8 @@ export async function installSpectrumSite(options: SpectrumSiteOptions): Promise
     const destination = join(outputDirectory, file);
     if (await exists(destination)) throw new Error(`Spectrum asset ${file} would replace an existing site file.`);
     await mkdir(dirname(destination), { recursive: true });
-    await copyFile(join(prototypeRoot, file), destination);
+    if (file.endsWith(".css")) await writeFile(destination, minifyCss(await readFile(join(prototypeRoot, file), "utf8")), "utf8");
+    else await copyFile(join(prototypeRoot, file), destination);
   }
 
   for (const source of pages) {
@@ -202,7 +298,9 @@ export async function installSpectrumSite(options: SpectrumSiteOptions): Promise
         const legacy = legacyPages.get(legacyKey);
         if (legacy === undefined) throw new Error(`Spectrum page ${output} has no existing page to take metadata from.`);
         const context: PageContext = { source, output, zh, absolute: source === NOT_FOUND, pages, basePath };
-        await write(output, renderPage(html, context, legacyHead(legacy, legacyKey)));
+        const card = shareCardFor(cards, zh ? counterpart(output) : output);
+        const head = withShareImage(legacyHead(legacy, legacyKey), `assets/share/${card}-${zh ? "zh" : "en"}.jpg`, basePath);
+        await write(output, renderPage(html, context, head));
       }
     }
   }

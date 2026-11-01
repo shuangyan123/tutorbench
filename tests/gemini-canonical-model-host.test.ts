@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import type { Server } from "node:http";
@@ -14,8 +15,12 @@ import {
 import { buildTutorBaselineGenerationSpec, loadTutorBaselinePrompt } from "../src/corpus/index.js";
 import { loadTutorEvalDataset } from "../src/datasets/index.js";
 
+const sessionToken = randomBytes(32).toString("hex");
+const hostHeaders = { "content-type": "application/json", authorization: "Bearer " + sessionToken };
+
 interface Configuration {
   readonly apiKey: string;
+  readonly sessionToken: string;
   readonly model: string;
   readonly timeoutMs: number;
   readonly port: number;
@@ -29,7 +34,7 @@ const { readConfiguration, startServer } = await import(modulePath) as {
 const environment = {
   GEMINI_API_KEY: "synthetic-secret-key",
   GEMINI_MODEL: "gemini-2.5-flash",
-  CANONICAL_MODEL_HOST_PORT: "0",
+  CANONICAL_MODEL_HOST_PORT: "0", CANONICAL_MODEL_HOST_TOKEN: sessionToken,
 };
 const secrets = /synthetic-secret-key|hidden thought|secret-signature|provider-secret|rawPayload/u;
 
@@ -79,7 +84,7 @@ async function fixture(t: TestContext, options: {
   const endpoint = `http://127.0.0.1:${address.port}/generate`;
   const send = async (body?: unknown) => {
     const response = await fetch(endpoint, {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body ?? await packet()),
+      method: "POST", headers: hostHeaders, body: JSON.stringify(body ?? await packet()),
     });
     const result: unknown = await response.json();
     assert.doesNotMatch(JSON.stringify(result), secrets);
@@ -224,16 +229,16 @@ test("Gemini rejects unsupported controls, hidden fields, invalid packets and un
   ]) {
     assert.deepEqual(await host.send(invalid), { status: 400, body: { error: "tutor_execution_packet_invalid" } });
   }
-  const malformed = await fetch(host.endpoint, { method: "POST", body: "{provider-secret" });
+  const malformed = await fetch(host.endpoint, { method: "POST", headers: hostHeaders, body: "{provider-secret" });
   assert.equal(malformed.status, 400);
-  assert.equal((await fetch(host.endpoint)).status, 404);
-  const oversized = await fetch(host.endpoint, { method: "POST", body: "x".repeat(2_000_001) });
+  assert.equal((await fetch(host.endpoint, { headers: hostHeaders })).status, 404);
+  const oversized = await fetch(host.endpoint, { method: "POST", headers: hostHeaders, body: "x".repeat(2_000_001) });
   assert.equal(oversized.status, 413);
   assert.equal(host.calls.length, 0);
 });
 
 test("Gemini configuration fails closed without echoing values or accepting floating aliases", () => {
-  assert.deepEqual(readConfiguration(environment), { apiKey: environment.GEMINI_API_KEY, model: environment.GEMINI_MODEL, timeoutMs: 60_000, port: 0, diagnostics: false });
+  assert.deepEqual(readConfiguration(environment), { apiKey: environment.GEMINI_API_KEY, sessionToken, model: environment.GEMINI_MODEL, timeoutMs: 60_000, port: 0, diagnostics: false });
   for (const overrides of [
     { GEMINI_API_KEY: "" }, { GEMINI_MODEL: "" }, { GEMINI_MODEL: "gemini-flash-latest" },
     { GEMINI_MODEL: "gemini-2.5-flash-latest" }, { GEMINI_MODEL: "models/gemini-2.5-flash" },
@@ -260,7 +265,7 @@ test("Gemini synthetic collect-model smoke preserves existing corpus identity an
   const promptAsset = await loadTutorBaselinePrompt();
   const generationSpec = buildTutorBaselineGenerationSpec(promptAsset);
   const options = {
-    host: createHttpTutorExecutionHost({ endpoint: host.endpoint }), dataset,
+    host: createHttpTutorExecutionHost({ endpoint: host.endpoint, sessionToken }), dataset,
     selectedCases: [dataset.cases[0]!], promptAsset, generationSpec,
     tutorDescriptor: { provider: "synthetic-gemini-fixture", model: environment.GEMINI_MODEL,
       promptId: generationSpec.prompt.id, promptVersion: generationSpec.prompt.version },
@@ -278,7 +283,7 @@ test("Gemini synthetic collect-model smoke preserves existing corpus identity an
   assert.doesNotMatch(JSON.stringify(collection), secrets);
   assert.equal(host.calls.length, 1);
   const truncated = await fixture(t, { body: providerResponse([{ text: "Partial" }], "MAX_TOKENS") });
-  const failure = await collectCanonicalTutorModel({ ...options, host: createHttpTutorExecutionHost({ endpoint: truncated.endpoint }) });
+  const failure = await collectCanonicalTutorModel({ ...options, host: createHttpTutorExecutionHost({ endpoint: truncated.endpoint, sessionToken }) });
   assert.equal(failure.corpus?.responses.length ?? 0, 0);
   assert.equal(failure.report.failures[0]?.code, "execution_output_truncated");
   assert.equal(truncated.calls.length, 1);
@@ -289,7 +294,7 @@ test("Gemini collect-model CLI dry-run makes zero host calls without a credentia
   const child = spawnSync(process.execPath, [resolve("dist/src/cli/tutorbench.js"), "collect-model",
     "--http", host.endpoint, "--provider", "google", "--model", environment.GEMINI_MODEL,
     "--limit", "1", "--dry-run"], {
-    env: { ...process.env, GEMINI_API_KEY: "" }, encoding: "utf8", timeout: 5000,
+    env: { ...process.env, GEMINI_API_KEY: "", CANONICAL_MODEL_HOST_TOKEN: undefined }, encoding: "utf8", timeout: 5000,
   });
   assert.equal(child.status, 0, child.stderr);
   assert.match(child.stdout, /Model calls made: 0/u);

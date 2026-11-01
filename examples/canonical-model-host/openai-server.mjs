@@ -1,10 +1,12 @@
 import { createServer } from "node:http";
+import { parseCanonicalHostSessionToken, requestRejection, rejectRequest } from "./request-security.mjs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
 import OpenAI from "openai";
 
 import { parseTutorExecutionPacketFile } from "../../dist/src/contracts/index.js";
+import { createBoundedFetch, ResponseBodyLimitError } from "../../dist/src/transport/response-body.js";
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 9001;
@@ -81,8 +83,9 @@ function validateBaseUrl(environment) {
   return parsed.toString().replace(/\/$/u, "");
 }
 
-function readConfiguration(environment = process.env) {
+export function readConfiguration(environment = process.env) {
   return {
+    sessionToken: parseCanonicalHostSessionToken(environment.CANONICAL_MODEL_HOST_TOKEN),
     apiKey: requiredEnvironment("OPENAI_API_KEY", environment),
     model: requiredEnvironment("OPENAI_MODEL", environment),
     baseURL: validateBaseUrl(environment),
@@ -185,7 +188,10 @@ async function executePacket(client, packet, model, timeoutMs) {
       maxRetries: 0,
       timeout: timeoutMs,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof ResponseBodyLimitError) {
+      throw new CanonicalHostRequestError("provider_response_invalid");
+    }
     throw new CanonicalHostRequestError("provider_request_failed");
   }
 
@@ -275,14 +281,21 @@ async function handleRequest(request, response, client, configuration) {
   }
 }
 
-async function startServer(configuration) {
+export async function startServer(configuration, fetchImplementation) {
+  const sessionToken = parseCanonicalHostSessionToken(configuration.sessionToken);
+  if (sessionToken === configuration.apiKey) {
+    throw new CanonicalHostConfigurationError("Host session capability must differ from the Provider credential.");
+  }
   const client = new OpenAI({
     apiKey: configuration.apiKey,
     baseURL: configuration.baseURL,
     maxRetries: 0,
     timeout: configuration.timeoutMs,
+    fetch: createBoundedFetch(fetchImplementation),
   });
   const server = createServer((request, response) => {
+    const rejection = requestRejection(request, sessionToken);
+    if (rejection) { rejectRequest(request, response, rejection); return; }
     void handleRequest(request, response, client, configuration).catch(() => {
       if (!response.headersSent) {
         sendJson(response, 500, { error: "canonical_host_failed" });

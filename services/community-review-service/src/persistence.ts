@@ -670,4 +670,14 @@ export interface CommunityReviewPersistence {
   transaction<T>(
     callback: (transaction: CommunityReviewPersistenceTransaction) => Promise<T> | T,
   ): Promise<T>;
+
+  /** Atomic withdrawal scoped to one application, without the service-wide snapshot. */
+  applicationWithdrawalTransaction<T>(
+    applicationId: string,
+    callback: (transaction: ApplicationWithdrawalTransaction) => Promise<T> | T,
+  ): Promise<T>;
 }
+
+export type ApplicationWithdrawalTransaction = Pick<CommunityReviewPersistenceTransaction,
+  "getCommunityReviewApplication" | "updateCommunityReviewApplication" |
+  "deleteCommunityReviewApplicationContact" | "insertCommunityReviewApplicationAuditEvent">;

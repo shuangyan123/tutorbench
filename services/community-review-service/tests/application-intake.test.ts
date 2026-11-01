@@ -89,6 +89,38 @@ test("withdrawal remains available after intake is paused or closed", async () =
   assert.equal(repository.snapshot().applicationContacts.length, 0);
 });
 
+test("CLOSED and PAUSED withdrawal retains credential checks and one stable redacted tombstone", async () => {
+  for (const intakeState of ["CLOSED", "PAUSED"] as const) {
+    const repository = new InMemoryCommunityReviewRepository();
+    const submitted = await service(repository).submitApplication({
+      application: application(), idempotencyKey: "closed-withdrawal",
+    });
+    const intake = new CommunityReviewApplicationIntakeService(repository, {
+      intakeState,
+      clock: () => "2026-01-02T00:00:00.000Z",
+    });
+    const input = {
+      applicationId: submitted.receipt.applicationId,
+      withdrawalCredential: submitted.receipt.withdrawalCredential!,
+      sourceKey: "synthetic-withdrawal-source",
+    };
+    const before = repository.snapshot();
+    await assert.rejects(intake.withdrawApplication({ ...input, withdrawalCredential: "bad".repeat(16) }),
+      errorCode("application_withdrawal_not_authorized"));
+    assert.deepEqual(repository.snapshot(), before);
+    const first = await intake.withdrawApplication(input);
+    const after = repository.snapshot();
+    assert.deepEqual(await intake.withdrawApplication(input), first);
+    assert.deepEqual(repository.snapshot(), after);
+    assert.equal(after.applications[0]?.motivation, undefined);
+    assert.equal(after.applications[0]?.experienceSummary, undefined);
+    assert.equal(after.applicationContacts.length, 0);
+    assert.equal(after.applicationIdempotency.length, 1);
+    assert.equal(after.applicationAuditEvents.filter((event) => event.eventType === "application_withdrawn").length, 1);
+    assert.doesNotMatch(JSON.stringify(after), /synthetic-withdrawal-source/u);
+  }
+});
+
 test("submission is retry-safe, conflicts on semantic changes, and returns the credential once", async () => {
   const repository = new InMemoryCommunityReviewRepository();
   const intake = service(repository);

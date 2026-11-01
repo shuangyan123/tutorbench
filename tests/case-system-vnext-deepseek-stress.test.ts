@@ -40,9 +40,7 @@ async function firstPacket() {
 }
 
 function response(content: string) {
-  return {
-    status: 200,
-    json: async () => ({
+  return new Response(JSON.stringify({
       choices: [{
         message: {
           reasoning_content: "must not enter benchmark evidence",
@@ -55,8 +53,7 @@ function response(content: string) {
         completion_tokens: 10,
         total_tokens: 110,
       },
-    }),
-  };
+  }), { headers: { "content-type": "application/json" } });
 }
 
 test("DeepSeek vNext stress adapter sends only the blind packet and parses the exact outcome", async () => {
@@ -140,7 +137,7 @@ test("DeepSeek vNext stress adapter fails closed on malformed or mismatched outp
     thinkingMode: "disabled",
     temperature: 0,
     maxAttempts: 1,
-    fetch: async () => ({ status: 503, json: async () => ({}) }),
+    fetch: async () => new Response("{}", { status: 503 }),
   });
   assert.deepEqual(await unavailable.judge(packet), {
     status: "unavailable",

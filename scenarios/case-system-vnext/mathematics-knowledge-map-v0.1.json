@@ -1,0 +1,1166 @@
+{
+  "schemaVersion": 2,
+  "id": "mathematics-knowledge-map-v0.1",
+  "version": "0.2.0",
+  "status": "author-proposed-uncalibrated",
+  "scope": "Proposed school mathematics coverage through selected introductory university topics; secondary derivatives belong in school electives in some curricula. Candidate edges are NOT mandatory learning order or KST-validated prerequisite relations. Stage labels are broad authoring contexts, not universal curriculum order. The limits-and-continuity node labels introductory intuitive treatment in this pilot, not rigorous university real analysis. Schema v2 preserves legacy node IDs and prerequisiteIds as authoring hints; typed edge records and alternativePaths do not imply a single necessary instructional order. Curriculum-specific stages can be overlaid only with explicit mapping status.",
+  "sources": [
+    {
+      "label": "PISA 2022 mathematics framework",
+      "url": "https://www.oecd.org/en/publications/pisa-2022-assessment-and-analytical-framework_dfe0bf9c-en/full-report/component-3.html",
+      "use": "Four content-phenomenon families and distinction between content and mathematical processes."
+    },
+    {
+      "label": "TIMSS 2023 mathematics framework",
+      "url": "https://timssandpirls.bc.edu/timss2023/frameworks/index.html",
+      "use": "Grade-relative content domains and knowing/applying/reasoning cognition; not a global difficulty scale."
+    },
+    {
+      "label": "China Compulsory Education Mathematics Curriculum Standards (2022)",
+      "url": "https://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html",
+      "use": "Primary and lower-secondary content-strand scope only; no per-node clause or prerequisite is certified from this citation."
+    },
+    {
+      "label": "China General High School Mathematics Curriculum Standards (2017, revised 2020)",
+      "url": "https://www.moe.gov.cn/srcsite/A26/s8001/202006/t20200603_462199.html",
+      "use": "Secondary core/elective curriculum scope and grade-context review; no per-node mapping or empirical mastery claims."
+    },
+    {
+      "label": "Common Core State Standards for Mathematics",
+      "url": "https://www.thecorestandards.org/Math/Content/HSM/",
+      "use": "Secondary cross-curriculum comparison; conceptual categories and practices, not universal grade order."
+    },
+    {
+      "label": "Knowledge Space Theory (Doignon and Falmagne)",
+      "url": "https://escholarship.org/uc/item/94b9x5sw",
+      "use": "Research precedent for multiple possible knowledge-state and learning-path structures; current edges are author-proposed and are NOT a constructed or validated knowledge space."
+    }
+  ],
+  "domains": [
+    {
+      "id": "number-quantity",
+      "label": "Numbers, quantities and proportional reasoning",
+      "pisaContent": "quantity",
+      "classificationSource": "pisa-content"
+    },
+    {
+      "id": "algebra-equations",
+      "label": "Algebra and equations",
+      "pisaContent": "change-and-relationships",
+      "classificationSource": "pisa-content"
+    },
+    {
+      "id": "functions",
+      "label": "Functions and change",
+      "pisaContent": "change-and-relationships",
+      "classificationSource": "pisa-content"
+    },
+    {
+      "id": "geometry",
+      "label": "Geometry and spatial reasoning",
+      "pisaContent": "space-and-shape",
+      "classificationSource": "pisa-content"
+    },
+    {
+      "id": "discrete-probability",
+      "label": "Counting and probability",
+      "pisaContent": "uncertainty-and-data",
+      "classificationSource": "pisa-content"
+    },
+    {
+      "id": "statistics",
+      "label": "Statistics and data interpretation",
+      "pisaContent": "uncertainty-and-data",
+      "classificationSource": "pisa-content"
+    },
+    {
+      "id": "proof-structures",
+      "label": "Proof, logic and generalization",
+      "classificationSource": "tutorbench-internal",
+      "internalCategory": "cross-cutting-practice"
+    },
+    {
+      "id": "advanced-mathematics",
+      "label": "Introductory calculus and linear algebra",
+      "classificationSource": "tutorbench-internal",
+      "internalCategory": "advanced-topics"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "units-whole",
+      "domainId": "number-quantity",
+      "label": "Whole and unit reference",
+      "stage": "primary",
+      "prerequisiteIds": [],
+      "commonMisconception": "Changing the reference whole while comparing or combining fractions",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "integers-operations",
+      "domainId": "number-quantity",
+      "label": "Integer operations",
+      "stage": "primary",
+      "prerequisiteIds": [],
+      "commonMisconception": "Applying a sign rule without checking the operation",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "fractions-units",
+      "domainId": "number-quantity",
+      "label": "Fractional units and denominators",
+      "stage": "primary",
+      "prerequisiteIds": [
+        "units-whole"
+      ],
+      "commonMisconception": "Adding numerator and denominator independently",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "fraction-equivalence",
+      "domainId": "number-quantity",
+      "label": "Equivalent fractions and shared units",
+      "stage": "primary",
+      "prerequisiteIds": [
+        "fractions-units",
+        "integers-operations"
+      ],
+      "commonMisconception": "Treating unequal-size parts as directly additive",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "ratios",
+      "domainId": "number-quantity",
+      "label": "Ratios and proportional relationships",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "fractions-units"
+      ],
+      "commonMisconception": "Confusing ratio with additive difference",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "percent-base",
+      "domainId": "number-quantity",
+      "label": "Percent as a fraction of a base",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "ratios"
+      ],
+      "commonMisconception": "Using the wrong reference base after a change",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "successive-changes",
+      "domainId": "number-quantity",
+      "label": "Successive multiplicative changes",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "percent-base"
+      ],
+      "commonMisconception": "Assuming successive equal percentage changes cancel",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "variable-symbols",
+      "domainId": "algebra-equations",
+      "label": "Variables, expressions and equivalence",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "integers-operations"
+      ],
+      "commonMisconception": "Treating = as a command rather than an invariant",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "linear-equations",
+      "domainId": "algebra-equations",
+      "label": "Linear equations and inverse operations",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "variable-symbols"
+      ],
+      "commonMisconception": "Changing one side without preserving equality",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "polynomial-factorization",
+      "domainId": "algebra-equations",
+      "label": "Expansion and factorization",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "variable-symbols"
+      ],
+      "commonMisconception": "Memorizing structure without justifying valid transformations",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "rational-domain",
+      "domainId": "algebra-equations",
+      "label": "Rational expressions and excluded values",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "polynomial-factorization",
+        "linear-equations"
+      ],
+      "commonMisconception": "Cancelling a zero factor and admitting an excluded root",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "inequality-signs",
+      "domainId": "algebra-equations",
+      "label": "Inequality transformations and signs",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "linear-equations"
+      ],
+      "commonMisconception": "Multiplying by a negative number without reversing direction",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "quadratic-discriminant",
+      "domainId": "algebra-equations",
+      "label": "Quadratic roots and discriminant",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "polynomial-factorization"
+      ],
+      "commonMisconception": "Mistaking existence of real roots for an extra sign condition",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "root-sign-conditions",
+      "domainId": "algebra-equations",
+      "label": "Positive and negative root conditions",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "quadratic-discriminant",
+        "inequality-signs"
+      ],
+      "commonMisconception": "Confusing necessary and sufficient root constraints",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "coordinate-graph",
+      "domainId": "functions",
+      "label": "Coordinate graphs",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "variable-symbols"
+      ],
+      "commonMisconception": "Reading the horizontal value as the output",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "function-definition",
+      "domainId": "functions",
+      "label": "Functions as mappings and domains",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "coordinate-graph"
+      ],
+      "commonMisconception": "Assuming every symbolic expression accepts all real inputs",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "function-composition",
+      "domainId": "functions",
+      "label": "Function composition and domain restrictions",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "function-definition"
+      ],
+      "commonMisconception": "Checking only the outer expression and ignoring inner domain",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "inverse-functions",
+      "domainId": "functions",
+      "label": "Inverse functions and one-to-one restrictions",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "function-definition"
+      ],
+      "commonMisconception": "Assuming inverse exists globally without restriction",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "exponential-laws",
+      "domainId": "functions",
+      "label": "Exponential expressions and growth",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "function-definition",
+        "polynomial-factorization"
+      ],
+      "commonMisconception": "Using linear rather than multiplicative growth",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "logarithm-inequalities",
+      "domainId": "functions",
+      "label": "Logarithm domain, base and inequality direction",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "exponential-laws",
+        "inequality-signs"
+      ],
+      "commonMisconception": "Ignoring domain or reversal for base in (0,1)",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "limits-continuity",
+      "domainId": "functions",
+      "label": "Limits and continuity",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "function-composition"
+      ],
+      "commonMisconception": "Inferring a limit solely from substitution in an undefined expression",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "length-area",
+      "domainId": "geometry",
+      "label": "Measurements of length and area",
+      "stage": "primary",
+      "prerequisiteIds": [
+        "units-whole"
+      ],
+      "commonMisconception": "Confusing a linear scale factor with an area factor",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "angles-triangles",
+      "domainId": "geometry",
+      "label": "Angles and triangle properties",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "length-area"
+      ],
+      "commonMisconception": "Assuming a diagram proves a property",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "similarity-scale",
+      "domainId": "geometry",
+      "label": "Similarity, length and area scale",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "angles-triangles",
+        "ratios"
+      ],
+      "commonMisconception": "Applying similarity ratio directly to areas",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "pythagoras",
+      "domainId": "geometry",
+      "label": "Right triangle and distance",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "angles-triangles"
+      ],
+      "commonMisconception": "Assuming a theorem's conditions without checking right angles",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "coordinate-geometry",
+      "domainId": "geometry",
+      "label": "Lines, circles and coordinate constraints",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "coordinate-graph",
+        "pythagoras",
+        "quadratic-discriminant"
+      ],
+      "commonMisconception": "Confusing passing through a point with tangency",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "trigonometry",
+      "domainId": "geometry",
+      "label": "Trigonometric definitions and geometry",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "similarity-scale",
+        "pythagoras"
+      ],
+      "commonMisconception": "Using right-triangle identities outside their scope",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "counting-principle",
+      "domainId": "discrete-probability",
+      "label": "Multiplication, permutations and unordered choices",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "integers-operations"
+      ],
+      "commonMisconception": "Double counting indistinguishable arrangements",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "combinations",
+      "domainId": "discrete-probability",
+      "label": "Combinations and counting without order",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "counting-principle",
+        "fractions-units"
+      ],
+      "commonMisconception": "Treating ordered draws as unordered without adjusting counts",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "probability-events",
+      "domainId": "discrete-probability",
+      "label": "Events and equally likely sample spaces",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "fractions-units",
+        "counting-principle"
+      ],
+      "commonMisconception": "Using a denominator that excludes eligible outcomes",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "conditional-events",
+      "domainId": "discrete-probability",
+      "label": "Conditional probability and restricted sample spaces",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "probability-events",
+        "combinations"
+      ],
+      "commonMisconception": "Using unconditional frequency after conditioning",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "bayes-base-rate",
+      "domainId": "discrete-probability",
+      "label": "Base rates and inverse conditional probability",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "conditional-events"
+      ],
+      "commonMisconception": "Confusing P(test+|condition) with P(condition|test+)",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "sequences-recursive",
+      "domainId": "proof-structures",
+      "label": "Sequences and recurrences",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "variable-symbols",
+        "exponential-laws"
+      ],
+      "commonMisconception": "Mistaking several terms for a general recurrence proof",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "logic-quantifiers",
+      "domainId": "proof-structures",
+      "label": "Quantifiers, cases and counterexamples",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "variable-symbols"
+      ],
+      "commonMisconception": "Using one favorable example as proof of a universal claim",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "mathematical-induction",
+      "domainId": "proof-structures",
+      "label": "Induction base and step",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "sequences-recursive",
+        "logic-quantifiers"
+      ],
+      "commonMisconception": "Performing inductive step without proving base",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "inequality-proofs",
+      "domainId": "proof-structures",
+      "label": "Inequality proof and equality cases",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "inequality-signs",
+        "logic-quantifiers"
+      ],
+      "commonMisconception": "Using positive-only AM-GM for negative inputs",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "statistics-weighted",
+      "domainId": "statistics",
+      "label": "Weighted averages and aggregation",
+      "stage": "lower-secondary",
+      "prerequisiteIds": [
+        "percent-base"
+      ],
+      "commonMisconception": "Taking an unweighted average across unequal denominators",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "statistics-conditioning",
+      "domainId": "statistics",
+      "label": "Subgroup rates and Simpson's paradox",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "statistics-weighted"
+      ],
+      "commonMisconception": "Treating pooled rates as comparable without checking group mix",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "statistics-variability",
+      "domainId": "statistics",
+      "label": "Variation and distributions",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "statistics-weighted"
+      ],
+      "commonMisconception": "Comparing means without spread or sample sizes",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "statistics-inference",
+      "domainId": "statistics",
+      "label": "Sampling and inference limitations",
+      "stage": "university-intro",
+      "prerequisiteIds": [
+        "statistics-variability",
+        "conditional-events"
+      ],
+      "commonMisconception": "Treating association as evidence of causality",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "derivatives-rate",
+      "domainId": "advanced-mathematics",
+      "label": "Derivatives and local rates of change",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "limits-continuity",
+        "polynomial-factorization"
+      ],
+      "commonMisconception": "Treating f'=0 as a complete global optimization procedure",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "optimization-boundary",
+      "domainId": "advanced-mathematics",
+      "label": "Optimization and domain endpoints",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "derivatives-rate",
+        "inequality-signs"
+      ],
+      "commonMisconception": "Ignoring boundaries or differentiability exceptions",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "systems-equations",
+      "domainId": "advanced-mathematics",
+      "label": "Linear systems and consistency",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [
+        "linear-equations"
+      ],
+      "commonMisconception": "Assuming every pair of equations has a unique solution",
+      "prerequisiteEvidence": "author-hypothesis"
+    },
+    {
+      "id": "linear-algebra-rank",
+      "domainId": "advanced-mathematics",
+      "label": "Rank, dependence and consistency",
+      "stage": "university-intro",
+      "prerequisiteIds": [
+        "systems-equations",
+        "variable-symbols"
+      ],
+      "commonMisconception": "Ignoring linear dependence and inconsistent right-hand sides",
+      "prerequisiteEvidence": "author-hypothesis"
+    }
+  ],
+  "caseMappings": [
+    {
+      "taskId": "quadratic-positive-roots",
+      "nodeIds": [
+        "quadratic-discriminant",
+        "root-sign-conditions"
+      ]
+    },
+    {
+      "taskId": "conditional-two-red",
+      "nodeIds": [
+        "combinations",
+        "conditional-events"
+      ]
+    },
+    {
+      "taskId": "fraction-unit-repair",
+      "nodeIds": [
+        "fractions-units",
+        "fraction-equivalence"
+      ]
+    },
+    {
+      "taskId": "successive-percentage-base",
+      "nodeIds": [
+        "percent-base",
+        "successive-changes"
+      ]
+    },
+    {
+      "taskId": "rational-equation-excluded-root",
+      "nodeIds": [
+        "rational-domain"
+      ]
+    },
+    {
+      "taskId": "function-composition-domains",
+      "nodeIds": [
+        "function-composition"
+      ]
+    },
+    {
+      "taskId": "decreasing-logarithm-inequality",
+      "nodeIds": [
+        "logarithm-inequalities"
+      ]
+    },
+    {
+      "taskId": "similar-geometry-area-scale",
+      "nodeIds": [
+        "similarity-scale"
+      ]
+    },
+    {
+      "taskId": "circle-line-tangency-constraint",
+      "nodeIds": [
+        "coordinate-geometry"
+      ]
+    },
+    {
+      "taskId": "permutations-with-indistinguishable-objects",
+      "nodeIds": [
+        "counting-principle",
+        "combinations"
+      ]
+    },
+    {
+      "taskId": "base-rate-inverse-probability",
+      "nodeIds": [
+        "bayes-base-rate"
+      ]
+    },
+    {
+      "taskId": "simpson-paradox-unequal-mixtures",
+      "nodeIds": [
+        "statistics-conditioning"
+      ]
+    },
+    {
+      "taskId": "recurrence-mathematical-induction",
+      "nodeIds": [
+        "sequences-recursive",
+        "mathematical-induction"
+      ]
+    },
+    {
+      "taskId": "inequality-conditions-and-counterexample",
+      "nodeIds": [
+        "inequality-proofs",
+        "logic-quantifiers"
+      ]
+    },
+    {
+      "taskId": "closed-interval-optimization-endpoints",
+      "nodeIds": [
+        "optimization-boundary"
+      ]
+    },
+    {
+      "taskId": "linear-system-consistency-versus-rank",
+      "nodeIds": [
+        "linear-algebra-rank"
+      ]
+    }
+  ],
+  "notes": "Case mappings are linked to independently validated task evidence; unmapped nodes mean untested coverage, not absence of a skill from mathematics.",
+  "knowledgeRelations": [
+    {
+      "fromNodeId": "units-whole",
+      "toNodeId": "fractions-units",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "fractions-units",
+      "toNodeId": "fraction-equivalence",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "integers-operations",
+      "toNodeId": "fraction-equivalence",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "fractions-units",
+      "toNodeId": "ratios",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "ratios",
+      "toNodeId": "percent-base",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "percent-base",
+      "toNodeId": "successive-changes",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "integers-operations",
+      "toNodeId": "variable-symbols",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "linear-equations",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "polynomial-factorization",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "polynomial-factorization",
+      "toNodeId": "rational-domain",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "linear-equations",
+      "toNodeId": "rational-domain",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "linear-equations",
+      "toNodeId": "inequality-signs",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "polynomial-factorization",
+      "toNodeId": "quadratic-discriminant",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "quadratic-discriminant",
+      "toNodeId": "root-sign-conditions",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "inequality-signs",
+      "toNodeId": "root-sign-conditions",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "coordinate-graph",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "coordinate-graph",
+      "toNodeId": "function-definition",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "function-definition",
+      "toNodeId": "function-composition",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "function-definition",
+      "toNodeId": "inverse-functions",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "function-definition",
+      "toNodeId": "exponential-laws",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "polynomial-factorization",
+      "toNodeId": "exponential-laws",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "exponential-laws",
+      "toNodeId": "logarithm-inequalities",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "inequality-signs",
+      "toNodeId": "logarithm-inequalities",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "function-composition",
+      "toNodeId": "limits-continuity",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "units-whole",
+      "toNodeId": "length-area",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "length-area",
+      "toNodeId": "angles-triangles",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "angles-triangles",
+      "toNodeId": "similarity-scale",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "ratios",
+      "toNodeId": "similarity-scale",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "angles-triangles",
+      "toNodeId": "pythagoras",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "coordinate-graph",
+      "toNodeId": "coordinate-geometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "pythagoras",
+      "toNodeId": "coordinate-geometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "quadratic-discriminant",
+      "toNodeId": "coordinate-geometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "similarity-scale",
+      "toNodeId": "trigonometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "pythagoras",
+      "toNodeId": "trigonometry",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "integers-operations",
+      "toNodeId": "counting-principle",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "counting-principle",
+      "toNodeId": "combinations",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "fractions-units",
+      "toNodeId": "combinations",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "fractions-units",
+      "toNodeId": "probability-events",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "counting-principle",
+      "toNodeId": "probability-events",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "probability-events",
+      "toNodeId": "conditional-events",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "combinations",
+      "toNodeId": "conditional-events",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "conditional-events",
+      "toNodeId": "bayes-base-rate",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "sequences-recursive",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "exponential-laws",
+      "toNodeId": "sequences-recursive",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "logic-quantifiers",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "sequences-recursive",
+      "toNodeId": "mathematical-induction",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "logic-quantifiers",
+      "toNodeId": "mathematical-induction",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "inequality-signs",
+      "toNodeId": "inequality-proofs",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "logic-quantifiers",
+      "toNodeId": "inequality-proofs",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "percent-base",
+      "toNodeId": "statistics-weighted",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "statistics-weighted",
+      "toNodeId": "statistics-conditioning",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "statistics-weighted",
+      "toNodeId": "statistics-variability",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "statistics-variability",
+      "toNodeId": "statistics-inference",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "conditional-events",
+      "toNodeId": "statistics-inference",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "limits-continuity",
+      "toNodeId": "derivatives-rate",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "polynomial-factorization",
+      "toNodeId": "derivatives-rate",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "derivatives-rate",
+      "toNodeId": "optimization-boundary",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "inequality-signs",
+      "toNodeId": "optimization-boundary",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "linear-equations",
+      "toNodeId": "systems-equations",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "systems-equations",
+      "toNodeId": "linear-algebra-rank",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    },
+    {
+      "fromNodeId": "variable-symbols",
+      "toNodeId": "linear-algebra-rank",
+      "relationType": "helpful",
+      "evidenceStatus": "author-hypothesis",
+      "sourceRefs": []
+    }
+  ],
+  "alternativePaths": [
+    {
+      "id": "conditional-enumeration",
+      "targetNodeId": "conditional-events",
+      "nodeIds": [
+        "probability-events",
+        "counting-principle"
+      ],
+      "description": "Count equally likely outcomes directly without invoking combination formulas.",
+      "evidenceStatus": "author-hypothesis"
+    },
+    {
+      "id": "conditional-combinations",
+      "targetNodeId": "conditional-events",
+      "nodeIds": [
+        "probability-events",
+        "combinations"
+      ],
+      "description": "Count unordered eligible outcomes with combination methods.",
+      "evidenceStatus": "author-hypothesis"
+    },
+    {
+      "id": "function-table-rule",
+      "targetNodeId": "function-definition",
+      "nodeIds": [
+        "variable-symbols"
+      ],
+      "description": "Introduce inputs and outputs through a rule or a mapping table without a coordinate graph.",
+      "evidenceStatus": "author-hypothesis"
+    },
+    {
+      "id": "function-graph",
+      "targetNodeId": "function-definition",
+      "nodeIds": [
+        "coordinate-graph"
+      ],
+      "description": "Introduce a function using coordinate representations and graphs.",
+      "evidenceStatus": "author-hypothesis"
+    }
+  ],
+  "curriculumStageMappings": []
+}

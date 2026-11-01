@@ -1,5 +1,59 @@
 # Canonical model host examples
 
+## Local Provider Host authorization (NV-02)
+
+The OpenAI, Gemini and Chat Completions Node hosts require
+`CANONICAL_MODEL_HOST_TOKEN`: a fresh cryptographically random 32-byte value
+encoded as 64 lowercase hex characters, separate from the Provider API key.
+Missing/malformed configuration prevents startup; there is no public default.
+Every `/generate` request needs `Authorization: Bearer <session capability>`.
+This also applies to local no-auth upstreams: upstream and Host authorization
+are separate boundaries.
+
+Generate the capability in the parent shell without displaying it. Start the
+Host and collector as child processes of that shell so they inherit it.
+Never copy it into command arguments, URLs, committed files, reports or logs.
+After configuring the chosen Provider as described below, a PowerShell session
+can start the Host in a separate process and invoke the collector:
+
+```powershell
+$env:CANONICAL_MODEL_HOST_TOKEN = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant()
+$hostProcess = Start-Process node -ArgumentList 'examples/canonical-model-host/openai-server.mjs' -WindowStyle Hidden -PassThru
+try {
+  node dist/src/cli/tutorbench.js collect-model --http http://127.0.0.1:9001/generate --provider openai --model $env:OPENAI_MODEL --limit 1
+} finally {
+  Stop-Process -Id $hostProcess.Id
+  Remove-Item Env:CANONICAL_MODEL_HOST_TOKEN
+}
+```
+
+Substitute the corresponding Gemini or Chat Completions entry point and model.
+Build first. Provider calls in this example are live and require explicit
+operator authorization; automated tests use fake Providers only.
+Stop the Host and discard the environment value after the session; generate a
+new capability for each later session. Clearing a parent's environment does not
+revoke a still-running child's copy. Never reuse Provider credentials. Local
+users/processes able to inspect Host memory or environment remain trusted.
+
+Live `collect-model` now requires the environment capability. Dry-run needs
+none and sends no request. Programmatic `createHttpTutorExecutionHost` callers
+pass `sessionToken` explicitly. It is private client state, never packet, corpus
+or report data. Credentialed clients reject redirects, URL queries/fragments,
+and non-loopback cleartext HTTP. The generic canonical client can omit the
+option for independently secured external implementations; these three example
+Hosts always reject omitted credentials. Product HTTP adapter authentication,
+packet identity, generation controls and scoring are unchanged.
+
+Each Host remains bound to `127.0.0.1`. Before packet reads it validates the
+real socket's listening port against exactly `127.0.0.1:<port>` or
+`localhost:<port>`, rejects every Origin header (including empty and null),
+checks the capability in constant time, and requires application/json
+(optionally UTF-8 charset). Proxy headers do not override Host validation.
+No browser CORS permission is added. Header rejections close the connection
+without waiting for or buffering the complete packet.
+
+See [the offline browser verification procedure](../../docs/canonical-host-nv02-verification.md).
+
 `server.py` is a synthetic Python standard-library protocol fixture for the
 advanced canonical execution boundary. It accepts one `TutorExecutionPacket`
 request, reads the exact messages and generation spec, and returns sanitized

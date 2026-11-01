@@ -12,8 +12,39 @@
   /* ------------------------------------------------------------ 0 a new page opens at its top
      Some preview hosts carry the previous page's scroll position across a link. A new page starts at
      the top; a #anchor and the back/forward buttons keep their own position. */
+  var PLACE = "teachometry-place";   // where the reader was when they switched language
+  // the reader's place, as the last marked heading or figure above the reading line and how far it
+  // is from there to the next one, so the other language (whose text runs longer or shorter) opens
+  // at the same place
+  function marks() {
+    var out = [];
+    Array.prototype.forEach.call(document.querySelectorAll("main [id]"), function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.width || r.height) out.push({ id: el.id, top: r.top + window.scrollY });
+    });
+    return out.sort(function (a, b) { return a.top - b.top; });
+  }
+  function nextTop(list, top) {
+    for (var i = 0; i < list.length; i++) if (list[i].top > top + 1) return list[i].top;
+    return root.scrollHeight;
+  }
+  function readerPlace() {
+    var list = marks(), y = window.scrollY, at = null;
+    list.forEach(function (m) { if (m.top <= y + 1) at = m; });
+    if (!at) return { id: "", f: y / Math.max(1, root.scrollHeight) };   // no marks: the same share of the page
+    return { id: at.id, f: (y - at.top) / Math.max(1, nextTop(list, at.top) - at.top) };
+  }
+  function placeY(place) {
+    var list = marks(), at = null;
+    list.forEach(function (m) { if (m.id === place.id) at = m; });
+    if (!at) return place.id ? 0 : Math.round(place.f * root.scrollHeight);
+    return Math.max(0, Math.round(at.top + Math.min(1, Math.max(0, place.f)) * (nextTop(list, at.top) - at.top)));
+  }
   (function () {
     var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    var place = null;
+    try { place = JSON.parse(window.sessionStorage.getItem(PLACE) || "null"); window.sessionStorage.removeItem(PLACE); } catch { /* storage is optional */ }
+    if (place && place.path !== location.pathname) place = null;
     if ((nav && nav.type === "back_forward") || (location.hash && location.hash.length > 1)) return;
     var touched = false;   // once the reader scrolls, leave the page where they put it
     ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) { window.addEventListener(t, function () { touched = true; }, { once: true, passive: true }); });
@@ -21,13 +52,15 @@
       if (touched || (location.hash && location.hash.length > 1)) return;
       var before = root.style.scrollBehavior;
       root.style.scrollBehavior = "auto";
-      window.scrollTo(0, 0);
+      window.scrollTo(0, place ? placeY(place) : 0);
       // when the host page scrolls instead of this frame, bring the frame's top into view as well
       if (window.self !== window.top) { try { root.scrollIntoView({ block: "start", behavior: "instant" }); } catch { /* ignore */ } }
       root.style.scrollBehavior = before;
     }
     toTop();
     window.addEventListener("load", function () { toTop(); setTimeout(toTop, 60); }, { once: true });
+    // web fonts can change the page's length after load; keep the reader's place once they settle
+    if (place && document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(toTop, 30); });
   })();
 
   /* ------------------------------------------------------------ 0b site menu */
@@ -73,7 +106,12 @@
     try { window.localStorage.setItem("teachometry-lang", next); } catch { /* storage is optional */ }
     // published site: each language has its own URL, so the toggle goes to the other page
     var other = otherLanguagePath(root);
-    if (other) { location.href = location.origin + other; return; }
+    if (other) {
+      var at = window.scrollY > 24 ? readerPlace() : null;
+      if (at) { at.path = other; try { window.sessionStorage.setItem(PLACE, JSON.stringify(at)); } catch { /* storage is optional */ } }
+      location.href = location.origin + other;
+      return;
+    }
     root.setAttribute("data-lang", next);
     root.lang = next === "zh" ? "zh-CN" : "en";
     try {

@@ -4,6 +4,7 @@ import type {
   ResponseCreateParamsNonStreaming,
 } from "openai/resources/responses/responses.js";
 import type { ReasoningEffort } from "openai/resources/shared.js";
+import { createBoundedFetch, ResponseBodyLimitError } from "../../transport/response-body.js";
 
 import {
   buildTutorEvalJudgeResultJsonSchema,
@@ -400,7 +401,7 @@ export function createOpenAIJudge(options: OpenAIJudgeOptions): OpenAIJudge {
   const apiKey = nonEmptyEnvironmentValue(environment.OPENAI_API_KEY);
   const client: OpenAIResponsesClient | null =
     options.client ??
-    (apiKey === null ? null : new OpenAI({ apiKey, maxRetries: 0 }));
+    (apiKey === null ? null : new OpenAI({ apiKey, maxRetries: 0, fetch: createBoundedFetch() }));
   const descriptor: TutorEvalJudgeDescriptor = {
     provider: OPENAI_JUDGE_PROVIDER,
     model: options.model,
@@ -438,6 +439,9 @@ export function createOpenAIJudge(options: OpenAIJudgeOptions): OpenAIJudge {
       } catch (error) {
         if (error instanceof TutorEvalJudgeExecutionError) {
           throw error;
+        }
+        if (error instanceof ResponseBodyLimitError) {
+          throw new TutorEvalJudgeExecutionError("judge_result_invalid", buildMetrics(startedAt, attempts));
         }
         if (isTimeoutError(error)) {
           throw new TutorEvalJudgeExecutionError(

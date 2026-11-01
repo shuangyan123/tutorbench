@@ -30,7 +30,6 @@ export const biPE = (tag, cls, en, zh = Z(en)) => biP(tag, cls, esc(en), esc(zh)
 /** the live Chinese when the site has it, otherwise our own (for strings the live site leaves untranslated) */
 export const Zor = (en, zh) => SITE_ZH_CN_COPY[en] ?? zh;
 
-export const RENDERED = ["Rendered in Blender.", "Blender 渲染。"];
 
 const INDEX = readFileSync(join(PROTO, "index.html"), "utf8");
 const cut = (a, b) => { const i = INDEX.indexOf(a); const j = INDEX.indexOf(b, i); if (i < 0 || j < 0) throw new Error(`frame: ${a}`); return INDEX.slice(i, j + b.length); };
@@ -57,8 +56,6 @@ export function frame({ prefix, title, titleZh, description, body, current, css 
     foot = foot.replace(`<a href="${prefix}index.html#${anchor}">`, `<a href="${prefix}${page}">`);
   }
   bar = bar.replace(`<a class="run-btn" href="${prefix}index.html#reproduce">`, `<a class="run-btn" href="${prefix}run/index.html"${current === "run" ? ' aria-current="page"' : ""}>`);
-  foot = foot.replace("The cover kaleidoscope and gems are rendered in Blender (Cycles).", "The section covers and photographs are rendered in Blender (Cycles).")
-    .replace("封面万花筒与宝石由 Blender（Cycles）渲染。", "各栏目封面与图版由 Blender（Cycles）渲染。");
   return `${head}</head>
 <body>
 <a class="skip" href="#main">${bi("Skip to content", "跳到正文")}</a>

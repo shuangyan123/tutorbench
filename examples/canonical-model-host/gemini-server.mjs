@@ -1,10 +1,12 @@
 import { createServer } from "node:http";
+import { parseCanonicalHostSessionToken, requestRejection, rejectRequest } from "./request-security.mjs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { ApiError, GoogleGenAI } from "@google/genai";
 
 import { parseTutorExecutionPacketFile } from "../../dist/src/contracts/index.js";
+import { createBoundedFetch, ResponseBodyLimitError } from "../../dist/src/transport/response-body.js";
 
 const MAX_REQUEST_BYTES = 2_000_000;
 const MAX_TIMEOUT_MS = 2_147_483_647;
@@ -39,6 +41,7 @@ export function readConfiguration(environment = process.env) {
     throw new CanonicalHostConfigurationError("GEMINI_MODEL must be an explicit versioned Gemini model ID.");
   }
   return {
+    sessionToken: parseCanonicalHostSessionToken(environment.CANONICAL_MODEL_HOST_TOKEN),
     apiKey: requiredEnvironment("GEMINI_API_KEY", environment),
     model,
     timeoutMs: integerEnvironment("GEMINI_TIMEOUT_MS", environment, 60_000, 1, MAX_TIMEOUT_MS),
@@ -146,7 +149,7 @@ function providerErrorCode(error) {
   if (error?.status === 429) return "provider_rate_limited";
   if (Number.isInteger(error?.status) && error.status >= 500) return "provider_server_error";
   if (Number.isInteger(error?.status) && error.status >= 400) return "provider_http_error";
-  if (error instanceof SyntaxError) return "provider_response_invalid";
+  if (error instanceof SyntaxError || error instanceof ResponseBodyLimitError) return "provider_response_invalid";
   return "provider_request_failed";
 }
 
@@ -261,6 +264,10 @@ async function handleRequest(request, response, client, configuration) {
 
 // fetch 注入仅用于离线测试；CLI 不提供重定向上游地址或切换 Vertex 的配置。
 export async function startServer(configuration, fetchImplementation) {
+  const sessionToken = parseCanonicalHostSessionToken(configuration.sessionToken);
+  if (sessionToken === configuration.apiKey) {
+    throw new CanonicalHostConfigurationError("Host session capability must differ from the Provider credential.");
+  }
   const client = new GoogleGenAI({
     apiKey: configuration.apiKey,
     vertexai: false,
@@ -268,10 +275,12 @@ export async function startServer(configuration, fetchImplementation) {
       baseUrl: "https://generativelanguage.googleapis.com",
       apiVersion: "v1beta",
       retryOptions: { attempts: 1 },
-      ...(fetchImplementation === undefined ? {} : { fetch: fetchImplementation }),
+      fetch: createBoundedFetch(fetchImplementation),
     },
   });
   const server = createServer((request, response) => {
+    const rejection = requestRejection(request, sessionToken);
+    if (rejection) { rejectRequest(request, response, rejection); return; }
     void handleRequest(request, response, client, configuration).catch(() => {
       diagnostic(configuration, "host", "unknown", "canonical_host_failed");
       if (!response.headersSent) sendJson(response, 500, { error: "canonical_host_failed" });

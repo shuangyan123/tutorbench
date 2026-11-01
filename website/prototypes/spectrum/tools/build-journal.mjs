@@ -6,7 +6,7 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import process from "node:process";
 import { join } from "node:path";
-import { PROTO, REPO, esc, Z, bi, biE, biP, frame, RENDERED } from "./site-kit.mjs";
+import { PROTO, REPO, esc, Z, bi, biE, biP, frame } from "./site-kit.mjs";
 
 const { BLOG_POSTS, articleHeadingId } = await import(join(REPO, "dist/src/site/pages/blog.js"));
 
@@ -51,7 +51,7 @@ const plate = (src, w, h, alt) => `<img src="../../assets/journal/${src}" alt="$
 const FIGS = {
   "why-teaching-does-not-scale": [
     { at: "end:0", cls: "fig-wide", body: plate("classroom.webp", 1800, 1000, ["An empty classroom in morning sun, seen from the back corner: thirty desks facing one blackboard.", "清晨阳光里的空教室，从后排角落看去：三十张课桌朝向同一块黑板。"]),
-      cap: ["Thirty desks, one blackboard. The room is built for one person’s attention to be shared. " + RENDERED[0], "三十张课桌，一块黑板。整间教室的设计，就是让一个人的注意力被大家分着用。" + RENDERED[1]] },
+      cap: ["Thirty desks, one blackboard. The room is built for one person’s attention to be shared.", "三十张课桌，一块黑板。整间教室的设计，就是让一个人的注意力被大家分着用。"] },
     { at: "before:2", cls: "fig-margin", body: ledger([["Dedicated attention", "专属注意力"], ["Direct accountability to the family", "对家庭的直接责任"], ["Supervision of the student", "对学生的监督"], ["Visible progress", "可见进步"], ["A trust signal: credentials, experience, reputation, past results", "信任信号：资历、经验、口碑或过去结果"]]),
       cap: ["What a family buys with a private tutor besides the explanation itself, as listed in this section.", "除了讲解本身，家庭请私人教师时还买到了什么（按本节列举）。"] },
     { at: "after:4.0", body: `<div class="dialog">
@@ -78,7 +78,7 @@ const FIGS = {
   ],
   "when-learning-starts-to-feel-like-failure": [
     { at: "after:4.1", cls: "fig-wide", body: plate("graphpaper.webp", 1800, 1000, ["Graph paper with pencil parabolas y = ax² for a = 1/2, 1 and 2, a rubbed-out attempt, and the same curve shifted along the axis; a cedar pencil lies across the sheet.", "方格纸上用铅笔画的抛物线 y = ax²（a = 1/2、1、2），一条被擦掉的尝试，以及沿坐标轴平移后的同一条曲线；一支杉木铅笔横放在纸上。"]),
-      cap: ["The example from this section, worked on paper: how the parameter a changes y = ax², then the same curve moved along the axis. " + RENDERED[0], "本节的例子在纸上的样子：参数 a 如何改变 y = ax² 的图像，再把同一条曲线沿坐标轴平移。" + RENDERED[1]] },
+      cap: ["The example from this section, worked on paper: how the parameter a changes y = ax², then the same curve moved along the axis.", "本节的例子在纸上的样子：参数 a 如何改变 y = ax² 的图像，再把同一条曲线沿坐标轴平移。"] },
     { at: "after:8.1", body: `<ol class="ladder rise">
             ${[["I cannot do this", "我做不到"], ["I can do this with help", "在帮助下我能做到"], ["I can do this with less help", "减少帮助后我也能做到"], ["I can do this alone", "我可以独立做到"], ["I can use it somewhere new", "我还能在新的地方使用它"]].map(([en, zh], i) => `<li${i === 4 ? ' class="now"' : ""}><span class="l-no">${String(i + 1).padStart(2, "0")}</span><span class="l-name">${bi(esc(en), esc(zh))}</span></li>`).join("")}
           </ol>`,
@@ -180,7 +180,7 @@ function essayPage(p, idx) {
       </div>
       <figure class="cover-plate">
         <img src="../../assets/journal/${cover.img}" alt="${esc(cover.alt[0])}" width="900" height="1100" data-alt-en="${esc(cover.alt[0])}" data-alt-zh="${esc(cover.alt[1])}">
-        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc(cover.cap[0] + " " + RENDERED[0]), esc(cover.cap[1] + RENDERED[1]))}</figcaption>
+        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc(cover.cap[0]), esc(cover.cap[1]))}</figcaption>
       </figure>
     </div>
   </header>

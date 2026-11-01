@@ -114,6 +114,9 @@ export function createCommunityReviewPostgresRepository(
   config: CommunityReviewServiceConfig,
 ): PostgreSQLCommunityReviewRepository {
   if (config.databaseUrl === undefined) throw new CommunityReviewConfigurationError("database_required");
+  if (config.environment === "production" && (!config.databaseSsl || !config.databaseSslRejectUnauthorized)) {
+    throw new CommunityReviewConfigurationError("database_tls_required");
+  }
   const poolConfig: Omit<PoolConfig, "connectionString"> = {
     max: 10,
     connectionTimeoutMillis: 5000,

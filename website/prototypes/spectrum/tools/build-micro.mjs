@@ -8,7 +8,7 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import process from "node:process";
 import { join } from "node:path";
-import { PROTO, esc, Z, Zor, bi, biE, biPE, frame, RENDERED } from "./site-kit.mjs";
+import { PROTO, esc, Z, Zor, bi, biE, biPE, frame } from "./site-kit.mjs";
 
 const ARROW = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>`;
 /** a math expression read aloud in the page's language */
@@ -37,7 +37,7 @@ function page() {
       </div>
       <figure class="cover-plate">
         <img src="../assets/micro/${COVER.file}" alt="${esc(COVER.alt[0])}" width="900" height="1100" data-alt-en="${esc(COVER.alt[0])}" data-alt-zh="${esc(COVER.alt[1])}">
-        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc(COVER.cap[0] + " " + RENDERED[0]), esc(COVER.cap[1] + RENDERED[1]))}</figcaption>
+        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc(COVER.cap[0]), esc(COVER.cap[1]))}</figcaption>
       </figure>
     </div>
   </header>

@@ -4,6 +4,7 @@ import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
+import { minifyCss, shareCardFor, withShareImage } from "../src/cli/spectrum-site.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
 // generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
@@ -133,4 +134,84 @@ test("product facts stay on the published pages", async () => {
   assert.match(contact, /https:\/\/x\.com\/1Shuangyan36877/u);
   assert.match(await page("leaderboard/index.html"), /No calibrated public model runs yet\./u);
   assert.match(await page("zh-cn/micro-review/index.html"), /<html lang="zh-CN"/u);
+});
+
+const PROTOTYPE = join(process.cwd(), "website", "prototypes", "spectrum");
+
+async function prototypeText(directory = PROTOTYPE, prefix = ""): Promise<string> {
+  let text = "";
+  for (const entry of await readdir(join(directory, prefix), { withFileTypes: true })) {
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      if (relative !== "render" && relative !== "tools") text += await prototypeText(directory, relative);
+    } else if (/\.(?:html|js|css)$/u.test(entry.name) && relative !== "journal-sample.html") {
+      text += await readFile(join(directory, relative), "utf8");
+    }
+  }
+  return text;
+}
+
+test("the site serves its own fonts, and they cover every Chinese character on the pages", async () => {
+  for (const file of await htmlFiles(spectrum)) {
+    assert.doesNotMatch(await page(file), /fonts\.(?:googleapis|gstatic)\.com/u, file);
+  }
+  const fonts = await page("fonts.css");
+  const sources = [...fonts.matchAll(/url\(([^)]+)\)/gu)].map((match) => match[1] ?? "");
+  assert.ok(sources.length >= 10);
+  for (const source of sources) assert.ok(await isFile(join(spectrum, source)), `fonts.css: ${source} is missing`);
+  // tools/build-fonts.py cuts the Chinese faces to the characters in the pages; rerun it when this fails
+  const covered = new Set(await readFile(join(PROTOTYPE, "assets", "fonts", "cjk-coverage.txt"), "utf8"));
+  const missing = [...new Set(await prototypeText())].filter((char) => (char.codePointAt(0) ?? 0) >= 0x2e80 && !covered.has(char));
+  assert.deepEqual(missing, [], "run: python3 website/prototypes/spectrum/tools/build-fonts.py");
+});
+
+test("published stylesheets are minified without changing strings or selectors", () => {
+  assert.equal(
+    minifyCss('a  { color : red ; /* note */ background: url("data:x;a  b") }\n@media (max-width: 4px) {\n  .a > .b, .c { x: calc(1px + 2px); }\n}\n'),
+    'a{color : red;background: url("data:x;a  b")}@media (max-width: 4px){.a > .b, .c{x: calc(1px + 2px)}}\n',
+  );
+});
+
+test("every page shares its own section's preview card, in its own language", async () => {
+  const card = async (page: string): Promise<string> => {
+    const html = await readFile(join(spectrum, page), "utf8");
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image">/u, page);
+    const image = /<meta property="og:image" content="([^"]+)">/u.exec(html)?.[1];
+    assert.ok(image, `${page} has no og:image`);
+    assert.equal(/<meta name="twitter:image" content="([^"]+)">/u.exec(html)?.[1], image, page);
+    assert.ok(image.startsWith(`${SITE_URL}/assets/share/`), image);
+    assert.ok(await isFile(join(spectrum, image.slice(SITE_URL.length + 1))), `${image} is not published`);
+    return image.slice(image.lastIndexOf("/") + 1);
+  };
+  assert.equal(await card("index.html"), "home-en.jpg");
+  assert.equal(await card("zh-cn/index.html"), "home-zh.jpg");
+  assert.equal(await card("methodology/index.html"), "methodology-en.jpg");
+  assert.equal(await card("zh-cn/blog/why-teaching-does-not-scale/index.html"), "essay-scale-zh.jpg");
+  assert.equal(await card("data/cases/fraction-misconception-001/index.html"), "cases-en.jpg");
+  assert.equal(await card("zh-cn/models/[modelId]/index.html"), "models-zh.jpg");
+  assert.equal(await card("404.html"), "home-en.jpg");
+});
+
+test("share cards: longest route prefix wins, and no site URL means no image", () => {
+  const cards = [{ id: "home", routes: [""] }, { id: "data", routes: ["data/"] }, { id: "cases", routes: ["data/cases/"] }];
+  assert.equal(shareCardFor(cards, "data/cases/x/index.html"), "cases");
+  assert.equal(shareCardFor(cards, "data/index.html"), "data");
+  assert.equal(shareCardFor(cards, "about/index.html"), "home");
+  const head = '<title>T</title>\n<meta name="twitter:card" content="summary">';
+  assert.equal(withShareImage(head, "assets/share/home-en.jpg", ""), head);
+});
+
+test("an old page's own preview image is replaced by the card, not doubled", () => {
+  const head = [
+    '<meta property="og:url" content="https://example.org/tb/blog/x/">',
+    '<meta property="og:image" content="https://example.org/tb/assets/old.webp">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    '<meta name="twitter:description" content="d">',
+    '<meta name="twitter:image" content="https://example.org/tb/assets/old.webp">',
+  ].join("\n");
+  const out = withShareImage(head, "assets/share/essay-en.jpg", "/tb");
+  assert.doesNotMatch(out, /old\.webp/u);
+  assert.equal(out.match(/og:image"/gu)?.length, 1);
+  assert.equal(out.match(/twitter:image"/gu)?.length, 1);
+  assert.match(out, /content="https:\/\/example\.org\/tb\/assets\/share\/essay-en\.jpg"/u);
 });

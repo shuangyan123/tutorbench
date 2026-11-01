@@ -60,10 +60,8 @@ function validResult(caseId: string): string {
   });
 }
 
-function responseBody(content: string): { readonly status: number; json(): Promise<unknown> } {
-  return {
-    status: 200,
-    json: async () => ({
+function responseBody(content: string): Response {
+  return new Response(JSON.stringify({
       id: "provider-response-secret",
       choices: [{
         message: {
@@ -75,8 +73,7 @@ function responseBody(content: string): { readonly status: number; json(): Promi
       }],
       usage: { prompt_tokens: 12, completion_tokens: 9, total_tokens: 21 },
       rawProviderPayload: "must not persist",
-    }),
-  };
+  }), { headers: { "content-type": "application/json" } });
 }
 
 const promptOptions = {

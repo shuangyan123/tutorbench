@@ -17,6 +17,41 @@ The root package remains `tutor-benchmark@0.1.0`; the service package is
 private and has its own lockfile/dependencies. Do not publish the service
 package or widen the root `files` allowlist.
 
+## Database TLS policy (TB-SEC-01)
+
+TLS is controlled by the application settings, never by database URL query
+parameters. Production requires `COMMUNITY_REVIEW_DATABASE_SSL=require` and
+`COMMUNITY_REVIEW_DATABASE_SSL_REJECT_UNAUTHORIZED=true` (the default). The
+repository factory enforces these requirements even for a hand-built config;
+serve, readiness, and migration use the same policy.
+
+Both `COMMUNITY_REVIEW_DATABASE_URL` and its `DATABASE_URL` fallback reject
+query parameter names beginning with `ssl` or `tls`, plus `uselibpqcompat`,
+case-insensitively after URL decoding. This includes `ssl`, `sslmode`,
+`sslcert`, `sslkey`, `sslrootcert`, and `sslnegotiation`, empty values, encoded
+names, and every occurrence of a duplicate parameter. Validation also runs
+before a repository-owned pool is constructed. Invalid configuration fails
+closed with `database_invalid`; it is not retried as plaintext or replaced
+with the fallback URL, and the error does not echo the input.
+
+We reject TLS query options rather than reimplementing connection-string
+parsing: node-postgres replaces an explicit `ssl` object with URL-provided
+SSL options. A controlled parse would require maintaining mappings and
+defaults for unrelated driver parameters. Rejection preserves normal driver
+parsing while leaving one authoritative TLS configuration source. Regression
+tests construct real `pg.Client` instances from the service's pool options
+to inspect effective TLS settings without opening a connection.
+
+Compatibility: remove TLS query parameters from existing URLs before updating
+the service, including apparently secure options such as `sslmode=verify-full`.
+URLs without these parameters retain their existing behavior. Development and
+test environments may still explicitly disable TLS or certificate verification
+through the application settings; production may do neither. URL-based custom
+CA/client-certificate/key provisioning is now rejected. Such deployments need a
+separately reviewed trust-store/mTLS provisioning plan before rollout; do not
+work around the rejection by disabling certificate verification. This change
+does not alter external database or deployment configuration.
+
 ## Configuration
 
 Set these values through the deployment secret/configuration mechanism. Never
@@ -202,6 +237,27 @@ The L2-C2D exposure record is in
 The application limiter is process-local and transient; it is not a global
 multi-instance control. External edge abuse protection remains a separate hard
 launch blocker until an approved control is actually configured and tested.
+
+### Withdrawal resource boundary (TB-SEC-02)
+
+Application withdrawal remains available in `CLOSED` and `PAUSED`. Before any
+database connection is acquired, a separate transient withdrawal budget permits
+30 requests per source per minute, 120 requests total per minute, and at most
+four in-flight withdrawals per service instance. Excess requests return the
+existing `application_rate_limited` HTTP 429 response without queueing for a
+connection. These budgets count invalid credentials and retries, use HMAC-derived
+source keys, do not consume the new-application budget, and reset with the
+process. They do not replace the external edge or distributed abuse-control gate.
+
+PostgreSQL withdrawals lock only the target application by primary key. They
+do not acquire the service-wide advisory lock or read a service-wide snapshot.
+Credential verification, free-text redaction, contact deletion, and the audit
+insert commit in one transaction. Existing snapshot writers lock application
+rows before reading their snapshot, so they serialize with the same target row
+without overwriting a committed withdrawal. The withdrawal transaction applies
+five-second lock and statement deadlines; an error rolls back all changes and
+releases the admission slot. Successful retries return the existing tombstone
+without another audit event, and idempotency mappings remain intact.
 
 For a container deployment, build
 `services/community-review-service/Dockerfile`. It uses Node 24 bookworm slim, excludes

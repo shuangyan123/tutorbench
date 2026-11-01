@@ -4,6 +4,7 @@ import {
   type ReviewTranslationLocale,
   type ReviewTranslationSourceType,
 } from "./contracts.js";
+import { cancelResponseBody, readBoundedJson } from "../transport/response-body.js";
 
 export const DEFAULT_REVIEW_TRANSLATION_TIMEOUT_MS = 30_000 as const;
 
@@ -157,12 +158,13 @@ export class HttpReviewTranslator implements ReviewTranslator {
       }
 
       if (!response.ok) {
+        cancelResponseBody(response);
         throw new ReviewTranslationProviderError("translator_transport_error");
       }
 
       let body: unknown;
       try {
-        body = await response.json();
+        body = await readBoundedJson(response, controller.signal);
       } catch {
         throw new ReviewTranslationProviderError(
           controller.signal.aborted

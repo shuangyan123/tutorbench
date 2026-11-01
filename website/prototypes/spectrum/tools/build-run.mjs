@@ -9,7 +9,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import process from "node:process";
 import { join } from "node:path";
-import { PROTO, REPO, esc, Z, Zor, bi, biE, biPE, frame, RENDERED } from "./site-kit.mjs";
+import { PROTO, REPO, esc, Z, Zor, bi, biE, biPE, frame } from "./site-kit.mjs";
 
 const { DOC_COUNT_TEMPLATES, formatCurrentDataset, formatCanonicalCases } = await import(join(REPO, "dist/src/site/public-localization-formatters.js"));
 const { publicEvidenceCopy } = await import(join(REPO, "dist/src/site/public-localization.js"));
@@ -172,7 +172,7 @@ function runPage() {
       </div>
       <figure class="cover-plate">
         <img src="../assets/run/${COVER.file}" alt="${esc(COVER.alt[0])}" width="900" height="1100" data-alt-en="${esc(COVER.alt[0])}" data-alt-zh="${esc(COVER.alt[1])}">
-        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(`${esc(["Same cases.", "Different Tutors.", "Comparable evidence."].join(" "))} ${esc(RENDERED[0])}`, `${["Same cases.", "Different Tutors.", "Comparable evidence."].map((s) => esc(Z(s))).join("")}${esc(RENDERED[1])}`)}</figcaption>
+        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(`${esc(["Same cases.", "Different Tutors.", "Comparable evidence."].join(" "))}`, `${["Same cases.", "Different Tutors.", "Comparable evidence."].map((s) => esc(Z(s))).join("")}`)}</figcaption>
       </figure>
     </div>
   </header>
@@ -315,7 +315,7 @@ function docsPage() {
   const T = DOC_COUNT_TEMPLATES;
   const body = `<main id="main" class="dc docs-page">
   <header class="dc-head">
-    <figure class="dc-band"><img src="../assets/run/tracing.webp" alt="" width="1600" height="560"><figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc("Vellum over the repository’s own docs/quickstart.md, its structure traced in pencil: a map, not a replacement. " + RENDERED[0]), esc("硫酸纸蒙在仓库自己的 docs/quickstart.md 上，用铅笔描出它的结构：是地图，不是替代。" + RENDERED[1]))}</figcaption></figure>
+    <figure class="dc-band"><img src="../assets/run/tracing.webp" alt="" width="1600" height="560"><figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${bi(esc("Vellum over the repository’s own docs/quickstart.md, its structure traced in pencil: a map, not a replacement."), esc("硫酸纸蒙在仓库自己的 docs/quickstart.md 上，用铅笔描出它的结构：是地图，不是替代。"))}</figcaption></figure>
     <div class="wrap dc-head-in">
       <div class="dc-head-copy">
         <p class="essay-meta kicker"><span class="issue">${biE("Documentation")}</span><span class="rule" aria-hidden="true"></span><span>${INDEX.length} ${bi("references", "条参考资料")}</span></p>

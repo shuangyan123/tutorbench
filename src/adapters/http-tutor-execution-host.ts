@@ -6,11 +6,15 @@ import {
   type TutorTurnMetrics,
   type TutorTurnOutput,
 } from "../contracts/index.js";
+import { parseCanonicalHostSessionToken } from "../transport/canonical-host-session.js";
+import { readBoundedJson } from "../transport/response-body.js";
 
 export const DEFAULT_HTTP_TUTOR_EXECUTION_HOST_TIMEOUT_MS = 30_000 as const;
 
 export interface HttpTutorExecutionHostOptions {
   readonly endpoint: string;
+  /** Explicit Host capability; never inferred from Provider credentials or environment. */
+  readonly sessionToken?: string;
   readonly timeoutMs?: number;
 }
 
@@ -197,9 +201,10 @@ const stableProviderErrorCodes: Readonly<
 
 async function nonSuccessCode(
   response: Response,
+  signal: AbortSignal,
 ): Promise<HttpTutorExecutionHostRequestErrorCode> {
   try {
-    const body = asRecord(await response.json());
+    const body = asRecord(await readBoundedJson(response, signal));
     const providerCode = body?.error;
     if (typeof providerCode === "string") {
       const stableCode = stableProviderErrorCodes[providerCode];
@@ -235,10 +240,21 @@ async function nonSuccessCode(
 export class HttpTutorExecutionHost {
   readonly endpoint: string;
   readonly timeoutMs: number;
+  readonly #sessionToken: string | undefined;
 
   constructor(options: HttpTutorExecutionHostOptions) {
     this.endpoint = validateEndpoint(options.endpoint);
     this.timeoutMs = validateTimeout(options.timeoutMs);
+    this.#sessionToken = options.sessionToken === undefined ? undefined : parseCanonicalHostSessionToken(options.sessionToken);
+    if (this.#sessionToken !== undefined) {
+      const target = new URL(this.endpoint);
+      if (target.search || target.hash ||
+          (target.protocol !== "https:" && !["127.0.0.1", "localhost", "[::1]"].includes(target.hostname))) {
+        throw new HttpTutorExecutionHostConfigurationError(
+          "Host session credentials require HTTPS or loopback HTTP, without URL query or fragment.",
+        );
+      }
+    }
   }
 
   async execute(packet: TutorExecutionPacketFile): Promise<TutorExecutionHostResult> {
@@ -256,9 +272,11 @@ export class HttpTutorExecutionHost {
         response = await fetch(this.endpoint, {
           method: "POST",
           headers: {
+            ...(this.#sessionToken === undefined ? {} : { authorization: "Bearer " + this.#sessionToken }),
             accept: "application/json",
             "content-type": "application/json",
           },
+          ...(this.#sessionToken === undefined ? {} : { redirect: "error" as const }),
           body: JSON.stringify(canonicalPacket),
           signal: controller.signal,
         });
@@ -276,13 +294,13 @@ export class HttpTutorExecutionHost {
       }
       if (!response.ok) {
         throw new HttpTutorExecutionHostRequestError(
-          await nonSuccessCode(response),
+          await nonSuccessCode(response, controller.signal),
           "Canonical Tutor execution host returned a non-success status.",
         );
       }
       let body: unknown;
       try {
-        body = await response.json();
+        body = await readBoundedJson(response, controller.signal);
       } catch {
         throw new HttpTutorExecutionHostRequestError(
           "invalid_json",

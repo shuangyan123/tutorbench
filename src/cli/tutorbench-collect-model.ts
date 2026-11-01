@@ -1,3 +1,4 @@
+import { parseCanonicalHostSessionToken } from "../transport/canonical-host-session.js";
 import { access } from "node:fs/promises";
 import { resolve } from "node:path";
 
@@ -278,6 +279,10 @@ Collects canonical foundation-model evidence from a host that executes the
 exact TutorExecutionPacket and TutorGenerationSpec. It fixes provenance to
 recorded_model, never invokes a Judge, never retries, and never publishes artifacts.
 
+Live collection requires CANONICAL_MODEL_HOST_TOKEN in the environment.
+Use a fresh Host session capability, never a Provider API key or URL parameter.
+Dry-run needs no credential and makes no HTTP request.
+
 Options:
   --http <url>          Canonical model host endpoint (http/https, no credentials)
   --provider <id>       Provider identity for the model host
@@ -441,6 +446,7 @@ export async function runTutorbenchCollectModel(
   const host = createHttpTutorExecutionHost({
     endpoint: options.endpoint,
     timeoutMs: options.timeoutMs,
+    ...(options.dryRun ? {} : { sessionToken: parseCanonicalHostSessionToken(process.env.CANONICAL_MODEL_HOST_TOKEN) }),
   });
   if (options.dryRun) {
     for (const tutorEvalCase of selectedCases) {

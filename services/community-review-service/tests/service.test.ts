@@ -368,6 +368,7 @@ function decoratedPersistence(
   decorate: (transaction: CommunityReviewPersistenceTransaction) => CommunityReviewPersistenceTransaction,
 ): CommunityReviewPersistence {
   return {
+    applicationWithdrawalTransaction: (id, callback) => repository.applicationWithdrawalTransaction(id, callback),
     transaction<T>(callback: (transaction: CommunityReviewPersistenceTransaction) => Promise<T> | T): Promise<T> {
       return repository.transaction((transaction) => callback(decorate(transaction)));
     },

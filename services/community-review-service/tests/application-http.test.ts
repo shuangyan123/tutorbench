@@ -34,7 +34,7 @@ function application(overrides: Record<string, unknown> = {}): Record<string, un
   };
 }
 
-function runtimeFor(state?: "CLOSED" | "OPEN" | "PAUSED", corsOrigins?: string) {
+function runtimeFor(state?: "CLOSED" | "OPEN" | "PAUSED", corsOrigins?: string, trustedProxy?: string, sourceLimit?: number) {
   const config = loadCommunityReviewConfig({
     env: {
       COMMUNITY_REVIEW_ENV: "development",
@@ -46,6 +46,8 @@ function runtimeFor(state?: "CLOSED" | "OPEN" | "PAUSED", corsOrigins?: string) 
       COMMUNITY_REVIEW_REQUEST_BODY_LIMIT_BYTES: "4096",
       ...(state === undefined ? {} : { COMMUNITY_REVIEW_APPLICATION_INTAKE_STATE: state }),
       ...(corsOrigins === undefined ? {} : { COMMUNITY_REVIEW_APPLICATION_CORS_ORIGINS: corsOrigins }),
+      ...(trustedProxy === undefined ? {} : { COMMUNITY_REVIEW_TRUSTED_PROXY_CIDRS: trustedProxy }),
+      ...(sourceLimit === undefined ? {} : { COMMUNITY_REVIEW_APPLICATION_RATE_LIMIT_MAX_REQUESTS: String(sourceLimit) }),
     },
   });
   return createCommunityReviewRuntime(config);
@@ -76,6 +78,30 @@ async function listen(server: Server): Promise<AddressInfo> {
   assert.equal(typeof address, "object");
   return address as AddressInfo;
 }
+
+test("NV-01: forwarded spoofed prefixes cannot rotate actual application rate-limit identity", async () => {
+  const runtime = runtimeFor("OPEN", undefined, "127.0.0.1/32", 2);
+  const server = createCommunityReviewHttpServer(runtime, new CommunityReviewLogger("error"));
+  const address = await listen(server);
+  const base = `http://127.0.0.1:${address.port}`;
+  try {
+    for (let index = 0; index < 3; index += 1) {
+      const response = await fetch(`${base}/v1/applications`, {
+        method: "POST",
+        headers: {
+          ...jsonHeaders(undefined, `nv01-http-${index}`),
+          "x-forwarded-for": `198.51.100.${10 + index}, 203.0.113.9`,
+        },
+        body: JSON.stringify(application({ contact: { type: "email", value: `nv01-${index}@example.invalid` } })),
+      });
+      assert.equal(response.status, index < 2 ? 200 : 429);
+      await response.arrayBuffer();
+    }
+  } finally {
+    await new Promise<void>((resolve, reject) =>
+      server.close((error) => error ? reject(error) : resolve()));
+  }
+});
 
 test("closed public application POST is enforced before persistence and public reviewer intake stays separate", async () => {
   const runtime = runtimeFor();

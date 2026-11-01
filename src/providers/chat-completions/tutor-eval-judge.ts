@@ -8,6 +8,7 @@ import {
   type TutorEvalJudgeMetrics,
   type TutorEvalTokenUsage,
 } from "../../contracts/index.js";
+import { cancelResponseBody, readBoundedJson } from "../../transport/response-body.js";
 
 export const CHAT_COMPLETIONS_JUDGE_PATH = "/chat/completions" as const;
 export const DEFAULT_CHAT_COMPLETIONS_JUDGE_TIMEOUT_MS = 30_000 as const;
@@ -63,10 +64,7 @@ export class ChatCompletionsJudgeConfigurationError extends Error {
   }
 }
 
-export interface ChatCompletionsHttpResponse {
-  readonly status: number;
-  json(): Promise<unknown>;
-}
+export type ChatCompletionsHttpResponse = Pick<Response, "status" | "body">;
 
 export interface ChatCompletionsRequestInit {
   readonly method: "POST";
@@ -569,6 +567,7 @@ export function createChatCompletionsExecutor<TInput, TResult>(
         }
 
         if (response.status < 200 || response.status >= 300) {
+          cancelResponseBody(response);
           const statusError = Object.assign(new Error("chat_completions_http_error"), {
             status: response.status,
           });
@@ -583,7 +582,7 @@ export function createChatCompletionsExecutor<TInput, TResult>(
 
         let body: unknown;
         try {
-          body = await Promise.race([response.json(), timeoutPromise]);
+          body = await Promise.race([readBoundedJson(response, controller.signal), timeoutPromise]);
         } catch {
           if (timedOut) {
             throw new TutorEvalJudgeExecutionError(
