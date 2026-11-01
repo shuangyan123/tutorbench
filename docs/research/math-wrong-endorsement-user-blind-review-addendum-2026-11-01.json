@@ -32,6 +32,16 @@
       "leakage": "是",
       "confidence": "高",
       "reason": "完全肯定。"
+    },
+    {
+      "code": "T05",
+      "math": "错误",
+      "wrongEndorsement": "是",
+      "final": "是",
+      "closure": "是",
+      "leakage": "是",
+      "confidence": "高",
+      "reason": "错误答案也是泄露。"
     }
   ]
 }
