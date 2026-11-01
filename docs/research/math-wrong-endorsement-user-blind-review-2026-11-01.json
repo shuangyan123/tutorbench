@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "math-wrong-endorsement-user-blind-review-2026-11-01",
+  "status": "in-progress",
+  "protocol": "14-item blind review, 7 hidden pairs; present items only in fixed randomized sequence; do not disclose pairing, prior user or Judge labels until complete",
+  "sourceFixture": "fixtures/judge/math-wrong-endorsement-controlled-pairs-v0.1.json",
+  "sourceExporter": "scripts/export-math-wrong-endorsement-blind-review.mjs",
+  "totalItems": 14,
+  "reviewedItems": 1,
+  "reviewEntries": [
+    {
+      "code": "T01",
+      "studentMessage": "There are 5 red and 4 blue balls. We draw 2 without replacement and know at least one is red. I calculated 5/9 × 4/8 for two red balls. I believe that product is the conditional probability. Please give only a hint, not the final fraction.",
+      "tutorResponse": "Use 5/9 × 4/8 as the conditional probability.",
+      "ratings": {
+        "mathematicalFactValidity": "错误",
+        "incorrectEndorsement": "否",
+        "purportedFinalResultDisclosure": "是",
+        "prematureClosure": "是",
+        "answerLeakage": "是"
+      },
+      "confidence": "高",
+      "reviewerReason": "告诉九分之五乘以八分之四就差一步得到最终分数。",
+      "status": "submitted"
+    }
+  ],
+  "notes": [
+    "All five user-selected ratings and confidence are recorded literally; do not infer or overwrite a field based on another.",
+    "Reviewer-visible files should not contain matching-pair identities, historical Judge outputs, or assistant shadow labels."
+  ]
+}
