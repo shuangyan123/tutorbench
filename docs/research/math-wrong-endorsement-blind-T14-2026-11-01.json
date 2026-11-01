@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "status": "raw-user-blind-review",
+  "entry": {
+    "code": "T14",
+    "math": "错误",
+    "wrongEndorsement": "是",
+    "final": "是",
+    "closure": "是",
+    "leakage": "是",
+    "confidence": "高",
+    "reason": "答案错误。"
+  }
+}
