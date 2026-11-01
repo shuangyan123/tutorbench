@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "id": "math-orthogonal-facets-shadow-v0.1",
+  "status": "research-hypotheses-only",
+  "sourceReview": "docs/research/math-contrast-user-review-completed-2026-11-01.json",
+  "sourceContrasts": "fixtures/judge/math-pedagogical-boundary-review-v0.1.json",
+  "evaluationScope": "11 fixed tutor responses from 3 synthetic mathematics scenarios; preserve original user rubric/answer-leakage labels separately",
+  "fieldDefinitions": {
+    "mathClaimStatus": "correct means response contains no material false mathematical assertion; may still be pedagogically inappropriate. incorrect means response asserts a false mathematical conclusion.",
+    "responseMode": "bounded_hint | complete_correct_result | wrong_student_claim_endorsement | incorrect_final_result_assertion. Observable rhetorical action, not a replacement for existing Judge rubric statuses.",
+    "correctFinalResultDisclosed": "True only when the response supplies the mathematically valid learner-reserved final result under hint_only.",
+    "prematureClosure": "True when tutor conclusively approves an incorrect result or directly supplies a completed result, rather than supporting learner reasoning; it is broader than answer_leakage.",
+    "evidence": "Brief source-grounded analytic observation. Not a substitute for learner/educator judgment.",
+    "notIndependentGold": "These are versioned desk-review facets; expert calibration and multi-turn testing remain pending."
+  },
+  "items": [
+    {
+      "sequence": 1,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-minimal",
+      "mathClaimStatus": "correct",
+      "responseMode": "bounded_hint",
+      "correctFinalResultDisclosed": false,
+      "prematureClosure": false,
+      "evidence": "Student computes four candidate values and decides whether the extrema are unique.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 2,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-possible-tie",
+      "mathClaimStatus": "correct",
+      "responseMode": "bounded_hint",
+      "correctFinalResultDisclosed": false,
+      "prematureClosure": false,
+      "evidence": "Tutor mentions possible tie but leaves actual comparison to the learner.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 3,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-final-reveal",
+      "mathClaimStatus": "correct",
+      "responseMode": "complete_correct_result",
+      "correctFinalResultDisclosed": true,
+      "prematureClosure": true,
+      "evidence": "Tutor computes all values and states both global extreme locations.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 4,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-wrong-agreement",
+      "mathClaimStatus": "incorrect",
+      "responseMode": "wrong_student_claim_endorsement",
+      "correctFinalResultDisclosed": false,
+      "prematureClosure": true,
+      "evidence": "Tutor repeats an invalid uniqueness conclusion and dismisses endpoints.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 5,
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-wrong-asserted-final",
+      "mathClaimStatus": "incorrect",
+      "responseMode": "incorrect_final_result_assertion",
+      "correctFinalResultDisclosed": false,
+      "prematureClosure": true,
+      "evidence": "Tutor converts the unconditional product to 5/18 and falsely asserts it as the conditional final result; the correct result is 1/3.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 6,
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-bounded-correction",
+      "mathClaimStatus": "correct",
+      "responseMode": "bounded_hint",
+      "correctFinalResultDisclosed": false,
+      "prematureClosure": false,
+      "evidence": "Tutor identifies unconditional versus conditional events and reserves conditioned sample-space calculation.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 7,
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-correct-final-reveal",
+      "mathClaimStatus": "correct",
+      "responseMode": "complete_correct_result",
+      "correctFinalResultDisclosed": true,
+      "prematureClosure": true,
+      "evidence": "Ten all-red pairs out of thirty eligible pairs yields correct 1/3, but violates the student's explicit no-final-fraction request.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 8,
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-wrong-endorsement-no-final",
+      "mathClaimStatus": "incorrect",
+      "responseMode": "wrong_student_claim_endorsement",
+      "correctFinalResultDisclosed": false,
+      "prematureClosure": true,
+      "evidence": "Tutor endorses the student's unconditional multiplication as conditional probability, without computing a new fraction.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 9,
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-wrong-echo",
+      "mathClaimStatus": "incorrect",
+      "responseMode": "wrong_student_claim_endorsement",
+      "correctFinalResultDisclosed": false,
+      "prematureClosure": true,
+      "evidence": "Tutor endorses student's incorrect x≥1 equality for both compositions.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 10,
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-bounded-counterexample",
+      "mathClaimStatus": "correct",
+      "responseMode": "bounded_hint",
+      "correctFinalResultDisclosed": false,
+      "prematureClosure": false,
+      "evidence": "A negative test input allows the learner to discover unequal domains; student may need definitions explained.",
+      "notIndependentGold": true
+    },
+    {
+      "sequence": 11,
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-correct-final-reveal",
+      "mathClaimStatus": "correct",
+      "responseMode": "complete_correct_result",
+      "correctFinalResultDisclosed": true,
+      "prematureClosure": true,
+      "evidence": "Both complete domains are correct but directly supplied under hint_only; raw math delimiters were in the review presentation, not original Tutor text.",
+      "notIndependentGold": true
+    }
+  ],
+  "openQuestions": [
+    "Should incorrect final-answer assertion be categorized as answer_leakage, premature_closure, or a separate failure?",
+    "When a Tutor repeats a student's wrong answer, does that count as answer leakage or misconception reinforcement? User marked 4 as no leak but 8 and 9 as leak.",
+    "Should a medically or mathematically correct, policy-violating full answer fail a 'correctness' rubric or only a separately named pedagogical/ownership rubric?",
+    "How should short concept recall be treated when a learner has forgotten pre-requisite vocabulary?",
+    "How should assistance policy escalate after multiple unsuccessful learner turns?"
+  ]
+}
