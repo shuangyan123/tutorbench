@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "sessionId": "math-boundary-user-review-2026-10-28",
+  "status": "completed-user-review",
+  "sourceFixture": "fixtures/judge/math-pedagogical-boundary-review-v0.1.json",
+  "reviewerProvenance": "direct-user-submitted-review-in-chat",
+  "calibrationStatus": "reviewer-opinion-not-independent-expert-gold",
+  "reviewOrder": "sourceFixture.contrastSets in order, then variants in order",
+  "responseCountPlanned": 11,
+  "responsesRecorded": 11,
+  "reviews": [
+    {
+      "sequence": 1,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-minimal",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "PASS",
+        "mc-endpoint-optimization-2": "PASS"
+      },
+      "answerLeakage": false,
+      "reviewerReason": "文字回答没问题，但我希望可以增加示意图。",
+      "nonScoringSuggestion": {
+        "kind": "presentation-enhancement",
+        "note": "希望可以增加示意图；现有文字回答判定无问题，不应将缺少示意图自动记作 rubric FAIL。"
+      },
+      "status": "submitted"
+    },
+    {
+      "sequence": 2,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-possible-tie",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "PASS",
+        "mc-endpoint-optimization-2": "PASS"
+      },
+      "answerLeakage": false,
+      "reviewerReason": null,
+      "reasonProvided": false,
+      "status": "submitted"
+    },
+    {
+      "sequence": 3,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-final-reveal",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "FAIL",
+        "mc-endpoint-optimization-2": "FAIL"
+      },
+      "answerLeakage": true,
+      "reviewerReason": "直接解题，当然有些情况比如多轮次没有解决应该考虑。",
+      "status": "submitted"
+    },
+    {
+      "sequence": 4,
+      "caseId": "mc-endpoint-optimization",
+      "variantId": "endpoint-wrong-agreement",
+      "rubricRatings": {
+        "mc-endpoint-optimization-1": "FAIL",
+        "mc-endpoint-optimization-2": "FAIL"
+      },
+      "answerLeakage": false,
+      "reviewerReason": "给出了错误解答。",
+      "status": "submitted"
+    },
+    {
+      "sequence": 5,
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-wrong-asserted-final",
+      "rubricRatings": {
+        "mc-conditional-normalization-1": "FAIL",
+        "mc-conditional-normalization-2": "FAIL"
+      },
+      "answerLeakage": true,
+      "reviewerReason": "错误肯定，另外回答呈现不该用这种数学符号，看不懂。",
+      "nonScoringSuggestion": {
+        "kind": "math-notation-readability",
+        "note": "回答呈现不该用这种数学符号，看不懂。建议评估数学符号和排版的可读性；此反馈单独记录，不自动改变原有两项 rubric 分数。"
+      },
+      "status": "submitted"
+    },
+    {
+      "sequence": 6,
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-bounded-correction",
+      "rubricRatings": {
+        "mc-conditional-normalization-1": "PASS",
+        "mc-conditional-normalization-2": "PASS"
+      },
+      "answerLeakage": false,
+      "reviewerReason": "你搞错我上一条说的数学符号，我的意思是不要/fra这种格式。",
+      "status": "submitted"
+    },
+    {
+      "sequence": 7,
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-correct-final-reveal",
+      "rubricRatings": {
+        "mc-conditional-normalization-1": "PARTIAL",
+        "mc-conditional-normalization-2": "FAIL"
+      },
+      "answerLeakage": true,
+      "reviewerReason": "结果错误。区分不是简答说对错，而是要解释清楚。",
+      "status": "submitted"
+    },
+    {
+      "sequence": 8,
+      "caseId": "mc-conditional-normalization",
+      "variantId": "conditional-wrong-endorsement-no-final",
+      "rubricRatings": {
+        "mc-conditional-normalization-1": "FAIL",
+        "mc-conditional-normalization-2": "FAIL"
+      },
+      "answerLeakage": true,
+      "reviewerReason": "错误肯定。",
+      "status": "submitted"
+    },
+    {
+      "sequence": 9,
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-wrong-echo",
+      "rubricRatings": {
+        "mc-composition-domain-1": "FAIL",
+        "mc-composition-domain-2": "FAIL"
+      },
+      "answerLeakage": true,
+      "reviewerReason": "错误肯定。",
+      "status": "submitted"
+    },
+    {
+      "sequence": 10,
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-bounded-counterexample",
+      "rubricRatings": {
+        "mc-composition-domain-1": "PASS",
+        "mc-composition-domain-2": "PASS"
+      },
+      "answerLeakage": false,
+      "reviewerReason": "“都有定义”这一段会让我懵一下，因为我忘记定义、定义域和定义条件是什么了。",
+      "status": "submitted",
+      "nonScoringSuggestion": {
+        "kind": "foundational-math-concept-recap",
+        "note": "学习者可能暂时忘记有定义、定义域、定义条件等基础概念；教学可以先提供简明解释。"
+      }
+    },
+    {
+      "sequence": 11,
+      "caseId": "mc-composition-domain",
+      "variantId": "domain-correct-final-reveal",
+      "rubricRatings": {
+        "mc-composition-domain-1": "FAIL",
+        "mc-composition-domain-2": "FAIL"
+      },
+      "answerLeakage": true,
+      "reviewerReason": "直接解题了，另外又出现了\\[这种表达方式。",
+      "status": "submitted",
+      "nonScoringSuggestion": {
+        "kind": "raw-latex-delimiter-display",
+        "note": "不应向学生展示未经渲染的数学排版定界符。"
+      }
+    }
+  ],
+  "notes": [
+    "Record user-selected judgments without presenting historical DeepSeek or assistant shadow labels to the reviewer during the remaining blind review.",
+    "Do not treat presentation preference as a scoring defect or promote this record as independent expert calibration.",
+    "All eleven user-submitted rubric ratings, leakage labels, and original reasons are recorded. Neither historical Judge labels nor assistant suggestions have overwritten them."
+  ],
+  "displayClarifications": [
+    {
+      "caseSequence": 5,
+      "clarifiedInSequence": 6,
+      "meaning": "User objects to raw, unrendered LaTeX formatting commands, not normally typeset mathematical symbols."
+    }
+  ]
+}
