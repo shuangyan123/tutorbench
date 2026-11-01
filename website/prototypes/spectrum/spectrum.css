@@ -221,6 +221,9 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .hero-copy, .hero-hint { opacity: calc(1 - var(--p, 0) * 13.5) !important; }  /* gone after the same ~27vh of scroll as before the cover grew */
 .hero-hint { z-index: 2; }
 .hero[data-narrow] .seq-read { display: none; }
+/* phones and tall windows: a shorter turn (about 1.4 screens), so the masthead arrives before the reader wonders */
+.hero[data-narrow] { height: 240vh; }
+.hero[data-narrow] .hero-copy, .hero[data-narrow] .hero-hint { opacity: calc(1 - var(--p, 0) * 5.2) !important; }  /* the same ~27vh fade over the shorter turn */
 
 .hero-copy {
   position: absolute; z-index: 2; left: max(var(--gutter), env(safe-area-inset-left, 0px)); bottom: clamp(56px, 9vh, 96px); width: min(calc(100% - 2 * var(--gutter)), 640px); border-radius: 22px; padding: clamp(22px, 2.6vw, 36px);
@@ -251,17 +254,17 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .hero-hint { position: absolute; right: max(var(--gutter), env(safe-area-inset-right, 0px)); bottom: 22px; text-align: right; font-size: 10.5px; color: var(--ink-3); letter-spacing: .14em; }
 .hero-hint span[lang="zh-CN"] { font-family: var(--f-ui); letter-spacing: .1em; }
 
-.hero-copy > *, .hero-corner, .hero-hint { opacity: 0; transform: translateY(12px); animation: rise 1.1s cubic-bezier(.2, .7, .2, 1) forwards; }
-.hero-copy > :nth-child(1) { animation-delay: 1.6s; }
-.hero-copy > :nth-child(2) { animation-delay: 1.75s; }
-.hero-copy > :nth-child(3) { animation-delay: 1.95s; }
-.hero-copy > :nth-child(4) { animation-delay: 2.1s; }
-.hero-corner { animation-delay: 2.3s; }
-.hero-hint { animation-delay: 2.8s; }
+.hero-copy > *, .hero-corner, .hero-hint { opacity: 0; transform: translateY(12px); animation: rise .9s cubic-bezier(.2, .7, .2, 1) forwards; }
+.hero-copy > :nth-child(1) { animation-delay: .65s; }
+.hero-copy > :nth-child(2) { animation-delay: .75s; }
+.hero-copy > :nth-child(3) { animation-delay: .85s; }
+.hero-copy > :nth-child(4) { animation-delay: .95s; }
+.hero-corner { animation-delay: 1.1s; }
+.hero-hint { animation-delay: 1.5s; }
 @keyframes rise { to { opacity: 1; transform: none; } }
 /* The glass panel comes in with its first line. Until then it stays hidden, so the web fonts, which
    arrive just after the first paint, settle the copy's height before anyone sees the panel move. */
-.hero-copy { visibility: hidden; animation: panel-in .9s cubic-bezier(.2, .7, .2, 1) 1.45s forwards; }
+.hero-copy { visibility: hidden; animation: panel-in .7s cubic-bezier(.2, .7, .2, 1) .5s forwards; }
 @keyframes panel-in {
   from { visibility: visible; background-color: rgba(214, 222, 242, 0); border-color: rgba(255, 255, 255, 0);
     box-shadow: 0 24px 60px -30px rgba(30, 40, 90, 0), inset 0 1px 0 rgba(255, 255, 255, 0);
@@ -691,7 +694,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
   .hero-copy { animation: none; visibility: visible; }
   [data-reveal] { transform: none; transition: none; }
   .rail::after { --beam: 1; transition: none; }
-  .hero { height: auto; }
+  .hero, .hero[data-narrow] { height: auto; }
   .hero-hint { display: none; }
   .masthead { margin-top: 0; }
 }
@@ -700,7 +703,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 :root[data-motion="reduce"] [data-reveal] { transform: none; transition: none; }
 :root[data-motion="reduce"] .rail::after { --beam: 1; transition: none; }
 :root[data-motion="reduce"] { scroll-behavior: auto; }
-:root[data-motion="reduce"] .hero { height: auto; }
+:root[data-motion="reduce"] .hero, :root[data-motion="reduce"] .hero[data-narrow] { height: auto; }
 :root[data-motion="reduce"] .hero-hint { display: none; }
 :root[data-motion="reduce"] .masthead { margin-top: 0; }
 

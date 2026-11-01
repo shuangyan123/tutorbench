@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "id": "mathematics-exam-locales-v0.1",
+  "version": "0.1.0",
+  "status": "review-guides-only",
+  "purpose": "Reviewer language and exam-system adaptation for established exam profiles. This is not an internationalized product UI or a verified language-of-administration claim.",
+  "fallbackPolicy": "Fallback to original issuer's syllabus and English international review guide; never silently substitute a Chinese exam standard or translated rubric for official local examination requirements.",
+  "entries": [
+    {
+      "profileId": "cn-zhongkao-math-general",
+      "primaryLocale": "zh-CN",
+      "reviewLocale": "zh-CN",
+      "reviewGuide": "docs/mathematics-global-exam-systems-zh-cn-v0.2.md",
+      "supportedReviewLocales": [
+        "zh-CN"
+      ],
+      "examName": "中考数学（地方具体卷别待定）",
+      "adaptationNotes": "Use current Chinese exam syllabus and local/provincial route; do not import SAT, GCSE, AP or GRE test formats."
+    },
+    {
+      "profileId": "cn-gaokao-math-national-2026",
+      "primaryLocale": "zh-CN",
+      "reviewLocale": "zh-CN",
+      "reviewGuide": "docs/mathematics-global-exam-systems-zh-cn-v0.2.md",
+      "supportedReviewLocales": [
+        "zh-CN"
+      ],
+      "examName": "高考数学（2026全国卷参考）",
+      "adaptationNotes": "Use current Chinese exam syllabus and local/provincial route; do not import SAT, GCSE, AP or GRE test formats."
+    },
+    {
+      "profileId": "cn-guokao-aptitude-2027",
+      "primaryLocale": "zh-CN",
+      "reviewLocale": "zh-CN",
+      "reviewGuide": "docs/mathematics-global-exam-systems-zh-cn-v0.2.md",
+      "supportedReviewLocales": [
+        "zh-CN"
+      ],
+      "examName": "国考行测数量关系与资料分析（2027）",
+      "adaptationNotes": "Use current Chinese exam syllabus and local/provincial route; do not import SAT, GCSE, AP or GRE test formats."
+    },
+    {
+      "profileId": "cn-kaoyan-math-1-2027",
+      "primaryLocale": "zh-CN",
+      "reviewLocale": "zh-CN",
+      "reviewGuide": "docs/mathematics-global-exam-systems-zh-cn-v0.2.md",
+      "supportedReviewLocales": [
+        "zh-CN"
+      ],
+      "examName": "考研数学（一）（2027）",
+      "adaptationNotes": "Use current Chinese exam syllabus and local/provincial route; do not import SAT, GCSE, AP or GRE test formats."
+    },
+    {
+      "profileId": "cn-kaoyan-math-2-2027",
+      "primaryLocale": "zh-CN",
+      "reviewLocale": "zh-CN",
+      "reviewGuide": "docs/mathematics-global-exam-systems-zh-cn-v0.2.md",
+      "supportedReviewLocales": [
+        "zh-CN"
+      ],
+      "examName": "考研数学（二）（2027）",
+      "adaptationNotes": "Use current Chinese exam syllabus and local/provincial route; do not import SAT, GCSE, AP or GRE test formats."
+    },
+    {
+      "profileId": "cn-kaoyan-math-3-2027",
+      "primaryLocale": "zh-CN",
+      "reviewLocale": "zh-CN",
+      "reviewGuide": "docs/mathematics-global-exam-systems-zh-cn-v0.2.md",
+      "supportedReviewLocales": [
+        "zh-CN"
+      ],
+      "examName": "考研数学（三）（2027）",
+      "adaptationNotes": "Use current Chinese exam syllabus and local/provincial route; do not import SAT, GCSE, AP or GRE test formats."
+    },
+    {
+      "profileId": "us-sat-math-digital-2026",
+      "primaryLocale": "en-US",
+      "reviewLocale": "en-US",
+      "reviewGuide": "docs/math-locales/en-US/exam-review.md",
+      "supportedReviewLocales": [
+        "en-US"
+      ],
+      "examName": "SAT Math",
+      "adaptationNotes": "Four College Board domains; adaptive digital modules; include multiple-choice and student-produced responses."
+    },
+    {
+      "profileId": "us-ap-calculus-ab-2027",
+      "primaryLocale": "en-US",
+      "reviewLocale": "en-US",
+      "reviewGuide": "docs/math-locales/en-US/exam-review.md",
+      "supportedReviewLocales": [
+        "en-US"
+      ],
+      "examName": "AP Calculus AB",
+      "adaptationNotes": "2027 course/exam update; calculus representations and calculator-specific policies."
+    },
+    {
+      "profileId": "us-ap-calculus-bc-2027",
+      "primaryLocale": "en-US",
+      "reviewLocale": "en-US",
+      "reviewGuide": "docs/math-locales/en-US/exam-review.md",
+      "supportedReviewLocales": [
+        "en-US"
+      ],
+      "examName": "AP Calculus BC",
+      "adaptationNotes": "Different BC topic scope; series and parametric/polar content not inferred from AB."
+    },
+    {
+      "profileId": "uk-gcse-aqa-math-8300-2026",
+      "primaryLocale": "en-GB",
+      "reviewLocale": "en-GB",
+      "reviewGuide": "docs/math-locales/en-GB/exam-review.md",
+      "supportedReviewLocales": [
+        "en-GB"
+      ],
+      "examName": "GCSE Mathematics",
+      "adaptationNotes": "AQA 8300 Foundation/Higher tiers and calculator/non-calculator papers."
+    },
+    {
+      "profileId": "intl-cambridge-igcse-0580-2026",
+      "primaryLocale": "en-GB",
+      "reviewLocale": "en-GB",
+      "reviewGuide": "docs/math-locales/en-GB/exam-review.md",
+      "supportedReviewLocales": [
+        "en-GB"
+      ],
+      "examName": "Cambridge IGCSE Mathematics",
+      "adaptationNotes": "0580 Core/Extended and 2025–2027 assessment syllabus, not its 2028 revision."
+    },
+    {
+      "profileId": "intl-cambridge-alevel-9709-2026",
+      "primaryLocale": "en-GB",
+      "reviewLocale": "en-GB",
+      "reviewGuide": "docs/math-locales/en-GB/exam-review.md",
+      "supportedReviewLocales": [
+        "en-GB"
+      ],
+      "examName": "Cambridge AS & A Level Mathematics",
+      "adaptationNotes": "9709 2026–2027 syllabus and permitted Pure/Mechanics/Statistics paper combinations."
+    },
+    {
+      "profileId": "intl-ib-dp-math-aa-2026",
+      "primaryLocale": "en-001",
+      "reviewLocale": "en-001",
+      "reviewGuide": "docs/math-locales/en-001/ib-dp-review.md",
+      "supportedReviewLocales": [
+        "en-001"
+      ],
+      "examName": "IB DP Mathematics: Analysis and Approaches",
+      "adaptationNotes": "AA SL/HL and 2026 current curriculum, not first-assessment-2029 update."
+    },
+    {
+      "profileId": "intl-ib-dp-math-ai-2026",
+      "primaryLocale": "en-001",
+      "reviewLocale": "en-001",
+      "reviewGuide": "docs/math-locales/en-001/ib-dp-review.md",
+      "supportedReviewLocales": [
+        "en-001"
+      ],
+      "examName": "IB DP Mathematics: Applications and Interpretation",
+      "adaptationNotes": "AI SL/HL, modelling/interpretation and technology appropriately, not lower-level AA."
+    },
+    {
+      "profileId": "intl-gre-general-quant-2026",
+      "primaryLocale": "en-US",
+      "reviewLocale": "en-US",
+      "reviewGuide": "docs/math-locales/en-US/graduate-admissions-review.md",
+      "supportedReviewLocales": [
+        "en-US"
+      ],
+      "examName": "GRE General Test Quantitative Reasoning",
+      "adaptationNotes": "ETS arithmetic, algebra, geometry and data analysis; GRE Math Subject is a different test."
+    },
+    {
+      "profileId": "intl-gmat-quant-data-2026",
+      "primaryLocale": "en-US",
+      "reviewLocale": "en-US",
+      "reviewGuide": "docs/math-locales/en-US/graduate-admissions-review.md",
+      "supportedReviewLocales": [
+        "en-US"
+      ],
+      "examName": "GMAT Exam Quantitative Reasoning / Data Insights",
+      "adaptationNotes": "Different sections, Data Sufficiency and section-level calculator permission."
+    }
+  ]
+}
