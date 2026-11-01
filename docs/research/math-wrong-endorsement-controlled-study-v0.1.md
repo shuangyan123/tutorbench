@@ -85,3 +85,16 @@ A meaningful result is a *consistent boundary* across matched pairs and independ
 - Report output availability, semantic agreement, and learner-outcome evidence separately. **No DeepSeek calls are needed to construct or test this fixture.**
 
 **Preservation rule:** Original user scores and reasons remain untouched. No canonical suites, scorer, original contrast corpus, or live Judge prompt are modified by this research stage.
+
+
+## Reproducible blind-packet export
+
+Use the provider-free exporter after checking out this PR branch locally:
+
+```powershell
+node scripts/export-math-wrong-endorsement-blind-review.mjs --seed 20261101 --packet artifacts/math-endorsement-review-packet.json --key artifacts/math-endorsement-sealed-map.json
+```
+
+**Only share the packet with independent reviewers.** The key contains pair IDs, factor values and arm identities; store it separately, do not commit participant ratings into it, and reveal it only after all reviews are frozen. The exporter makes deterministic anonymous IDs `T01`–`T14`, shuffles arms with the specified seed, and forbids paired arms from appearing adjacently. Its tests check that no source labels, pair IDs, factor names, or existing Judge results are present in the reviewer packet.
+
+The packet's `ratings: null` is intentional. Neither script nor tests synthesize human verdicts.
