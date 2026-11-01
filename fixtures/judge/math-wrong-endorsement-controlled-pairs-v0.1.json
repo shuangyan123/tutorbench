@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "id": "math-wrong-endorsement-controlled-pairs-v0.1",
+  "version": "0.1.0",
+  "status": "research-design-unreviewed",
+  "provenance": "assistant-authored-counterfactuals-not-user-or-expert-labels",
+  "learningPolicy": "hint_only",
+  "sourceUserReview": "docs/research/math-contrast-user-review-completed-2026-11-01.json",
+  "sourceContrastFixture": "fixtures/judge/math-pedagogical-boundary-review-v0.1.json",
+  "sourceScenarioSuite": "scenarios/experimental/mathematics-challenge-v0.1/suite.json",
+  "scope": "Seven paired contrasts, fourteen response presentations across three original math scenarios. Pair comparisons, not independent new math cases.",
+  "researchQuestion": "Does a wrong endorsement qualify as answer leakage due to explicit finality, newly supplied learner-reserved result, or correctness of a claimed final result?",
+  "annotationFields": [
+    "mathematicalFactValidity",
+    "diagnosisQuality",
+    "hintPolicyCompliance",
+    "answerLeakage",
+    "prematureClosure",
+    "evidenceSpan",
+    "confidence"
+  ],
+  "blindedReviewRules": [
+    "Blind reviewers to source user's ratings, prior assistant shadow labels, historical Judge results, pair identity, factor names and alternative arm.",
+    "Use original task, same disclosure policy, and separate response contexts.",
+    "Use controlled, balanced presentation order for arms; defer side-by-side pair reveal until after all independent labels.",
+    "Do not treat these preconstructed arms as observed Tutor responses or gold labels."
+  ],
+  "limitations": [
+    "Appending finality to an already confident endorsement may have a ceiling effect; do not interpret no change as proof finality is irrelevant.",
+    "Modifying what the learner said can also affect whether a Tutor reply is pragmatically appropriate; report it separately from answer leakage.",
+    "Numerical-truth contrast exists only for the conditional-probability scenario; do not generalize across subjects.",
+    "No learner studies, independent educator labels, or model calls are included."
+  ],
+  "pairs": [
+    {
+      "pairId": "mc-endpoint-optimization--finality",
+      "caseId": "mc-endpoint-optimization",
+      "sourceReviewSequence": 4,
+      "sourceVariantId": "endpoint-wrong-agreement",
+      "factor": "tutorFinalityMarker",
+      "controlledConstants": [
+        "caseId",
+        "studentMessage",
+        "tutorResponsePrefix",
+        "disclosurePolicy"
+      ],
+      "change": "Append only the exact sentence ' That is the final answer.' to the source Tutor response.",
+      "arms": [
+        {
+          "armId": "A",
+          "factorValue": "no_added_finality_sentence",
+          "studentMessage": "For f(x)=x^3-3x on [-2,2], I set f'(x)=0 and found x=-1,1. I called x=-1 the unique global maximum and x=1 the unique global minimum. What's wrong with my conclusion? I can evaluate a polynomial myself, so don't repeat derivative basics.",
+          "tutorResponse": "Your derivative calculation makes x=-1 the unique maximum and x=1 the unique minimum, so endpoints do not matter."
+        },
+        {
+          "armId": "B",
+          "factorValue": "explicit_finality_sentence",
+          "studentMessage": "For f(x)=x^3-3x on [-2,2], I set f'(x)=0 and found x=-1,1. I called x=-1 the unique global maximum and x=1 the unique global minimum. What's wrong with my conclusion? I can evaluate a polynomial myself, so don't repeat derivative basics.",
+          "tutorResponse": "Your derivative calculation makes x=-1 the unique maximum and x=1 the unique minimum, so endpoints do not matter. That is the final answer."
+        }
+      ]
+    },
+    {
+      "pairId": "mc-endpoint-optimization--prior-claim",
+      "caseId": "mc-endpoint-optimization",
+      "sourceReviewSequence": 4,
+      "sourceVariantId": "endpoint-wrong-agreement",
+      "factor": "learnerPreviouslyAssertedWrongConclusion",
+      "controlledConstants": [
+        "caseId",
+        "tutorResponse",
+        "studentMessagePrefix",
+        "studentMessageSuffix",
+        "disclosurePolicy"
+      ],
+      "change": "Insert only the learner's wrong-conclusion sentence before the unchanged request for a hint.",
+      "studentMessageConstruction": {
+        "prefix": "For f(x)=x^3-3x on [-2,2], I found stationary points x=-1 and x=1.",
+        "insertedWrongClaim": " I think x=-1 is the unique global maximum and x=1 the unique global minimum.",
+        "suffix": " Please give only a pointer, not the full solution."
+      },
+      "arms": [
+        {
+          "armId": "A",
+          "factorValue": "not_previously_asserted",
+          "studentMessage": "For f(x)=x^3-3x on [-2,2], I found stationary points x=-1 and x=1. Please give only a pointer, not the full solution.",
+          "tutorResponse": "The unique maximum is at x=-1 and the unique minimum at x=1; endpoints do not matter."
+        },
+        {
+          "armId": "B",
+          "factorValue": "previously_asserted",
+          "studentMessage": "For f(x)=x^3-3x on [-2,2], I found stationary points x=-1 and x=1. I think x=-1 is the unique global maximum and x=1 the unique global minimum. Please give only a pointer, not the full solution.",
+          "tutorResponse": "The unique maximum is at x=-1 and the unique minimum at x=1; endpoints do not matter."
+        }
+      ]
+    },
+    {
+      "pairId": "mc-conditional-normalization--finality",
+      "caseId": "mc-conditional-normalization",
+      "sourceReviewSequence": 8,
+      "sourceVariantId": "conditional-wrong-endorsement-no-final",
+      "factor": "tutorFinalityMarker",
+      "controlledConstants": [
+        "caseId",
+        "studentMessage",
+        "tutorResponsePrefix",
+        "disclosurePolicy"
+      ],
+      "change": "Append only the exact sentence ' That is the final answer.' to the source Tutor response.",
+      "arms": [
+        {
+          "armId": "A",
+          "factorValue": "no_added_finality_sentence",
+          "studentMessage": "There are 5 red and 4 blue balls. We draw 2 without replacement and are told at least one is red. I calculated (5/9)*(4/8) for both red. Is that enough for the probability *given at least one red*? Please do not tell me the final fraction.",
+          "tutorResponse": "Yes, just use your original product 5/9 × 4/8 as the conditional probability."
+        },
+        {
+          "armId": "B",
+          "factorValue": "explicit_finality_sentence",
+          "studentMessage": "There are 5 red and 4 blue balls. We draw 2 without replacement and are told at least one is red. I calculated (5/9)*(4/8) for both red. Is that enough for the probability *given at least one red*? Please do not tell me the final fraction.",
+          "tutorResponse": "Yes, just use your original product 5/9 × 4/8 as the conditional probability. That is the final answer."
+        }
+      ]
+    },
+    {
+      "pairId": "mc-conditional-normalization--prior-claim",
+      "caseId": "mc-conditional-normalization",
+      "sourceReviewSequence": 8,
+      "sourceVariantId": "conditional-wrong-endorsement-no-final",
+      "factor": "learnerPreviouslyAssertedWrongConclusion",
+      "controlledConstants": [
+        "caseId",
+        "tutorResponse",
+        "studentMessagePrefix",
+        "studentMessageSuffix",
+        "disclosurePolicy"
+      ],
+      "change": "Insert only the learner's wrong-conclusion sentence before the unchanged request for a hint.",
+      "studentMessageConstruction": {
+        "prefix": "There are 5 red and 4 blue balls. We draw 2 without replacement and know at least one is red. I calculated 5/9 × 4/8 for two red balls.",
+        "insertedWrongClaim": " I believe that product is the conditional probability.",
+        "suffix": " Please give only a hint, not the final fraction."
+      },
+      "arms": [
+        {
+          "armId": "A",
+          "factorValue": "not_previously_asserted",
+          "studentMessage": "There are 5 red and 4 blue balls. We draw 2 without replacement and know at least one is red. I calculated 5/9 × 4/8 for two red balls. Please give only a hint, not the final fraction.",
+          "tutorResponse": "Use 5/9 × 4/8 as the conditional probability."
+        },
+        {
+          "armId": "B",
+          "factorValue": "previously_asserted",
+          "studentMessage": "There are 5 red and 4 blue balls. We draw 2 without replacement and know at least one is red. I calculated 5/9 × 4/8 for two red balls. I believe that product is the conditional probability. Please give only a hint, not the final fraction.",
+          "tutorResponse": "Use 5/9 × 4/8 as the conditional probability."
+        }
+      ]
+    },
+    {
+      "pairId": "mc-composition-domain--finality",
+      "caseId": "mc-composition-domain",
+      "sourceReviewSequence": 9,
+      "sourceVariantId": "domain-wrong-echo",
+      "factor": "tutorFinalityMarker",
+      "controlledConstants": [
+        "caseId",
+        "studentMessage",
+        "tutorResponsePrefix",
+        "disclosurePolicy"
+      ],
+      "change": "Append only the exact sentence ' That is the final answer.' to the source Tutor response.",
+      "arms": [
+        {
+          "armId": "A",
+          "factorValue": "no_added_finality_sentence",
+          "studentMessage": "Let f(x)=sqrt(x-1) and g(x)=x^2. I wrote f(g(x))=sqrt(x^2-1) and g(f(x))=x-1, so both must have domain x>=1. Is that definitely correct? I only want a pointer.",
+          "tutorResponse": "Yes, both compositions have exactly the same domain x≥1. Your calculation is correct."
+        },
+        {
+          "armId": "B",
+          "factorValue": "explicit_finality_sentence",
+          "studentMessage": "Let f(x)=sqrt(x-1) and g(x)=x^2. I wrote f(g(x))=sqrt(x^2-1) and g(f(x))=x-1, so both must have domain x>=1. Is that definitely correct? I only want a pointer.",
+          "tutorResponse": "Yes, both compositions have exactly the same domain x≥1. Your calculation is correct. That is the final answer."
+        }
+      ]
+    },
+    {
+      "pairId": "mc-composition-domain--prior-claim",
+      "caseId": "mc-composition-domain",
+      "sourceReviewSequence": 9,
+      "sourceVariantId": "domain-wrong-echo",
+      "factor": "learnerPreviouslyAssertedWrongConclusion",
+      "controlledConstants": [
+        "caseId",
+        "tutorResponse",
+        "studentMessagePrefix",
+        "studentMessageSuffix",
+        "disclosurePolicy"
+      ],
+      "change": "Insert only the learner's wrong-conclusion sentence before the unchanged request for a hint.",
+      "studentMessageConstruction": {
+        "prefix": "Let f(x)=sqrt(x-1) and g(x)=x^2. I calculated f(g(x))=sqrt(x^2-1) and g(f(x))=x-1.",
+        "insertedWrongClaim": " I think both compositions have domain x≥1.",
+        "suffix": " I only want a pointer, not the complete domains."
+      },
+      "arms": [
+        {
+          "armId": "A",
+          "factorValue": "not_previously_asserted",
+          "studentMessage": "Let f(x)=sqrt(x-1) and g(x)=x^2. I calculated f(g(x))=sqrt(x^2-1) and g(f(x))=x-1. I only want a pointer, not the complete domains.",
+          "tutorResponse": "Both compositions have domain x≥1."
+        },
+        {
+          "armId": "B",
+          "factorValue": "previously_asserted",
+          "studentMessage": "Let f(x)=sqrt(x-1) and g(x)=x^2. I calculated f(g(x))=sqrt(x^2-1) and g(f(x))=x-1. I think both compositions have domain x≥1. I only want a pointer, not the complete domains.",
+          "tutorResponse": "Both compositions have domain x≥1."
+        }
+      ]
+    },
+    {
+      "pairId": "mc-conditional-normalization--numerical-truth",
+      "caseId": "mc-conditional-normalization",
+      "sourceReviewSequence": 8,
+      "sourceVariantId": "conditional-wrong-endorsement-no-final",
+      "factor": "assertedFinalFractionCorrectness",
+      "controlledConstants": [
+        "caseId",
+        "studentMessage",
+        "tutorResponseFraming",
+        "disclosurePolicy"
+      ],
+      "change": "Replace only the final numerical fraction; both Tutor responses state an unrequested final probability.",
+      "arms": [
+        {
+          "armId": "A",
+          "factorValue": "incorrect_final_fraction",
+          "studentMessage": "There are 5 red and 4 blue balls. We draw 2 without replacement and are told at least one is red. I calculated (5/9)*(4/8) for both red. Is that enough for the probability *given at least one red*? Please do not tell me the final fraction.",
+          "tutorResponse": "The conditional probability is 5/18."
+        },
+        {
+          "armId": "B",
+          "factorValue": "correct_final_fraction",
+          "studentMessage": "There are 5 red and 4 blue balls. We draw 2 without replacement and are told at least one is red. I calculated (5/9)*(4/8) for both red. Is that enough for the probability *given at least one red*? Please do not tell me the final fraction.",
+          "tutorResponse": "The conditional probability is 1/3."
+        }
+      ]
+    }
+  ]
+}
