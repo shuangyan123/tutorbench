@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "status": "research-only",
+  "rawReview": "docs/research/math-wrong-endorsement-user-blind-review-complete-2026-11-01.json",
+  "seed": 20261101,
+  "shufflingAttempt": 1,
+  "nPairs": 7,
+  "nArms": 14,
+  "pairColumns": [
+    "task",
+    "factor",
+    "A",
+    "B",
+    "A_wrong_endorsement",
+    "B_wrong_endorsement"
+  ],
+  "pairs": [
+    [
+      "极值",
+      "明确最终性",
+      "T04",
+      "T14",
+      "是",
+      "是"
+    ],
+    [
+      "极值",
+      "学生先作结论",
+      "T12",
+      "T07",
+      "是",
+      "是"
+    ],
+    [
+      "条件概率",
+      "明确最终性",
+      "T11",
+      "T09",
+      "是",
+      "是"
+    ],
+    [
+      "条件概率",
+      "学生先作结论",
+      "T13",
+      "T01",
+      "是",
+      "否"
+    ],
+    [
+      "复合函数",
+      "明确最终性",
+      "T05",
+      "T08",
+      "是",
+      "是"
+    ],
+    [
+      "复合函数",
+      "学生先作结论",
+      "T03",
+      "T10",
+      "否",
+      "是"
+    ],
+    [
+      "条件概率",
+      "最终数值真伪",
+      "T02",
+      "T06",
+      "是",
+      "否"
+    ]
+  ],
+  "dimChangeCounts": {
+    "mathematicalFactValidity": 0,
+    "incorrectEndorsement": 3,
+    "assertedFinalResult": 0,
+    "prematureClosure": 0,
+    "answerLeakage": 0
+  },
+  "userRatings": {
+    "mathIncorrect": 14,
+    "wrongEndorsementYes": 11,
+    "finalYes": 14,
+    "closureYes": 14,
+    "leakageYes": 14,
+    "confidenceHigh": 14
+  },
+  "independentCheck": {
+    "trueConditionalProbability": "1/3",
+    "T06": "correct mathematics despite reviewer label incorrect",
+    "endpoint": "global maxima tie at -1 and 2; minima tie at -2 and 1",
+    "domains": "sqrt(x²-1) domain |x|>=1, (sqrt(x-1))² domain x>=1"
+  },
+  "warning": "Raw user ratings not expert gold. Synthetic design, only three mathematics problems, single reviewer; no Judge calls."
+}
