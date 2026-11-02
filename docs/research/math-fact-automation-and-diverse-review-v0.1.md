@@ -16,7 +16,7 @@ The completed blind review repeated three mathematical questions across seven A/
 
 `fixtures/judge/math-diverse-human-review-candidates-v0.1.json` has 12 distinct topics: equations, fractions, proportions, geometry, conditional coin probability, inequalities, logarithms, differentiation, quadratics, percentage growth, systems and absolute values. It contains 10 hint-only and 2 full-solution-allowed scenarios, different student states, and a mix of bounded hints, wrong endorsements, over-disclosures and appropriate full solutions. The `probeIntent` fields are researcher hypotheses and must be hidden from blind reviewers. Every `humanRatings` value remains null.
 
-**Blocking gate:** The mathematical references for these 12 NEW candidates are intentionally `pending_structured_reference`. The implemented automated math verifier covers only the THREE ORIGINAL math task structures and their 14 counterfactual arms. Do not send the candidates for gold labeling, infer model performance, or silently assume their math claims are verified until separate mathematical reference tests are added.
+**Structured reference gate implemented:** The 12 research candidates now have source-pinned inputs in `fixtures/judge/math-diverse-structured-math-references-v0.1.json` and a separate deterministic verifier, `scripts/verify-math-diverse-candidates.mjs`. This does not convert free-form Tutor text to a complete mathematical proof, score pedagogy, or produce educator gold. Only a small, explicit set of final-claim patterns can be verified; four hint-like responses are categorized as `no_final_result_claim`, which does **not** mean every sentence was mathematically audited. Source drift or unsupported wording yields `unverified`, and strict mode fails until resolved. All review labels remain null.
 
 ## Anti-repetition and verification policy
 
@@ -26,13 +26,16 @@ The completed blind review repeated three mathematical questions across seven A/
 - Ask at least two independent qualified educational reviewers before calibrating ambiguity and report disagreements; human ratings are not expert gold automatically.
 - Verify 14 fixture arms are recognized with exactly one true and 13 false mathematical assertions; any unknown claim must remain `unverified` and strict mode must exit with nonzero status.
 - Guard 12 candidate topics, distinct response strings, mixed disclosure policies and absence of prefilled user labels with tests.
+- Cross-check each structured task's source message, compute twelve mathematical references, and use positive/negative/adversarial counterexamples for assertions and unknown wording.
 - No production rubric, historic Judge result, frozen 14 labels or canonical suite is modified in this research stage.
 
 ## Commands
 
     node scripts/verify-math-assertions.mjs --require-full-coverage
     node scripts/verify-math-assertions.mjs --output artifacts/math-assertion-verification.json
+    node scripts/verify-math-diverse-candidates.mjs --require-full-coverage
+    node scripts/verify-math-diverse-candidates.mjs --output artifacts/math-diverse-reference-verification.json
     npm run build
-    node --test dist/tests/math-assertion-verifier.test.js dist/tests/math-diverse-human-review-candidates.test.js
+    node --test dist/tests/math-assertion-verifier.test.js dist/tests/math-diverse-human-review-candidates.test.js dist/tests/math-diverse-structured-reference.test.js
 
-These scripts are deterministic and require no API key. The generated JSON report reports reference values, every claim outcome and unverified coverage separately from student-learning and answer-leakage scores.
+The diverse verifier's expected initial counts are 4 mathematically correct final assertions, 4 mathematically incorrect final assertions, 4 recognized responses with no asserted final result, and 0 unverified. These are synthetic-case verification counts, NOT tutoring-success rates. Both scripts are deterministic and require no API key. Their generated reports keep mathematical claim outcomes separate from student-learning and answer-leakage scores.
