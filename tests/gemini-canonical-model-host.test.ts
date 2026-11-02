@@ -60,12 +60,13 @@ async function fixture(t: TestContext, options: {
   readonly raw?: string;
   readonly transport?: Transport;
   readonly timeoutMs?: number;
+  readonly model?: string;
 } = {}) {
   const calls: { url: string; init: RequestInit; body: Record<string, unknown> }[] = [];
   const warnings: unknown[][] = [];
   t.mock.method(console, "warn", (...args: unknown[]) => { warnings.push(args); });
   t.mock.method(console, "error", (...args: unknown[]) => { warnings.push(args); });
-  const server = await startServer({ ...readConfiguration(environment), timeoutMs: options.timeoutMs ?? 2000 }, async (url, init) => {
+  const server = await startServer({ ...readConfiguration({ ...environment, GEMINI_MODEL: options.model ?? environment.GEMINI_MODEL }), timeoutMs: options.timeoutMs ?? 2000 }, async (url, init) => {
     assert.ok(init);
     // 唯一 SDK 网络入口完全替换，不允许回退到真实 fetch。
     calls.push({ url, init, body: JSON.parse(String(init.body)) as Record<string, unknown> });
@@ -126,6 +127,30 @@ test("Gemini official SDK preserves system and every turn, native controls, fina
     contents: messages.slice(1).map(({ role, content }) => ({ role: role === "assistant" ? "model" : "user", parts: [{ text: content }] })),
     generationConfig: { maxOutputTokens: 321, candidateCount: 1, responseModalities: ["TEXT"] },
   });
+  assert.deepEqual(host.warnings, []);
+});
+
+test("Gemini 3.8 Flash SDK request omits unsupported candidateCount and makes one call", async (t) => {
+  const host = await fixture(t, { model: "gemini-3.8-flash" });
+  const response = await host.send();
+  assert.equal(response.status, 200);
+  assert.equal((response.body as { output: { text: string } }).output.text, "Visible answer.");
+  assert.equal(host.calls.length, 1);
+  const request = host.calls[0]!;
+  assert.equal(request.url, "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent");
+  assert.equal(new Headers(request.init.headers).get("x-goog-api-key"), environment.GEMINI_API_KEY);
+  const baselinePacket = await packet();
+  assert.deepEqual(request.body, {
+    systemInstruction: { parts: [{ text: baselinePacket.cases[0]!.messages[0]!.content }] },
+    contents: baselinePacket.cases[0]!.messages.slice(1).map(({ role, content }) => ({
+      role: role === "assistant" ? "model" : "user", parts: [{ text: content }],
+    })),
+    generationConfig: {
+      maxOutputTokens: baselinePacket.generationSpec.maxOutputTokens,
+      responseModalities: ["TEXT"],
+    },
+  });
+  assert.equal(Object.hasOwn(request.body.generationConfig as object, "candidateCount"), false);
   assert.deepEqual(host.warnings, []);
 });
 

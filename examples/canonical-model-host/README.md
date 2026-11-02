@@ -127,6 +127,60 @@ run, and only after reviewing it consider the complete 24-case run. The exact
 sequence and ignored artifact paths are documented in
 [`docs/first-real-baseline.md`](../../docs/first-real-baseline.md).
 
+## Gemini 3.8 Flash first smoke (2026-11-02)
+
+Google's official stable model ID is `gemini-3.8-flash`. This host uses the
+existing `models.generateContent` boundary, disables automatic retry and
+continuation, and omits the Gemini 3-incompatible `candidateCount` parameter.
+Google's default thinking level is medium; the benchmark's original generation
+spec does **not** attest a particular thinking level. Do not label it as low
+or deterministic. Google model aliases, availability, quota and model snapshots
+must be checked at the provider account; versioned model ID is not a pinned
+weights digest.
+
+A provider-free dry run (zero API calls) is:
+
+```powershell
+npm ci
+npm run build
+$env:GEMINI_MODEL = "gemini-3.8-flash"
+node dist/src/cli/tutorbench.js collect-model `
+  --http http://127.0.0.1:9001/generate `
+  --provider google --model $env:GEMINI_MODEL --limit 1 --dry-run
+```
+
+For a **single authorized live call**, the operator must have `GEMINI_API_KEY`
+securely configured in the local shell. Generate the independent host session
+capability in that same shell, then run a host subprocess and one collector
+invocation, both inheriting the capability:
+
+```powershell
+if (-not $env:GEMINI_API_KEY) { throw "Configure GEMINI_API_KEY locally; never paste it into chat." }
+$env:GEMINI_MODEL = "gemini-3.8-flash"
+$env:CANONICAL_MODEL_HOST_TOKEN = [Convert]::ToHexString(
+  [Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant()
+$hostProcess = Start-Process node -ArgumentList 'examples/canonical-model-host/gemini-server.mjs' -PassThru
+try {
+  node dist/src/cli/tutorbench.js collect-model `
+    --http http://127.0.0.1:9001/generate `
+    --provider google --model $env:GEMINI_MODEL `
+    --timeout-ms 65000 --limit 1 `
+    --corpus-id preliminary-gemini38-smoke-20261102-001 `
+    --output artifacts/real-model/preliminary-gemini38-smoke-20261102-001.corpus.json `
+    --report artifacts/real-model/preliminary-gemini38-smoke-20261102-001.report.json
+} finally {
+  Stop-Process -Id $hostProcess.Id -ErrorAction SilentlyContinue
+  Remove-Item Env:CANONICAL_MODEL_HOST_TOKEN -ErrorAction SilentlyContinue
+}
+```
+
+The collector will fail rather than silently retry if the host is not ready.
+Do not call this a live-success record unless the report shows one successful
+`recorded_model` response and zero collection failures. It is preliminary,
+unreviewed, and not leaderboard-eligible. Check AI Studio quota, billing
+project/tier and data policy before the live call. Running the host alone
+makes no provider call.
+
 ## Google AI Studio Gemini host
 
 `gemini-server.mjs` uses the official [`@google/genai` SDK](https://github.com/googleapis/js-genai),
@@ -216,8 +270,10 @@ flattening. Later system messages or consecutive assistant messages fail
 before any SDK call.
 
 The host calls [`models.generateContent`](https://googleapis.github.io/js-genai/release_docs/classes/models.Models.html)
-once with `candidateCount: 1`, `responseModalities: ["TEXT"]`, and the packet's
-exact `maxOutputTokens`. It attests only `{ maxOutputTokens: true }`.
+once with `responseModalities: ["TEXT"]` and the packet's exact
+`maxOutputTokens`. For Gemini 2.x it also sends `candidateCount: 1`;
+for Gemini 3.x and newer it omits `candidateCount`, which Google rejects for
+those models. The exactly-one-candidate response validation remains enforced. It attests only `{ maxOutputTokens: true }`.
 Requested `temperature`, `seed`, or `reasoningEffort` fail closed with
 `unsupported_generation_control`; no model-specific sampling/reasoning
 support is assumed. Native thinking defaults remain in effect. No extra

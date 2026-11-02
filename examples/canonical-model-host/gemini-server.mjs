@@ -89,7 +89,8 @@ function requestForPacket(packet, model) {
     config: {
       systemInstruction: { parts: [{ text: system.content }] },
       maxOutputTokens: spec.maxOutputTokens,
-      candidateCount: 1,
+      // Gemini 3+ rejects candidateCount; preserve the 2.x single-candidate request.
+      ...(/^gemini-2(?:\.|-)/u.test(model) ? { candidateCount: 1 } : {}),
       responseModalities: ["TEXT"],
       automaticFunctionCalling: { disable: true },
       // SDK 2.30 默认续传可能追加请求，必须与重试一起关闭。
