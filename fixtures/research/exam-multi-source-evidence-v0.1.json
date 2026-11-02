@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "id": "exam-multi-source-evidence-v0.1",
+  "status": "review_only_no_gold",
+  "policy": {
+    "minimumIndependentlyReviewedPublisherGroupsForGold": 2,
+    "independentlyReviewedLineageRequired": true,
+    "secondHumanPaperReviewRequired": true,
+    "independentMathVerificationRequired": true,
+    "sourceConflictCannotBeMajorityVotedAway": true,
+    "ignoreCopiesAndUnknownLineageAsIndependentVotes": true,
+    "sourceCanNeverBeCertifiedByMutableUrlAlone": true,
+    "claimVerificationRequiresSameStatementAndDomain": true
+  },
+  "collectedAt": "2026-11-02",
+  "cases": [
+    {
+      "caseId": "kaoyan-math-1-2025-q20",
+      "paperId": "kaoyan-math-1-2025",
+      "question": 20,
+      "formalizedClaimId": "cone_outward_flux",
+      "provisionalComputedResult": "-2*sqrt(3)*pi/3",
+      "paperWitness": {
+        "url": "https://edu.xaiu.edu.cn/__local/F/34/3C/E53427A7070AE155EC2FF88073B_9EAE259B_511D6.pdf",
+        "page": 4,
+        "publisherKind": "university_hosted_copy",
+        "statementPageVisuallyCompared": true,
+        "officialExamAuthenticated": false,
+        "secondIndependentHumanReviewer": false,
+        "statementIdentity": "z-axis revolved around x=y=z, outward oriented lateral flux; vector field (x,y+1,z+2)",
+        "statementFingerprinted": false
+      },
+      "sources": [
+        {
+          "id": "pdf-copy-2025-q20",
+          "role": "paper_copy",
+          "url": "https://edu.xaiu.edu.cn/__local/F/34/3C/E53427A7070AE155EC2FF88073B_9EAE259B_511D6.pdf",
+          "publicationGroup": "xaiu-hosted-exam-scan",
+          "claim": null,
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "page 4",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "chen-2025-q20",
+          "role": "worked_solution",
+          "url": "https://kungfu-crab.github.io/posts/2025%E8%80%83%E7%A0%94%E6%95%B0%E5%AD%A6-%E4%B8%80-%E8%A7%A3%E7%AD%94/",
+          "publicationGroup": "kungfu-crab-author",
+          "claim": "-2*sqrt(3)*pi/3",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "section 20, posted 2024-12-23",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "csgraduates-2025-q20",
+          "role": "worked_solution",
+          "url": "https://csgraduates.com/study_methods/math/math1/2025/",
+          "publicationGroup": "csgraduates-editorial",
+          "claim": "-2*sqrt(3)*pi/3",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "question 20, worked divergence formula",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "tsekaluk-2025-q20",
+          "role": "converted_solution",
+          "url": "https://github.com/TsekaLuk/Kaoyan-Math1-Papers/blob/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2025%E5%B9%B4%E6%95%B0%E5%AD%A6%E4%B8%80%E7%9C%9F%E9%A2%98.md",
+          "publicationGroup": "tsekaluk-pdf-conversion",
+          "claim": "sqrt(2)*pi/4-1",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "original Git blob 582683c6623fd24b1e3f46c8ef45112fa31b5beb, Markdown line 467",
+          "hasImmutableContentSnapshot": true
+        },
+        {
+          "id": "kuaiyizhi-2025-q20",
+          "role": "transcription_conflict",
+          "url": "https://www.kuaiyizhi.cn/zh-cn/courses/higher-mathematics/2025-math1-zhenti/",
+          "publicationGroup": "kuaiyizhi-math1",
+          "claim": "not_consistent",
+          "problemAlignment": "contradictory_problem_statement",
+          "lineageReview": "unverified",
+          "locator": "question 20, conflicting revolving-line formula",
+          "hasImmutableContentSnapshot": false
+        }
+      ],
+      "requiredIndependentMathMethods": [
+        "divergence_theorem",
+        "direct_outward_parameterization"
+      ],
+      "recordedIssues": [
+        "incorrect_converted_answer",
+        "conflicting_site_problem_formalization"
+      ]
+    },
+    {
+      "caseId": "kaoyan-math-1-2025-q08",
+      "paperId": "kaoyan-math-1-2025",
+      "question": 8,
+      "formalizedClaimId": "covariance_max_eigenvalue",
+      "provisionalComputedResult": "C",
+      "paperWitness": {
+        "url": "https://edu.xaiu.edu.cn/__local/F/34/3C/E53427A7070AE155EC2FF88073B_9EAE259B_511D6.pdf",
+        "page": 2,
+        "publisherKind": "university_hosted_copy",
+        "statementPageVisuallyCompared": true,
+        "officialExamAuthenticated": false,
+        "secondIndependentHumanReviewer": false,
+        "statementIdentity": "bivariate normal unit marginals, correlation rho in (-1,1), unit coefficient vector; maximize variance",
+        "statementFingerprinted": false
+      },
+      "sources": [
+        {
+          "id": "pdf-copy-2025-q08",
+          "role": "paper_copy",
+          "url": "https://edu.xaiu.edu.cn/__local/F/34/3C/E53427A7070AE155EC2FF88073B_9EAE259B_511D6.pdf",
+          "publicationGroup": "xaiu-hosted-exam-scan",
+          "claim": null,
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "page 2",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "chen-2025-q08",
+          "role": "worked_solution",
+          "url": "https://kungfu-crab.github.io/posts/2025%E8%80%83%E7%A0%94%E6%95%B0%E5%AD%A6-%E4%B8%80-%E8%A7%A3%E7%AD%94/",
+          "publicationGroup": "kungfu-crab-author",
+          "claim": "C",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "section 8",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "csgraduates-2025-q08",
+          "role": "worked_solution",
+          "url": "https://csgraduates.com/study_methods/math/math1/2025/",
+          "publicationGroup": "csgraduates-editorial",
+          "claim": "C",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "question 8",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "kuaiyizhi-2025-q08",
+          "role": "worked_solution",
+          "url": "https://www.kuaiyizhi.cn/zh-cn/courses/higher-mathematics/2025-math1-zhenti/",
+          "publicationGroup": "kuaiyizhi-math1",
+          "claim": "C",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "question 8",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "tsekaluk-2025-q08",
+          "role": "converted_solution",
+          "url": "https://github.com/TsekaLuk/Kaoyan-Math1-Papers/blob/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2025%E5%B9%B4%E6%95%B0%E5%AD%A6%E4%B8%80%E7%9C%9F%E9%A2%98.md",
+          "publicationGroup": "tsekaluk-pdf-conversion",
+          "claim": "unreadable_blank_key",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "source converted answer field",
+          "hasImmutableContentSnapshot": true
+        }
+      ],
+      "requiredIndependentMathMethods": [
+        "covariance_spectrum",
+        "variance_bound"
+      ],
+      "recordedIssues": [
+        "blank_key_in_converted_markdown"
+      ]
+    },
+    {
+      "caseId": "kaoyan-math-2-2022-q02",
+      "paperId": "kaoyan-math-2-2022",
+      "question": 2,
+      "formalizedClaimId": "triangular_double_integral",
+      "provisionalComputedResult": "2/3",
+      "paperWitness": {
+        "url": "https://github.com/TsekaLuk/Kaoyan-Math2-Papers/blob/fd42c56eed412cce0cb97d6bd688f314c78e542e/solutions/2022/math2_2022/math2_2022.md",
+        "page": null,
+        "publisherKind": "third_party_pdf_conversion",
+        "statementPageVisuallyCompared": false,
+        "officialExamAuthenticated": false,
+        "secondIndependentHumanReviewer": false,
+        "statementIdentity": "integral y=0..2, x=y..2 of y/sqrt(1+x^3) dxdy",
+        "statementFingerprinted": false
+      },
+      "sources": [
+        {
+          "id": "math2-md-2022-q02-key",
+          "role": "converted_solution",
+          "url": "https://github.com/TsekaLuk/Kaoyan-Math2-Papers/blob/fd42c56eed412cce0cb97d6bd688f314c78e542e/solutions/2022/math2_2022/math2_2022.md",
+          "publicationGroup": "tsekaluk-math2-conversion",
+          "claim": "D:2",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "converted question 2: choice D=2, reported answer letter D",
+          "hasImmutableContentSnapshot": true
+        },
+        {
+          "id": "math2-md-2022-q02-work",
+          "role": "worked_solution",
+          "url": "https://github.com/TsekaLuk/Kaoyan-Math2-Papers/blob/fd42c56eed412cce0cb97d6bd688f314c78e542e/solutions/2022/math2_2022/math2_2022.md",
+          "publicationGroup": "tsekaluk-math2-conversion",
+          "claim": "2/3",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "same author's worked integral, equivalent expression",
+          "hasImmutableContentSnapshot": true
+        }
+      ],
+      "requiredIndependentMathMethods": [
+        "direct_iterated_integral",
+        "reversed_order_integral"
+      ],
+      "recordedIssues": [
+        "source_key_vs_own_worked_solution",
+        "original_pdf_not_checked"
+      ]
+    }
+  ]
+}
