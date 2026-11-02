@@ -66,7 +66,7 @@ def math_witnesses(formalization):
 def canonical(result, formalization):
     if formalization == "covariance_max_eigenvalue":
         target = 1+S.Abs(S.Symbol("rho",real=True))
-        if S.simplify(result-target)!=0:
+        if S.simplify(result.rewrite(S.Abs)-target)!=0:
             raise AssertionError("covariance_math_disagreement")
         return "C"
     return str(S.simplify(result))
