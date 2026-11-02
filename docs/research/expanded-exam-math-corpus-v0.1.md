@@ -61,3 +61,18 @@ A future release path must require an independent source reviewer, exact problem
 ## Upstream object revalidation
 
 The isolated `Expanded Exam Mathematics Source Integrity` GitHub workflow fetches immutable Git trees for the two main repositories and independently compares all **300 referenced PDF/PNG blob hashes** to the catalog. This checks source identity and drift only; it never extracts copyrighted images or claims an answer is correct. The `npm test` suite additionally injects tampered blob SHAs, duplicate papers, missing question images and fabricated gold statuses to assert failure.
+
+
+## First non-Math-I real-source arithmetic discrepancy (2022 Math II Q2)
+
+The 2022 Math-II source conversion in `TsekaLuk/Kaoyan-Math2-Papers` (blob SHA `a256f908ba4dd13e4e3da861857dce6e19f47c29`) displays answer letter **D**, a displayed **D = 2**, and a worked integral that itself ends in **2/3**. Independently evaluating the *manually formalized transcribed integral* with SymPy also gives **2/3**.
+
+```text
+∫ y=0..2 ∫ x=y..2 y / sqrt(1+x^3) dx dy
+  = ∫ x=0..2 x²/(2 sqrt(1+x³)) dx
+  = (sqrt(9) - sqrt(1))/3 = 2/3.
+```
+
+**Status: conversion inconsistency, NOT proof that the original exam key is D, C or another choice.** The source's C option is visibly garbled, and the original PDF's question and choice layout still require an independent page/image check. The problem does not become a gold-verified exam question merely because an analytic integral is correct.
+
+The separate research workflow runs `scripts/research/check-math2-2022-source-integral.py` against the pinned downloaded Markdown in isolated storage using SymPy 1.14.0. It checks the upstream Git blob identity, the incompatible extracted choice/derivation anchors and an independently calculated exact value. The result is permanently blocked from automatic exam-answer promotion until the original paper is confirmed.
