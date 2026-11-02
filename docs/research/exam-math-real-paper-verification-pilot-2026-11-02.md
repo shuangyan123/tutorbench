@@ -36,3 +36,19 @@ The second command intentionally exits nonzero while even one task remains unver
 3. Replace hardcoded exam-family patterns with a typed general math claim representation and an established symbolic/SMT backend where applicable. Differentiate solution validity from solution-set completeness and conditional domains.
 4. Add out-of-distribution cases, adversarial paraphrases, ambiguous questions, unsupported proofs and human verification. Report coverage, incorrect-pass rate and abstention separately.
 5. Keep study-only until expert review and CI demonstrate reproducibility; no inference of improved pedagogical outcomes.
+
+
+## 2025 Math I OCR/transcription gate (2026-11-02)
+
+A source-version-pinned independent preflight now exists at `scripts/audit-kaoyan-transcription.mjs`. It **does not bundle third-party papers** and requires the operator to provide the original Markdown as `--input`. The pinned Git blob SHA and PDF comparison observations are in `fixtures/research/kaoyan-math1-2025-transcription-audit-v0.1.json`.
+
+```sh
+node scripts/audit-kaoyan-transcription.mjs --input path/to/downloaded/2025-paper.md
+node scripts/audit-kaoyan-transcription.mjs --input path/to/downloaded/2025-paper.md --require-clean
+```
+
+The strict command is **expected to exit nonzero** against the current third-party Markdown. It detects missing option labels/answer fields, unrecognized answer tokens, suspicious extraction glyphs and source SHA drift; it also records separately sourced observations from PDF review. Its source-status names are not mathematical judgments.
+
+Observed risks include missing labels/garbled options in question 4, blank answer marker in question 8, a question/solution radical inconsistency in question 2, and endpoint wording inconsistency in question 3. Those findings require a page-by-page human PDF reconciliation; do not auto-repair formulas from solution guesses. The provisional candidate answer for Q2 is B, but the Q2 option numeric mapping in the old pilot is a **placeholder**, and the existing task remains intentionally `unverified`.
+
+The code-only check does not authenticate the PDF as the official exam. Do not treat a source SHA match as semantic correctness or publish extracted answer keys without independent checking.
