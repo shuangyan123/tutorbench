@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
 import test from 'node:test';
 
-const script='scripts/audit-kaoyan-transcription.mjs';
 const load=async()=>import('../scripts/audit-kaoyan-transcription.mjs') as Promise<{
   gitBlobSha:(v:string)=>string;
   auditTranscription:(v:string,manifest:unknown)=>{status:string;summary:{findings:number;foundChoiceQuestions:number};findings:Array<{code:string;question:number|null}>;source:{sourceMatched:boolean}};
@@ -10,7 +8,7 @@ const load=async()=>import('../scripts/audit-kaoyan-transcription.mjs') as Promi
 function source(choice8=''){
   return ['# 一、选择题',...Array.from({length:10},(_,i)=>{
     const n=i+1;return n+'．题目\\nA．1\\nB．2\\nC．3\\nD．4\\n【答案】'+(n===8?choice8:'B');
-  }).flatMap(x=>x.split('\\n')),'# 二、填空题'].join('\\n').replaceAll('\\\\n','\\n');
+  }).flatMap(x=>x.split(String.fromCharCode(92,110))),'# 二、填空题'].join(String.fromCharCode(10));
 }
 test('transcription gate finds missing answers and refuses a changed source',async()=>{
   const {gitBlobSha,auditTranscription}=await load();
