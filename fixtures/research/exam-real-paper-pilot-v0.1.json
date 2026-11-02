@@ -1,0 +1,165 @@
+{
+  "id": "exam-real-paper-pilot-v0.1",
+  "status": "hand_transcribed_examples_not_educator_gold",
+  "note": "Paraphrased structured mathematical data from cited published examination-paper pages. No student/person data, full paper text, official score or pedagogy labels. Unknown task families remain unverified.",
+  "items": [
+    {
+      "id": "gk25-q1",
+      "exam": "gaokao-national-1",
+      "year": 2025,
+      "question": 1,
+      "sourceUrl": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+      "sourcePage": 1,
+      "family": "complex-times-i-imaginary",
+      "parameters": {
+        "real": 1,
+        "imaginary": 5,
+        "multiplyBy": "i"
+      },
+      "answerFormat": "option",
+      "options": {
+        "A": "-1",
+        "B": "0",
+        "C": "1",
+        "D": "6"
+      },
+      "candidateAnswer": "C"
+    },
+    {
+      "id": "gk25-q2",
+      "exam": "gaokao-national-1",
+      "year": 2025,
+      "question": 2,
+      "sourceUrl": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+      "sourcePage": 1,
+      "family": "finite-complement-count",
+      "parameters": {
+        "universeMaxExclusive": 9,
+        "excluded": [
+          1,
+          3,
+          5
+        ]
+      },
+      "answerFormat": "option",
+      "options": {
+        "A": "2",
+        "B": "3",
+        "C": "5",
+        "D": "8"
+      },
+      "candidateAnswer": "C"
+    },
+    {
+      "id": "gk25-q12",
+      "exam": "gaokao-national-1",
+      "year": 2025,
+      "question": 12,
+      "sourceUrl": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+      "sourcePage": 2,
+      "family": "exp-linear-tangent-shift",
+      "parameters": {
+        "expCoefficient": 1,
+        "linearCoefficient": 1,
+        "tangentAt": 0,
+        "tangentSlope": 2,
+        "tangentIntercept": 5
+      },
+      "answerFormat": "numeric",
+      "candidateAnswer": "4"
+    },
+    {
+      "id": "gk25-q13",
+      "exam": "gaokao-national-1",
+      "year": 2025,
+      "question": 13,
+      "sourceUrl": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+      "sourcePage": 2,
+      "family": "positive-geometric-ratio-from-sums",
+      "parameters": {
+        "sum4": 4,
+        "sum8": 68
+      },
+      "answerFormat": "numeric",
+      "candidateAnswer": "2"
+    },
+    {
+      "id": "gk25-q14",
+      "exam": "gaokao-national-1",
+      "year": 2025,
+      "question": 14,
+      "sourceUrl": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+      "sourcePage": 2,
+      "family": "distinct-draws-expectation",
+      "parameters": {
+        "numberedObjects": 5,
+        "draws": 3,
+        "replacement": true
+      },
+      "answerFormat": "numeric",
+      "candidateAnswer": "61/25"
+    },
+    {
+      "id": "gk26-q1",
+      "exam": "gaokao-national-1",
+      "year": 2026,
+      "question": 1,
+      "sourceUrl": "https://zy.21cnjy.com/25912080",
+      "sourcePage": 1,
+      "family": "odd-sample-median",
+      "parameters": {
+        "values": [
+          6,
+          8,
+          4,
+          5,
+          12
+        ]
+      },
+      "answerFormat": "option",
+      "options": {
+        "A": "5",
+        "B": "6",
+        "C": "8",
+        "D": "9"
+      },
+      "candidateAnswer": "B"
+    },
+    {
+      "id": "ky26-q16",
+      "exam": "kaoyan-math-1",
+      "year": 2026,
+      "question": 16,
+      "sourceUrl": "https://static.kaoyan.cn/file/question/2025/12/27/f3a552ec0d163308d2ac28dc7a10bbd0.pdf",
+      "sourcePage": 4,
+      "family": "poisson-xy-independent-difference",
+      "parameters": {
+        "lambdaX": 1,
+        "lambdaY": 3,
+        "independence": "X independent of X_minus_Y"
+      },
+      "answerFormat": "numeric",
+      "candidateAnswer": "4"
+    },
+    {
+      "id": "ky25-q2",
+      "exam": "kaoyan-math-1",
+      "year": 2025,
+      "question": 2,
+      "sourceUrl": "https://edu.xaiu.edu.cn/__local/F/34/3C/E53427A7070AE155EC2FF88073B_9EAE259B_511D6.pdf",
+      "sourcePage": 1,
+      "family": "two-series-absolute-convergence",
+      "parameters": {
+        "requires": "symbolic-asymptotics-and-integrality"
+      },
+      "answerFormat": "option",
+      "options": {
+        "A": "1",
+        "B": "2",
+        "C": "3",
+        "D": "4"
+      },
+      "candidateAnswer": "D"
+    }
+  ]
+}
