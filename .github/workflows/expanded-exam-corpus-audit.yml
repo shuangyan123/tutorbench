@@ -9,6 +9,9 @@ on:
       - 'scripts/verify-exam-source-upstream-trees.mjs'
       - 'tests/exam-source-expansion.test.ts'
       - 'tests/exam-source-upstream-trees.test.ts'
+      - 'scripts/gate-exam-reference-claims.mjs'
+      - 'fixtures/research/exam-claim-promotion-negative-controls-v0.1.json'
+      - 'tests/exam-claim-promotion-gate.test.ts'
   workflow_dispatch:
 
 permissions:
@@ -43,3 +46,17 @@ jobs:
           node scripts/verify-exam-source-upstream-trees.mjs \
             --gaokao-tree "$RUNNER_TEMP/gaokao-tree.json" \
             --postgrad-tree "$RUNNER_TEMP/kaoyan-tree.json"
+      - name: Reject exam gold promotion of merely symbolic local results
+        run: |
+          node scripts/gate-exam-reference-claims.mjs \
+            --proposals fixtures/research/exam-claim-promotion-negative-controls-v0.1.json \
+            > "$RUNNER_TEMP/promotion-gate.json"
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const d=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/promotion-gate.json","utf8"));
+            if(d.status!=="no_exam_gold_releases" || d.summary.total!==8 ||
+               d.summary.released!==0 || d.summary.blocked!==8) {
+              throw Error("An unreviewed exam claim was incorrectly released");
+            }
+            console.log("All unreviewed exam-source claims remained blocked");
+          '
