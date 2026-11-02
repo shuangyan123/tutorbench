@@ -23,6 +23,22 @@ coverage cells. Their overlap with P-001 is a research question, not a reason to
 create additional scores. The first authored example is
 [cinema seating](v0.1.0/cinema-seating-pilot.md).
 
+## Cross-cutting long-term learner goal (candidate, not P-007)
+
+[Starting Points, Attainable Capability and Avoidable Learning Cost v0.1](../learner-starting-point-and-learning-cost-v0.1.md)
+states a goal-level hypothesis: learning paths should adapt to evidenced
+prerequisites, expand independently attainable capability and reduce
+unnecessary learning costs without lowering the goal or prematurely treating
+one performance as a fixed learner ceiling.
+
+The companion experimental protocol fixes one mathematics objective across
+three authored learner starting points, and reserves uncued immediate, transfer
+and delayed checks for *real* learner work. It does not change P-001–P-006,
+add a new scored principle, register new Tutor Health cases, or claim learner
+outcomes. Independent expert validation is not a prerequisite for self-testing
+and failure discovery, but claims beyond the observed scope still require
+appropriate evidence.
+
 ## Authoring lifecycle and versioning
 
 `candidate → review-ready → empirically supported / contested` describes the
