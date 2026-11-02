@@ -91,6 +91,8 @@ def verify_one(item):
         else:
             domain1 = continuous_domain(expected, SYMBOL, sp.S.Reals)
             domain2 = continuous_domain(candidate, SYMBOL, sp.S.Reals)
+        if domain1.is_empty is True or domain2.is_empty is True:
+            return {**base, **status("unverified", "empty_real_domain")}
         domains_equal = (domain1 == domain2 or
                          (domain1.is_subset(domain2) is True and
                           domain2.is_subset(domain1) is True))
