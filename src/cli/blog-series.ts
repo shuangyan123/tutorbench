@@ -472,6 +472,7 @@ function rewriteMetadata(html: string, post: Article, zh: boolean, url: string):
   return html
     .replace(/<title>[\s\S]*?<\/title>/u, "<title>" + title + "</title>")
     .replace(/<meta name="description" content="[^"]*">/u, '<meta name="description" content="' + description + '">')
+    .replace(/<meta name="robots" content="noindex">/u, '<meta name="robots" content="index,follow">\n<link rel="canonical" href="' + esc(url) + '">\n<meta property="og:title" content="' + title + '">\n<meta property="og:description" content="' + description + '">\n<meta property="og:url" content="' + esc(url) + '">\n<meta name="twitter:title" content="' + title + '">\n<meta name="twitter:description" content="' + description + '">')
     .replace(/<link rel="canonical" href="[^"]*">/u, '<link rel="canonical" href="' + esc(url) + '">')
     .replace(/<meta property="og:title" content="[^"]*">/u, '<meta property="og:title" content="' + title + '">')
     .replace(/<meta property="og:description" content="[^"]*">/u, '<meta property="og:description" content="' + description + '">')
