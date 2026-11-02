@@ -159,7 +159,9 @@
         "C": "3",
         "D": "4"
       },
-      "candidateAnswer": "D"
+      "candidateAnswer": "B",
+      "answerRepresentation": "choice_label_only_placeholder_not_source_options",
+      "sourceIntegrity": "unverified_original_choice_values_are_placeholders"
     }
   ]
 }
