@@ -43,3 +43,25 @@ The first status reports **symbolic consistency under a trusted structured repre
 The Python test suite (12 synthetic fixture cases, plus hostile-input and CLI checks) is run in the **separate** path-filtered GitHub research workflow. Default Node tests and production evaluation do not depend on SymPy or this tool. No reference outputs are connected to canonical TutorBench, student outcomes, Judge ratings or human reviewer labels.
 
 Before expanding this API to real model responses, an expert must separately review input provenance, source problem semantics, function domains, parsing ambiguity, completeness of solution sets, symbolic library reliability, timeout/resource limits and independent reference derivations. This is a necessary building block, not evidence of 100% automatic mathematics coverage.
+
+
+## Complete real solution-set checks (bounded research extension)
+
+The separate `scripts/research/verify-complete-rational-roots.py` evaluates **complete sets of real solutions** for trusted, structured rational-coefficient polynomials of degree at most two. It uses `fractions.Fraction` and `math.isqrt`, with exact rational arithmetic and no numerical approximation. Its claim input must provide `claimKind: "all_real_roots"`, coefficients `a,b,c` (quadratic/linear/constant), an explicit `real` or rational-bounded `interval` domain, and a candidate list of rational roots. It neither parses an exam problem nor infers the intended domain.
+
+```sh
+python scripts/research/verify-complete-rational-roots.py --fixture fixtures/research/bounded-rational-roots-contract-v0.1.json
+python -m unittest scripts/research/test_complete_rational_roots.py -v
+```
+
+The verifier makes the **completeness** assertion explicit: all valid in-domain roots must be present; invalid/extraneous roots must be absent. Outputs are `verified_complete_solution_set`, `refuted_solution_set`, or `unverified`. `unverified` includes irrational roots (not currently representable by the finite rational list), polynomial identities with infinitely many solutions, malformed coefficients, missing domain, and unsupported bounds. A contradiction is not inferred merely from inability to solve. Duplicate entries are normalized as a **set**; `[2,2]` does **not** pass for the distinct required set `{2,3}`, but a polynomial with one double root at 2 legitimately has the set `{2}` (with a duplicate-entry diagnostic). This concerns solution sets, not root multiplicities.
+
+The structured [2025 Math I Q16] *intermediate* assertion is included as a direct real-paper-linked example, not an official answer key: independently translating `P(A)=2P(B)` and `P(A∪B)=5/8` under independence gives, for `p=P(B)`,
+
+```text
+2p² - 3p + 5/8 = 0,    0 ≤ p ≤ 1/2
+```
+
+The algebraic roots are `1/4` and `5/4`, but only `1/4` meets the probability constraint. The fixture rejects the extra root and checks the unique admissible root **without claiming this is the final answer to Q16**. The actual requested conditional probability `4/5` is a further distinct step and must be checked separately; this module does not grade that complete problem or the quality of a written solution.
+
+The example is manually formalized from a university-hosted third-party copy and is **not authenticated official gold**; no PDF images or exam paper prose are bundled. This extension is exercised by an isolated research CI workflow and does not affect production, synthetic canonical scoring, human reviewer labels, or the rest of TutorBench. Mathematical trust extends only to the correctly supplied formal statement and the program's tested exact arithmetic. It does not establish 100% accuracy for all exam questions.
