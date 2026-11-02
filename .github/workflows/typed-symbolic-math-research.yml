@@ -8,6 +8,9 @@ on:
       - 'scripts/research/test_typed_symbolic_claims.py'
       - 'fixtures/research/typed-symbolic-claim-contract-v0.1.json'
       - 'docs/research/typed-symbolic-verifier-contract-v0.1.md'
+      - 'scripts/research/verify-complete-rational-roots.py'
+      - 'scripts/research/test_complete_rational_roots.py'
+      - 'fixtures/research/bounded-rational-roots-contract-v0.1.json'
   workflow_dispatch:
 
 permissions:
@@ -33,3 +36,12 @@ jobs:
             --fixture fixtures/research/typed-symbolic-claim-contract-v0.1.json \
             > "$RUNNER_TEMP/typed-result.json"
           python3 -c "import json,os; d=json.load(open(os.environ['RUNNER_TEMP']+'/typed-result.json')); assert d['summary']=={'total':12,'symbolicallyEqual':3,'counterexamples':2,'unverified':7}; print(d['summary'])"
+
+      - name: Test complete rational solution sets and exam Q16 intermediate claim
+        run: "$RUNNER_TEMP/typed-math/bin/python -m unittest scripts/research/test_complete_rational_roots.py -v"
+      - name: Smoke rational-root CLI with exact counts
+        run: |
+          "$RUNNER_TEMP/typed-math/bin/python" scripts/research/verify-complete-rational-roots.py \
+            --fixture fixtures/research/bounded-rational-roots-contract-v0.1.json \
+            > "$RUNNER_TEMP/roots.json"
+          python3 -c "import json,os; d=json.load(open(os.environ['RUNNER_TEMP']+'/roots.json')); assert d['summary']=={'total':15,'verifiedComplete':7,'refuted':4,'unverified':4}; print(d['summary'])"
