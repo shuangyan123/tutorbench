@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "kaoyan-math2-2022-q02-source-conflict-v0.1",
+  "status": "research-transcription-conflict-no-official-gold",
+  "exam": "kaoyan",
+  "variant": "math-2",
+  "year": 2022,
+  "question": 2,
+  "source": {
+    "repository": "TsekaLuk/Kaoyan-Math2-Papers",
+    "revision": "fd42c56eed412cce0cb97d6bd688f314c78e542e",
+    "path": "solutions/2022/math2_2022/math2_2022.md",
+    "gitBlobSha": "a256f908ba4dd13e4e3da861857dce6e19f47c29",
+    "lines": {
+      "problem": 32,
+      "optionD": 40,
+      "reportedKey": 42,
+      "workedDerivation": 47
+    },
+    "originalPdfVerified": false
+  },
+  "conflict": {
+    "code": "MARKDOWN_KEY_AND_WORKED_VALUE_DISAGREE",
+    "sourceExtractedLetter": "D",
+    "sourceExtractedOptionD": "2",
+    "sourceWorkedValue": "2/3",
+    "sourceExtractedOptionC": "garbled; not reliably parseable",
+    "independentMathFromTranscribedExpression": "2/3",
+    "explanation": "Interchange integration order on the stated triangular region: ∫₀² x²/(2√(1+x³)) dx = (√9−√1)/3 = 2/3. Exact SymPy cross-check also yields 2/3. The Markdown's displayed D value and key do not agree with its own derivation.",
+    "goldStatus": "blocked_until_original_pdf_choice_layout_and_question_text_verified"
+  },
+  "sourceRights": "Third-party converted text; do not reproduce original exam pages or assume source key is official."
+}
