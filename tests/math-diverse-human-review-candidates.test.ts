@@ -32,7 +32,7 @@ test('research candidates vary mathematical tasks and policies without inventing
     assert.ok(item.studentMessage.length >= 60, item.id);
     assert.ok(item.tutorResponse.length >= 25, item.id);
     assert.ok(item.probeIntent.length >= 15, item.id);
-    assert.equal(item.mathVerification, 'pending_structured_reference');
+    assert.equal(item.mathVerification, 'structured_reference_available_unadjudicated');
     assert.equal(item.humanRatings, null);
   }
   assert.equal(text.includes('"goldLabel"'), false);
