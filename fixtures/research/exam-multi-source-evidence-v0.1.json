@@ -225,6 +225,77 @@
         "source_key_vs_own_worked_solution",
         "original_pdf_not_checked"
       ]
+    },
+    {
+      "caseId": "gaokao-2025-national-1-q14",
+      "paperId": "gaokao-2025-national-1",
+      "question": 14,
+      "formalizedClaimId": "distinct_drawing_expectation",
+      "provisionalComputedResult": "61/25",
+      "paperWitness": {
+        "url": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+        "page": 2,
+        "publisherKind": "third_party_recollection_pdf",
+        "statementPageVisuallyCompared": true,
+        "officialExamAuthenticated": false,
+        "secondIndependentHumanReviewer": false,
+        "statementIdentity": "Five equally likely labelled balls drawn three times with replacement; X distinct labels observed; compute E(X)",
+        "statementFingerprinted": false
+      },
+      "sources": [
+        {
+          "id": "gk-paper-2025-q14",
+          "role": "paper_copy",
+          "url": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+          "publicationGroup": "jhgk-mathhub-recollection",
+          "claim": null,
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "page 2, marked recollection version",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "gaokaohub-2025-q14",
+          "role": "worked_solution",
+          "url": "https://gaokaohub.com/paper/2025-xinkebiao-i-math.html",
+          "publicationGroup": "gaokaohub",
+          "claim": "61/25",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "2025 new Gaokao I paper, question 14",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "meloon-2025-q14",
+          "role": "worked_solution",
+          "url": "https://exam.meloon.top/paper/paper-gk-math-2025-xhgk1/",
+          "publicationGroup": "meloon-exam",
+          "claim": "61/25",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "2025 new Gaokao I paper, question 14",
+          "hasImmutableContentSnapshot": false
+        },
+        {
+          "id": "gaokaowiki-2025-q14",
+          "role": "worked_solution",
+          "url": "https://gaokaowiki.com/math/%E7%9C%9F%E9%A2%98/%E6%B5%99%E6%B1%9F/2025/q14/",
+          "publicationGroup": "gaokaowiki",
+          "claim": "61/25",
+          "problemAlignment": "matching",
+          "lineageReview": "unverified",
+          "locator": "Zhejiang province shares new Gaokao I paper; question 14",
+          "hasImmutableContentSnapshot": false
+        }
+      ],
+      "requiredIndependentMathMethods": [
+        "indicator_linearity",
+        "enumerated_occupancy_counts"
+      ],
+      "recordedIssues": [
+        "original_copy_explicitly_recollection",
+        "publisher_lineage_unverified"
+      ]
     }
   ]
 }
