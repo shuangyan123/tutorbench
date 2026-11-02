@@ -14,7 +14,8 @@ def verify():
             raise AssertionError(f"Q{number}: {actual} != {expected}")
         items[str(number)]={"checkedScope":scope,"evidence":"symbolic_consistency",
                             "derived":str(S.simplify(actual))}
-    x,a,b,u,rho=S.symbols("x a b u rho",real=True)
+    x,a,b,rho=S.symbols("x a b rho",real=True)
+    u=S.symbols("u",positive=True)
     q5=S.Matrix([[1,1,1],[1,0,0],[1,0,0]])
     check(5,sum(mult for eig,mult in q5.eigenvals().items() if eig.is_positive),
           S.Integer(1),"positive inertia index")
