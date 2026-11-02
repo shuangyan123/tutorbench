@@ -508,7 +508,7 @@ export async function publishLearningAccessSeries(options: PublishOptions): Prom
     const template = await readFile(join(root,"blog/why-teaching-does-not-scale/index.html"),"utf8");
     const indexPath = join(root,"blog/index.html");
     const index = await readFile(indexPath,"utf8");
-    if (!index.includes('class="jx-premise"')) throw new Error("Journal index structure changed");
+    if (!index.includes('<section class="wrap jx-premise"')) throw new Error("Journal index structure changed");
     const updated = index.replace('<section class="wrap jx-premise"', seriesContents() + '\n<section class="wrap jx-premise"')
       .replaceAll("4 essays","9 essays").replaceAll("4 篇文章","9 篇文章");
     await writeFile(indexPath, updated,"utf8");
