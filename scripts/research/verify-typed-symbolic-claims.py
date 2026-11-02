@@ -91,7 +91,9 @@ def verify_one(item):
         else:
             domain1 = continuous_domain(expected, SYMBOL, sp.S.Reals)
             domain2 = continuous_domain(candidate, SYMBOL, sp.S.Reals)
-        domains_equal = domain1.equals(domain2)
+        domains_equal = (domain1 == domain2 or
+                         (domain1.is_subset(domain2) is True and
+                          domain2.is_subset(domain1) is True))
         if domains_equal is not True:
             return {**base, **status("unverified", "domain_not_proven_equal")}
         difference = sp.simplify(expected - candidate)
