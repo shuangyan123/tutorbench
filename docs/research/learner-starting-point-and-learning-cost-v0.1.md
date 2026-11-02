@@ -126,3 +126,10 @@ a public leaderboard, or background tracking.
 Next practical step: run the protocol on a genuinely unfamiliar concept with
 recorded independent attempts, review incorrect Tutor actions, and convert
 confirmed patterns into narrowly scoped experimental regression scenarios.
+
+## Merge-time validation boundary
+
+This protocol is a non-canonical research artifact, not a validated model-quality
+measure. CI, CodeQL, and dependency checks verify implementation hygiene, not
+learning effectiveness. Keep all real learner observations, claimed causal
+benefits, and generalization evidence out of scope until independently tested.
