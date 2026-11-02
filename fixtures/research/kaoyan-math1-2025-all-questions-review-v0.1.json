@@ -12,7 +12,7 @@
     "markdownGitBlobSha": "582683c6623fd24b1e3f46c8ef45112fa31b5beb"
   },
   "status": "research-only-no-official-key",
-  "notes": "All 22 numbered problems visually inventoried against 4-page non-official PDF. Provisional reference notes are NOT exam gold. Independently checked = bounded mathematics cross-check in opt-in SymPy script; it may certify only a portion of multi-part answer. Unreviewed proofs remain unresolved. Source material not reproduced.",
+  "notes": "All 22 numbered problems visually inventoried against 4-page non-official PDF. Provisional reference notes are NOT exam gold. Independently checked = bounded mathematics cross-check in research SymPy cross-check script (also used by independent CI); it may certify only a portion of multi-part answer. Unreviewed proofs remain unresolved. Source material not reproduced.",
   "items": [
     {
       "id": "ky2025-q01",
@@ -22,9 +22,9 @@
       ],
       "kind": "selection",
       "provisionalReference": "B",
-      "independentlyChecked": false,
+      "independentlyChecked": true,
       "sourceQuality": "pending_manual_proof",
-      "reviewNote": "Extremum/inflection verification not yet run through symbolic checks",
+      "reviewNote": "Extremum/inflection verification not yet run through symbolic checks; SymPy checks f''(0)=1 and g'''(0)=6 with analyticity (local extremum/inflection)",
       "verifiedAsOfficialKey": false,
       "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
     },
@@ -178,9 +178,9 @@
       ],
       "kind": "fill",
       "provisionalReference": "1/8",
-      "independentlyChecked": false,
+      "independentlyChecked": true,
       "sourceQuality": "formula_extraction_risk",
-      "reviewNote": "Fourier-sine series question needs a verified endpoint and extension interpretation",
+      "reviewNote": "Fourier-sine series question needs a verified endpoint and extension interpretation; SymPy checks left/right limits and Fourier sine-series Dirichlet average at x=1/2; original formula still needs source review",
       "verifiedAsOfficialKey": false,
       "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
     },
@@ -222,7 +222,7 @@
       "provisionalReference": "-4",
       "independentlyChecked": true,
       "sourceQuality": "reasoning_gap",
-      "reviewNote": "Determinant condition is necessary; checked existence of rank drop for admissible matrix",
+      "reviewNote": "Determinant condition is necessary; checked existence of rank drop for admissible matrix; rank-drop iff a=5,b=9 under determinant-zero constraint, not merely any a-b=-4",
       "verifiedAsOfficialKey": false,
       "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
     },
