@@ -16,6 +16,15 @@ def verify():
                             "derived":str(S.simplify(actual))}
     x,a,b,rho=S.symbols("x a b rho",real=True)
     u=S.symbols("u",positive=True)
+    # Near zero f''(0)>0 proves the f-minimum; analytic g with g'''(0)>0
+    # and g''(0)=0 has an inflection at (0,0).
+    t=S.symbols("t",real=True)
+    fprime=S.exp(x*x)*S.sin(x)
+    g=S.integrate(S.exp(t*t),(t,0,x))*S.sin(x)**2
+    assert S.diff(fprime,x).subs(x,0)==1
+    assert g.subs(x,0)==0 and S.diff(g,x,2).subs(x,0)==0
+    check(1,S.diff(g,x,3).subs(x,0),6,
+          "choice B: f''(0)=1, g(0)=g''(0)=0, analytic g'''(0)=6")
     q5=S.Matrix([[1,1,1],[1,0,0],[1,0,0]])
     check(5,sum(mult for eig,mult in q5.eigenvals().items() if eig.is_positive),
           S.Integer(1),"positive inertia index")
@@ -25,6 +34,16 @@ def verify():
     check(9,S.exp(-2)*(1+2),3*S.exp(-2),"Poisson approximation with lambda=2")
     check(11,S.limit((x**x-1)/(S.log(x)*S.log(1-x)),x,0,dir="+"),-1,
           "one-sided limit")
+    # Odd 2-periodic Fourier sine extension: -7/2 + 4 = 1/2;
+    # Dirichlet limit at the interior jump is the average of one-sided limits.
+    eps=S.symbols("eps",positive=True)
+    piece=S.Piecewise((0,x<S.Rational(1,2)),(x*x,True))
+    left=S.limit(piece.subs(x,S.Rational(1,2)-eps),eps,0,dir="+")
+    right=S.limit(piece.subs(x,S.Rational(1,2)+eps),eps,0,dir="+")
+    assert S.Rational(-7,2)+4==S.Rational(1,2)
+    assert (left,right)==(0,S.Rational(1,4))
+    check(12,(left+right)/2,S.Rational(1,8),
+          "sine-series Dirichlet jump average after 2-periodic extension")
     X,Y,Z=S.symbols("X Y Z",real=True)
     f=X*Y**2*Z**3
     unit=S.Matrix([2,2,-1])/3
@@ -37,6 +56,15 @@ def verify():
     check(15,S.factor(q15.det()),-a+b-4,"determinant necessary condition only")
     witness=q15.subs({a:5,b:9})
     assert witness.rank()==2 and (witness*witness).rank()==1
+    # The determinant alone does not suffice: under b=a+4, the characteristic
+    # polynomial is t*(t^2+a-5). A repeated zero root forces a=5; at a=5,
+    # rank(A)=2 > rank(A^2)=1, establishing the necessary and sufficient case.
+    det_zero=q15.subs(b,a+4)
+    characteristic=S.factor(det_zero.charpoly(S.Symbol("t")).as_expr())
+    tau=S.Symbol("t")
+    assert S.expand(characteristic-tau*(tau*tau+a-5))==0
+    unique=det_zero.subs(a,5)
+    assert unique.rank()==2 and (unique*unique).rank()==1
     p=S.symbols("p",real=True)
     roots=[v for v in S.solve(3*p-2*p*p-S.Rational(5,8),p)
            if 0<=v<=S.Rational(1,2)]
