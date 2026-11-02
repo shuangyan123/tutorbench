@@ -1,0 +1,45 @@
+name: Expanded Exam Mathematics Source Integrity
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/expanded-exam-corpus-audit.yml'
+      - 'fixtures/research/exam-source-expansion-2022-2026-v0.1.json'
+      - 'scripts/audit-exam-source-expansion.mjs'
+      - 'scripts/verify-exam-source-upstream-trees.mjs'
+      - 'tests/exam-source-expansion.test.ts'
+      - 'tests/exam-source-upstream-trees.test.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-git-source-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out only the research code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Node 24.21.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24.21.0
+      - name: Check year, paper edition, source count and gold-label boundary
+        run: node scripts/audit-exam-source-expansion.mjs
+      - name: Fetch immutable Git trees for independent blob identity checks
+        run: |
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 90 \
+            -H 'Accept: application/vnd.github+json' \
+            'https://api.github.com/repos/deekur/gaokaomath/git/trees/6e9677221edffa192276de27d61044f19ce63de3?recursive=1' \
+            --output "$RUNNER_TEMP/gaokao-tree.json"
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 90 \
+            -H 'Accept: application/vnd.github+json' \
+            'https://api.github.com/repos/lx-ruc/kaoyanshuxue/git/trees/196dc9d2d8271978a030a3721a828c8723cd3864?recursive=1' \
+            --output "$RUNNER_TEMP/kaoyan-tree.json"
+      - name: Verify all 36 PDFs and 264 image SHAs against independent repository trees
+        run: |
+          node scripts/verify-exam-source-upstream-trees.mjs \
+            --gaokao-tree "$RUNNER_TEMP/gaokao-tree.json" \
+            --postgrad-tree "$RUNNER_TEMP/kaoyan-tree.json"
