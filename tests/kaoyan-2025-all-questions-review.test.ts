@@ -26,7 +26,7 @@ test('2025 Math-I full inventory is complete, source-pin-aware, and never offici
     assert.ok(item.sourceQuality.length>5&&item.reviewNote.length>15,item.id);
     if(item.independentlyChecked)assert.ok(item.provisionalReference!==null,item.id);
   }
-  const find=(n:number)=>data.items[n-1];
+  const find=(n:number)=>{const item=data.items[n-1]; assert.ok(item); return item;};
   assert.equal(find(8).sourceQuality,'empty_markdown_key');
   assert.equal(find(17).sourceQuality,'source_solution_value_corrupted');
   assert.equal(find(19).kind,'proof');
