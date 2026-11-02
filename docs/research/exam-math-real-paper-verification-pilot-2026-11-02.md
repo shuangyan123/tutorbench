@@ -58,14 +58,14 @@ The code-only check does not authenticate the PDF as the official exam. Do not t
 
 All 22 numbered questions have a PDF-page and Markdown-source provenance record in `fixtures/research/kaoyan-math1-2025-all-questions-review-v0.1.json`. The PDF is a **university-hosted copy**, not an independently authenticated official answer key. The upstream Markdown Git blob is pinned. This is a *complete question inventory*, not a complete independently validated reference set.
 
-An **optional** independent mathematical cross-check of bounded subclaims in **13 different questions** is provided by:
+An **optional** independent mathematical cross-check of bounded subclaims in **15 different questions** is provided by:
 
 ```sh
 python -m pip install 'sympy==1.14.0'
 python scripts/research/verify-kaoyan-2025-symbolic.py
 ```
 
-The Python script independently recomputes supported mathematical expressions using SymPy; it does not solve arbitrary PDF content or decide whether all subparts of a multipart proof/solution are correct. It is **not part of production or the default Node test path**. Its inputs were manually transcribed from visually examined paper pages, so authoritative source comparison and second-reviewer adjudication remain required.
+The Python script independently recomputes supported mathematical expressions using SymPy; it does not solve arbitrary PDF content or decide whether all subparts of a multipart proof/solution are correct. It is **not part of production or the default Node test path**, but is executed by the separate research audit GitHub workflow on relevant changes. Its inputs were manually transcribed from visually examined paper pages, so authoritative source comparison and second-reviewer adjudication remain required.
 
 ### Findings needing explicit non-gold status
 
@@ -78,8 +78,22 @@ The Python script independently recomputes supported mathematical expressions us
 - **Question 21:** `a=3` is consistent, but the converted general-solution text additionally requires `a1*a2*a3 != 0`, which is **not necessary**. Witness `alpha=(0,0,1)^T`, `beta=(2,2,2)^T` satisfies both equations with nonzero vectors, contradicting that restriction. Correct all-solution characterization still requires explicit independent review.
 - **Question 19:** the strict-monotonicity proof has not been formally checked; the final-result verifier cannot grade proof rigor.
 
-Do not describe `13/22` as accuracy or complete-exam verified coverage. Every original paper key remains `verifiedAsOfficialKey: false`, including the 13 mathematical subchecks.
+Do not describe `15/22` as accuracy or complete-exam verified coverage. Every original paper key remains `verifiedAsOfficialKey: false`, including the 15 mathematical subchecks.
 
 ### Audit reliability controls
 
 Node tests enforce all 22 question identities, per-page evidence, non-gold provenance, and known critical inconsistencies. They do not claim to validate math semantics. The independent SymPy cross-check provides a *different computational method*, but its boundary is the manually entered mathematical expression, not the raw document. No source answer is copied into production scores.
+
+## Cross-paper source-integrity extension: 2024 Math I
+
+The upstream repository includes three divergent 2024 Math-I Markdown transcriptions. The chosen main transcription has identifiable question markers for all 22 tasks, **but the Q6 and Q12 identifiers are embedded after extraction noise rather than appearing as parseable line-start headings**. This means a strict importer detects only 20 clean headings and **must not infer that the two questions are absent from the actual exam**. The reference source and two alternative blob SHAs are recorded without importing their keys.
+
+- Manifest: `fixtures/research/kaoyan-math1-2024-markdown-integrity-v0.1.json`
+- Standalone provenance and identifier checker: `scripts/audit-exam-markdown-headings.mjs`
+- Independent source-identity runner: `.github/workflows/math-research-audit.yml` also downloads and checks the pinned upstream 2024 Markdown in CI.
+
+This is a **2024 source extraction diagnostic**, not an independently solved 2024 paper, and no previously indexed paper is promoted to mathematical gold. The provenance audit and symbolic mathematics checker are independent layers with distinct outcome semantics.
+
+## Strengthened 2025 symbolic checks
+
+The research runner now additionally verifies the Q1 local calculus extremum/inflection conditions and the Q12 Fourier-sine discontinuity average using exact SymPy expressions. Q15 includes a counterexample proving that the determinant-zero condition alone does not imply the required rank drop, and checks the unique admissible degeneracy `a=5, b=9`. The 15 checked records each cover specified subclaims only. A new inventory-identity assertion fails if the executed symbolic checks and the 22-question evidence ledger drift apart. CI must pass for these claims to be called run-verified.
