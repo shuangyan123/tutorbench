@@ -8,7 +8,7 @@ Two websites may republish a common answer key or copy the same mistaken OCR. An
 
 Each piece of evidence must retain source URL, publisher/origin group, problem-text alignment, claim value, author-lineage review state and the existence/absence of an immutable content snapshot. A source with **unverified lineage contributes zero independently confirmed publisher votes**, even when hosted on a different domain. Publishing a mathematically correct intermediate calculation is insufficient to certify a complete exam solution.
 
-## First three live-source cases (exam edition + question number)
+## First four live-source cases (exam edition + question number)
 
 | Case | Source-page verification | Web/converted evidence | Two mathematical cross-checks | Current result |
 | --- | --- | --- | --- | --- |
@@ -24,12 +24,13 @@ Sources and stable metadata are in `fixtures/research/exam-multi-source-evidence
 - Another site with conflicting Q20 formula transcription: https://www.kuaiyizhi.cn/zh-cn/courses/higher-mathematics/2025-math1-zhenti/
 - Source-converted Math I Markdown at `TsekaLuk/Kaoyan-Math1-Papers`, pinned blob `582683c6623fd24b1e3f46c8ef45112fa31b5beb`
 - Source-converted Math II Markdown at `TsekaLuk/Kaoyan-Math2-Papers`, pinned blob `a256f908ba4dd13e4e3da861857dce6e19f47c29`
+- 2025 national Gaokao I Q14: third-party PDF recollection https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf ; published online references https://gaokaohub.com/paper/2025-xinkebiao-i-math.html , https://exam.meloon.top/paper/paper-gk-math-2025-xhgk1/ , and https://gaokaowiki.com/math/%E7%9C%9F%E9%A2%98/%E6%B5%99%E6%B1%9F/2025/q14/ . The source label “浙江” refers to a province using the shared exam paper and is **not** an extra independent exam edition.
 
 **Lineage cautions:** None of the external publishers has received a documented editorial independence audit. These sites are therefore *different publisher hosts with matching claims*, not verified independent provenance chains. Their mutable web pages are also not archived/hash-pinned in this initial research set. Human review and content snapshots are next gates.
 
 ## Two independent methods, each still bounded to a formalized statement
 
-`scripts/research/adjudicate_exam_sources.py` executes two distinct mathematical identities for each of the three worked cases (six subchecks). For Q20, a direct surface parameterization must use the **outward**, not inward, cross-product orientation; the divergence/cap identity is checked separately. For Q8, exact symbolic spectrum and sharp variance bound are checked. For Q2, explicit Fubini region reversal and differentiation of the proposed antiderivative are checked.
+`scripts/research/adjudicate_exam_sources.py` executes two distinct mathematical identities for each of the four worked cases (eight subchecks). For Q20, a direct surface parameterization must use the **outward**, not inward, cross-product orientation; the divergence/cap identity is checked separately. For Q8, exact symbolic spectrum and sharp variance bound are checked. For Q2, explicit Fubini region reversal and differentiation of the proposed antiderivative are checked. For Gaokao Q14, an indicator-variable expectation and independent occupancy-count enumeration are checked.
 
 This is **methodological cross-checking** using one substantial SymPy implementation, not a formally verified kernel or evidence of completely independent software stacks. A successful SymPy check does not verify a scanned formula, exam option mapping, unspecified conditions or proof adequacy.
 
@@ -50,7 +51,7 @@ The isolated GitHub workflow repeats both operations without commercial model/Ju
 3. **Use independently checkable mathematics.** Reconstruct exact mathematical claims with a trusted typed representation, compare at least two methods where practical, and record counterexamples and domain restrictions. Do not transform multiple partial subclaim passes into whole-question PASS.
 4. **Flag all disagreements.** When a published answer conflicts with source options, when the mathematical derivation contradicts a copied key, or when problem statements differ, issue a dispute. A numeric majority cannot override a proven counterexample.
 5. **Promote nothing automatically in v0.1.** The reviewer must explicitly approve a versioned evidence bundle, with a second paper/source read, source-independent derivation, verified lineage or independent proof and human judgment for proofs. Pending that contract, `answerGoldCertified=false` is mandatory.
-6. **Report denominators.** Distinguish indexed exam editions, visually checked questions, source-consistent answers, mathematically checked subclaims, verified complete solutions, false passes and justified abstentions. Three examples are **not** a useful accuracy estimate.
+6. **Report denominators.** Distinguish indexed exam editions, visually checked questions, source-consistent answers, mathematically checked subclaims, verified complete solutions, false passes and justified abstentions. Four examples are **not** a useful accuracy estimate.
 
 ## Integration boundary
 
