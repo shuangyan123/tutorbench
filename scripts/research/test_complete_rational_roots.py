@@ -65,6 +65,42 @@ class CompleteRationalRootsContract(unittest.TestCase):
         with self.assertRaises(ValueError):
             verifier.verify_batch({"schemaVersion":1,"items":[original,original]})
 
+    def test_factorized_quadratics_cover_49_root_set_combinations(self):
+        real={"kind":"real"}
+        def n(v):
+            return {"num":v,"den":1}
+        for r1 in range(-3,4):
+            for r2 in range(-3,4):
+                coefficients={"a":n(1),"b":n(-(r1+r2)),"c":n(r1*r2)}
+                candidate=[n(x) for x in sorted(set([r1,r2]))]
+                row={"id":f"factor-{r1}-{r2}", "claimKind":"all_real_roots",
+                     "coefficients":coefficients,"domain":real,
+                     "candidateRoots":candidate}
+                self.assertEqual(verifier.verify_item(row)["status"],
+                                 "verified_complete_solution_set",row["id"])
+                if r1 != r2:
+                    row["candidateRoots"]=[n(r1),n(r1)]
+                    result=verifier.verify_item(row)
+                    self.assertEqual(result["status"],"refuted_solution_set",row["id"])
+                    self.assertEqual(result["missing"],[str(r2)],row["id"])
+
+    def test_nonzero_scaling_and_domain_narrowing_preserve_meaning(self):
+        def n(v):
+            return {"num":v,"den":1}
+        original={"id":"scale","claimKind":"all_real_roots",
+                  "coefficients":{"a":n(1),"b":n(-5),"c":n(6)},
+                  "domain":{"kind":"real"},"candidateRoots":[n(2),n(3)]}
+        for factor in [-3,-2,-1,1,2,3]:
+            row=json.loads(json.dumps(original))
+            row["coefficients"]={k:n(v["num"]*factor) for k,v in row["coefficients"].items()}
+            self.assertEqual(verifier.verify_item(row)["status"],"verified_complete_solution_set")
+        original["domain"]={"kind":"interval","min":n(2),"max":n(4),
+                            "includeMin":False,"includeMax":True}
+        original["candidateRoots"]=[n(3)]
+        self.assertEqual(verifier.verify_item(original)["status"],"verified_complete_solution_set")
+        original["candidateRoots"]=[n(2),n(3)]
+        self.assertEqual(verifier.verify_item(original)["status"],"refuted_solution_set")
+
     def test_strict_cli_fails_when_unsupported(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=Path(tmp)/"fixture.json"
