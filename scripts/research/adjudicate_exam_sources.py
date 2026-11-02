@@ -16,10 +16,12 @@ SUPPORTED = {
     "cone_outward_flux": ("divergence_theorem", "direct_outward_parameterization"),
     "covariance_max_eigenvalue": ("covariance_spectrum", "variance_bound"),
     "triangular_double_integral": ("direct_iterated_integral", "reversed_order_integral"),
+    "distinct_drawing_expectation": ("indicator_linearity", "enumerated_occupancy_counts"),
 }
 EXPECTED = {"cone_outward_flux": "-2*sqrt(3)*pi/3",
             "covariance_max_eigenvalue": "C",
-            "triangular_double_integral": "2/3"}
+            "triangular_double_integral": "2/3",
+            "distinct_drawing_expectation": "61/25"}
 
 
 def math_witnesses(formalization):
@@ -50,6 +52,16 @@ def math_witnesses(formalization):
         upper_negative = S.simplify(1-2*a*a*rho)
         assert upper_positive == 1+rho and upper_negative == 1-rho
         return {"covariance_spectrum":1+S.Abs(rho),"variance_bound":S.Max(upper_positive,upper_negative)}
+    if formalization == "distinct_drawing_expectation":
+        # Method 1: indicator for each of five distinct labels being seen at
+        # least once in three independent draws, with replacement.
+        indicator = 5 * (1-S.Rational(4,5)**3)
+        # Method 2: classify all 5^3 equally likely ordered draw sequences.
+        # One distinct label: 5; two: 10*(2^3-2)=60; three: 5*4*3=60.
+        occupancy = S.Rational(1*5 + 2*60 + 3*60, 5**3)
+        assert 5+60+60==5**3
+        return {"indicator_linearity":S.simplify(indicator),
+                "enumerated_occupancy_counts":S.simplify(occupancy)}
     if formalization == "triangular_double_integral":
         x = S.symbols("x", nonnegative=True)
         # Integrate y first over the equivalent triangle 0<=y<=x<=2.
