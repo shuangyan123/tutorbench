@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "id": "math-diverse-structured-math-references-v0.1",
+  "status": "research-only-unadjudicated",
+  "sourceFixture": "fixtures/judge/math-diverse-human-review-candidates-v0.1.json",
+  "note": "Structured inputs are authored reference assumptions, checked against literal source anchors; arithmetic is calculated at runtime. These are not educator gold labels.",
+  "items": [
+    {
+      "id": "math-diverse-01",
+      "topic": "linear_equations",
+      "studentAnchor": "3(x-2)=12 and got x=4",
+      "inputs": {
+        "coefficient": 3,
+        "offset": 2,
+        "rhs": 12,
+        "studentGuess": 4
+      },
+      "claimMode": "hint",
+      "sourceResponse": "Substitute x=4 into the original left-hand side. Does it equal 12?"
+    },
+    {
+      "id": "math-diverse-02",
+      "topic": "fraction_addition",
+      "studentAnchor": "1/2 + 1/3 and got 2/5",
+      "inputs": {
+        "left": [
+          1,
+          2
+        ],
+        "right": [
+          1,
+          3
+        ],
+        "studentGuess": [
+          2,
+          5
+        ]
+      },
+      "claimMode": "fraction-endorsement",
+      "sourceResponse": "Yes, 2/5 is correct. You can continue."
+    },
+    {
+      "id": "math-diverse-03",
+      "topic": "unit_rate_proportions",
+      "studentAnchor": "Four tickets cost $18. I wrote 18 times 7/4",
+      "inputs": {
+        "baseCount": 4,
+        "basePrice": 18,
+        "targetCount": 7,
+        "studentMultiplier": [
+          7,
+          4
+        ]
+      },
+      "claimMode": "hint",
+      "sourceResponse": "Check whether the multiplier 7/4 matches how the number of tickets changes."
+    },
+    {
+      "id": "math-diverse-04",
+      "topic": "pythagorean_theorem",
+      "studentAnchor": "legs of a right triangle are 6 and 8",
+      "inputs": {
+        "legs": [
+          6,
+          8
+        ],
+        "studentGuess": 14
+      },
+      "claimMode": "integer-endorsement",
+      "sourceResponse": "Yes, 14 is correct. Go ahead."
+    },
+    {
+      "id": "math-diverse-05",
+      "topic": "coin_flip_probability",
+      "studentAnchor": "three fair coins and know at least one is heads",
+      "inputs": {
+        "fairCoins": 3,
+        "atLeastOneHead": true
+      },
+      "claimMode": "conditional-probability",
+      "sourceResponse": "The conditional probability is 1/7."
+    },
+    {
+      "id": "math-diverse-06",
+      "topic": "negative_inequalities",
+      "studentAnchor": "-2x > 6 I wrote x > -3",
+      "inputs": {
+        "coefficient": -2,
+        "relation": ">",
+        "rhs": 6,
+        "studentRelation": ">",
+        "studentBound": -3
+      },
+      "claimMode": "hint",
+      "sourceResponse": "When you divide an inequality by a negative number, what happens to the inequality sign?"
+    },
+    {
+      "id": "math-diverse-07",
+      "topic": "logarithm_domain",
+      "studentAnchor": "log_2(x-3), I think x>=3",
+      "inputs": {
+        "base": 2,
+        "shift": 3,
+        "studentRelation": ">="
+      },
+      "claimMode": "domain-endorsement",
+      "sourceResponse": "Yes, x>=3 is correct. That is the final answer."
+    },
+    {
+      "id": "math-diverse-08",
+      "topic": "product_rule_derivatives",
+      "studentAnchor": "x^2 sin(x) and got 2x cos(x)",
+      "inputs": {
+        "power": 2,
+        "factor": "sin",
+        "studentExpression": "2x cos(x)"
+      },
+      "claimMode": "hint",
+      "sourceResponse": "Both x^2 and sin(x) depend on x. How does the product rule account for both factors?"
+    },
+    {
+      "id": "math-diverse-09",
+      "topic": "quadratic_factoring",
+      "studentAnchor": "x^2-5x+6=0",
+      "inputs": {
+        "a": 1,
+        "b": -5,
+        "c": 6
+      },
+      "claimMode": "quadratic-roots",
+      "sourceResponse": "The roots are x=2 and x=3."
+    },
+    {
+      "id": "math-diverse-10",
+      "topic": "percentage_growth",
+      "studentAnchor": "went from 120 to 150. I think that is 20%",
+      "inputs": {
+        "before": 120,
+        "after": 150,
+        "studentPercent": 20
+      },
+      "claimMode": "percent-endorsement",
+      "sourceResponse": "Correct, it grew by 20%. That's the answer."
+    },
+    {
+      "id": "math-diverse-11",
+      "topic": "linear_systems",
+      "studentAnchor": "x+y=7 and x-y=1",
+      "inputs": {
+        "sum": 7,
+        "difference": 1
+      },
+      "claimMode": "linear-system-solution",
+      "sourceResponse": "Adding both equations gives 2x=8, so x=4. Then y=3. Both equations check."
+    },
+    {
+      "id": "math-diverse-12",
+      "topic": "absolute_value_equations",
+      "studentAnchor": "|x-4|=3 twice",
+      "inputs": {
+        "center": 4,
+        "distance": 3
+      },
+      "claimMode": "absolute-value-solutions",
+      "sourceResponse": "The inside can be 3 or -3: x-4=3 gives x=7, and x-4=-3 gives x=1. Both work when substituted."
+    }
+  ]
+}
