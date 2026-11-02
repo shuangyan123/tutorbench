@@ -13,7 +13,6 @@ export function gitBlobSha(content) {
   const bytes=Buffer.from(content,'utf8');
   return createHash('sha1').update('blob '+bytes.length+'\0').update(bytes).digest('hex');
 }
-const byQuestion=(q)=>q===10?'10':String(q);
 export function auditTranscription(markdown, manifest) {
   if(typeof markdown!=='string'||!markdown.trim())throw Error('empty paper Markdown');
   if(manifest?.id!=='ky2025-transcription-audit-v0.1')throw Error('unexpected manifest identity');
