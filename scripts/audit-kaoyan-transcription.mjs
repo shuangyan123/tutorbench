@@ -56,7 +56,9 @@ export function auditTranscription(markdown, manifest) {
   for(const item of manifest.manualChecks??[]){
     if(!Number.isInteger(item.question)||!item.needle||!item.pdfPage)
       throw Error('invalid manual anchor');
-    const idx=lines.findIndex(line=>line.includes(item.needle));
+    const qStart=starts.find(x=>x.number===item.question)?.index;
+    const qEnd=starts.find(x=>x.number===item.question+1)?.index??end;
+    const idx=qStart===undefined?-1:lines.findIndex((line,i)=>i>=qStart&&i<qEnd&&line.includes(item.needle));
     if(idx<0)record(item.question,'MANUAL_ANCHOR_NOT_FOUND','Previously observed text was changed; re-review PDF needed',null,'manual_anchor');
     else if(sourceMatched)record(item.question,item.code,item.details,idx+1,'manual_pdf_comparison');
   }
