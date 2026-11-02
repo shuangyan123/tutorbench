@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/math-research-audit.yml'
       - 'fixtures/research/kaoyan-math1-2025-*.json'
+      - 'fixtures/research/kaoyan-math1-2024-*.json'
+      - 'scripts/audit-exam-markdown-headings.mjs'
       - 'scripts/research/verify-kaoyan-2025-symbolic.py'
       - 'scripts/audit-kaoyan-transcription.mjs'
       - 'scripts/audit-kaoyan-transcription.d.mts'
@@ -60,4 +62,18 @@ jobs:
             }
             if(d.summary.foundChoiceQuestions!==10) throw Error("Source choice count drift");
             console.log("Source SHA verified; known extraction defects remain blocked. Findings:",d.summary.findings);
+          '
+      - name: Fetch pinned 2024 Markdown and surface structural source damage
+        run: |
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 60 \
+            'https://raw.githubusercontent.com/TsekaLuk/Kaoyan-Math1-Papers/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2024%E5%B9%B4%E6%95%B0%E5%AD%A6%28%E4%B8%80%29%E7%9C%9F%E9%A2%98%E5%8F%8A%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md' \
+            --output "$RUNNER_TEMP/upstream-2024.md"
+          node scripts/audit-exam-markdown-headings.mjs --input "$RUNNER_TEMP/upstream-2024.md" > "$RUNNER_TEMP/source-audit-2024.json"
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const d=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/source-audit-2024.json","utf8"));
+            if(!d.sourceMatched || d.status!=="blocked_for_gold") throw Error("Untrusted 2024 source integrity");
+            if(JSON.stringify(d.missing)!==JSON.stringify([6,12])) throw Error("2024 leading heading inventory drift");
+            for(const q of [6,12]) if(!d.embedded.some(f=>f.question===q)) throw Error("Missing 2024 embedded heading: "+q);
+            console.log("2024 upstream SHA pinned; source blocking confirmed for question headings:",d.missing.join(","));
           '
