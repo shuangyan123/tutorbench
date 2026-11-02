@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const load=async()=>import('../scripts/audit-kaoyan-transcription.mjs') as Promise<{
+const moduleUrl = pathToFileURL(resolve('scripts/audit-kaoyan-transcription.mjs')).href;
+const load=async()=>import(moduleUrl) as Promise<{
   gitBlobSha:(v:string)=>string;
   auditTranscription:(v:string,manifest:unknown)=>{status:string;summary:{findings:number;foundChoiceQuestions:number};findings:Array<{code:string;question:number|null}>;source:{sourceMatched:boolean}};
 }>;
