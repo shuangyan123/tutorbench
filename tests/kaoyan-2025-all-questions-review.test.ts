@@ -19,7 +19,8 @@ test('2025 Math-I full inventory is complete, source-pin-aware, and never offici
   assert.equal(data.paper.markdownGitBlobSha,'582683c6623fd24b1e3f46c8ef45112fa31b5beb');
   assert.deepEqual(data.items.map(x=>x.question),Array.from({length:22},(_,i)=>i+1));
   assert.equal(new Set(data.items.map(x=>x.id)).size,22);
-  assert.equal(data.items.filter(x=>x.independentlyChecked).length,13);
+  const independentlyChecked = data.items.filter(x=>x.independentlyChecked).map(x=>x.question);
+  assert.deepEqual(independentlyChecked,[1,5,8,9,11,12,13,14,15,16,17,18,20,21,22]);
   for(const item of data.items) {
     assert.equal(item.verifiedAsOfficialKey,false);
     assert.ok(item.pdfPages.length>0&&item.pdfPages.every(x=>Number.isInteger(x)&&x>=1&&x<=4),item.id);
