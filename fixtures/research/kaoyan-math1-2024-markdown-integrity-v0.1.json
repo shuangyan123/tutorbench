@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "id": "kaoyan-math1-2024-markdown-integrity-v0.1",
+  "status": "source-text-only-not-mathematical-gold",
+  "source": {
+    "repository": "TsekaLuk/Kaoyan-Math1-Papers",
+    "revision": "3151b4acf26ea19ccd427b869a715e65e1990091",
+    "path": "papers/2024年数学(一)真题及参考答案.md",
+    "gitBlobSha": "8c644157868f4051df6675a9afc132d37542c08c",
+    "license": "CC-BY-NC-SA-4.0",
+    "sourceIntegrity": "third_party_pdf_to_md_unverified"
+  },
+  "expectedQuestionNumbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22
+  ],
+  "observedIssues": [
+    {
+      "code": "NON_LEADING_NUMBERED_QUESTION",
+      "question": 6,
+      "details": "The question marker appears after extraction artifacts rather than as a leading numbered heading."
+    },
+    {
+      "code": "NON_LEADING_NUMBERED_QUESTION",
+      "question": 12,
+      "details": "Question marker is embedded after stray PDF-extraction text; a strict section parser misses it."
+    }
+  ],
+  "alternativeTranscriptions": [
+    {
+      "path": "papers/2024考研数学一真题+答案.md",
+      "gitBlobSha": "e3bf19c17b7c4dde6605c396f9dd9c65c65830ec"
+    },
+    {
+      "path": "papers/2024考研数学一真题.md",
+      "gitBlobSha": "657976ab751ad48c57dbcf85fb8ea6a86809edd5"
+    }
+  ],
+  "note": "A source integrity inventory only. Do not use this repo's compiled answer fields as key labels; full PDF/source and mathematical checks remain pending."
+}
