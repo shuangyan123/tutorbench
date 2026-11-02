@@ -1,0 +1,36 @@
+name: Exam Multi-source Answer Adjudication Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/exam-multi-source-adjudication.yml'
+      - 'fixtures/research/exam-multi-source-evidence-v0.1.json'
+      - 'scripts/research/adjudicate_exam_sources.py'
+      - 'scripts/research/test_adjudicate_exam_sources.py'
+      - 'docs/research/exam-multisource-answer-adjudication-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-method-and-source-conflicts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out evidence and source-catalog code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install isolated exact mathematics dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/multisource-math"
+          "$RUNNER_TEMP/multisource-math/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Recompute independent math and test disagreement, lineage and gold boundaries
+        run: |
+          "$RUNNER_TEMP/multisource-math/bin/python" -m unittest \
+            scripts/research/test_adjudicate_exam_sources.py -v
+          "$RUNNER_TEMP/multisource-math/bin/python" \
+            scripts/research/adjudicate_exam_sources.py \
+            > "$RUNNER_TEMP/multi-source-review.json"
+          python3 -c "import os,json; d=json.load(open(os.environ['RUNNER_TEMP']+'/multi-source-review.json')); assert d['summary']=={'cases':3,'mathematicalMethodChecks':6,'contradictedCases':2,'releasedGoldAnswers':0}; assert all(x['answerGoldCertified'] is False for x in d['items']); print('Math verified locally; three exam answers remain non-gold and conflict-aware')"
