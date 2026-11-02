@@ -37,7 +37,7 @@ export function auditExpandedSources(doc){
   const summary={paperEditions:doc.papers.length,gaokaoPdfBlobs:0,postgradExamYears:0,
     postgradImageIndexedYears:0,postgradQuestionImageBlobs:0,postgrad2026NotIndexed:0,
     paperKeysCertified:0,questionResultsCertified:0,paperEditionsActuallyMathGraded:0,
-    catalogCompletenessPercent:100,questionVerificationCoveragePercent:null};
+    editionIndexSlotsPresent:51,questionVerificationCoveragePercent:null};
   const gaokaoByYear={};
   for(const p of doc.papers){
     ensure(typeof p.paperId==='string'&&!seen.has(p.paperId),'duplicate or missing paperId');
