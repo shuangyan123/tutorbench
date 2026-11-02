@@ -23,7 +23,7 @@ class MultiPublisherAdjudication(unittest.TestCase):
         result=verifier.evaluate(self.evidence,self.catalog)
         self.assertEqual(result["status"],"research_only_multi_source_no_gold")
         self.assertEqual(result["summary"],{
-            "cases":3,"mathematicalMethodChecks":6,
+            "cases":4,"mathematicalMethodChecks":8,
             "contradictedCases":2,"releasedGoldAnswers":0})
         claims={c["caseId"]:c for c in result["items"]}
         cone=claims["kaoyan-math-1-2025-q20"]
@@ -43,6 +43,12 @@ class MultiPublisherAdjudication(unittest.TestCase):
         self.assertEqual(set(integral["mathematics"].values()),{"2/3"})
         self.assertEqual(integral["sourceSupport"]["contradictingSourceIds"],["math2-md-2022-q02-key"])
         self.assertEqual(integral["sourceSupport"]["alignedSupportingPublisherGroups"],1)
+        gaokao=claims["gaokao-2025-national-1-q14"]
+        self.assertEqual(gaokao["status"],"provisionally_corrob_source_lineage_unverified")
+        self.assertEqual(set(gaokao["mathematics"].values()),{"61/25"})
+        self.assertEqual(gaokao["sourceSupport"]["alignedSupportingPublisherGroups"],3)
+        self.assertEqual(gaokao["sourceSupport"]["independentlyReviewedSupportingPublisherGroups"],0)
+        self.assertFalse(gaokao["sourceFlags"]["originalPaperAuthenticated"])
         self.assertTrue(all(c["answerGoldCertified"] is False for c in result["items"]))
 
     def test_same_publisher_worked_and_key_are_not_two_independent_sources(self):
