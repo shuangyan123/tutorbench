@@ -506,7 +506,11 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
     isPrivateBuild,
   );
   if (publishSpectrum) {
-    await publishLearningAccessSeries({ outputDirectory, siteUrl: options.siteUrl, basePath: options.basePath });
+    await publishLearningAccessSeries({
+      outputDirectory,
+      ...(options.siteUrl === undefined ? {} : { siteUrl: options.siteUrl }),
+      ...(options.basePath === undefined ? {} : { basePath: options.basePath }),
+    });
   }
 
   return routeCount;
