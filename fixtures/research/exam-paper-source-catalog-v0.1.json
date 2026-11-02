@@ -1,0 +1,90 @@
+{
+  "id": "exam-paper-source-catalog-v0.1",
+  "status": "research-source-catalog-not-exam-gold",
+  "notes": "Years 2022-2026 inclusive. Page-checked refers to an inspected page, not verified official provenance; third-party recollections may be imperfect. Other years are discovery links only.",
+  "papers": [
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2022,
+      "status": "index_only",
+      "url": "https://kaoyan.eol.cn/shiti/shuxue/",
+      "sourceType": "educational_index"
+    },
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2023,
+      "status": "index_only",
+      "url": "https://kaoyan.eol.cn/shiti/shuxue/",
+      "sourceType": "educational_index"
+    },
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2024,
+      "status": "index_only",
+      "url": "https://kaoyan.eol.cn/shiti/shuxue/",
+      "sourceType": "educational_index"
+    },
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2025,
+      "status": "page_checked",
+      "url": "https://edu.xaiu.edu.cn/__local/F/34/3C/E53427A7070AE155EC2FF88073B_9EAE259B_511D6.pdf",
+      "sourceType": "university_hosted_copy_not_official_key",
+      "checkedPages": [
+        1
+      ]
+    },
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2026,
+      "status": "page_checked",
+      "url": "https://static.kaoyan.cn/file/question/2025/12/27/f3a552ec0d163308d2ac28dc7a10bbd0.pdf",
+      "sourceType": "third_party_answered_pdf",
+      "checkedPages": [
+        4
+      ]
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2022,
+      "status": "index_only",
+      "url": "https://gaokao.eol.cn/e_html/gk/gkst/2024st.shtml",
+      "sourceType": "educational_index"
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2023,
+      "status": "index_only",
+      "url": "https://gaokao.eol.cn/e_html/gk/gkst/2024st.shtml",
+      "sourceType": "educational_index"
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2024,
+      "status": "index_only",
+      "url": "https://gaokao.eol.cn/e_html/gk/gkst/2024st.shtml",
+      "sourceType": "educational_index"
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2025,
+      "status": "page_checked",
+      "url": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+      "sourceType": "third_party_recollection_may_have_errors",
+      "checkedPages": [
+        1,
+        2
+      ]
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2026,
+      "status": "page_checked",
+      "url": "https://zy.21cnjy.com/25912080",
+      "sourceType": "third_party_html_math_markup_incomplete",
+      "checkedPages": [
+        1
+      ]
+    }
+  ]
+}
