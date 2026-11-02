@@ -1,0 +1,2519 @@
+{
+  "schemaVersion": 1,
+  "id": "exam-source-expansion-2022-2026-v0.1",
+  "status": "source-discovery-only-not-an-answer-key",
+  "generatedPurpose": "Expanded source evidence for real mathematics exams without reproducing third-party paper text or assuming correct model answers.",
+  "years": [
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "sourcePolicy": {
+    "provenance": "Git object existence and immutable commit SHA alone do not authenticate the official exam, accurate OCR, question semantics or correct answers.",
+    "reviewRequired": [
+      "rightful-source-license",
+      "paper-edition",
+      "full-question-page-review",
+      "official-or-independent-answer-key",
+      "math-result-check",
+      "solution-completeness-check"
+    ],
+    "noSourceTextIncluded": true,
+    "noAnswerGoldIncluded": true,
+    "notes": "2022–2024 Gaokao has older national/national A/B and newer Gaokao variants; 2025–2026 naming differs. Treat distinct paper variants as distinct papers, not provinces. A nonempty image list means Git blobs exist, not that 22 questions were visually inspected."
+  },
+  "papers": [
+    {
+      "paperId": "gaokao-2022-beijing",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "北京",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022北京.pdf",
+        "gitBlobSha": "ea0ff981a771e78d8da170caf9ff4ad1f281cf68",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E5%8C%97%E4%BA%AC.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-national-a-humanities",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "全国甲文",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022全国甲文(云南,广西,贵州,西藏,四川).pdf",
+        "gitBlobSha": "680d10ba6dfb7707e93fb4c0702d04c8bbb6fd0f",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E5%85%A8%E5%9B%BD%E7%94%B2%E6%96%87(%E4%BA%91%E5%8D%97%2C%E5%B9%BF%E8%A5%BF%2C%E8%B4%B5%E5%B7%9E%2C%E8%A5%BF%E8%97%8F%2C%E5%9B%9B%E5%B7%9D).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-national-a-science",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "全国甲理",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022全国甲理(云南,广西,贵州,西藏,四川).pdf",
+        "gitBlobSha": "739782af97922d5e57c340ecf6bcc173f8cef8e9",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E5%85%A8%E5%9B%BD%E7%94%B2%E7%90%86(%E4%BA%91%E5%8D%97%2C%E5%B9%BF%E8%A5%BF%2C%E8%B4%B5%E5%B7%9E%2C%E8%A5%BF%E8%97%8F%2C%E5%9B%9B%E5%B7%9D).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-national-b-humanities",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "全国乙文",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022全国乙文(河南,山西,江西,安徽,陕西,甘肃,青海,内蒙古,黑龙江,吉林,.宁夏,新疆).pdf",
+        "gitBlobSha": "324bbee5625d441cfd20e0ecc5dc5208f3d17f19",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E5%85%A8%E5%9B%BD%E4%B9%99%E6%96%87(%E6%B2%B3%E5%8D%97%2C%E5%B1%B1%E8%A5%BF%2C%E6%B1%9F%E8%A5%BF%2C%E5%AE%89%E5%BE%BD%2C%E9%99%95%E8%A5%BF%2C%E7%94%98%E8%82%83%2C%E9%9D%92%E6%B5%B7%2C%E5%86%85%E8%92%99%E5%8F%A4%2C%E9%BB%91%E9%BE%99%E6%B1%9F%2C%E5%90%89%E6%9E%97%2C.%E5%AE%81%E5%A4%8F%2C%E6%96%B0%E7%96%86).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-national-b-science",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "全国乙理",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022全国乙理(河南,山西,江西,安徽,陕西,甘肃,青海,内蒙古,黑龙江,吉林,.宁夏,新疆).pdf",
+        "gitBlobSha": "ae7468cc26071270c7ef9f40281eaf594f724b4e",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E5%85%A8%E5%9B%BD%E4%B9%99%E7%90%86(%E6%B2%B3%E5%8D%97%2C%E5%B1%B1%E8%A5%BF%2C%E6%B1%9F%E8%A5%BF%2C%E5%AE%89%E5%BE%BD%2C%E9%99%95%E8%A5%BF%2C%E7%94%98%E8%82%83%2C%E9%9D%92%E6%B5%B7%2C%E5%86%85%E8%92%99%E5%8F%A4%2C%E9%BB%91%E9%BE%99%E6%B1%9F%2C%E5%90%89%E6%9E%97%2C.%E5%AE%81%E5%A4%8F%2C%E6%96%B0%E7%96%86).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-new-gaokao-1",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "新高考1",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022新高考1(山东,广东,湖南,湖北,河北,江苏,福建).pdf",
+        "gitBlobSha": "48e90f225eacec6718f0c7448725558d11729e8d",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E6%96%B0%E9%AB%98%E8%80%831(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-new-gaokao-2",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "新高考2",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022新高考2(海南,辽宁,重庆).pdf",
+        "gitBlobSha": "2edd884894d6f930cec77de451cc03de0d2ac5d5",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E6%96%B0%E9%AB%98%E8%80%832(%E6%B5%B7%E5%8D%97%2C%E8%BE%BD%E5%AE%81%2C%E9%87%8D%E5%BA%86).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-shanghai",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "上海",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022上海.pdf",
+        "gitBlobSha": "21e9b91c1505cdec723c492c34758be641080429",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E4%B8%8A%E6%B5%B7.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-tianjin",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "天津",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022天津.pdf",
+        "gitBlobSha": "31cf72b6a37a3550b0e9c25fa9c26103d044c4fe",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E5%A4%A9%E6%B4%A5.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2022-zhejiang",
+      "exam": "gaokao",
+      "year": 2022,
+      "variant": "浙江",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022浙江.pdf",
+        "gitBlobSha": "754cf398b650e7148a5b5cd66118113271d8abb8",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E6%B5%99%E6%B1%9F.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-beijing",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "北京",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023北京.pdf",
+        "gitBlobSha": "3abf358b9557c1801a30e621a5d4c79f25be9b70",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E5%8C%97%E4%BA%AC.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-national-a-humanities",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "全国甲文",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023全国甲文(广西,贵州,西藏,四川).pdf",
+        "gitBlobSha": "34d08b47f047d38ec08d8b26f22b2e72e4eea38a",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E5%85%A8%E5%9B%BD%E7%94%B2%E6%96%87(%E5%B9%BF%E8%A5%BF%2C%E8%B4%B5%E5%B7%9E%2C%E8%A5%BF%E8%97%8F%2C%E5%9B%9B%E5%B7%9D).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-national-a-science",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "全国甲理",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023全国甲理(广西,贵州,西藏,四川).pdf",
+        "gitBlobSha": "8cdd35de4dd2d4a078bd6111395a352b1e01e2c7",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E5%85%A8%E5%9B%BD%E7%94%B2%E7%90%86(%E5%B9%BF%E8%A5%BF%2C%E8%B4%B5%E5%B7%9E%2C%E8%A5%BF%E8%97%8F%2C%E5%9B%9B%E5%B7%9D).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-national-b-humanities",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "全国乙文",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023全国乙文(河南,江西,陕西,甘肃,青海,内蒙古,宁夏,新疆).pdf",
+        "gitBlobSha": "e6575dcf65413e7430af2fdf9b282c3ae62f7a78",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E5%85%A8%E5%9B%BD%E4%B9%99%E6%96%87(%E6%B2%B3%E5%8D%97%2C%E6%B1%9F%E8%A5%BF%2C%E9%99%95%E8%A5%BF%2C%E7%94%98%E8%82%83%2C%E9%9D%92%E6%B5%B7%2C%E5%86%85%E8%92%99%E5%8F%A4%2C%E5%AE%81%E5%A4%8F%2C%E6%96%B0%E7%96%86).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-national-b-science",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "全国乙理",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023全国乙理(河南,江西,陕西,甘肃,青海,内蒙古,宁夏,新疆).pdf",
+        "gitBlobSha": "dcfd4e1a755862422b81ce36b53b496dd9c81536",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E5%85%A8%E5%9B%BD%E4%B9%99%E7%90%86(%E6%B2%B3%E5%8D%97%2C%E6%B1%9F%E8%A5%BF%2C%E9%99%95%E8%A5%BF%2C%E7%94%98%E8%82%83%2C%E9%9D%92%E6%B5%B7%2C%E5%86%85%E8%92%99%E5%8F%A4%2C%E5%AE%81%E5%A4%8F%2C%E6%96%B0%E7%96%86).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-new-gaokao-1",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "新高考1",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023新高考1(山东,广东,湖南,湖北,河北,江苏,福建,浙江).pdf",
+        "gitBlobSha": "90505e1146e12c0ed0fc296b3568a1ab5e82482c",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E6%96%B0%E9%AB%98%E8%80%831(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA%2C%E6%B5%99%E6%B1%9F).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-new-gaokao-2",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "新高考2",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023新高考2(辽宁,重庆,海南,安徽,吉林,黑龙江,山西,云南).pdf",
+        "gitBlobSha": "4d49c7230294fda7f476735a120fd5cde7843a58",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E6%96%B0%E9%AB%98%E8%80%832(%E8%BE%BD%E5%AE%81%2C%E9%87%8D%E5%BA%86%2C%E6%B5%B7%E5%8D%97%2C%E5%AE%89%E5%BE%BD%2C%E5%90%89%E6%9E%97%2C%E9%BB%91%E9%BE%99%E6%B1%9F%2C%E5%B1%B1%E8%A5%BF%2C%E4%BA%91%E5%8D%97).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-shanghai",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "上海",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023上海.pdf",
+        "gitBlobSha": "b9de1366a0c41dd04925c177a4a1c792dbefd692",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E4%B8%8A%E6%B5%B7.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2023-tianjin",
+      "exam": "gaokao",
+      "year": 2023,
+      "variant": "天津",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023天津.pdf",
+        "gitBlobSha": "ba9c93b59d737d76c7fb165001b0bd2c7f78d91e",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E5%A4%A9%E6%B4%A5.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2024-beijing",
+      "exam": "gaokao",
+      "year": 2024,
+      "variant": "北京",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2024/2024北京.pdf",
+        "gitBlobSha": "88b193ce716a6ecbfb6cae35b057ae229f997010",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2024/2024%E5%8C%97%E4%BA%AC.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2024-national-humanities",
+      "exam": "gaokao",
+      "year": 2024,
+      "variant": "全国文",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2024/2024全国文(西藏,四川,内蒙古,陕西,青海,宁夏).pdf",
+        "gitBlobSha": "fc21870d3497ed3cd8b2cacbfc744b93ac770285",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2024/2024%E5%85%A8%E5%9B%BD%E6%96%87(%E8%A5%BF%E8%97%8F%2C%E5%9B%9B%E5%B7%9D%2C%E5%86%85%E8%92%99%E5%8F%A4%2C%E9%99%95%E8%A5%BF%2C%E9%9D%92%E6%B5%B7%2C%E5%AE%81%E5%A4%8F).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2024-national-science",
+      "exam": "gaokao",
+      "year": 2024,
+      "variant": "全国理",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2024/2024全国理(西藏,四川,内蒙古,陕西,青海,宁夏).pdf",
+        "gitBlobSha": "caa13a1b51a72571ff20ddf54fcc624cda91961a",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2024/2024%E5%85%A8%E5%9B%BD%E7%90%86(%E8%A5%BF%E8%97%8F%2C%E5%9B%9B%E5%B7%9D%2C%E5%86%85%E8%92%99%E5%8F%A4%2C%E9%99%95%E8%A5%BF%2C%E9%9D%92%E6%B5%B7%2C%E5%AE%81%E5%A4%8F).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2024-new-gaokao-1",
+      "exam": "gaokao",
+      "year": 2024,
+      "variant": "新高考1",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2024/2024新高考1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+        "gitBlobSha": "a408f5467da376f7335cdb397855fe07ddc87149",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2024/2024%E6%96%B0%E9%AB%98%E8%80%831(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA%2C%E6%B5%99%E6%B1%9F%2C%E6%B2%B3%E5%8D%97%2C%E6%B1%9F%E8%A5%BF%2C%E5%AE%89%E5%BE%BD).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2024-new-gaokao-2",
+      "exam": "gaokao",
+      "year": 2024,
+      "variant": "新高考2",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2024/2024新高考2(辽宁,重庆,海南,吉林,黑龙江,山西,云南,广西,甘肃,贵州,新疆).pdf",
+        "gitBlobSha": "76940fabd984c1ecb221f49580226852043d2962",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2024/2024%E6%96%B0%E9%AB%98%E8%80%832(%E8%BE%BD%E5%AE%81%2C%E9%87%8D%E5%BA%86%2C%E6%B5%B7%E5%8D%97%2C%E5%90%89%E6%9E%97%2C%E9%BB%91%E9%BE%99%E6%B1%9F%2C%E5%B1%B1%E8%A5%BF%2C%E4%BA%91%E5%8D%97%2C%E5%B9%BF%E8%A5%BF%2C%E7%94%98%E8%82%83%2C%E8%B4%B5%E5%B7%9E%2C%E6%96%B0%E7%96%86).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2024-shanghai",
+      "exam": "gaokao",
+      "year": 2024,
+      "variant": "上海",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2024/2024上海.pdf",
+        "gitBlobSha": "4b81efb14384b5c54e6c33d147ba460e745b46d5",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2024/2024%E4%B8%8A%E6%B5%B7.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2024-tianjin",
+      "exam": "gaokao",
+      "year": 2024,
+      "variant": "天津",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2024/2024天津.pdf",
+        "gitBlobSha": "a6e06d59ec22b01744562bc2cc970486da161b3a",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2024/2024%E5%A4%A9%E6%B4%A5.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2025-beijing",
+      "exam": "gaokao",
+      "year": 2025,
+      "variant": "北京",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2025/2025北京.pdf",
+        "gitBlobSha": "a40bf77b801fd5294044be83e20a1908b3db0049",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2025/2025%E5%8C%97%E4%BA%AC.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2025-national-1",
+      "exam": "gaokao",
+      "year": 2025,
+      "variant": "全国1",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2025/2025全国1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+        "gitBlobSha": "4a5702dda207a470840a62c982ab2392362a404e",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2025/2025%E5%85%A8%E5%9B%BD1(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA%2C%E6%B5%99%E6%B1%9F%2C%E6%B2%B3%E5%8D%97%2C%E6%B1%9F%E8%A5%BF%2C%E5%AE%89%E5%BE%BD).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2025-national-2",
+      "exam": "gaokao",
+      "year": 2025,
+      "variant": "全国2",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2025/2025全国2(辽宁,重庆,海南,吉林,黑龙江,山西,云南,广西,甘肃,贵州,新疆,四川,内蒙古,陕西,青海,宁夏,西藏).pdf",
+        "gitBlobSha": "bf84d54405bb73b09f2222e184141762fb2b07ab",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2025/2025%E5%85%A8%E5%9B%BD2(%E8%BE%BD%E5%AE%81%2C%E9%87%8D%E5%BA%86%2C%E6%B5%B7%E5%8D%97%2C%E5%90%89%E6%9E%97%2C%E9%BB%91%E9%BE%99%E6%B1%9F%2C%E5%B1%B1%E8%A5%BF%2C%E4%BA%91%E5%8D%97%2C%E5%B9%BF%E8%A5%BF%2C%E7%94%98%E8%82%83%2C%E8%B4%B5%E5%B7%9E%2C%E6%96%B0%E7%96%86%2C%E5%9B%9B%E5%B7%9D%2C%E5%86%85%E8%92%99%E5%8F%A4%2C%E9%99%95%E8%A5%BF%2C%E9%9D%92%E6%B5%B7%2C%E5%AE%81%E5%A4%8F%2C%E8%A5%BF%E8%97%8F).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2025-shanghai",
+      "exam": "gaokao",
+      "year": 2025,
+      "variant": "上海",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2025/2025上海.pdf",
+        "gitBlobSha": "010d2f378b9b728bf9bc62d5143b036549f0190c",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2025/2025%E4%B8%8A%E6%B5%B7.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2025-tianjin",
+      "exam": "gaokao",
+      "year": 2025,
+      "variant": "天津",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2025/2025天津.pdf",
+        "gitBlobSha": "8980f941273d99bde283449aaeefa051f670813c",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2025/2025%E5%A4%A9%E6%B4%A5.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2026-beijing",
+      "exam": "gaokao",
+      "year": 2026,
+      "variant": "北京",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2026/2026北京.pdf",
+        "gitBlobSha": "b78795ff07e6bbcd606ea1b4e13a323fae4358f7",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2026/2026%E5%8C%97%E4%BA%AC.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2026-national-1",
+      "exam": "gaokao",
+      "year": 2026,
+      "variant": "全国1",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2026/2026全国1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+        "gitBlobSha": "520ab76bc3becadb8246705d261f4562f7d62e12",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2026/2026%E5%85%A8%E5%9B%BD1(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA%2C%E6%B5%99%E6%B1%9F%2C%E6%B2%B3%E5%8D%97%2C%E6%B1%9F%E8%A5%BF%2C%E5%AE%89%E5%BE%BD).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2026-national-2",
+      "exam": "gaokao",
+      "year": 2026,
+      "variant": "全国2",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2026/2026全国2(辽宁,重庆,海南,吉林,黑龙江,山西,云南,广西,甘肃,贵州,新疆,四川,内蒙古,陕西,青海,宁夏,西藏).pdf",
+        "gitBlobSha": "792203b786b2f5484eacadaf1f9e36c1c1df90a3",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2026/2026%E5%85%A8%E5%9B%BD2(%E8%BE%BD%E5%AE%81%2C%E9%87%8D%E5%BA%86%2C%E6%B5%B7%E5%8D%97%2C%E5%90%89%E6%9E%97%2C%E9%BB%91%E9%BE%99%E6%B1%9F%2C%E5%B1%B1%E8%A5%BF%2C%E4%BA%91%E5%8D%97%2C%E5%B9%BF%E8%A5%BF%2C%E7%94%98%E8%82%83%2C%E8%B4%B5%E5%B7%9E%2C%E6%96%B0%E7%96%86%2C%E5%9B%9B%E5%B7%9D%2C%E5%86%85%E8%92%99%E5%8F%A4%2C%E9%99%95%E8%A5%BF%2C%E9%9D%92%E6%B5%B7%2C%E5%AE%81%E5%A4%8F%2C%E8%A5%BF%E8%97%8F).pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2026-shanghai",
+      "exam": "gaokao",
+      "year": 2026,
+      "variant": "上海",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2026/2026上海.pdf",
+        "gitBlobSha": "786d9c540fde71603bc49bbd1374d8b965822904",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2026/2026%E4%B8%8A%E6%B5%B7.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "gaokao-2026-tianjin",
+      "exam": "gaokao",
+      "year": 2026,
+      "variant": "天津",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2026/2026天津.pdf",
+        "gitBlobSha": "9bcc71a224c7d0d06543b15b7c45a12b7a06090e",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2026/2026%E5%A4%A9%E6%B4%A5.pdf",
+        "fileKind": "pdf",
+        "presence": "repository_tree_blob_only",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "Collection repo declares CC BY 4.0 for compilation; original exam questions remain with their respective rights holders."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-1-2022",
+      "exam": "kaoyan",
+      "subject": "数学一",
+      "year": 2022,
+      "variant": "math-1",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学一/2022",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%80/2022",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学一/2022/Q01_id731.png",
+          "gitBlobSha": "8b1a42475cd567875fe22c23e4ded85aff2d3e1e"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学一/2022/Q02_id729.png",
+          "gitBlobSha": "7d9f679ba4605af0d35ca27d0cd01c2b15443ce9"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学一/2022/Q03_id730.png",
+          "gitBlobSha": "7957d54f1760b7d023117114160ec1e101746720"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学一/2022/Q04_id725.png",
+          "gitBlobSha": "fb83d5d0e553e1b96ccfef09e613fe2538f6cc18"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学一/2022/Q05_id726.png",
+          "gitBlobSha": "89a35a94b4de0be972068efdde08a2962da064c7"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学一/2022/Q06_id728.png",
+          "gitBlobSha": "f1010b684acc0f71e08ad7283a0dc7c10034cf3a"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学一/2022/Q07_id727.png",
+          "gitBlobSha": "32748a76689f13422c9159a67a0553ff35a611f8"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学一/2022/Q08_id710.png",
+          "gitBlobSha": "8d915efb30bd16b0d0bea6c222f07bcd005b4030"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学一/2022/Q09_id711.png",
+          "gitBlobSha": "d75f1b20d99b5b175219974365c133724256d852"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学一/2022/Q10_id719.png",
+          "gitBlobSha": "71fe63c84014ff25ae7495e5f5a5425c324e7437"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学一/2022/Q11_id718.png",
+          "gitBlobSha": "5bb7ee330b7e92ab2bb8a1de3deba866efc45306"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学一/2022/Q12_id716.png",
+          "gitBlobSha": "28a604c708d42670b4067fa6a387907e91547a73"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学一/2022/Q13_id717.png",
+          "gitBlobSha": "ec8920d3feba06a4d87874b9a331ae4af3b0f98b"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学一/2022/Q14_id712.png",
+          "gitBlobSha": "614df59ec9e74e74b8e11305deb1cae2bf66b07e"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学一/2022/Q15_id713.png",
+          "gitBlobSha": "20024f007a078f6d1fcb75848491c0e1bc290734"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学一/2022/Q16_id715.png",
+          "gitBlobSha": "fa468274f88061b85c5151afb9492e2aafb858ee"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学一/2022/Q17_id714.png",
+          "gitBlobSha": "a7650def0d560ed410c0bb91a9e36749278ee5eb"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学一/2022/Q18_id723.png",
+          "gitBlobSha": "34fe8f2afbfcaf4780e92a99062a4ec770a19869"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学一/2022/Q19_id724.png",
+          "gitBlobSha": "0c1db41fc84843e61bb4fc954e149fa3fa9fa10b"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学一/2022/Q20_id721.png",
+          "gitBlobSha": "de3dab76e838262ad3e72085b2cc01c8efa349da"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学一/2022/Q21_id720.png",
+          "gitBlobSha": "f5879cdc15a1e46d501738d6208c04a893595c18"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学一/2022/Q22_id722.png",
+          "gitBlobSha": "9c43644c1a9aa0cab0f1015810bb5f2b39425558"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-2-2022",
+      "exam": "kaoyan",
+      "subject": "数学二",
+      "year": 2022,
+      "variant": "math-2",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学二/2022",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%BA%8C/2022",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学二/2022/Q01_id1002.png",
+          "gitBlobSha": "bde30bb29c718dc180866f96b96726fe9f718482"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学二/2022/Q02_id1000.png",
+          "gitBlobSha": "14d78aef65023cf16548a15f8459ceaa18812c69"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学二/2022/Q03_id1001.png",
+          "gitBlobSha": "5e101df04be5fff1cc755dac0ccecc1a7fd8a1a8"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学二/2022/Q04_id996.png",
+          "gitBlobSha": "464155f44f76530a617fdd891a49e17af3953008"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学二/2022/Q05_id997.png",
+          "gitBlobSha": "83763a27dac79757520619aa26ed0b878ac82d49"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学二/2022/Q06_id999.png",
+          "gitBlobSha": "20874aefc284bd85af6d235f8939a9e8a9813a31"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学二/2022/Q07_id998.png",
+          "gitBlobSha": "d28228a6aca9529369874304dd7e03c217029852"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学二/2022/Q08_id981.png",
+          "gitBlobSha": "c2ae972b1e9b09625ada187137da4d2bcc0d6621"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学二/2022/Q09_id982.png",
+          "gitBlobSha": "3a028d63304f38ac37c5d67ec71c05c29c84153f"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学二/2022/Q10_id990.png",
+          "gitBlobSha": "e38e61495e300f310d0639ff033efeafe6b94feb"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学二/2022/Q11_id989.png",
+          "gitBlobSha": "8282fa3565c2d08d97bab554949b0cc24949774a"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学二/2022/Q12_id987.png",
+          "gitBlobSha": "4caa7a32082d2790b8df7a22c592481e8f92b9eb"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学二/2022/Q13_id988.png",
+          "gitBlobSha": "214efdf7c0db7945f83a19ee0c1a47d666ab62e5"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学二/2022/Q14_id983.png",
+          "gitBlobSha": "44b67524fce86aa2e78e2d82dd2535ce5deae608"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学二/2022/Q15_id984.png",
+          "gitBlobSha": "cef627aa47b79b4cb2ef8021ed35f3110248bf39"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学二/2022/Q16_id986.png",
+          "gitBlobSha": "5b3bf645624dfd7818a1bebd24ba01ccf1444c25"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学二/2022/Q17_id985.png",
+          "gitBlobSha": "b01df180b50757c1bb571297c7f42e7243a4f0c0"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学二/2022/Q18_id994.png",
+          "gitBlobSha": "3679838e16c28eee431a173fe21070c6d4404b71"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学二/2022/Q19_id995.png",
+          "gitBlobSha": "0c6f62183c9b065c9d12dbfa17d4124bdfedff19"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学二/2022/Q20_id992.png",
+          "gitBlobSha": "51fd518f57f6a77e9e6da46d5f00193fe2d69289"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学二/2022/Q21_id991.png",
+          "gitBlobSha": "af4bc6a1955815923c010cfd6c04d845788b06f2"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学二/2022/Q22_id993.png",
+          "gitBlobSha": "988ed6aa50c64112f8433da2fe3e5f935ab8db63"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified",
+      "secondaryCandidate": {
+        "repository": "TsekaLuk/Kaoyan-Math2-Papers",
+        "revision": "fd42c56eed412cce0cb97d6bd688f314c78e542e",
+        "path": "solutions/2022/math2_2022/math2_2022.md",
+        "gitBlobSha": "a256f908ba4dd13e4e3da861857dce6e19f47c29",
+        "url": "https://github.com/TsekaLuk/Kaoyan-Math2-Papers/blob/fd42c56eed412cce0cb97d6bd688f314c78e542e/solutions/2022/math2_2022/math2_2022.md",
+        "status": "unverified_pdf_conversion_not_answer_gold"
+      }
+    },
+    {
+      "paperId": "kaoyan-math-3-2022",
+      "exam": "kaoyan",
+      "subject": "数学三",
+      "year": 2022,
+      "variant": "math-3",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学三/2022",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%89/2022",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学三/2022/Q01_id1273.png",
+          "gitBlobSha": "e3d6ddf01eaeb10119e8e25dd0b9d1da2d7f7158"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学三/2022/Q02_id1271.png",
+          "gitBlobSha": "a4013ecf466f5c960858341ccea7ab58860c219b"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学三/2022/Q03_id1272.png",
+          "gitBlobSha": "e64cdcf9e24280f74117219b7a3814837aecf802"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学三/2022/Q04_id1267.png",
+          "gitBlobSha": "ec5da82b4eaf53a2521dffa22cc48050ecc30145"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学三/2022/Q05_id1268.png",
+          "gitBlobSha": "965295ad14d3631e68ba977310323b8fd6966ae3"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学三/2022/Q06_id1270.png",
+          "gitBlobSha": "dece30b4715c23cad3321c634bfa40577e5c3e6a"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学三/2022/Q07_id1269.png",
+          "gitBlobSha": "9b6a213aa212864b9cb2fcb770fea44a265b4ed9"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学三/2022/Q08_id1252.png",
+          "gitBlobSha": "8d4c157dd8d92f1f9c661b117846f560c9d26864"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学三/2022/Q09_id1253.png",
+          "gitBlobSha": "1cc1bdb12d2320dd3e942dd9d795bbad5dc43877"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学三/2022/Q10_id1261.png",
+          "gitBlobSha": "f0ade21072118a02be92da4172f52696aab7c197"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学三/2022/Q11_id1260.png",
+          "gitBlobSha": "8282fa3565c2d08d97bab554949b0cc24949774a"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学三/2022/Q12_id1258.png",
+          "gitBlobSha": "3df0456aad82c05f58347e50eacb91ec70c30bd8"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学三/2022/Q13_id1259.png",
+          "gitBlobSha": "9f101ba32cfd98b4dce3c59f56efadaadcc6875f"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学三/2022/Q14_id1254.png",
+          "gitBlobSha": "eebb3c46383aafcfd00a8ab3a2328a837395fda2"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学三/2022/Q15_id1255.png",
+          "gitBlobSha": "9923ef9b72b2f011527009bc8d0676de204f1111"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学三/2022/Q16_id1257.png",
+          "gitBlobSha": "cbfb87484099bf3cfb9d2a5485f3d19ef57da78c"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学三/2022/Q17_id1256.png",
+          "gitBlobSha": "b35dc3f8c088157ac612404f682436413138ff40"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学三/2022/Q18_id1265.png",
+          "gitBlobSha": "2a2bd2c10785ad4af40c2a1ef3d233e7803ce71f"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学三/2022/Q19_id1266.png",
+          "gitBlobSha": "0c6f62183c9b065c9d12dbfa17d4124bdfedff19"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学三/2022/Q20_id1263.png",
+          "gitBlobSha": "16a502f1f9ce15de6ab1dd6f824b1570b610d60b"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学三/2022/Q21_id1262.png",
+          "gitBlobSha": "49ecd37c96b83f7266c37b61980437f0c9b9c3fd"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学三/2022/Q22_id1264.png",
+          "gitBlobSha": "2cb312cd129bb2416363031039f9bb28cedb28bb"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-1-2023",
+      "exam": "kaoyan",
+      "subject": "数学一",
+      "year": 2023,
+      "variant": "math-1",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学一/2023",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%80/2023",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学一/2023/Q01_id709.png",
+          "gitBlobSha": "bfb55c7ac3260b97431ceb303abc32dc840ba42e"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学一/2023/Q02_id707.png",
+          "gitBlobSha": "280bc4bcb17219126e6b3a31ebfdd4b5d6e069b3"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学一/2023/Q03_id708.png",
+          "gitBlobSha": "6c4f1211806ffbda0dc80a13732efa048a0db97d"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学一/2023/Q04_id703.png",
+          "gitBlobSha": "a62d11a5bcb0a74352b7e86ef4d6f5961479f4c1"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学一/2023/Q05_id704.png",
+          "gitBlobSha": "f2dfe2357476ecd7ab3bd5098f85f31125509613"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学一/2023/Q06_id706.png",
+          "gitBlobSha": "d71c40c46d9224868402a6e427efe79f640abbdf"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学一/2023/Q07_id705.png",
+          "gitBlobSha": "fd15d29e9a465d06a53e2416add1ab8c3f56329b"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学一/2023/Q08_id688.png",
+          "gitBlobSha": "e93a20e94b1e470face4423b291c5ed113de87e2"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学一/2023/Q09_id689.png",
+          "gitBlobSha": "a2762b2cba11b675fb84853218153d147aec3fad"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学一/2023/Q10_id697.png",
+          "gitBlobSha": "28ee8609f220326bdc5c5df46905ee1accddfe7e"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学一/2023/Q11_id696.png",
+          "gitBlobSha": "33ddd412c5d0074d438e40837f2a5948ca0fa8e3"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学一/2023/Q12_id694.png",
+          "gitBlobSha": "1f92eb09442a5ac6d350d34212ff28fb36fd864a"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学一/2023/Q13_id695.png",
+          "gitBlobSha": "95814556b3271bbe7a7445d731c26ff8a23fbc1f"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学一/2023/Q14_id690.png",
+          "gitBlobSha": "2e5ea1bf10dc6ab75595fc75ac8bfee8a0750d24"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学一/2023/Q15_id691.png",
+          "gitBlobSha": "25e07b42286661c5da3ba667d395b588178c6930"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学一/2023/Q16_id693.png",
+          "gitBlobSha": "644ecefbdf191b9938152bd8ad734c423828ec2d"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学一/2023/Q17_id692.png",
+          "gitBlobSha": "9442ebb4a0bc54893118735e775c829f7cdd0c0f"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学一/2023/Q18_id701.png",
+          "gitBlobSha": "abfb294ef4f638950a4cc1c8081aa056ab5d9788"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学一/2023/Q19_id702.png",
+          "gitBlobSha": "72a4358831db4b0f44dcb25be2f2824358459dba"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学一/2023/Q20_id699.png",
+          "gitBlobSha": "1419fce940d3519f977bee005e1eb9c21d6f9b8a"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学一/2023/Q21_id698.png",
+          "gitBlobSha": "5d9464977eafb1082b19792e97e868fdf9feb406"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学一/2023/Q22_id700.png",
+          "gitBlobSha": "eb2e4a967822503b304a3f26ee494d2c9b6937e7"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-2-2023",
+      "exam": "kaoyan",
+      "subject": "数学二",
+      "year": 2023,
+      "variant": "math-2",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学二/2023",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%BA%8C/2023",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学二/2023/Q01_id980.png",
+          "gitBlobSha": "494a32985a7cd04c117ec8757c86f96d7313bf26"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学二/2023/Q02_id978.png",
+          "gitBlobSha": "f87647a9e6c112a434509f90eee06c5f096b84e1"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学二/2023/Q03_id979.png",
+          "gitBlobSha": "c662aea009fc511a8a937a1cd271747d8b2ee829"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学二/2023/Q04_id974.png",
+          "gitBlobSha": "8c69d4f9efdd616202a01a0b4ff9f541c7bb1252"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学二/2023/Q05_id975.png",
+          "gitBlobSha": "5cd719c0a3ab8098caf23c0f43bba32572ced1e1"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学二/2023/Q06_id977.png",
+          "gitBlobSha": "b81a6c8ed0fcee10bb60e0eb51ab6566d6f3c3d1"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学二/2023/Q07_id976.png",
+          "gitBlobSha": "1242fae7889d733afb5f206afbb7c7e879a7bcdc"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学二/2023/Q08_id959.png",
+          "gitBlobSha": "98d0c9172379d0a3bd51501677ad2767b98e02d8"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学二/2023/Q09_id960.png",
+          "gitBlobSha": "b6268a0dfdbf6e1e685ded1683112dab754e2d26"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学二/2023/Q10_id968.png",
+          "gitBlobSha": "911c80499f5d4a29e78b70b9966229e562596f4b"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学二/2023/Q11_id967.png",
+          "gitBlobSha": "33ddd412c5d0074d438e40837f2a5948ca0fa8e3"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学二/2023/Q12_id965.png",
+          "gitBlobSha": "a1a12feaf3bf4587a846792df451db1a97819478"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学二/2023/Q13_id966.png",
+          "gitBlobSha": "70153376e627315706a21660df5e4d85750bfac5"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学二/2023/Q14_id961.png",
+          "gitBlobSha": "4d06b8ef46e2f286982cf1fd97edb8a46980b6e1"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学二/2023/Q15_id962.png",
+          "gitBlobSha": "7a5110170ba3a94ecb83dbc30e9d20c742bfd3c8"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学二/2023/Q16_id964.png",
+          "gitBlobSha": "8daea26401e47cfcb1b258673b99ae66b0ac4d09"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学二/2023/Q17_id963.png",
+          "gitBlobSha": "f6c60a3d02f5033484043e9e3034c3f73e1a5089"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学二/2023/Q18_id972.png",
+          "gitBlobSha": "dfc7b9660d59a91c79fa302688214f5f6511a69c"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学二/2023/Q19_id973.png",
+          "gitBlobSha": "3fcc486899e421f02d51c5f219f79495dc8adc25"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学二/2023/Q20_id970.png",
+          "gitBlobSha": "6ad26adad005cca5c4bab664346d4df53920536b"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学二/2023/Q21_id969.png",
+          "gitBlobSha": "b2784ac3e33c8858986ce2237b6845422d2fa769"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学二/2023/Q22_id971.png",
+          "gitBlobSha": "8b39752ed5a707b4642e49afa89d03f5ea6b6c13"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified",
+      "secondaryCandidate": {
+        "repository": "TsekaLuk/Kaoyan-Math2-Papers",
+        "revision": "fd42c56eed412cce0cb97d6bd688f314c78e542e",
+        "path": "solutions/2023/math2_2023/math2_2023.md",
+        "gitBlobSha": "256516f4af3670d7e5932f4bf0628c1a34154d89",
+        "url": "https://github.com/TsekaLuk/Kaoyan-Math2-Papers/blob/fd42c56eed412cce0cb97d6bd688f314c78e542e/solutions/2023/math2_2023/math2_2023.md",
+        "status": "unverified_pdf_conversion_not_answer_gold"
+      }
+    },
+    {
+      "paperId": "kaoyan-math-3-2023",
+      "exam": "kaoyan",
+      "subject": "数学三",
+      "year": 2023,
+      "variant": "math-3",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学三/2023",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%89/2023",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学三/2023/Q01_id1251.png",
+          "gitBlobSha": "87e762c82fe37173b8cda0e281458cd462914af6"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学三/2023/Q02_id1249.png",
+          "gitBlobSha": "9c8c9f516d1e6c15927d688d714c813af7fbd6ee"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学三/2023/Q03_id1250.png",
+          "gitBlobSha": "3cdd6b2fa0fb1c8e7c73dc7e1995c23700040d3d"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学三/2023/Q04_id1245.png",
+          "gitBlobSha": "41d0b1cb98564a1685b30a16fb53797f002751bc"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学三/2023/Q05_id1246.png",
+          "gitBlobSha": "4fd5a3b9778a1b4350d0d3beeef4e24e8e8e902c"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学三/2023/Q06_id1248.png",
+          "gitBlobSha": "6fec6670e32e0579505667271930c3d308bc61a4"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学三/2023/Q07_id1247.png",
+          "gitBlobSha": "0d029d6d3e808c8456ad96273af8946d60d6af07"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学三/2023/Q08_id1230.png",
+          "gitBlobSha": "b5594ea3e66070a71cd001bcf8de5303379ad813"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学三/2023/Q09_id1231.png",
+          "gitBlobSha": "9a1027f4727a6901931502ec81a3cafbb4fa753c"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学三/2023/Q10_id1239.png",
+          "gitBlobSha": "a6be5dd45fae8d20f61fad64bead01022db885fc"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学三/2023/Q11_id1238.png",
+          "gitBlobSha": "7493398f2fa1ac7ad0b20e5a749f5dea7796a76a"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学三/2023/Q12_id1236.png",
+          "gitBlobSha": "619a7735660612d3d9e16b05f60711f417c6b689"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学三/2023/Q13_id1237.png",
+          "gitBlobSha": "6bf189f7d9996c7e46a83dc17af3fe716107237f"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学三/2023/Q14_id1232.png",
+          "gitBlobSha": "907ef0043a3e2d91319dc81ab256226ab0e9467d"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学三/2023/Q15_id1233.png",
+          "gitBlobSha": "235fccf4b96a641ce5e8a3423de2158f6d59741d"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学三/2023/Q16_id1235.png",
+          "gitBlobSha": "045aad35311c9c888828c24a297cd1cd1ce103fc"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学三/2023/Q17_id1234.png",
+          "gitBlobSha": "f1968c04965a5432b7a7f2ee655b1b0ddc5f7a14"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学三/2023/Q18_id1243.png",
+          "gitBlobSha": "f966afbc89bd9763dfedd1096258803e160ace84"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学三/2023/Q19_id1244.png",
+          "gitBlobSha": "d6179b46eb7442fc989fcff06704f736514eaf4a"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学三/2023/Q20_id1241.png",
+          "gitBlobSha": "14b12833d0184850ac3b12362888ee58faa2f7be"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学三/2023/Q21_id1240.png",
+          "gitBlobSha": "faa7edf253cba31881085b4e61f3ede2d966df5d"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学三/2023/Q22_id1242.png",
+          "gitBlobSha": "c13f3d9512197ad72934ad99a531562ad2ebbf72"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-1-2024",
+      "exam": "kaoyan",
+      "subject": "数学一",
+      "year": 2024,
+      "variant": "math-1",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学一/2024",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%80/2024",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学一/2024/Q01_id687.png",
+          "gitBlobSha": "9b8aba3af33fe5784d15bb8427bcf84505261be0"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学一/2024/Q02_id685.png",
+          "gitBlobSha": "6d40d6f7df50bf844e1ead75f6d529471d2f22ca"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学一/2024/Q03_id686.png",
+          "gitBlobSha": "0d1b4bf0b36d5b61ea1e232c75046700fb6a4c25"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学一/2024/Q04_id681.png",
+          "gitBlobSha": "5bafabd0a66ec65a7fa6569d2722167c505bcf4b"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学一/2024/Q05_id682.png",
+          "gitBlobSha": "7c1598b85576f49a402bc97c34147a45000b17ca"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学一/2024/Q06_id684.png",
+          "gitBlobSha": "a7fcbdede60e648b8d3a6c3aaa8546eeec332e7f"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学一/2024/Q07_id683.png",
+          "gitBlobSha": "e4478c97ff26d1e5bc1ae7456035285ae12b5297"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学一/2024/Q08_id666.png",
+          "gitBlobSha": "a1ed85e35afcc3b0a0ce833fd18fc27d3ffb56c7"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学一/2024/Q09_id667.png",
+          "gitBlobSha": "d049880956434fc6d4f23c6a179d1d32fa2698b9"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学一/2024/Q10_id675.png",
+          "gitBlobSha": "dbbd84513591b1175a75e6b03df7e6b4db6d47bc"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学一/2024/Q11_id674.png",
+          "gitBlobSha": "4068fbd1ae25a991cde2a0a9e64c52521b026b9b"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学一/2024/Q12_id672.png",
+          "gitBlobSha": "8c74c46ad508a6f295728d31e7adc7af8cfc4b65"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学一/2024/Q13_id673.png",
+          "gitBlobSha": "111455a8441e762a3c9f6e4e9c714e796eec2db8"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学一/2024/Q14_id668.png",
+          "gitBlobSha": "8f3413cb61221644bfc8e4c29747d60227e889e0"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学一/2024/Q15_id669.png",
+          "gitBlobSha": "fc53ee159d91c18506efc47fb556342b441ed439"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学一/2024/Q16_id671.png",
+          "gitBlobSha": "59d5e440fb7ea9a554d784ad28f9ce7f5f7cd370"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学一/2024/Q17_id670.png",
+          "gitBlobSha": "0c1017951a7aff651b381c26c007d505e5dc88e8"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学一/2024/Q18_id679.png",
+          "gitBlobSha": "a83975d97bb4f1da6a7c95e1b20fd2289690f6b6"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学一/2024/Q19_id680.png",
+          "gitBlobSha": "0094ff6b60fbdc381e5a3618b51d1fe51c02b2f4"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学一/2024/Q20_id677.png",
+          "gitBlobSha": "b98d4c656dd8901caeb007803268a2697e457ff1"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学一/2024/Q21_id676.png",
+          "gitBlobSha": "9fd3059760510d4ccf8853a903e7a6abe365067e"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学一/2024/Q22_id678.png",
+          "gitBlobSha": "eb158ba20c252aa55baf61f579b2efab25b1a72f"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-2-2024",
+      "exam": "kaoyan",
+      "subject": "数学二",
+      "year": 2024,
+      "variant": "math-2",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学二/2024",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%BA%8C/2024",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学二/2024/Q01_id958.png",
+          "gitBlobSha": "46fef580868a68899a2eaa8998cdabf682c37755"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学二/2024/Q02_id956.png",
+          "gitBlobSha": "33c3bcedfbca93f5a6acd5aec8d7a75a61bd9282"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学二/2024/Q03_id957.png",
+          "gitBlobSha": "19ffe5fe8364ff7ba50f763f8f4c92b7d77102ab"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学二/2024/Q04_id952.png",
+          "gitBlobSha": "6f5f7a38272125e01b8052d11068962167e1a4d2"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学二/2024/Q05_id953.png",
+          "gitBlobSha": "f461fe3c8255cc397fa4a601479c5151d780f07c"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学二/2024/Q06_id955.png",
+          "gitBlobSha": "f3b7bff0d0a690b8398af13d1a7914e18f9ed39c"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学二/2024/Q07_id954.png",
+          "gitBlobSha": "0bb2985c990e0d2ab7fa62a9b813fa36b40e0d13"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学二/2024/Q08_id937.png",
+          "gitBlobSha": "ae1bc4547df465a48a5e11d30ffb59c8a071a2ce"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学二/2024/Q09_id938.png",
+          "gitBlobSha": "a9cee5706b9bccfffb52371a5b699aab771cd4c6"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学二/2024/Q10_id946.png",
+          "gitBlobSha": "0d69629c3cfafd72ed29a3674386c1bd26683abc"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学二/2024/Q11_id945.png",
+          "gitBlobSha": "dda8740fcc3d07e21ff8f8b45d800e1e22ae383e"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学二/2024/Q12_id943.png",
+          "gitBlobSha": "bffba4952abd26c904928ed6455cf24f72541b75"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学二/2024/Q13_id944.png",
+          "gitBlobSha": "1e22b5b5d82acc7a6160877c1a785a227d394ed7"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学二/2024/Q14_id939.png",
+          "gitBlobSha": "ff1c807ad8a386fefb011be2ac0dc382277a4824"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学二/2024/Q15_id940.png",
+          "gitBlobSha": "fd057c193f91c15c92fe9849dc38d768023d6720"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学二/2024/Q16_id942.png",
+          "gitBlobSha": "b2e0c8c7e06486f350f24c1b01e285680120d958"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学二/2024/Q17_id941.png",
+          "gitBlobSha": "c9e62e6bcb7b58ec84826a5a8b609b85a42c011f"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学二/2024/Q18_id950.png",
+          "gitBlobSha": "56610ce2f9a38d8b17e34c588bab9583910417f2"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学二/2024/Q19_id951.png",
+          "gitBlobSha": "ef1b44c537bd3f5f217b4a87b921d45ce0fb54bb"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学二/2024/Q20_id948.png",
+          "gitBlobSha": "dfaa862aed208043671916af9bae516ee6a32f9f"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学二/2024/Q21_id947.png",
+          "gitBlobSha": "bd94c3d250a5ff5b80f0e2faaa71de7605e097ff"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学二/2024/Q22_id949.png",
+          "gitBlobSha": "594fc5c482a08c76ca43362cb8300b67edc60acc"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified",
+      "secondaryCandidate": {
+        "repository": "TsekaLuk/Kaoyan-Math2-Papers",
+        "revision": "fd42c56eed412cce0cb97d6bd688f314c78e542e",
+        "path": "solutions/2024/math2_2024.md",
+        "gitBlobSha": "7a3c273a15e7adbf240bd2dec8f83787fc79428a",
+        "url": "https://github.com/TsekaLuk/Kaoyan-Math2-Papers/blob/fd42c56eed412cce0cb97d6bd688f314c78e542e/solutions/2024/math2_2024.md",
+        "status": "unverified_pdf_conversion_not_answer_gold"
+      }
+    },
+    {
+      "paperId": "kaoyan-math-3-2024",
+      "exam": "kaoyan",
+      "subject": "数学三",
+      "year": 2024,
+      "variant": "math-3",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学三/2024",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%89/2024",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学三/2024/Q01_id1229.png",
+          "gitBlobSha": "3c9f9feba9aefbd879af44839dc0375b974b5c03"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学三/2024/Q02_id1227.png",
+          "gitBlobSha": "0ead4c58b27a55f822e32fd8293f974a007001eb"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学三/2024/Q03_id1228.png",
+          "gitBlobSha": "a9fa2b7b58319ba26ad28f21858c3767a6eea788"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学三/2024/Q04_id1223.png",
+          "gitBlobSha": "c9a2600df5772445c2841b9c17839c97d5890773"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学三/2024/Q05_id1224.png",
+          "gitBlobSha": "bd1fa6354f448ebef0caebff2bbbe3e9e4a7e963"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学三/2024/Q06_id1226.png",
+          "gitBlobSha": "a85a0ff26d6bce96bc53cd64179b157268c0fc97"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学三/2024/Q07_id1225.png",
+          "gitBlobSha": "527f24e83f7cccf455c01972ce029138fd042a44"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学三/2024/Q08_id1208.png",
+          "gitBlobSha": "20fdfbc35eb61a3ccd8f43f05e851907e14a052f"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学三/2024/Q09_id1209.png",
+          "gitBlobSha": "916fb141fea2289c5b1f5cdedc84a424fa1d2a57"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学三/2024/Q10_id1217.png",
+          "gitBlobSha": "f05a6bbff885a27f3bc8d865a9b08b6487f83e16"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学三/2024/Q11_id1216.png",
+          "gitBlobSha": "e0ee85c99016cfa7e8219e690b9d24eb4f6f2144"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学三/2024/Q12_id1214.png",
+          "gitBlobSha": "acdd1ddd328c9f4557daabde5d2631bfd2189890"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学三/2024/Q13_id1215.png",
+          "gitBlobSha": "d3b264c1f57ae2b408fce7ace84166003293004f"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学三/2024/Q14_id1210.png",
+          "gitBlobSha": "c26d3adaf7c3efcca5da1c6636b866d05d0bd3bc"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学三/2024/Q15_id1211.png",
+          "gitBlobSha": "7c6f506ae85c09c30bc286fe5f9fd4b265afc603"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学三/2024/Q16_id1213.png",
+          "gitBlobSha": "59d5e440fb7ea9a554d784ad28f9ce7f5f7cd370"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学三/2024/Q17_id1212.png",
+          "gitBlobSha": "2898b0e9f22da706b598edaa47644eb20f9e9eaa"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学三/2024/Q18_id1221.png",
+          "gitBlobSha": "27d01b0892b7f06d755a68db5fbd6f94e33a2f09"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学三/2024/Q19_id1222.png",
+          "gitBlobSha": "a3936f14fa21006b4d1afe02605d04d526d1a997"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学三/2024/Q20_id1219.png",
+          "gitBlobSha": "495bfa583023b05c6ad66afb338865fde236f784"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学三/2024/Q21_id1218.png",
+          "gitBlobSha": "4fef433303d6667774ac44db84a6749bcc474372"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学三/2024/Q22_id1220.png",
+          "gitBlobSha": "dbfe5da7611c55568be7c98775f84d00b6727412"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-1-2025",
+      "exam": "kaoyan",
+      "subject": "数学一",
+      "year": 2025,
+      "variant": "math-1",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学一/2025",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%80/2025",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学一/2025/Q01_id665.png",
+          "gitBlobSha": "d734c3c050595d53c949543fb42d86c513e7794e"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学一/2025/Q02_id663.png",
+          "gitBlobSha": "050640823352b2affa4e97cc604235e6bf336043"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学一/2025/Q03_id664.png",
+          "gitBlobSha": "b8c621e9fe2dd6e04486a13ab141621f99ad59c7"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学一/2025/Q04_id659.png",
+          "gitBlobSha": "9e17bc5cf8799a79870a6bfda144bfe56ce85a66"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学一/2025/Q05_id660.png",
+          "gitBlobSha": "b8bfa7873c6c35ffc62140206f65af614d7002fe"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学一/2025/Q06_id662.png",
+          "gitBlobSha": "f5e225ee9ef0f2a42ea371123b3d73b5a89683c9"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学一/2025/Q07_id661.png",
+          "gitBlobSha": "bca2da1d6ec4a1c158b8bb188fe609274a7231cc"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学一/2025/Q08_id644.png",
+          "gitBlobSha": "02eefa87c7e3de94d77207b2e6c1d232adbad3b8"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学一/2025/Q09_id645.png",
+          "gitBlobSha": "dbe93a041b70ed5cb692a8de059f4cae3cc41dda"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学一/2025/Q10_id653.png",
+          "gitBlobSha": "2a01169742ac899fd8f3df41e70645dcae95fe64"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学一/2025/Q11_id652.png",
+          "gitBlobSha": "bd40910112e05264b89afbd12eb5cf569170e8d3"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学一/2025/Q12_id650.png",
+          "gitBlobSha": "3c8be49742f34f5257f8e6f694f61afafff5f762"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学一/2025/Q13_id651.png",
+          "gitBlobSha": "6578eb900ea8d5dd7375180aeb2b250a2ec03f85"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学一/2025/Q14_id646.png",
+          "gitBlobSha": "294677810c0affdab97c476300ec47321855b2dd"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学一/2025/Q15_id647.png",
+          "gitBlobSha": "3c839a0bfbec5f95d7bb47d6917dbee778d90e87"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学一/2025/Q16_id649.png",
+          "gitBlobSha": "06dd7d4e81d404940945ce691228ba55447a5331"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学一/2025/Q17_id648.png",
+          "gitBlobSha": "36bf4d884c4c881fb60cfd5ff27564a4707654a0"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学一/2025/Q18_id657.png",
+          "gitBlobSha": "2b24741d749e0d532a040d1326a2ecd6fafc2a7b"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学一/2025/Q19_id658.png",
+          "gitBlobSha": "61041c9fc5cd497b92e538bff510bd14162dc4b9"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学一/2025/Q20_id655.png",
+          "gitBlobSha": "3ff60e21bbc56b8fa8f6d3c2505a3e2aa181c5e5"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学一/2025/Q21_id654.png",
+          "gitBlobSha": "6283b03f0cd04059de2283c4d48bc93539fe2fa4"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学一/2025/Q22_id656.png",
+          "gitBlobSha": "426dee8ab3f9c508646e7ca390e720aa2fec5d64"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-2-2025",
+      "exam": "kaoyan",
+      "subject": "数学二",
+      "year": 2025,
+      "variant": "math-2",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学二/2025",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%BA%8C/2025",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学二/2025/Q01_id936.png",
+          "gitBlobSha": "f112f87d89d19f3dc32e9e9366ab0410ffbcff63"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学二/2025/Q02_id934.png",
+          "gitBlobSha": "78eee216bd069fe1a683b5f5715fcbcdda9b8d64"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学二/2025/Q03_id935.png",
+          "gitBlobSha": "2549d133f2b05df03b4e90cc002594c7d0e36506"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学二/2025/Q04_id930.png",
+          "gitBlobSha": "740fc13d4537239f66268b0b9a17f4b9d922d764"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学二/2025/Q05_id931.png",
+          "gitBlobSha": "6d2c1f92e946859c519f527f3ddc3a1063824698"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学二/2025/Q06_id933.png",
+          "gitBlobSha": "bd9f4239a5e42c4f7f60d08f8105e747260fedd1"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学二/2025/Q07_id932.png",
+          "gitBlobSha": "f7a6242accd0b760831f9cf76e70b5a070aaf074"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学二/2025/Q08_id915.png",
+          "gitBlobSha": "98f74a3ca6fc1d48bd69720fcc3fd1feca3ab85a"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学二/2025/Q09_id916.png",
+          "gitBlobSha": "62fecde9d8552f6c5a622e1b2587c7fa5ec87328"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学二/2025/Q10_id924.png",
+          "gitBlobSha": "af19878b95f9e414ed8fe4045cf4e0c38a0a9b3a"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学二/2025/Q11_id923.png",
+          "gitBlobSha": "abcb30e040ed1b53d78d42da91643a11b2df6790"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学二/2025/Q12_id921.png",
+          "gitBlobSha": "14e0ba88e5f838b1631c932ee7a93113226d522e"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学二/2025/Q13_id922.png",
+          "gitBlobSha": "522a35b9d5b2f336f0c20ccf84fdb27783a4bc60"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学二/2025/Q14_id917.png",
+          "gitBlobSha": "7f1b22dee1de3bb3b4c1f8b3db0941169c29d816"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学二/2025/Q15_id918.png",
+          "gitBlobSha": "43833799df6a156284ee4426ee139fc7fae1388c"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学二/2025/Q16_id920.png",
+          "gitBlobSha": "8f5ac51140b0ada4a8188f235ee409f1eb99ee36"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学二/2025/Q17_id919.png",
+          "gitBlobSha": "151b95ed7cdad6ae0c4e65947801bcb7fa8e5020"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学二/2025/Q18_id928.png",
+          "gitBlobSha": "7515ecc8c32b2e5f173147252506b2a897ed622c"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学二/2025/Q19_id929.png",
+          "gitBlobSha": "d96eea4507fe40cf42c62064fd49d8320c4d7ad7"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学二/2025/Q20_id926.png",
+          "gitBlobSha": "68448ff5ba497f531dbd2f78b30a3061049974dc"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学二/2025/Q21_id925.png",
+          "gitBlobSha": "cc73442aaba4d7e269c7451da1e72c53453d8983"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学二/2025/Q22_id927.png",
+          "gitBlobSha": "7c6690a158d811f6914fca9ff41ef21cdc63e681"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-3-2025",
+      "exam": "kaoyan",
+      "subject": "数学三",
+      "year": 2025,
+      "variant": "math-3",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学三/2025",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%89/2025",
+        "fileKind": "question_images",
+        "presence": "22_question_image_paths_in_repository_tree",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [
+        {
+          "question": 1,
+          "path": "kaoyan_math_images/数学三/2025/Q01_id1207.png",
+          "gitBlobSha": "4c6bd306a0d52a53c71b66a91448d70903e36f3b"
+        },
+        {
+          "question": 2,
+          "path": "kaoyan_math_images/数学三/2025/Q02_id1205.png",
+          "gitBlobSha": "f135b529e1b6af3f817aca1b26900a69f7058311"
+        },
+        {
+          "question": 3,
+          "path": "kaoyan_math_images/数学三/2025/Q03_id1206.png",
+          "gitBlobSha": "dcc04e184b643b8a96856ad93f95b309ac08fe6e"
+        },
+        {
+          "question": 4,
+          "path": "kaoyan_math_images/数学三/2025/Q04_id1201.png",
+          "gitBlobSha": "aa5953772c1862bac7cf20c95bc45b452b614984"
+        },
+        {
+          "question": 5,
+          "path": "kaoyan_math_images/数学三/2025/Q05_id1202.png",
+          "gitBlobSha": "76eeaf433d003ffa17e30426c1479a4fd65ba734"
+        },
+        {
+          "question": 6,
+          "path": "kaoyan_math_images/数学三/2025/Q06_id1204.png",
+          "gitBlobSha": "7d275d950bf08353a779f08e3cfda2ef6f94a049"
+        },
+        {
+          "question": 7,
+          "path": "kaoyan_math_images/数学三/2025/Q07_id1203.png",
+          "gitBlobSha": "552b2d178fe4183851f0d68d5760d4649f0b79a6"
+        },
+        {
+          "question": 8,
+          "path": "kaoyan_math_images/数学三/2025/Q08_id1186.png",
+          "gitBlobSha": "856c3b3310e3f05f4bb94fae1cae8c4fc685ac17"
+        },
+        {
+          "question": 9,
+          "path": "kaoyan_math_images/数学三/2025/Q09_id1187.png",
+          "gitBlobSha": "4d2796fe63c0054b166e6099631750c406bbaa42"
+        },
+        {
+          "question": 10,
+          "path": "kaoyan_math_images/数学三/2025/Q10_id1195.png",
+          "gitBlobSha": "3927c2caa76febb5322f96f1aaaa20bc89e97963"
+        },
+        {
+          "question": 11,
+          "path": "kaoyan_math_images/数学三/2025/Q11_id1194.png",
+          "gitBlobSha": "3ce5ff72dd3c6b9620a673ab60bf49805a978014"
+        },
+        {
+          "question": 12,
+          "path": "kaoyan_math_images/数学三/2025/Q12_id1192.png",
+          "gitBlobSha": "f5cdd6d49f7202d07ebf63f6499aeec4ce44baf5"
+        },
+        {
+          "question": 13,
+          "path": "kaoyan_math_images/数学三/2025/Q13_id1193.png",
+          "gitBlobSha": "44d3ae6f1104b0bf8f80e929439163aed80e439a"
+        },
+        {
+          "question": 14,
+          "path": "kaoyan_math_images/数学三/2025/Q14_id1188.png",
+          "gitBlobSha": "033fdaabafab1b6d9ce9e7478e222af22ca65a56"
+        },
+        {
+          "question": 15,
+          "path": "kaoyan_math_images/数学三/2025/Q15_id1189.png",
+          "gitBlobSha": "d3d8f09874b7e8c9ccf2f97a053c092b26c11b97"
+        },
+        {
+          "question": 16,
+          "path": "kaoyan_math_images/数学三/2025/Q16_id1191.png",
+          "gitBlobSha": "a0e2db8b3573f0d7b88a56bc45b7b1bfaab46616"
+        },
+        {
+          "question": 17,
+          "path": "kaoyan_math_images/数学三/2025/Q17_id1190.png",
+          "gitBlobSha": "36bf4d884c4c881fb60cfd5ff27564a4707654a0"
+        },
+        {
+          "question": 18,
+          "path": "kaoyan_math_images/数学三/2025/Q18_id1199.png",
+          "gitBlobSha": "ef920bced033e1077a3fcbc50ef8b144ebba052e"
+        },
+        {
+          "question": 19,
+          "path": "kaoyan_math_images/数学三/2025/Q19_id1200.png",
+          "gitBlobSha": "78ea2358c8f151463272c99211db959d0c2afa41"
+        },
+        {
+          "question": 20,
+          "path": "kaoyan_math_images/数学三/2025/Q20_id1197.png",
+          "gitBlobSha": "60b7db2cbd71fe25d7c8b973828428292125dad0"
+        },
+        {
+          "question": 21,
+          "path": "kaoyan_math_images/数学三/2025/Q21_id1196.png",
+          "gitBlobSha": "1a10bc472ea9461fd15773c34b13f9cfc7512485"
+        },
+        {
+          "question": 22,
+          "path": "kaoyan_math_images/数学三/2025/Q22_id1198.png",
+          "gitBlobSha": "96ec7d1e780518bf2431f792eb61f57a5a6fb327"
+        }
+      ],
+      "questionCountFromSource": 22,
+      "answerGoldStatus": "not_verified"
+    },
+    {
+      "paperId": "kaoyan-math-1-2026",
+      "exam": "kaoyan",
+      "subject": "数学一",
+      "year": 2026,
+      "variant": "math-1",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学一/2026",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%80/2026",
+        "fileKind": "question_images",
+        "presence": "absent_from_pinned_repository",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified",
+      "fallbackDiscovery": {
+        "url": "https://static.kaoyan.cn/file/question/2025/12/27/f3a552ec0d163308d2ac28dc7a10bbd0.pdf",
+        "status": "prior_research_page_checked_third_party_pdf_not_official_gold"
+      }
+    },
+    {
+      "paperId": "kaoyan-math-2-2026",
+      "exam": "kaoyan",
+      "subject": "数学二",
+      "year": 2026,
+      "variant": "math-2",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学二/2026",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%BA%8C/2026",
+        "fileKind": "question_images",
+        "presence": "absent_from_pinned_repository",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified",
+      "fallbackDiscovery": {
+        "url": "https://kaoyan.eol.cn/shiti/shuxue/",
+        "status": "index_only_no_exam_file_pinned"
+      }
+    },
+    {
+      "paperId": "kaoyan-math-3-2026",
+      "exam": "kaoyan",
+      "subject": "数学三",
+      "year": 2026,
+      "variant": "math-3",
+      "source": {
+        "repository": "lx-ruc/kaoyanshuxue",
+        "revision": "196dc9d2d8271978a030a3721a828c8723cd3864",
+        "path": "kaoyan_math_images/数学三/2026",
+        "url": "https://github.com/lx-ruc/kaoyanshuxue/blob/196dc9d2d8271978a030a3721a828c8723cd3864/kaoyan_math_images/%E6%95%B0%E5%AD%A6%E4%B8%89/2026",
+        "fileKind": "question_images",
+        "presence": "absent_from_pinned_repository",
+        "rawPaperInspected": false,
+        "questionCountVerified": false,
+        "answersIndependentlyVerified": false,
+        "permissionNote": "No repository LICENSE was found by direct lookup; images and exam answer rights not independently cleared."
+      },
+      "questionImages": [],
+      "questionCountFromSource": null,
+      "answerGoldStatus": "not_verified",
+      "fallbackDiscovery": {
+        "url": "https://kaoyan.eol.cn/shiti/shuxue/",
+        "status": "index_only_no_exam_file_pinned"
+      }
+    }
+  ]
+}
