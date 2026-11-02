@@ -33,4 +33,4 @@ jobs:
           "$RUNNER_TEMP/multisource-math/bin/python" \
             scripts/research/adjudicate_exam_sources.py \
             > "$RUNNER_TEMP/multi-source-review.json"
-          python3 -c "import os,json; d=json.load(open(os.environ['RUNNER_TEMP']+'/multi-source-review.json')); assert d['summary']=={'cases':4,'mathematicalMethodChecks':8,'contradictedCases':2,'releasedGoldAnswers':0}; assert all(x['answerGoldCertified'] is False for x in d['items']); print('Math verified locally; three exam answers remain non-gold and conflict-aware')"
+          python3 -c "import os,json; d=json.load(open(os.environ['RUNNER_TEMP']+'/multi-source-review.json')); assert d['summary']=={'cases':4,'mathematicalMethodChecks':8,'contradictedCases':2,'releasedGoldAnswers':0}; assert all(x['answerGoldCertified'] is False for x in d['items']); print('Math verified locally; four exam answers remain non-gold and conflict-aware')"
