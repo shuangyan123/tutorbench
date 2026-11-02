@@ -75,6 +75,7 @@ import {
   renderWhyTeachingDoesNotScalePage,
 } from "../site/pages/blog.js";
 import { installSpectrumSite, isSpectrumSiteFile } from "./spectrum-site.js";
+import { publishLearningAccessSeries } from "./blog-series.js";
 
 const websiteRoot = resolve(process.cwd(), "website");
 const defaultOutputDirectory = resolve(websiteRoot, "dist");
@@ -504,6 +505,9 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
     options.siteUrl,
     isPrivateBuild,
   );
+  if (publishSpectrum) {
+    await publishLearningAccessSeries({ outputDirectory, siteUrl: options.siteUrl, basePath: options.basePath });
+  }
 
   return routeCount;
 }
