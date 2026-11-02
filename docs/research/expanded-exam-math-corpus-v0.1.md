@@ -43,3 +43,21 @@ This script checks source catalog consistency, exact IDs, all expected years and
 5. **Integration:** only allow a source-pinned, independently checked claim into a research validation set, and only later integrate into TutorBench if the human review and CI gates pass. **Keep teaching appropriateness a separate dimension.**
 
 This expansion is independent of experimental Judge prompts, canonical rubrics, blind review history and student learning outcomes. No original exam questions are copied into this repository.
+
+
+## Research claim release firewall
+
+The companion `scripts/gate-exam-reference-claims.mjs` is a **no-promotion gate**. It accepts source-paper IDs, question numbers and statuses from a bounded symbolic mathematics checker. It returns `no_exam_gold_releases` unless a future independently reviewed **source-claim-math evidence contract** is implemented and adjudicated.
+
+```sh
+node scripts/gate-exam-reference-claims.mjs \
+  --proposals fixtures/research/exam-claim-promotion-negative-controls-v0.1.json
+```
+
+All eight negative-control proposals must remain blocked; they cover apparent local symbolic success, local counterexamples, an unseen 2026 paper, an out-of-range question, a fabricated paper identity and an unsupported status. Even if source metadata is artificially changed to `rawPaperInspected` and `answersIndependentlyVerified`, the absence of an independently adjudicated evidence contract prevents release. This deliberately **does not yet implement** an automated route to a gold answer. It prevents the specific engineering mistake where a valid calculation on an incorrectly transcribed question is presented as official exam-answer correctness.
+
+A future release path must require an independent source reviewer, exact problem/paper fingerprint, formally recorded domain and answer format, a mathematical check or proof artifact, and an explicit versioned adjudication decision. None exists in this catalog.
+
+## Upstream object revalidation
+
+The isolated `Expanded Exam Mathematics Source Integrity` GitHub workflow fetches immutable Git trees for the two main repositories and independently compares all **300 referenced PDF/PNG blob hashes** to the catalog. This checks source identity and drift only; it never extracts copyrighted images or claims an answer is correct. The `npm test` suite additionally injects tampered blob SHAs, duplicate papers, missing question images and fabricated gold statuses to assert failure.
