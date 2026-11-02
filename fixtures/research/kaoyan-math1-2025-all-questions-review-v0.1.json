@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "id": "kaoyan-math1-2025-all-questions-review-v0.1",
+  "paper": {
+    "exam": "kaoyan-math-1",
+    "year": 2025,
+    "expectedQuestions": 22,
+    "pdf": "https://edu.xaiu.edu.cn/__local/F/34/3C/E53427A7070AE155EC2FF88073B_9EAE259B_511D6.pdf",
+    "markdownRepository": "TsekaLuk/Kaoyan-Math1-Papers",
+    "markdownRevision": "3151b4acf26ea19ccd427b869a715e65e1990091",
+    "markdownPath": "papers/2025年数学一真题.md",
+    "markdownGitBlobSha": "582683c6623fd24b1e3f46c8ef45112fa31b5beb"
+  },
+  "status": "research-only-no-official-key",
+  "notes": "All 22 numbered problems visually inventoried against 4-page non-official PDF. Provisional reference notes are NOT exam gold. Independently checked = bounded mathematics cross-check in opt-in SymPy script; it may certify only a portion of multi-part answer. Unreviewed proofs remain unresolved. Source material not reproduced.",
+  "items": [
+    {
+      "id": "ky2025-q01",
+      "question": 1,
+      "pdfPages": [
+        1
+      ],
+      "kind": "selection",
+      "provisionalReference": "B",
+      "independentlyChecked": false,
+      "sourceQuality": "pending_manual_proof",
+      "reviewNote": "Extremum/inflection verification not yet run through symbolic checks",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q02",
+      "question": 2,
+      "pdfPages": [
+        1
+      ],
+      "kind": "selection",
+      "provisionalReference": "B",
+      "independentlyChecked": false,
+      "sourceQuality": "formula_conflict",
+      "reviewNote": "Second series radical differs between question and solution; refuse using the converted derivation as gold",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q03",
+      "question": 3,
+      "pdfPages": [
+        1
+      ],
+      "kind": "selection",
+      "provisionalReference": "D",
+      "independentlyChecked": false,
+      "sourceQuality": "domain_condition_changed",
+      "reviewNote": "PDF [0,+∞) vs Markdown (0,+∞); evaluate endpoint condition before parsing",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q04",
+      "question": 4,
+      "pdfPages": [
+        1,
+        2
+      ],
+      "kind": "selection",
+      "provisionalReference": "A",
+      "independentlyChecked": false,
+      "sourceQuality": "option_extraction_damaged",
+      "reviewNote": "Options A/B identifiers missing and C/D formula extraction malformed",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q05",
+      "question": 5,
+      "pdfPages": [
+        2
+      ],
+      "kind": "selection",
+      "provisionalReference": "B",
+      "independentlyChecked": true,
+      "sourceQuality": "no_detected_transcription_issue",
+      "reviewNote": "Positive inertia index computed from matrix eigenvalues",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q06",
+      "question": 6,
+      "pdfPages": [
+        2
+      ],
+      "kind": "selection",
+      "provisionalReference": "D",
+      "independentlyChecked": false,
+      "sourceQuality": "pending_independent_proof",
+      "reviewNote": "Affine solution geometry requires explicit independent rank proof",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q07",
+      "question": 7,
+      "pdfPages": [
+        2
+      ],
+      "kind": "selection",
+      "provisionalReference": "A",
+      "independentlyChecked": false,
+      "sourceQuality": "pending_independent_proof",
+      "reviewNote": "Universal rank statements require counterexample-resistant proof",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q08",
+      "question": 8,
+      "pdfPages": [
+        2
+      ],
+      "kind": "selection",
+      "provisionalReference": "C",
+      "independentlyChecked": true,
+      "sourceQuality": "empty_markdown_key",
+      "reviewNote": "Blank source answer marker; covariance eigenvalue independently checked",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q09",
+      "question": 9,
+      "pdfPages": [
+        2
+      ],
+      "kind": "selection",
+      "provisionalReference": "C",
+      "independentlyChecked": true,
+      "sourceQuality": "no_detected_transcription_issue",
+      "reviewNote": "Poisson approximation from lambda = 2",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q10",
+      "question": 10,
+      "pdfPages": [
+        2,
+        3
+      ],
+      "kind": "selection",
+      "provisionalReference": "D",
+      "independentlyChecked": false,
+      "sourceQuality": "option_extraction_damaged",
+      "reviewNote": "Source Markdown lacks four distinct selectable alternatives",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q11",
+      "question": 11,
+      "pdfPages": [
+        3
+      ],
+      "kind": "fill",
+      "provisionalReference": "-1",
+      "independentlyChecked": true,
+      "sourceQuality": "nonstandard_answer_glyph",
+      "reviewNote": "Unicode private-use minus appears in source answer",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q12",
+      "question": 12,
+      "pdfPages": [
+        3
+      ],
+      "kind": "fill",
+      "provisionalReference": "1/8",
+      "independentlyChecked": false,
+      "sourceQuality": "formula_extraction_risk",
+      "reviewNote": "Fourier-sine series question needs a verified endpoint and extension interpretation",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q13",
+      "question": 13,
+      "pdfPages": [
+        3
+      ],
+      "kind": "fill",
+      "provisionalReference": "1",
+      "independentlyChecked": true,
+      "sourceQuality": "operator_extraction_damaged",
+      "reviewNote": "Derivative operator glyph damaged, verified unit direction from PDF",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q14",
+      "question": 14,
+      "pdfPages": [
+        3
+      ],
+      "kind": "fill",
+      "provisionalReference": "4/3-2*sin(1)",
+      "independentlyChecked": true,
+      "sourceQuality": "no_detected_transcription_issue",
+      "reviewNote": "Independent oriented curve integral check",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q15",
+      "question": 15,
+      "pdfPages": [
+        3
+      ],
+      "kind": "fill",
+      "provisionalReference": "-4",
+      "independentlyChecked": true,
+      "sourceQuality": "reasoning_gap",
+      "reviewNote": "Determinant condition is necessary; checked existence of rank drop for admissible matrix",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q16",
+      "question": 16,
+      "pdfPages": [
+        3
+      ],
+      "kind": "fill",
+      "provisionalReference": "4/5",
+      "independentlyChecked": true,
+      "sourceQuality": "no_detected_transcription_issue",
+      "reviewNote": "Independent probability derivation and admissible roots",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q17",
+      "question": 17,
+      "pdfPages": [
+        3
+      ],
+      "kind": "worked",
+      "provisionalReference": "(3*log(2)+pi)/10",
+      "independentlyChecked": true,
+      "sourceQuality": "source_solution_value_corrupted",
+      "reviewNote": "Source worked answer contains malformed 3/0 ln2; independent integral disagrees",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q18",
+      "question": 18,
+      "pdfPages": [
+        4
+      ],
+      "kind": "worked",
+      "provisionalReference": "log(u)^2/2+2*log(u)+1",
+      "independentlyChecked": true,
+      "sourceQuality": "source_solution_algebra_garbled",
+      "reviewNote": "Candidate ODE solution substituted and initial data checked",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q19",
+      "question": 19,
+      "pdfPages": [
+        4
+      ],
+      "kind": "proof",
+      "provisionalReference": null,
+      "independentlyChecked": false,
+      "sourceQuality": "formal_proof_pending",
+      "reviewNote": "Strict derivative monotonicity proof cannot be certified by final-result matching",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q20",
+      "question": 20,
+      "pdfPages": [
+        4
+      ],
+      "kind": "worked",
+      "provisionalReference": "-2*sqrt(3)*pi/3",
+      "independentlyChecked": true,
+      "sourceQuality": "source_solution_mathematically_wrong",
+      "reviewNote": "Source side-flux result pi*sqrt(2)/4-1 conflicts with independent cone geometry, divergence, cap flux",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q21",
+      "question": 21,
+      "pdfPages": [
+        4
+      ],
+      "kind": "worked",
+      "provisionalReference": "a=3; alpha arbitrary except 2*a3=a1+a2; beta=(2*a3-a1-a2)*(1,1,1)",
+      "independentlyChecked": true,
+      "sourceQuality": "source_solution_incomplete",
+      "reviewNote": "Source claims a1*a2*a3 !=0; valid alpha=(0,0,1) beta=(2,2,2) refutes restriction",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    },
+    {
+      "id": "ky2025-q22",
+      "question": 22,
+      "pdfPages": [
+        4
+      ],
+      "kind": "worked",
+      "provisionalReference": "P(Y>0)=1/4; E(Y)=50; M~Poisson(2)",
+      "independentlyChecked": true,
+      "sourceQuality": "no_detected_transcription_issue",
+      "reviewNote": "Symbolic tail integrals and Poisson thinning parameter checked",
+      "verifiedAsOfficialKey": false,
+      "sourceStatus": "human_page_read_against_university_hosted_pdf_not_official_certification"
+    }
+  ]
+}
