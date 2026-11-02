@@ -5,6 +5,7 @@ Run: python -m pip install 'sympy==1.14.0'
      python scripts/research/verify-kaoyan-2025-symbolic.py
 """
 import json
+from pathlib import Path
 import sympy as S
 
 def verify():
@@ -65,6 +66,9 @@ def verify():
     assert S.expand(characteristic-tau*(tau*tau+a-5))==0
     unique=det_zero.subs(a,5)
     assert unique.rank()==2 and (unique*unique).rank()==1
+    # Counterexample to the shortcut 'det=0 implies kernels differ'.
+    other=det_zero.subs(a,0)
+    assert other.det()==0 and other.rank()==(other*other).rank()
     p=S.symbols("p",real=True)
     roots=[v for v in S.solve(3*p-2*p*p-S.Rational(5,8),p)
            if 0<=v<=S.Rational(1,2)]
@@ -84,6 +88,7 @@ def verify():
     cap_flux=(4/S.sqrt(3))*S.pi*radius2
     check(20,3*cone_volume-cap_flux,-2*S.sqrt(3)*S.pi/3,
           "cone side-flux; source worked final is contradicted")
+    assert S.simplify(3*cone_volume-cap_flux-(S.sqrt(2)*S.pi/4-1))!=0
     A=S.Matrix([[0,-1,2],[-1,0,2],[-1,-1,a]])
     t=S.symbols("t")
     possible=S.solve(S.diff(A.charpoly(t).as_expr(),t).subs(t,1),a)
@@ -104,5 +109,19 @@ def verify():
             "scope":"Manually transcribed subclaims only; source PDF is not official-gold authenticated",
             "sympyVersion":S.__version__,"checkedQuestionCount":len(items),
             "items":items}
+def verify_inventory(result):
+    """Fail closed if the evidence ledger disagrees with executed symbolic checks."""
+    path=Path(__file__).resolve().parents[2]/"fixtures/research/kaoyan-math1-2025-all-questions-review-v0.1.json"
+    ledger=json.loads(path.read_text(encoding="utf-8"))
+    assert ledger["id"]=="kaoyan-math1-2025-all-questions-review-v0.1"
+    all_items=ledger["items"]
+    assert len(all_items)==22 and [i["question"] for i in all_items]==list(range(1,23))
+    assert all(i["verifiedAsOfficialKey"] is False for i in all_items)
+    expected={str(i["question"]) for i in all_items if i["independentlyChecked"]}
+    actual=set(result["items"])
+    assert len(expected)==15 and expected==actual, (sorted(expected), sorted(actual))
+    assert result["checkedQuestionCount"]==len(actual)
+    return result
+
 if __name__=="__main__":
-    print(json.dumps(verify(),ensure_ascii=False,indent=2))
+    print(json.dumps(verify_inventory(verify()),ensure_ascii=False,indent=2))
