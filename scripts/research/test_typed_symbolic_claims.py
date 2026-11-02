@@ -46,6 +46,23 @@ class TypedSymbolicContract(unittest.TestCase):
         self.assertEqual(result["status"], "unverified")
         self.assertEqual(result["reason"], "unsupported_operator")
 
+    def test_vacuous_equality_on_empty_real_domain_cannot_pass(self):
+        x = {"op": "symbol", "name": "x"}
+        impossible = {
+            "op": "sqrt",
+            "arg": {"op": "add", "args": [
+                {"op": "int", "value": -1},
+                {"op": "mul", "args": [
+                    {"op": "int", "value": -1},
+                    {"op": "pow", "base": x, "exponent": 2},
+                ]},
+            ]},
+        }
+        result = verifier.verify_one({"id": "empty-domain", "expected": impossible,
+                                      "candidate": impossible})
+        self.assertEqual(result["status"], "unverified")
+        self.assertEqual(result["reason"], "empty_real_domain")
+
     def test_bounds_and_duplicate_identity_fail_closed(self):
         huge = {"id": "huge", "expected": {"op": "int", "value": 1},
                 "candidate": {"op": "pow", "base": {"op": "int", "value": 2}, "exponent": 100}}
