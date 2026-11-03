@@ -144,6 +144,7 @@ def evaluate(pdf_text,html_sources,fixture,catalog,pinned_pdf=None):
             continue
         content_hash=hashlib.sha256(html.encode("utf-8")).hexdigest()
         if content_hash not in seen_exact_content:
+            observation["retrievedHtmlSha256"]=content_hash
             observations.append(observation)
             seen_exact_content.add(content_hash)
     if len(observations)<2:
@@ -152,6 +153,7 @@ def evaluate(pdf_text,html_sources,fixture,catalog,pinned_pdf=None):
         "status":"live_source_text_and_answer_corroborated_not_official_gold",
         "scope":"Read-backed problem facts and answer claims from current external pages, plus mathematical consistency; DOES NOT authenticate official examination or editorial independence",
         "originalPdfCopyQuestionTextMatched":pdf["statementMatched"],
+        "extractedPdfPageTextSha256":hashlib.sha256(pdf_text.encode("utf-8")).hexdigest(),
         "pinnedGitPdfBlobShaMatched":blob_hash is not None,
         "pinnedGitPdfBlobSha":blob_hash,
         "mathematicallyDerivedAnswer":str(reference),
