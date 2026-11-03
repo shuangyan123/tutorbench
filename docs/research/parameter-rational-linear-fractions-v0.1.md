@@ -31,11 +31,11 @@ At each parameter representative the verifier:
 
 1. Constructs the **original**, uncancelled numerator and denominator with exact coefficients.
 2. Computes the complete sign chart by separating all real numerator zeros and **all denominator poles**; excludes every denominator zero, including a common zero.
-3. Independently asks SymPy \`solve_univariate_inequality\` or \`solveset\` to solve the **original rational expression**; intersects with its original denominator domain even if SymPy simplifies the fraction.
+3. Independently uses the strictly positive multiplier \(D(t,x)^2>0\) on the original domain: \(N/D\;\square\;0\) is equivalent to \(N D\;\square\;0\), **only where \(D\ne0\)**. The second calculation uses SymPy's polynomial inequality solver, or \(N=0\) for equality, and again removes **every original denominator zero**. This avoids a documented symbolic sorting failure for unsimplified equivalent algebraic roots at irrational parameter thresholds.
 4. Compares the entire sets from the two different symbolic paths using all exact algebraic endpoints and at least one exact interior witness per interval.
 5. Expands the proposed branch's typed x-interval endpoints at that t and compares **its entire set**, including pole omissions and strict/weak endpoints. A mismatch reports the **parameter witness t and x witness** where defined; uncovered or double-covered t points get an explicit partition error.
 
-The two paths share SymPy arithmetic and thus are **differential checking, not independent formal-proof kernels**. If the independent solver cannot resolve an input or disagrees with the sign chart, the checker returns **unverified**, never majority votes. This remains **research-only** until source truth and production integration are separately assessed.
+The two paths (uncancelled rational sign chart vs a separately derived denominator-square polynomial inequality reduction) share SymPy arithmetic and thus are **differential checking, not independent formal-proof kernels**. If the independent solver cannot resolve an input or disagrees with the sign chart, the checker returns **unverified**, never majority votes. This remains **research-only** until source truth and production integration are separately assessed.
 
 ## Parameter-cancellation and domain-degeneration examples
 
@@ -81,7 +81,7 @@ python scripts/research/verify_parameter_rational_inequalities.py \
 The 81 recorded mathematical claims consist of **51 correct complete parameter families, 18 demonstrably wrong cases and 12 deliberately unsupported/malformed controls**. Additional tests include:
 
 - Six independent comparison operators for denominator cancellation, numerator-zero and denominator-zero cases; **all false cases must carry an exact parameter witness**.
-- 32 seeded random affine-in-t numerator/denominator coefficient families, independently checked against the other solver at every real coefficient/resultant root and every open parameter cell.
+- 32 seeded random affine-in-t numerator/denominator coefficient families, independently checked by polynomial inequality reduction at every real coefficient/resultant root and every open parameter cell. Algebraic parameter endpoints that expose duplicate-root ordering failures in direct rational solvers are regression targets.
 - Pointwise original-fraction sign checks, even when denominator is zero.
 - Positive/negative common rescaling of numerator and denominator, which cannot change the rational function or original zero domain.
 - Complementary relations \`eq/ne\`, \`lt/ge\`, \`gt/le\`, which must partition the **original defined x-domain** and never include excluded poles.
