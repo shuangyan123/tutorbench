@@ -258,7 +258,7 @@ def main():
     document = json.loads(Path(args.fixture).read_text(encoding="utf-8"))
     result = check_batch(document)
     print(json.dumps(result, indent=2, ensure_ascii=False))
-    return int(args.require_decidable and result["summary"]["unverified"])
+    return int(bool(args.require_decidable and result["summary"]["unverified"]))
 
 
 if __name__ == "__main__":
