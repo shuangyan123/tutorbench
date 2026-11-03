@@ -87,8 +87,17 @@ test("public data and discovery files are unchanged by the redesign", async () =
       assert.ok(await isFile(join(spectrum, route, "index.html")), route);
       assert.ok(spectrumSitemap.includes(`<loc>${SITE_URL}/${route}</loc>`), route);
       const article = await page(route + "index.html");
-      assert.match(article, /<meta name="robots" content="index,follow">/u);
+      assert.match(article, /<meta name="robots" content="index,follow(?:,|")/u);
       assert.match(article, /class="essay-text"/u);
+      const canonical = `${SITE_URL}/${route}`;
+      const english = `${SITE_URL}/blog/${slug}/`;
+      const chinese = `${SITE_URL}/zh-cn/blog/${slug}/`;
+      assert.ok(article.includes(`<link rel="canonical" href="${canonical}">`), route);
+      assert.ok(article.includes(`<link rel="alternate" hreflang="en" href="${english}">`), route);
+      assert.ok(article.includes(`<link rel="alternate" hreflang="zh-CN" href="${chinese}">`), route);
+      assert.ok(!article.includes("why-teaching-does-not-scale/"), `inherited prior canonical or alternate: ${route}`);
+      assert.ok(!article.includes("essay-scale-"), `inherited prior essay share card: ${route}`);
+      assert.match(article, /<meta property="article:published_time" content="2026-11-02">/u);
     }
   }
 });
