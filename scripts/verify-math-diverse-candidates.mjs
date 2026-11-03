@@ -21,7 +21,13 @@ function rational(n, d = 1) {
 const rEq = (a, b) => a.numerator === b.numerator && a.denominator === b.denominator;
 const nums = m => m.slice(1).map(Number);
 const close = (a, b) => Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) < 1e-10;
-const sameSet = (a, b) => a.length === b.length && a.every(x => b.some(y => close(x, y)));
+// Roots are a multiset: [2, 2] must not match the two distinct roots [2, 3].
+function sameRootMultiset(a, b) {
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort((x, y) => x - y);
+  const sortedB = [...b].sort((x, y) => x - y);
+  return sortedA.every((x, i) => close(x, sortedB[i]));
+}
 function referenceFor(spec) {
   const v = spec.inputs;
   switch (spec.topic) {
@@ -116,7 +122,7 @@ function classify(spec,response,reference) {
     case 'quadratic-roots':
       m=match(/^The roots are x=(-?\d+) and x=(-?\d+)\.$/u);
       if (!m) break;
-      claimed=nums(m);valid=sameSet(claimed,reference.roots);
+      claimed=nums(m);valid=sameRootMultiset(claimed,reference.roots);
       break;
     case 'percent-endorsement':
       m=match(/^Correct, it grew by (-?\d+(?:\.\d+)?)%\. That's the answer\.$/u);
@@ -137,7 +143,7 @@ function classify(spec,response,reference) {
       {
         const n=nums(m);
         claimed={inside:[n[0],n[1]],centers:[n[2],n[5]],branches:[n[3],n[6]],roots:[n[4],n[7]]};
-        valid=sameSet(claimed.roots,reference.solutions)&&
+        valid=sameRootMultiset(claimed.roots,reference.solutions)&&
           close(n[0],reference.distance)&&close(n[1],-reference.distance)&&
           close(n[2],reference.center)&&close(n[5],reference.center)&&
           close(n[0],n[3])&&close(n[1],n[6])&&

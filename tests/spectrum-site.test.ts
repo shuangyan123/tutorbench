@@ -65,8 +65,57 @@ test("public data and discovery files are unchanged by the redesign", async () =
       await readFile(join(legacy, "public-data", file), "utf8"),
     );
   }
-  for (const file of ["robots.txt", "sitemap.xml"]) {
-    assert.equal(await readFile(join(spectrum, file), "utf8"), await readFile(join(legacy, file), "utf8"));
+  assert.equal(
+    await readFile(join(spectrum, "robots.txt"), "utf8"),
+    await readFile(join(legacy, "robots.txt"), "utf8"),
+  );
+  const spectrumSitemap = await readFile(join(spectrum, "sitemap.xml"), "utf8");
+  const legacySitemap = await readFile(join(legacy, "sitemap.xml"), "utf8");
+  for (const loc of [...legacySitemap.matchAll(/<loc>([^<]+)<\/loc>/gu)].map((match) => match[1])) {
+    assert.ok(spectrumSitemap.includes(`<loc>${loc}</loc>`), `existing sitemap entry lost: ${loc}`);
+  }
+  const slug = "why-learning-resources-fail-to-reach-learners";
+  const old = [
+    ["who-owns-the-past-exam-paper", 3],
+    ["libraries-should-buy-access-not-databases", 5],
+    ["a-university-id-is-not-a-research-ability", 4],
+    ["you-cannot-search-for-a-course-you-dont-know-exists", 2],
+    ["best-courses-plus-personalized-ai-help", 7],
+  ] as const;
+  for (const locale of ["", "zh-cn/"]) {
+    const route = `${locale}blog/${slug}/`;
+    assert.ok(await isFile(join(spectrum, route, "index.html")), route);
+    assert.ok(spectrumSitemap.includes(`<loc>${SITE_URL}/${route}</loc>`), route);
+    const article = await page(route + "index.html");
+    assert.match(article, /<meta name="robots" content="index,follow(?:,|")/u);
+    assert.match(article, /class="essay-text"/u);
+    assert.match(article, /id="section-9"/u);
+    assert.match(article, /<meta property="article:published_time" content="2026-11-03">/u);
+    assert.ok(article.includes("Why Good Learning Resources Fail to Reach the People Who Need Them"));
+    assert.ok(article.includes("为什么优质教育资源没有抵达需要它的人？"));
+    const english = `${SITE_URL}/blog/${slug}/`;
+    const chinese = `${SITE_URL}/zh-cn/blog/${slug}/`;
+    assert.ok(article.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), route);
+    assert.ok(article.includes(`<link rel="alternate" hreflang="en" href="${english}">`), route);
+    assert.ok(article.includes(`<link rel="alternate" hreflang="zh-CN" href="${chinese}">`), route);
+    assert.ok(!article.includes("essay-scale-"), `inherited prior essay share card: ${route}`);
+    assert.ok(!article.includes("why-teaching-does-not-scale/"), `inherited prior essay route: ${route}`);
+    assert.match(article, /<h2 id="sources">/u);
+    assert.match(article, /https:\/\/doi\.org\/10\.1073\/pnas\.2422633122/u);
+
+    const index = await page(`${locale}blog/index.html`);
+    assert.ok(index.includes(`${slug}/index.html`), "new essay not linked on Journal index");
+    assert.ok(index.includes(locale ? "5 篇文章" : "5 essays"), "index count was not updated");
+
+    for (const [oldSlug, section] of old) {
+      const oldRoute = `${locale}blog/${oldSlug}/`;
+      assert.ok(await isFile(join(spectrum, oldRoute, "index.html")), oldRoute);
+      const redirect = await page(oldRoute + "index.html");
+      assert.match(redirect, /<meta name="robots" content="noindex,follow">/u);
+      assert.ok(redirect.includes(`../${slug}/index.html#section-${section}`), oldRoute);
+      assert.ok(redirect.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), oldRoute);
+      assert.ok(!spectrumSitemap.includes(`<loc>${SITE_URL}/${oldRoute}</loc>`), "old short essay should not remain indexed");
+    }
   }
 });
 
