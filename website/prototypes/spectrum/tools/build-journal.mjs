@@ -8,7 +8,45 @@ import process from "node:process";
 import { join } from "node:path";
 import { PROTO, REPO, esc, Z, bi, biE, biP, frame } from "./site-kit.mjs";
 
-const { BLOG_POSTS, articleHeadingId } = await import(join(REPO, "dist/src/site/pages/blog.js"));
+const { BLOG_POSTS: SITE_POSTS, articleHeadingId } = await import(join(REPO, "dist/src/site/pages/blog.js"));
+const { LEARNING_ACCESS_ESSAY: LA } = await import(join(REPO, "dist/src/cli/learning-access-essay.js"));
+const { SITE_ZH_CN_COPY } = await import(join(REPO, "dist/src/site/locale-copy.js"));
+
+// "Why Good Learning Resources Fail to Reach the People Who Need Them" (2026-11-03) is written as two
+// parallel essays (src/cli/learning-access-essay.ts) rather than English plus the site's zh-CN copy.
+// Its Chinese is registered as that copy here, so the essay goes through the same page as the others.
+const LA_BOUNDARY = ["This essay proposes directions for education policy and product design. It is not a TutorBench result, a finding of wrongdoing, or proof of learning impact.",
+  "本文讨论教育政策和产品设计方向，不是 TutorBench 的评测结果，也不构成对任何机构违法行为的认定或对学习成效的实证证明。"];
+const LA_SOURCES_EN = [
+  "MIT Open Learning: MIT OpenCourseWare (free courses and terms of use)",
+  "Peking University Library: off-campus access notice (who may use licensed resources)",
+  "Tsinghua University Library: notice on protecting the intellectual property of electronic resources",
+  "CALIS Smart Services: e得 document delivery and interlibrary sharing",
+  "National Science and Technology Library: foreign journals opened nationwide",
+  "Bastani et al. (2025), PNAS: Generative AI without guardrails can harm learning",
+];
+function register(en, zh) {
+  const have = SITE_ZH_CN_COPY[en];
+  if (have !== undefined && have !== zh) throw new Error(`zh-CN copy already has a different translation for: ${en.slice(0, 60)}`);
+  SITE_ZH_CN_COPY[en] = zh;
+}
+const learningAccess = {
+  route: `/blog/${LA.slug}/`, category: "Perspective", publishedDate: "November 3, 2026",
+  title: LA.en.title, excerpt: LA.en.dek, description: LA.en.description, evidenceBoundary: LA_BOUNDARY[0],
+  sections: LA.en.sections.map((sec) => ({ heading: sec.heading, paragraphs: sec.paragraphs })),
+  sources: LA.sources.map((src, i) => ({ en: LA_SOURCES_EN[i], zh: src.label, url: src.url })),
+};
+if (LA.sources.length !== LA_SOURCES_EN.length) throw new Error("learning access: sources changed, update LA_SOURCES_EN");
+register(LA.en.title, LA.zh.title); register(LA.en.dek, LA.zh.dek); register(LA.en.description, LA.zh.description);
+register(LA_BOUNDARY[0], LA_BOUNDARY[1]); register("November 3, 2026", "2026年11月3日");
+LA.en.sections.forEach((sec, i) => {
+  const zh = LA.zh.sections[i];
+  if (zh === undefined || zh.paragraphs.length !== sec.paragraphs.length) throw new Error(`learning access: section ${i + 1} differs between languages`);
+  register(sec.heading, zh.heading);
+  sec.paragraphs.forEach((para, k) => register(para, zh.paragraphs[k]));
+});
+// newest first, as the Journal has always been ordered
+const BLOG_POSTS = [learningAccess, ...SITE_POSTS];
 
 const slug = (p) => p.route.split("/").filter(Boolean).pop();
 const zhWords = (s) => s.replace(/\s/g, "").length;
@@ -18,10 +56,15 @@ function readingTime(p) {
   const zh = all.map((x) => zhWords(Z(x))).reduce((a, b) => a + b, 0);
   return { en: Math.max(1, Math.round(en / 230)), zh: Math.max(1, Math.round(zh / 420)) };
 }
-const DATE_ISO = { "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
+const DATE_ISO = { "November 3, 2026": "2026-11-03", "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
 
 // ---------------------------------------------------------------- covers and figures (design content)
 const COVERS = {
+  [LA.slug]: {
+    img: "ladder.webp",
+    alt: ["A wall of library shelves at dusk with a rolling ladder hooked onto its brass rail; high up, one red book has been drawn half out of its row.", "黄昏的图书馆书墙，一架移动梯挂在黄铜横杆上；高处有一本红色的书被抽出了一半。"],
+    cap: ["The books are on the shelf. The question is the way up.", "书一直在架上，难的是怎么够到它。"],
+  },
   "when-learning-starts-to-feel-like-failure": {
     img: "eraser.webp",
     alt: ["A worn eraser resting on an exercise page whose first attempt has been rubbed out.", "一块用旧的橡皮，放在一页练习纸上，纸上第一次的演算已经被擦掉。"],
@@ -126,10 +169,47 @@ const FIGS = {
       cap: ["The staffing shift this section describes as possible, and the work it names as still needing people. A hypothesis, not a forecast.", "本节所说的人员配置可能如何转变，以及文中点名仍可能需要人的工作。这是假设，不是预测。"] },
   ],
 };
+FIGS[LA.slug] = [
+  { at: "after:1.1", body: `<ol class="ladder reach">
+            ${[["Available", "开放", "Published under usable terms", "资源已经以明确方式提供"],
+               ["Discoverable", "可发现", "Found without already knowing the institution, title or acronym", "不知道提供者名称的人，也有合理机会找到它"],
+               ["Usable", "可利用", "Its language, sequence, prerequisites, format and exercises let this learner make progress", "语言、难度、先修知识、结构与练习，能支持具体的人开始学习"],
+               ["Improves independent learning", "提高独立学习能力", "Needs evidence beyond a visit or a download", "需要另外验证：一次访问、一次下载不等于学习成效"]].map(([en, zh, nen, nzh], i) => `<li${i === 3 ? ' class="now"' : ""}><span class="l-no">${String(i + 1).padStart(2, "0")}</span><span class="l-name">${bi(esc(en), esc(zh))}</span><span class="l-note">${bi(esc(nen), esc(nzh))}</span></li>`).join("")}
+          </ol>`,
+    cap: ["The three conditions this section separates, and the fourth, which a visit or a download cannot show.", "本节区分的三个条件，以及访问量和下载量证明不了的第四个。"] },
+  { at: "end:4", body: `<div class="ratio">
+            ${biP("p", "rt-name", "Fulfilment rate", "文献需求满足率")}
+            <p class="rt-frac"><span class="rt-num">${bi("valid requests legally fulfilled within a specified period", "在约定时限内合法满足的有效请求数")}</span><span class="rt-den">${bi("all valid requests", "全部有效请求数")}</span></p>
+            ${biP("p", "rt-h", "Recorded for each request, and nothing more", "每条需求只记录")}
+            <ul class="rt-log">${[["Is there an authorised open copy?", "是否有合法开放版本？"], ["Does the institution hold the licence?", "机构是否已有授权？"], ["Was lawful document delivery tried?", "是否尝试合规文献传递？"], ["Time, cost to the reader, outcome", "等待多久、支付多少、最终是否取得"]].map(([en, zh]) => `<li>${bi(esc(en), esc(zh))}</li>`).join("")}</ul>
+          </div>`,
+    cap: ["The measure this section proposes in place of counting database packages. Personal reading histories are not published.", "本节建议用来代替“买了多少数据库”的指标。个人阅读记录不公开。"] },
+  { at: "end:7", body: `<ol class="studies">
+            ${[["Discoverability task", "资源发现实验", "Whether learners with varied backgrounds find a suitable free course, how long it takes, which prerequisites they miss", "不同背景的学习者能否找到合适的免费课程、花多少时间、遗漏了哪些先修要求", "They find courses but cannot complete them", "找到了课程，却无法完成学习"],
+               ["Document-request audit", "学术文献需求审计", "Lawful fulfilment rate, delay and cost for a sample of valid requests", "抽样有效请求的合法全文获取率、等待时间和成本", "Collective purchasing raises costs without improving fulfilment", "联合采购增加了成本，却没有提升全文获取率"],
+               ["Instructional comparison", "教学效果比较", "Later, unaided transfer on unfamiliar problems, not just engagement", "不只看体验和投入，还看延迟的、离开 AI 后的独立迁移表现", "AI-assisted answers improve while independent solutions weaken", "AI 让练习答案更好看，却降低了独立解题能力"]].map(([en, zh, men, mzh, fen, fzh], i) => `<li><span class="s-no">${String(i + 1).padStart(2, "0")}</span><span class="s-name">${bi(esc(en), esc(zh))}</span><span class="s-k">${bi("Records", "记录")}</span><span class="s-v">${bi(esc(men), esc(mzh))}</span><span class="s-k s-fail">${bi("It has failed if", "失败信号")}</span><span class="s-v">${bi(esc(fen), esc(fzh))}</span></li>`).join("")}
+          </ol>`,
+    cap: ["The three studies this section proposes, each with the result that would count against the idea it tests.", "本节提出的三项研究，以及会推翻各自设想的结果。"] },
+];
 // the pull quote goes after this section (skipped when it repeats the dek or a callout)
 const PULL_AFTER = { "when-learning-starts-to-feel-like-failure": "after:5.0", "the-classroom-does-not-need-30-robots": "end:0" };
 
 // ---------------------------------------------------------------- essay page
+function prose(text, zh = false) {
+  return esc(text)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(zh ? /〔资料 ?(\d+)〕/g : /\s?\[(\d+)\]/g, (m, n) => `<a class="fn" href="#source-${n}" aria-label="${zh ? `资料 ${n}` : `Source ${n}`}">${n}</a>`);
+}
+// Chinese headings break only between words (a long one otherwise splits a word across lines)
+const seg = new Intl.Segmenter("zh-CN", { granularity: "word" });
+const zhHead = (en) => [...seg.segment(Z(en))].map((x) => esc(x.segment)).join("<wbr>");
+const biH = (en) => bi(esc(en), zhHead(en));
+function sources(list) {
+  return `<section class="sources" aria-labelledby="sources">
+          <h2 id="sources" class="src-h">${biE("Sources and further reading", "资料来源与延伸阅读")}</h2>
+          <ol class="notes-list">${list.map((src, i) => `<li id="source-${i + 1}"><span><a href="${esc(src.url)}" rel="noopener">${bi(esc(src.en), esc(src.zh))}</a></span></li>`).join("")}</ol>
+        </section>`;
+}
 function steps(prog) {
   return `<ol class="steps">${prog.map((x) => `<li><span class="st-l">${biE(x.label)}</span><span class="st-t">${biE(x.text)}</span></li>`).join("")}</ol>`;
 }
@@ -156,10 +236,10 @@ function essayPage(p, idx) {
 
   const body = [];
   p.sections.forEach((sec, i) => {
-    body.push(`        <h2 id="${articleHeadingId(sec.heading)}"><span class="no">§${i + 1}</span><span>${biE(sec.heading)}</span></h2>`);
+    body.push(`        <h2 id="${articleHeadingId(sec.heading)}"><span class="no">§${i + 1}</span><span>${biH(sec.heading)}</span></h2>`);
     body.push(figAt(`before:${i}`));
     sec.paragraphs.forEach((para, k) => {
-      body.push("        " + biP("p", i === 0 && k === 0 ? "first" : "", esc(para), esc(Z(para))));
+      body.push("        " + biP("p", i === 0 && k === 0 ? "first" : "", prose(para), prose(Z(para), true)));
       body.push(figAt(`after:${i}.${k}`)); body.push(pull(`after:${i}.${k}`));
     });
     if (sec.progression) body.push(`        <figure class="fig fig-steps">${steps(sec.progression)}</figure>`);
@@ -174,7 +254,7 @@ function essayPage(p, idx) {
     <div class="wrap essay-grid">
       <div>
         <p class="essay-meta kicker"><a class="issue" href="../index.html">${bi(`Journal · Essay ${idx + 1} of ${n}`, `期刊 · 第 ${idx + 1} 篇，共 ${n} 篇`)}</a><span class="rule" aria-hidden="true"></span><span>${biE(p.category)}</span><time datetime="${DATE_ISO[p.publishedDate]}">${biE(p.publishedDate)}</time></p>
-        <h1 class="essay-title">${biE(p.title)}</h1>
+        <h1 class="essay-title">${biH(p.title)}</h1>
         ${biP("p", "essay-dek", esc(p.excerpt), esc(Z(p.excerpt)))}
         <p class="essay-byline kicker"><span>Teachometry</span><span>${bi(`${p.sections.length} sections · about ${rt.en} min`, `${p.sections.length} 节 · 约 ${rt.zh} 分钟`)}</span></p>
       </div>
@@ -196,6 +276,7 @@ ${p.sections.map((sec) => `        <li><a href="#${articleHeadingId(sec.heading)
       <div class="prose">
 ${body.filter(Boolean).join("\n")}
         ${callout({ label: "Evidence boundary", body: p.evidenceBoundary }, " boundary")}
+${p.sources ? "        " + sources(p.sources) : ""}
       </div>
     </article>
   </div>
