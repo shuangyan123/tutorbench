@@ -1,0 +1,57 @@
+name: Exact Parameter Rational Inequality Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/parameter-rational-inequalities.yml'
+      - 'scripts/research/verify_parameter_rational_inequalities.py'
+      - 'scripts/research/test_verify_parameter_rational_inequalities.py'
+      - 'fixtures/research/parameter-rational-linear-fractions-v0.1.json'
+      - 'docs/research/parameter-rational-linear-fractions-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  complete-rational-x-sets-all-real-parameters:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research sources without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install exact symbolic mathematics dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/rational-parameters"
+          "$RUNNER_TEMP/rational-parameters/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Run independently cross-checked complete parameter rational inequality tests
+        run: |
+          "$RUNNER_TEMP/rational-parameters/bin/python" -m unittest \
+            scripts/research/test_verify_parameter_rational_inequalities.py -v
+      - name: Recalculate every source model with a complete x solution set and no official exam gold
+        run: |
+          "$RUNNER_TEMP/rational-parameters/bin/python" \
+            scripts/research/verify_parameter_rational_inequalities.py \
+            --fixture fixtures/research/parameter-rational-linear-fractions-v0.1.json \
+            > "$RUNNER_TEMP/rational-parameter-sets.json"
+          python3 - <<'PY'
+          import json
+          import os
+          path=os.path.join(os.environ['RUNNER_TEMP'],'rational-parameter-sets.json')
+          with open(path,encoding='utf8') as f: report=json.load(f)
+          assert report['status']=='exact_parameter_rational_fraction_real_sets_research_only'
+          assert report['summary']=={
+              'total':81,'verifiedComplete':51,'refuted':18,
+              'unverified':12,'officialExamGoldReleased':0}
+          items={row['id']:row for row in report['items']}
+          assert items['crossing_linear_root_pole_gt']['criticalParameters']==['1']
+          assert items['false_cancelled_hole_all_reals']['parameterWitness']=='1'
+          assert items['false_cancelled_hole_all_reals']['xWitness']=='1'
+          assert items['false_zero_denominator_returns_full']['parameterWitness']=='0'
+          assert items['false_slope_root_pole_coincide']['parameterWitness']=='-1'
+          assert items['two_linear_coefficient_degeneration_eq']['status']=='verified_complete_parameter_solution_family'
+          assert all(row['officialExamGoldCertified'] is False for row in report['items'])
+          print('Complete rational inequality sets all real parameters: verified under bounded model; no official exam gold')
+          PY
