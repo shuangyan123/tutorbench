@@ -226,6 +226,7 @@ class LocalBlindMathPilot(unittest.TestCase):
         for change in [
             lambda d:d["cases"][0].update({"referenceAnswer":"61/25"}),
             lambda d:d["cases"][0]["question"]["model"].update({"independent":False}),
+            lambda d:d["cases"][1]["question"]["model"].update({"numberOfLabels":9}),
             lambda d:d["cases"][1].update({"id":d["cases"][0]["id"]}),
             lambda d:d["cases"][0]["question"].update({"metric":"expected_value"}),
         ]:
@@ -236,6 +237,32 @@ class LocalBlindMathPilot(unittest.TestCase):
                 path.write_text(json.dumps(doc),encoding="utf8")
                 with self.assertRaises(pilot.Rejected):
                     pilot.load_suite(path)
+
+    def test_live_transcripts_must_stay_out_of_tracked_repository_files(self):
+        with patch.object(pilot,"ask_local_host",
+                          side_effect=AssertionError("must_not_connect")):
+            with tempfile.TemporaryDirectory() as tmp:
+                external=Path(tmp)/"model-results.json"
+                with self.assertRaisesRegex(pilot.Rejected,
+                                            "capture_must_be_inside_gitignored_artifacts"):
+                    pilot.main(["run","--suite",str(FIXTURE),"--execute-live",
+                                "--output",str(external)],
+                               env={"CANONICAL_MODEL_HOST_TOKEN":"a"*64})
+
+    def test_existing_output_blocks_billable_requests_before_network(self):
+        root=ROOT/"artifacts"
+        root.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=root) as tmp:
+            target=Path(tmp)/"already-exists.json"
+            target.write_text("previous run, never overwrite",encoding="utf8")
+            with patch.object(pilot,"ask_local_host",
+                              side_effect=AssertionError("must_not_connect")):
+                with self.assertRaises(FileExistsError):
+                    pilot.main(["run","--suite",str(FIXTURE),"--execute-live",
+                                "--output",str(target)],
+                               env={"CANONICAL_MODEL_HOST_TOKEN":"a"*64})
+            self.assertEqual(target.read_text(encoding="utf8"),
+                             "previous run, never overwrite")
 
     def test_failed_request_is_not_retried(self):
         number={"calls":0}
