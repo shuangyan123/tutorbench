@@ -121,7 +121,7 @@ function featureContents(): string {
     '</p><p class="jx-links"><a href="' + esc(post.slug) + '/index.html">' +
     pair("Read the full essay","阅读全文") + '</a></p></div></section>';
 }
-function legacyRedirect(slug: string, section: number, zh: boolean, canonical: string): string {
+function legacyRedirect(section: number, zh: boolean, canonical: string): string {
   const target = "../" + POSTS[0]!.slug + "/index.html#section-" + section;
   const title = zh ? "本文已整合进新的完整文章" : "This essay has been incorporated into a fuller argument";
   const description = zh
@@ -181,7 +181,7 @@ export async function publishLearningAccessSeries(options: PublishOptions): Prom
     for (const legacy of LEGACY_ARTICLE_ANCHORS) {
       const legacyDir = join(root, "blog", legacy.slug);
       await mkdir(legacyDir, { recursive: true });
-      await writeFile(join(legacyDir, "index.html"), legacyRedirect(legacy.slug, legacy.section, zh, url), "utf8");
+      await writeFile(join(legacyDir, "index.html"), legacyRedirect(legacy.section, zh, url), "utf8");
     }
   }
   if (site) {
