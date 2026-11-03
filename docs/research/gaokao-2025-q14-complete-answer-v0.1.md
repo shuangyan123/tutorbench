@@ -11,7 +11,7 @@ The visually inspected second page of a third-party recollection PDF (https://ww
 - [MeloonExam](https://exam.meloon.top/paper/paper-gk-math-2025-xhgk1/) (reported answer 61/25)
 - [Gaokao Wiki](https://gaokaowiki.com/math/%E7%9C%9F%E9%A2%98/%E6%B5%99%E6%B1%9F/2025/q14/) (reported answer 61/25; Zhejiang uses this exam edition)
 
-Published answer reports are **corroboration only**. The sites' mutual editorial independence has not been audited. Their raw web content is not cryptographically pinned; the machine-readable source evidence is a record of inspected content, not a fresh source retrieval every time the checker runs. The PDF itself says it is a **recollection**, potentially imperfect.
+Published answer reports are **corroboration only**. The sites' mutual editorial independence has not been audited. Their raw pages remain mutable and their independent editorial lineage is unverified. The typed evidence fixture is a record of inspected content, **while a separate research CI job now re-downloads the live public answer pages and PDF text** and rejects missing or contradictory evidence. The immutable Git blob SHA of the separately collected Gaokao PDF copy is checked at the same time. The PDF itself says it is a **recollection**, potentially imperfect.
 
 ## Three genuinely different exact proofs
 
@@ -56,6 +56,26 @@ The output separates:
 - `officialExamGoldCertified: false`: source authenticity and independent publisher lineage remain unproven; this flag is **not upgraded** by mathematical agreement.
 
 This fixed case is a **fully checked numeric-result task under exact assumptions**, not a formally verified authentication of a historical national examination sheet. If someone silently changes replacement, uniformity, independence, number of draws, random variable or question number, the case rejects the altered problem.
+
+## Automated live source verification — no human reviewer
+
+A second job in `.github/workflows/gaokao-q14-complete-verification.yml` independently downloads a pinned GitHub 2025 national-I paper PDF and the separately collected recollection PDF, verifies the **Git blob SHA** of the pinned copy, extracts the relevant PDF page with `pdftotext`, and fetches current answer-site HTML from GaokaoHub, Meloon and Gaokao Wiki.
+
+`scripts/research/audit_gaokao_q14_live_sources.py` requires the PDF page to match the **five labelled balls, three with-replacement draws, distinct labels, expected value** statement. It then requires **at least two separate observable answer-host pages** to display the mathematically derived exact fraction near that same question, not merely somewhere else on their sites. Identical downloaded HTML content cannot be double-counted. Any aligned page with an explicit contradictory final answer triggers a **hard conflict**, regardless of how many other pages agree.
+
+Six negative-control regression tests cover mismatched problem conditions (especially *without replacement*), wrong answer sites, three-host majority against an explicit contrary source, same-content mirrors, script-only fake source text and a changed PDF blob identity. This is performed automatically in CI and **does not ask a person to check an answer**. Source-page unavailability or contradicting reports must fail closed, rather than reusing earlier positive metadata.
+
+Run a local source audit with previously downloaded documents (paths must be actual PDF-extracted plain text and untrusted HTML, not trusted assertions):
+
+```sh
+python3 scripts/research/audit_gaokao_q14_live_sources.py \
+  --pdf-text /tmp/paper-page-2.txt \
+  --pinned-pdf /tmp/gaokao-pinned.pdf \
+  --html-source gaokaohub=/tmp/gaokaohub.html \
+  --html-source meloon=/tmp/meloon.html
+```
+
+The source audit still does **not** prove government/official origin or editorial independence, even with multiple agreements. The reported success is restricted to mathematical correctness of the exactly formalized finite-probability question plus consistency with the accessible published question descriptions and claims. No official answer gold is released.
 
 ## Generalization and what is actually resolved
 
