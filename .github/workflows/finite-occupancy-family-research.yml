@@ -1,0 +1,56 @@
+name: Finite Occupancy Mathematical Family Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/finite-occupancy-family-research.yml'
+      - 'fixtures/research/finite-occupancy-family-v0.1.json'
+      - 'scripts/research/verify_finite_occupancy_family.py'
+      - 'scripts/research/test_verify_finite_occupancy_family.py'
+      - 'docs/research/finite-occupancy-family-contract-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-family-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research sources with no persisted token
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Verify three exact general distribution algorithms and a fourth bounded brute-force oracle
+        run: |
+          python3 -m unittest scripts/research/test_verify_finite_occupancy_family.py -v
+          python3 scripts/research/verify_finite_occupancy_family.py \
+            --fixture fixtures/research/finite-occupancy-family-v0.1.json \
+            > "$RUNNER_TEMP/family.json"
+      - name: Enforce real Q14 anchor, complete family metric decisions and no official gold
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from fractions import Fraction
+          with open(os.path.join(os.environ['RUNNER_TEMP'],'family.json'),encoding='utf-8') as f:
+            report=json.load(f)
+          summary=report['summary']
+          assert summary=={'total':41,'verifiedCorrect':26,'verifiedIncorrect':4,
+                           'unverified':11,'officialExamGoldReleased':0,
+                           'distinctMathematicalModelsChecked':4}
+          assert report['status']=='research_math_family_checked_not_official_gold'
+          by={x['id']:x for x in report['items']}
+          prefix='real-2025-gaokao-1-q14-'
+          for key,value in {
+            'expected-fraction':Fraction(61,25),
+            'variance-fraction':Fraction(204,625),
+            'one-label':Fraction(1,25),
+            'two-labels':Fraction(12,25),
+            'three-labels':Fraction(12,25),
+            'at-least-two':Fraction(24,25),
+            'at-most-two':Fraction(13,25),
+          }.items():
+            assert Fraction(by[prefix+key]['exactReference'])==value
+          assert all(x.get('sourceAuthenticatedOfficially') is not True for x in report['items'])
+          print('Complete exact occupancy distribution + expectation + variance + tail probability family checked; official exam authentication remains separate')
+          PY

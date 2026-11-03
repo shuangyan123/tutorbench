@@ -1,0 +1,87 @@
+name: Expanded Exam Mathematics Source Integrity
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/expanded-exam-corpus-audit.yml'
+      - 'fixtures/research/exam-source-expansion-2022-2026-v0.1.json'
+      - 'scripts/audit-exam-source-expansion.mjs'
+      - 'scripts/verify-exam-source-upstream-trees.mjs'
+      - 'tests/exam-source-expansion.test.ts'
+      - 'tests/exam-source-upstream-trees.test.ts'
+      - 'scripts/gate-exam-reference-claims.mjs'
+      - 'fixtures/research/exam-claim-promotion-negative-controls-v0.1.json'
+      - 'tests/exam-claim-promotion-gate.test.ts'
+      - 'fixtures/research/kaoyan-math2-2022-q02-source-conflict-v0.1.json'
+      - 'scripts/research/check-math2-2022-source-integral.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-git-source-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out only the research code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Node 24.21.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24.21.0
+      - name: Check year, paper edition, source count and gold-label boundary
+        run: node scripts/audit-exam-source-expansion.mjs
+      - name: Fetch immutable Git trees for independent blob identity checks
+        run: |
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 90 \
+            -H 'Accept: application/vnd.github+json' \
+            'https://api.github.com/repos/deekur/gaokaomath/git/trees/6e9677221edffa192276de27d61044f19ce63de3?recursive=1' \
+            --output "$RUNNER_TEMP/gaokao-tree.json"
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 90 \
+            -H 'Accept: application/vnd.github+json' \
+            'https://api.github.com/repos/lx-ruc/kaoyanshuxue/git/trees/196dc9d2d8271978a030a3721a828c8723cd3864?recursive=1' \
+            --output "$RUNNER_TEMP/kaoyan-tree.json"
+      - name: Verify all 36 PDFs and 264 image SHAs against independent repository trees
+        run: |
+          node scripts/verify-exam-source-upstream-trees.mjs \
+            --gaokao-tree "$RUNNER_TEMP/gaokao-tree.json" \
+            --postgrad-tree "$RUNNER_TEMP/kaoyan-tree.json"
+      - name: Reject exam gold promotion of merely symbolic local results
+        run: |
+          node scripts/gate-exam-reference-claims.mjs \
+            --proposals fixtures/research/exam-claim-promotion-negative-controls-v0.1.json \
+            > "$RUNNER_TEMP/promotion-gate.json"
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const d=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/promotion-gate.json","utf8"));
+            if(d.status!=="no_exam_gold_releases" || d.summary.total!==8 ||
+               d.summary.released!==0 || d.summary.blocked!==8) {
+              throw Error("An unreviewed exam claim was incorrectly released");
+            }
+            console.log("All unreviewed exam-source claims remained blocked");
+          '
+
+  math2-2022-independent-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research checker
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Download pinned Math-II converted Markdown into temporary runner storage
+        run: |
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 60 \
+            'https://raw.githubusercontent.com/TsekaLuk/Kaoyan-Math2-Papers/fd42c56eed412cce0cb97d6bd688f314c78e542e/solutions/2022/math2_2022/math2_2022.md' \
+            --output "$RUNNER_TEMP/math2-2022.md"
+      - name: Isolate exact symbolic math checker
+        run: |
+          python3 -m venv "$RUNNER_TEMP/math2-sympy"
+          "$RUNNER_TEMP/math2-sympy/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Verify source key mismatch versus exact integral without promoting exam gold
+        run: |
+          "$RUNNER_TEMP/math2-sympy/bin/python" scripts/research/check-math2-2022-source-integral.py \
+            --source "$RUNNER_TEMP/math2-2022.md" > "$RUNNER_TEMP/math2-audit.json"
+          python3 -c "import json,os; d=json.load(open(os.environ['RUNNER_TEMP']+'/math2-audit.json')); assert d['status']=='converted_source_conflict_not_exam_gold'; assert d['sourceMatched'] and d['independentIntegralResult']=='2/3'; assert d['originalExamPdfIndependentlyChecked'] is False; print('Source conflict confirmed; NO exam gold established')"

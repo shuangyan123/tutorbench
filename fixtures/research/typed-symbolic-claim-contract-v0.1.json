@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "status": "synthetic_contract_tests_not_exam_gold",
+  "description": "Bounded hand-authored algebra pairs for AST verifier regressions. Status assertions are not authoritative mathematical answer keys for external exams.",
+  "items": [
+    {
+      "id": "fraction-equivalent",
+      "expected": {
+        "op": "add",
+        "args": [
+          {
+            "op": "rat",
+            "num": 1,
+            "den": 2
+          },
+          {
+            "op": "rat",
+            "num": 1,
+            "den": 3
+          }
+        ]
+      },
+      "candidate": {
+        "op": "rat",
+        "num": 5,
+        "den": 6
+      },
+      "expectedStatus": "symbolically_equal"
+    },
+    {
+      "id": "fraction-error",
+      "expected": {
+        "op": "rat",
+        "num": 5,
+        "den": 6
+      },
+      "candidate": {
+        "op": "rat",
+        "num": 2,
+        "den": 5
+      },
+      "expectedStatus": "counterexample_found"
+    },
+    {
+      "id": "logarithmic-equivalent",
+      "expected": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "int",
+            "value": 3
+          },
+          {
+            "op": "log",
+            "arg": {
+              "op": "int",
+              "value": 2
+            }
+          }
+        ]
+      },
+      "candidate": {
+        "op": "log",
+        "arg": {
+          "op": "int",
+          "value": 8
+        }
+      },
+      "expectedStatus": "symbolically_equal"
+    },
+    {
+      "id": "polynomial-equivalent",
+      "expected": {
+        "op": "pow",
+        "base": {
+          "op": "symbol",
+          "name": "x"
+        },
+        "exponent": 2
+      },
+      "candidate": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "symbol",
+            "name": "x"
+          },
+          {
+            "op": "symbol",
+            "name": "x"
+          }
+        ]
+      },
+      "expectedStatus": "symbolically_equal"
+    },
+    {
+      "id": "absolute-value-counterexample",
+      "expected": {
+        "op": "sqrt",
+        "arg": {
+          "op": "pow",
+          "base": {
+            "op": "symbol",
+            "name": "x"
+          },
+          "exponent": 2
+        }
+      },
+      "candidate": {
+        "op": "symbol",
+        "name": "x"
+      },
+      "expectedStatus": "counterexample_found"
+    },
+    {
+      "id": "removable-singularity",
+      "expected": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "symbol",
+            "name": "x"
+          },
+          {
+            "op": "pow",
+            "base": {
+              "op": "symbol",
+              "name": "x"
+            },
+            "exponent": -1
+          }
+        ]
+      },
+      "candidate": {
+        "op": "int",
+        "value": 1
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "exponential-log-domain",
+      "expected": {
+        "op": "exp",
+        "arg": {
+          "op": "log",
+          "arg": {
+            "op": "symbol",
+            "name": "x"
+          }
+        }
+      },
+      "candidate": {
+        "op": "symbol",
+        "name": "x"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "unknown-operator",
+      "expected": {
+        "op": "int",
+        "value": 1
+      },
+      "candidate": {
+        "op": "eval",
+        "text": "1+1"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "division-by-zero",
+      "expected": {
+        "op": "int",
+        "value": 1
+      },
+      "candidate": {
+        "op": "rat",
+        "num": 1,
+        "den": 0
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "complex-valued-log",
+      "expected": {
+        "op": "int",
+        "value": 1
+      },
+      "candidate": {
+        "op": "log",
+        "arg": {
+          "op": "int",
+          "value": -1
+        }
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "missing-claim",
+      "expected": {
+        "op": "int",
+        "value": 1
+      },
+      "candidate": null,
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "pi-is-not-a-decimal-key",
+      "expected": {
+        "op": "const",
+        "name": "pi"
+      },
+      "candidate": {
+        "op": "decimal",
+        "value": "3.14"
+      },
+      "expectedStatus": "unverified"
+    }
+  ]
+}

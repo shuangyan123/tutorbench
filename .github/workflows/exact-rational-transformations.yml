@@ -1,0 +1,60 @@
+name: Exact Rational Transformation Semantics Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/exact-rational-transformations.yml'
+      - 'scripts/research/verify_exact_rational_transformations.py'
+      - 'scripts/research/test_verify_exact_rational_transformations.py'
+      - 'fixtures/research/exact-rational-transformations-v0.1.json'
+      - 'docs/research/exact-rational-transformation-semantics-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original-domain-and-exact-transformation-proofs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research branch without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Pin symbolic algebra dependencies in isolated environment
+        run: |
+          python3 -m venv "$RUNNER_TEMP/exact-transform"
+          "$RUNNER_TEMP/exact-transform/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Validate original AST domain, exact witness and two mathematical paths
+        run: |
+          timeout 120s "$RUNNER_TEMP/exact-transform/bin/python" -m unittest \
+            scripts/research/test_verify_exact_rational_transformations.py -v
+      - name: Recalculate all 81 research claims and disallow source-gold promotion
+        run: |
+          timeout 120s "$RUNNER_TEMP/exact-transform/bin/python" \
+            scripts/research/verify_exact_rational_transformations.py \
+            --fixture fixtures/research/exact-rational-transformations-v0.1.json \
+            > "$RUNNER_TEMP/exact-transform-results.json"
+          python3 - <<'PY'
+          import json
+          import os
+          with open(os.path.join(os.environ['RUNNER_TEMP'],'exact-transform-results.json'),
+                    encoding='utf8') as f: report=json.load(f)
+          assert report['status']=='research_exact_rational_transformation_semantics_no_official_gold'
+          assert report['summary']=={
+            'total':81,'verified_domain_and_function_equivalence':16,
+            'verified_relation_and_domain_equivalence':10,
+            'verified_solution_equivalence_domain_changed':9,
+            'verified_transformation_chain':4,'refuted':28,'unverified':14,
+            'officialExamGoldReleased':0}
+          rows={item['id']:item for item in report['items']}
+          assert rows['false-cancel-x-x-domain']['xWitness']=='0'
+          assert rows['false-cancel-x-minus1-domain']['xWitness']=='1'
+          assert rows['solution-only-crossmultiply-strict']['domainChanged'] is True
+          assert rows['false-crossmultiply-weak-includes-pole']['xWitness']=='1'
+          assert rows['chain-fails-at-second-weakening']['failedTransition']==1
+          assert rows['chain-fails-extra-square-root']['xWitness']=='-1'
+          assert all(item['officialExamGoldCertified'] is False for item in report['items'])
+          print('Exact original-domain and rational transformation semantics verified in bounded scope, no official exam gold')
+          PY
