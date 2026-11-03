@@ -36,10 +36,22 @@ class SourceReadback(unittest.TestCase):
         self.assertFalse(result["humanReviewRequired"])
 
     def test_one_wrong_or_misaligned_source_fails_not_majority_voted(self):
-        for other in (make_html("61/125"),make_html(replacement=False),
+        with self.assertRaisesRegex(ValueError,"published_answer_conflict_requires_adjudication"):
+            audit.evaluate(PDF_TEXT,{"a":make_html(),"b":make_html("61/125")},FIXTURE,CATALOG)
+        for other in (make_html(replacement=False),
                       "<html><body>14. no readable question</body></html>"):
             with self.assertRaisesRegex(ValueError,"fewer_than_two_live_matched_source_pages"):
                 audit.evaluate(PDF_TEXT,{"a":make_html(),"b":other},FIXTURE,CATALOG)
+
+    def test_three_hosts_cannot_majority_vote_away_an_explicit_conflict(self):
+        sources={"a":make_html(),"b":make_html(result=r"\frac{61}{25}"),
+                 "c":make_html("61/125")}
+        with self.assertRaisesRegex(ValueError,"published_answer_conflict_requires_adjudication"):
+            audit.evaluate(PDF_TEXT,sources,FIXTURE,CATALOG)
+
+    def test_exact_website_content_mirror_not_two_sources(self):
+        with self.assertRaisesRegex(ValueError,"fewer_than_two_live_matched_source_pages"):
+            audit.evaluate(PDF_TEXT,{"a":make_html(),"b":make_html()},FIXTURE,CATALOG)
 
     def test_modified_paper_assumptions_are_not_the_same_question(self):
         wrong=PDF_TEXT.replace("有放回地","不放回地")
