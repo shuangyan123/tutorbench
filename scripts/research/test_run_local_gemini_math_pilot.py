@@ -199,20 +199,15 @@ class LocalBlindMathPilot(unittest.TestCase):
             lambda req:("61/25",{"latencyMs":0}),"local_host_observed","gemini-2.5-flash")
         self.assertEqual(report["summary"]["overallSuccess"],
                          {"numerator":1,"denominator":1,"value":1.0})
-        self.assertFalse(report["summary"]["providerIdentityCryptographicallyVerified"]
-                         if "providerIdentityCryptographicallyVerified" in report["summary"]
-                         else report["providerIdentityCryptographicallyVerified"])
+        self.assertFalse(report["providerIdentityCryptographicallyVerified"])
         self.assertFalse(report["summary"]["benchmarkedWholeSuite"])
+        self.assertIsNone(report["summary"]["measuredLiveModelAccuracy"])
 
     def test_precision_is_exact_and_prose_abstains_instead_of_guessing(self):
-        report=pilot.run_items(self.suite,3,
-            iter([
-                ("2.4400000001",{"latencyMs":3}),
-                ("1105/343",{"latencyMs":3}),
-                ("结果是204/625。",{"latencyMs":3}),
-            ]).__next__ if False else lambda request:("UNSURE",{"latencyMs":3}),
+        prose=pilot.run_items(self.suite,1,
+            lambda _:("结果是 61/25。",{"latencyMs":3}),
             "mock_transport","gemini-2.5-flash")
-        self.assertEqual(report["summary"]["unverifiedAnswers"],3)
+        self.assertEqual(prose["items"][0]["status"],"unverified_output")
         changed=pilot.run_items(self.suite,1,
             lambda _:("2.4400000001",{"latencyMs":0}),
             "mock_transport","gemini-2.5-flash")
