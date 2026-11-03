@@ -1,0 +1,130 @@
+name: Gaokao Q14 Complete Exact Answer Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/gaokao-q14-complete-verification.yml'
+      - 'fixtures/research/gaokao-2025-q14-typed-contract-v0.1.json'
+      - 'scripts/research/verify_gaokao_q14_exact.py'
+      - 'scripts/research/test_verify_gaokao_q14_exact.py'
+      - 'scripts/research/audit_gaokao_q14_live_sources.py'
+      - 'scripts/research/test_audit_gaokao_q14_live_sources.py'
+      - 'docs/research/gaokao-2025-q14-complete-answer-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  complete-numeric-answer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out isolated research source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Recompute exact formula, occupancy distribution and all 125 outcomes
+        run: |
+          python3 -m unittest scripts/research/test_verify_gaokao_q14_exact.py -v
+          python3 scripts/research/verify_gaokao_q14_exact.py \
+            --require-source-consensus > "$RUNNER_TEMP/q14-result.json"
+      - name: Enforce complete typed answer and qualified source boundary
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from fractions import Fraction
+          with open(os.path.join(os.environ["RUNNER_TEMP"],"q14-result.json"),encoding="utf-8") as f:
+              r=json.load(f)
+          assert r["status"]=="mathematics_verified_published_sources_corroborated"
+          assert r["mathematics"]["exactReference"]=="61/25"
+          assert r["mathematics"]["orderedSampleSpaceSize"]==125
+          assert r["mathematics"]["distributionCounts"]=={"1":5,"2":60,"3":60}
+          assert len(r["mathematics"]["methodResults"])==3
+          assert set(r["mathematics"]["methodResults"].values())=={"61/25"}
+          assert sum(Fraction(k)*v for k,v in r["mathematics"]["distributionCounts"].items())==305
+          assert r["sourceCertification"]["publishedMatchingAnswerHosts"]>=2
+          assert r["sourceCertification"]["officialExamGoldCertified"] is False
+          assert r["sourceCertification"]["publisherIndependenceAuthenticated"] is False
+          by={x["id"]:x for x in r["results"]}
+          assert by["original-reported-fraction"]["status"]=="verified_correct_under_typed_model"
+          assert by["equivalent-decimal"]["status"]=="verified_correct_under_typed_model"
+          assert by["incorrect-three-distinct"]["status"]=="verified_incorrect_under_typed_model"
+          assert by["incorrect-61-over-125"]["status"]=="verified_incorrect_under_typed_model"
+          assert by["malformed-claim"]["status"]=="unverified"
+          print("One fully specified exam probability answer confirmed by 3 exact methods; source authenticity remains unverified")
+          PY
+
+  live-published-source-readback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out typed contract and immutable Git object manifest
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Run source readback negative controls
+        run: python3 -m unittest scripts/research/test_audit_gaokao_q14_live_sources.py -v
+      - name: Download source PDFs and published external answer pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          PDF_URL=$(python3 - <<'PY'
+          import json
+          from urllib.parse import quote
+          data=json.load(open('fixtures/research/exam-source-expansion-2022-2026-v0.1.json'))
+          row=next(p for p in data['papers'] if p['paperId']=='gaokao-2025-national-1')
+          src=row['source']
+          print('https://raw.githubusercontent.com/'+src['repository']+'/'+src['revision']+'/'+quote(src['path'],safe='/'))
+          PY
+          )
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 90 \
+            "$PDF_URL" --output "$RUNNER_TEMP/pinned-paper.pdf"
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 90 \
+            'https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf' \
+            --output "$RUNNER_TEMP/recollection-paper.pdf"
+          if ! command -v pdftotext >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq poppler-utils
+          fi
+          pdftotext -f 2 -l 2 -layout "$RUNNER_TEMP/recollection-paper.pdf" "$RUNNER_TEMP/paper-q14.txt"
+          for group in gaokaohub meloon gaokaowiki; do
+            case "$group" in
+              gaokaohub) url='https://gaokaohub.com/paper/2025-xinkebiao-i-math.html' ;;
+              meloon) url='https://exam.meloon.top/paper/paper-gk-math-2025-xhgk1/' ;;
+              gaokaowiki) url='https://gaokaowiki.com/math/%E7%9C%9F%E9%A2%98/%E6%B5%99%E6%B1%9F/2025/q14/' ;;
+            esac
+            if ! curl --fail --silent --show-error --location --retry 2 --retry-delay 2 --max-time 45 \
+                 "$url" --output "$RUNNER_TEMP/$group.html"; then
+              rm -f "$RUNNER_TEMP/$group.html"
+              echo "Publisher page unavailable: $group (will fail closed if fewer than two viable)"
+            fi
+          done
+      - name: Check actual downloaded sources against one correctly formalized probability answer
+        shell: bash
+        run: |
+          set -euo pipefail
+          set -- --pdf-text "$RUNNER_TEMP/paper-q14.txt" --pinned-pdf "$RUNNER_TEMP/pinned-paper.pdf"
+          for group in gaokaohub meloon gaokaowiki; do
+            if test -s "$RUNNER_TEMP/$group.html"; then
+              set -- "$@" --html-source "$group=$RUNNER_TEMP/$group.html"
+            fi
+          done
+          python3 scripts/research/audit_gaokao_q14_live_sources.py "$@" > "$RUNNER_TEMP/live-q14.json"
+          python3 - <<'PY'
+          import json,os
+          with open(os.path.join(os.environ['RUNNER_TEMP'],'live-q14.json'),encoding='utf8') as f:
+              d=json.load(f)
+          assert d['status']=='live_source_text_and_answer_corroborated_not_official_gold'
+          assert d['pinnedGitPdfBlobShaMatched'] is True
+          assert d['originalPdfCopyQuestionTextMatched'] is True
+          assert d['publishedMatchingAnswerHosts']>=2
+          assert d['mathematicallyDerivedAnswer']=='61/25'
+          assert d['humanReviewRequired'] is False
+          assert d['officialExamAuthenticityVerified'] is False
+          print('Q14 current published answer hosts:', ', '.join(x['publisher'] for x in d['publishedSourcePagesVerified']))
+          print('Pinned Git PDF blob SHA:',d['pinnedGitPdfBlobSha'])
+          print('PDF page extracted text SHA-256:',d['extractedPdfPageTextSha256'])
+          for x in d['publishedSourcePagesVerified']:
+              print(x['publisher'],'HTML SHA-256:',x['retrievedHtmlSha256'])
+          print('Q14 source-content and mathematical checking complete; official exam provenance not authenticated')
+          PY
