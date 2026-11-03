@@ -185,4 +185,4 @@ export const LEARNING_ACCESS_ESSAY = {
       "url": "https://doi.org/10.1073/pnas.2422633122"
     }
   ]
-} as const;
+};
