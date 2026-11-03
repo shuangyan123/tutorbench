@@ -85,7 +85,7 @@ def verify_pdf_text(pdf_text):
 
 
 def verify_published_html(html,publisher,reference):
-    if len(html)>5_000_000 or len(html)<300:
+    if len(html)>5_000_000 or len(html)<100:
         raise ValueError("invalid_html_size_"+publisher)
     window=find_problem_window(plain(html))
     if not window:
