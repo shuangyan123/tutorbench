@@ -233,6 +233,76 @@ def candidate_x_set(doc,a,b,c,d):
     return S.Union(*pieces) if pieces else S.EmptySet
 
 
+def fixed_x_boundaries_in_candidate(branches):
+    """Read and validate any numeric x endpoints before parameter cell proof.
+
+    A fixed x endpoint e can collide with a moving root/pole inside an
+    otherwise coefficient-sign-invariant parameter cell. That collision MUST
+    be a parameter critical value or a single matching sample could pass a
+    globally incorrect candidate. Symbolic root/pole endpoints are handled
+    by the determinant and coefficient critical roots instead.
+    """
+    fixed=set()
+    for _,solution in branches:
+        if solution["kind"]!="union":
+            continue
+        for part in solution["parts"]:
+            if not isinstance(part,dict):
+                raise Abstain("invalid_x_solution_piece")
+            kind=part.get("kind")
+            if kind=="point" and set(part)=={"kind","value"}:
+                endpoints=[part["value"]]
+            elif kind=="interval" and set(part)=={
+                    "kind","left","right","includeLeft","includeRight"}:
+                if type(part["includeLeft"]) is not bool or type(part["includeRight"]) is not bool:
+                    raise Abstain("invalid_x_interval_boolean")
+                endpoints=[part["left"],part["right"]]
+            else:
+                raise Abstain("unknown_x_solution_piece")
+            for e in endpoints:
+                if not isinstance(e,dict):
+                    raise Abstain("invalid_x_endpoint")
+                tag=e.get("kind")
+                if tag in ("num_zero","den_zero"):
+                    if e!={"kind":tag}:
+                        raise Abstain("symbolic_root_endpoint_has_extra_fields")
+                elif tag=="infinity":
+                    try:
+                        base.endpoint(e)
+                    except base.Abstain as err:
+                        raise Abstain(str(err)) from err
+                elif tag in ("rational","surd"):
+                    try:
+                        exact=base.endpoint(e)
+                    except base.Abstain as err:
+                        raise Abstain(str(err)) from err
+                    if exact.is_real is not True:
+                        raise Abstain("fixed_x_endpoint_not_proven_real")
+                    fixed.add(exact)
+                else:
+                    raise Abstain("unsupported_x_endpoint")
+    if len(fixed)>64:
+        raise Abstain("too_many_fixed_x_endpoints")
+    return fixed
+
+
+def static_endpoint_crossing_parameters(A,B,C,D,values):
+    """Solve N(t,e)=0 and D(t,e)=0 exactly, for every fixed candidate e."""
+    out=set()
+    for e in values:
+        for slope,constant in ((A,B),(C,D)):
+            equation=S.expand(slope*e+constant)
+            param_slope=S.simplify(S.diff(equation,T))
+            param_const=S.simplify(equation.subs(T,0))
+            if param_slope==0:
+                continue
+            root=S.simplify(S.radsimp(-param_const/param_slope))
+            if root.is_real is not True:
+                raise Abstain("fixed_x_endpoint_parameter_collision_not_exact")
+            out.add(root)
+    return out
+
+
 def classify_case(case):
     ident=case.get("id") if isinstance(case,dict) else None
     if not isinstance(ident,str) or not ident or len(ident)>128:
@@ -266,7 +336,8 @@ def classify_case(case):
                 raise Abstain("invalid_x_union_schema")
             branches.append((when,sol))
         determinant=S.expand(A*D-B*C)
-        critical=set()
+        fixed_x=fixed_x_boundaries_in_candidate(branches)
+        critical=static_endpoint_crossing_parameters(A,B,C,D,fixed_x)
         for polynomial in (A,B,C,D,determinant):
             critical.update(base.polynomial_roots(polynomial))
         for region,_ in branches:
