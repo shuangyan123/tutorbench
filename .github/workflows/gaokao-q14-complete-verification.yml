@@ -121,5 +121,10 @@ jobs:
           assert d['mathematicallyDerivedAnswer']=='61/25'
           assert d['humanReviewRequired'] is False
           assert d['officialExamAuthenticityVerified'] is False
-          print('Q14 read back from current external pages, pinned source copy hash matched, exact answer independently recalculated')
+          print('Q14 current published answer hosts:', ', '.join(x['publisher'] for x in d['publishedSourcePagesVerified']))
+          print('Pinned Git PDF blob SHA:',d['pinnedGitPdfBlobSha'])
+          print('PDF page extracted text SHA-256:',d['extractedPdfPageTextSha256'])
+          for x in d['publishedSourcePagesVerified']:
+              print(x['publisher'],'HTML SHA-256:',x['retrievedHtmlSha256'])
+          print('Q14 source-content and mathematical checking complete; official exam provenance not authenticated')
           PY
