@@ -49,6 +49,11 @@ class SourceReadback(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"source_claim_conflict_"):
             audit.verify_published_html(deceptive,"bad-key",__import__("fractions").Fraction(61,25))
 
+    def test_mathml_flattened_digits_must_not_override_tex_fraction_annotation(self):
+        html=make_html(result=r"6125\frac{61}{25}2.44")
+        observed=audit.verify_published_html(html,"rich-math-rendering",__import__("fractions").Fraction(61,25))
+        self.assertEqual(observed["exactAnswerClaimObserved"],"61/25")
+
     def test_no_explicit_final_answer_cannot_be_counted_as_publisher_confirmation(self):
         article=make_html().replace("参考答案", "讨论中出现")
         with self.assertRaisesRegex(ValueError,"source_final_answer_not_readable"):
