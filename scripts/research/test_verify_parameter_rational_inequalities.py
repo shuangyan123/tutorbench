@@ -40,8 +40,10 @@ class ParameterRationalInequalityFamily(unittest.TestCase):
         for suffix in ("gt","ge","lt","le","eq","ne"):
             row=math.classify_case(self.byid["crossing_linear_root_pole_"+suffix])
             self.assertEqual(row["status"],"verified_complete_parameter_solution_family",suffix)
-            self.assertEqual(row["criticalParameters"],["1"])
-            self.assertEqual(row["exactParameterCellChecks"],3)
+            # The numerator constant is -t, so t=0 is also an intentionally
+            # enumerated coefficient zero even though its root remains valid.
+            self.assertEqual(row["criticalParameters"],["0","1"])
+            self.assertEqual(row["exactParameterCellChecks"],5)
         wrong=math.classify_case(self.byid["false_cancelled_hole_all_reals"])
         self.assertEqual(wrong["status"],"refuted_parameter_solution_family")
         self.assertEqual(wrong["parameterWitness"],"1")
