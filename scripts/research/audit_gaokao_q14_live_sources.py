@@ -84,25 +84,45 @@ def verify_pdf_text(pdf_text):
     return {"statementMatched":True,"editionNotOfficiallyAuthenticated":True}
 
 
+def first_reported_answer(window):
+    # Prefer an explicit final-answer field, never a number merely mentioned in
+    # a derivation. "对答案" (CTA text) is not an answer field.
+    for pattern in (r"参考答案",r"〖答案〗",r"(?<!对)(?<!核)答案(?=[:：$\\0-9])"):
+        marker=re.search(pattern,window)
+        if marker is None:
+            continue
+        tail=window[marker.end():marker.end()+180]
+        found=re.search(
+            r"(?:d?frac)\{([+-]?\d+)\}\{(\d+)\}"
+            r"|(?<!\d)([+-]?\d+)/(\d+)(?!\d)"
+            r"|(?<![\w])([+-]?\d+(?:\.\d+)?)",
+            tail)
+        if found is None:
+            raise ValueError("answer_field_unparseable")
+        if found.group(1) is not None:
+            p,q=found.group(1),found.group(2)
+            return Fraction(int(p),int(q)) if int(q)!=0 else None
+        if found.group(3) is not None:
+            p,q=found.group(3),found.group(4)
+            return Fraction(int(p),int(q)) if int(q)!=0 else None
+        return Fraction(found.group(5))
+    raise ValueError("no_explicit_final_answer_field")
+
+
 def verify_published_html(html,publisher,reference):
     if len(html)>5_000_000 or len(html)<100:
         raise ValueError("invalid_html_size_"+publisher)
     window=find_problem_window(plain(html))
     if not window:
         raise ValueError("source_question_semantics_differ_"+publisher)
-    if not contains_answer(window,reference.numerator,reference.denominator):
-        # A contradictory published answer is not overridden by a majority.
-        # Only the answer segment is examined; formulae from other questions
-        # or intermediate derivations do not count as final answer claims.
-        marks=list(re.finditer(r"(?:参考答案|〖答案〗|答案[:：]?)",window))
-        for mark in marks[:3]:
-            segment=window[mark.end():mark.end()+180]
-            if re.search(r"(?:d?frac)\\?\{\\?\d+\}\\?\{\\?\d+\}",segment) or re.search(r"(?<!\d)\d+/\d+(?!\d)",segment) or re.search(r"^[:：]?[0-9]+(?:\\.[0-9]+)?",segment):
-                raise ValueError("source_claim_conflict_"+publisher)
-        raise ValueError("source_answer_not_present_near_problem_"+publisher)
+    try:
+        claim=first_reported_answer(window)
+    except ValueError:
+        raise ValueError("source_final_answer_not_readable_"+publisher) from None
+    if claim!=reference:
+        raise ValueError("source_claim_conflict_"+publisher)
     return {"publisher":publisher,"questionAligned":True,"exactAnswerClaimObserved":str(reference),
             "independentEditorialLineageCertified":False}
-
 
 def verify_pinned_pdf_blob(contents,source_record):
     expected=source_record.get("gitBlobSha")
