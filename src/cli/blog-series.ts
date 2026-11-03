@@ -465,22 +465,48 @@ function mainArticle(post: Article, index: number): string {
     '<nav class="wrap essay-nav" aria-label="Article navigation">' + neighbor(POSTS[index-1],"Previous in series","上一篇") +
     '<a class="all kicker" href="../index.html">'+pair("Back to all essays","返回全部文章")+'</a>' + neighbor(POSTS[index+1],"Next in series","下一篇") + '</nav></main>';
 }
-function rewriteMetadata(html: string, post: Article, zh: boolean, url: string): string {
+function rewriteMetadata(
+  html: string,
+  post: Article,
+  zh: boolean,
+  url: string,
+  englishUrl: string,
+  chineseUrl: string,
+): string {
   const copy = zh ? post.zh : post.en;
   const description = esc(copy.description);
   const title = esc(copy.title + " · Teachometry Journal");
+  // The generated article is based on a prior essay for its layout. Replace its SEO
+  // metadata as a single block instead of carrying over that essay's canonical,
+  // hreflang, social preview, published date, or inaccurate share image.
+  const metadata = [
+    "<title>" + title + "</title>",
+    '<meta name="description" content="' + description + '">',
+    '<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">',
+    '<meta property="og:type" content="article">',
+    '<meta property="og:site_name" content="Teachometry">',
+    '<meta property="og:title" content="' + title + '">',
+    '<meta property="og:description" content="' + description + '">',
+    '<meta property="og:locale" content="' + (zh ? "zh_CN" : "en_US") + '">',
+    '<meta property="og:url" content="' + esc(url) + '">',
+    '<link rel="canonical" href="' + esc(url) + '">',
+    '<link rel="alternate" hreflang="en" href="' + esc(englishUrl) + '">',
+    '<link rel="alternate" hreflang="zh-CN" href="' + esc(chineseUrl) + '">',
+    '<link rel="alternate" hreflang="x-default" href="' + esc(englishUrl) + '">',
+    '<meta property="article:published_time" content="' + PUBLISHED + '">',
+    // No original social preview card exists for these essays yet. A summary
+    // is preferable to incorrectly displaying a different article's headline.
+    '<meta name="twitter:card" content="summary">',
+    '<meta name="twitter:title" content="' + title + '">',
+    '<meta name="twitter:description" content="' + description + '">',
+    "",
+  ].join("\n");
+  if (!/<title>[\s\S]*?(?=<link rel="icon")/u.test(html)) {
+    throw new Error("Source journal article metadata structure changed");
+  }
   return html
-    .replace(/<title>[\s\S]*?<\/title>/u, "<title>" + title + "</title>")
-    .replace(/<meta name="description" content="[^"]*">/u, '<meta name="description" content="' + description + '">')
-    .replace(/<meta name="robots" content="noindex">/u, '<meta name="robots" content="index,follow">\n<link rel="canonical" href="' + esc(url) + '">\n<meta property="og:title" content="' + title + '">\n<meta property="og:description" content="' + description + '">\n<meta property="og:url" content="' + esc(url) + '">\n<meta name="twitter:title" content="' + title + '">\n<meta name="twitter:description" content="' + description + '">')
-    .replace(/<link rel="canonical" href="[^"]*">/u, '<link rel="canonical" href="' + esc(url) + '">')
-    .replace(/<meta property="og:title" content="[^"]*">/u, '<meta property="og:title" content="' + title + '">')
-    .replace(/<meta property="og:description" content="[^"]*">/u, '<meta property="og:description" content="' + description + '">')
-    .replace(/<meta property="og:url" content="[^"]*">/u, '<meta property="og:url" content="' + esc(url) + '">')
-    .replace(/<meta name="twitter:title" content="[^"]*">/u, '<meta name="twitter:title" content="' + title + '">')
-    .replace(/<meta name="twitter:description" content="[^"]*">/u, '<meta name="twitter:description" content="' + description + '">')
-    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/gu, "")
-    .replace(/<meta property="article:published_time" content="[^"]*">/u, '<meta property="article:published_time" content="'+PUBLISHED+'">');
+    .replace(/<title>[\s\S]*?(?=<link rel="icon")/u, metadata)
+    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/gu, "");
 }
 function seriesContents(): string {
   return '<section class="wrap jx-premise" aria-labelledby="learning-access-series"><div><p class="kicker">' +
@@ -516,7 +542,16 @@ export async function publishLearningAccessSeries(options: PublishOptions): Prom
       const dest = join(root,"blog",post.slug,"index.html");
       await mkdir(join(root,"blog",post.slug),{recursive:true});
       const url = site ? site + "/" + locale + "blog/" + post.slug + "/" : "/" + locale + "blog/" + post.slug + "/";
-      const changed = rewriteMetadata(template.replace(/<main id="main">[\s\S]*?<\/main>/u, mainArticle(post,i)),post,locale !== "",url);
+      const englishUrl = site ? site + "/blog/" + post.slug + "/" : "/blog/" + post.slug + "/";
+      const chineseUrl = site ? site + "/zh-cn/blog/" + post.slug + "/" : "/zh-cn/blog/" + post.slug + "/";
+      const changed = rewriteMetadata(
+        template.replace(/<main id="main">[\s\S]*?<\/main>/u, mainArticle(post,i)),
+        post,
+        locale !== "",
+        url,
+        englishUrl,
+        chineseUrl,
+      );
       if (!changed.includes(post.en.title) || !changed.includes("sources")) throw new Error("Article render failed: "+post.slug);
       await writeFile(dest, changed, "utf8");
     }
