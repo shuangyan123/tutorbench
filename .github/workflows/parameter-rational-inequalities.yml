@@ -43,7 +43,7 @@ jobs:
           with open(path,encoding='utf8') as f: report=json.load(f)
           assert report['status']=='exact_parameter_rational_fraction_real_sets_research_only'
           assert report['summary']=={
-              'total':81,'verifiedComplete':51,'refuted':18,
+              'total':84,'verifiedComplete':52,'refuted':20,
               'unverified':12,'officialExamGoldReleased':0}
           items={row['id']:row for row in report['items']}
           assert items['crossing_linear_root_pole_gt']['criticalParameters']==['0','1']
