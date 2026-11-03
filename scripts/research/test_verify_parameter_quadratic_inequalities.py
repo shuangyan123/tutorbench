@@ -118,6 +118,28 @@ class CompleteParameterInequalityFamilies(unittest.TestCase):
                 checks+=1
         self.assertGreater(checks,130)
 
+    def test_open_and_closed_root_endpoints_are_not_inverted(self):
+        # Explicit regression: SymPy Interval defaults to CLOSED finite ends.
+        # All strict polynomial inequalities MUST exclude their zero points.
+        for a,b,c,comparison,expected,roots,contained in [
+            (1,0,-1,"lt","between_open",[-1,1],False),
+            (1,0,-1,"le","between_closed",[-1,1],True),
+            (1,0,-1,"gt","outside_open",[-1,1],False),
+            (1,0,-1,"ge","outside_closed",[-1,1],True),
+            (-1,0,1,"gt","between_open",[-1,1],False),
+            (-1,0,1,"ge","between_closed",[-1,1],True),
+            (1,-2,1,"gt","except_point",[1],False),
+            (1,-2,1,"ge","all_reals",[1],True),
+            (0,-2,2,"gt","left_open",[1],False),
+            (0,-2,2,"ge","left_closed",[1],True),
+        ]:
+            with self.subTest(a=a,b=b,c=c,comparison=comparison):
+                template=math.expected_kind(S.Integer(a),S.Integer(b),S.Integer(c),comparison)
+                self.assertEqual(template,expected)
+                result=math.exact_template_set(template,S.Integer(a),S.Integer(b),S.Integer(c))
+                for r in roots:
+                    self.assertEqual(math.in_set(result,S.Integer(r)),contained)
+
     def test_positive_scaling_and_negative_comparison_reversal(self):
         rng=random.Random(11032026)
         checks=0
