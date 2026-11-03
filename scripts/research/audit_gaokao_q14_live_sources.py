@@ -65,6 +65,8 @@ def find_problem_window(text):
         # Some references mention "5球" in earlier unrelated sections;
         # require all core semantic features within a bounded local window.
         window=body[m.start():m.start()+2200]
+        if re.search(r"(?:不放回|无放回|不放回地)",window[:250]):
+            continue
         if (bool(re.search(r"5.{0,15}球",window[:160])) and
             bool(re.search(r"(?:有放回|放回地)",window[:250])) and
             bool(re.search(r"(?:三次|3次)",window[:250])) and
