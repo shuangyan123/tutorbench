@@ -1,0 +1,57 @@
+name: Exact Parameter Quadratic Inequality Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/parameter-quadratic-inequalities.yml'
+      - 'scripts/research/verify_parameter_quadratic_inequalities.py'
+      - 'scripts/research/test_verify_parameter_quadratic_inequalities.py'
+      - 'fixtures/research/parameter-affine-quadratic-inequalities-v0.1.json'
+      - 'docs/research/parameter-affine-quadratic-inequalities-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  entire-parameter-axis-inequality-sets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out parameter inequality research code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install pinned exact symbolic dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/parameter-inequality-math"
+          "$RUNNER_TEMP/parameter-inequality-math/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Run exact full-solution and metamorphic regression suite
+        run: |
+          "$RUNNER_TEMP/parameter-inequality-math/bin/python" -m unittest \
+            scripts/research/test_verify_parameter_quadratic_inequalities.py -v
+      - name: Independently recalculate every parameter-region answer and enforce no-gold boundary
+        run: |
+          "$RUNNER_TEMP/parameter-inequality-math/bin/python" \
+            scripts/research/verify_parameter_quadratic_inequalities.py \
+            --fixture fixtures/research/parameter-affine-quadratic-inequalities-v0.1.json \
+            > "$RUNNER_TEMP/parameter-inequalities.json"
+          python3 - <<'PY'
+          import json
+          import os
+          path=os.path.join(os.environ['RUNNER_TEMP'],'parameter-inequalities.json')
+          with open(path,encoding='utf8') as f:
+              report=json.load(f)
+          assert report['status']=='research_exact_parameter_quadratic_inequality_sets_no_exam_gold'
+          assert report['summary']=={
+            'total':65,'verifiedComplete':38,'refuted':15,
+            'unverified':12,'officialExamGoldReleased':0}
+          rows={item['id']:item for item in report['items']}
+          assert rows['tquad_xplus1_gt']['criticalParameters']==['0','1/4']
+          assert rows['f_quadratic_instead_of_linear_at_t0']['parameterWitness']=='0'
+          assert rows['f_forgets_excluded_double_root']['parameterWitness']=='1/4'
+          assert rows['f_missing_degenerate_singleton']['reason']=='incomplete_or_overlapping_parameter_partition'
+          assert rows['irrational_discriminant_gt']['status']=='verified_complete_parameter_solution_family'
+          assert all(item['officialExamGoldCertified'] is False for item in report['items'])
+          print('Exact complete real x-solution inequality families across ALL real t checked; exam-gold promotion prohibited')
+          PY
