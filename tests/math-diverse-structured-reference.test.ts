@@ -78,6 +78,29 @@ test('same task references change verdict when claimed final numbers change',asy
     assert.equal(result.summary.unverified,0);
   }finally{await rm(dir,{recursive:true,force:true});}
 });
+test('repeated claimed roots cannot pass for two distinct reference roots', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'tutorbench-math-duplicate-roots-'));
+  try {
+    const original = JSON.parse(await readFile(candidatePath, 'utf8')) as {
+      items: Array<{id:string; tutorResponse:string}>;
+    };
+    const changed = structuredClone(original);
+    const quadratic = changed.items.find(x => x.id === 'math-diverse-09');
+    const absolute = changed.items.find(x => x.id === 'math-diverse-12');
+    assert.ok(quadratic);
+    assert.ok(absolute);
+    quadratic.tutorResponse = 'The roots are x=2 and x=2.';
+    absolute.tutorResponse = 'The inside can be 3 or -3: x-4=3 gives x=1, and x-4=-3 gives x=1. Both work when substituted.';
+    const file = join(dir, 'repeated-roots.json');
+    await writeFile(file, JSON.stringify(changed));
+    const result = invoke(file);
+    assert.equal(byId(result, '09').status, 'verified_false');
+    assert.equal(byId(result, '12').status, 'verified_false');
+  } finally {
+    await rm(dir, {recursive:true, force:true});
+  }
+});
+
 test('unsupported wording, source drift and supposed hints containing answers never receive automatic truth scores',async()=>{
   const dir=await mkdtemp(join(tmpdir(),'tutorbench-math-unknown-'));
   try{
