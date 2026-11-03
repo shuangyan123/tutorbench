@@ -71,6 +71,15 @@ def in_domain(a,b,c,d,point):
     return S.simplify(c*point+d)!=0
 
 
+def x_cell_probe(lo,hi):
+    # Exact algebraic midpoint for x-cells; rational-only t probes remain
+    # handled by the parent all-parameter classifier.
+    if lo==-S.oo and hi==S.oo:return S.Integer(0)
+    if lo==-S.oo:return S.floor(hi)-1
+    if hi==S.oo:return S.ceiling(lo)+1
+    return S.simplify((lo+hi)/2)
+
+
 def exact_signchart(a,b,c,d,op):
     """Independent sign-cell construction on the ORIGINAL numerator/denominator."""
     if c==0 and d==0:
@@ -79,7 +88,7 @@ def exact_signchart(a,b,c,d,op):
     edges=[-S.oo,*boundaries,S.oo]
     parts=[]
     for lo,hi in zip(edges,edges[1:]):
-        x=base.point_between(lo,hi)
+        x=x_cell_probe(lo,hi)
         nval=S.simplify(a*x+b)
         dval=S.simplify(c*x+d)
         if dval==0:
@@ -146,7 +155,7 @@ def equal_sets(left,right):
     critical=sorted(set(set_boundaries(left)+set_boundaries(right)),
                     key=cmp_to_key(base.compare))
     edges=[-S.oo,*critical,S.oo]
-    probes=[*critical,*[base.point_between(lo,hi) for lo,hi in zip(edges,edges[1:])]]
+    probes=[*critical,*[x_cell_probe(lo,hi) for lo,hi in zip(edges,edges[1:])]]
     for p in probes:
         if membership(left,p)!=membership(right,p):
             return False,p
@@ -204,6 +213,13 @@ def candidate_x_set(doc,a,b,c,d):
             if (lo==-S.oo and lc) or (hi==S.oo and rc) or lo==S.oo or hi==-S.oo:
                 raise Abstain("invalid_infinite_x_boundary")
             if not base.before(lo,hi):
+                # A permanently reversed numeric interval is invalid schema;
+                # an ordering reversal of symbolic roots at a particular t is
+                # a genuine wrong parameter branch and must be refuted.
+                constant_kinds=("rational","surd","infinity")
+                if (part["left"].get("kind") in constant_kinds and
+                    part["right"].get("kind") in constant_kinds):
+                    raise Abstain("candidate_static_interval_reversed_or_empty")
                 raise UndefinedCandidateAtParameter("candidate_x_interval_empty_or_reversed_at_parameter")
             pieces.append(S.Interval(lo,hi,left_open=not lc,right_open=not rc))
             continue
