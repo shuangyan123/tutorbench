@@ -125,9 +125,9 @@ def exact_template_set(kind,a,b,c):
     lo,hi=roots
     if kind=="two_points":return S.FiniteSet(lo,hi)
     if kind=="except_two_points":return S.S.Reals-S.FiniteSet(lo,hi)
-    if kind=="between_open":return S.Interval(lo,hi)
+    if kind=="between_open":return S.Interval(lo,hi,left_open=True,right_open=True)
     if kind=="between_closed":return S.Interval(lo,hi,left_open=False,right_open=False)
-    if kind=="outside_open":return S.Union(S.Interval(-S.oo,lo),S.Interval(hi,S.oo))
+    if kind=="outside_open":return S.Union(S.Interval(-S.oo,lo,right_open=True),S.Interval(hi,S.oo,left_open=True))
     if kind=="outside_closed":
         return S.Union(S.Interval(-S.oo,lo,right_open=False),
                        S.Interval(hi,S.oo,left_open=False))
