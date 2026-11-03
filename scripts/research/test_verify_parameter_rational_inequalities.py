@@ -129,6 +129,24 @@ class ParameterRationalInequalityFamily(unittest.TestCase):
                 checked+=1
         self.assertGreater(checked,500)
 
+    def test_irrational_parameter_duplicate_roots_do_not_break_second_solver(self):
+        # A real regression: SymPy's raw rational inequality root sorter can
+        # try to order 4/(5-sqrt(17)) against (5+sqrt(17))/2, which are equal.
+        # Rechecking via (N*D) □ 0 on D!=0 avoids that non-decidable ordering.
+        root=(S.Integer(5)+S.sqrt(17))/2
+        a,b,c,d=S.Integer(1),-root,S.Integer(5)-S.sqrt(17),S.Integer(-4)
+        self.assertEqual(S.simplify(-d/c-root),0)
+        hole=S.S.Reals-S.FiniteSet(root)
+        expected={"gt":hole,"ge":hole,"lt":S.EmptySet,"le":S.EmptySet,
+                  "eq":S.EmptySet,"ne":hole}
+        for op,answer in expected.items():
+            with self.subTest(comparison=op):
+                first=math.exact_signchart(a,b,c,d,op)
+                second=math.original_solver(a,b,c,d,op)
+                self.assertTrue(math.equal_sets(first,answer)[0])
+                self.assertTrue(math.equal_sets(second,answer)[0])
+                self.assertFalse(math.membership(first,root))
+
     def test_scale_numerator_and_denominator_without_changing_result(self):
         rng=random.Random(11142026)
         checks=0
