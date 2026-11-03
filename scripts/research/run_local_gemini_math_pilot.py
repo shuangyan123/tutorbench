@@ -38,6 +38,14 @@ MAX_RESPONSE_BYTES=256_000
 MAX_RAW_TEXT=8192
 MAX_CASES=8
 DEFAULT_ENDPOINT="http://127.0.0.1:9001/generate"
+FROZEN_CASES=(
+    ("exam-linked-gaokao-2025-i-q14-typed-adaptation",5,3,"expected_value",None),
+    ("synthetic-seven-labels-four-draws-mean",7,4,"expected_value",None),
+    ("synthetic-five-labels-three-draws-variance",5,3,"variance",None),
+    ("synthetic-five-labels-probability-two",5,3,"probability_exact",2),
+    ("synthetic-five-labels-at-least-two",5,3,"probability_at_least",2),
+    ("synthetic-four-labels-zero-draws-mean",4,0,"expected_value",None),
+)
 
 
 class Rejected(Exception):
@@ -97,6 +105,16 @@ def load_suite(path):
             raise Rejected("unsupported_blind_problem_"+str(e)) from e
         if set(question)!={"kind","model","query"}:
             raise Rejected("unknown_typed_problem_fields")
+    # Comparing model runs is meaningful only when every question and its
+    # stable ID are unchanged. No hidden answers are used in this binding.
+    observed=tuple(
+        (r["id"],r["question"]["model"]["numberOfLabels"],
+         r["question"]["model"]["numberOfDraws"],
+         r["question"]["query"]["metric"],r["question"]["query"].get("k"))
+        for r in rows
+    )
+    if observed!=FROZEN_CASES:
+        raise Rejected("frozen_blind_pilot_question_drift")
     linked=[r for r in rows if r["provenanceKind"]=="exam_linked_typed_adaptation"]
     # There is exactly ONE exam-linked typed adaptation in this frozen pilot.
     # A different problem cannot inherit the real-exam source label.
@@ -346,6 +364,14 @@ def main(argv=None,env=None):
     if not args.output:
         raise Rejected("explicit_output_path_required_for_live_provenance")
     path=Path(args.output).resolve()
+    # Raw model text must stay under the repository's git-ignored artifacts/
+    # directory; never silently write transcripts into tracked source files.
+    try:
+        path.relative_to((ROOT/"artifacts").resolve())
+    except ValueError as exc:
+        raise Rejected("capture_must_be_inside_gitignored_artifacts") from exc
+    if path.suffix!=".json":
+        raise Rejected("capture_must_have_json_extension")
     # Reserve the output EXCLUSIVELY before calling a potentially paid model.
     # A pre-existing capture can never trigger a duplicate billable run.
     path.parent.mkdir(parents=True,exist_ok=True)
