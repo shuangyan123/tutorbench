@@ -4,7 +4,7 @@
 
 ## What the model actually receives
 
-Six frozen real-language Chinese numerical problems about independent uniform draws with replacement. The suite has exactly one question **linked to a typed adaptation** of the 2025 New Gaokao I mathematics Q14 occupancy problem, and five new synthetic variations (expectation, variance, exact event, threshold event and zero-draw edge case). It does **not** contain answer keys, correct result strings, human annotations, or grader model responses.
+Six **identity- and model-frozen** real-language Chinese numerical problems about independent uniform draws with replacement. The suite has exactly one question **linked to a typed adaptation** of the 2025 New Gaokao I mathematics Q14 occupancy problem, and five new synthetic variations (expectation, variance, exact event, threshold event and zero-draw edge case). It does **not** contain answer keys, correct result strings, human annotations, or grader model responses.
 
 Each one-case request uses the existing **TutorExecutionPacketFile v1** contract: pinned system prompt SHA-256, explicit generation spec (256 max output tokens; no optional controls), three role-valid messages, `locale=zh-CN`, and one case. The question generator only reads the typed mathematical **assumptions and requested metric**, never the independently calculated answer. It requests an integer, exact fraction or finite decimal **without any surrounding text**. `UNSURE` and mixed prose are *unverified*, not guessed to be mathematically correct.
 
@@ -14,7 +14,7 @@ The local Gemini Host already implements explicit model version selection, singl
 
 - **Plan** is the default planning route and makes **zero model calls**; it does not read a secret or check the provider endpoint.
 - Live calls only happen with the explicit `run --execute-live` command. The runner requires a 64-character random lowercase-hex `CANONICAL_MODEL_HOST_TOKEN` from the local environment, a versioned declared Gemini ID, a loopback-only `http://127.0.0.1:<port>/generate` address and an output file path.
-- The output file is **reserved exclusively before any network requests**; an existing capture is never overwritten or silently retried, avoiding unintentional repeated costs.
+- The output file is **reserved exclusively before any network requests** and must live within the repository's git-ignored `artifacts/` directory; an existing capture is never overwritten or silently retried, avoiding unintentional repeated costs.
 - Each case gets one POST, no application-level retry. The host must return the expected canonical `output.text` and supported generation flags. HTTP failures and timeouts are counted separately; they **do not** imply a math mistake.
 - The raw model text, full typed-question SHA-256, actual one-case packet SHA-256, host-reported timing and token counts, run UUID, UTC capture time and declared model are written into an **ignored local** `artifacts/` JSON file. The session token and Google API credential are **never** serialized.
 - User-set `--model` is **operator-declared**; neither the canonical Host response nor its local capture contains provider-signed model identity. The report therefore sets `providerIdentityCryptographicallyVerified=false` and does **not** assert a signed provider/model attestation.
@@ -82,7 +82,7 @@ The local captures are intentionally under `artifacts/`, which the repository ig
 
 ## Research acceptance and demonstrated limits
 
-The isolated GitHub workflow runs **14 standard-library tests** with a fake localhost canonical Host, including request role order, prompt hashes, actual HTTP bearer-token exchange, no-Origin behavior, endpoint restriction, zero-call plan, explicit live opt-in, correct/wrong/abstained model-output classification, exact decimal precision, untrusted input, single-attempt semantics, corrupted independent mathematical engine and strict metadata. The same tests explicitly refuse to turn mocked model text into live-model accuracy statistics.
+The isolated GitHub workflow runs **16 standard-library tests** with a fake localhost canonical Host, including request role order, prompt hashes, actual HTTP bearer-token exchange, no-Origin behavior, endpoint restriction, zero-call plan, explicit live opt-in, correct/wrong/abstained model-output classification, exact decimal precision, untrusted input, single-attempt semantics, corrupted independent mathematical engine and strict metadata. The same tests explicitly refuse to turn mocked model text into live-model accuracy statistics.
 
 **Still missing before a real model-accuracy claim:** a local live Gemini capture generated with the user's opt-in and available credentials, authoritative provider-model attestation if independently verified provenance is required, natural-language answer extraction beyond plain numeric results, a larger genuine exam question cohort and independent measured verifier false-acceptance rates. The existing 2025 Gaokao record's publication lineage/official exam authenticity is still unknown; this pilot only tests its **typed mathematical adaptation**.
 
