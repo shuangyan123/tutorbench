@@ -97,6 +97,17 @@ def load_suite(path):
             raise Rejected("unsupported_blind_problem_"+str(e)) from e
         if set(question)!={"kind","model","query"}:
             raise Rejected("unknown_typed_problem_fields")
+    linked=[r for r in rows if r["provenanceKind"]=="exam_linked_typed_adaptation"]
+    # There is exactly ONE exam-linked typed adaptation in this frozen pilot.
+    # A different problem cannot inherit the real-exam source label.
+    if len(linked)!=1 or linked[0]["id"]!="exam-linked-gaokao-2025-i-q14-typed-adaptation":
+        raise Rejected("exam_linked_case_identity_drift")
+    linked_question=linked[0]["question"]
+    if (linked_question["model"]!={"numberOfLabels":5,"numberOfDraws":3,
+         "uniform":True,"independent":True,"withReplacement":True,
+         "randomVariable":"number_of_distinct_labels_seen"} or
+        linked_question["query"]!={"metric":"expected_value"}):
+        raise Rejected("exam_linked_typed_formalization_drift")
     return suite
 
 
@@ -332,12 +343,13 @@ def main(argv=None,env=None):
     if not args.output:
         raise Rejected("explicit_output_path_required_for_live_provenance")
     path=Path(args.output).resolve()
-    # Exclusive write: a previous model run must never be overwritten.
-    def transport(data):
-        return ask_local_host(data,args.endpoint,token,args.timeout)
-    result=run_items(suite,limit,transport,"local_host_observed",args.model)
+    # Reserve the output EXCLUSIVELY before calling a potentially paid model.
+    # A pre-existing capture can never trigger a duplicate billable run.
     path.parent.mkdir(parents=True,exist_ok=True)
     with path.open("x",encoding="utf8") as f:
+        def transport(data):
+            return ask_local_host(data,args.endpoint,token,args.timeout)
+        result=run_items(suite,limit,transport,"local_host_observed",args.model)
         json.dump(result,f,indent=2,ensure_ascii=False)
         f.write("\n")
     # Print aggregates and file location, never raw model output or token.
