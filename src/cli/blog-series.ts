@@ -132,7 +132,7 @@ function legacyRedirect(section: number, zh: boolean, canonical: string): string
     '<title>' + esc(title) + ' · Teachometry</title><meta name="description" content="' + esc(description) + '">' +
     '<meta name="robots" content="noindex,follow"><link rel="canonical" href="' + esc(canonical) + '">' +
     '<meta http-equiv="refresh" content="0; url=' + esc(target) + '">' +
-    '<link rel="stylesheet" href="../../journal.css"></head><body><main style="max-width:55rem;margin:8vh auto;padding:1.5rem">' +
+    '<link rel="stylesheet" href="' + (zh ? "../../../journal.css" : "../../journal.css") + '"></head><body><main style="max-width:55rem;margin:8vh auto;padding:1.5rem">' +
     '<h1>' + esc(title) + '</h1><p>' + esc(description) + '</p><p><a href="' + esc(target) + '">' +
     (zh ? "前往新版文章" : "Read the revised essay") + '</a></p></main></body></html>';
 }
