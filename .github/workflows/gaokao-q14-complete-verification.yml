@@ -1,0 +1,54 @@
+name: Gaokao Q14 Complete Exact Answer Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/gaokao-q14-complete-verification.yml'
+      - 'fixtures/research/gaokao-2025-q14-typed-contract-v0.1.json'
+      - 'scripts/research/verify_gaokao_q14_exact.py'
+      - 'scripts/research/test_verify_gaokao_q14_exact.py'
+      - 'docs/research/gaokao-2025-q14-complete-answer-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  complete-numeric-answer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out isolated research source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Recompute exact formula, occupancy distribution and all 125 outcomes
+        run: |
+          python3 -m unittest scripts/research/test_verify_gaokao_q14_exact.py -v
+          python3 scripts/research/verify_gaokao_q14_exact.py \
+            --require-source-consensus > "$RUNNER_TEMP/q14-result.json"
+      - name: Enforce complete typed answer and qualified source boundary
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from fractions import Fraction
+          with open(os.path.join(os.environ["RUNNER_TEMP"],"q14-result.json"),encoding="utf-8") as f:
+              r=json.load(f)
+          assert r["status"]=="mathematics_verified_published_sources_corroborated"
+          assert r["mathematics"]["exactReference"]=="61/25"
+          assert r["mathematics"]["orderedSampleSpaceSize"]==125
+          assert r["mathematics"]["distributionCounts"]=={"1":5,"2":60,"3":60}
+          assert len(r["mathematics"]["methodResults"])==3
+          assert set(r["mathematics"]["methodResults"].values())=={"61/25"}
+          assert sum(Fraction(k)*v for k,v in r["mathematics"]["distributionCounts"].items())==305
+          assert r["sourceCertification"]["publishedMatchingAnswerHosts"]>=2
+          assert r["sourceCertification"]["officialExamGoldCertified"] is False
+          assert r["sourceCertification"]["publisherIndependenceAuthenticated"] is False
+          by={x["id"]:x for x in r["results"]}
+          assert by["original-reported-fraction"]["status"]=="verified_correct_under_typed_model"
+          assert by["equivalent-decimal"]["status"]=="verified_correct_under_typed_model"
+          assert by["incorrect-three-distinct"]["status"]=="verified_incorrect_under_typed_model"
+          assert by["incorrect-61-over-125"]["status"]=="verified_incorrect_under_typed_model"
+          assert by["malformed-claim"]["status"]=="unverified"
+          print("One fully specified exam probability answer confirmed by 3 exact methods; source authenticity remains unverified")
+          PY
