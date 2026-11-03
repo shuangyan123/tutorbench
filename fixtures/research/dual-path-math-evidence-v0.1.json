@@ -1,0 +1,753 @@
+{
+  "schemaVersion": 1,
+  "id": "dual-path-math-answer-evidence-v0.1",
+  "status": "research_no_official_gold",
+  "cases": [
+    {
+      "id": "exam-gaokao-2025-14",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "referenceAnswer": "61/25",
+      "sourceCaseId": "gaokao-2025-national-1-q14",
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "reference-wrong",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "referenceAnswer": "61/125",
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "reference-decimal-correct",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "referenceAnswer": "2.44",
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "reference-false-paper-association",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 6,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "referenceAnswer": "61/25",
+      "sourceCaseId": "gaokao-2025-national-1-q14",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "reference-unpublished-paper-value",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "referenceAnswer": "61/125",
+      "sourceCaseId": "gaokao-2025-national-1-q14",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "reference-unsupported-paper-formalization",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "referenceAnswer": "61/25",
+      "sourceCaseId": "kaoyan-math-1-2025-q20",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "reference-solution-set-correct",
+      "path": "existing_answer",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "reference-solution-set-missing-root",
+      "path": "existing_answer",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "reference-domain-hole",
+      "path": "existing_answer",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "no-answer-real-exam-occupancy",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "no-answer-generic-occupancy",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 7,
+          "numberOfDraws": 4,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "no-answer-occupancy-variance",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "variance"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "no-answer-occupancy-two-labels",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_exact",
+          "k": 2
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "no-answer-quadratic-irrational",
+      "path": "no_answer",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "no-answer-domain-hole",
+      "path": "no_answer",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "no-answer-undefined-denominator",
+      "path": "no_answer",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 0,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "ge",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "offline-candidate-correct",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "fixture-output-not-live",
+        "rawText": "61/25",
+        "answer": "61/25"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "offline-candidate-decimal-correct",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "fixture-output-not-live",
+        "rawText": "2.44",
+        "answer": "2.44"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "offline-candidate-wrong",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "fixture-output-not-live",
+        "rawText": "61/125",
+        "answer": "61/125"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_refuted"
+    },
+    {
+      "id": "offline-candidate-near-wrong",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "fixture-output-not-live",
+        "rawText": "2.44000001",
+        "answer": "2.44000001"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_refuted"
+    },
+    {
+      "id": "offline-candidate-variance-correct",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "variance"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "fixture-output-not-live",
+        "rawText": "204/625",
+        "answer": "204/625"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "offline-candidate-new-problem-wrong",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 6,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "fixture-output-not-live",
+        "rawText": "61/25",
+        "answer": "61/25"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_refuted"
+    },
+    {
+      "id": "offline-candidate-ambiguous",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "fixture-output-not-live",
+        "rawText": "I think 61/25.",
+        "answer": "I think 61/25."
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "offline-candidate-answer-not-in-raw",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "fixture-output-not-live",
+        "rawText": "61/125",
+        "answer": "61/25"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "no-answer-received-reference",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "referenceAnswer": "61/25",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "no-answer-unsupported-capture",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "unattested",
+        "modelId": "fixture-output",
+        "rawText": "61/25",
+        "answer": "61/25"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "no-answer-mismatched-premises",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": false,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "expectedStatus": "unverified"
+    }
+  ]
+}
