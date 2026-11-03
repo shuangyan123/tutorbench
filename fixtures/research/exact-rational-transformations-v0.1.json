@@ -1,0 +1,3136 @@
+{
+  "schemaVersion": 1,
+  "id": "exact-rational-transformations-v0.1",
+  "status": "research_only_no_official_gold",
+  "description": "Univariate exact rational AST equivalence, defined-domain preservation, full rational relation solution sets and multi-step transformation validity. Synthetic research controls only, not official exam gold.",
+  "cases": [
+    {
+      "id": "function-x-identity",
+      "mode": "function",
+      "left": {
+        "kind": "x"
+      },
+      "right": {
+        "kind": "x"
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-add-commutation",
+      "mode": "function",
+      "left": {
+        "kind": "add",
+        "args": [
+          {
+            "kind": "x"
+          },
+          {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "right": {
+        "kind": "add",
+        "args": [
+          {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          },
+          {
+            "kind": "x"
+          }
+        ]
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-zero-product",
+      "mode": "function",
+      "left": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "const",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "x"
+          }
+        ]
+      },
+      "right": {
+        "kind": "const",
+        "num": 0,
+        "den": 1
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-double-negation",
+      "mode": "function",
+      "left": {
+        "kind": "neg",
+        "arg": {
+          "kind": "neg",
+          "arg": {
+            "kind": "x"
+          }
+        }
+      },
+      "right": {
+        "kind": "x"
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-power-vs-product",
+      "mode": "function",
+      "left": {
+        "kind": "pow",
+        "base": {
+          "kind": "x"
+        },
+        "exponent": 2
+      },
+      "right": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "x"
+          },
+          {
+            "kind": "x"
+          }
+        ]
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-zero-power",
+      "mode": "function",
+      "left": {
+        "kind": "pow",
+        "base": {
+          "kind": "x"
+        },
+        "exponent": 0
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-rational-common-factor",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "mul",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          ]
+        },
+        "denominator": {
+          "kind": "pow",
+          "base": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          },
+          "exponent": 2
+        }
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-removable-hole-same-domain",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "pow",
+          "base": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          },
+          "exponent": 2
+        },
+        "denominator": {
+          "kind": "pow",
+          "base": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          },
+          "exponent": 2
+        }
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-zero-times-undefined-preserved",
+      "mode": "function",
+      "left": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "const",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "div",
+            "numerator": {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "const",
+          "num": 0,
+          "den": 1
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-add-common-denominator",
+      "mode": "function",
+      "left": {
+        "kind": "add",
+        "args": [
+          {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          },
+          {
+            "kind": "div",
+            "numerator": {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-cancel-two-quotients",
+      "mode": "function",
+      "left": {
+        "kind": "add",
+        "args": [
+          {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          },
+          {
+            "kind": "neg",
+            "arg": {
+              "kind": "div",
+              "numerator": {
+                "kind": "x"
+              },
+              "denominator": {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "const",
+          "num": 0,
+          "den": 1
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-div-x-x-vs-quadratic",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "x"
+        }
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        },
+        "denominator": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        }
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-pow-zero-retains-hole",
+      "mode": "function",
+      "left": {
+        "kind": "pow",
+        "base": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "exponent": 0
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "x"
+        }
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-nested-div-retains-hole",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "denominator": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        }
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "x"
+        }
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-associative-product",
+      "mode": "function",
+      "left": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "x"
+          },
+          {
+            "kind": "const",
+            "num": 2,
+            "den": 1
+          },
+          {
+            "kind": "const",
+            "num": 3,
+            "den": 1
+          }
+        ]
+      },
+      "right": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "const",
+            "num": 3,
+            "den": 1
+          },
+          {
+            "kind": "mul",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": 2,
+                "den": 1
+              }
+            ]
+          }
+        ]
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "function-equivalent-rational-constants",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "const",
+          "num": 2,
+          "den": 1
+        },
+        "denominator": {
+          "kind": "const",
+          "num": 4,
+          "den": 1
+        }
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 2
+      },
+      "expectedStatus": "verified_domain_and_function_equivalence"
+    },
+    {
+      "id": "false-cancel-x-x-domain",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "x"
+        }
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-cancel-x-minus1-domain",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-zero-times-undefined-as-zero",
+      "mode": "function",
+      "left": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "const",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "div",
+            "numerator": {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "right": {
+        "kind": "const",
+        "num": 0,
+        "den": 1
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-pow-zero-erases-domain",
+      "mode": "function",
+      "left": {
+        "kind": "pow",
+        "base": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "exponent": 0
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-multiply-by-reciprocal",
+      "mode": "function",
+      "left": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "x"
+          },
+          {
+            "kind": "div",
+            "numerator": {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            },
+            "denominator": {
+              "kind": "x"
+            }
+          }
+        ]
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-rational-different-poles",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-two-cancelled-expressions-diff-holes",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-function-not-equal",
+      "mode": "function",
+      "left": {
+        "kind": "pow",
+        "base": {
+          "kind": "x"
+        },
+        "exponent": 2
+      },
+      "right": {
+        "kind": "x"
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-scaled-linear",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "const",
+          "num": 2,
+          "den": 1
+        }
+      },
+      "right": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "const",
+            "num": 2,
+            "den": 1
+          },
+          {
+            "kind": "x"
+          }
+        ]
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-same-domain-different-values",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "right": {
+        "kind": "div",
+        "numerator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        }
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-x-over-x-add-one",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "x"
+        }
+      },
+      "right": {
+        "kind": "add",
+        "args": [
+          {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "x"
+            }
+          },
+          {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-zero-constant-vs-one",
+      "mode": "function",
+      "left": {
+        "kind": "const",
+        "num": 0,
+        "den": 1
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "relation-factor-inequality-preserves-original-domain",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "mul",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "denominator": {
+            "kind": "pow",
+            "base": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            },
+            "exponent": 2
+          }
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-cancelled-holes-preserved",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "pow",
+            "base": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            },
+            "exponent": 2
+          },
+          "denominator": {
+            "kind": "pow",
+            "base": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            },
+            "exponent": 2
+          }
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-equivalent-double-negation",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "neg",
+          "arg": {
+            "kind": "x"
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "lt"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-equation-x-square-equals-zero",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-always-true",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        },
+        "comparison": "ge"
+      },
+      "right": {
+        "expression": {
+          "kind": "const",
+          "num": 1,
+          "den": 1
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-always-false",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        },
+        "comparison": "lt"
+      },
+      "right": {
+        "expression": {
+          "kind": "const",
+          "num": 1,
+          "den": 1
+        },
+        "comparison": "lt"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-x-over-x-is-one",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "div",
+              "numerator": {
+                "kind": "x"
+              },
+              "denominator": {
+                "kind": "x"
+              }
+            },
+            {
+              "kind": "neg",
+              "arg": {
+                "kind": "const",
+                "num": 1,
+                "den": 1
+              }
+            }
+          ]
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-same-domain-x-hole-not-equal",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "comparison": "ne"
+      },
+      "right": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "ne"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "relation-same-domain-cancel-equation",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "div",
+              "numerator": {
+                "kind": "x"
+              },
+              "denominator": {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "neg",
+              "arg": {
+                "kind": "div",
+                "numerator": {
+                  "kind": "x"
+                },
+                "denominator": {
+                  "kind": "add",
+                  "args": [
+                    {
+                      "kind": "x"
+                    },
+                    {
+                      "kind": "const",
+                      "num": -1,
+                      "den": 1
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 0,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-equation-factor-with-hole",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "mul",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "relation-rational-sign-flip-negation",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "neg",
+          "arg": {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "lt"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "verified_relation_and_domain_equivalence"
+    },
+    {
+      "id": "solution-only-crossmultiply-strict",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "mul",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          ]
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "solution-only-reciprocal-strict",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "solution-only-reciprocal-negative",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "lt"
+      },
+      "right": {
+        "expression": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "lt"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "solution-only-equation-cancel-hole",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "solution-only-not-eq-product",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "ne"
+      },
+      "right": {
+        "expression": {
+          "kind": "mul",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          ]
+        },
+        "comparison": "ne"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "solution-only-zero-not-eq",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 0,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "ne"
+      },
+      "right": {
+        "expression": {
+          "kind": "const",
+          "num": 0,
+          "den": 1
+        },
+        "comparison": "ne"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "solution-only-reciprocal-no-zero",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "const",
+          "num": 1,
+          "den": 1
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "solution-only-denominator-no-zero",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "solution-only-cancelled-pow-true-except",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "ne"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "verified_solution_equivalence_domain_changed"
+    },
+    {
+      "id": "false-crossmultiply-weak-includes-pole",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "ge"
+      },
+      "right": {
+        "expression": {
+          "kind": "mul",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          ]
+        },
+        "comparison": "ge"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-crossmultiply-demand-domain",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "mul",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          ]
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-reciprocal-weak-includes-pole",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "ge"
+      },
+      "right": {
+        "expression": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "ge"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-x-positive-for-rational",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-x-over-x-ne-domain",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "const",
+          "num": 1,
+          "den": 1
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-x-square-strict-vs-weak",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        },
+        "comparison": "ge"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-x-square-no-root-vs-equality",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        },
+        "comparison": "lt"
+      },
+      "right": {
+        "expression": {
+          "kind": "pow",
+          "base": {
+            "kind": "x"
+          },
+          "exponent": 2
+        },
+        "comparison": "le"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-reversed-sign",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "x"
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "lt"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-hole-zero-numerator-equation",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "const",
+            "num": 0,
+            "den": 1
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "const",
+          "num": 0,
+          "den": 1
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-division-square-root-style-spurious",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "pow",
+              "base": {
+                "kind": "x"
+              },
+              "exponent": 2
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "add",
+          "args": [
+            {
+              "kind": "x"
+            },
+            {
+              "kind": "const",
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "false-cancelled-true-vs-always-true",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          },
+          "denominator": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          }
+        },
+        "comparison": "gt"
+      },
+      "right": {
+        "expression": {
+          "kind": "const",
+          "num": 1,
+          "den": 1
+        },
+        "comparison": "gt"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "chain-equivalent-rational-rewrite",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "mul",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "add",
+                  "args": [
+                    {
+                      "kind": "x"
+                    },
+                    {
+                      "kind": "const",
+                      "num": -1,
+                      "den": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            "denominator": {
+              "kind": "pow",
+              "base": {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              },
+              "exponent": 2
+            }
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          },
+          "comparison": "gt"
+        }
+      ],
+      "requireSameDomain": true,
+      "expectedStatus": "verified_transformation_chain"
+    },
+    {
+      "id": "chain-crossmultiply-strict-solution-only",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "mul",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "neg",
+            "arg": {
+              "kind": "mul",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "add",
+                  "args": [
+                    {
+                      "kind": "x"
+                    },
+                    {
+                      "kind": "const",
+                      "num": -1,
+                      "den": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "comparison": "lt"
+        }
+      ],
+      "requireSameDomain": false,
+      "expectedStatus": "verified_transformation_chain"
+    },
+    {
+      "id": "chain-empty-solution-with-domain-change",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "const",
+              "num": 0,
+              "den": 1
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          },
+          "comparison": "ne"
+        },
+        {
+          "expression": {
+            "kind": "const",
+            "num": 0,
+            "den": 1
+          },
+          "comparison": "ne"
+        },
+        {
+          "expression": {
+            "kind": "const",
+            "num": 1,
+            "den": 1
+          },
+          "comparison": "eq"
+        }
+      ],
+      "requireSameDomain": false,
+      "expectedStatus": "verified_transformation_chain"
+    },
+    {
+      "id": "chain-equivalent-equation-steps",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "pow",
+            "base": {
+              "kind": "x"
+            },
+            "exponent": 2
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "mul",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "x"
+              }
+            ]
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        }
+      ],
+      "requireSameDomain": true,
+      "expectedStatus": "verified_transformation_chain"
+    },
+    {
+      "id": "chain-fails-at-second-weakening",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "mul",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "mul",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "comparison": "ge"
+        }
+      ],
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "chain-fails-first-crossmultiply-domain",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "add",
+              "args": [
+                {
+                  "kind": "x"
+                },
+                {
+                  "kind": "const",
+                  "num": -1,
+                  "den": 1
+                }
+              ]
+            }
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "mul",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "add",
+                "args": [
+                  {
+                    "kind": "x"
+                  },
+                  {
+                    "kind": "const",
+                    "num": -1,
+                    "den": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "comparison": "gt"
+        }
+      ],
+      "requireSameDomain": true,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "chain-fails-first-wrong-sign",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "const",
+              "num": 1,
+              "den": 1
+            },
+            "denominator": {
+              "kind": "x"
+            }
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "lt"
+        }
+      ],
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "chain-fails-extra-square-root",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "x"
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "add",
+            "args": [
+              {
+                "kind": "pow",
+                "base": {
+                  "kind": "x"
+                },
+                "exponent": 2
+              },
+              {
+                "kind": "const",
+                "num": -1,
+                "den": 1
+              }
+            ]
+          },
+          "comparison": "eq"
+        }
+      ],
+      "requireSameDomain": false,
+      "expectedStatus": "refuted"
+    },
+    {
+      "id": "abstain-division-by-zero",
+      "mode": "function",
+      "left": {
+        "kind": "div",
+        "numerator": {
+          "kind": "x"
+        },
+        "denominator": {
+          "kind": "const",
+          "num": 0,
+          "den": 1
+        }
+      },
+      "right": {
+        "kind": "x"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-third-degree",
+      "mode": "function",
+      "left": {
+        "kind": "pow",
+        "base": {
+          "kind": "x"
+        },
+        "exponent": 3
+      },
+      "right": {
+        "kind": "x"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-integer-input-string",
+      "mode": "function",
+      "left": {
+        "kind": "const",
+        "num": "__import__(\"os\")",
+        "den": 1
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-invalid-constant-denominator",
+      "mode": "function",
+      "left": {
+        "kind": "const",
+        "num": 1,
+        "den": 0
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-invalid-constant-boolean",
+      "mode": "function",
+      "left": {
+        "kind": "const",
+        "num": true,
+        "den": 1
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-unrecognized-sqrt",
+      "mode": "function",
+      "left": {
+        "kind": "sqrt",
+        "arg": {
+          "kind": "x"
+        }
+      },
+      "right": {
+        "kind": "x"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-mul-polynomial-degree-four",
+      "mode": "function",
+      "left": {
+        "kind": "mul",
+        "args": [
+          {
+            "kind": "pow",
+            "base": {
+              "kind": "x"
+            },
+            "exponent": 2
+          },
+          {
+            "kind": "pow",
+            "base": {
+              "kind": "x"
+            },
+            "exponent": 2
+          }
+        ]
+      },
+      "right": {
+        "kind": "const",
+        "num": 1,
+        "den": 1
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-bad-field",
+      "mode": "function",
+      "left": {
+        "kind": "x",
+        "attacker": "x"
+      },
+      "right": {
+        "kind": "x"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-bad-operator",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "~"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": true,
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-relation-empty-domain",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "div",
+          "numerator": {
+            "kind": "x"
+          },
+          "denominator": {
+            "kind": "const",
+            "num": 0,
+            "den": 1
+          }
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": false,
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-bad-domain-boolean",
+      "mode": "relation",
+      "left": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "eq"
+      },
+      "right": {
+        "expression": {
+          "kind": "x"
+        },
+        "comparison": "eq"
+      },
+      "requireSameDomain": "false",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-chain-empty-domain",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "div",
+            "numerator": {
+              "kind": "x"
+            },
+            "denominator": {
+              "kind": "const",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "comparison": "gt"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "gt"
+        }
+      ],
+      "requireSameDomain": true,
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-chain-too-deep",
+      "mode": "chain",
+      "steps": [
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        },
+        {
+          "expression": {
+            "kind": "x"
+          },
+          "comparison": "eq"
+        }
+      ],
+      "requireSameDomain": true,
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "abstain-excessive-depth",
+      "mode": "function",
+      "left": {
+        "kind": "neg",
+        "arg": {
+          "kind": "neg",
+          "arg": {
+            "kind": "neg",
+            "arg": {
+              "kind": "neg",
+              "arg": {
+                "kind": "neg",
+                "arg": {
+                  "kind": "neg",
+                  "arg": {
+                    "kind": "neg",
+                    "arg": {
+                      "kind": "neg",
+                      "arg": {
+                        "kind": "neg",
+                        "arg": {
+                          "kind": "neg",
+                          "arg": {
+                            "kind": "x"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "right": {
+        "kind": "x"
+      },
+      "expectedStatus": "unverified"
+    }
+  ]
+}
