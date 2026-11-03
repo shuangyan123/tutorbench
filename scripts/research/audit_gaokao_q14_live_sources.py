@@ -120,7 +120,7 @@ def verify_published_html(html,publisher,reference):
     except ValueError:
         raise ValueError("source_final_answer_not_readable_"+publisher) from None
     if claim!=reference:
-        raise ValueError("source_claim_conflict_"+publisher)
+        raise ValueError("source_claim_conflict_"+publisher+"_parsed_"+str(claim))
     return {"publisher":publisher,"questionAligned":True,"exactAnswerClaimObserved":str(reference),
             "independentEditorialLineageCertified":False}
 
@@ -160,7 +160,7 @@ def evaluate(pdf_text,html_sources,fixture,catalog,pinned_pdf=None):
             observation=verify_published_html(html,publisher,reference)
         except ValueError as exc:
             if str(exc).startswith("source_claim_conflict_"):
-                raise ValueError("published_answer_conflict_requires_adjudication") from exc
+                raise ValueError("published_answer_conflict_requires_adjudication:"+str(exc)) from exc
             continue
         content_hash=hashlib.sha256(html.encode("utf-8")).hexdigest()
         if content_hash not in seen_exact_content:
