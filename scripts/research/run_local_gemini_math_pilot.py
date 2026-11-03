@@ -274,6 +274,7 @@ def run_items(suite,limit,transport,provenance,declared_model):
     observed=total-failed
     # Mock transport MUST NOT result in published "live model accuracy".
     real=(provenance=="local_host_observed")
+    complete=(total==len(suite["cases"]) and failed==0)
     return {
         "schemaVersion":1,"id":"local-blind-math-host-run-v0.1",
         "researchOnly":True,
@@ -297,8 +298,10 @@ def run_items(suite,limit,transport,provenance,declared_model):
                                     "value":verified/total if total and real else None},
             "abstentionRate":{"numerator":abstain,"denominator":total,
                              "value":abstain/total if total and real else None},
-            "benchmarkedWholeSuite":total==len(suite["cases"]) and failed==0,
-            "measuredLiveModelAccuracy":(correct/total if total and real else None),
+            "benchmarkedWholeSuite":complete,
+            # A one-case smoke or network-incomplete run is NOT a full-cohort
+            # model accuracy. Per-run fractions still retain true denominators.
+            "measuredLiveModelAccuracy":(correct/total if real and complete else None),
             "falseAcceptanceRate":None,
             "officialExamGoldReleased":0,
         },"items":results,
