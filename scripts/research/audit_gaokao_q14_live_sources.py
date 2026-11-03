@@ -91,6 +91,14 @@ def verify_published_html(html,publisher,reference):
     if not window:
         raise ValueError("source_question_semantics_differ_"+publisher)
     if not contains_answer(window,reference.numerator,reference.denominator):
+        # A contradictory published answer is not overridden by a majority.
+        # Only the answer segment is examined; formulae from other questions
+        # or intermediate derivations do not count as final answer claims.
+        marks=list(re.finditer(r"(?:参考答案|〖答案〗|答案[:：]?)",window))
+        for mark in marks[:3]:
+            segment=window[mark.end():mark.end()+180]
+            if re.search(r"(?:d?frac)\\?\{\\?\d+\}\\?\{\\?\d+\}",segment) or re.search(r"(?<!\d)\d+/\d+(?!\d)",segment) or re.search(r"^[:：]?[0-9]+(?:\\.[0-9]+)?",segment):
+                raise ValueError("source_claim_conflict_"+publisher)
         raise ValueError("source_answer_not_present_near_problem_"+publisher)
     return {"publisher":publisher,"questionAligned":True,"exactAnswerClaimObserved":str(reference),
             "independentEditorialLineageCertified":False}
@@ -126,11 +134,18 @@ def evaluate(pdf_text,html_sources,fixture,catalog,pinned_pdf=None):
         raise ValueError("typed_model_not_same_question")
     reference=Fraction(n*(n**d-(n-1)**d),n**d)
     observations=[]
+    seen_exact_content=set()
     for publisher,html in sorted(html_sources.items()):
         try:
-            observations.append(verify_published_html(html,publisher,reference))
-        except ValueError:
+            observation=verify_published_html(html,publisher,reference)
+        except ValueError as exc:
+            if str(exc).startswith("source_claim_conflict_"):
+                raise ValueError("published_answer_conflict_requires_adjudication") from exc
             continue
+        content_hash=hashlib.sha256(html.encode("utf-8")).hexdigest()
+        if content_hash not in seen_exact_content:
+            observations.append(observation)
+            seen_exact_content.add(content_hash)
     if len(observations)<2:
         raise ValueError("fewer_than_two_live_matched_source_pages")
     return {
