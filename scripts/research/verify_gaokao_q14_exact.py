@@ -84,7 +84,9 @@ def method_stirling(n,d):
         falling=1
         for j in range(k):
             falling*=n-j
-        counts[k]=falling*stir[k]
+        count=falling*stir[k]
+        if count>0:
+            counts[k]=count
     total=n**d
     if sum(counts.values())!=total or any(v<0 for v in counts.values()):
         raise AssertionError("occupancy_probabilities_not_normalized")
