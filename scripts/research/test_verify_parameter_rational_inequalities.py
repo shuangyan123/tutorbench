@@ -30,7 +30,7 @@ class ParameterRationalInequalityFamily(unittest.TestCase):
         result=math.check_batch(self.document)
         self.assertEqual(result["status"],"exact_parameter_rational_fraction_real_sets_research_only")
         self.assertEqual(result["summary"],{
-            "total":81,"verifiedComplete":51,"refuted":18,
+            "total":84,"verifiedComplete":52,"refuted":20,
             "unverified":12,"officialExamGoldReleased":0})
         self.assertEqual({v["id"]:v["status"] for v in result["items"]},
                          {v["id"]:v["expectedStatus"] for v in self.document["cases"]})
@@ -146,6 +146,23 @@ class ParameterRationalInequalityFamily(unittest.TestCase):
                 self.assertTrue(math.equal_sets(first,answer)[0])
                 self.assertTrue(math.equal_sets(second,answer)[0])
                 self.assertFalse(math.membership(first,root))
+
+    def test_fixed_x_endpoint_collisions_prevent_single_sample_false_pass(self):
+        # Without candidate-fixed-x collision critical points, t>0 is sampled
+        # only at t=1: the false assertion (x>1 for all t>0) would PASS.
+        # The correct set for (x-t)/1>0 is x>t, varying with t.
+        for name in ("false_fixed_x_endpoint_matches_only_sample_t1",
+                     "false_surd_fixed_x_endpoint_matches_only_sample_t1"):
+            result=math.classify_case(self.byid[name])
+            self.assertEqual(result["status"],"refuted_parameter_solution_family",name)
+            self.assertEqual(result["reason"],"wrong_full_x_solution_set",name)
+            self.assertIsNotNone(result["parameterWitness"])
+            self.assertNotEqual(result["parameterWitness"],"1",name)
+            self.assertIsNotNone(result["xWitness"])
+        # A truly fixed numerator/pole pair can be stated using rational
+        # constants instead of symbolic root tokens, for every real t.
+        correct=math.classify_case(self.byid["correct_constant_numeric_x_endpoints"])
+        self.assertEqual(correct["status"],"verified_complete_parameter_solution_family")
 
     def test_scale_numerator_and_denominator_without_changing_result(self):
         rng=random.Random(11142026)
