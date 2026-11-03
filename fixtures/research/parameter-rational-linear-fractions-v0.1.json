@@ -12357,6 +12357,405 @@
         }
       ],
       "expectedStatus": "unverified"
+    },
+    {
+      "id": "correct_constant_numeric_x_endpoints",
+      "model": {
+        "numerator": {
+          "slope": {
+            "constant": {
+              "num": 1,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "constant": {
+            "constant": {
+              "num": -1,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        "denominator": {
+          "slope": {
+            "constant": {
+              "num": 1,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "constant": {
+            "constant": {
+              "num": -2,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "xSolution": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "infinity",
+                  "side": "negative"
+                },
+                "right": {
+                  "kind": "rational",
+                  "num": 1,
+                  "den": 1
+                },
+                "includeLeft": false,
+                "includeRight": false
+              },
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "rational",
+                  "num": 2,
+                  "den": 1
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": false,
+                "includeRight": false
+              }
+            ]
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "false_fixed_x_endpoint_matches_only_sample_t1",
+      "model": {
+        "numerator": {
+          "slope": {
+            "constant": {
+              "num": 1,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "constant": {
+            "constant": {
+              "num": 0,
+              "den": 1
+            },
+            "parameter": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        },
+        "denominator": {
+          "slope": {
+            "constant": {
+              "num": 0,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "constant": {
+            "constant": {
+              "num": 1,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "xSolution": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "num_zero"
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": false,
+                "includeRight": false
+              }
+            ]
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "xSolution": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "num_zero"
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": false,
+                "includeRight": false
+              }
+            ]
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "xSolution": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "rational",
+                  "num": 1,
+                  "den": 1
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": false,
+                "includeRight": false
+              }
+            ]
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "false_surd_fixed_x_endpoint_matches_only_sample_t1",
+      "model": {
+        "numerator": {
+          "slope": {
+            "constant": {
+              "num": 1,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "constant": {
+            "constant": {
+              "num": 0,
+              "den": 1
+            },
+            "parameter": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        },
+        "denominator": {
+          "slope": {
+            "constant": {
+              "num": 0,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "constant": {
+            "constant": {
+              "num": 1,
+              "den": 1
+            },
+            "parameter": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "xSolution": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "num_zero"
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": false,
+                "includeRight": false
+              }
+            ]
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "xSolution": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "num_zero"
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": false,
+                "includeRight": false
+              }
+            ]
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "xSolution": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "surd",
+                  "a": 0,
+                  "b": 1,
+                  "radicand": 1,
+                  "den": 1
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": false,
+                "includeRight": false
+              }
+            ]
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
     }
   ]
 }
