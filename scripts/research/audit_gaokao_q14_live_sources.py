@@ -91,13 +91,18 @@ def first_reported_answer(window):
         marker=re.search(pattern,window)
         if marker is None:
             continue
-        tail=window[marker.end():marker.end()+180]
+        tail=window[marker.end():marker.end()+260]
+        # A KaTeX/MathML fraction may appear in visible text as "6125"
+        # followed by an embedded TeX annotation "\\frac{61}{25}".
+        # Prefer the actual fraction annotation over flattened layout digits.
+        tail=re.split(r"(?:解题过程|〖解析〗|〖详解〗|解析[:：]|本题的知识树|详细解析|题解)",tail,maxsplit=1)[0]
         found=re.search(
             r"(?:d?frac)\{([+-]?\d+)\}\{(\d+)\}"
-            r"|(?<!\d)([+-]?\d+)/(\d+)(?!\d)"
-            r"|(?<![\w])([+-]?\d+(?:\.\d+)?)",
-            tail)
+            r"|(?<!\d)([+-]?\d+)/(\d+)(?!\d)",tail)
         if found is None:
+            found=re.search(r"(?<![\w])([+-]?\d+(?:\.\d+)?)",tail)
+            if found is not None:
+                return Fraction(found.group(1))
             raise ValueError("answer_field_unparseable")
         if found.group(1) is not None:
             p,q=found.group(1),found.group(2)
@@ -105,7 +110,7 @@ def first_reported_answer(window):
         if found.group(3) is not None:
             p,q=found.group(3),found.group(4)
             return Fraction(int(p),int(q)) if int(q)!=0 else None
-        return Fraction(found.group(5))
+        raise ValueError("unrecognized_final_answer_number")
     raise ValueError("no_explicit_final_answer_field")
 
 
