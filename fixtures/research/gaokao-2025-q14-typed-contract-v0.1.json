@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "id": "gaokao-2025-national-1-q14-typed-contract-v0.1",
+  "status": "single-question-fully-checkable-math-result-not-official-exam-authentication",
+  "exam": {
+    "paperId": "gaokao-2025-national-1",
+    "question": 14,
+    "year": 2025,
+    "answerKind": "numeric-expectation",
+    "questionForm": "count_distinct_labels"
+  },
+  "model": {
+    "numberOfEquiprobableLabels": 5,
+    "numberOfDraws": 3,
+    "drawsWithReplacement": true,
+    "independentDraws": true,
+    "samplingUniform": true,
+    "quantity": "number_of_distinct_labels_seen"
+  },
+  "candidateAnswers": [
+    {
+      "id": "original-reported-fraction",
+      "claim": "61/25"
+    },
+    {
+      "id": "equivalent-decimal",
+      "claim": "2.44"
+    },
+    {
+      "id": "incorrect-three-distinct",
+      "claim": "3"
+    },
+    {
+      "id": "incorrect-61-over-125",
+      "claim": "61/125"
+    },
+    {
+      "id": "malformed-claim",
+      "claim": "61/0"
+    },
+    {
+      "id": "unknown-language",
+      "claim": "大约两个多"
+    }
+  ],
+  "sourceEvidence": {
+    "canonicalSourceClass": "multiple-unofficial-exam-copies",
+    "pdfWitness": {
+      "url": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+      "page": 2,
+      "pageViewedOn": "2026-11-03",
+      "copyrightNotice": "third_party_recollection",
+      "paperTextAutomaticallyAuthenticated": false
+    },
+    "sameQuestionIndependentPages": [
+      {
+        "url": "https://zujuan.21cnjy.com/paper/view/5580096",
+        "publisherGroup": "21cnjy-zujuan",
+        "independentEditorialOriginConfirmed": false,
+        "statementFeatures": [
+          "five_labeled_balls",
+          "three_draws",
+          "with_replacement",
+          "count_seen_labels"
+        ],
+        "claimedAnswer": null
+      },
+      {
+        "url": "https://gaokaohub.com/paper/2025-xinkebiao-i-math.html",
+        "publisherGroup": "gaokaohub",
+        "independentEditorialOriginConfirmed": false,
+        "statementFeatures": [
+          "five_labeled_balls",
+          "three_draws",
+          "with_replacement",
+          "count_seen_labels"
+        ],
+        "claimedAnswer": "61/25"
+      },
+      {
+        "url": "https://exam.meloon.top/paper/paper-gk-math-2025-xhgk1/",
+        "publisherGroup": "meloon-exam",
+        "independentEditorialOriginConfirmed": false,
+        "statementFeatures": [
+          "five_labeled_balls",
+          "three_draws",
+          "with_replacement",
+          "count_seen_labels"
+        ],
+        "claimedAnswer": "61/25"
+      },
+      {
+        "url": "https://gaokaowiki.com/math/%E7%9C%9F%E9%A2%98/%E6%B5%99%E6%B1%9F/2025/q14/",
+        "publisherGroup": "gaokaowiki",
+        "independentEditorialOriginConfirmed": false,
+        "statementFeatures": [
+          "five_labeled_balls",
+          "three_draws",
+          "with_replacement",
+          "count_seen_labels"
+        ],
+        "claimedAnswer": "61/25"
+      }
+    ],
+    "sourceAudit": "Manual human reviewers not required; source assertions here were inspected by AI using published pages and rendered recollection PDF; remote publisher lineage remains unverified; these assertions are not machine-readable official evidence."
+  },
+  "verificationPolicy": {
+    "minimumDistinctPublishedHostsWithMatchingAnswer": 2,
+    "requireThreeIndependentAlgorithms": true,
+    "requireExactFraction": true,
+    "doNotInferOfficialExamAuthentication": true,
+    "doNotDependOnHumanReview": true,
+    "studyOnly": true
+  }
+}
