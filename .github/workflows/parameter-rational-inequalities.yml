@@ -46,7 +46,7 @@ jobs:
               'total':81,'verifiedComplete':51,'refuted':18,
               'unverified':12,'officialExamGoldReleased':0}
           items={row['id']:row for row in report['items']}
-          assert items['crossing_linear_root_pole_gt']['criticalParameters']==['1']
+          assert items['crossing_linear_root_pole_gt']['criticalParameters']==['0','1']
           assert items['false_cancelled_hole_all_reals']['parameterWitness']=='1'
           assert items['false_cancelled_hole_all_reals']['xWitness']=='1'
           assert items['false_zero_denominator_returns_full']['parameterWitness']=='0'
