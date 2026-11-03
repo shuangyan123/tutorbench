@@ -108,24 +108,30 @@ def exact_signchart(a,b,c,d,op):
 
 
 def original_solver(a,b,c,d,op):
-    """Differential SymPy solve on unsimplified fraction, then original-pole removal."""
+    """Independent exact reduction by multiplication with D(x)^2 > 0.
+
+    On the original domain D!=0, N/D □ 0 iff N*D □ 0. For equality and
+    disequality it is enough to solve N=0, and always remove the ORIGINAL
+    denominator poles. Unlike solving a rational expression directly, this
+    avoids SymPy's duplicate algebraic-root sorting failures at t-surds.
+    """
     if c==0 and d==0:
         return S.EmptySet
-    n=S.Add(S.Mul(a,X,evaluate=False),b,evaluate=False)
-    den=S.Add(S.Mul(c,X,evaluate=False),d,evaluate=False)
-    rat=S.Mul(n,S.Pow(den,-1,evaluate=False),evaluate=False)
+    numerator=S.expand(a*X+b)
+    denominator=S.expand(c*X+d)
     pole=xzero(c,d)
     valid=S.S.Reals if pole is None else S.S.Reals-S.FiniteSet(pole)
     if op=="eq":
-        roots=S.solveset(S.Eq(rat,0,evaluate=False),X,domain=S.S.Reals)
+        roots=S.solveset(S.Eq(numerator,0,evaluate=False),X,domain=S.S.Reals)
         return roots.intersect(valid)
     if op=="ne":
-        roots=S.solveset(S.Eq(rat,0,evaluate=False),X,domain=S.S.Reals)
+        roots=S.solveset(S.Eq(numerator,0,evaluate=False),X,domain=S.S.Reals)
         return valid-roots
-    relation={"lt":S.Lt,"le":S.Le,"gt":S.Gt,"ge":S.Ge}[op](rat,0,evaluate=False)
+    polynomial=S.expand(numerator*denominator)
+    relation={"lt":S.Lt,"le":S.Le,"gt":S.Gt,"ge":S.Ge}[op](
+        polynomial,0,evaluate=False)
     return solve_univariate_inequality(
         relation,X,relational=False,domain=S.S.Reals).intersect(valid)
-
 
 def set_boundaries(value):
     if value in (S.S.Reals,S.EmptySet):
@@ -284,9 +290,9 @@ def classify_case(case):
                 independently=original_solver(a,b,c,d,op)
                 agree,xwitness=equal_sets(from_chart,independently)
             except (ValueError,TypeError,NotImplementedError,RuntimeError,RecursionError) as err:
-                raise Abstain("independent_rational_inequality_solver_unsupported") from err
+                raise Abstain("independent_polynomial_reduction_solver_unsupported") from err
             if not agree:
-                raise Abstain("independent_original_fraction_solver_disagrees_at_t_"+
+                raise Abstain("independent_denominator_square_reduction_disagrees_at_t_"+
                               str(t)+"_x_"+str(xwitness))
             try:
                 submitted=candidate_x_set(selected[0],a,b,c,d)
