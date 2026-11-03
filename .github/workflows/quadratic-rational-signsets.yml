@@ -1,0 +1,57 @@
+name: Exact Quadratic and Rational Sign-set Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/quadratic-rational-signsets.yml'
+      - 'scripts/research/verify_quadratic_signsets.py'
+      - 'scripts/research/test_verify_quadratic_signsets.py'
+      - 'fixtures/research/quadratic-rational-signsets-v0.1.json'
+      - 'docs/research/quadratic-rational-signsets-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-complete-real-solution-sets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mathematics research code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install isolated exact symbolic dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/math-signsets"
+          "$RUNNER_TEMP/math-signsets/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Differential, adversarial and source-gold-boundary tests
+        run: |
+          "$RUNNER_TEMP/math-signsets/bin/python" -m unittest \
+            scripts/research/test_verify_quadratic_signsets.py -v
+      - name: Recalculate all 64 complete equation or inequality solution sets
+        run: |
+          "$RUNNER_TEMP/math-signsets/bin/python" \
+            scripts/research/verify_quadratic_signsets.py \
+            --fixture fixtures/research/quadratic-rational-signsets-v0.1.json \
+            > "$RUNNER_TEMP/signset-results.json"
+          python3 - <<'PY'
+          import json
+          import os
+          with open(os.path.join(os.environ["RUNNER_TEMP"],"signset-results.json"),encoding="utf-8") as handle:
+              report=json.load(handle)
+          assert report["status"]=="research_complete_real_signset_comparison_not_official_exam_gold"
+          assert report["summary"]=={
+              "total":64,"verifiedComplete":39,"refuted":13,
+              "unverified":12,"officialExamGoldReleased":0}
+          lookup={item["id"]:item for item in report["items"]}
+          assert lookup["real-exam-math1-2025-q16-intermediate-p"]["status"]=="verified_complete_solution_set"
+          assert lookup["real-exam-math1-2025-q16-extra-pole-like-root"]["status"]=="refuted_solution_set"
+          assert lookup["real-exam-math1-2025-q16-extra-pole-like-root"]["witness"]=="5/4"
+          assert lookup["rational-hole-common-factor-false-all-reals"]["witness"]=="1"
+          assert lookup["quadratic-surds-complete"]["status"]=="verified_complete_solution_set"
+          assert lookup["two-surds-overlap-gt"]["status"]=="verified_complete_solution_set"
+          assert all(item["officialExamGoldCertified"] is False for item in report["items"])
+          print("Bounded complete quadratic/rational sign-sets verified; no exam-gold promotion")
+          PY

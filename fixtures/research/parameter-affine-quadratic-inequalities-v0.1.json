@@ -1,0 +1,6976 @@
+{
+  "schemaVersion": 1,
+  "id": "parameter-affine-quadratic-inequalities-v0.1",
+  "status": "research_only_no_official_exam_gold",
+  "description": "Typed complete real x solution sets for all real parameter t in affine-rational quadratic comparisons; exact templates, coefficient degeneration, discriminant root checks, and negative controls. Synthetic mathematical families; not official exam answers.",
+  "cases": [
+    {
+      "id": "tquad_xplus1_gt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "tquad_xplus1_ge",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ge",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "tquad_xplus1_lt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "lt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "left_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "tquad_xplus1_le",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "le",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "left_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "tquad_xplus1_eq",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "two_points"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "two_points"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "tquad_xplus1_ne",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ne",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "except_two_points"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "except_two_points"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_factor_no_real_roots_gt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_factor_no_real_roots_ge",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ge",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_factor_no_real_roots_lt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "lt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_factor_no_real_roots_le",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "le",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_factor_no_real_roots_eq",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_factor_no_real_roots_ne",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ne",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "x2_t_x_plus1_gt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "x2_t_x_plus1_ge",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ge",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_closed"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "x2_t_x_plus1_lt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "lt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "x2_t_x_plus1_le",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "le",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_closed"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "x2_t_x_plus1_eq",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "two_points"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "two_points"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "x2_t_x_plus1_ne",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ne",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "except_two_points"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "except_two_points"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "linear_t_x_plus1_gt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "left_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "linear_t_x_plus1_ge",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ge",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "left_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "right_closed"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "linear_t_x_plus1_lt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "lt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "left_open"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "linear_t_x_plus1_le",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "le",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "right_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "left_closed"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "linear_t_x_plus1_eq",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "point"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "linear_t_x_plus1_ne",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ne",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "irrational_discriminant_gt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 2
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "irrational_discriminant_ge",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 2
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ge",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_closed"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "irrational_discriminant_lt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 2
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "lt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "irrational_discriminant_eq",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 2
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "two_points"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "two_points"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_x2_plus1_eq",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "two_points"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_x2_plus1_gt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_x2_plus1_le",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "le",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_x2_plus1_ge",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ge",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "constant_positive_x2_plus1_gt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "constant_positive_x2_plus1_ge",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ge",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "constant_positive_x2_plus1_le",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "le",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_x2_zero_eq",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "point"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_x2_zero_gt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "t_x2_zero_lt",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "lt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "verified_complete_parameter_solution_family"
+    },
+    {
+      "id": "f_quadratic_instead_of_linear_at_t0",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "f_forgets_excluded_double_root",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "f_wrong_sign_for_negative_leading",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "f_missing_degenerate_singleton",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "f_overlapping_boundary",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "h_forgets_double_root_exclusion",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "h_closed_endpoint_mistaken_open",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "le",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_closed"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "h_invents_roots_where_discriminant_negative",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "lt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "linear_reverses_ray_for_negative_slope",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "linear_misses_constant_parameter_zero",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "point"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "factor_zero_is_all_real_not_empty",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "eq",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "irrational_boundary_misclassified",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 2
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "constant_degeneration_at_tzero",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "ge",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_closed"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "empty"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "positive_polynomial_not_globally_negative",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "le",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "wrong_noncritical_partition_gap",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "refuted_parameter_solution_family"
+    },
+    {
+      "id": "invalid_operator",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "approx",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "missing_polynomial_coefficient",
+      "equation": {
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "malicious_coefficient_string",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": "__import__('os')",
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "coefficient_out_of_bound",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 200000000,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "rational_zero_denominator",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 0
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "unrecognized_extra_model_field",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          },
+          "nonlinear": {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "unknown_root_set_template",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "quadratic"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "reversed_parameter_interval",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "invalid_irrational_radicand",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 2
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "point_at_infinite_t",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "infinity",
+              "side": "positive"
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "nonboolean_interval_endpoint",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": 1
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "unknown_claim_field",
+      "equation": {
+        "quadratic": {
+          "constant": {
+            "num": 0,
+            "den": 1
+          },
+          "parameter": {
+            "num": 1,
+            "den": 1
+          }
+        },
+        "linear": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        },
+        "constant": {
+          "constant": {
+            "num": 1,
+            "den": 1
+          },
+          "parameter": {
+            "num": 0,
+            "den": 1
+          }
+        }
+      },
+      "comparison": "gt",
+      "parameterBranches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "between_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          "solution": {
+            "kind": "right_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "outside_open"
+          }
+        },
+        {
+          "when": {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          "solution": {
+            "kind": "except_point"
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "solution": {
+            "kind": "all_reals"
+          }
+        }
+      ],
+      "expectedStatus": "unverified",
+      "extraField": "arbitrary-expression"
+    }
+  ]
+}

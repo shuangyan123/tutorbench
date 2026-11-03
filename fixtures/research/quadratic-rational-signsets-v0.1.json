@@ -1,0 +1,3732 @@
+{
+  "schemaVersion": 1,
+  "id": "quadratic-rational-signsets-v0.1",
+  "status": "research_only_typed_math_not_official_gold",
+  "description": "Exact complete real solution sets of rational functions of degree up to two, with bounded real interval unions and quadratic irrational roots; 2025 Math-I Q16 is an intermediate subclaim only.",
+  "cases": [
+    {
+      "id": "quadratic-two-roots",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -4,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-missing-root",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -4,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "quadratic-root-duplicated-but-missing",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -4,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "quadratic-extraneous-root",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -4,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "quadratic-surds-complete",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-surd-missing-negative",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "quadratic-no-real-roots",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-no-real-roots-false-one",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "repeated-double-root",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "repeated-double-root-duplicate-representation",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "zero-polynomial-equation",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "constant-nonzero-equation",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 2,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "zero-polynomial-nonzero",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "ne",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "constant-nonzero-ne",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 2,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "ne",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-sign-gt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-sign-ge",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-sign-lt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-sign-le",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-sign-ne",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "ne",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "quadratic-sign-strict-wrong-endpoint",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "quadratic-sign-le-wrong-open",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "rational-hole-common-factor-gt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-hole-common-factor-eq",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-hole-common-factor-lt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-hole-common-factor-false-all-reals",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "rational-one-pole-gt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-one-pole-lt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-one-pole-ge",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-one-pole-le",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-cancel-hole-ge",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-cancel-hole-ge-false-includes-pole",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "rational-quadratic-poles-gt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-squared-zero-ge",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "rational-zero-numerator-le-exclude-pole",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "domain-positive-restrict-equation",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -4,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "domain-positive-extraneous-root",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -4,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "domain-open-excludes-eq-root",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -4,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "domain-closed-includes-eq-root",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -4,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "domain-half-open-quadratic-gt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "domain-disconnected-quadratic-le",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "le",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "domain-gap-excludes-one-root",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "real-exam-math1-2025-q16-intermediate-p",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 5,
+            "den": 8
+          },
+          {
+            "kind": "rational",
+            "num": -3,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 2,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 2
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set",
+      "sourceEvidence": {
+        "exam": "kaoyan-math-1",
+        "year": 2025,
+        "question": 16,
+        "onlyIntermediateClaim": true,
+        "claim": "2p^2-3p+5/8=0 and 0<=p<=1/2; not the full probability answer",
+        "officialGold": false
+      }
+    },
+    {
+      "id": "real-exam-math1-2025-q16-extra-pole-like-root",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 5,
+            "den": 8
+          },
+          {
+            "kind": "rational",
+            "num": -3,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 2,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 2
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 4
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 5,
+              "den": 4
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "surd-quadratic-lt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "surd-quadratic-le",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "surd-quadratic-outside",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "surd-quadratic-positive-root-domain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "two-surds-overlap-gt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -3,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 3,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "two-surds-overlap-lt",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -3,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 3,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "two-surds-wrong-pole-included",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -3,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 3,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "root-of-quadratic-large-rational",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -1000000,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1000000
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "root_of",
+              "polynomial": {
+                "coefficients": [
+                  {
+                    "kind": "rational",
+                    "num": -1000000,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 0,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 1,
+                    "den": 1000000
+                  }
+                ]
+              },
+              "index": 0
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "root_of",
+              "polynomial": {
+                "coefficients": [
+                  {
+                    "kind": "rational",
+                    "num": -1000000,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 0,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 1,
+                    "den": 1000000
+                  }
+                ]
+              },
+              "index": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "root-of-quadratic-other-polynomial-wrong",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "root_of",
+              "polynomial": {
+                "coefficients": [
+                  {
+                    "kind": "rational",
+                    "num": -3,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 0,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 1,
+                    "den": 1
+                  }
+                ]
+              },
+              "index": 0
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "root_of",
+              "polynomial": {
+                "coefficients": [
+                  {
+                    "kind": "rational",
+                    "num": -3,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 0,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 1,
+                    "den": 1
+                  }
+                ]
+              },
+              "index": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "root-of-invalid-index",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "root_of",
+              "polynomial": {
+                "coefficients": [
+                  {
+                    "kind": "rational",
+                    "num": -2,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 0,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 1,
+                    "den": 1
+                  }
+                ]
+              },
+              "index": 2
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "root-of-nonreal-index",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "root_of",
+              "polynomial": {
+                "coefficients": [
+                  {
+                    "kind": "rational",
+                    "num": 1,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 0,
+                    "den": 1
+                  },
+                  {
+                    "kind": "rational",
+                    "num": 1,
+                    "den": 1
+                  }
+                ]
+              },
+              "index": 0
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "zero-denominator-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "degree-three-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "invalid-comparison-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "different",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "domain-empty-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "empty"
+      },
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "invalid-rational-denominator-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 0
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "invalid-surd-radicand-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": -2,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          },
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": -2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "malformed-infinite-singleton-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "infinity",
+              "side": "positive"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "missing-candidate-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "reversed-interval-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "nonboolean-interval-abstain",
+      "numerator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 0,
+            "den": 1
+          }
+        ]
+      },
+      "denominator": {
+        "coefficients": [
+          {
+            "kind": "rational",
+            "num": 1,
+            "den": 1
+          }
+        ]
+      },
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": 1,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    }
+  ]
+}
