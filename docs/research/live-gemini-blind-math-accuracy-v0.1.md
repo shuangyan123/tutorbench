@@ -6,19 +6,19 @@
 
 Six frozen real-language Chinese numerical problems about independent uniform draws with replacement. The suite has exactly one question **linked to a typed adaptation** of the 2025 New Gaokao I mathematics Q14 occupancy problem, and five new synthetic variations (expectation, variance, exact event, threshold event and zero-draw edge case). It does **not** contain answer keys, correct result strings, human annotations, or grader model responses.
 
-Each one-case request uses the existing **TutorExecutionPacketFile v1** contract: pinned system prompt SHA-256, explicit generation spec (256 max output tokens; no optional controls), three role-valid messages, \`locale=zh-CN\`, and one case. The question generator only reads the typed mathematical **assumptions and requested metric**, never the independently calculated answer. It requests an integer, exact fraction or finite decimal **without any surrounding text**. \`UNSURE\` and mixed prose are *unverified*, not guessed to be mathematically correct.
+Each one-case request uses the existing **TutorExecutionPacketFile v1** contract: pinned system prompt SHA-256, explicit generation spec (256 max output tokens; no optional controls), three role-valid messages, `locale=zh-CN`, and one case. The question generator only reads the typed mathematical **assumptions and requested metric**, never the independently calculated answer. It requests an integer, exact fraction or finite decimal **without any surrounding text**. `UNSURE` and mixed prose are *unverified*, not guessed to be mathematically correct.
 
-The local Gemini Host already implements explicit model version selection, single response validation, disabled SDK retries/continuation/tool calls, request timeout, session token separate from the provider API key, and restricted \`127.0.0.1\` binding. The new runner **reuses this Host** rather than calling Google directly or adding another API wrapper.
+The local Gemini Host already implements explicit model version selection, single response validation, disabled SDK retries/continuation/tool calls, request timeout, session token separate from the provider API key, and restricted `127.0.0.1` binding. The new runner **reuses this Host** rather than calling Google directly or adding another API wrapper.
 
 ### Required safety properties
 
 - **Plan** is the default planning route and makes **zero model calls**; it does not read a secret or check the provider endpoint.
-- Live calls only happen with the explicit \`run --execute-live\` command. The runner requires a 64-character random lowercase-hex \`CANONICAL_MODEL_HOST_TOKEN\` from the local environment, a versioned declared Gemini ID, a loopback-only \`http://127.0.0.1:<port>/generate\` address and an output file path.
+- Live calls only happen with the explicit `run --execute-live` command. The runner requires a 64-character random lowercase-hex `CANONICAL_MODEL_HOST_TOKEN` from the local environment, a versioned declared Gemini ID, a loopback-only `http://127.0.0.1:<port>/generate` address and an output file path.
 - The output file is **reserved exclusively before any network requests**; an existing capture is never overwritten or silently retried, avoiding unintentional repeated costs.
-- Each case gets one POST, no application-level retry. The host must return the expected canonical \`output.text\` and supported generation flags. HTTP failures and timeouts are counted separately; they **do not** imply a math mistake.
-- The raw model text, full typed-question SHA-256, actual one-case packet SHA-256, host-reported timing and token counts, run UUID, UTC capture time and declared model are written into an **ignored local** \`artifacts/\` JSON file. The session token and Google API credential are **never** serialized.
-- User-set \`--model\` is **operator-declared**; neither the canonical Host response nor its local capture contains provider-signed model identity. The report therefore sets \`providerIdentityCryptographicallyVerified=false\` and does **not** assert a signed provider/model attestation.
-- Mock HTTP tests may calculate numerators and denominators but **cannot** output a measured live AI accuracy: \`executionProvenance=mock_transport\` forces all displayed accuracy \`value\` fields to \`null\`.
+- Each case gets one POST, no application-level retry. The host must return the expected canonical `output.text` and supported generation flags. HTTP failures and timeouts are counted separately; they **do not** imply a math mistake.
+- The raw model text, full typed-question SHA-256, actual one-case packet SHA-256, host-reported timing and token counts, run UUID, UTC capture time and declared model are written into an **ignored local** `artifacts/` JSON file. The session token and Google API credential are **never** serialized.
+- User-set `--model` is **operator-declared**; neither the canonical Host response nor its local capture contains provider-signed model identity. The report therefore sets `providerIdentityCryptographicallyVerified=false` and does **not** assert a signed provider/model attestation.
+- Mock HTTP tests may calculate numerators and denominators but **cannot** output a measured live AI accuracy: `executionProvenance=mock_transport` forces all displayed accuracy `value` fields to `null`.
 
 ### Metrics: never hide the denominator
 
@@ -35,7 +35,7 @@ For a genuine locally observed Host execution, the JSON report distinguishes:
 \text{Abstention Rate}=\frac{\text{Unverified responses}}{\text{All attempted}}.
 \]
 
-It also records \`hostFailures\`, \`hostSuccessfulResponses\`, \`benchmarkedWholeSuite\`, and \`falseAcceptanceRate=null\` (not empirically measured here). All fractions are accompanied by numerator, denominator and \`value\`; no reported success rate silently excludes failed requests or unparseable responses. A \`limit=1\` smoke run must explicitly say \`benchmarkedWholeSuite=false\` and cannot be described as a full-cohort accuracy result.
+It also records `hostFailures`, `hostSuccessfulResponses`, `benchmarkedWholeSuite`, and `falseAcceptanceRate=null` (not empirically measured here). All fractions are accompanied by numerator, denominator and `value`; no reported success rate silently excludes failed requests or unparseable responses. A `limit=1` smoke run must explicitly say `benchmarkedWholeSuite=false` and its top-line `measuredLiveModelAccuracy` remains **null**. That top-line statistic is only populated after the entire fixed cohort has been attempted **and all six Host requests have returned successfully**; partial-run per-question fractions remain available with their exact denominators.
 
 Model scores are **observable local Host-output scores** with independent exact mathematical adjudication. They are **not** official exam-paper accuracy (5/6 are synthetic), unbiased model leaderboard estimates, or provider-signed immutable traces. A response file copied from elsewhere is not reclassified as a genuine live call.
 
@@ -43,22 +43,22 @@ Model scores are **observable local Host-output scores** with independent exact 
 
 On the **research branch** after dependencies are installed:
 
-\`\`\`powershell
+```powershell
 python -m pip install sympy==1.14.0 mpmath==1.3.0
 python scripts/research/run_local_gemini_math_pilot.py plan
 python scripts/research/run_local_gemini_math_pilot.py plan --limit 1
 python -m unittest scripts/research/test_run_local_gemini_math_pilot.py -v
-\`\`\`
+```
 
 These commands do **not** contact Gemini or require any credentials.
 
 ## Opt-in actual Gemini run (local Windows PowerShell)
 
-First, ensure your own Google Gemini AI Studio key is configured **locally** as \`GEMINI_API_KEY\` through your existing secure process. **Never paste the key or session token into chat, an issue, a PR or a commit.** An API request may incur cost or consume quota; do not use live mode until you intend to make those calls.
+First, ensure your own Google Gemini AI Studio key is configured **locally** as `GEMINI_API_KEY` through your existing secure process. **Never paste the key or session token into chat, an issue, a PR or a commit.** An API request may incur cost or consume quota; do not use live mode until you intend to make those calls.
 
 The same PowerShell shell can spawn the existing Host subprocess so it inherits the *same* local capability token:
 
-\`\`\`powershell
+```powershell
 npm ci
 npm run build
 $env:GEMINI_MODEL = "gemini-2.5-flash"
@@ -72,13 +72,13 @@ python scripts/research/run_local_gemini_math_pilot.py run --execute-live --limi
 python scripts/research/run_local_gemini_math_pilot.py run --execute-live --model gemini-2.5-flash --output artifacts/research/gemini-math-full-001.json
 
 Stop-Process -Id $hostProc.Id
-\`\`\`
+```
 
 **Note:** The full six-case command sends all six requests **including** the first smoke problem again, by design. They are two separately named runs; avoid repeating it if you only intended one call. For a full-cohort score, evaluate the six-case capture in isolation, never combine smoke and full into a fabricated 7-case measurement.
 
 If the Host is already running, use its configured token rather than trying to generate a different one for an existing session; an incompatible bearer token returns HTTP 401 and must not be interpreted as an incorrect math answer. If port 9001 is in use, stop the prior Host or configure a matching local port in both processes.
 
-The local captures are intentionally under \`artifacts/\`, which the repository ignores. Review raw output content before sharing a result file publicly.
+The local captures are intentionally under `artifacts/`, which the repository ignores. Review raw output content before sharing a result file publicly.
 
 ## Research acceptance and demonstrated limits
 
