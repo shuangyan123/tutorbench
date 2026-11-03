@@ -1,0 +1,218 @@
+{
+  "id": "exam-paper-source-catalog-v0.1",
+  "status": "research-source-catalog-not-exam-gold",
+  "notes": "Years 2022-2026 inclusive. Page-checked refers to an inspected page, not verified official provenance; third-party recollections may be imperfect. Other years are discovery links only. The repositoryCandidate entries are SHA-pinned file-discovery references only and do not upgrade original page_checked, answer-key, or exam authenticity status. Repo compilation licenses do not establish permission for underlying exam questions.",
+  "papers": [
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2022,
+      "status": "index_only",
+      "url": "https://kaoyan.eol.cn/shiti/shuxue/",
+      "sourceType": "educational_index",
+      "repositoryCandidate": {
+        "repository": "TsekaLuk/Kaoyan-Math1-Papers",
+        "revision": "3151b4acf26ea19ccd427b869a715e65e1990091",
+        "path": "papers/2022年考研数学(一)真题.md",
+        "blobSha": "2b1ca970ad5d66e4b8cddfa2b0fd4dcf8b13da29",
+        "url": "https://github.com/TsekaLuk/Kaoyan-Math1-Papers/blob/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2022%E5%B9%B4%E8%80%83%E7%A0%94%E6%95%B0%E5%AD%A6(%E4%B8%80)%E7%9C%9F%E9%A2%98.md",
+        "format": "markdown",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-NC-SA-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF-to-Markdown OCR is imperfect; 2022 visibly garbled, 2025 formulas/analysis inconsistent; do not import keys as gold."
+      }
+    },
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2023,
+      "status": "index_only",
+      "url": "https://kaoyan.eol.cn/shiti/shuxue/",
+      "sourceType": "educational_index",
+      "repositoryCandidate": {
+        "repository": "TsekaLuk/Kaoyan-Math1-Papers",
+        "revision": "3151b4acf26ea19ccd427b869a715e65e1990091",
+        "path": "papers/2023年考研数学(一)真题.md",
+        "blobSha": "90d3676639f68b482750ea93ba76ff1b23016e6d",
+        "url": "https://github.com/TsekaLuk/Kaoyan-Math1-Papers/blob/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2023%E5%B9%B4%E8%80%83%E7%A0%94%E6%95%B0%E5%AD%A6(%E4%B8%80)%E7%9C%9F%E9%A2%98.md",
+        "format": "markdown",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-NC-SA-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF-to-Markdown OCR is imperfect; 2022 visibly garbled, 2025 formulas/analysis inconsistent; do not import keys as gold."
+      }
+    },
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2024,
+      "status": "index_only",
+      "url": "https://kaoyan.eol.cn/shiti/shuxue/",
+      "sourceType": "educational_index",
+      "repositoryCandidate": {
+        "repository": "TsekaLuk/Kaoyan-Math1-Papers",
+        "revision": "3151b4acf26ea19ccd427b869a715e65e1990091",
+        "path": "papers/2024年数学(一)真题及参考答案.md",
+        "blobSha": "8c644157868f4051df6675a9afc132d37542c08c",
+        "url": "https://github.com/TsekaLuk/Kaoyan-Math1-Papers/blob/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2024%E5%B9%B4%E6%95%B0%E5%AD%A6(%E4%B8%80)%E7%9C%9F%E9%A2%98%E5%8F%8A%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md",
+        "format": "markdown",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-NC-SA-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF-to-Markdown OCR is imperfect; 2022 visibly garbled, 2025 formulas/analysis inconsistent; do not import keys as gold. Primary 2024 version has non-leading headers for Q6/Q12; both alternative transcriptions exist but require independent cross-check.",
+        "alternativeTranscriptions": [
+          {
+            "path": "papers/2024考研数学一真题+答案.md",
+            "gitBlobSha": "e3bf19c17b7c4dde6605c396f9dd9c65c65830ec"
+          },
+          {
+            "path": "papers/2024考研数学一真题.md",
+            "gitBlobSha": "657976ab751ad48c57dbcf85fb8ea6a86809edd5"
+          }
+        ]
+      }
+    },
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2025,
+      "status": "page_checked",
+      "url": "https://edu.xaiu.edu.cn/__local/F/34/3C/E53427A7070AE155EC2FF88073B_9EAE259B_511D6.pdf",
+      "sourceType": "university_hosted_copy_not_official_key",
+      "checkedPages": [
+        1
+      ],
+      "repositoryCandidate": {
+        "repository": "TsekaLuk/Kaoyan-Math1-Papers",
+        "revision": "3151b4acf26ea19ccd427b869a715e65e1990091",
+        "path": "papers/2025年数学一真题.md",
+        "blobSha": "582683c6623fd24b1e3f46c8ef45112fa31b5beb",
+        "url": "https://github.com/TsekaLuk/Kaoyan-Math1-Papers/blob/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2025%E5%B9%B4%E6%95%B0%E5%AD%A6%E4%B8%80%E7%9C%9F%E9%A2%98.md",
+        "format": "markdown",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-NC-SA-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF-to-Markdown OCR is imperfect; 2022 visibly garbled, 2025 formulas/analysis inconsistent; do not import keys as gold."
+      }
+    },
+    {
+      "exam": "kaoyan-math-1",
+      "year": 2026,
+      "status": "page_checked",
+      "url": "https://static.kaoyan.cn/file/question/2025/12/27/f3a552ec0d163308d2ac28dc7a10bbd0.pdf",
+      "sourceType": "third_party_answered_pdf",
+      "checkedPages": [
+        4
+      ],
+      "repositoryCandidateMissing": "Not found in TsekaLuk/Kaoyan-Math1-Papers at commit 3151b4acf26ea19ccd427b869a715e65e1990091; independent third-party 2026 PDF remains the existing source."
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2022,
+      "status": "index_only",
+      "url": "https://gaokao.eol.cn/e_html/gk/gkst/2024st.shtml",
+      "sourceType": "educational_index",
+      "repositoryCandidate": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2022/2022新高考1(山东,广东,湖南,湖北,河北,江苏,福建).pdf",
+        "blobSha": "48e90f225eacec6718f0c7448725558d11729e8d",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2022/2022%E6%96%B0%E9%AB%98%E8%80%831(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA).pdf",
+        "format": "pdf",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF presence checked via repository tree; embedded formulas/figures/pages not yet audited against official paper."
+      }
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2023,
+      "status": "index_only",
+      "url": "https://gaokao.eol.cn/e_html/gk/gkst/2024st.shtml",
+      "sourceType": "educational_index",
+      "repositoryCandidate": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2023/2023新高考1(山东,广东,湖南,湖北,河北,江苏,福建,浙江).pdf",
+        "blobSha": "90505e1146e12c0ed0fc296b3568a1ab5e82482c",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2023/2023%E6%96%B0%E9%AB%98%E8%80%831(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA%2C%E6%B5%99%E6%B1%9F).pdf",
+        "format": "pdf",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF presence checked via repository tree; embedded formulas/figures/pages not yet audited against official paper."
+      }
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2024,
+      "status": "index_only",
+      "url": "https://gaokao.eol.cn/e_html/gk/gkst/2024st.shtml",
+      "sourceType": "educational_index",
+      "repositoryCandidate": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2024/2024新高考1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+        "blobSha": "a408f5467da376f7335cdb397855fe07ddc87149",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2024/2024%E6%96%B0%E9%AB%98%E8%80%831(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA%2C%E6%B5%99%E6%B1%9F%2C%E6%B2%B3%E5%8D%97%2C%E6%B1%9F%E8%A5%BF%2C%E5%AE%89%E5%BE%BD).pdf",
+        "format": "pdf",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF presence checked via repository tree; embedded formulas/figures/pages not yet audited against official paper."
+      }
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2025,
+      "status": "page_checked",
+      "url": "https://www.jhgk.cn/upload/file/20250610/1749549496776033663.pdf",
+      "sourceType": "third_party_recollection_may_have_errors",
+      "checkedPages": [
+        1,
+        2
+      ],
+      "repositoryCandidate": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2025/2025全国1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+        "blobSha": "4a5702dda207a470840a62c982ab2392362a404e",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2025/2025%E5%85%A8%E5%9B%BD1(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA%2C%E6%B5%99%E6%B1%9F%2C%E6%B2%B3%E5%8D%97%2C%E6%B1%9F%E8%A5%BF%2C%E5%AE%89%E5%BE%BD).pdf",
+        "format": "pdf",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF presence checked via repository tree; embedded formulas/figures/pages not yet audited against official paper."
+      }
+    },
+    {
+      "exam": "gaokao-national-1",
+      "year": 2026,
+      "status": "page_checked",
+      "url": "https://zy.21cnjy.com/25912080",
+      "sourceType": "third_party_html_math_markup_incomplete",
+      "checkedPages": [
+        1
+      ],
+      "repositoryCandidate": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2026/2026全国1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+        "blobSha": "520ab76bc3becadb8246705d261f4562f7d62e12",
+        "url": "https://github.com/deekur/gaokaomath/blob/6e9677221edffa192276de27d61044f19ce63de3/%E6%99%AE%E9%80%9A%E9%AB%98%E8%80%83/2026/2026%E5%85%A8%E5%9B%BD1(%E5%B1%B1%E4%B8%9C%2C%E5%B9%BF%E4%B8%9C%2C%E6%B9%96%E5%8D%97%2C%E6%B9%96%E5%8C%97%2C%E6%B2%B3%E5%8C%97%2C%E6%B1%9F%E8%8B%8F%2C%E7%A6%8F%E5%BB%BA%2C%E6%B5%99%E6%B1%9F%2C%E6%B2%B3%E5%8D%97%2C%E6%B1%9F%E8%A5%BF%2C%E5%AE%89%E5%BE%BD).pdf",
+        "format": "pdf",
+        "checkedLevel": "repository_file_exists_only",
+        "answersIndependentlyVerified": false,
+        "licenseForCompilation": "CC-BY-4.0",
+        "questionRights": "reserved_by_original_exam_setters",
+        "qualityCaution": "PDF presence checked via repository tree; embedded formulas/figures/pages not yet audited against official paper."
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "ky2025-transcription-audit-v0.1",
+  "repository": "TsekaLuk/Kaoyan-Math1-Papers",
+  "revision": "3151b4acf26ea19ccd427b869a715e65e1990091",
+  "path": "papers/2025年数学一真题.md",
+  "gitBlobSha": "582683c6623fd24b1e3f46c8ef45112fa31b5beb",
+  "manualChecks": [
+    {
+      "question": 2,
+      "code": "FORMULA_TRANSCRIPTION_CONFLICT",
+      "needle": "\\sqrt [ 2 ]{n ^ {3}}",
+      "pdfPage": 1,
+      "details": "Solution transcription changes the cube-root expression; PDF and mathematical formula require manual recheck"
+    },
+    {
+      "question": 3,
+      "code": "DOMAIN_BRACKET_CONFLICT",
+      "needle": "\\left( 0 , + \\infty \\right)",
+      "pdfPage": 1,
+      "details": "Markdown interval differs from PDF interval endpoint notation"
+    },
+    {
+      "question": 4,
+      "code": "BROKEN_CHOICE_LAYOUT",
+      "needle": "C． ",
+      "pdfPage": 1,
+      "details": "Third/fourth option mathematics damaged and A/B option labels missing"
+    },
+    {
+      "question": 8,
+      "code": "MISSING_ANSWER_KEY",
+      "needle": "【答案】",
+      "pdfPage": 2,
+      "details": "Blank answer key in item 8; solution indicates C but is not authenticated official gold"
+    }
+  ]
+}
