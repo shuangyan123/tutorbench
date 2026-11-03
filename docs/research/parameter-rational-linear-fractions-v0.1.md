@@ -19,13 +19,15 @@ If the entire original denominator is identically zero for a particular paramete
 
 ## Why every real parameter is accounted for
 
-A parameter value changes the mathematical topology of these affine-over-affine x-sign sets only when one of A,B,C,D vanishes, or the two x-roots coincide. That collision is exactly
+A parameter value changes the mathematical topology of these affine-over-affine x-sign sets when one of A,B,C,D vanishes, or the two x-roots coincide. However, when a candidate x solution mentions a **fixed rational or surd endpoint e**, agreement between that endpoint and a moving numerator root or pole can also occur at an isolated parameter. These additional exact crossing parameters **must** be enumerated, or one lucky parameter sample can falsely certify a globally incorrect answer.
+
+The root-pole collision is exactly
 
 \[
 A(t)D(t)-B(t)C(t)=0.
 \]
 
-Because all coefficients are affine rational in t, the **resultant determinant** above is a polynomial of degree at most two. The verifier computes all exact real zeros of A, B, C, D and this determinant, *plus every candidate partition boundary*. These critical parameters cut the full real t-axis into exact singleton points and open parameter cells. On an open cell all four coefficient zero/nonzero statuses, x-root ordering and sign at x-infinity are invariant. Therefore one exact rational representative of each cell and every critical point suffice to verify the **entire parameter axis**, not a finite statistical sample.
+Because all coefficients are affine rational in t, the **resultant determinant** above is a polynomial of degree at most two. The verifier computes all exact real zeros of A, B, C, D and this determinant, *plus every candidate partition boundary*. It also extracts every fixed x-endpoint e from the candidate and solves **A(t)e+B(t)=0** and **C(t)e+D(t)=0** exactly for t; these roots are mandatory additional critical parameters. The input is bounded to at most 64 distinct fixed endpoints to avoid an unchecked algebraic complexity explosion. These points cut the full real t-axis into exact singleton points and open parameter cells. On an open cell all coefficients' zero/nonzero statuses, x-root/pole ordering, signs at x-infinity **and relative ordering to each fixed candidate x-endpoint** are invariant. Therefore one certified exact interior representative of each cell and every critical point suffice to verify the **entire parameter axis**, not a finite statistical sample.
 
 At each parameter representative the verifier:
 
@@ -69,6 +71,9 @@ For \(\frac{tx+1}{x-1}>0\), the numerator zero disappears at t=0 and collides wi
 
 For \(\frac{0}{tx-1}=0\), the equality is true on all real x when t=0 (denominator is a nonzero constant), while for t≠0 it excludes x=1/t. This independently tests that holes cannot be deleted just because the numerator is identically zero.
 
+
+**False-PASS regression:** for \((x-t)/1>0\), the correct x-set is \((t,\infty)\). A submitted branch claiming \(x>1\) for *every* t>0 would match the initial interior representative t=1 while being false elsewhere. The checker now adds **t=1** to the critical set because the moving numerator root x=t collides with the candidate's fixed endpoint x=1, and rejects the branch using an exact t,x counterexample. A fixed surd endpoint representing the same algebraic value is handled equivalently. Conversely, genuinely constant x endpoints, such as those of \((x-1)/(x-2)>0\), remain supported and accepted. This fixes an actual global-proof vulnerability that ordinary random testing could miss.
+
 ## Reproduction, no-gold boundary and acceptance
 
 \`\`\`sh
@@ -78,7 +83,7 @@ python scripts/research/verify_parameter_rational_inequalities.py \
   --fixture fixtures/research/parameter-rational-linear-fractions-v0.1.json
 \`\`\`
 
-The 81 recorded mathematical claims consist of **51 correct complete parameter families, 18 demonstrably wrong cases and 12 deliberately unsupported/malformed controls**. Additional tests include:
+The 84 recorded mathematical claims consist of **52 correct complete parameter families, 20 demonstrably wrong cases and 12 deliberately unsupported/malformed controls**. Additional tests include:
 
 - Six independent comparison operators for denominator cancellation, numerator-zero and denominator-zero cases; **all false cases must carry an exact parameter witness**.
 - 32 seeded random affine-in-t numerator/denominator coefficient families, independently checked by polynomial inequality reduction at every real coefficient/resultant root and every open parameter cell. Algebraic parameter endpoints that expose duplicate-root ordering failures in direct rational solvers are regression targets.
