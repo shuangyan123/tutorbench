@@ -93,9 +93,8 @@ class GaokaoQ14CompleteAnswer(unittest.TestCase):
 
     def test_source_missing_and_fake_web_claims_cannot_become_official_gold(self):
         changed=copy.deepcopy(self.fixture)
-        changed["sourceEvidence"]["sameQuestionIndependentPages"]=[
-            x for x in changed["sourceEvidence"]["sameQuestionIndependentPages"]
-            if x["claimedAnswer"] is None]
+        for x in changed["sourceEvidence"]["sameQuestionIndependentPages"]:
+            x["claimedAnswer"]=None
         report=verifier.check_document(changed)
         self.assertEqual(report["status"],"mathematics_verified_source_consensus_unresolved")
         self.assertFalse(report["sourceCertification"]["publishedConsensusPresent"])
