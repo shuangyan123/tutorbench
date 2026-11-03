@@ -43,6 +43,17 @@ class SourceReadback(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"fewer_than_two_live_matched_source_pages"):
                 audit.evaluate(PDF_TEXT,{"a":make_html(),"b":other},FIXTURE,CATALOG)
 
+    def test_correct_formula_in_explanation_does_not_override_wrong_final_key(self):
+        deceptive=make_html(result="3").replace("</p>",
+                     "解题过程：有的公式提到了61/25，但最终答案仍写成3。</p>")
+        with self.assertRaisesRegex(ValueError,"source_claim_conflict_"):
+            audit.verify_published_html(deceptive,"bad-key",__import__("fractions").Fraction(61,25))
+
+    def test_no_explicit_final_answer_cannot_be_counted_as_publisher_confirmation(self):
+        article=make_html().replace("参考答案", "讨论中出现")
+        with self.assertRaisesRegex(ValueError,"source_final_answer_not_readable"):
+            audit.verify_published_html(article,"not-an-answer",__import__("fractions").Fraction(61,25))
+
     def test_three_hosts_cannot_majority_vote_away_an_explicit_conflict(self):
         sources={"a":make_html(),"b":make_html(result=r"\frac{61}{25}"),
                  "c":make_html("61/125")}
