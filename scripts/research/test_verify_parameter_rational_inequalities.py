@@ -177,7 +177,7 @@ class ParameterRationalInequalityFamily(unittest.TestCase):
         with patch.object(math,"original_solver",return_value=S.EmptySet):
             output=math.classify_case(self.byid["crossing_linear_root_pole_gt"])
             self.assertEqual(output["status"],"unverified")
-            self.assertIn("independent_original_fraction_solver_disagrees",output["reason"])
+            self.assertIn("independent_denominator_square_reduction_disagrees",output["reason"])
         with patch.object(math,"original_solver",return_value=S.S.Reals):
             output=math.classify_case(self.byid["denominator_identically_zero_eq"])
             self.assertEqual(output["status"],"unverified")
