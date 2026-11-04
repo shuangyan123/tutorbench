@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import verify_finite_occupancy_family as occupancy
 import verify_quadratic_signsets as algebra
 import verify_finite_arithmetic_geometric_sum as sequence_sum
+import verify_circle_line_intersections as circle_line
 
 ID="dual-path-math-answer-evidence-v0.1"
 SOURCE_ID="exam-multi-source-evidence-v0.1"
@@ -52,6 +53,11 @@ def question_math(question):
             return sequence_sum.solve_question(question)
         except sequence_sum.Unsupported as e:
             raise Abstain("arithmetic_geometric_sum_"+str(e)) from e
+    if question["kind"]=="circle_line_intersections":
+        try:
+            return circle_line.solve_question(question)
+        except circle_line.Unsupported as e:
+            raise Abstain("circle_line_"+str(e)) from e
     if question["kind"]=="quadratic_real_solution_set":
         if set(question)!={"kind","numerator","denominator","comparison","domain"}:
             raise Abstain("unknown_quadratic_question_fields")
@@ -88,6 +94,11 @@ def validate_candidate(question,derived,candidate):
         except occupancy.Unsupported as e:
             raise Abstain("candidate_"+str(e)) from e
         return (num==derived["value"],str(num),None)
+    if derived["kind"]=="circle_line_intersections":
+        try:
+            return circle_line.verify_candidate(derived,candidate)
+        except circle_line.Unsupported as e:
+            raise Abstain("circle_line_candidate_"+str(e)) from e
     if derived["kind"]=="finite_arithmetic_geometric_sum":
         try:
             number=sequence_sum.exact_number(candidate)
@@ -251,12 +262,22 @@ def adjudicate(row,sources):
             raise Abstain("invalid_model_attempt_record")
         if attempt["captureKind"]!="offline_replay" or not isinstance(attempt["modelId"],str) or not attempt["modelId"] or len(attempt["modelId"])>96:
             raise Abstain("model_attempt_not_attested_live_run")
-        # Strict extraction contract: no silent accepting a numeric value
-        # that was not actually present as the entire visible model answer.
-        if (not isinstance(attempt["rawText"],str) or
-            len(attempt["rawText"])>256 or
-            not isinstance(attempt["answer"],str) or
-            attempt["rawText"].strip()!=attempt["answer"].strip()):
+        # The existing scalar/set paths retain their original exact-string
+        # replay contract. Geometric point-set replies require the ENTIRE
+        # visible raw answer to equal canonical JSON of the typed point set;
+        # no extraction from prose, hidden key or altered structure.
+        if derived["kind"]=="circle_line_intersections":
+            raw=attempt["rawText"]
+            candidate=attempt["answer"]
+            if (not isinstance(raw,str) or len(raw)>4096 or
+                not isinstance(candidate,dict) or
+                raw.strip()!=json.dumps(candidate,ensure_ascii=False,sort_keys=True,
+                                        separators=(",",":"))):
+                raise Abstain("model_output_extraction_not_certified")
+        elif (not isinstance(attempt["rawText"],str) or
+              len(attempt["rawText"])>256 or
+              not isinstance(attempt["answer"],str) or
+              attempt["rawText"].strip()!=attempt["answer"].strip()):
             raise Abstain("model_output_extraction_not_certified")
         correct,normalized,witness=validate_candidate(question,derived,attempt["answer"])
         return {**base,"path":path,

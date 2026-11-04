@@ -1,0 +1,710 @@
+{
+  "schemaVersion": 1,
+  "id": "dual-path-math-answer-evidence-v0.1",
+  "status": "research_no_official_gold",
+  "cases": [
+    {
+      "id": "circle-secants-two",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "circle-tangent-one",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "circle-disjoint-zero",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-6"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "circle-irrational-radical",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "vertical-line-two-points",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "c": "-3"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "offset-center-oblique",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "1",
+          "centerY": "-2",
+          "radiusSquared": "5"
+        },
+        "line": {
+          "a": "1",
+          "b": "-1",
+          "c": "-3"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "radius-zero-hit",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "1",
+          "centerY": "2",
+          "radiusSquared": "0"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "c": "-1"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "radius-zero-miss",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "1",
+          "centerY": "2",
+          "radiusSquared": "0"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "c": "-2"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "published-candidate-tangent-correct",
+      "path": "existing_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": [
+          {
+            "x": {
+              "kind": "rational",
+              "value": "0"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "5"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "published-candidate-wrong-chord",
+      "path": "existing_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-3"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": [
+          {
+            "x": {
+              "kind": "rational",
+              "value": "-3"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "3"
+            }
+          },
+          {
+            "x": {
+              "kind": "rational",
+              "value": "3"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "3"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "published-candidate-empty-correct",
+      "path": "existing_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-6"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": []
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "published-candidate-empty-wrong",
+      "path": "existing_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": []
+      },
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "offline-irrational-correct",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-fixture",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"coefficient\":\"-1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}},{\"x\":{\"coefficient\":\"1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "-1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            },
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            }
+          ]
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "offline-irrational-wrong",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-fixture",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"-1\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}},{\"x\":{\"kind\":\"rational\",\"value\":\"1\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "-1"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            },
+            {
+              "x": {
+                "kind": "rational",
+                "value": "1"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            }
+          ]
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_refuted"
+    },
+    {
+      "id": "offline-near-miss-rational",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-fixture",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"0\"},\"y\":{\"kind\":\"rational\",\"value\":\"5.00001\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "0"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "5.00001"
+              }
+            }
+          ]
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_refuted"
+    },
+    {
+      "id": "offline-noncanonical-visible-text",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-fixture",
+        "rawText": "Answer: (0,5)",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "0"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "5"
+              }
+            }
+          ]
+        }
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "candidate-duplicated-point",
+      "path": "existing_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": [
+          {
+            "x": {
+              "kind": "rational",
+              "value": "0"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "5"
+            }
+          },
+          {
+            "x": {
+              "kind": "rational",
+              "value": "0"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "5"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "forged-gaokao-source-link",
+      "path": "existing_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": [
+          {
+            "x": {
+              "kind": "rational",
+              "value": "-5"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "0"
+            }
+          },
+          {
+            "x": {
+              "kind": "rational",
+              "value": "5"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "0"
+            }
+          }
+        ]
+      },
+      "sourceCaseId": "gaokao-2025-national-1-q14",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "invalid-line-normal",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "0",
+          "c": "1"
+        }
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "candidate-three-points",
+      "path": "existing_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": [
+          {
+            "x": {
+              "kind": "rational",
+              "value": "-5"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "0"
+            }
+          },
+          {
+            "x": {
+              "kind": "rational",
+              "value": "0"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "0"
+            }
+          },
+          {
+            "x": {
+              "kind": "rational",
+              "value": "5"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "0"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "invalid-float-model",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": 0.1,
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "invalid-negative-radicand",
+      "path": "existing_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": [
+          {
+            "x": {
+              "kind": "affine_sqrt",
+              "offset": "0",
+              "coefficient": "1",
+              "radicand": "-2"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "0"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "offline-swapped-order-correct",
+      "path": "no_answer",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-fixture",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"coefficient\":\"1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}},{\"x\":{\"coefficient\":\"-1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            },
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "-1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            }
+          ]
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    }
+  ]
+}
