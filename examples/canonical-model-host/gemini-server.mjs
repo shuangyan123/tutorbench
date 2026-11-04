@@ -163,6 +163,9 @@ function sanitizedTokenUsage(usage) {
 }
 
 function providerErrorCode(error) {
+  // A real upstream 503 is distinct from local SDK errors and provider 500.
+  // Never infer an upstream status from arbitrary error objects or messages.
+  if (upstreamHttpStatus(error) === 503) return "provider_unavailable";
   if (error?.status === 401) return "provider_unauthorized";
   if (error?.status === 403) return "provider_forbidden";
   if (error?.status === 429) return "provider_rate_limited";
@@ -276,6 +279,7 @@ async function handleRequest(request, response, client, configuration) {
       provider_forbidden: 403,
       provider_rate_limited: 429,
       provider_request_timeout: 504,
+      provider_unavailable: 503,
     }[code] ?? 502;
     sendJson(response, status, { error: code });
   }

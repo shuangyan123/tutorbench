@@ -197,9 +197,42 @@ def token_from_environment(env):
     return token
 
 
+# Only codes emitted by the trusted local canonical Host are accepted. Never
+# persist arbitrary provider/HTML/SDK messages as research error evidence.
+HOST_FAILURE_CODES={
+    (503,"provider_unavailable"):"host_upstream_unavailable",
+    (504,"provider_request_timeout"):"host_provider_request_timeout",
+    (502,"provider_response_truncated"):"host_provider_response_truncated",
+    (502,"provider_response_invalid"):"host_provider_response_invalid",
+    (502,"provider_http_error"):"host_provider_http_rejected",
+    (502,"provider_server_error"):"host_provider_server_error",
+    (502,"provider_request_failed"):"host_provider_transport_or_sdk_failed",
+    (401,"provider_unauthorized"):"host_provider_unauthorized",
+    (403,"provider_forbidden"):"host_provider_forbidden",
+    (429,"provider_rate_limited"):"host_provider_rate_limited",
+    (422,"unsupported_generation_control"):"host_generation_control_rejected",
+    (400,"tutor_execution_packet_invalid"):"host_packet_rejected",
+}
+
+
+def safe_host_failure(status,raw,content_type):
+    if content_type.lower().startswith("application/json") and len(raw)<=2048:
+        try:
+            doc=json.loads(raw)
+        except (ValueError,UnicodeError):
+            doc=None
+        if isinstance(doc,dict) and set(doc)=={"error"} and isinstance(doc["error"],str):
+            known=HOST_FAILURE_CODES.get((status,doc["error"]))
+            if known:
+                return known
+    return "host_http_error_"+str(status)
+
+
 def ask_local_host(raw,endpoint,token,timeout_seconds):
     port=loopback_port(endpoint)
-    conn=http.client.HTTPConnection("127.0.0.1",port,timeout=timeout_seconds)
+    # Allow the Host to return its own 504 before the runner socket times out.
+    # The CLI --timeout is the requested provider budget, not the socket budget.
+    conn=http.client.HTTPConnection("127.0.0.1",port,timeout=timeout_seconds+15)
     try:
         conn.request("POST","/generate",body=raw,headers={
             "Authorization":"Bearer "+token,
@@ -211,8 +244,8 @@ def ask_local_host(raw,endpoint,token,timeout_seconds):
         if len(data)>MAX_RESPONSE_BYTES:
             raise Rejected("host_response_too_large")
         if response.status!=200:
-            # No raw server error messages or arbitrary headers leaked.
-            raise Rejected("host_http_error_"+str(response.status))
+            raise Rejected(safe_host_failure(response.status,data,
+                                             response.getheader("Content-Type","")))
         if not response.getheader("Content-Type","").lower().startswith("application/json"):
             raise Rejected("host_response_not_json")
         try:

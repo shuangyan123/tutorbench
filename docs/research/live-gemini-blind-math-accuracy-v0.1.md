@@ -84,6 +84,14 @@ Stop-Process -Id $hostProc.Id
 
 If the Host is already running, use its configured token rather than trying to generate a different one for an existing session; an incompatible bearer token returns HTTP 401 and must not be interpreted as an incorrect math answer. If port 9001 is in use, stop the prior Host or configure a matching local port in both processes.
 
+### Failure-attribution contract (provider-free regression tested)
+
+The 2026-11-04 smoke attempts did not yield any usable model answers. The direct Google REST `generateContent` probe returned HTTP `503 UNAVAILABLE` while the official Host's prior request timed out after 120 seconds; these are **two distinct observed failures**, not a measured math error and not proof of one shared root cause.
+
+The Host now maps only an authenticated Google SDK `ApiError` with upstream HTTP 503 to `provider_unavailable` / local HTTP 503. Its existing status-safe diagnostic distinguishes provider rejection (other 4xx), 500/other 5xx, 429, timeout, SDK/transport faults, token-limit truncation and invalid responses. The Python runner reads **only** a small, literal allowlist of sanitized Host `error` codes paired to the expected HTTP status; it never copies upstream error messages, SDK payloads or arbitrary local text into its captures. A mismatched, malformed or unknown error falls back to `host_http_error_<status>`. This prevents ambiguous 502 reports without exposing credentials, prompts or hidden thinking.
+
+The runner gives the configured Host request budget an additional 15-second socket grace period, making it possible to receive and classify the Host's HTTP 504 rather than winning a 120-second timeout race. Each case still has **one** Host POST and **zero automatic retries**. The fallback evidence from older captures, including their `host_http_error_502`, is retained unmodified; never retroactively relabel it as a specific provider cause without the safe diagnostic record.
+
 The local captures are intentionally under `artifacts/`, which the repository ignores. Review raw output content before sharing a result file publicly. To compare `high` thinking later, stop and restart the Host with `GEMINI_THINKING_LEVEL=high`, use `--thinking-level high` and a new filename. A 4096-token ceiling can still truncate demanding reasoning; a provider `MAX_TOKENS` response must remain a Host failure rather than a mathematically incorrect response.
 
 ## Research acceptance and demonstrated limits

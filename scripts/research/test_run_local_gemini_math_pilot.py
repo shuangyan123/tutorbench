@@ -24,8 +24,9 @@ spec.loader.exec_module(pilot)
 
 
 class MockCanonicalHost:
-    def __init__(self,answers,token="a"*64):
+    def __init__(self,answers,token="a"*64,error=None):
         self.answers=answers
+        self.error=error
         self.token=token
         self.requests=[]
         parent=self
@@ -45,6 +46,13 @@ class MockCanonicalHost:
                     self.send_header("Content-Type","application/json")
                     self.end_headers()
                     self.wfile.write(b'{"error":"host_unauthorized"}')
+                    return
+                if parent.error is not None:
+                    status,code=parent.error
+                    self.send_response(status)
+                    self.send_header("Content-Type","application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error":code}).encode("utf8"))
                     return
                 doc=json.loads(body)
                 assert len(doc["cases"])==1
@@ -199,6 +207,41 @@ class LocalBlindMathPilot(unittest.TestCase):
             self.assertEqual(report["items"][0]["errorCode"],"host_http_error_401")
             self.assertEqual(report["summary"]["mathematicallyIncorrect"],0)
             self.assertEqual(report["summary"]["hostFailures"],1)
+
+    def test_sanitized_host_failure_attribution_does_not_leak_untrusted_text(self):
+        # No provider calls: a synthetic local Host emits the same sanitized
+        # codes that the official SDK Host returns.
+        samples=[
+            (503,"provider_unavailable","host_upstream_unavailable"),
+            (504,"provider_request_timeout","host_provider_request_timeout"),
+            (502,"provider_response_truncated","host_provider_response_truncated"),
+            (502,"provider_response_invalid","host_provider_response_invalid"),
+            (502,"provider_http_error","host_provider_http_rejected"),
+            (502,"provider_server_error","host_provider_server_error"),
+            (502,"provider_request_failed","host_provider_transport_or_sdk_failed"),
+            (401,"provider_unauthorized","host_provider_unauthorized"),
+            (403,"provider_forbidden","host_provider_forbidden"),
+            (429,"provider_rate_limited","host_provider_rate_limited"),
+            (422,"unsupported_generation_control","host_generation_control_rejected"),
+        ]
+        for http_status,host_code,expected in samples:
+            with self.subTest(host_code=host_code), MockCanonicalHost({},error=(http_status,host_code)) as host:
+                report=pilot.run_items(self.suite,1,
+                    lambda data:pilot.ask_local_host(data,f"http://127.0.0.1:{host.port}/generate",host.token,5),
+                    "mock_transport","gemini-3.8-flash")
+                self.assertEqual(report["items"][0]["status"],"host_failure")
+                self.assertEqual(report["items"][0]["errorCode"],expected)
+                self.assertEqual(len(host.requests),1)
+                self.assertEqual(report["summary"]["mathematicallyIncorrect"],0)
+        bad=b'{"error":"provider_unavailable","secret":"do-not-log"}'
+        self.assertEqual(pilot.safe_host_failure(503,bad,"application/json"),"host_http_error_503")
+        self.assertEqual(pilot.safe_host_failure(503,b"<html>secret</html>","text/html"),"host_http_error_503")
+        self.assertEqual(pilot.safe_host_failure(502,b'{"error":"unknown_vendor_error"}',"application/json"),"host_http_error_502")
+        self.assertEqual(pilot.safe_host_failure(502,b'{"error":"provider_unavailable"}',"application/json"),"host_http_error_502")
+
+    def test_runner_timeout_outlasts_host_budget(self):
+        import inspect
+        self.assertIn("timeout=timeout_seconds+15",inspect.getsource(pilot.ask_local_host))
 
     def test_simulated_data_never_becomes_published_live_accuracy(self):
         report=pilot.run_items(self.suite,1,

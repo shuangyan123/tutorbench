@@ -221,7 +221,7 @@ test("Gemini maps provider status failures with exactly one SDK attempt", async 
   for (const [status, expectedStatus, error] of [
     [401, 401, "provider_unauthorized"], [403, 403, "provider_forbidden"],
     [429, 429, "provider_rate_limited"], [500, 502, "provider_server_error"],
-    [503, 502, "provider_server_error"], [400, 502, "provider_http_error"],
+    [503, 503, "provider_unavailable"], [400, 502, "provider_http_error"],
   ] as const) {
     await t.test(String(status), async (subtest) => {
       const host = await fixture(subtest, { status, body: { error: { code: status, message: "provider-secret synthetic-secret-key rawPayload" } } });
