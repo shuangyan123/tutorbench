@@ -43,6 +43,9 @@ jobs:
           assert plan['mode']=='plan'
           assert plan['requestsSent']==0
           assert plan['totalCases']==6 and plan['selectedCases']==6
+          assert plan['declaredModel']=='gemini-3.8-flash'
+          assert plan['declaredThinkingLevel']=='medium'
+          assert plan['maxOutputTokens']==4096
           assert plan['answerKeysIncludedInPrompt'] is False
           assert plan['modelCredentialsRead'] is False
           assert all('61/25' not in row['prompt'] for row in plan['selected'])

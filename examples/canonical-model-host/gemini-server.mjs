@@ -35,12 +35,26 @@ function integerEnvironment(name, environment, fallback, minimum, maximum) {
   return value;
 }
 
+function readThinkingLevel(model, environment) {
+  const value = environment.GEMINI_THINKING_LEVEL?.trim();
+  if (model === "gemini-3.8-flash") {
+    if (!["low", "medium", "high"].includes(value)) {
+      throw new CanonicalHostConfigurationError("GEMINI_THINKING_LEVEL must be low, medium or high for Gemini 3.8 Flash.");
+    }
+    return value;
+  }
+  if (value) throw new CanonicalHostConfigurationError("GEMINI_THINKING_LEVEL is only supported for gemini-3.8-flash.");
+  return undefined;
+}
+
 export function readConfiguration(environment = process.env) {
   const model = requiredEnvironment("GEMINI_MODEL", environment);
   if (!/^gemini-\d[\da-z.-]*$/u.test(model) || /(?:^|-)latest(?:-|$)/u.test(model)) {
     throw new CanonicalHostConfigurationError("GEMINI_MODEL must be an explicit versioned Gemini model ID.");
   }
+  const thinkingLevel = readThinkingLevel(model, environment);
   return {
+    ...(thinkingLevel === undefined ? {} : { thinkingLevel }),
     sessionToken: parseCanonicalHostSessionToken(environment.CANONICAL_MODEL_HOST_TOKEN),
     apiKey: requiredEnvironment("GEMINI_API_KEY", environment),
     model,
@@ -66,8 +80,11 @@ function upstreamHttpStatus(error) {
     ? error.status : null;
 }
 
-function requestForPacket(packet, model) {
+function requestForPacket(packet, model, thinkingLevel) {
   const spec = packet.generationSpec;
+  if (model === "gemini-3.8-flash" && !["low", "medium", "high"].includes(thinkingLevel)) {
+    throw new CanonicalHostRequestError("unsupported_generation_control");
+  }
   // 只证明当前原生默认配置；不把其他厂商的控制语义猜测为 Gemini 能力。
   if (spec.temperature !== undefined || spec.seed !== undefined || spec.reasoningEffort !== undefined) {
     throw new CanonicalHostRequestError("unsupported_generation_control");
@@ -92,6 +109,7 @@ function requestForPacket(packet, model) {
       // Gemini 3+ rejects candidateCount; preserve the 2.x single-candidate request.
       ...(/^gemini-2(?:\.|-)/u.test(model) ? { candidateCount: 1 } : {}),
       responseModalities: ["TEXT"],
+      ...(model === "gemini-3.8-flash" ? { thinkingConfig: { thinkingLevel } } : {}),
       automaticFunctionCalling: { disable: true },
       // SDK 2.30 默认续传可能追加请求，必须与重试一起关闭。
       automaticContinuation: false,
@@ -155,7 +173,7 @@ function providerErrorCode(error) {
 }
 
 async function executePacket(client, packet, configuration) {
-  const request = requestForPacket(packet, configuration.model);
+  const request = requestForPacket(packet, configuration.model, configuration.thinkingLevel);
   const controller = new AbortController();
   const startedAt = performance.now();
   let timer;

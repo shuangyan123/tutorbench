@@ -33,7 +33,7 @@ SYSTEM_PROMPT=(
 USER_CONTEXT="以下是一道独立求解的数学题；不提供参考答案。"
 DATASET_ID="math-blind-occupancy-pilot"
 SPEC_VERSION="0.1.0"
-MAX_OUTPUT_TOKENS=256
+MAX_OUTPUT_TOKENS=4096
 MAX_RESPONSE_BYTES=256_000
 MAX_RAW_TEXT=8192
 MAX_CASES=8
@@ -240,7 +240,9 @@ def ask_local_host(raw,endpoint,token,timeout_seconds):
         conn.close()
 
 
-def run_items(suite,limit,transport,provenance,declared_model):
+def run_items(suite,limit,transport,provenance,declared_model,declared_thinking_level="medium"):
+    if declared_thinking_level not in ("low","medium","high"):
+        raise Rejected("invalid_declared_thinking_level")
     if provenance not in ("local_host_observed","mock_transport"):
         raise Rejected("invalid_execution_provenance")
     if type(limit) is not int or not 1<=limit<=len(suite["cases"]):
@@ -300,6 +302,11 @@ def run_items(suite,limit,transport,provenance,declared_model):
         "runId":str(uuid.uuid4()),"capturedAtUtc":utc_now(),
         "executionProvenance":provenance,
         "declaredModel":declared_model,
+        "declaredThinkingLevel":declared_thinking_level,
+        "thinkingLevelCryptographicallyVerified":False,
+        "generationConfig":{"maxOutputTokens":MAX_OUTPUT_TOKENS,
+                            "thinkingLevel":declared_thinking_level,
+                            "thinkingLevelProvenance":"operator_declared_only"},
         "providerIdentityCryptographicallyVerified":False,
         "sourceOfficialExamGoldVerified":False,
         "rawTranscriptIsLocallyCapturedNotProviderSigned":True,
@@ -331,15 +338,16 @@ def main(argv=None,env=None):
     parser.add_argument("mode",choices=("plan","run"))
     parser.add_argument("--suite",default=str(ROOT/"fixtures/research/live-blind-occupancy-pilot-v0.1.json"))
     parser.add_argument("--endpoint",default=DEFAULT_ENDPOINT)
-    parser.add_argument("--model",default="gemini-2.5-flash")
+    parser.add_argument("--model",default="gemini-3.8-flash")
+    parser.add_argument("--thinking-level",choices=("low","medium","high"),default="medium")
     parser.add_argument("--limit",type=int)
     parser.add_argument("--timeout",type=int,default=60)
     parser.add_argument("--execute-live",action="store_true")
     parser.add_argument("--output")
     args=parser.parse_args(argv)
     suite=load_suite(args.suite)
-    if not isinstance(args.model,str) or not re.fullmatch(r"gemini-\d[\da-z.-]{1,80}",args.model):
-        raise Rejected("explicit_versioned_gemini_model_id_required")
+    if args.model!="gemini-3.8-flash":
+        raise Rejected("pilot_is_pinned_to_gemini_3_8_flash")
     loopback_port(args.endpoint)
     if not 1<=args.timeout<=120:
         raise Rejected("invalid_timeout")
@@ -352,6 +360,8 @@ def main(argv=None,env=None):
         print(json.dumps({"mode":"plan","requestsSent":0,
                           "suiteId":suite["id"],"totalCases":len(suite["cases"]),
                           "selectedCases":limit,"declaredModel":args.model,
+                          "declaredThinkingLevel":args.thinking_level,
+                          "maxOutputTokens":MAX_OUTPUT_TOKENS,
                           "promptSha256":sha256(SYSTEM_PROMPT.encode("utf8")),
                           "selected":[{"id":r["id"],"prompt":question_text(r["question"])}
                                       for r in suite["cases"][:limit]],
@@ -378,11 +388,14 @@ def main(argv=None,env=None):
     with path.open("x",encoding="utf8") as f:
         def transport(data):
             return ask_local_host(data,args.endpoint,token,args.timeout)
-        result=run_items(suite,limit,transport,"local_host_observed",args.model)
+        result=run_items(suite,limit,transport,"local_host_observed",args.model,args.thinking_level)
         json.dump(result,f,indent=2,ensure_ascii=False)
         f.write("\n")
     # Print aggregates and file location, never raw model output or token.
     print(json.dumps({"savedAt":str(path),"executionProvenance":result["executionProvenance"],
+                      "declaredModel":result["declaredModel"],
+                      "declaredThinkingLevel":result["declaredThinkingLevel"],
+                      "maxOutputTokens":MAX_OUTPUT_TOKENS,
                       "summary":result["summary"]},ensure_ascii=False,indent=2))
     return 0 if result["summary"]["hostFailures"]==0 else 2
 

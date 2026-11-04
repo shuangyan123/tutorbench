@@ -106,7 +106,21 @@ class LocalBlindMathPilot(unittest.TestCase):
             self.assertFalse(result["answerKeysIncludedInPrompt"])
             self.assertFalse(result["modelCredentialsRead"])
             self.assertEqual(result["selectedCases"],6)
+            self.assertEqual(result["declaredModel"],"gemini-3.8-flash")
+            self.assertEqual(result["declaredThinkingLevel"],"medium")
+            self.assertEqual(result["maxOutputTokens"],4096)
             self.assertFalse(any("61/25" in r["prompt"] for r in result["selected"]))
+
+    def test_38_flash_high_thinking_is_declared_and_old_model_is_rejected(self):
+        captured=io.StringIO()
+        with redirect_stdout(captured):
+            self.assertEqual(pilot.main(["plan","--thinking-level","high"],env={}),0)
+        plan=json.loads(captured.getvalue())
+        self.assertEqual(plan["declaredModel"],"gemini-3.8-flash")
+        self.assertEqual(plan["declaredThinkingLevel"],"high")
+        self.assertEqual(plan["maxOutputTokens"],4096)
+        with self.assertRaisesRegex(pilot.Rejected,"pilot_is_pinned_to_gemini_3_8_flash"):
+            pilot.main(["plan","--model","gemini-2.5-flash"],env={})
 
     def test_single_case_packet_obeys_tutorbench_canonical_host_contract(self):
         packet,raw=pilot.packet_for(self.suite["cases"][0])
@@ -119,7 +133,7 @@ class LocalBlindMathPilot(unittest.TestCase):
         self.assertEqual(packet["generationSpec"]["prompt"]["sha256"],
                          sha256(pilot.SYSTEM_PROMPT.encode("utf8")).hexdigest())
         self.assertNotIn(b"61/25",raw)
-        self.assertEqual(packet["generationSpec"]["maxOutputTokens"],256)
+        self.assertEqual(packet["generationSpec"]["maxOutputTokens"],4096)
         self.assertNotIn("temperature",packet["generationSpec"])
 
     def test_http_only_127_loopback_and_session_authentication(self):
@@ -154,7 +168,7 @@ class LocalBlindMathPilot(unittest.TestCase):
             target=f"http://127.0.0.1:{host.port}/generate"
             def transport(request):
                 return pilot.ask_local_host(request,target,host.token,5)
-            result=pilot.run_items(self.suite,6,transport,"mock_transport","gemini-2.5-flash")
+            result=pilot.run_items(self.suite,6,transport,"mock_transport","gemini-3.8-flash")
             self.assertEqual(result["summary"]["mathematicallyCorrect"],4)
             self.assertEqual(result["summary"]["mathematicallyIncorrect"],1)
             self.assertEqual(result["summary"]["unverifiedAnswers"],1)
@@ -180,7 +194,7 @@ class LocalBlindMathPilot(unittest.TestCase):
             target=f"http://127.0.0.1:{host.port}/generate"
             report=pilot.run_items(self.suite,1,
                 lambda request:pilot.ask_local_host(request,target,"f"*64,5),
-                "mock_transport","gemini-2.5-flash")
+                "mock_transport","gemini-3.8-flash")
             self.assertEqual(report["items"][0]["status"],"host_failure")
             self.assertEqual(report["items"][0]["errorCode"],"host_http_error_401")
             self.assertEqual(report["summary"]["mathematicallyIncorrect"],0)
@@ -188,7 +202,7 @@ class LocalBlindMathPilot(unittest.TestCase):
 
     def test_simulated_data_never_becomes_published_live_accuracy(self):
         report=pilot.run_items(self.suite,1,
-            lambda req:("61/25",{"latencyMs":0}),"mock_transport","gemini-2.5-flash")
+            lambda req:("61/25",{"latencyMs":0}),"mock_transport","gemini-3.8-flash")
         self.assertEqual(report["summary"]["mathematicallyCorrect"],1)
         self.assertIsNone(report["summary"]["measuredLiveModelAccuracy"])
         self.assertIsNone(report["summary"]["verificationCoverage"]["value"])
@@ -196,21 +210,26 @@ class LocalBlindMathPilot(unittest.TestCase):
 
     def test_live_local_host_only_reports_observed_gateway_score_not_signed_provider_identity(self):
         report=pilot.run_items(self.suite,1,
-            lambda req:("61/25",{"latencyMs":0}),"local_host_observed","gemini-2.5-flash")
+            lambda req:("61/25",{"latencyMs":0}),"local_host_observed","gemini-3.8-flash")
         self.assertEqual(report["summary"]["overallSuccess"],
                          {"numerator":1,"denominator":1,"value":1.0})
         self.assertFalse(report["providerIdentityCryptographicallyVerified"])
+        self.assertFalse(report["thinkingLevelCryptographicallyVerified"])
+        self.assertEqual(report["declaredThinkingLevel"],"medium")
+        self.assertEqual(report["generationConfig"],
+                         {"maxOutputTokens":4096,"thinkingLevel":"medium",
+                          "thinkingLevelProvenance":"operator_declared_only"})
         self.assertFalse(report["summary"]["benchmarkedWholeSuite"])
         self.assertIsNone(report["summary"]["measuredLiveModelAccuracy"])
 
     def test_precision_is_exact_and_prose_abstains_instead_of_guessing(self):
         prose=pilot.run_items(self.suite,1,
             lambda _:("结果是 61/25。",{"latencyMs":3}),
-            "mock_transport","gemini-2.5-flash")
+            "mock_transport","gemini-3.8-flash")
         self.assertEqual(prose["items"][0]["status"],"unverified_output")
         changed=pilot.run_items(self.suite,1,
             lambda _:("2.4400000001",{"latencyMs":0}),
-            "mock_transport","gemini-2.5-flash")
+            "mock_transport","gemini-3.8-flash")
         self.assertEqual(changed["items"][0]["status"],"exactly_incorrect")
 
     def test_crosscheck_can_fail_without_auto_marking_model_wrong(self):
@@ -218,7 +237,7 @@ class LocalBlindMathPilot(unittest.TestCase):
                           return_value={1:1}):
             report=pilot.run_items(self.suite,1,
                 lambda _:("61/25",{"latencyMs":1}),
-                "mock_transport","gemini-2.5-flash")
+                "mock_transport","gemini-3.8-flash")
             self.assertEqual(report["items"][0]["status"],"unverified_math")
             self.assertEqual(report["summary"]["mathematicallyIncorrect"],0)
 
@@ -269,13 +288,13 @@ class LocalBlindMathPilot(unittest.TestCase):
         def request(_):
             number["calls"]+=1
             raise pilot.Rejected("host_http_error_429")
-        report=pilot.run_items(self.suite,1,request,"mock_transport","gemini-2.5-flash")
+        report=pilot.run_items(self.suite,1,request,"mock_transport","gemini-3.8-flash")
         self.assertEqual(number["calls"],1)
         self.assertEqual(report["summary"]["hostFailures"],1)
 
     def test_raw_and_request_hashes_are_pinned(self):
         report=pilot.run_items(self.suite,1,
-            lambda _:("61/25",{"latencyMs":1}),"mock_transport","gemini-2.5-flash")
+            lambda _:("61/25",{"latencyMs":1}),"mock_transport","gemini-3.8-flash")
         item=report["items"][0]
         self.assertEqual(item["rawOutputSha256"],sha256(b"61/25").hexdigest())
         _,request=pilot.packet_for(self.suite["cases"][0])
