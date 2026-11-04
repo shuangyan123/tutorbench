@@ -1,7 +1,43 @@
-# Teachometry Public Website
+# Teachometry website
 
-The website is a static, read-only Developer Preview generated from the
-canonical TutorEval 0.2A dataset.
+The public site, [teachometry.com](https://teachometry.com), is built from this
+repository. It is static and bilingual (English at each route, Simplified
+Chinese under `/zh-cn/`), and it consumes only secret-free public artifacts: no
+Tutor runs, API keys, model scores or rankings.
+
+```bash
+npm run website:build      # writes website/dist/ (ignored)
+npm run website:dev        # build and serve locally
+npm run test:website       # build + artifact smoke check
+npm run test:website:hit   # real-browser click/hit tests (needs Chrome or CHROME_PATH)
+```
+
+`.github/workflows/pages.yml` builds from `main` and deploys through GitHub
+Pages. It supplies the site URL and base path to the build, validates the
+generated routes and public-data firewall before upload, and needs no model,
+API, database or deployment secret.
+
+## Two page sources
+
+| Source | Where | Used for |
+| --- | --- | --- |
+| **Spectrum** (the live site) | [`prototypes/spectrum/`](prototypes/spectrum/README.md), installed by `src/cli/spectrum-site.ts` | Every public route. The folder name is historical: it started as the redesign prototype and has been the published site since 2026-10-24. |
+| **Generated pages** (legacy) | `src/site/` and `website/src/` | Search metadata for each route, the private local audit build, and `TUTOR_BENCHMARK_SITE=legacy npm run website:build`. |
+
+How the Spectrum pages are made (covers, section colours, generators, fonts,
+share cards) is documented in
+[`prototypes/spectrum/README.md`](prototypes/spectrum/README.md).
+
+## Brand
+
+**Teachometry** is the parent brand: an italic wordmark in the navigation, a
+signature in the footer and a seal for reports. **TutorBench** is Teachometry's
+AI tutor evaluation product; its T1 trajectory mark appears only beside the
+TutorBench name. The build copies the canonical TutorBench SVG variants and
+favicon files into `assets/brand/tutorbench/`; it does not redraw or rasterize
+the mark. See [`assets/brand/tutorbench/README.md`](../assets/brand/tutorbench/README.md).
+
+## Release-channel wording
 
 The Run and Docs pages describe the current repository channel, not the frozen
 npm `tutor-benchmark@0.1.0` payload. They distinguish Node 24 repository setup
@@ -9,13 +45,11 @@ from the Node 22 published package and mark Tutor Health as repository-only.
 See [release channels](../docs/release.md#installation-channels). A local
 website build does not establish that those changes are deployed.
 
-**Teachometry** is the parent brand and has no approved logo yet, so the shared
-header and footer set its name as text. **TutorBench** is Teachometry's AI tutor
-evaluation product; its T1 trajectory mark appears only beside the TutorBench
-name ("TutorBench · AI tutor evaluation" in the header, "An AI tutoring quality
-evaluation product by Teachometry." in the footer). The website build copies
-the canonical SVG variants and supplied favicon files into
-`assets/brand/tutorbench/`; it does not redraw or rasterize the primary mark.
+## Generated pages and data boundaries
+
+The sections below describe the generated (legacy) pages and the public-data
+pipeline they share with the live site. They are kept as the reference for the
+private audit build and for tests.
 
 ```text
 benchmark core
@@ -24,15 +58,9 @@ benchmark core
   -> static HTML/CSS/JS
 ```
 
-Build or serve it from the repository root:
-
-```bash
-npm run website:build
-npm run website:dev
-npm run test:website:hit   # real-browser click/hit test (needs Chrome or CHROME_PATH)
-```
-
-The hit test serves the build, drives a local Chrome/Chromium through the
+`npm run test:website:hit` runs two browser checks: `scripts/website-spectrum-hit-test.mjs`
+over the live Spectrum build, and `scripts/website-hit-test.mjs` over a legacy build in
+`website/legacy-dist/`. The legacy hit test serves the build, drives a local Chrome/Chromium through the
 DevTools protocol and checks that every visible header control and the three
 homepage paths own their own click area (centre and edges), including at
 1024/1100/1440 px, in both locales and with 200% text; the 1024px header also
@@ -74,13 +102,6 @@ limitations. The homepage hero links to it as a clearly labeled constructed
 demo, separate from running a TutorBench evaluation and from the Methodology;
 the primary navigation is unchanged.
 
-`.github/workflows/pages.yml` builds this directory and deploys it to GitHub
-Pages only from `main`. GitHub Pages provides the project `base_path` and
-canonical `base_url` to the generator, so project-site links work under
-`/<repo>/` while local builds continue to use `/`. The workflow validates the
-generated routes and public-data firewall before upload and requires no model,
-API, database, or deployment secret.
-
 The Run and Methodology pages describe the 0.4A.3 `baseline-native-default`
 generation profile: the benchmark prompt/messages and 1024-token output cap
 are fixed, while temperature, reasoning, and seed remain provider-native and
@@ -104,7 +125,7 @@ artifact, use `npm run website:build -- -- --evaluation <path> --output
 website/private-dist --locale zh-CN`. The default Pages build never loads that
 path and never emits private evaluation content.
 
-## Reference-led homepage
+### Legacy homepage (September 2026)
 
 The homepage uses the supplied September 2026 art direction: an ivory/forest
 palette, serif thesis, case walkthrough, five-dimension path, and compact data
