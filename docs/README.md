@@ -111,6 +111,7 @@ Knowledge maps and exam-system reviews, several in Chinese.
 Isolated research pilots and contracts. They do not change the canonical benchmark.
 
 - [Exact complete solution sets: absolute values, radicals and finite piecewise branches](research/abs-radical-piecewise-solution-sets-v0.1.md)
+- [Immutable third-party examination artifact identity — research v0.1](research/pinned-exam-artifact-identity-v0.1.md)
 - [Controlled problem-statement to exact mathematics evidence chain (research v0.1)](research/controlled-statement-math-evidence-chain-v0.1.md)
 - [Parameterized circle–line intersection-count partitions (research v0.1)](research/parametric-circle-line-classification-v0.1.md)
 - [Dual-path answer verification: published reference vs. no-reference candidate](research/dual-path-math-answer-evidence-v0.1.md)
