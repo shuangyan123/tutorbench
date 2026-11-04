@@ -81,6 +81,16 @@ class CircleLineExactResearch(unittest.TestCase):
         self.assertFalse(any(r["officialExamGoldCertified"] or r["liveAIModelCallPerformed"]
                              for r in report["items"]))
 
+    def test_intended_replay_fixture_answers_match_full_visible_canonical_json(self):
+        # Regression: editing a candidate without its visible raw transcript
+        # must never silently change a decisional case into an abstention.
+        replays=[row for row in self.document["cases"]
+                 if "modelAttempt" in row and row["expectedStatus"]!="unverified"]
+        self.assertEqual(len(replays),4)
+        for row in replays:
+            attempt=row["modelAttempt"]
+            self.assertEqual(attempt["rawText"],canonical_json(attempt["answer"]),row["id"])
+
     def test_geometric_classification_and_exact_points_cover_288_grid_models(self):
         samples=["0","1","-3/2"]
         for h in samples:

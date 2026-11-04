@@ -386,7 +386,7 @@
       "modelAttempt": {
         "captureKind": "offline_replay",
         "modelId": "synthetic-offline-fixture",
-        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"0\"},\"y\":{\"kind\":\"rational\",\"value\":\"5.000001\"}}]}",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"0\"},\"y\":{\"kind\":\"rational\",\"value\":\"5.00001\"}}]}",
         "answer": {
           "kind": "point_set",
           "points": [
