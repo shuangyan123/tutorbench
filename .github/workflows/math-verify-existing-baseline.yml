@@ -1,0 +1,47 @@
+name: Math-Verify Existing Baseline Stage II
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/math-verify-existing-baseline.yml'
+      - 'scripts/research/compare_math_verify_baseline.py'
+      - 'scripts/research/test_compare_math_verify_baseline.py'
+      - 'scripts/research/run_real_natural_math_holdout.py'
+      - 'docs/research/math-verify-baseline-stage-ii.md'
+      - 'docs/README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-existing-parser-no-provider:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install pinned external baseline only in temporary venv
+        run: |
+          python3 -m venv "$RUNNER_TEMP/mathverify"
+          "$RUNNER_TEMP/mathverify/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'math-verify[antlr4_13_2]==0.9.0'
+      - name: Test real Math-Verify API and conservative handling of natural boxed answers
+        run: |
+          timeout 180s "$RUNNER_TEMP/mathverify/bin/python" \
+            -m unittest scripts/research/test_compare_math_verify_baseline.py -v
+      - name: No-key syntax, dependency and reference docs checks
+        run: |
+          "$RUNNER_TEMP/mathverify/bin/python" -m py_compile \
+            scripts/research/compare_math_verify_baseline.py
+          python3 - <<'PY'
+          from pathlib import Path
+          index=Path("docs/README.md").read_text(encoding="utf8")
+          target="research/math-verify-baseline-stage-ii.md"
+          assert index.count("("+target+")")==1
+          assert Path("docs",target).is_file()
+          assert "Math-Verify" in Path("docs",target).read_text(encoding="utf8")
+          print("No paid models called, external parser only")
+          PY

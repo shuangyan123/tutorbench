@@ -115,6 +115,7 @@ Isolated research pilots and contracts. They do not change the canonical benchma
 - [Mathematical wrong-answer detection and supported-type coverage (research v0.1)](research/math-wrong-answer-detection-v0.1.md)
 - [DeepSeek Flash 25-question real-response math-verifier pilot (research v0.1)](research/deepseek-flash-25-math-real-response-pilot-v0.1.md)
 - [Stage II: natural mathematical answers and paired DeepSeek reasoning (research v0.1)](research/real-natural-math-holdout-stage-ii-v0.1.md)
+- [Stage II: external Math-Verify parsing baseline before rebuilding parsers](research/math-verify-baseline-stage-ii.md)
 - [Controlled problem-statement to exact mathematics evidence chain (research v0.1)](research/controlled-statement-math-evidence-chain-v0.1.md)
 - [Parameterized circle–line intersection-count partitions (research v0.1)](research/parametric-circle-line-classification-v0.1.md)
 - [Dual-path answer verification: published reference vs. no-reference candidate](research/dual-path-math-answer-evidence-v0.1.md)
