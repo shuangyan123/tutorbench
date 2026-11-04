@@ -1,0 +1,2248 @@
+{
+  "schemaVersion": 1,
+  "id": "math-wrong-answer-detection-v0.1",
+  "status": "synthetic_not_live_not_general_math_coverage",
+  "cases": [
+    {
+      "id": "occupancy-expectation-01",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-expectation",
+      "truthLabel": "correct",
+      "errorMode": "reduced_fraction",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "61/25",
+        "answer": "61/25"
+      }
+    },
+    {
+      "id": "occupancy-expectation-02",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-expectation",
+      "truthLabel": "correct",
+      "errorMode": "equivalent_decimal",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "2.44",
+        "answer": "2.44"
+      }
+    },
+    {
+      "id": "occupancy-expectation-03",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-expectation",
+      "truthLabel": "wrong",
+      "errorMode": "wrong_total_draw_space",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "61/125",
+        "answer": "61/125"
+      }
+    },
+    {
+      "id": "occupancy-expectation-04",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-expectation",
+      "truthLabel": "wrong",
+      "errorMode": "near_miss_decimal",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "2.440001",
+        "answer": "2.440001"
+      }
+    },
+    {
+      "id": "occupancy-expectation-05",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-expectation",
+      "truthLabel": "wrong",
+      "errorMode": "off_by_one",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "3.44",
+        "answer": "3.44"
+      }
+    },
+    {
+      "id": "occupancy-expectation-06",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-expectation",
+      "truthLabel": "unsupported",
+      "errorMode": "free_form_prose",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "Approximately 2.44.",
+        "answer": "2.44"
+      }
+    },
+    {
+      "id": "occupancy-single-01",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-single",
+      "truthLabel": "correct",
+      "errorMode": "exact_probability",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_exact",
+          "k": 1
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "1/25",
+        "answer": "1/25"
+      }
+    },
+    {
+      "id": "occupancy-single-02",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-single",
+      "truthLabel": "wrong",
+      "errorMode": "event_denominator_error",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_exact",
+          "k": 1
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "1/5",
+        "answer": "1/5"
+      }
+    },
+    {
+      "id": "occupancy-double-01",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-double",
+      "truthLabel": "correct",
+      "errorMode": "exact_probability",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_exact",
+          "k": 2
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "12/25",
+        "answer": "12/25"
+      }
+    },
+    {
+      "id": "occupancy-double-02",
+      "family": "finite_uniform_occupancy",
+      "oracleKey": "occupancy-double",
+      "truthLabel": "wrong",
+      "errorMode": "confuse_exactly_two_with_three",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_exact",
+          "k": 2
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "1/25",
+        "answer": "1/25"
+      }
+    },
+    {
+      "id": "sequence-mixed-01",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-mixed",
+      "truthLabel": "correct",
+      "errorMode": "integer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "49",
+        "answer": "49"
+      }
+    },
+    {
+      "id": "sequence-mixed-02",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-mixed",
+      "truthLabel": "correct",
+      "errorMode": "equivalent_decimal",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "49.0",
+        "answer": "49.0"
+      }
+    },
+    {
+      "id": "sequence-mixed-03",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-mixed",
+      "truthLabel": "wrong",
+      "errorMode": "omit_last_term",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "17",
+        "answer": "17"
+      }
+    },
+    {
+      "id": "sequence-mixed-04",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-mixed",
+      "truthLabel": "wrong",
+      "errorMode": "off_by_one",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "50",
+        "answer": "50"
+      }
+    },
+    {
+      "id": "sequence-mixed-05",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-mixed",
+      "truthLabel": "wrong",
+      "errorMode": "near_miss_decimal",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "49.000001",
+        "answer": "49.000001"
+      }
+    },
+    {
+      "id": "sequence-mixed-06",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-mixed",
+      "truthLabel": "unsupported",
+      "errorMode": "scientific_notation",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "4.9e1",
+        "answer": "4.9e1"
+      }
+    },
+    {
+      "id": "sequence-zero-01",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-zero",
+      "truthLabel": "correct",
+      "errorMode": "zero_terms",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "5",
+          "commonDifference": "0",
+          "commonRatio": "1",
+          "termCount": 0
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "0",
+        "answer": "0"
+      }
+    },
+    {
+      "id": "sequence-zero-02",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-zero",
+      "truthLabel": "wrong",
+      "errorMode": "empty_sum_not_zero",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "5",
+          "commonDifference": "0",
+          "commonRatio": "1",
+          "termCount": 0
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "5",
+        "answer": "5"
+      }
+    },
+    {
+      "id": "sequence-arithmetic-01",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-arithmetic",
+      "truthLabel": "correct",
+      "errorMode": "ratio_one_boundary",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "2",
+          "commonDifference": "3",
+          "commonRatio": "1",
+          "termCount": 8
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "100",
+        "answer": "100"
+      }
+    },
+    {
+      "id": "sequence-arithmetic-02",
+      "family": "finite_arithmetic_geometric_sum",
+      "oracleKey": "sequence-arithmetic",
+      "truthLabel": "wrong",
+      "errorMode": "miss_last_index",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "2",
+          "commonDifference": "3",
+          "commonRatio": "1",
+          "termCount": 8
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "72",
+        "answer": "72"
+      }
+    },
+    {
+      "id": "circle-irrational-01",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-irrational",
+      "truthLabel": "correct",
+      "errorMode": "exact_radical_coordinate",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"coefficient\":\"-1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}},{\"x\":{\"coefficient\":\"1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "-1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            },
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-irrational-02",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-irrational",
+      "truthLabel": "correct",
+      "errorMode": "unordered_points",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"coefficient\":\"1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}},{\"x\":{\"coefficient\":\"-1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            },
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "-1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-irrational-03",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-irrational",
+      "truthLabel": "wrong",
+      "errorMode": "missing_negative_root",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"coefficient\":\"1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-irrational-04",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-irrational",
+      "truthLabel": "wrong",
+      "errorMode": "incorrect_radical",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"-1.4142\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}},{\"x\":{\"kind\":\"rational\",\"value\":\"1.4142\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "-1.4142"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            },
+            {
+              "x": {
+                "kind": "rational",
+                "value": "1.4142"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-irrational-05",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-irrational",
+      "truthLabel": "wrong",
+      "errorMode": "wrong_root_sign",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"coefficient\":\"1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}},{\"x\":{\"coefficient\":\"1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"1\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            },
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "1"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-tangent-01",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-tangent",
+      "truthLabel": "correct",
+      "errorMode": "one_tangent_point",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"0\"},\"y\":{\"kind\":\"rational\",\"value\":\"5\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "0"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "5"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-tangent-02",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-tangent",
+      "truthLabel": "wrong",
+      "errorMode": "wrong_tangent_side",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"0\"},\"y\":{\"kind\":\"rational\",\"value\":\"-5\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "0"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "-5"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-tangent-03",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-tangent",
+      "truthLabel": "wrong",
+      "errorMode": "invent_extra_root",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"0\"},\"y\":{\"kind\":\"rational\",\"value\":\"-5\"}},{\"x\":{\"kind\":\"rational\",\"value\":\"0\"},\"y\":{\"kind\":\"rational\",\"value\":\"5\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "0"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "-5"
+              }
+            },
+            {
+              "x": {
+                "kind": "rational",
+                "value": "0"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "5"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-disjoint-01",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-disjoint",
+      "truthLabel": "correct",
+      "errorMode": "empty_intersection",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-6"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[]}",
+        "answer": {
+          "kind": "point_set",
+          "points": []
+        }
+      }
+    },
+    {
+      "id": "circle-disjoint-02",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-disjoint",
+      "truthLabel": "wrong",
+      "errorMode": "imaginary_real_root",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-6"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"kind\":\"rational\",\"value\":\"0\"},\"y\":{\"kind\":\"rational\",\"value\":\"6\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "0"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "6"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "circle-tangent-04",
+      "family": "circle_line_intersections",
+      "oracleKey": "circle-tangent",
+      "truthLabel": "unsupported",
+      "errorMode": "raw_text_not_canonical",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "(0, 5)",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "rational",
+                "value": "0"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "5"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-roots-01",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-roots",
+      "truthLabel": "correct",
+      "errorMode": "two_irrational_roots",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"kind\":\"point\",\"value\":{\"a\":0,\"b\":-1,\"den\":1,\"kind\":\"surd\",\"radicand\":2}},{\"kind\":\"point\",\"value\":{\"a\":0,\"b\":1,\"den\":1,\"kind\":\"surd\",\"radicand\":2}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "point",
+              "value": {
+                "kind": "surd",
+                "a": 0,
+                "b": -1,
+                "radicand": 2,
+                "den": 1
+              }
+            },
+            {
+              "kind": "point",
+              "value": {
+                "kind": "surd",
+                "a": 0,
+                "b": 1,
+                "radicand": 2,
+                "den": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-roots-02",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-roots",
+      "truthLabel": "correct",
+      "errorMode": "unordered_roots",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"kind\":\"point\",\"value\":{\"a\":0,\"b\":1,\"den\":1,\"kind\":\"surd\",\"radicand\":2}},{\"kind\":\"point\",\"value\":{\"a\":0,\"b\":-1,\"den\":1,\"kind\":\"surd\",\"radicand\":2}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "point",
+              "value": {
+                "kind": "surd",
+                "a": 0,
+                "b": 1,
+                "radicand": 2,
+                "den": 1
+              }
+            },
+            {
+              "kind": "point",
+              "value": {
+                "kind": "surd",
+                "a": 0,
+                "b": -1,
+                "radicand": 2,
+                "den": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-roots-03",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-roots",
+      "truthLabel": "wrong",
+      "errorMode": "omit_negative_root",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"kind\":\"point\",\"value\":{\"a\":0,\"b\":1,\"den\":1,\"kind\":\"surd\",\"radicand\":2}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "point",
+              "value": {
+                "kind": "surd",
+                "a": 0,
+                "b": 1,
+                "radicand": 2,
+                "den": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-roots-04",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-roots",
+      "truthLabel": "wrong",
+      "errorMode": "replace_radical_with_integer",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"kind\":\"point\",\"value\":{\"den\":1,\"kind\":\"rational\",\"num\":-2}},{\"kind\":\"point\",\"value\":{\"den\":1,\"kind\":\"rational\",\"num\":2}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "point",
+              "value": {
+                "kind": "rational",
+                "num": -2,
+                "den": 1
+              }
+            },
+            {
+              "kind": "point",
+              "value": {
+                "kind": "rational",
+                "num": 2,
+                "den": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-domain-hole-01",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-domain-hole",
+      "truthLabel": "correct",
+      "errorMode": "preserve_excluded_pole",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"kind\":\"infinity\",\"side\":\"negative\"},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":1}},{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":1},\"right\":{\"kind\":\"infinity\",\"side\":\"positive\"}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "infinity",
+                "side": "negative"
+              },
+              "right": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            },
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "right": {
+                "kind": "infinity",
+                "side": "positive"
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-domain-hole-02",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-domain-hole",
+      "truthLabel": "wrong",
+      "errorMode": "cancel_denominator_domain_hole",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"all_real\"}",
+        "answer": {
+          "kind": "all_real"
+        }
+      }
+    },
+    {
+      "id": "quadratic-domain-hole-03",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-domain-hole",
+      "truthLabel": "wrong",
+      "errorMode": "exclude_entire_halfline",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"kind\":\"infinity\",\"side\":\"negative\"},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":1}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "infinity",
+                "side": "negative"
+              },
+              "right": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-strict-01",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-strict",
+      "truthLabel": "correct",
+      "errorMode": "strict_inequality",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"kind\":\"infinity\",\"side\":\"negative\"},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":-1}},{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":1},\"right\":{\"kind\":\"infinity\",\"side\":\"positive\"}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "infinity",
+                "side": "negative"
+              },
+              "right": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            },
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "right": {
+                "kind": "infinity",
+                "side": "positive"
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-strict-02",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-strict",
+      "truthLabel": "wrong",
+      "errorMode": "include_equality_endpoints",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":true,\"kind\":\"interval\",\"left\":{\"kind\":\"infinity\",\"side\":\"negative\"},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":-1}},{\"includeLeft\":true,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":1},\"right\":{\"kind\":\"infinity\",\"side\":\"positive\"}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "infinity",
+                "side": "negative"
+              },
+              "right": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": true
+            },
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "right": {
+                "kind": "infinity",
+                "side": "positive"
+              },
+              "includeLeft": true,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-strict-03",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-strict",
+      "truthLabel": "wrong",
+      "errorMode": "forget_negative_branch",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":1},\"right\":{\"kind\":\"infinity\",\"side\":\"positive\"}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "right": {
+                "kind": "infinity",
+                "side": "positive"
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "quadratic-roots-05",
+      "family": "quadratic_real_solution_set",
+      "oracleKey": "quadratic-roots",
+      "truthLabel": "unsupported",
+      "errorMode": "free_form_answer",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "±√2",
+        "answer": "±√2"
+      }
+    },
+    {
+      "id": "parameter-two-01",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-two",
+      "truthLabel": "correct",
+      "errorMode": "open_tangent_boundaries",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":-1},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":1}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              },
+              "right": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "parameter-two-02",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-two",
+      "truthLabel": "wrong",
+      "errorMode": "include_tangency_boundaries",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":true,\"includeRight\":true,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":-1},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":1}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              },
+              "right": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "includeLeft": true,
+              "includeRight": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "parameter-two-03",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-two",
+      "truthLabel": "wrong",
+      "errorMode": "wrong_parameter_scale",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":-2},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":2}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": -2,
+                "den": 1
+              },
+              "right": {
+                "kind": "rational",
+                "num": 2,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "parameter-two-04",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-two",
+      "truthLabel": "wrong",
+      "errorMode": "forget_negative_range",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":0},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":1}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 0,
+                "den": 1
+              },
+              "right": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "parameter-one-01",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-one",
+      "truthLabel": "correct",
+      "errorMode": "two_tangency_points",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"kind\":\"point\",\"value\":{\"den\":1,\"kind\":\"rational\",\"num\":-1}},{\"kind\":\"point\",\"value\":{\"den\":1,\"kind\":\"rational\",\"num\":1}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "point",
+              "value": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              }
+            },
+            {
+              "kind": "point",
+              "value": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "parameter-one-02",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-one",
+      "truthLabel": "wrong",
+      "errorMode": "only_one_tangency",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"kind\":\"point\",\"value\":{\"den\":1,\"kind\":\"rational\",\"num\":1}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "point",
+              "value": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "parameter-zero-01",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-zero",
+      "truthLabel": "correct",
+      "errorMode": "exterior_parameter_ranges",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"kind\":\"infinity\",\"side\":\"negative\"},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":-1}},{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":1},\"right\":{\"kind\":\"infinity\",\"side\":\"positive\"}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "infinity",
+                "side": "negative"
+              },
+              "right": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            },
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "right": {
+                "kind": "infinity",
+                "side": "positive"
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "parameter-zero-02",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-zero",
+      "truthLabel": "wrong",
+      "errorMode": "include_tangent_as_disjoint",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":true,\"kind\":\"interval\",\"left\":{\"kind\":\"infinity\",\"side\":\"negative\"},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":-1}},{\"includeLeft\":true,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":1},\"right\":{\"kind\":\"infinity\",\"side\":\"positive\"}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "infinity",
+                "side": "negative"
+              },
+              "right": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": true
+            },
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "right": {
+                "kind": "infinity",
+                "side": "positive"
+              },
+              "includeLeft": true,
+              "includeRight": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "parameter-constant-one-01",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-constant-one",
+      "truthLabel": "correct",
+      "errorMode": "constant_tangent_all_t",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "-1",
+          "parameterC": "0"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"all_real\"}",
+        "answer": {
+          "kind": "all_real"
+        }
+      }
+    },
+    {
+      "id": "parameter-constant-one-02",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-constant-one",
+      "truthLabel": "wrong",
+      "errorMode": "constant_tangent_no_parameter",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "-1",
+          "parameterC": "0"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "{\"kind\":\"empty\"}",
+        "answer": {
+          "kind": "empty"
+        }
+      }
+    },
+    {
+      "id": "parameter-two-05",
+      "family": "parametric_circle_line_intersection_count",
+      "oracleKey": "parameter-two",
+      "truthLabel": "unsupported",
+      "errorMode": "prose_extraction",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "Incorrect result: (-1,1)",
+        "answer": "Incorrect result: (-1,1)"
+      }
+    },
+    {
+      "id": "unsupported-free-form-proof-01",
+      "family": "unimplemented_open_math",
+      "oracleKey": "unsupported-freeform",
+      "truthLabel": "unsupported",
+      "errorMode": "unimplemented_question_family",
+      "question": {
+        "kind": "arbitrary_multivariable_integral",
+        "expression": "x^2+y^2",
+        "domain": "all_real"
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-mutant-not-live",
+        "rawText": "42",
+        "answer": "42"
+      }
+    }
+  ]
+}
