@@ -1,0 +1,59 @@
+name: Exact Arithmetic-Geometric Sequence Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/finite-arithmetic-geometric-sum-research.yml'
+      - 'scripts/research/verify_finite_arithmetic_geometric_sum.py'
+      - 'scripts/research/test_verify_finite_arithmetic_geometric_sum.py'
+      - 'scripts/research/verify_dual_path_math_answers.py'
+      - 'fixtures/research/finite-arithmetic-geometric-sum-v0.1.json'
+      - 'docs/research/finite-arithmetic-geometric-sum-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-finite-series-crosscheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out without persisting credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install pinned exact-math engine for dual-path integration
+        run: |
+          python3 -m venv "$RUNNER_TEMP/exact-sequences"
+          "$RUNNER_TEMP/exact-sequences/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Test independent series algorithms, counterexamples and both adjudication paths
+        run: |
+          timeout 180s "$RUNNER_TEMP/exact-sequences/bin/python" -m unittest \
+            scripts/research/test_verify_finite_arithmetic_geometric_sum.py \
+            scripts/research/test_verify_dual_path_math_answers.py -v
+      - name: Recompute all 13 research fixture decisions with no credentials
+        run: |
+          timeout 120s "$RUNNER_TEMP/exact-sequences/bin/python" \
+            scripts/research/verify_dual_path_math_answers.py \
+            --fixture fixtures/research/finite-arithmetic-geometric-sum-v0.1.json \
+            --sources fixtures/research/exam-multi-source-evidence-v0.1.json \
+            > "$RUNNER_TEMP/finite-series-results.json"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          result=json.loads((Path(os.environ["RUNNER_TEMP"])/"finite-series-results.json").read_text())
+          summary=result["summary"]
+          assert summary["total"]==13
+          assert summary["reference_mathematically_verified"]==1
+          assert summary["reference_mathematically_refuted"]==1
+          assert summary["deterministic_no_answer_solution"]==5
+          assert summary["replayed_candidate_mathematically_verified"]==1
+          assert summary["replayed_candidate_mathematically_refuted"]==2
+          assert summary["unverified"]==3
+          assert summary["genuineAIModelRuns"]==0
+          assert summary["measuredLiveAIAccuracy"] is None
+          assert summary["officialExamGoldReleased"]==0
+          assert summary["realExamCasesProvenAuthenticated"]==0
+          print("Independent finite-series family and both answer paths verified without model calls")
+          PY
