@@ -1,0 +1,118 @@
+name: Pinned Exam Artifact Byte Identity Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/pinned-exam-artifact-identity.yml'
+      - 'scripts/research/audit_pinned_exam_artifacts.py'
+      - 'scripts/research/test_audit_pinned_exam_artifacts.py'
+      - 'fixtures/research/pinned-exam-artifacts-v0.1.json'
+      - 'docs/research/pinned-exam-artifact-identity-v0.1.md'
+      - 'docs/README.md'
+      - 'fixtures/research/exam-source-expansion-2022-2026-v0.1.json'
+      - 'fixtures/research/exam-multi-source-evidence-v0.1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-source-evidence-negative-controls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out without persisting access credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Pin exact math dependency for conditional hypothesis checks
+        run: |
+          python3 -m venv "$RUNNER_TEMP/pinned-exam"
+          "$RUNNER_TEMP/pinned-exam/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Test source integrity and false-gold blockers without provider calls
+        run: |
+          timeout 120s "$RUNNER_TEMP/pinned-exam/bin/python" -m unittest \
+            scripts/research/test_audit_pinned_exam_artifacts.py \
+            scripts/research/test_verify_controlled_math_statement_binding.py \
+            scripts/research/test_verify_dual_path_math_answers.py -v
+      - name: Require offline byte coverage to remain zero
+        run: |
+          timeout 30s "$RUNNER_TEMP/pinned-exam/bin/python" \
+            scripts/research/audit_pinned_exam_artifacts.py \
+            --manifest fixtures/research/pinned-exam-artifacts-v0.1.json \
+            > "$RUNNER_TEMP/offline-source-audit.json"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          r=json.loads((Path(os.environ["RUNNER_TEMP"])/"offline-source-audit.json").read_text())
+          assert r["summary"]["total"]==2
+          assert r["summary"]["byteVerified"]==0
+          assert r["summary"]["officialExamGoldReleased"]==0
+          assert r["summary"]["sourcePaperOfficiallyAuthenticated"]==0
+          assert r["summary"]["typedModelsAlignedWithSourceText"]==0
+          assert r["summary"]["measuredLiveExamAccuracy"] is None
+          index=Path("docs/README.md").read_text(encoding="utf8")
+          research=index.split("## Research notes\n",1)[1].split("\n## ",1)[0]
+          name="research/pinned-exam-artifact-identity-v0.1.md"
+          assert research.count("("+name+")")==1
+          assert (Path("docs")/name).is_file()
+          print("Offline coverage honest, source claims withheld, docs indexed")
+          PY
+
+  pinned-public-source-byte-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out without persisting access credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Pin exact math dependency
+        run: |
+          python3 -m venv "$RUNNER_TEMP/public-exam"
+          "$RUNNER_TEMP/public-exam/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Read two public pinned Git objects with no provider credentials
+        run: |
+          timeout 120s "$RUNNER_TEMP/public-exam/bin/python" \
+            scripts/research/audit_pinned_exam_artifacts.py \
+            --manifest fixtures/research/pinned-exam-artifacts-v0.1.json \
+            --fetch-upstream \
+            --require-byte-verification > "$RUNNER_TEMP/public-source-evidence.json"
+      - name: Require source bytes verified but exam authenticity still unresolved
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads((Path(os.environ["RUNNER_TEMP"])/"public-source-evidence.json").read_text())
+          assert report["summary"]=={
+            "total":2,
+            "byteVerified":2,
+            "convertedQuestionSectionLocated":1,
+            "pdfQuestionsFaithfullyVerified":0,
+            "sourcePaperOfficiallyAuthenticated":0,
+            "typedModelsAlignedWithSourceText":0,
+            "mathematicallyMatchedHypothesesOnly":1,
+            "officialExamGoldReleased":0,
+            "realModelRuns":0,
+            "measuredLiveExamAccuracy":None,
+          }
+          rows={r["id"]:r for r in report["items"]}
+          p=rows["gaokao-2025-national-1-q14"]
+          assert p["artifactStatus"]=="git_blob_bytes_verified"
+          assert p["questionLocatorStatus"]=="pdf_binary_only_question_not_located"
+          assert p["hypothesisMathStatus"]=="typed_math_candidate_matches"
+          assert p["hypothesisExactAnswer"]=="61/25"
+          assert p["hypothesisSourceTextAlignment"]=="not_proven"
+          q=rows["kaoyan-math1-2025-q20"]
+          assert q["artifactStatus"]=="git_blob_bytes_verified"
+          assert q["questionLocatorStatus"]=="pinned_conversion_section_located_not_authenticated"
+          assert q["locatorEvidence"]["faithfulToOriginalExamStatement"] is False
+          for row in rows.values():
+              assert len(row["artifactSha256"])==64
+              assert row["observedGitBlobSha"]==row["expectedGitBlobSha"]
+              assert row["sourceOfficiallyAuthenticated"] is False
+              assert row["questionFormalizationVerified"] is False
+              assert row["officialExamGoldCertified"] is False
+              assert row["liveModelRunPerformed"] is False
+          print("2 public Git blob byte identities verified; 0 authenticated originals, 0 gold")
+          PY

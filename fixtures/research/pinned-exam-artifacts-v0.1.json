@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "pinned-exam-artifact-identity-v0.1",
+  "cases": [
+    {
+      "id": "gaokao-2025-national-1-q14",
+      "paperId": "gaokao-2025-national-1",
+      "questionNumber": 14,
+      "scope": "upstream_public_copy_not_official_paper",
+      "source": {
+        "repository": "deekur/gaokaomath",
+        "revision": "6e9677221edffa192276de27d61044f19ce63de3",
+        "path": "普通高考/2025/2025全国1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+        "gitBlobSha": "4a5702dda207a470840a62c982ab2392362a404e",
+        "format": "pdf"
+      },
+      "locator": {
+        "kind": "pdf_question_not_yet_located"
+      },
+      "hypothesis": {
+        "origin": "unverified_external_transcription_hypothesis",
+        "typedQuestion": {
+          "kind": "finite_uniform_occupancy",
+          "model": {
+            "numberOfLabels": 5,
+            "numberOfDraws": 3,
+            "uniform": true,
+            "independent": true,
+            "withReplacement": true,
+            "randomVariable": "number_of_distinct_labels_seen"
+          },
+          "query": {
+            "metric": "expected_value"
+          }
+        },
+        "referenceCandidate": "61/25"
+      }
+    },
+    {
+      "id": "kaoyan-math1-2025-q20",
+      "paperId": "kaoyan-math-1-2025",
+      "questionNumber": 20,
+      "scope": "upstream_public_copy_not_official_paper",
+      "source": {
+        "repository": "TsekaLuk/Kaoyan-Math1-Papers",
+        "revision": "3151b4acf26ea19ccd427b869a715e65e1990091",
+        "path": "papers/2025年数学一真题.md",
+        "gitBlobSha": "582683c6623fd24b1e3f46c8ef45112fa31b5beb",
+        "format": "markdown"
+      },
+      "locator": {
+        "kind": "converted_markdown_section",
+        "section": {
+          "startMarker": "20.（本题满分 10分）",
+          "endMarker": "21.（本题满分 10分）",
+          "requiredAnchors": [
+            "x t  ,设",
+            "旋转一周得到的曲面",
+            "I = \\iint_ {\\Sigma_ {1}}"
+          ]
+        }
+      },
+      "hypothesis": null
+    }
+  ]
+}
