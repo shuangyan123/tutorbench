@@ -1,19 +1,21 @@
-"""Offline integration and fail-closed tests for optional Hugging Face Math-Verify baseline."""
+"""Regression controls for the Windows-safe Math-Verify 0.9.0 offline baseline.
+
+No DeepSeek API calls. The optional dependency is installed by a separate
+test-only CI environment. Windows and Unix must both use the same worker.
+"""
 import json
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 from unittest.mock import patch
-
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/"scripts/research"))
 import compare_math_verify_baseline as baseline
 import run_real_natural_math_holdout as holdout
 
-from sympy import Float, Rational
 
-
-class MathVerifyBaselineTest(unittest.TestCase):
+class ExternalBaseline(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.case=holdout.manifest()["cases"][0]
@@ -23,63 +25,100 @@ class MathVerifyBaselineTest(unittest.TestCase):
                 "family":"finite_uniform_occupancy",
                 "status":"scalar_extraction_abstained","rawText":raw}
 
-    def test_current_extractor_abstains_on_real_response_format(self):
-        mixed=r"计算后得到 \[ \boxed{E[X]=\frac{671}{216}\approx 3.1065} \]"
-        self.assertEqual(holdout.extract_scalar(mixed)[1],"scalar_extraction_abstained")
+    def synthetic(self,value="671",denominator="216"):
+        return {"state":"parsed","candidateCount":1,"candidates":[{
+            "type":"Rational","repr":value+"/"+denominator,
+            "numericKind":"exact_rational",
+            "numerator":value,"denominator":denominator}]}
 
-    def test_alternative_parser_never_receives_gold(self):
-        raw=r"过程包含 625/1296，最后 \boxed{E[X]=\frac{671}{216}\approx 3.1065}"
-        with patch.object(baseline,"parse_without_gold",return_value=[Rational(671,216)]) as spy:
-            report=baseline.diagnose(self.source(raw),self.case)
-        spy.assert_called_once_with(raw)
-        self.assertEqual(report["strictTypedMathVerdict"],"accepted_by_verifier")
-        self.assertEqual(report["exactAnswerUnderTypedQuestion"],"671/216")
-        self.assertTrue(report["baselineNotProductionDecision"])
-        self.assertNotIn("rawText",report)
+    def test_original_parser_abstained_on_boxed_equation(self):
+        text=r"计算后，最终答案：\[\boxed{E[X]=\frac{671}{216}\approx3.1065}\]"
+        self.assertEqual(holdout.extract_scalar(text)[1],
+                         "scalar_extraction_abstained")
 
-    def test_whether_wrong_candidate_was_extracted_is_visible(self):
-        raw="最终答案：2"
-        with patch.object(baseline,"parse_without_gold",return_value=[Rational(2)]) as spy:
-            report=baseline.diagnose(self.source(raw),self.case)
-        spy.assert_called_once_with(raw)
-        self.assertEqual(report["strictTypedMathVerdict"],"refuted_by_verifier")
-        self.assertEqual(report["extractedNumeric"],"2")
+    def test_subprocess_receives_only_model_text_no_reference(self):
+        text=r"得到 625/1296；最终答案 \boxed{E[X]=\frac{671}{216}\approx 3.1065}"
+        with patch.object(baseline,"parse_without_gold",return_value=self.synthetic()) as mock:
+            result=baseline.diagnose(self.source(text),self.case)
+        mock.assert_called_once_with(text)
+        self.assertEqual(result["strictTypedMathVerdict"],"accepted_by_verifier")
+        self.assertEqual(result["exactAnswerUnderTypedQuestion"],"671/216")
+        self.assertNotIn("rawText",result)
+        self.assertTrue(result["baselineNotProductionDecision"])
 
-    def test_float_is_approximation_not_exact_proof(self):
-        with patch.object(baseline,"parse_without_gold",return_value=[Float("3.1065")]):
-            report=baseline.diagnose(self.source("答案约 3.1065"),self.case)
-        self.assertEqual(report["mathVerifyState"],"approximate_only_no_exact_comparison")
-        self.assertNotIn("strictTypedMathVerdict",report)
+    def test_wrong_extraction_diagnosed_not_concealed(self):
+        with patch.object(baseline,"parse_without_gold",
+                          return_value=self.synthetic("1","2")):
+            result=baseline.diagnose(self.source("模型回答：1/2"),self.case)
+        self.assertEqual(result["strictTypedMathVerdict"],"refuted_by_verifier")
+        self.assertEqual(result["extractedNumeric"],"1/2")
 
-    def test_nonnumeric_ambiguous_and_empty_fail_closed(self):
-        from sympy import Symbol
-        for parsed,expected in [
-            ([], "no_expression_extracted"),
-            ([Symbol("x")], "ambiguous_or_nonnumeric"),
-            ([Rational(1,2),Rational(3,4)], "ambiguous_or_nonnumeric"),
-        ]:
-            with patch.object(baseline,"parse_without_gold",return_value=parsed):
-                self.assertEqual(baseline.diagnose(
-                    self.source("a model explanation"),self.case)["mathVerifyState"],expected)
+    def test_float_and_symbolic_are_never_exact_verifier_gold(self):
+        cases=[
+            ({"state":"parsed","candidateCount":1,"candidates":[{
+              "type":"Float","repr":"3.1065","numericKind":"approximate_float"}]},
+             "approximate_only_no_exact_comparison"),
+            ({"state":"parsed","candidateCount":1,"candidates":[{
+              "type":"Equality","repr":"Eq(X, 671/216)","numericKind":"not_scalar_numeric"}]},
+             "ambiguous_or_nonnumeric"),
+            ({"state":"parsed","candidateCount":2,"candidates":[
+              {"type":"Rational","repr":"671/216","numericKind":"exact_rational",
+               "numerator":"671","denominator":"216"},
+              {"type":"Rational","repr":"625/1296","numericKind":"exact_rational",
+               "numerator":"625","denominator":"1296"}]},
+             "ambiguous_or_nonnumeric"),
+        ]
+        for result,expected in cases:
+            with self.subTest(expected=expected):
+                with patch.object(baseline,"parse_without_gold",return_value=result):
+                    data=baseline.diagnose(self.source("Final answer"),self.case)
+                self.assertEqual(data["mathVerifyState"],expected)
+                self.assertNotIn("strictTypedMathVerdict",data)
 
-    def test_real_optional_package_parses_simple_boxed_fraction(self):
-        # This is a test of the external package, NOT a claim the actual mixed
-        # equation-plus-approximation examples will parse correctly.
-        import math_verify
-        extracted=baseline.parse_without_gold(r"最终答案：\boxed{\frac{671}{216}}")
-        self.assertTrue(extracted)
-        self.assertTrue(any(str(x)=="671/216" for x in extracted),
-                        repr(extracted))
+    def test_worker_timeout_platform_failure_and_exception_are_not_empty_parse(self):
+        for state in ["worker_timeout","worker_launch_failure","parser_exception",
+                      "worker_failed","worker_output_invalid"]:
+            with patch.object(baseline,"parse_without_gold",return_value={"state":state}):
+                data=baseline.diagnose(self.source("some answer"),self.case)
+                self.assertEqual(data["mathVerifyState"],state)
+                self.assertNotEqual(data["mathVerifyState"],"no_expression_extracted")
 
-    def test_real_mixed_answer_is_diagnostic_not_automatically_promoted(self):
-        # The currently supplied model answer contains both exact and
-        # approximate values. Even if Math-Verify parses something, this
-        # test must NOT require automatic mathematical acceptance.
-        mixed=r"最终答案：\[\boxed{E[X]=\frac{671}{216}\approx 3.1065}\]"
+    def test_timeout_enforced_by_parent_not_math_verify_multiprocessing(self):
+        args={}
+        def fake_run(command,**kwargs):
+            args.update(kwargs)
+            return subprocess.CompletedProcess(command,0,stdout=json.dumps(self.synthetic()))
+        with patch.object(baseline.subprocess,"run",side_effect=fake_run) as proc:
+            result=baseline.parse_without_gold(r"\boxed{\frac{671}{216}}")
+        self.assertEqual(result["state"],"parsed")
+        self.assertEqual(args["timeout"],baseline.PARSE_WALL_SECONDS)
+        self.assertEqual(args["encoding"],"utf8")
+        self.assertEqual(args["stderr"],subprocess.DEVNULL)
+        self.assertEqual(proc.call_args.args[0][0],sys.executable)
+        with patch.object(baseline.subprocess,"run",
+                          side_effect=subprocess.TimeoutExpired("python",10)):
+            self.assertEqual(baseline.parse_without_gold("a")["state"],"worker_timeout")
+
+    def test_actual_real_external_worker_parses_simple_boxed_expression(self):
+        # In Windows this used to be [] due to the upstream internal timeout
+        # and WinError5/6. A standalone subprocess + parsing_timeout=None works
+        # independently of the parent's OS.
+        record=baseline.parse_without_gold(
+            r"最终答案：\(\boxed{\frac{671}{216}}\)")
+        self.assertEqual(record["state"],"parsed",record)
+        self.assertTrue(record["candidateCount"]>=1,record)
+        self.assertTrue(any(x["repr"]=="671/216" for x in record["candidates"]),record)
+
+    def test_real_compound_answer_diagnostic_may_abstain_but_must_not_fail_platform(self):
+        mixed=r"答案：\[\boxed{E[X]=\frac{671}{216}\approx 3.1065}\]"
+        record=baseline.parse_without_gold(mixed)
+        self.assertEqual(record["state"],"parsed",record)
+        # Parse completeness/selection is evaluated by real-data replay,
+        # not asserted based on a simplified mock.
         report=baseline.diagnose(self.source(mixed,mode="high"),self.case)
-        self.assertIn(report["mathVerifyState"],(
-            "exact_candidate_adjudicated","approximate_only_no_exact_comparison",
-            "ambiguous_or_nonnumeric","no_expression_extracted","parser_exception"))
+        self.assertNotIn(report["mathVerifyState"],
+                         ["worker_timeout","worker_launch_failure","parser_exception",
+                          "worker_failed","worker_output_invalid"])
         self.assertTrue(report["baselineNotProductionDecision"])
 
 

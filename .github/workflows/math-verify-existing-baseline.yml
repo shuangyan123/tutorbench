@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/math-verify-existing-baseline.yml'
       - 'scripts/research/compare_math_verify_baseline.py'
+      - 'scripts/research/mathverify_parse_worker.py'
       - 'scripts/research/test_compare_math_verify_baseline.py'
       - 'scripts/research/run_real_natural_math_holdout.py'
       - 'docs/research/math-verify-baseline-stage-ii.md'
@@ -35,7 +36,8 @@ jobs:
       - name: No-key syntax, dependency and reference docs checks
         run: |
           "$RUNNER_TEMP/mathverify/bin/python" -m py_compile \
-            scripts/research/compare_math_verify_baseline.py
+            scripts/research/compare_math_verify_baseline.py \
+            scripts/research/mathverify_parse_worker.py
           python3 - <<'PY'
           from pathlib import Path
           index=Path("docs/README.md").read_text(encoding="utf8")
@@ -45,3 +47,23 @@ jobs:
           assert "Math-Verify" in Path("docs",target).read_text(encoding="utf8")
           print("No paid models called, external parser only")
           PY
+
+
+  windows-worker-no-implicit-multiprocessing:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout without persistent credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Prepare independently pinned Math-Verify environment
+        shell: pwsh
+        run: |
+          py -3 -m venv "$env:RUNNER_TEMP\mathverify"
+          & "$env:RUNNER_TEMP\mathverify\Scripts\python.exe" -m pip install --disable-pip-version-check --no-cache-dir 'math-verify[antlr4_13_2]==0.9.0'
+      - name: Verify Windows worker parsing and failure classification without any provider
+        shell: pwsh
+        run: |
+          & "$env:RUNNER_TEMP\mathverify\Scripts\python.exe" -m unittest scripts/research/test_compare_math_verify_baseline.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

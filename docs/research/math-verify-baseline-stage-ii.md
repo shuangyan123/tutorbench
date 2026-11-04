@@ -16,6 +16,21 @@ The goal is to compare the **existing** answer extractor on captured real output
 
 Math-Verify itself uses heuristic extraction and configurable numeric tolerance, so it is not a proof-producing oracle. In particular, a parsed approximation such as 3.1065 cannot be treated as exactly equal to 671/216; extracting an intermediate 625/1296 instead of the final answer would produce a spurious wrong verdict. The diagnostic uses the external library's parsed candidates as evidence only, and forwards **one single exact rational candidate** to our own typed verifier. Floats, symbolic expressions and ambiguous multiple results remain non-decisive in this conservative research report. For complete sets, geometric point sets, algebraic proofs and other tasks, automatic general mathematical truth claims remain out of scope.
 
+## Windows result invalidation and corrective verification (2026-11-04)
+
+The first two real Windows trials returned \`no_expression_extracted\` for both non-thinking and high-thinking \`h-occ-01\`, while the Windows shell printed \`PermissionError: [WinError 5]\` and \`OSError: [WinError 6]\` from \`multiprocessing.spawn\`. **Do not count either result as an actual extraction failure.**
+
+Math-Verify 0.9.0 has an existing upstream issue [#79](https://github.com/huggingface/Math-Verify/issues/79), opened 2026-04-03, documenting this very Windows timeout/pickling failure: with \`raise_on_error=False\`, internal exceptions can silently return \`[]\`; related handle errors can follow. Our initial \`parsing_timeout=3\` inadvertently enabled exactly that incompatible internal timeout wrapper.
+
+The updated baseline uses two explicit layers:
+
+1. A fresh, minimal Python worker calls \`parse(..., parsing_timeout=None, raise_on_error=True)\` without Math-Verify's internal multiprocessing timeout or silent exception swallowing.
+2. The parent calls that worker with \`subprocess.run(..., timeout=20)\`, enforces bounded UTF-8 input and output, and distinguishes \`worker_timeout\`, \`worker_launch_failure\`, \`parser_exception\`, \`worker_output_invalid\` and a genuinely successful \`parsed\` with zero candidates. Worker output is JSON-only; no SymPy object is pickled across the process boundary.
+
+The Windows CI regression starts a real third-party parser subprocess, tests a simple boxed fraction, and inspects an equation-plus-approximation fixture without treating heuristics as guaranteed. An actual replay of the two saved JSONL files is still necessary to determine whether this version of Math-Verify successfully extracts their answers.
+
+The package version is now obtained from \`importlib.metadata.version("math-verify")\`; the prior \`mathVerifyInstalledVersion: null\` resulted from reading a missing module \`__version__\`, not necessarily an uninstalled distribution.
+
 The comparison input is the actual JSONL files generated in the local 20-case holdout. Their immutable request SHA, response ID, finish reason and original raw model output are preserved. The benchmark script emits only minimal extracted representations and a source-response SHA-256, **not full original model text**. Reference mathematics is derived only after extraction, never passed to Math-Verify or used to select among candidate extractions.
 
 ## Windows PowerShell instructions (zero additional DeepSeek API requests)
