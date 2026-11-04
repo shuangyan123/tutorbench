@@ -1,0 +1,74 @@
+name: Mathematical Wrong Answer Detection Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/math-wrong-answer-detection-research.yml'
+      - 'scripts/research/measure_math_wrong_answer_detection.py'
+      - 'scripts/research/test_measure_math_wrong_answer_detection.py'
+      - 'fixtures/research/math-wrong-answer-detection-v0.1.json'
+      - 'docs/research/math-wrong-answer-detection-v0.1.md'
+      - 'docs/README.md'
+      - 'scripts/research/verify_dual_path_math_answers.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  error-detection-and-false-acceptance-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install pinned exact mathematics
+        run: |
+          python3 -m venv "$RUNNER_TEMP/math-detection"
+          "$RUNNER_TEMP/math-detection/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Test false acceptance, false rejection, abstention, and adversarial fault injection
+        run: |
+          timeout 180s "$RUNNER_TEMP/math-detection/bin/python" -m unittest \
+            scripts/research/test_measure_math_wrong_answer_detection.py \
+            scripts/research/test_verify_dual_path_math_answers.py \
+            scripts/research/test_verify_finite_arithmetic_geometric_sum.py \
+            scripts/research/test_verify_circle_line_intersections.py \
+            scripts/research/test_verify_parametric_circle_line_classification.py -v
+      - name: Compute all 54 synthetic model-response trials and enforce zero false accept
+        run: |
+          timeout 120s "$RUNNER_TEMP/math-detection/bin/python" \
+            scripts/research/measure_math_wrong_answer_detection.py \
+            --fixture fixtures/research/math-wrong-answer-detection-v0.1.json \
+            --require-zero-false-decisions \
+            --require-full-supported-coverage > "$RUNNER_TEMP/mutant-verdicts.json"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads((Path(os.environ["RUNNER_TEMP"])/"mutant-verdicts.json").read_text(encoding="utf8"))
+          s=report["summary"]
+          assert (s["total"],s["knownWrong"],s["knownCorrect"],s["knownUnsupported"])==(54,28,20,6)
+          assert s["wrongDetected"]==28 and s["wrongFalselyAccepted"]==0 and s["wrongAbstained"]==0
+          assert s["correctAccepted"]==20 and s["correctFalselyRefuted"]==0 and s["correctAbstained"]==0
+          assert s["unsupportedAbstained"]==6 and s["unsupportedGivenVerdict"]==0
+          assert s["falseAcceptanceGatePassed"] and s["fullSupportedDecisionCoverageGatePassed"]
+          assert s["genuineModelRuns"]==0 and s["measuredLiveModelErrorDetectionRate"] is None
+          assert s["officialExamGoldReleased"]==0
+          supported={
+            "finite_uniform_occupancy","finite_arithmetic_geometric_sum",
+            "circle_line_intersections","quadratic_real_solution_set",
+            "parametric_circle_line_intersection_count"}
+          assert supported.issubset(report["byFamily"].keys())
+          for family in supported:
+              f=report["byFamily"][family]
+              assert f["knownWrong"]>0 and f["knownCorrect"]>0
+              assert f["wrongFalselyAccepted"]==0 and f["correctFalselyRefuted"]==0
+              assert f["wrongDetected"]==f["knownWrong"]
+          index=Path("docs/README.md").read_text(encoding="utf8")
+          section=index.split("## Research notes\n",1)[1].split("\n## ",1)[0]
+          document="research/math-wrong-answer-detection-v0.1.md"
+          assert section.count("("+document+")")==1
+          assert (Path("docs")/document).is_file()
+          print("Five math families detect all known wrong mutants; no false acceptance or model claims")
+          PY
