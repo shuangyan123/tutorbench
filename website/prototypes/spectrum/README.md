@@ -80,7 +80,8 @@ a pull quote, notes and references, and a colophon.
 
 Boundaries kept: no model scores, rankings or model names; the tutoring exchange is a
 constructed example (the same one used by Micro-Review) and the five-dimension reading
-is labelled as illustrative, not a TutorBench score. Teachometry stays a text wordmark.
+is labelled as illustrative, not a TutorBench score. Teachometry uses its own wordmark, signature
+and seal (`assets/logo/`); the TutorBench mark stays separate.
 
 ## The Journal (`blog/`)
 

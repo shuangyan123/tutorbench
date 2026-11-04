@@ -9,9 +9,14 @@ systems, developed by [Teachometry](https://teachometry.com).**
 
 TutorBench tests how an AI tutor behaves in authored learning situations,
 diagnoses concrete pedagogical failures, and preserves the evidence needed to
-fix and retest them. The canonical TutorEval benchmark remains the measurement
-foundation; Tutor Health adds scenario-based, finding-first evaluation for
-product-facing workflows.
+fix and retest them. It is built to help make AI tutors better, not to produce
+a leaderboard.
+
+[Website](https://teachometry.com) ·
+[Quickstart](docs/quickstart.md) ·
+[Documentation index](docs/README.md) ·
+[Full repository reference](docs/repository-reference.md) ·
+[Roadmap](docs/roadmap.md)
 
 > **Naming note:** this repository is Teachometry's independent TutorBench
 > project. It is not affiliated with Scale AI's separately named
@@ -24,86 +29,38 @@ product-facing workflows.
 and technical contract surface. On first external mention, prefer
 **Teachometry TutorBench** or **Teachometry's TutorBench**; technical
 documentation may use **TutorBench** after that context is established.
-
-## Why TutorBench exists
-
-AI systems may make individualized learning support available at a scale that
-human teaching alone cannot always provide. Learners differ in prior
-knowledge, pace, misconceptions, and the kind of help they need, while
-classrooms necessarily operate under constraints of time and attention.
-
-But access to an AI system is not the same as access to a good tutor. A model
-can answer a question correctly and still fail to diagnose misunderstanding,
-guide reasoning, adapt its help, or preserve learner agency. Before AI
-tutoring can be trusted at scale, those capabilities need to be measurable.
-
-TutorBench exists as reproducible, provider-neutral quality infrastructure for
-that problem: test observable tutoring decisions in context, diagnose where a
-Tutor failed, and make the result reproducible enough to retest after a product
-change. It is designed to support better AI tutoring systems—not merely produce
-a leaderboard.
-
-## How TutorBench fits together
-
-TutorBench has four complementary layers:
-
-- **Tutor Health** — measures how well a Tutor teaches in concrete learner
-  scenarios.
-- **Case System vNext** — designs what tutoring situations and capabilities
-  should be tested.
-- **Evaluator Stress / Expert Review** — checks whether TutorBench's own
-  evaluators and reference expectations are trustworthy.
-- **Mastery / Transfer / Teach-back** — explores whether learners actually
-  develop usable, transferable understanding after tutoring.
-
-In short:
-
-**evaluate the Tutor → design better tests → validate the measurement → study
-learner outcomes**
-
-These layers have different evidence boundaries. Tutor Health is the core
-evaluation product. Case System vNext improves the quality and coverage of the
-cases it runs. Evaluator Stress and Expert Review validate TutorBench's own
-measurement machinery. Mastery, Transfer, and Teach-back remain experimental
-learner-outcome work and do not currently imply causal learning gains.
-
-The approved T1 trajectory mark and its usage rules are documented in
+The T1 trajectory mark above belongs to TutorBench only; its usage rules are in
 [`assets/brand/tutorbench/README.md`](assets/brand/tutorbench/README.md).
 
-Current repository surfaces include (not all are in the published npm release):
+## Why it exists
 
-- a 13-scenario Productive Struggle & Intervention suite for Tutor Health;
-- explicit Tutor Health coverage, Release Gate, evidence-backed Findings, and
-  regression targets;
-- the canonical 48-case TutorEval dataset (24 English + 24 zh-CN) across five
-  subjects and five historical TutorEval scoring categories;
-- deterministic evaluators plus optional semantic Judge providers.
-- experimental, non-canonical Case System vNext authoring, evaluator-stress,
-  Mastery & Transfer, and independent expert-review infrastructure.
+Access to an AI system is not the same as access to a good tutor. A model can
+answer a question correctly and still fail to diagnose a misunderstanding,
+guide reasoning, adapt its help, or preserve the learner's agency. Before AI
+tutoring can be trusted at scale, those capabilities need to be measurable.
 
-The current Tutor Health suite is an authored synthetic design artifact. It
-assesses 5/7 health dimensions and reports that partial coverage explicitly; it
-is not a validated general measure of tutor quality or learner outcomes.
+TutorBench is reproducible, provider-neutral quality infrastructure for that
+problem: test observable tutoring decisions in context, show where a Tutor
+failed, and keep the result reproducible enough to retest after a change.
 
-This repository evaluates a `TutorUnderTest`. It is not a tutor product, chat
-application, prompt playground, model leaderboard, or Review Workspace
-module.
+## What is in the repository
 
-## Install
-
-Choose the channel before installing:
-
-| Channel | Runtime | Available surface |
+| Layer | What it does | Status |
 | --- | --- | --- |
-| Published `tutor-benchmark@0.1.0` | Node 22 (`>=22 <23`) | Quickstart, TutorEval/HTTP evaluation and historical diagnostic CLI |
-| Repository `main` | Node 24 (`>=24 <25`) | Current source, including Tutor Health, Scenario vNext and Community Review contracts |
+| **Tutor Health** | Measures how well a Tutor teaches in concrete learner scenarios, with Findings, a Release Gate and regression targets | Core product; 13-scenario suite, 5 of 7 dimensions covered |
+| **TutorEval** | The canonical 48-case benchmark (24 English + 24 zh-CN, five subjects) with deterministic checks and optional Judge providers | Measurement foundation |
+| **Case System vNext** | Designs which tutoring situations and capabilities should be tested | Experimental, non-canonical |
+| **Evaluator Stress / Expert Review** | Checks whether TutorBench's own evaluators and expectations can be trusted | Reviewer-ready; no expert labels yet |
+| **Mastery / Transfer / Teach-back** | Explores whether learners develop usable, transferable understanding | Experimental; no causal claims |
+| **Community Review** | Protocol and service for future independent human review | Built; public intake closed |
 
-The repository still declares package version `0.1.0`, but its current payload
-is not the published `0.1.0` tarball. No newer npm release is available as of
-2026-10-14. See [release channels](docs/release.md#installation-channels) for
-the registry evidence, CLI and API boundaries.
+The core flow is:
 
-For the current source:
+```text
+Scenario -> TutorUnderTest -> Tutor output -> evaluator/Judge -> result -> report
+```
+
+## Five-minute start
 
 ```bash
 git clone https://github.com/shuangyan123/tutorbench.git
@@ -112,218 +69,43 @@ npm ci
 npm run quickstart
 ```
 
-Quickstart is a provider-free, network-free deterministic demonstration. It
-needs no API key or Judge, prints four fixed development/smoke cases, and
-shows case-level checks without producing an official benchmark score. One
-bundled example response is intentionally weak so the output includes a clear
-pedagogical `FAIL`; that expected demo outcome still exits successfully. The
-default path prints only a concise summary. Use `--output <path>` if you also
-want an explicitly marked local `QuickstartSummary` JSON artifact.
+Quickstart needs no API key, network or Judge. It runs four fixed demo cases;
+one bundled response is intentionally weak so you can see a clear `FAIL`. It is
+a demonstration, not an official score. Details:
+[`docs/quickstart.md`](docs/quickstart.md).
 
-For the historical published package, use Node 22 and its own bundled demo:
+## Choose your path
 
-```bash
-npm install tutor-benchmark@0.1.0
-npx --no-install tutorbench quickstart
-```
+| I want to… | Start here |
+| --- | --- |
+| Evaluate my Tutor from TypeScript | [Use your Tutor](docs/repository-reference.md#use-your-tutor) |
+| Evaluate a Tutor in any language over HTTP | [Use any language](docs/repository-reference.md#use-any-language) |
+| Run Tutor Health on a product | [Run a Tutor Health evaluation](docs/repository-reference.md#run-a-tutor-health-evaluation) · [finding-first model](docs/real-world-finding-first-evaluation.md) |
+| Run the canonical benchmark | `npm run benchmark` · [TutorEval 0.2A](docs/tutor-eval-v0.2a.md) |
+| Collect real-model evidence | [Real-model baselines](docs/real-model-baselines.md) |
+| Run a private design-partner pilot | [Design Partner Pilot Boundary](docs/design-partner-pilot.md) |
+| Understand the methodology | [Documentation index](docs/README.md) |
 
-See [`docs/quickstart.md`](docs/quickstart.md) for the exact subset identity,
-eligibility boundary, and failure semantics.
+## Install channels
 
-## Run a Tutor Health evaluation
+| Channel | Runtime | Available surface |
+| --- | --- | --- |
+| Published `tutor-benchmark@0.1.0` | Node 22 (`>=22 <23`) | Quickstart, TutorEval/HTTP evaluation and historical diagnostic CLI |
+| Repository `main` | Node 24 (`>=24 <25`) | Current source, including Tutor Health, Scenario vNext and Community Review contracts |
 
-Tutor Health requires the repository build; npm `0.1.0` has no `health` or
-`health-compare` command. In a clone, build with `npm run build` and invoke
-`node dist/src/cli/tutorbench.js` for the CLI examples in this README:
-
-```bash
-node dist/src/cli/tutorbench.js health \
-  --http https://partner.example.com/respond \
-  --suite productive-struggle-intervention-v0.1 \
-  --tutor-provider partner \
-  --tutor-model production \
-  --prompt-version v17 \
-  --output artifacts/partner-pilot
-```
-
-The command evaluates the registered real-world scenario suite through the
-existing TutorEval evaluator boundary and writes:
-
-```text
-artifacts/partner-pilot/
-├── evaluation.json
-├── health-report.json
-├── health-report.txt
-└── pilot-run-manifest.json
-```
-
-`evaluation.json` preserves the underlying `TutorEvalRunResult`; the Health
-Report adds the summary score, explicit coverage, Release Gate, Findings,
-evidence references, and regression targets. Tutor provider, model/config, and
-prompt version are recorded in the evaluation artifact so baseline and candidate
-runs can be distinguished without relying on filenames.
-
-The deterministic run manifest binds the validated suite snapshot and the exact
-evaluation/report JSON bytes. It records local execution provenance, not
-attestation of the remote Tutor's actual model or prompt. Use a separate output
-directory for each run: existing health artifact files are never overwritten.
-
-Judge providers are opt-in:
-
-```bash
-tutorbench health ... --judge-openai
-tutorbench health ... --judge-deepseek
-tutorbench health ... --judge-chat-completions
-```
-
-Without a Judge, Judge-owned checks stay unresolved, the report clearly marks
-the evidence as incomplete, and the command exits with code `2`. Missing
-evidence is never silently converted into a pedagogical pass.
-
-See [`docs/real-world-finding-first-evaluation.md`](docs/real-world-finding-first-evaluation.md)
-for the current scenario, coverage, Finding, and claim boundaries.
-
-## Design-partner pilots
-
-Real partner scenarios and artifacts are private by default. Do not copy raw
-production chats, private prompts, credentials, identifiable learner data, or
-partner-confidential policy material into this public repository.
-
-Use the [Design Partner Pilot Boundary](docs/design-partner-pilot.md), the
-[Pilot Spec Template](docs/design-partner-pilot-spec-template.md), and the
-[Scenario Intake Template](docs/design-partner-scenario-intake-template.md) to
-freeze the project-level scope first and then turn each accepted teaching-policy
-boundary into a small private Scenario vNext suite. Run it directly with
-`tutorbench health --http <url> --suite-file <private-suite.json>
---tutor-provider <alias> --tutor-model <configuration> --prompt-version <version>
---output <new-run-directory>` (one command). `--suite-file` reads and validates
-local JSON and is mutually exclusive with `--suite`; omitting both keeps the
-default registered suite. It does not register, copy, or upload the suite file.
-The existing Tutor-visible request and opt-in Judge boundaries still apply.
-The package API (`parseTutorScenarioSuiteVNext`, `runTutorHealthEvaluation`)
-also remains available.
-
-Preserve the private suite and each run's artifacts and manifest, then use
-`tutorbench health-compare` after the partner changes its Tutor. Publication
-permission remains separate. Only synthetic dry runs have been verified; a
-real design-partner validation loop remains pending.
-
-## Case System vNext — experimental infrastructure
-
-Case System vNext is implemented as **experimental, non-canonical authoring and
-evaluation infrastructure** alongside the frozen TutorEval corpus. It currently
-includes:
-
-- an audit-seeded 23-domain taxonomy and a versioned 15-archetype D1/D3/D5
-  pilot;
-- task-specific strategy profiles and explicit learning-oriented vs
-  exam-oriented objectives;
-- a 17-fixture provider-neutral evaluator-stress suite with bounded preference,
-  equivalence, non-dominance, and insufficient-evidence semantics;
-- deterministic blind expert-review export/import with domain-scoped reviewer
-  cohorts;
-- a six-scenario executable pilot spanning Physics D1, Biology D3, Chemistry
-  D5, Python debugging D3, Mathematics generalization D5, and History D5
-  through the existing Scenario vNext -> TutorEval -> Tutor Health path;
-- an objective-sensitive **Mastery & Transfer** reporting area that remains
-  outside the seven-dimension Tutor Health aggregate score.
-
-For exam-oriented cases, the authored capability path is:
-
-```text
-concept / method mastery
-  -> problem-family mastery
-     -> robustness to legitimate variants
-        -> reliable and efficient exam execution
-           -> score-relevant performance
-```
-
-These are response- and scenario-level score-relevant proxies. TutorBench does
-**not** claim that a Tutor raises real examination scores, causes durable
-mastery, or produces observed learner transfer without longitudinal learner
-data and actual assessment outcomes.
-
-The expert-review workflow is reviewer-ready and can generate counterbalanced
-domain-scoped packets, but **no independent expert labels are available yet**.
-Developer-authored stress expectations therefore remain diagnostic rather than
-human reference evidence.
-
-The executable pilot is also non-canonical. It can be exercised with the same
-external-Tutor health command by selecting:
-
-```bash
-tutorbench health \
-  --http https://partner.example.com/respond \
-  --suite case-system-vnext-executable-pilot-v0.1 \
-  --tutor-provider partner \
-  --tutor-model production \
-  --prompt-version v1
-```
-
-This currently covers six authored checkpoints across six domains and does not
-imply that all 15 Case System vNext archetypes have been converted or
-independently validated.
-
-TutorBench also includes an experimental `Teach-back Outcome Evidence v0.1`
-contract for complementary post-Tutor learner evidence. It records whether a
-learner can reconstruct knowledge for a peer or lower-prerequisite recipient,
-diagnose that recipient's gap, adapt an explanation, and whether the recipient
-can then perform independently on immediate and transfer tasks. Synthetic
-recipient runs remain proxy evidence, and all v0.1 artifacts are explicitly
-bounded to observational/proxy claims rather than causal learning-gain claims.
-Teach-back evidence is not an eighth Tutor Health dimension and is not included
-in the Tutor Health aggregate score.
-
-See [Case System vNext](docs/case-system-vnext.md), the
-[Core Coverage Matrix](docs/case-system-vnext-coverage-matrix.md),
-[Mastery & Transfer Positioning](docs/case-system-vnext-mastery-transfer.md),
-[Evaluator Stress Test](docs/case-system-vnext-evaluator-stress.md), and the
-[Independent Expert Review Protocol](docs/case-system-vnext-expert-review.md).
-
-## Run the canonical TutorEval benchmark
-
-The canonical full benchmark remains a separate foundational path:
-
-```bash
-npm run benchmark
-```
-
-It runs the current `tutor-eval-v0.2a@0.2a.6` dataset with the existing
-`0.3a.5` evaluator semantics. The canonical cases include Judge-required
-semantic rubrics. Without an explicitly configured Judge, those criteria stay
-unresolved and the normal run reports Judge-unavailable errors with no score;
-it never silently turns missing evidence into a pass. Quickstart does not
-replace or weaken this full-benchmark behavior.
-
-Structured Judge results reporting insufficient information remain unresolved;
-see the [validity contract](docs/tutor-eval-insufficient-information.md).
-
-The intended package install command is:
-
-```bash
-npm install tutor-benchmark
-```
-
-The first `tutor-benchmark@0.1.0` Developer Preview is published through the
-documented P2B release path. The package publication, GitHub Release, and
-artifact identity remain separate, read-back-verified release facts.
+The repository still declares version `0.1.0`, but its payload is newer than
+the published tarball. Tutor Health is only available from the repository
+build. See [release channels](docs/release.md#installation-channels).
 
 ## Use your Tutor
 
-The default developer path is a small provider-neutral contract:
-
 ```ts
-import {
-  runTutorBenchmark,
-  type TutorUnderTest,
-} from "tutor-benchmark";
+import { runTutorBenchmark, type TutorUnderTest } from "tutor-benchmark";
 
 const tutor: TutorUnderTest = {
   id: "my-tutor",
   async respond(input) {
-    return {
-      text: await myTutor(input.currentStudentMessage),
-    };
+    return { text: await myTutor(input.currentStudentMessage) };
   },
 };
 
@@ -331,417 +113,39 @@ const result = await runTutorBenchmark({ tutor });
 ```
 
 `TutorUnderTest` receives only Tutor-visible input. Hidden ground truth,
-misconceptions, disclosure policies, and rubrics stay on the evaluator side.
-The result preserves case-level evidence, errors, critical failures, and
-category scores.
-
-For a deterministic-only smoke run, provide a selected dataset or use the
-legacy seven-case dataset while developing an adapter:
-
-```ts
-import { loadTutorEvalDataset, runTutorBenchmark } from "tutor-benchmark";
-
-const dataset = await loadTutorEvalDataset("tutor-eval-v0.1");
-const result = await runTutorBenchmark({ tutor, dataset });
-```
-
-The canonical 0.2A dataset is the default for the historical TutorEval runner.
-It intentionally contains both deterministic and Judge-required rubrics; a
-Judge is optional, but unresolved Judge evidence is reported as an error rather
-than silently omitted. Tutor Health is additive and does not replace or rewrite
-these historical TutorEval semantics.
-The current snapshot is `tutor-eval-v0.2a@0.2a.6`, composed from immutable
-`0.2a.5` English / zh-CN snapshots plus the versioned fraction-pair override.
-The previous English-only `0.2a.1` snapshot and bilingual `0.2a.2`, `0.2a.3`,
-`0.2a.4`, and `0.2a.5` snapshots can be loaded explicitly for historical
-corpus and audit work; none is silently treated as the current dataset.
-
-The two cohorts are authored to target the same pedagogical constructs across
-language contexts. A locale breakdown observes tutoring performance in an
-English-language context or Chinese-language context; it is not a pure language
-ability test and is not a claim of scientific equivalence or completed human
-validation. See
-[`docs/tutor-eval-bilingual-cohorts.md`](docs/tutor-eval-bilingual-cohorts.md)
-for the boundaries and locale-aware reporting behavior.
-
-## Use any language
-
-An external Tutor can implement the same boundary over HTTP without importing
-this package. The repository includes a Python standard-library integration
-example:
-
-```bash
-python examples/http-python-tutor/server.py
-```
-
-In another terminal, use the published package command:
-
-```bash
-tutorbench run \
-  --http http://127.0.0.1:8000/respond \
-  --limit 3
-```
-
-The three CLI paths are deliberately distinct:
-
-```text
-Repository clone:       node dist/src/cli/tutorbench.js ...
-Installed package:      tutorbench ...
-npx package runner:     npx tutor-benchmark ...
-```
-
-From a repository clone, use `node dist/src/cli/tutorbench.js` after
-`npm run build`.
-
-The HTTP v1 contract is deliberately small:
-
-```text
-POST /respond
-request:  TutorTurnInput JSON
-response: { "text": string, "metrics"?: { latencyMs?, tokenUsage?, cost? } }
-```
-
-Only Tutor-visible input is sent. The adapter validates and sanitizes the
-response, uses a 30-second timeout by default, accepts only `http`/`https`
-endpoints without embedded credentials, and performs no automatic retry.
-`--dataset`, repeated `--case`, `--limit`, `--runs`, `--timeout-ms`, and
-`--output` are available on `tutorbench run`. Judge-required rubrics remain
-unresolved when no Judge is configured; the HTTP command never requires or
-reads `OPENAI_API_KEY`.
-
-## Human review translation
-
-The private/local Audit path also supports an optional Chinese review
-translation sidecar. This is a reading aid for English or other source text,
-not a Chinese benchmark case and not part of Tutor generation, Judge input,
-scoring, corpus identity, replay, or public artifacts.
-
-```bash
-node dist/src/cli/tutorbench.js review-translate \
-  --evaluation artifacts/real-model/example.evaluation.json \
-  --target-locale zh-CN \
-  --http http://127.0.0.1:9000/translate \
-  --output artifacts/review/example.zh-CN.review.json
-
-node dist/src/cli/website-build.js \
-  --evaluation artifacts/real-model/example.evaluation.json \
-  --review-translation artifacts/review/example.zh-CN.review.json \
-  --locale zh-CN \
-  --output website/private-dist/example
-```
-
-The Audit page shows Chinese assistance first for student context, rubric
-criteria, Tutor response, and Judge evidence, while keeping the original text
-available under `View original` / `查看原文`. The sidecar is source-hash-bound,
-incrementally reusable, provider-neutral, and local-only. See
-[`docs/review-translation.md`](docs/review-translation.md) for the schema,
-isolation boundary, provider contract, and stale-translation behavior.
-
-## Community Review protocol (P3)
-
-`community-review-protocol@0.1.0` defines a provider-independent contract for
-future independent human review: qualification receipt envelopes, sealed blind
-packets, exact atomic submissions, close/freeze semantics, descriptive
-human-human agreement, and explicit-policy public evidence. The protocol is
-implemented. The isolated P4 service is **deployment-ready at the private
-staging boundary**, but that does not mean public launch is ready. Public
-application/reviewer intake remains closed, the real campaign has not started,
-and the current roadmap keeps public exposure blocked until the approved
-external edge/CDN abuse-control requirement is configured and verified. The
-separate `community-review-application@0.1.0` contract defines the
-closed-to-open intake gate; no public applications are being collected. See the [Community Review service guide](docs/community-review-service.md)
-and [participation application gate](docs/community-review-application-gate.md)
-for the explicit authority, privacy, and non-intake boundaries.
-
-P3 does not turn the historical Human Reference qualification fixture or Pilot
-artifacts into secure public evidence. Agreement is consistency evidence, not
-correctness, calibration, or a leaderboard result. See
-[`docs/community-review-protocol.md`](docs/community-review-protocol.md) for
-the versioning, privacy, blindness, disclosure, and P4 boundary.
-
-## What it measures
-
-The core flow is:
-
-```text
-Scenario -> TutorUnderTest -> Tutor output -> evaluator/Judge -> result -> report
-```
-
-TutorEval keeps atomic rubrics across correctness, diagnosis, guidance,
-adaptation, and actionability. Deterministic checks are useful observable
-proxies, not a scientific measurement of full tutoring quality. Semantic
-rubrics remain available through the provider-independent Judge contract.
-The overall rubric score and the critical-failure quality gate are independent
-dimensions: a high rubric score does not override a gated critical failure.
-The default gate treats `major` and `critical` instances of every declared
-critical-failure type as case failures; `minor` findings remain diagnostic.
-Gated critical failures produce `status: "failed"`, not an evaluator error.
-Disclosure failures are interpreted against each case's policy, so a complete
-answer is not leakage when `full_solution_allowed` or `full_solution_required`
-applies. Concept explanations under `no_answer` are not automatically leakage
-when the case has no concrete final answer. See the [disclosure and
-critical-failure semantics audit](docs/tutor-eval-disclosure-critical-semantics-audit.md)
-and the [critical-failure quality-gate audit](docs/critical-failure-quality-gate-audit.md).
-
-## Public API
-
-The current repository package root is the local-evaluation surface below.
-The published `0.1.0` root exposes `runTutorBenchmark`, `runTutorEval`,
-`loadTutorEvalDataset`, `createHttpTutor`, `toTutorTurnInput`, and their
-TutorEval contracts; it does not expose the Health, Scenario vNext or Community
-Review additions. See [release channels](docs/release.md#installation-channels)
-before writing consumer code against the published package.
-
-- `TutorUnderTest`, `TutorTurnInput`, and `TutorTurnOutput`
-- `runTutorHealthEvaluation` for Scenario vNext → TutorEval → Tutor Health
-  evaluation
-- `loadTutorScenarioSuiteVNext`, `parseTutorScenarioSuiteVNext`, and
-  `formatTutorHealthReport` for public or private finding-first workflows
-- `runTutorBenchmark` for the small historical/default benchmark runner
-- `runTutorEval` for explicit TutorEval dataset and runner control
-- `loadTutorEvalDataset` for the checked-in public TutorEval datasets
-- `createHttpTutor` for a provider-neutral HTTP Tutor adapter
-- provider-independent Community Review protocol contracts and helpers,
-  including deterministic fingerprinting and validation utilities
-- typed TutorEval, Scenario vNext, Finding, Tutor Health, and public Community
-  Review protocol contracts
-
-Corpus/replay, generation packets, calibration, site generation, provider
-implementations, and the private Community Review service runtime remain
-explicit advanced modules. They are not prerequisites for the first local run
-and are not re-exported from the package root.
-
-## Dataset and privacy boundary
-
-The canonical dataset lives in `scenarios/tutor-eval-v0.2a/cases.json` and is
-synthetic. Each case separates Tutor-visible `tutorInput` from
-`evaluatorOnly` evidence. Runtime parsing and integrity checks protect that
-boundary. Legacy `tutor-eval-v0.1` remains readable for compatibility.
-
-Only synthetic, public, properly licensed, or reviewed anonymized assets may
-be committed. Never add real chats, production exports, credentials, cookies,
-private prompts, database dumps, or identifiable data.
-
-## Advanced workflows
-
-The repository retains three intentionally separate levels:
-
-1. Local evaluation: call a `TutorUnderTest` directly and score the result.
-2. Reproducible evaluation: record a `TutorResponseCorpus`, replay it, and
-   compare evaluator versions offline.
-3. Official/public evaluation: use a canonical `TutorExecutionPacket`,
-   repeated runs, validated corpus evidence, and calibrated reporting.
-
-Useful commands for the advanced layers include:
-
-```bash
-npm run tutor:export-cases
-npm run tutor:export-execution
-npm run tutor:corpus:validate -- -- --corpus path/to/corpus.json
-npm run benchmark:corpus -- -- --corpus path/to/corpus.json
-npm run calibration:export
-npm run calibration:validate
-npm run calibration:report
-npm run calibration:aggregate
-npm run calibration:critical:export
-npm run calibration:critical:prepare
-npm run calibration:critical:validate
-npm run calibration:critical:report
-npm run calibration:critical:aggregate
-```
-
-Critical-failure calibration is a separate provider-independent contract from
-rubric calibration. Its committed inputs are synthetic-only; real reviewer
-files stay in ignored private storage, and the workflow performs no live Judge
-or Tutor calls. See
-[`docs/tutor-eval-critical-failure-calibration.md`](docs/tutor-eval-critical-failure-calibration.md).
-
-Corpus replay is offline. The OpenAI Responses Judge and DeepSeek Chat
-Completions Judge are separate optional evaluator integrations; live calls
-require an explicit provider flag and are not part of CI. `--judge-openai` and
-`--judge-deepseek`, and `--judge-chat-completions` are mutually exclusive.
-Judge output always passes through the existing runtime parser and
-rubric-ownership validation. The generic Chat Completions path supports
-provider-configured DeepSeek/MiniMax-compatible endpoints without requiring
-OpenAI quota.
-For fixed diagnostic work, `judge-candidate-comparison` compares explicitly
-configured DeepSeek V4-Flash and MiniMax candidates across repeated runs,
-reports stability and sanitized token/latency measurements, and never infers
-an automatic winner. See
-[`docs/judge-candidate-comparison.md`](docs/judge-candidate-comparison.md).
-The OpenAI SDK is a development dependency and optional peer rather than a
-requirement for stable package-root or HTTP usage. Consumers explicitly using
-the OpenAI provider must install the compatible optional peer version declared
-by the current package metadata.
-
-### Real-model evidence
-
-The two collection commands have different evidence semantics. Product Tutor
-collection sends `TutorTurnInput` to an external orchestration and leaves
-`generationSpec` absent. Canonical model collection sends the exact
-`TutorExecutionPacket` and `baseline-native-default` generation spec to a model
-execution host; only that path uses `recorded_model` provenance.
-
-The repository includes a local OpenAI Responses API host example at
-`examples/canonical-model-host/openai-server.mjs` and a provider-neutral
-Chat Completions bridge at
-`examples/canonical-model-host/chat-completions-server.mjs`. Both are outside
-Benchmark Core and CI: credentials remain in environment variables, the hosts
-disable provider retries, and real artifacts remain under ignored
-`artifacts/real-model/` paths.
-The dry-run, smoke, full-run, validation, replay, and review sequence is in
-[`docs/first-real-baseline.md`](docs/first-real-baseline.md).
-
-```bash
-tutorbench collect \
-  --http http://127.0.0.1:8000/respond \
-  --provider my-product \
-  --model tutor-product \
-  --prompt-version product-config-v3 \
-  --provenance external
-
-tutorbench collect-model \
-  --http http://127.0.0.1:9000/generate \
-  --provider <provider> \
-  --model <actual-model-id> \
-  --locale zh-CN
-
-tutorbench evaluate --corpus artifacts/real-model/baseline.json
-```
-
-For a frozen corpus, evaluation can select a deterministic subset without
-calling the Tutor again. Repeated `--case` values select explicit available
-cases; `--limit` then truncates that selection in stable case-ID order. An
-explicit Judge run requires a concrete provider model ID in the local
-environment. `--report-locale zh-CN` changes report labels only; it does not
-change case selection, `targetLocale`, scoring, or artifact identity.
-
-```powershell
-$env:DEEPSEEK_API_KEY = "<local secret>"
-$env:DEEPSEEK_JUDGE_MODEL = "<exact provider model id>"
-```
-
-DeepSeek V4 Judge generation is repository-owned and explicit rather than
-provider-defaulted. Unless overridden, each request records and sends:
-
-```text
-thinking: enabled
-reasoning effort: high
-max output tokens: 8192
-JSON mode: json_object
-stream: false
-```
-
-The optional controls are `DEEPSEEK_JUDGE_THINKING` (`enabled` or `disabled`),
-`DEEPSEEK_JUDGE_REASONING_EFFORT` (`high` or `max` when thinking is enabled),
-and `DEEPSEEK_JUDGE_MAX_TOKENS` (a positive integer). Thinking-enabled runs
-reject `DEEPSEEK_JUDGE_TEMPERATURE` because DeepSeek does not apply that
-control in that mode. Thinking-disabled runs may set the existing temperature
-variable, and omit reasoning effort when it is not explicitly configured.
-Provider `reasoning_content` is private execution data, not benchmark
-evidence, and is never persisted, logged, or included in metrics.
-
-The DeepSeek execution profile uses a repository-owned
-`DEEPSEEK_JUDGE_TIMEOUT_MS` default of `60000` milliseconds and keeps
-`DEEPSEEK_JUDGE_MAX_ATTEMPTS` at its existing default of `2` (with the
-existing maximum of `3`). Both values can be overridden through the
-environment. The effective `timeoutMs` and `maxAttempts` are recorded in
-Judge provenance, separately from each call's observed
-`judgeMetrics.latencyMs` and `attempts`; a timeout remains a `judge_timeout`
-error and is never retried. Transient HTTP retry behavior is unchanged.
-
-The timeout and retry defaults are repository-owned execution settings rather
-than model-quality claims. Historical diagnostic runs that motivated those
-defaults, including timeout observations and evaluator-version provenance, are
-kept in the dedicated real-model and evaluator-stress documentation instead of
-being treated as stable README facts. See
-[real-model baselines](docs/real-model-baselines.md) and
-[Case System vNext evaluator stress](docs/case-system-vnext-evaluator-stress.md).
-
-
-
-```powershell
-node dist/src/cli/tutorbench.js evaluate `
-  --corpus "artifacts/real-model/preliminary-openrouter-nemotron-baseline-001.json" `
-  --case "hint-only-linear-equation-001" `
-  --judge-deepseek `
-  --output "artifacts/real-model/nemotron-deepseek-judge-smoke-001.json"
-
-node dist/src/cli/tutorbench.js evaluate `
-  --corpus "artifacts/real-model/preliminary-openrouter-nemotron-baseline-001.json" `
-  --limit 3 `
-  --judge-deepseek `
-  --output "artifacts/real-model/nemotron-deepseek-judge-smoke-003.json"
-```
-
-The final full available-corpus run omits both `--case` and `--limit`. These
-commands replay the ignored frozen response corpus and never regenerate Tutor
-or Nemotron responses. Source corpus `coverage`, available response count, and
-missing case count remain distinct from the recorded `evaluationSelection`
-metadata. DeepSeek JSON mode requests an object but does not claim OpenAI-style
-strict Structured Outputs; malformed, incomplete, or ownership-invalid Judge
-results fail closed. When Chat Completions explicitly returns
-`finish_reason: "length"`, the run reports `judge_output_truncated` instead of
-folding provider-confirmed output truncation into `judge_result_invalid`.
-
-The output-token default is a reliability margin for thinking-enabled Judge
-execution, not a scoring or model-quality adjustment. Provider-confirmed
-truncation is reported explicitly rather than interpreted as a semantic Judge
-failure; detailed diagnostic history belongs in the versioned evidence docs.
-
-
-
-Both paths are sequential, have no automatic retry, preserve successful
-responses on partial failure, and validate the same `TutorResponseCorpus`
-before success. A new `collect-model` run refuses to overwrite an existing
-corpus; use `--resume <path> --output <same-path>` to reuse only successful
-case-runs after identity validation. Results are preliminary and uncalibrated; they are not public
-leaderboard runs. See [the real-model baseline guide](docs/real-model-baselines.md).
-
-## Public website / Developer Preview
-
-The static website consumes secret-free benchmark artifacts. It does not run a
-Tutor, store API keys, or change scoring. Public model rankings remain empty
-until reproducible and calibrated public artifacts exist:
-
-```bash
-npm run website:build
-npm run website:dev
-```
-
-The website is deployed from `main` through GitHub Pages after a clean build;
-the repository does not hard-code an unverified public URL. The Pages workflow
-supplies the project base path at build time, while local preview remains
-available at the root path. The generated `website/dist/` directory is ignored.
-
-## Package and website validation
-
-Maintainers can validate the public delivery surfaces without a registry,
-OpenAI key, or live model:
-
-```bash
-npm run test:package
-npm run test:website
-```
-
-The package smoke installs the local tarball into a temporary empty consumer,
-imports `runTutorBenchmark`, `createHttpTutor`, and `loadTutorEvalDataset`,
-executes one package-root run, and invokes the installed `tutorbench --help`.
-The optional OpenAI peer is not installed by this smoke.
-
-## Relationship with other products
-
-Review Workspace (`shuangyan123/demo`) is one optional future Tutor adapter.
-This repository does not import its services, repositories, UI, Electron,
-Dexie, credentials, or browser state. Other products, local models, and
-external services can participate through the same `TutorUnderTest` boundary.
-
-The provider-neutral external protocol and the architecture rationale are in
-[the product-boundary note](docs/benchmark-product-boundary.md).
-
-## Repository development
-
-The normal local gates are:
+misconceptions, disclosure policies and rubrics stay on the evaluator side.
+Any language can implement the same boundary over HTTP (`POST /respond`); see
+[`examples/http-python-tutor/`](examples/http-python-tutor/) and the
+[repository reference](docs/repository-reference.md#use-any-language).
+
+## What TutorBench does not claim
+
+- The Tutor Health suite is an authored synthetic design artifact. It covers
+  5 of 7 health dimensions and says so; it is not a validated general measure
+  of tutor quality or learner outcomes.
+- Deterministic checks are observable proxies, not a full measure of teaching
+  quality. Without a Judge, Judge-owned criteria stay unresolved instead of
+  passing silently.
+- No independent expert labels exist yet, and nothing here claims to raise exam
+  scores or cause learning gains.
+- Community Review public intake is closed and no real reviewer campaign has
+  started. There are no public model rankings.
+
+## Data and privacy
+
+Commit only synthetic, public, properly licensed, or reviewed anonymized
+evaluation assets. Never add real chats, production exports, credentials,
+cookies, private prompts, database dumps, or identifiable data. Real partner
+scenarios and artifacts stay private.
+
+## Website
+
+[teachometry.com](https://teachometry.com) is built from this repository with
+`npm run website:build` and deployed from `main` through GitHub Pages. It
+consumes only secret-free public artifacts. See the
+[website guide](website/README.md).
+
+## Development
 
 ```bash
 npm run typecheck
@@ -756,13 +160,8 @@ npm run release:verify
 git diff --check
 ```
 
-`release:verify` requires a clean checkout and writes only ignored
-`artifacts/release/` outputs. It binds the package payload and website artifact
-to the resolved source commit for later maintainer review; it does not publish.
-
-See [the roadmap](docs/roadmap.md), [release notes](docs/release.md), and the
-versioned TutorEval guides under `docs/` for delivery and methodology phase
-boundaries.
+Repository rules for contributors and coding agents are in
+[`AGENTS.md`](AGENTS.md). Phase status is in the [roadmap](docs/roadmap.md).
 
 ## License and governance
 
