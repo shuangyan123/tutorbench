@@ -112,6 +112,7 @@ Isolated research pilots and contracts. They do not change the canonical benchma
 
 - [Exact complete solution sets: absolute values, radicals and finite piecewise branches](research/abs-radical-piecewise-solution-sets-v0.1.md)
 - [Dual-path answer verification: published reference vs. no-reference candidate](research/dual-path-math-answer-evidence-v0.1.md)
+- [Exact circle–line intersection point sets (research v0.1)](research/circle-line-intersections-v0.1.md)
 - [Exact rational transformation semantics: definedness, solution sets and counterexamples](research/exact-rational-transformation-semantics-v0.1.md)
 - [2022–2026 mathematics examination reference-verification pilot](research/exam-math-real-paper-verification-pilot-2026-11-02.md)
 - [Multi-source examination answer adjudication — research v0.1](research/exam-multisource-answer-adjudication-v0.1.md)
