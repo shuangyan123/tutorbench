@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
 import { minifyCss, shareCardFor, withShareImage } from "../src/cli/spectrum-site.js";
+import { learningAccessSectionId } from "../src/cli/blog-series.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
 // generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
@@ -89,7 +90,8 @@ test("public data and discovery files are unchanged by the redesign", async () =
     const article = await page(route + "index.html");
     assert.match(article, /<meta name="robots" content="index,follow(?:,|")/u);
     assert.match(article, /class="essay-text"/u);
-    assert.match(article, /id="section-9"/u);
+    assert.ok(article.includes(`id="${learningAccessSectionId(9)}"`), "essay has all nine sections");
+    assert.doesNotMatch(article, /\*\*/u, "markdown emphasis left in the text");
     assert.match(article, /<meta property="article:published_time" content="2026-11-03">/u);
     assert.ok(article.includes("Why Good Learning Resources Fail to Reach the People Who Need Them"));
     assert.ok(article.includes("为什么优质教育资源没有抵达需要它的人？"));
@@ -98,13 +100,16 @@ test("public data and discovery files are unchanged by the redesign", async () =
     assert.ok(article.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), route);
     assert.ok(article.includes(`<link rel="alternate" hreflang="en" href="${english}">`), route);
     assert.ok(article.includes(`<link rel="alternate" hreflang="zh-CN" href="${chinese}">`), route);
-    assert.ok(!article.includes("essay-scale-"), `inherited prior essay share card: ${route}`);
-    assert.ok(!article.includes("why-teaching-does-not-scale/"), `inherited prior essay route: ${route}`);
-    assert.match(article, /<h2 id="sources">/u);
+    const head = article.slice(0, article.indexOf("</head>"));
+    assert.ok(head.includes(`assets/share/essay-access-${locale ? "zh" : "en"}.jpg`), `essay share card: ${route}`);
+    assert.match(head, /<meta name="twitter:card" content="summary_large_image">/u);
+    assert.ok(!head.includes("why-teaching-does-not-scale"), `inherited prior essay metadata: ${route}`);
+    assert.match(article, /<h2 id="sources"[ >]/u);
+    assert.match(article, /<a class="fn" href="#source-6"/u);
     assert.match(article, /https:\/\/doi\.org\/10\.1073\/pnas\.2422633122/u);
 
     const index = await page(`${locale}blog/index.html`);
-    assert.ok(index.includes(`${slug}/index.html`), "new essay not linked on Journal index");
+    assert.ok(index.includes(`href="${slug}/"`), "new essay not linked on Journal index");
     assert.ok(index.includes(locale ? "5 篇文章" : "5 essays"), "index count was not updated");
 
     for (const [oldSlug, section] of old) {
@@ -112,7 +117,7 @@ test("public data and discovery files are unchanged by the redesign", async () =
       assert.ok(await isFile(join(spectrum, oldRoute, "index.html")), oldRoute);
       const redirect = await page(oldRoute + "index.html");
       assert.match(redirect, /<meta name="robots" content="noindex,follow">/u);
-      assert.ok(redirect.includes(`../${slug}/index.html#section-${section}`), oldRoute);
+      assert.ok(redirect.includes(`../${slug}/#${learningAccessSectionId(section)}`), oldRoute);
       assert.ok(redirect.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), oldRoute);
       assert.ok(!spectrumSitemap.includes(`<loc>${SITE_URL}/${oldRoute}</loc>`), "old short essay should not remain indexed");
     }
