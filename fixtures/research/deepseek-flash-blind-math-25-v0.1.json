@@ -1,0 +1,529 @@
+{
+  "schemaVersion": 1,
+  "id": "deepseek-flash-blind-math-25-v0.1",
+  "status": "real_model_opt_in_no_answers_in_prompts",
+  "model": "deepseek-flash",
+  "thinking": "disabled",
+  "cases": [
+    {
+      "id": "occ-01",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      }
+    },
+    {
+      "id": "occ-02",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 4,
+          "numberOfDraws": 4,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      }
+    },
+    {
+      "id": "occ-03",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 4,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "variance"
+        }
+      }
+    },
+    {
+      "id": "occ-04",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 4,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_exact",
+          "k": 2
+        }
+      }
+    },
+    {
+      "id": "occ-05",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 4,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_at_least",
+          "k": 3
+        }
+      }
+    },
+    {
+      "id": "seq-01",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 5
+        },
+        "query": {
+          "metric": "sum"
+        }
+      }
+    },
+    {
+      "id": "seq-02",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "2",
+          "commonDifference": "3",
+          "commonRatio": "1",
+          "termCount": 9
+        },
+        "query": {
+          "metric": "sum"
+        }
+      }
+    },
+    {
+      "id": "seq-03",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "3",
+          "commonDifference": "-1",
+          "commonRatio": "-1",
+          "termCount": 7
+        },
+        "query": {
+          "metric": "sum"
+        }
+      }
+    },
+    {
+      "id": "seq-04",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "5",
+          "commonDifference": "2",
+          "commonRatio": "1/2",
+          "termCount": 8
+        },
+        "query": {
+          "metric": "sum"
+        }
+      }
+    },
+    {
+      "id": "seq-05",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "7",
+          "commonDifference": "-4",
+          "commonRatio": "0",
+          "termCount": 6
+        },
+        "query": {
+          "metric": "sum"
+        }
+      }
+    },
+    {
+      "id": "circle-01",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      }
+    },
+    {
+      "id": "circle-02",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "1",
+          "centerY": "2",
+          "radiusSquared": "9"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      }
+    },
+    {
+      "id": "circle-03",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-6"
+        }
+      }
+    },
+    {
+      "id": "circle-04",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-3"
+        }
+      }
+    },
+    {
+      "id": "circle-05",
+      "question": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "2",
+          "centerY": "-1",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "c": "-1"
+        }
+      }
+    },
+    {
+      "id": "quad-01",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -2,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "eq",
+        "domain": {
+          "kind": "all_real"
+        }
+      }
+    },
+    {
+      "id": "quad-02",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      }
+    },
+    {
+      "id": "quad-03",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -1,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "gt",
+        "domain": {
+          "kind": "all_real"
+        }
+      }
+    },
+    {
+      "id": "quad-04",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": -4,
+              "den": 1
+            },
+            {
+              "num": 4,
+              "den": 1
+            },
+            {
+              "num": -1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "ge",
+        "domain": {
+          "kind": "all_real"
+        }
+      }
+    },
+    {
+      "id": "quad-05",
+      "question": {
+        "kind": "quadratic_real_solution_set",
+        "numerator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "denominator": {
+          "coefficients": [
+            {
+              "num": 1,
+              "den": 1
+            },
+            {
+              "num": 0,
+              "den": 1
+            },
+            {
+              "num": 1,
+              "den": 1
+            }
+          ]
+        },
+        "comparison": "le",
+        "domain": {
+          "kind": "all_real"
+        }
+      }
+    },
+    {
+      "id": "param-01",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      }
+    },
+    {
+      "id": "param-02",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      }
+    },
+    {
+      "id": "param-03",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      }
+    },
+    {
+      "id": "param-04",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "9"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "2"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      }
+    },
+    {
+      "id": "param-05",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "0"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      }
+    }
+  ]
+}
