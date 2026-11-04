@@ -16,6 +16,7 @@ import sympy as S
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import verify_finite_occupancy_family as occupancy
 import verify_quadratic_signsets as algebra
+import verify_finite_arithmetic_geometric_sum as sequence_sum
 
 ID="dual-path-math-answer-evidence-v0.1"
 SOURCE_ID="exam-multi-source-evidence-v0.1"
@@ -46,6 +47,11 @@ def question_math(question):
                 "value":expected,"mathematicalMethods":proof["mathematicalMethods"],
                 "proofType":"exact_finite_distribution_and_indicator_crosscheck",
                 "mathValidated":True}
+    if question["kind"]=="finite_arithmetic_geometric_sum":
+        try:
+            return sequence_sum.solve_question(question)
+        except sequence_sum.Unsupported as e:
+            raise Abstain("arithmetic_geometric_sum_"+str(e)) from e
     if question["kind"]=="quadratic_real_solution_set":
         if set(question)!={"kind","numerator","denominator","comparison","domain"}:
             raise Abstain("unknown_quadratic_question_fields")
@@ -82,6 +88,12 @@ def validate_candidate(question,derived,candidate):
         except occupancy.Unsupported as e:
             raise Abstain("candidate_"+str(e)) from e
         return (num==derived["value"],str(num),None)
+    if derived["kind"]=="finite_arithmetic_geometric_sum":
+        try:
+            number=sequence_sum.exact_number(candidate)
+        except sequence_sum.Unsupported as e:
+            raise Abstain("candidate_"+str(e)) from e
+        return (number==derived["value"],str(number),None)
     if not isinstance(candidate,dict) or candidate.get("kind") not in ("union","all_real","empty"):
         raise Abstain("candidate_not_typed_real_set")
     try:

@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "id": "dual-path-math-answer-evidence-v0.1",
+  "status": "research_no_official_gold",
+  "cases": [
+    {
+      "id": "zero-terms",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "7",
+          "commonDifference": "-3/2",
+          "commonRatio": "-2",
+          "termCount": 0
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "ratio-one-arithmetic",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "2",
+          "commonDifference": "3",
+          "commonRatio": "1",
+          "termCount": 8
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "ratio-zero",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "5/3",
+          "commonDifference": "12",
+          "commonRatio": "0",
+          "termCount": 24
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "negative-ratio-cancellation",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "4",
+          "commonDifference": "2",
+          "commonRatio": "-1",
+          "termCount": 6
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "fractional-ratio",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "3/2",
+          "commonDifference": "1/2",
+          "commonRatio": "1/2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "existing-candidate-correct",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "3",
+          "commonDifference": "0",
+          "commonRatio": "2",
+          "termCount": 5
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "referenceAnswer": "93",
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "existing-candidate-wrong",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "3",
+          "commonDifference": "0",
+          "commonRatio": "2",
+          "termCount": 5
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "referenceAnswer": "94",
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "offline-replay-correct",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "49",
+        "answer": "49"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "offline-replay-wrong",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "48",
+        "answer": "48"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_refuted"
+    },
+    {
+      "id": "near-miss-decimal",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1/2",
+          "commonDifference": "0",
+          "commonRatio": "1/2",
+          "termCount": 2
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "0.7500000001",
+        "answer": "0.7500000001"
+      },
+      "expectedStatus": "replayed_candidate_mathematically_refuted"
+    },
+    {
+      "id": "invalid-numeric-model",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1e309",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 3
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "false-exam-source-link",
+      "path": "existing_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "referenceAnswer": "49",
+      "sourceCaseId": "gaokao-2025-national-1-q14",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "unverifiable-prose-extraction",
+      "path": "no_answer",
+      "question": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "The answer is 49",
+        "answer": "49"
+      },
+      "expectedStatus": "unverified"
+    }
+  ]
+}
