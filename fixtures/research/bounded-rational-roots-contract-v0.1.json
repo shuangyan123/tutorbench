@@ -1,0 +1,486 @@
+{
+  "schemaVersion": 1,
+  "id": "bounded-rational-roots-contract-v0.1",
+  "status": "research-only-hand-structured-not-source-gold",
+  "description": "Includes Q16 2025 postgraduate math-I intermediate probability root-selection claim from manually reviewed paper and synthetic adversarial root sets. Does not verify its entire exam solution or an official key.",
+  "items": [
+    {
+      "id": "two-distinct-real-roots",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -5,
+          "den": 1
+        },
+        "c": {
+          "num": 6,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [
+        {
+          "num": 2,
+          "den": 1
+        },
+        {
+          "num": 3,
+          "den": 1
+        }
+      ],
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "missing-second-root-by-duplication",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -5,
+          "den": 1
+        },
+        "c": {
+          "num": 6,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [
+        {
+          "num": 2,
+          "den": 1
+        },
+        {
+          "num": 2,
+          "den": 1
+        }
+      ],
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "extra-root",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -5,
+          "den": 1
+        },
+        "c": {
+          "num": 6,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [
+        {
+          "num": 2,
+          "den": 1
+        },
+        {
+          "num": 3,
+          "den": 1
+        },
+        {
+          "num": 4,
+          "den": 1
+        }
+      ],
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "out-of-order-equivalent-root-set",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -5,
+          "den": 1
+        },
+        "c": {
+          "num": 6,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [
+        {
+          "num": 3,
+          "den": 1
+        },
+        {
+          "num": 2,
+          "den": 1
+        }
+      ],
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "repeated-polynomial-root",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -4,
+          "den": 1
+        },
+        "c": {
+          "num": 4,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [
+        {
+          "num": 2,
+          "den": 1
+        },
+        {
+          "num": 2,
+          "den": 1
+        }
+      ],
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "no-real-roots",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": 0,
+          "den": 1
+        },
+        "c": {
+          "num": 1,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [],
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "constant-nonzero-empty-real-set",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 0,
+          "den": 1
+        },
+        "b": {
+          "num": 0,
+          "den": 1
+        },
+        "c": {
+          "num": 1,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [],
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "identically-zero-polynomial-infinite-set",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 0,
+          "den": 1
+        },
+        "b": {
+          "num": 0,
+          "den": 1
+        },
+        "c": {
+          "num": 0,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "irrational-roots-not-supported",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": 0,
+          "den": 1
+        },
+        "c": {
+          "num": -2,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "open-endpoint-excluded",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -1,
+          "den": 1
+        },
+        "c": {
+          "num": 0,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "interval",
+        "min": {
+          "num": 0,
+          "den": 1
+        },
+        "max": {
+          "num": 2,
+          "den": 1
+        },
+        "includeMin": false,
+        "includeMax": true
+      },
+      "candidateRoots": [
+        {
+          "num": 1,
+          "den": 1
+        }
+      ],
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "endpoint-missing",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -1,
+          "den": 1
+        },
+        "c": {
+          "num": 0,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "interval",
+        "min": {
+          "num": 0,
+          "den": 1
+        },
+        "max": {
+          "num": 2,
+          "den": 1
+        },
+        "includeMin": true,
+        "includeMax": true
+      },
+      "candidateRoots": [
+        {
+          "num": 1,
+          "den": 1
+        }
+      ],
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "ky2025-q16-probability-subclaim",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 2,
+          "den": 1
+        },
+        "b": {
+          "num": -3,
+          "den": 1
+        },
+        "c": {
+          "num": 5,
+          "den": 8
+        }
+      },
+      "domain": {
+        "kind": "interval",
+        "min": {
+          "num": 0,
+          "den": 1
+        },
+        "max": {
+          "num": 1,
+          "den": 2
+        },
+        "includeMin": true,
+        "includeMax": true
+      },
+      "candidateRoots": [
+        {
+          "num": 1,
+          "den": 4
+        }
+      ],
+      "expectedStatus": "verified_complete_solution_set",
+      "examEvidence": {
+        "exam": "kaoyan-math-1",
+        "year": 2025,
+        "question": 16,
+        "source": "university-hosted-pdf-manually-transcribed",
+        "checkedSubclaim": "P(B)=p solves 2*p^2-3*p+5/8=0 and 0<=p<=1/2",
+        "notOfficialAnswerKey": true,
+        "doesNotVerifyFinalProbability": true
+      }
+    },
+    {
+      "id": "ky2025-q16-forbidden-extra-root",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 2,
+          "den": 1
+        },
+        "b": {
+          "num": -3,
+          "den": 1
+        },
+        "c": {
+          "num": 5,
+          "den": 8
+        }
+      },
+      "domain": {
+        "kind": "interval",
+        "min": {
+          "num": 0,
+          "den": 1
+        },
+        "max": {
+          "num": 1,
+          "den": 2
+        },
+        "includeMin": true,
+        "includeMax": true
+      },
+      "candidateRoots": [
+        {
+          "num": 1,
+          "den": 4
+        },
+        {
+          "num": 5,
+          "den": 4
+        }
+      ],
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "invalid-zero-denominator",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -5,
+          "den": 1
+        },
+        "c": {
+          "num": 6,
+          "den": 1
+        }
+      },
+      "domain": {
+        "kind": "real"
+      },
+      "candidateRoots": [
+        {
+          "num": 1,
+          "den": 0
+        }
+      ],
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "missing-domain",
+      "claimKind": "all_real_roots",
+      "coefficients": {
+        "a": {
+          "num": 1,
+          "den": 1
+        },
+        "b": {
+          "num": -5,
+          "den": 1
+        },
+        "c": {
+          "num": 6,
+          "den": 1
+        }
+      },
+      "candidateRoots": [
+        {
+          "num": 2,
+          "den": 1
+        },
+        {
+          "num": 3,
+          "den": 1
+        }
+      ],
+      "expectedStatus": "unverified"
+    }
+  ]
+}

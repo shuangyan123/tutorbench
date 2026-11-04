@@ -1,0 +1,78 @@
+# Expanded real-examination mathematics source catalog — research v0.1
+
+**Status: SOURCE DISCOVERY ONLY. Zero newly authenticated mathematical answer keys. Zero full-paper automatic scores.**
+
+## The actual paper-edition denominator
+
+The corpus discovery scope is 2022–2026 inclusive, separating each examination paper **edition** rather than counting a province twice when it shares a paper.
+
+| Exam | 2022 | 2023 | 2024 | 2025 | 2026 | Paper-editions |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Gaokao mathematics variants (national A/B humanities/science, new-Gaokao 1/2, municipal/provincial papers as named) | 10 | 9 | 7 | 5 | 5 | **36** |
+| Postgraduate Math I, II, III | 3 | 3 | 3 | 3 | 3 | **15** |
+| Total | 13 | 12 | 10 | 8 | 8 | **51** |
+
+The Gaokao series changes across years. **Do not normalize all variants to “全国一卷,”** do not assume two provinces are two independently set papers, and do not treat historical 文科/理科 versions as one exam. The directory's place lists are metadata, not independently audited exam jurisdiction. Different years also have different exam paper structures; no blanket question-count assumption for Gaokao is made.
+
+## Source provenance and why this is not mathematical verification
+
+* Gaokao: `deekur/gaokaomath` at immutable commit `6e9677221edffa192276de27d61044f19ce63de3`, **36 PDF Git blobs** in `普通高考/2022–2026`. The repository's compilation is CC BY 4.0 according to its README; underlying questions remain the rightsholders' works. Neither PDF text nor official answer keys are bundled in this project.
+* Postgraduate Math I / II / III: `lx-ruc/kaoyanshuxue` at commit `196dc9d2d8271978a030a3721a828c8723cd3864`, containing **12 year-by-subject folders for 2022–2025** with exactly 22 question PNG Git blobs in each, **264 indexed question images total**. This is repository-directory evidence, **not** confirmation that each question is completely legible, that editions match an official examination, or that repository answers are correct. No repository `LICENSE` file was found by the GitHub lookup; seek permission before republishing original question images, and independently review the original exam rights.
+* Supplemental Math II Markdown: `TsekaLuk/Kaoyan-Math2-Papers` at commit `fd42c56eed412cce0cb97d6bd688f314c78e542e`, 2022, 2023, 2024 alternative source conversions. Their formulas and solution keys are **not** accepted as verified answers.
+* Postgraduate Math I/II/III **2026**: the pinned image repository has **no matching question folders**. Math I has a separate previously inspected third-party PDF pointer from PR #314; Math II and Math III remain discovery indexes only here. All three have no authenticated exam key in this catalog.
+
+**Critically, 51/51 edition entries reflects enumerating the intended comparison framework, not 51 verified papers.** 36 PDF file presences and 264 image file presences are not mathematical correctness statistics. The question-level denominator for authentic complete paper scoring is not established. Report verified mathematical coverage as *not measured*, **never** `264/264`, `51/51`, or 100%.
+
+## Machine-checkable record contract
+
+`fixtures/research/exam-source-expansion-2022-2026-v0.1.json` stores one record per edition with a pinned repository SHA, its source path, a Git blob SHA for PDF files or **each** postgraduate question PNG, and explicit rejection of gold-key or provenance promotion.
+
+```sh
+node scripts/audit-exam-source-expansion.mjs
+npm test
+```
+
+This script checks source catalog consistency, exact IDs, all expected years and varieties, 22 distinct PNG file identifiers for each 2022–2025 postgraduate subject/year, duplicate prevention, hash syntax, and the **non-gold** boundary. It does *not* read/verify binary PDF or PNG bytes, authenticate exam authorities, OCR a formula, solve equations, validate a written proof, or link to production grading. The separate CI workflow can compare the source catalog to frozen Git trees.
+
+## Expert acceptance gates before using real exam answers
+
+1. **Legitimate provenance:** retain the exact paper edition, unmodified source, rights clearance and source/version hash; verify problem pages and image legibility.
+2. **Transcription:** independently transcribe each equation, diagram, conditions, option order, and the demand for one solution vs the complete solution set. Double review ambiguous markings.
+3. **Reference truth:** independently compute/derive answers using exact arithmetic, symbolic tools, a proof system or expert review as appropriate. A provider's “official answer” label, internet key or a single symbolic output is insufficient by itself.
+4. **Coverage:** count all actual question tasks, including those too difficult to parse. Record unique paper-editions, question count validated, attempted claims, verifiable claims, *proven wrong decisions*, correct abstentions and unreviewed items with explicit denominators.
+5. **Integration:** only allow a source-pinned, independently checked claim into a research validation set, and only later integrate into TutorBench if the human review and CI gates pass. **Keep teaching appropriateness a separate dimension.**
+
+This expansion is independent of experimental Judge prompts, canonical rubrics, blind review history and student learning outcomes. No original exam questions are copied into this repository.
+
+
+## Research claim release firewall
+
+The companion `scripts/gate-exam-reference-claims.mjs` is a **no-promotion gate**. It accepts source-paper IDs, question numbers and statuses from a bounded symbolic mathematics checker. It returns `no_exam_gold_releases` unless a future independently reviewed **source-claim-math evidence contract** is implemented and adjudicated.
+
+```sh
+node scripts/gate-exam-reference-claims.mjs \
+  --proposals fixtures/research/exam-claim-promotion-negative-controls-v0.1.json
+```
+
+All eight negative-control proposals must remain blocked; they cover apparent local symbolic success, local counterexamples, an unseen 2026 paper, an out-of-range question, a fabricated paper identity and an unsupported status. Even if source metadata is artificially changed to `rawPaperInspected` and `answersIndependentlyVerified`, the absence of an independently adjudicated evidence contract prevents release. This deliberately **does not yet implement** an automated route to a gold answer. It prevents the specific engineering mistake where a valid calculation on an incorrectly transcribed question is presented as official exam-answer correctness.
+
+A future release path must require an independent source reviewer, exact problem/paper fingerprint, formally recorded domain and answer format, a mathematical check or proof artifact, and an explicit versioned adjudication decision. None exists in this catalog.
+
+## Upstream object revalidation
+
+The isolated `Expanded Exam Mathematics Source Integrity` GitHub workflow fetches immutable Git trees for the two main repositories and independently compares all **300 referenced PDF/PNG blob hashes** to the catalog. This checks source identity and drift only; it never extracts copyrighted images or claims an answer is correct. The `npm test` suite additionally injects tampered blob SHAs, duplicate papers, missing question images and fabricated gold statuses to assert failure.
+
+
+## First non-Math-I real-source arithmetic discrepancy (2022 Math II Q2)
+
+The 2022 Math-II source conversion in `TsekaLuk/Kaoyan-Math2-Papers` (blob SHA `a256f908ba4dd13e4e3da861857dce6e19f47c29`) displays answer letter **D**, a displayed **D = 2**, and a worked integral that itself ends in **2/3**. Independently evaluating the *manually formalized transcribed integral* with SymPy also gives **2/3**.
+
+```text
+∫ y=0..2 ∫ x=y..2 y / sqrt(1+x^3) dx dy
+  = ∫ x=0..2 x²/(2 sqrt(1+x³)) dx
+  = (sqrt(9) - sqrt(1))/3 = 2/3.
+```
+
+**Status: conversion inconsistency, NOT proof that the original exam key is D, C or another choice.** The source's C option is visibly garbled, and the original PDF's question and choice layout still require an independent page/image check. The problem does not become a gold-verified exam question merely because an analytic integral is correct.
+
+The separate research workflow runs `scripts/research/check-math2-2022-source-integral.py` against the pinned downloaded Markdown in isolated storage using SymPy 1.14.0. It checks the upstream Git blob identity, the incompatible extracted choice/derivation anchors and an independently calculated exact value. The result is permanently blocked from automatic exam-answer promotion until the original paper is confirmed.

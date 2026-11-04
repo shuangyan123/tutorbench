@@ -1,0 +1,5910 @@
+{
+  "schemaVersion": 1,
+  "id": "abs-radical-piecewise-solution-sets-v0.1",
+  "status": "research_only_no_exam_gold",
+  "description": "Exact finite-branch absolute value and square-root versus affine solution sets, with independently derived symbolic oracle and sign branches; typed math only, no official paper assertion.",
+  "cases": [
+    {
+      "id": "abs-two-roots",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-missing-negative-root",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "abs-duplicated-root-missing",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "abs-extraneous-root",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "abs-negative-rhs-no-roots",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": -2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-nonzero",
+      "comparison": "ne",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-lt2",
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-le2",
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-gt2",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-ge2",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-strict-wrong-endpoint",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "abs-weak-wrong-open",
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "abs-ge-self",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-eq-self",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-gt-self",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-le-self",
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-lt-self-impossible",
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-eq-x",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 2
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-le-x",
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 2
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-gt-x",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 2
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-eq-2x-plus-one",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-ge-2x-plus-one",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-lt-2x-plus-one",
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-zero-eq-zero",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-zero-gt-zero",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-domain-excludes-negative-root",
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "rational",
+                  "num": 0,
+                  "den": 1
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": true,
+                "includeRight": false
+              }
+            ]
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "abs-domain-false-extra-root",
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "rational",
+                  "num": 0,
+                  "den": 1
+                },
+                "right": {
+                  "kind": "infinity",
+                  "side": "positive"
+                },
+                "includeLeft": true,
+                "includeRight": false
+              }
+            ]
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "sqrt-eq-xminusone",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-eq-extraneous-negative-branch",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "sqrt-eq-negative-one-empty",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-eq-zero",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-ne-zero",
+      "comparison": "ne",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-gt-zero",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-ge-zero",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-lt-zero",
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-le-zero",
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-ge-xminusone",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-gt-xminusone",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-lt-xminusone",
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-le-xminusone",
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-ne-xminusone",
+      "comparison": "ne",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-eq-radicand",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-le-radicand",
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-gt-radicand",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-ge-radicand",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-eq-4minusx",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": -1,
+              "den": 1
+            },
+            "b": {
+              "num": 4,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 1,
+              "b": 1,
+              "radicand": 13,
+              "den": 2
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-eq-4minusx-extraneous",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": -1,
+              "den": 1
+            },
+            "b": {
+              "num": 4,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 1,
+              "b": 1,
+              "radicand": 13,
+              "den": 2
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 1,
+              "b": -1,
+              "radicand": 13,
+              "den": 2
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "sqrt-ge-4minusx",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": -1,
+              "den": 1
+            },
+            "b": {
+              "num": 4,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 1,
+              "b": 1,
+              "radicand": 13,
+              "den": 2
+            },
+            "includeLeft": false,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-gt-4minusx",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": -1,
+              "den": 1
+            },
+            "b": {
+              "num": 4,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "surd",
+              "a": 1,
+              "b": 1,
+              "radicand": 13,
+              "den": 2
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-eq-2xminusone",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 2,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-eq-2xminusone-extraneous",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 2,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 2,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "sqrt-ge-2xminusone",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 2
+            },
+            "right": {
+              "kind": "surd",
+              "a": 2,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-gt-2xminusone",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 2
+            },
+            "right": {
+              "kind": "surd",
+              "a": 2,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-le-2xminusone",
+      "comparison": "le",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 2,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-lt-2xminusone",
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 2,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 2,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-domain-excludes-root",
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "rational",
+                  "num": -1,
+                  "den": 1
+                },
+                "right": {
+                  "kind": "rational",
+                  "num": 3,
+                  "den": 1
+                },
+                "includeLeft": true,
+                "includeRight": false
+              }
+            ]
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-domain-includes-root",
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "union",
+            "parts": [
+              {
+                "kind": "interval",
+                "left": {
+                  "kind": "rational",
+                  "num": -1,
+                  "den": 1
+                },
+                "right": {
+                  "kind": "rational",
+                  "num": 3,
+                  "den": 1
+                },
+                "includeLeft": true,
+                "includeRight": true
+              }
+            ]
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 3,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "sqrt-false-domain-includes-undefined",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-eq-one",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-eq-one-missing",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-gt-one",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-ge-zero",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-eq-zero",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-lt-zero",
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-ne-zero",
+      "comparison": "ne",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-eq-x",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-ge-x",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-abs-sqrt-lt-x",
+      "comparison": "lt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-two-affines-gt",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "affine",
+            "a": {
+              "num": -1,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-two-affines-eq",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "affine",
+            "a": {
+              "num": -1,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-two-affines-open-endpoint-error",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "affine",
+            "a": {
+              "num": -1,
+              "den": 1
+            },
+            "b": {
+              "num": 2,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "piecewise-guard-domain-limited",
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -2,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "piecewise-guard-domain-limited-false-excludes-endpoint",
+      "comparison": "eq",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": -2,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "refuted_solution_set"
+    },
+    {
+      "id": "piecewise-overlapping-at-zero",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": true
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "piecewise-overlapping-interior",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": true,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "piecewise-missing-interval",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "piecewise-missing-zero-point",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "infinity",
+              "side": "negative"
+            },
+            "right": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "infinity",
+              "side": "positive"
+            },
+            "includeLeft": false,
+            "includeRight": false
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "piecewise-unsupported-rhs",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "piecewise-empty-branch",
+      "comparison": "ge",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "empty"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        },
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "all_real"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "sqrt-negative-constant-outside-real-domain",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "sqrt-negative-constant-inequality",
+      "comparison": "gt",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": -1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": -2,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "bad-expression-kind",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "log_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "bad-surd-negative-radicand",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": -1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "bad-empty-requested-domain",
+      "comparison": "eq",
+      "domain": {
+        "kind": "empty"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "empty"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 1,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "bad-answer-infinity-point",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "infinity",
+              "side": "positive"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "bad-comparison",
+      "comparison": "wrong",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "bad-variable-input-injection",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": "__import__('os')",
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "empty"
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "bad-candidate-interval-reversed",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "bad-nonbool-open-endpoint",
+      "comparison": "eq",
+      "domain": {
+        "kind": "all_real"
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "abs_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": 1,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "guard-too-wide-for-domain",
+      "comparison": "ge",
+      "domain": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "branches": [
+        {
+          "when": {
+            "kind": "all_real"
+          },
+          "lhs": {
+            "kind": "sqrt_affine",
+            "a": {
+              "num": 1,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          },
+          "rhs": {
+            "kind": "affine",
+            "a": {
+              "num": 0,
+              "den": 1
+            },
+            "b": {
+              "num": 0,
+              "den": 1
+            }
+          }
+        }
+      ],
+      "candidateSolution": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": 0,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 2,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "unverified"
+    }
+  ]
+}

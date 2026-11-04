@@ -1,0 +1,63 @@
+name: Exact Absolute Radical Piecewise Math Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/exact-abs-radical-piecewise-research.yml'
+      - 'scripts/research/verify_abs_radical_piecewise.py'
+      - 'scripts/research/test_verify_abs_radical_piecewise.py'
+      - 'fixtures/research/abs-radical-piecewise-v0.1.json'
+      - 'docs/research/abs-radical-piecewise-solution-sets-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  complete-real-solution-set-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research code with no persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install isolated exact symbolic math dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/math-piecewise"
+          "$RUNNER_TEMP/math-piecewise/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Verify complete abs, radical and guarded piecewise sets
+        run: |
+          "$RUNNER_TEMP/math-piecewise/bin/python" -m unittest \
+            scripts/research/test_verify_abs_radical_piecewise.py -v
+      - name: Recheck 90 contract cases and exact false/unknown distinction
+        run: |
+          "$RUNNER_TEMP/math-piecewise/bin/python" \
+            scripts/research/verify_abs_radical_piecewise.py \
+            --fixture fixtures/research/abs-radical-piecewise-v0.1.json \
+            > "$RUNNER_TEMP/abs-radical-sets.json"
+          python3 - <<'PY'
+          import json
+          import os
+          path=os.path.join(os.environ['RUNNER_TEMP'],'abs-radical-sets.json')
+          with open(path,encoding='utf8') as handle:
+              result=json.load(handle)
+          assert result['status']=='research_exact_abs_radical_piecewise_no_official_gold'
+          assert result['summary']=={
+              'total':90,'verifiedComplete':60,'refuted':13,
+              'unverified':17,'officialExamGoldReleased':0}
+          by_id={row['id']:row for row in result['items']}
+          for name in ('sqrt-eq-extraneous-negative-branch',
+                       'sqrt-eq-4minusx-extraneous',
+                       'sqrt-eq-2xminusone-extraneous',
+                       'piecewise-abs-sqrt-eq-one-missing',
+                       'piecewise-two-affines-open-endpoint-error'):
+              assert by_id[name]['status']=='refuted_solution_set'
+              assert by_id[name]['witness'] is not None
+          for name in ('piecewise-overlapping-at-zero',
+                       'piecewise-missing-zero-point',
+                       'sqrt-negative-constant-outside-real-domain'):
+              assert by_id[name]['status']=='unverified'
+          assert all(row['officialExamGoldCertified'] is False for row in result['items'])
+          print('Exact bounded abs/radical/piecewise full-solution-set contract passed; no official exam gold')
+          PY

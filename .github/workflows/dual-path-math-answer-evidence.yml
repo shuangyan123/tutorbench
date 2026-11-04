@@ -1,0 +1,70 @@
+name: Dual Path Math Answer and Evidence Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/dual-path-math-answer-evidence.yml'
+      - 'scripts/research/verify_dual_path_math_answers.py'
+      - 'scripts/research/test_verify_dual_path_math_answers.py'
+      - 'scripts/research/verify_finite_occupancy_family.py'
+      - 'fixtures/research/dual-path-math-evidence-v0.1.json'
+      - 'fixtures/research/exam-multi-source-evidence-v0.1.json'
+      - 'docs/research/dual-path-math-answer-evidence-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-math-published-and-blind-candidate-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read isolated research branch with no stored credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install exact mathematics packages
+        run: |
+          python3 -m venv "$RUNNER_TEMP/dual-path-math"
+          "$RUNNER_TEMP/dual-path-math/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Test blind-answer derivation and published-answer source provenance
+        run: |
+          timeout 180s "$RUNNER_TEMP/dual-path-math/bin/python" -m unittest \
+            scripts/research/test_verify_dual_path_math_answers.py -v
+      - name: Recalculate every math verdict and enforce true accuracy denominator
+        run: |
+          timeout 120s "$RUNNER_TEMP/dual-path-math/bin/python" \
+            scripts/research/verify_dual_path_math_answers.py \
+            --fixture fixtures/research/dual-path-math-evidence-v0.1.json \
+            --sources fixtures/research/exam-multi-source-evidence-v0.1.json \
+            > "$RUNNER_TEMP/dual-path-results.json"
+          python3 - <<'PY'
+          import json,os
+          with open(os.path.join(os.environ['RUNNER_TEMP'],'dual-path-results.json'),
+                    encoding='utf8') as f: out=json.load(f)
+          assert out['status']=='bounded_dual_path_math_verified_not_live_ai_accuracy_or_exam_gold'
+          assert out['summary']=={
+            'total':27,'reference_mathematically_verified':4,
+            'reference_mathematically_refuted':2,
+            'deterministic_no_answer_solution':6,
+            'replayed_candidate_mathematically_verified':3,
+            'replayed_candidate_mathematically_refuted':3,
+            'unverified':9,'offlineReplayDecidable':6,
+            'offlineReplayCorrect':3,'genuineAIModelRuns':0,
+            'measuredLiveAIAccuracy':None,'officialExamGoldReleased':0,
+            'realExamCasesProvenAuthenticated':0}
+          cases={i['id']:i for i in out['items']}
+          gaokao=cases['exam-gaokao-2025-14']
+          assert gaokao['exactAnswerUnderTypedModel']=='61/25'
+          assert gaokao['sourceEvidence']['independentlyVerifiedPublisherLineages']==0
+          assert gaokao['sourceEvidence']['paperOriginalAuthenticated'] is False
+          assert cases['no-answer-real-exam-occupancy']['status']=='deterministic_no_answer_solution'
+          assert cases['reference-wrong']['status']=='reference_mathematically_refuted'
+          assert cases['offline-candidate-wrong']['status']=='replayed_candidate_mathematically_refuted'
+          assert cases['reference-false-paper-association']['status']=='unverified'
+          assert cases['no-answer-received-reference']['status']=='unverified'
+          assert all(r['officialExamGoldCertified'] is False and
+                     r['liveAIModelCallPerformed'] is False for r in out['items'])
+          print('Typed math dual path verified; no false real AI accuracy or official exam gold')
+          PY

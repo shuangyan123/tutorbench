@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "exam-claim-promotion-negative-controls-v0.1",
+  "status": "synthetic-gate-cases-not-exam-answers",
+  "items": [
+    {
+      "id": "math2-2025-local-symbolic-success",
+      "paperId": "kaoyan-math-2-2025",
+      "question": 1,
+      "mathStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "math3-2025-local-counterexample",
+      "paperId": "kaoyan-math-3-2025",
+      "question": 2,
+      "mathStatus": "counterexample_found"
+    },
+    {
+      "id": "gaokao-2025-national-2-identity",
+      "paperId": "gaokao-2025-national-2",
+      "question": 1,
+      "mathStatus": "symbolically_equal"
+    },
+    {
+      "id": "gaokao-2022-beijing-unknown",
+      "paperId": "gaokao-2022-beijing",
+      "question": 12,
+      "mathStatus": "unverified"
+    },
+    {
+      "id": "math2-2026-not-in-index",
+      "paperId": "kaoyan-math-2-2026",
+      "question": 1,
+      "mathStatus": "symbolically_equal"
+    },
+    {
+      "id": "math1-2025-out-of-range",
+      "paperId": "kaoyan-math-1-2025",
+      "question": 23,
+      "mathStatus": "verified_complete_solution_set"
+    },
+    {
+      "id": "invented-paper",
+      "paperId": "gaokao-2025-unlisted",
+      "question": 1,
+      "mathStatus": "symbolically_equal"
+    },
+    {
+      "id": "unsupported-result",
+      "paperId": "kaoyan-math-3-2024",
+      "question": 1,
+      "mathStatus": "100%correct"
+    }
+  ]
+}

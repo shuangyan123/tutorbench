@@ -1,0 +1,79 @@
+name: Math Research Reference Audit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/math-research-audit.yml'
+      - 'fixtures/research/kaoyan-math1-2025-*.json'
+      - 'fixtures/research/kaoyan-math1-2024-*.json'
+      - 'scripts/audit-exam-markdown-headings.mjs'
+      - 'scripts/research/verify-kaoyan-2025-symbolic.py'
+      - 'scripts/audit-kaoyan-transcription.mjs'
+      - 'scripts/audit-kaoyan-transcription.d.mts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-symbolic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install isolated SymPy 1.14.0
+        run: |
+          python3 -m venv "$RUNNER_TEMP/math-sympy"
+          "$RUNNER_TEMP/math-sympy/bin/pip" install --disable-pip-version-check --no-cache-dir 'sympy==1.14.0'
+      - name: Cross-check bounded symbolic claims and ledger identities
+        run: |
+          "$RUNNER_TEMP/math-sympy/bin/python" scripts/research/verify-kaoyan-2025-symbolic.py > "$RUNNER_TEMP/symbolic.json"
+          python3 -c "import json,os; d=json.load(open(os.environ['RUNNER_TEMP']+'/symbolic.json')); assert d['checkedQuestionCount']==15; assert len(d['items'])==15; print('Bounded subclaims checked:',d['checkedQuestionCount'])"
+
+  pinned-upstream-transcription:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Node 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24.21.0
+      - name: Fetch public source at pinned third-party revision
+        run: |
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 60 \
+            'https://raw.githubusercontent.com/TsekaLuk/Kaoyan-Math1-Papers/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2025%E5%B9%B4%E6%95%B0%E5%AD%A6%E4%B8%80%E7%9C%9F%E9%A2%98.md' \
+            --output "$RUNNER_TEMP/upstream-2025.md"
+      - name: Audit original source without copying it into the repository
+        run: |
+          node scripts/audit-kaoyan-transcription.mjs --input "$RUNNER_TEMP/upstream-2025.md" > "$RUNNER_TEMP/source-audit.json"
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const d=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/source-audit.json","utf8"));
+            if(!d.source.sourceMatched || d.status!=="blocked_for_gold") throw Error("Untrusted source identity or unsafe clean status");
+            const known = new Set(d.findings.map(f => f.question+":"+f.code));
+            for(const key of ["2:FORMULA_TRANSCRIPTION_CONFLICT","3:DOMAIN_BRACKET_CONFLICT",
+              "4:BROKEN_CHOICE_LAYOUT","8:EMPTY_ANSWER_KEY"]) {
+              if(!known.has(key)) throw Error("Missing source anomaly: "+key);
+            }
+            if(d.summary.foundChoiceQuestions!==10) throw Error("Source choice count drift");
+            console.log("Source SHA verified; known extraction defects remain blocked. Findings:",d.summary.findings);
+          '
+      - name: Fetch pinned 2024 Markdown and surface structural source damage
+        run: |
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 --max-time 60 \
+            'https://raw.githubusercontent.com/TsekaLuk/Kaoyan-Math1-Papers/3151b4acf26ea19ccd427b869a715e65e1990091/papers/2024%E5%B9%B4%E6%95%B0%E5%AD%A6%28%E4%B8%80%29%E7%9C%9F%E9%A2%98%E5%8F%8A%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88.md' \
+            --output "$RUNNER_TEMP/upstream-2024.md"
+          node scripts/audit-exam-markdown-headings.mjs --input "$RUNNER_TEMP/upstream-2024.md" > "$RUNNER_TEMP/source-audit-2024.json"
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const d=JSON.parse(readFileSync(process.env.RUNNER_TEMP+"/source-audit-2024.json","utf8"));
+            if(!d.sourceMatched || d.status!=="blocked_for_gold") throw Error("Untrusted 2024 source integrity");
+            if(JSON.stringify(d.missing)!==JSON.stringify([6,12])) throw Error("2024 leading heading inventory drift");
+            for(const q of [6,12]) if(!d.embedded.some(f=>f.question===q)) throw Error("Missing 2024 embedded heading: "+q);
+            console.log("2024 upstream SHA pinned; source blocking confirmed for question headings:",d.missing.join(","));
+          '
