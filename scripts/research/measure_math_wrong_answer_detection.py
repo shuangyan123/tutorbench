@@ -276,7 +276,9 @@ def compare_one(row):
         raise InvalidControl("invalid_mutant_case_schema")
     if (not isinstance(row["id"],str) or not 1<=len(row["id"])<=128 or
         row["truthLabel"] not in VALID_LABELS or row["family"] not in FAMILIES or
-        row["question"].get("kind")!=row["family"] or
+        not isinstance(row["question"],dict) or
+        (row["family"]!="unimplemented_open_math" and
+         row["question"].get("kind")!=row["family"]) or
         not isinstance(row["errorMode"],str) or not 1<=len(row["errorMode"])<=100):
         raise InvalidControl("invalid_mutant_case_identity_or_label")
     attempt=row["modelAttempt"]
