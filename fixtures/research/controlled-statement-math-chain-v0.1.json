@@ -1,0 +1,456 @@
+{
+  "schemaVersion": 1,
+  "id": "controlled-statement-to-math-proof-v0.1",
+  "cases": [
+    {
+      "id": "sequence-source-no-answer",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "sequence-source-no-answer"
+      },
+      "statement": "【AGSUM-1】已知 u_k=(a+k*d)*r^k (k=0,...,n-1)；a=1；d=1；r=2；n=4。求总和。",
+      "statementSha256": "b64c5fd091c115eb06ab4d688e26c6e4f9e58193f22b04c360ad77decc8226ad",
+      "declaredQuestion": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "sequence-source-existing-correct",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "sequence-source-existing-correct"
+      },
+      "statement": "【AGSUM-1】已知 u_k=(a+k*d)*r^k (k=0,...,n-1)；a=1；d=1；r=2；n=4。求总和。",
+      "statementSha256": "b64c5fd091c115eb06ab4d688e26c6e4f9e58193f22b04c360ad77decc8226ad",
+      "declaredQuestion": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": "49",
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "sequence-source-existing-wrong",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "sequence-source-existing-wrong"
+      },
+      "statement": "【AGSUM-1】已知 u_k=(a+k*d)*r^k (k=0,...,n-1)；a=1；d=1；r=2；n=4。求总和。",
+      "statementSha256": "b64c5fd091c115eb06ab4d688e26c6e4f9e58193f22b04c360ad77decc8226ad",
+      "declaredQuestion": {
+        "kind": "finite_arithmetic_geometric_sum",
+        "model": {
+          "firstTerm": "1",
+          "commonDifference": "1",
+          "commonRatio": "2",
+          "termCount": 4
+        },
+        "query": {
+          "metric": "sum"
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": "50",
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "circle-source-irrational-no-answer",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "circle-source-irrational-no-answer"
+      },
+      "statement": "【CLPOINT-1】已知圆 (x-h)^2+(y-k)^2=R，直线 ax+by+c=0；h=0；k=0；R=2；a=0；b=1；c=0。求全部实数交点。",
+      "statementSha256": "5d24566ae208b4f569e76144c63515c355d4fc9f5e3e4fa7a4b69034a65d0cfd",
+      "declaredQuestion": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "circle-source-tangent-correct",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "circle-source-tangent-correct"
+      },
+      "statement": "【CLPOINT-1】已知圆 (x-h)^2+(y-k)^2=R，直线 ax+by+c=0；h=0；k=0；R=25；a=0；b=1；c=-5。求全部实数交点。",
+      "statementSha256": "7b6be3a979ac3832d77719484bf30e9ad408c4140a004513b22158aeadfcb183",
+      "declaredQuestion": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-5"
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": [
+          {
+            "x": {
+              "kind": "rational",
+              "value": "0"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "5"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "circle-source-disjoint-wrong",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "circle-source-disjoint-wrong"
+      },
+      "statement": "【CLPOINT-1】已知圆 (x-h)^2+(y-k)^2=R，直线 ax+by+c=0；h=0；k=0；R=25；a=0；b=1；c=-6。求全部实数交点。",
+      "statementSha256": "b070ceee4590e4c2861d9587b8bdb6c8e7162906a5d045dfc6fe60e66e8a386e",
+      "declaredQuestion": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "25"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "-6"
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "point_set",
+        "points": [
+          {
+            "x": {
+              "kind": "rational",
+              "value": "0"
+            },
+            "y": {
+              "kind": "rational",
+              "value": "0"
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "circle-source-irrational-replay",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "circle-source-irrational-replay"
+      },
+      "statement": "【CLPOINT-1】已知圆 (x-h)^2+(y-k)^2=R，直线 ax+by+c=0；h=0；k=0；R=2；a=0；b=1；c=0。求全部实数交点。",
+      "statementSha256": "5d24566ae208b4f569e76144c63515c355d4fc9f5e3e4fa7a4b69034a65d0cfd",
+      "declaredQuestion": {
+        "kind": "circle_line_intersections",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "0",
+          "b": "1",
+          "c": "0"
+        }
+      },
+      "path": "no_answer",
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "{\"kind\":\"point_set\",\"points\":[{\"x\":{\"coefficient\":\"-1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}},{\"x\":{\"coefficient\":\"1\",\"kind\":\"affine_sqrt\",\"offset\":\"0\",\"radicand\":\"2\"},\"y\":{\"kind\":\"rational\",\"value\":\"0\"}}]}",
+        "answer": {
+          "kind": "point_set",
+          "points": [
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "-1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            },
+            {
+              "x": {
+                "kind": "affine_sqrt",
+                "offset": "0",
+                "coefficient": "1",
+                "radicand": "2"
+              },
+              "y": {
+                "kind": "rational",
+                "value": "0"
+              }
+            }
+          ]
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "parameter-source-two-no-answer",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "parameter-source-two-no-answer"
+      },
+      "statement": "【CLPARAM-1】已知圆 (x-h)^2+(y-k)^2=R，直线族 ax+by+c0+c1*t=0；h=0；k=0；R=1；a=1；b=0；c0=0；c1=1。求恰有 2 个不同实数交点时 t 的全部实数取值。",
+      "statementSha256": "2135de648f01657fa410299f256a084c27fa5aa67710650a59a1bdd4b6895860",
+      "declaredQuestion": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "parameter-source-one-correct",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "parameter-source-one-correct"
+      },
+      "statement": "【CLPARAM-1】已知圆 (x-h)^2+(y-k)^2=R，直线族 ax+by+c0+c1*t=0；h=0；k=0；R=1；a=1；b=0；c0=0；c1=1。求恰有 1 个不同实数交点时 t 的全部实数取值。",
+      "statementSha256": "e3c85b46d3dc286cb57c3072abdc447afcdac6e4b08b518797f2f6426a3a34f5",
+      "declaredQuestion": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "parameter-source-two-wrong-boundary",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "parameter-source-two-wrong-boundary"
+      },
+      "statement": "【CLPARAM-1】已知圆 (x-h)^2+(y-k)^2=R，直线族 ax+by+c0+c1*t=0；h=0；k=0；R=1；a=1；b=0；c0=0；c1=1。求恰有 2 个不同实数交点时 t 的全部实数取值。",
+      "statementSha256": "2135de648f01657fa410299f256a084c27fa5aa67710650a59a1bdd4b6895860",
+      "declaredQuestion": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "parameter-source-zero-replay",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "parameter-source-zero-replay"
+      },
+      "statement": "【CLPARAM-1】已知圆 (x-h)^2+(y-k)^2=R，直线族 ax+by+c0+c1*t=0；h=0；k=0；R=1；a=1；b=0；c0=0；c1=1。求恰有 0 个不同实数交点时 t 的全部实数取值。",
+      "statementSha256": "40efaae2f09b07f0a1a8412bd5df654f7e8a2bcaee52925cabe63523f1770e5c",
+      "declaredQuestion": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      },
+      "path": "no_answer",
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"kind\":\"infinity\",\"side\":\"negative\"},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":-1}},{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":1},\"right\":{\"kind\":\"infinity\",\"side\":\"positive\"}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "infinity",
+                "side": "negative"
+              },
+              "right": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            },
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "right": {
+                "kind": "infinity",
+                "side": "positive"
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "parameter-source-zero-no-answer",
+      "source": {
+        "kind": "synthetic_controlled_statement",
+        "sourceId": "parameter-source-zero-no-answer"
+      },
+      "statement": "【CLPARAM-1】已知圆 (x-h)^2+(y-k)^2=R，直线族 ax+by+c0+c1*t=0；h=0；k=0；R=1；a=1；b=0；c0=0；c1=1。求恰有 0 个不同实数交点时 t 的全部实数取值。",
+      "statementSha256": "40efaae2f09b07f0a1a8412bd5df654f7e8a2bcaee52925cabe63523f1770e5c",
+      "declaredQuestion": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    }
+  ]
+}

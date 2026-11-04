@@ -1,0 +1,106 @@
+name: Math Source-to-Exact-Verifier Evidence Chain
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/math-source-to-exact-verifier-chain.yml'
+      - 'scripts/research/verify_parametric_circle_line_classification.py'
+      - 'scripts/research/test_verify_parametric_circle_line_classification.py'
+      - 'scripts/research/verify_controlled_math_statement_binding.py'
+      - 'scripts/research/test_verify_controlled_math_statement_binding.py'
+      - 'scripts/research/verify_dual_path_math_answers.py'
+      - 'fixtures/research/parametric-circle-line-classification-v0.1.json'
+      - 'fixtures/research/controlled-statement-math-chain-v0.1.json'
+      - 'docs/research/parametric-circle-line-classification-v0.1.md'
+      - 'docs/research/controlled-statement-math-evidence-chain-v0.1.md'
+      - 'docs/README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-parameter-and-statement-chain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install pinned exact math dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/math-statement-chain"
+          "$RUNNER_TEMP/math-statement-chain/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Prove bounded parameter partitions, negative source cases and old math cases
+        run: |
+          timeout 300s "$RUNNER_TEMP/math-statement-chain/bin/python" -m unittest \
+            scripts/research/test_verify_parametric_circle_line_classification.py \
+            scripts/research/test_verify_controlled_math_statement_binding.py \
+            scripts/research/test_verify_circle_line_intersections.py \
+            scripts/research/test_verify_finite_arithmetic_geometric_sum.py \
+            scripts/research/test_verify_dual_path_math_answers.py -v
+      - name: Recompute and enforce parameter fixture plus controlled-text provenance
+        run: |
+          timeout 120s "$RUNNER_TEMP/math-statement-chain/bin/python" \
+            scripts/research/verify_dual_path_math_answers.py \
+            --fixture fixtures/research/parametric-circle-line-classification-v0.1.json \
+            --sources fixtures/research/exam-multi-source-evidence-v0.1.json \
+            > "$RUNNER_TEMP/parametric-circle-line.json"
+          timeout 120s "$RUNNER_TEMP/math-statement-chain/bin/python" \
+            scripts/research/verify_controlled_math_statement_binding.py \
+            --fixture fixtures/research/controlled-statement-math-chain-v0.1.json \
+            --require-decidable > "$RUNNER_TEMP/math-statement-chain.json"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])
+          geometry=json.loads((base/"parametric-circle-line.json").read_text(encoding="utf8"))
+          assert geometry["summary"]=={
+            "total":26,
+            "reference_mathematically_verified":3,
+            "reference_mathematically_refuted":2,
+            "deterministic_no_answer_solution":12,
+            "replayed_candidate_mathematically_verified":2,
+            "replayed_candidate_mathematically_refuted":1,
+            "unverified":6,
+            "offlineReplayDecidable":3,
+            "offlineReplayCorrect":2,
+            "genuineAIModelRuns":0,
+            "measuredLiveAIAccuracy":None,
+            "officialExamGoldReleased":0,
+            "realExamCasesProvenAuthenticated":0,
+          }
+          source=json.loads((base/"math-statement-chain.json").read_text(encoding="utf8"))
+          assert source["summary"]=={
+            "total":12,
+            "reference_mathematically_verified":3,
+            "reference_mathematically_refuted":3,
+            "deterministic_no_answer_solution":4,
+            "replayed_candidate_mathematically_verified":2,
+            "replayed_candidate_mathematically_refuted":0,
+            "unverified":0,
+            "formalizationExact":12,
+            "sourceLineagesIndependentlyVerified":0,
+            "originalSourceAuthenticated":0,
+            "officialExamGoldReleased":0,
+            "genuineAIModelRuns":0,
+            "measuredLiveAIAccuracy":None,
+          }
+          assert all(not row["officialExamGoldCertified"] and
+                         not row["liveAIModelCallPerformed"] for row in
+                     geometry["items"]+source["items"])
+          for row in source["items"]:
+              assert row["originalSourceAuthenticated"] is False
+              assert row["sourceLineageIndependentlyVerified"] is False
+              assert row["formalizationStatus"]=="controlled_statement_exact_roundtrip"
+          index=Path("docs/README.md").read_text(encoding="utf8")
+          research=index.split("## Research notes\n",1)[1].split("\n## ",1)[0]
+          for doc in (
+            "research/parametric-circle-line-classification-v0.1.md",
+            "research/controlled-statement-math-evidence-chain-v0.1.md",
+          ):
+              assert research.count("("+doc+")")==1
+              assert (Path("docs")/doc).is_file()
+          print("Exact math + controlled-text chain + indexed docs; 0 official, 0 AI calls")
+          PY
