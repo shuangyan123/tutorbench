@@ -35,13 +35,16 @@ def parse_question(question):
     if (not isinstance(query,dict) or set(query)!={"intersectionCount"} or
         type(query["intersectionCount"]) is not int or query["intersectionCount"] not in KINDS):
         raise Unsupported("invalid_intersection_count_metric")
-    h=circle.rational_text(disk["centerX"])
-    k=circle.rational_text(disk["centerY"])
-    r2=circle.rational_text(disk["radiusSquared"])
-    a=circle.rational_text(line["a"])
-    b=circle.rational_text(line["b"])
-    c0=circle.rational_text(line["baseC"])
-    c1=circle.rational_text(line["parameterC"])
+    try:
+        h=circle.rational_text(disk["centerX"])
+        k=circle.rational_text(disk["centerY"])
+        r2=circle.rational_text(disk["radiusSquared"])
+        a=circle.rational_text(line["a"])
+        b=circle.rational_text(line["b"])
+        c0=circle.rational_text(line["baseC"])
+        c1=circle.rational_text(line["parameterC"])
+    except circle.Unsupported as error:
+        raise Unsupported("parameter_coefficient_"+str(error)) from error
     if r2<0:
         raise Unsupported("negative_squared_radius")
     if a==0 and b==0:
@@ -75,8 +78,12 @@ def analytic_partition(h,k,r2,a,b,c0,c1,count):
 
 def polynomial_partition(h,k,r2,a,b,c0,c1,count):
     """Independent polynomial sign chart; does not call analytic_partition."""
-    expression=S.expand(r2*(a*a+b*b)-(a*h+b*k+c0+c1*T)**2)
-    poly=S.Poly(expression,T,domain=S.QQ)
+    # The existing exact sign-cell engine solves roots in its own X symbol.
+    # Build this independent polynomial on that same symbol, otherwise its
+    # roots_poly() would silently solve for x in an expression containing t.
+    x=sets.X
+    expression=S.expand(r2*(a*a+b*b)-(a*h+b*k+c0+c1*x)**2)
+    poly=S.Poly(expression,x,domain=S.QQ)
     # Reuse the exact sign-cell partition engine at a separate abstraction.
     # Its degree bound is not inferred from untrusted input.
     try:
