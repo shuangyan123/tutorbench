@@ -1,0 +1,816 @@
+{
+  "schemaVersion": 1,
+  "id": "dual-path-math-answer-evidence-v0.1",
+  "status": "research_no_official_gold",
+  "cases": [
+    {
+      "id": "circle-1-zero",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "circle-1-one",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "circle-1-two",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "sqrt2-two",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "offset-circle-two",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "1",
+          "centerY": "-2",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "1",
+          "b": "-1",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "negative-slope-one",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "-2"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "zero-radius-zero",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "0"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "zero-radius-one",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "0"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "zero-radius-two",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "0"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "constant-secant-two",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "0"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "constant-tangent-one",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "-1",
+          "parameterC": "0"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "constant-disjoint-zero",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "-2",
+          "parameterC": "0"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "deterministic_no_answer_solution"
+    },
+    {
+      "id": "candidate-two-correct",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "candidate-two-includes-boundary",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": true,
+            "includeRight": true
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "candidate-one-correct",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "candidate-one-missing-root",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_refuted"
+    },
+    {
+      "id": "candidate-surd-correct",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "2"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "surd",
+              "a": 0,
+              "b": -1,
+              "radicand": 2,
+              "den": 1
+            },
+            "right": {
+              "kind": "surd",
+              "a": 0,
+              "b": 1,
+              "radicand": 2,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_verified"
+    },
+    {
+      "id": "replay-zero-correct",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 0
+        }
+      },
+      "path": "no_answer",
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"kind\":\"infinity\",\"side\":\"negative\"},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":-1}},{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1,\"kind\":\"rational\",\"num\":1},\"right\":{\"kind\":\"infinity\",\"side\":\"positive\"}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "infinity",
+                "side": "negative"
+              },
+              "right": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            },
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "right": {
+                "kind": "infinity",
+                "side": "positive"
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "replay-empty-correct",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "0"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "{\"kind\":\"empty\"}",
+        "answer": {
+          "kind": "empty"
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_verified"
+    },
+    {
+      "id": "replay-near-miss",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "{\"kind\":\"union\",\"parts\":[{\"includeLeft\":false,\"includeRight\":false,\"kind\":\"interval\",\"left\":{\"den\":1000,\"kind\":\"rational\",\"num\":-999},\"right\":{\"den\":1,\"kind\":\"rational\",\"num\":1}}]}",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "interval",
+              "left": {
+                "kind": "rational",
+                "num": -999,
+                "den": 1000
+              },
+              "right": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              },
+              "includeLeft": false,
+              "includeRight": false
+            }
+          ]
+        }
+      },
+      "expectedStatus": "replayed_candidate_mathematically_refuted"
+    },
+    {
+      "id": "invalid-normal",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "0",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "negative-radius",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "-1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "unrecognized-count",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 3
+        }
+      },
+      "path": "no_answer",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "attempt-prose-leak",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "no_answer",
+      "modelAttempt": {
+        "captureKind": "offline_replay",
+        "modelId": "synthetic-offline-replay",
+        "rawText": "The parameter values are -1 and 1.",
+        "answer": {
+          "kind": "union",
+          "parts": [
+            {
+              "kind": "point",
+              "value": {
+                "kind": "rational",
+                "num": -1,
+                "den": 1
+              }
+            },
+            {
+              "kind": "point",
+              "value": {
+                "kind": "rational",
+                "num": 1,
+                "den": 1
+              }
+            }
+          ]
+        }
+      },
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "fake-exam-link",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 2
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "interval",
+            "left": {
+              "kind": "rational",
+              "num": -1,
+              "den": 1
+            },
+            "right": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            },
+            "includeLeft": false,
+            "includeRight": false
+          }
+        ]
+      },
+      "sourceCaseId": "gaokao-2025-national-1-q14",
+      "expectedStatus": "unverified"
+    },
+    {
+      "id": "typed-repeated-point",
+      "question": {
+        "kind": "parametric_circle_line_intersection_count",
+        "circle": {
+          "centerX": "0",
+          "centerY": "0",
+          "radiusSquared": "1"
+        },
+        "line": {
+          "a": "1",
+          "b": "0",
+          "baseC": "0",
+          "parameterC": "1"
+        },
+        "query": {
+          "intersectionCount": 1
+        }
+      },
+      "path": "existing_answer",
+      "referenceAnswer": {
+        "kind": "union",
+        "parts": [
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          },
+          {
+            "kind": "point",
+            "value": {
+              "kind": "rational",
+              "num": 1,
+              "den": 1
+            }
+          }
+        ]
+      },
+      "expectedStatus": "reference_mathematically_refuted"
+    }
+  ]
+}

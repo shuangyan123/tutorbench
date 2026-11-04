@@ -18,6 +18,7 @@ import verify_finite_occupancy_family as occupancy
 import verify_quadratic_signsets as algebra
 import verify_finite_arithmetic_geometric_sum as sequence_sum
 import verify_circle_line_intersections as circle_line
+import verify_parametric_circle_line_classification as parametric_circle_line
 
 ID="dual-path-math-answer-evidence-v0.1"
 SOURCE_ID="exam-multi-source-evidence-v0.1"
@@ -53,6 +54,11 @@ def question_math(question):
             return sequence_sum.solve_question(question)
         except sequence_sum.Unsupported as e:
             raise Abstain("arithmetic_geometric_sum_"+str(e)) from e
+    if question["kind"]=="parametric_circle_line_intersection_count":
+        try:
+            return parametric_circle_line.solve_question(question)
+        except parametric_circle_line.Unsupported as e:
+            raise Abstain("parametric_circle_line_"+str(e)) from e
     if question["kind"]=="circle_line_intersections":
         try:
             return circle_line.solve_question(question)
@@ -94,6 +100,11 @@ def validate_candidate(question,derived,candidate):
         except occupancy.Unsupported as e:
             raise Abstain("candidate_"+str(e)) from e
         return (num==derived["value"],str(num),None)
+    if derived["kind"]=="parametric_circle_line_intersection_count":
+        try:
+            return parametric_circle_line.verify_candidate(derived,candidate)
+        except parametric_circle_line.Unsupported as e:
+            raise Abstain("parametric_circle_line_candidate_"+str(e)) from e
     if derived["kind"]=="circle_line_intersections":
         try:
             return circle_line.verify_candidate(derived,candidate)
@@ -266,7 +277,8 @@ def adjudicate(row,sources):
         # replay contract. Geometric point-set replies require the ENTIRE
         # visible raw answer to equal canonical JSON of the typed point set;
         # no extraction from prose, hidden key or altered structure.
-        if derived["kind"]=="circle_line_intersections":
+        if derived["kind"] in ("circle_line_intersections",
+                                "parametric_circle_line_intersection_count"):
             raw=attempt["rawText"]
             candidate=attempt["answer"]
             if (not isinstance(raw,str) or len(raw)>4096 or
