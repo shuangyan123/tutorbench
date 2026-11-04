@@ -48,7 +48,7 @@ Candidate parameter sets use the already bounded \`quadratic_real_solution_set\`
 
 The family is integrated into the existing dual-path mathematics research bridge. A supplied existing-answer candidate is compared **after** deriving the independent set, and an answerless question can be solved without a reference. Canonical-JSON-only offline replay is allowed strictly as a research fixture, not as an authenticated model run.
 
-The frozen fixture comprises **26 synthetic typed cases**: 12 independent answerless solutions, 3 right and 2 wrong existing references, 2 right and 1 wrong offline replay, and 6 intentionally unverified malformed or forged cases. Tests include 144 cross-product parameter families with 1,008 explicit rational-\(t\) classifications, 96 seeded rational problems, exact \(\sqrt2\) tangent boundaries, complete pairwise partitions of \(\mathbb R\), corrupted independent solvers, disallowed source links and answer extraction contamination.
+The frozen fixture comprises **26 synthetic typed cases**: 12 independent answerless solutions, 3 right and 3 wrong existing references, 2 right and 1 wrong offline replay, and 5 intentionally unverified malformed or forged cases. Tests include 144 cross-product parameter families with 1,008 explicit rational-\(t\) classifications, 96 seeded rational problems, exact \(\sqrt2\) tangent boundaries, complete pairwise partitions of \(\mathbb R\), corrupted independent solvers, disallowed source links and answer extraction contamination.
 
 \`\`\`powershell
 python -m pip install sympy==1.14.0 mpmath==1.3.0

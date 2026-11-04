@@ -58,11 +58,11 @@ class ExactMovingLineResearch(unittest.TestCase):
         expected={
             "total":26,
             "reference_mathematically_verified":3,
-            "reference_mathematically_refuted":2,
+            "reference_mathematically_refuted":3,
             "deterministic_no_answer_solution":12,
             "replayed_candidate_mathematically_verified":2,
             "replayed_candidate_mathematically_refuted":1,
-            "unverified":6,
+            "unverified":5,
             "offlineReplayDecidable":3,
             "offlineReplayCorrect":2,
             "genuineAIModelRuns":0,
@@ -210,7 +210,7 @@ class ExactMovingLineResearch(unittest.TestCase):
         self.assertEqual(output.returncode,0,output.stderr)
         result=json.loads(output.stdout)
         self.assertEqual(result["summary"]["total"],26)
-        self.assertEqual(result["summary"]["unverified"],6)
+        self.assertEqual(result["summary"]["unverified"],5)
         self.assertEqual(result["summary"]["officialExamGoldReleased"],0)
         self.assertIsNone(result["summary"]["measuredLiveAIAccuracy"])
 
