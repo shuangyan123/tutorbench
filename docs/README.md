@@ -116,6 +116,7 @@ Isolated research pilots and contracts. They do not change the canonical benchma
 - [2022–2026 mathematics examination reference-verification pilot](research/exam-math-real-paper-verification-pilot-2026-11-02.md)
 - [Multi-source examination answer adjudication — research v0.1](research/exam-multisource-answer-adjudication-v0.1.md)
 - [Expanded real-examination mathematics source catalog — research v0.1](research/expanded-exam-math-corpus-v0.1.md)
+- [Bounded exact arithmetic–geometric sequence sums (research v0.1)](research/finite-arithmetic-geometric-sum-v0.1.md)
 - [One complete mathematical task family: finite uniform occupancy](research/finite-occupancy-family-contract-v0.1.md)
 - [2025 Gaokao National I, Question 14 — complete numeric-answer verification](research/gaokao-2025-q14-complete-answer-v0.1.md)
 - [Learner Starting Points, Attainable Capability and Avoidable Learning Cost — v0.1](research/learner-starting-point-and-learning-cost-v0.1.md)
