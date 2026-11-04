@@ -59,6 +59,22 @@ class WrongAnswerDetectionResearch(unittest.TestCase):
             else:
                 self.assertEqual(item["verdict"],"abstained",item["id"])
 
+    def test_quadratic_set_model_replay_is_canonical_json_and_not_scalar_only(self):
+        # Regression found by the adversarial matrix: existing-answer checks
+        # could handle typed quadratic sets, but offline model replies wrongly
+        # went down the scalar-only extraction branch and always abstained.
+        for row in self.fixture["cases"]:
+            if row["family"]!="quadratic_real_solution_set" or row["truthLabel"]=="unsupported":
+                continue
+            with self.subTest(id=row["id"]):
+                r=detection.compare_one(row)
+                self.assertEqual(r["verdict"],
+                    "accepted_correct" if row["truthLabel"]=="correct" else "detected_wrong")
+                tampered=deepcopy(row)
+                tampered["modelAttempt"]["rawText"]="My reasoning: "+row["modelAttempt"]["rawText"]
+                verdict=detection.compare_one(tampered)
+                self.assertEqual(verdict["verdict"],"abstained")
+
     def test_exposes_whether_a_mutant_answer_wrongly_passes(self):
         # Fault injection: if verifier blindly accepts any supported candidate,
         # false acceptance rate MUST rise; cannot report 100% robust detection.

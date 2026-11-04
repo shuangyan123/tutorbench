@@ -273,12 +273,14 @@ def adjudicate(row,sources):
             raise Abstain("invalid_model_attempt_record")
         if attempt["captureKind"]!="offline_replay" or not isinstance(attempt["modelId"],str) or not attempt["modelId"] or len(attempt["modelId"])>96:
             raise Abstain("model_attempt_not_attested_live_run")
-        # The existing scalar/set paths retain their original exact-string
-        # replay contract. Geometric point-set replies require the ENTIRE
-        # visible raw answer to equal canonical JSON of the typed point set;
-        # no extraction from prose, hidden key or altered structure.
+        # Scalar answers require exact visible number-string equality.
+        # Every typed point/real-set answer requires the ENTIRE visible raw
+        # answer to equal canonical JSON. Never extract an answer from prose.
+        # In particular, quadratic real solution sets must not be silently
+        # left behind in the scalar-only replay contract.
         if derived["kind"] in ("circle_line_intersections",
-                                "parametric_circle_line_intersection_count"):
+                                "parametric_circle_line_intersection_count",
+                                "quadratic_real_solution_set"):
             raw=attempt["rawText"]
             candidate=attempt["answer"]
             if (not isinstance(raw,str) or len(raw)>4096 or

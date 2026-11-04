@@ -31,6 +31,12 @@ The measured verifier receives only the question and offline replay candidate, *
 
 Fault injection separately forces the verifier to accept everything, refute everything, or abstain on everything. The metrics and CI must expose each failure; an always-abstaining verifier must **not** pass the full supported-decision-coverage gate.
 
+## Coverage gap detected and repaired by this trial
+
+The first CI run exposed a real **integration failure**: the already-correct quadratic rational solution-set verifier could adjudicate typed set candidates through the published-answer path, but offline model replay still routed quadratic-set answers through a **scalar-string-only extraction contract**. Consequently, all 4 correct and 6 wrong quadratic-set controls were marked `unverified`, and this family's **wrong-answer detection recall was 0/6 despite its mathematical verifier being implemented**. The synthetic coverage gate correctly failed.
+
+The repair adds `quadratic_real_solution_set` to the *strict entire-visible canonical-JSON typed-answer branch*. No unstructured prose extraction is introduced. A new regression test verifies that correct typed sets are accepted, wrong typed sets are refuted, and extra explanatory text is **abstained**, not extracted. This is exactly why measuring **end-to-end detected errors**—not just the number of solver families—is necessary.
+
 ## Metrics with explicit denominators
 
 Let W be the known-wrong, C the known-correct, and U the intentionally unsupported test subsets. The metric definitions deliberately use **all authored examples in that subset**, not only decidable answers:
