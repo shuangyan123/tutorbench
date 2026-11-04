@@ -1,0 +1,60 @@
+name: Natural Math Holdout Stage II Research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/natural-math-holdout-stage-ii.yml'
+      - 'scripts/research/run_real_natural_math_holdout.py'
+      - 'scripts/research/test_run_real_natural_math_holdout.py'
+      - 'scripts/research/run_deepseek_flash_math_25.py'
+      - 'fixtures/research/real-natural-math-holdout-v0.1.json'
+      - 'fixtures/research/deepseek-flash-blind-math-25-v0.1.json'
+      - 'scripts/research/verify_dual_path_math_answers.py'
+      - 'docs/research/real-natural-math-holdout-stage-ii-v0.1.md'
+      - 'docs/README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  natural-answer-holdout-no-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Immutable source checkout without persistence
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install exact bounded math dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/natural-math"
+          "$RUNNER_TEMP/natural-math/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'mpmath==1.3.0'
+      - name: Offline CI tests, no provider keys or calls
+        run: |
+          timeout 180s "$RUNNER_TEMP/natural-math/bin/python" -m unittest \
+            scripts/research/test_run_real_natural_math_holdout.py \
+            scripts/research/test_run_deepseek_flash_math_25.py \
+            scripts/research/test_measure_math_wrong_answer_detection.py -v
+      - name: Check both new holdout plans and documentation index
+        run: |
+          timeout 90s "$RUNNER_TEMP/natural-math/bin/python" scripts/research/run_real_natural_math_holdout.py plan --mode high --limit 20 > "$RUNNER_TEMP/high-plan.json"
+          timeout 90s "$RUNNER_TEMP/natural-math/bin/python" scripts/research/run_real_natural_math_holdout.py plan --mode disabled --limit 20 > "$RUNNER_TEMP/off-plan.json"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])
+          a=json.loads((root/"high-plan.json").read_text(encoding="utf8"))
+          b=json.loads((root/"off-plan.json").read_text(encoding="utf8"))
+          assert a["mode"]==b["mode"]=="offline_plan_zero_api_calls"
+          assert a["selected"]==b["selected"]==20
+          assert a["thinkingMode"]=="high" and b["thinkingMode"]=="disabled"
+          assert [x["prompt"] for x in a["questions"]]==[x["prompt"] for x in b["questions"]]
+          assert len({x["requestSha256"] for x in a["questions"]})==20
+          assert len({x["requestSha256"] for x in b["questions"]})==20
+          target="research/real-natural-math-holdout-stage-ii-v0.1.md"
+          contents=Path("docs/README.md").read_text(encoding="utf8")
+          assert contents.count("("+target+")")==1
+          assert (Path("docs")/target).is_file()
+          print("New paired 20-question holdout, no provider calls, no synthetic gold claims")
+          PY
