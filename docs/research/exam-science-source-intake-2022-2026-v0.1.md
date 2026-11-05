@@ -28,6 +28,18 @@ Across this filtered source snapshot: 172 `indexed`, 1 `discovered`, and 44 `ver
 
 The existing 51-row **TutorBench mathematics catalog** counts 36 Gaokao math editions plus 15 postgraduate Math I/II/III editions. The new 217 rows are **upstream file candidates** across four Gaokao subjects and may include duplicates, separate file versions or shared editions. **Do not sum 217+51 or claim they are certified papers.**
 
+## Reconciliation result: explicit identity matching without false deduplication
+
+The independent [frozen reconciliation record](../../fixtures/research/exam-science-source-reconciliation-2022-2026-v0.1.json) cross-checks the source CSV against the **existing pinned TutorBench mathematics edition catalog** using only exact decoded *upstream source paths*, not title similarity.
+
+- **25/51** external **math candidate rows** have an exact source-path association to a single existing TutorBench mathematics Gaokao edition. This is a metadata linkage, NOT the number of newly authenticated papers.
+- **26/51** math candidate rows remain unassociated by that conservative rule. They may include alternative scans or already-known editions but require manual review; treating all 26 as new would double-count.
+- **18** broad `year + subject + paper_type + region` collision groups occur across the 217 candidates. These groups must NOT be collapsed: a national label can conceal I/II or historical arts/sciences editions; Zhejiang may have January/June variants.
+- **216** candidates supply an SHA-256; **0 repeated recorded SHA-256 values** among these. Distinct hashes do NOT establish distinct examination papers, since scans/annotations/recompression can differ.
+- Existing math source links are pinned to an immutable commit, but some other repository's `raw.githubusercontent.com/.../main/...` locator is **mutable**. A matching path is not byte equivalence. Confirm both source blobs separately before deciding content identity.
+
+The reconciliation holds all matched/unmatched candidate IDs and collision-group IDs. The CSV itself and its Git blob are pinned; no question bodies or answers are imported. The upstream repo's declared file statuses are retained as claims, not adopted as certified labels.
+
 ## Priority scope and edition discipline
 
 1. **P0**: 2022–2026 Gaokao mathematics (new-curriculum I/II, historical national A/B by year and actual arts/sciences variant), cross-referencing the existing 36-edition catalog. Begin with unambiguous short-answer, computation and structured-solvable items.
