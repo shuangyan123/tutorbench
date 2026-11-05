@@ -47,6 +47,10 @@ The reconciliation holds all matched/unmatched candidate IDs and collision-group
 3. **P1/P2**: Gaokao physics, chemistry, biology, as **discipline-specific exam editions**, often provincial, not automatically the same edition as nationally shared math papers. Start with reliable official or exam-agency source evidence and the upstream 2022–2026 candidate records, with separate problem and diagram review.
 4. **P2**: postgraduate physics, chemistry and biology by declared **difficulty strata and exact institution/subject/year**, not a fictitious single nationally unified paper. Nationally set specialized subjects, where applicable, retain their actual IDs.
 
+## First source-page locator witness
+
+A **2025 New Gaokao I mathematics Q14** question has been visibly located on page 2 of a [public third-party recollection PDF](gaokao-2025-i-q14-thirdparty-page-witness-v0.1.md), with semantic alignment to the existing five-label/three-draws-with-replacement typed question. This is an **external recollection**, not the pinned original-source PDF, and does not independently authenticate the official exam or release an answer key. The page locator and its limitations are recorded separately to avoid falsely upgrading all existing 2025 catalog records.
+
 ## What a source item must pass before it can be used as a verified question
 
 | Gate | Evidence needed | Status today |
