@@ -25,6 +25,7 @@ from replay_exam_phase1_sources import replay_sources, witness_transport
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures/research"
 YEARS = range(2022, 2027)
 SUBJECTS = {"数学", "物理", "化学", "生物"}
+ACCEPTANCE_SCOPE_V1_SHA256 = "c38933fe41c91976fbfbdac88f99a1792050ecaaf882b91df59de67d8ccd8816"
 SOURCE_PIN = {
     "repository": "qingshuo/China-Gaokao-Papers-Collection",
     "revision": "b33ea3dd5427afa963a944808d3a6c0183fc454e",
@@ -230,7 +231,8 @@ def audit_paper(paper, evidence, pdf_dir, access):
         path = pdf_dir / f"{paper_id}.pdf"
         if (separate := pdf_dir / "witnesses" / f"{paper_id}.pdf").is_file():
             path = separate
-    if path is not None and path.is_file():
+    # 联网重放失败时，同名目录副本不能替代发行方附件。
+    if g2 != "unavailable" and path is not None and path.is_file():
         try:
             check_pdf(path, source)
             g2 = "passed"
@@ -254,7 +256,7 @@ def audit_paper(paper, evidence, pdf_dir, access):
         except (ValueError, OSError, TypeError, KeyError, AttributeError):
             proofs[kind] = "conflict"
     official, research = proofs["officialOriginal"], proofs["researchRights"]
-    g1 = ("conflict" if "conflict" in (official, research) else
+    g1 = ("conflict" if "conflict" in proofs.values() else
           "passed" if g0 == "passed" and official == "confirmed" and research == "allowed" else "unverified")
 
     expected = None
@@ -417,6 +419,11 @@ def acceptance_targets(manifest, catalog, identities):
                           ("postgraduateMath", {p["paperId"] for p in catalog if p["exam"] == "kaoyan"})):
         require({p["paperId"] for p in manifest["groups"][key]["papers"]} == expected,
                 "acceptance scope drops a national mathematics target")
+    # 固定本版本的目标身份，防止通过删除或替换待核验卷别来缩小分母。
+    targets_by_group = {name: sorted(group["papers"], key=lambda paper: paper["paperId"])
+                        for name, group in manifest["groups"].items()}
+    require(evidence_digest(targets_by_group) == ACCEPTANCE_SCOPE_V1_SHA256,
+            "target identities changed within acceptance scope v1")
     return target_ids
 
 

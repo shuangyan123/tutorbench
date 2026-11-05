@@ -228,6 +228,12 @@ class ExamPhase1Test(unittest.TestCase):
         self.assertIsNone(real["phaseQuestionDenominator"])
         self.assertFalse(real["complete"])
         self.assertNotIn("gaokao-2022-beijing", ids)
+        for group in ("gaokaoScience", "postgraduateScience"):
+            with self.subTest(group=group):
+                modified = copy.deepcopy(manifest)
+                modified["groups"][group]["papers"].pop()
+                with self.assertRaisesRegex(ValueError, "changed within acceptance scope v1"):
+                    audit.acceptance_targets(modified, self.catalog, identities)
         manifest["groups"]["postgraduateMath"]["papers"].pop()
         with self.assertRaisesRegex(ValueError, "drops a national mathematics target"):
             audit.acceptance_targets(manifest, self.catalog, identities)
@@ -504,6 +510,24 @@ class AcceptanceFixtureTest(unittest.TestCase):
         self.assertEqual(result["attachmentLink"], "unverified")
         self.assertEqual(result["G0"], "unverified")
         self.assertEqual(result["G1"], "unverified")
+
+    def test_failed_live_download_cannot_reuse_same_named_local_bytes(self):
+        result = self.inspect({"listing": "reachable", "pdf": "unavailable"})
+        self.assertEqual(result["G2"], "unavailable")
+        self.assertEqual(result["G0"], "unverified")
+        self.assertEqual(result["sourceQualifiedQuestions"], 0)
+        result = self.inspect({"listing": "unavailable", "pdf": "reachable"})
+        self.assertEqual(result["publisherSnapshot"], "unavailable")
+        self.assertEqual(result["G0"], "unverified")
+
+    def test_conflicting_redistribution_proof_blocks_acceptance(self):
+        self.write_proof("publicRedistribution", "redistribution", "redistribution", "allowed", {"year": 2025})
+        result = self.inspect()
+        self.assertEqual(result["officialOriginal"], "confirmed")
+        self.assertEqual(result["internalResearchRights"], "allowed")
+        self.assertEqual(result["publicRedistributionRights"], "conflict")
+        self.assertEqual(result["G1"], "conflict")
+        self.assertFalse(accepted_scope([self.pid], {self.pid: result})["complete"])
 
     def test_proof_with_correct_hash_but_wrong_contents_is_rejected(self):
         for alter in ({"paperId": "another-paper"}, {"year": 2025}, {"purpose": "publicRedistribution"},

@@ -60,7 +60,7 @@ def assess_publication(paper, evidence, read_local, access, verified_pdf, bound)
             review_scope = {**scope, "purpose": "publisher_snapshot", "publicationKind": publication_kind,
                             "publicationTitle": title}
             if scoped_review(listing.get("review"), review_scope, expected_sha):
-                raw = read_local(f"{paper_id}.html")
+                raw = None if snapshot == "unavailable" else read_local(f"{paper_id}.html")
                 if raw is not None:
                     observed_sha = sha256(raw)
                     anchor = exact_attachment(raw, source["listing"], source["artifact"])
