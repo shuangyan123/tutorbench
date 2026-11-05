@@ -4,12 +4,12 @@ on:
   pull_request:
     paths:
       - '.github/workflows/exam-phase1-source-audit.yml'
-      - 'fixtures/research/exam-phase1-*-2022-2026-v0.1.json'
+      - 'fixtures/research/exam-phase1-*-2022-2026-v*.json'
       - 'fixtures/research/exam-science-*-2022-2026-v0.1.json'
       - 'fixtures/research/exam-source-expansion-2022-2026-v0.1.json'
       - 'fixtures/research/kaoyan-math1-2025-all-questions-review-v0.1.json'
       - 'scripts/research/*exam_phase1*.py'
-      - 'scripts/research/exam_phase1_evidence.py'
+      - 'scripts/research/exam_phase1_*.py'
       - 'scripts/research/audit_pinned_exam_artifacts.py'
 
 permissions:
@@ -61,6 +61,7 @@ jobs:
               ("Catalog PDFs", [v for k, v in files.items() if not k.startswith("mirrors/")]),
               ("Mirror PDFs", [v for k, v in files.items() if k.startswith("mirrors/")]),
               ("Witness PDFs", [v["G2"] for v in witnesses.values()]),
+              ("Publisher snapshots", [v["publisherSnapshot"] for v in witnesses.values()]),
           ):
               print(f"- {name} (n={len(values)}) — {dict(Counter(values))}")
           unavailable = report["replay"]["transport"]

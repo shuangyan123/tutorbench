@@ -2,6 +2,7 @@ import copy
 import csv
 import hashlib
 import io
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -11,7 +12,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_exam_phase1 as audit
-from exam_phase1_evidence import COMPARISON_CHECKS, GATES, accepted_scope, exact_attachment
+from exam_phase1_authority import NATIONAL_ISSUER, UNIVERSITY_HOSTS, publisher_route, source_scope
+from exam_phase1_evidence import GATES, accepted_scope, evidence_digest, exact_attachment
 from replay_exam_phase1_sources import download_public, raw_url
 
 
@@ -86,7 +88,7 @@ class ExamPhase1Test(unittest.TestCase):
     def test_g1_public_listing_and_mirror_are_not_rights_clearance(self):
         ledger = copy.deepcopy(self.ledger)
         result = self.inspect(ledger)
-        self.assertEqual(result["njust-2022-physics"]["issuerIdentity"], "reviewed_publisher")
+        self.assertEqual(result["njust-2022-physics"]["issuerIdentity"], "recognized_authority")
         self.assertEqual(result["njust-2022-physics"]["attachmentLink"], "unverified")
         self.assertEqual(result["gaokao-2025-national-1"]["issuerIdentity"], "unverified")
         self.assertTrue(all(x["officialOriginal"] == "unverified" and x["G1"] == "unverified"
@@ -207,12 +209,28 @@ class ExamPhase1Test(unittest.TestCase):
         self.assertIsNone(result["expectedQuestions"])
         self.assertEqual(result["locatedQuestions"], 0)
         self.assertEqual(result["recordedLocators"], 36)
+        reviews = copy.deepcopy(self.reviews)
+        reviews["njust-2022-biology"]["pages"][0]["starts"]["A"] = [1, 9]
+        result = self.inspect(reviews=reviews)["njust-2022-biology"]
+        self.assertEqual(result["G4"], "conflict")
+        self.assertIn("page_inventory_review_binding_conflict", result["evidenceConflicts"])
 
-    def test_open_scope_remains_open_even_if_a_paper_passes(self):
-        result = accepted_scope(["test-paper"], {"science": {"status": "open", "reason": "test gap"}},
-                                {"test-paper": {**dict.fromkeys(GATES, "passed"), "expectedQuestions": 2}})
-        self.assertFalse(result["complete"])
-        self.assertIsNone(result["phaseQuestionDenominator"])
+    def test_scope_has_frozen_categories_and_does_not_count_discovery(self):
+        manifest = audit.load("exam-phase1-acceptance-scope-2022-2026-v1.json")
+        identities = {p["paperId"]: p["identity"] for p in self.ledger["papers"]}
+        ids = audit.acceptance_targets(manifest, self.catalog, identities)
+        self.assertEqual({key: len(group["papers"]) for key, group in manifest["groups"].items()},
+                         {"gaokaoMath": 20, "gaokaoScience": 9, "postgraduateMath": 15, "postgraduateScience": 7})
+        real = accepted_scope(ids, self.inspect())
+        self.assertEqual(real["targetPapers"], 51)
+        self.assertEqual(len(real["missingPaperIds"]), 43)
+        self.assertEqual(real["expectedQuestionsInReviewedWitnesses"], 224)
+        self.assertIsNone(real["phaseQuestionDenominator"])
+        self.assertFalse(real["complete"])
+        self.assertNotIn("gaokao-2022-beijing", ids)
+        manifest["groups"]["postgraduateMath"]["papers"].pop()
+        with self.assertRaisesRegex(ValueError, "drops a national mathematics target"):
+            audit.acceptance_targets(manifest, self.catalog, identities)
 
 
 def synthetic_pdf(cover_label):
@@ -250,7 +268,7 @@ class AcceptanceFixtureTest(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.root = Path(self.directory.name)
-        self.issuer_patch = patch.dict(audit.ISSUER_HOSTS, {"Fixture University": "issuer.example"})
+        self.issuer_patch = patch.dict(UNIVERSITY_HOSTS, {"Fixture University": "issuer.example"})
         self.issuer_patch.start()
         self.addCleanup(self.issuer_patch.stop)
         self.pid = "synthetic-2026-physics"
@@ -273,42 +291,122 @@ class AcceptanceFixtureTest(unittest.TestCase):
                  "notation": "not_seen", "numberedParts": 0, "options": 0},
             ]},
         }
-        original, rights = b"fixture original confirmation", b"fixture internal research permission"
         self.evidence = {
             "artifactSha256": self.sha(self.pdf),
-            "issuerListing": {"url": "https://issuer.example/index.html", "sha256": self.sha(self.html), "review": self.review},
-            "cover": cover.copy(),
+            "issuerListing": None, "cover": cover.copy(), "coverReview": None,
             "pages": [{"starts": {"A": [1, 1]}, "continuations": [], "figures": {}},
                       {"starts": {"B": [1, 1]}, "continuations": ["A.1"],
                        "figures": {"A.1": ["figure-1"]}, "optionCounts": {"A.1": 4}}],
-            "pageReview": self.review,
-            "editionResolution": {"decision": "unique", "review": self.review},
-            "officialOriginal": {"url": "https://issuer.example/confirmation", "sha256": self.sha(original), "review": self.review},
-            "researchRights": {"basis": "https://issuer.example/rights", "sha256": self.sha(rights),
-                               "decision": "allowed_for_internal_research", "review": self.review},
+            "pageReview": self.review, "editionResolution": None,
+            "officialOriginal": None, "researchRights": None, "publicRedistribution": None,
             "comparisons": [], "difficultyReview": None,
         }
-        (self.root / f"{self.pid}.pdf").write_bytes(self.pdf)
-        (self.root / f"{self.pid}.html").write_bytes(self.html)
-        (self.root / "proofs").mkdir()
-        (self.root / f"proofs/{self.pid}.original").write_bytes(original)
-        (self.root / f"proofs/{self.pid}.rights").write_bytes(rights)
-        (self.root / f"comparisons/{self.pid}").mkdir(parents=True)
+        self.catalog = []
+        self.configure_source()
         for qid in ("A.1", "B.1"):
-            candidate = ('{"syntheticQuestion":"' + qid + '"}').encode()
-            (self.root / f"comparisons/{self.pid}/{qid}.json").write_bytes(candidate)
-            self.evidence["comparisons"].append({
-                "id": qid, "sourceSha256": self.sha(self.pdf), "candidateSha256": self.sha(candidate),
-                "checks": sorted(COMPARISON_CHECKS), "decision": "match", "review": self.review,
-            })
+            self.write_comparison(qid)
 
     @staticmethod
     def sha(data):
         return hashlib.sha256(data).hexdigest()
 
-    def inspect(self):
+    def scoped(self, scope, digest):
+        return {"schemaVersion": 2, "reviewerId": "fixture-reviewer", "date": self.review["date"],
+                "record": self.review["record"], "scope": scope, "evidenceSha256": digest}
+
+    def configure_source(self, title="2026年统一考试试题原卷"):
+        route, _, _, kind = publisher_route(self.paper["identity"])
+        self.scope = source_scope(self.paper, route)
+        self.html = (f"<title>{title}</title>" + '<a href="2026.pdf">Fixture original</a>'
+                     '<a href="confirmation">Original</a><a href="rights">Research rights</a>'
+                     '<a href="redistribution">Public rights</a>').encode()
+        digest = self.sha(self.html)
+        self.evidence["issuerListing"] = {
+            "url": self.scope["listingUrl"], "sha256": digest, "kind": kind, "title": title,
+            "review": self.scoped({**self.scope, "purpose": "publisher_snapshot", "publicationKind": kind,
+                                   "publicationTitle": title}, digest),
+        }
+        self.evidence["coverReview"] = self.scoped(
+            {**self.scope, "purpose": "cover_observation", "page": 1, "observedCover": self.evidence["cover"].copy()},
+            self.sha(self.pdf),
+        )
+        self.evidence["pageReview"] = self.scoped(
+            {"paperId": self.pid, "sourceSha256": self.sha(self.pdf), "pageCount": 2,
+             "purpose": "page_inventory"}, evidence_digest(self.evidence["pages"]),
+        )
+        self.evidence["editionResolution"] = {
+            "decision": "unique",
+            "review": self.scoped({**self.scope, "purpose": "edition_resolution", "decision": "unique"}, digest),
+        }
+        (self.root / f"{self.pid}.pdf").write_bytes(self.pdf)
+        (self.root / f"{self.pid}.html").write_bytes(self.html)
+        self.write_proof("officialOriginal", "original", "confirmation", "confirmed")
+        self.write_proof("researchRights", "rights", "rights", "allowed")
+        self.write_proof("publicRedistribution", "redistribution", "redistribution", "denied")
+
+    def write_proof(self, kind, suffix, path, decision, alter=None):
+        url = self.scope["listingUrl"].rsplit("/", 1)[0] + "/" + path
+        scope = {**self.scope, "publicationSha256": self.sha(self.html), "purpose": kind, "url": url}
+        doc = {"schemaVersion": 1, "scope": {**scope, **(alter or {})}, "decision": decision}
+        raw = json.dumps(doc).encode()
+        dest = self.root / f"proofs/{self.pid}.{suffix}"
+        dest.parent.mkdir(exist_ok=True)
+        dest.write_bytes(raw)
+        self.evidence[kind] = {"url": url, "sha256": self.sha(raw), "review": self.scoped(scope, self.sha(raw))}
+
+    def write_comparison(self, qid, *, change=None, author="fixture-author", reference_page=None,
+                         decision="match", differences=None):
+        cross = qid == "A.1"
+        anchor = {"paperId": self.pid, "questionId": qid, "sourceSha256": self.sha(self.pdf),
+                  "stemPage": 1 if cross else 2, "pages": [1, 2] if cross else [2]}
+        visual = b"fixture diagram bytes"
+        components = {"stem": "Synthetic stem", "conditions": ["A fixture condition"], "symbols": ["x"],
+                      "formulas": ["x + 1"], "units": ["m"], "options": ["A", "B", "C", "D"] if cross else [],
+                      "subparts": ["Part one", "Part two"] if cross else [],
+                      "visuals": [{"id": "figure-1", "page": 2, "sha256": self.sha(visual)}] if cross else []}
+        candidate = {"schemaVersion": 1, "paperId": self.pid, "questionId": qid, "authorId": author,
+                     "components": {**components, **(change or {})}}
+        source = {"schemaVersion": 1, "anchor": {**anchor, "stemPage": reference_page or anchor["stemPage"]},
+                  "reviewerId": "fixture-reviewer", "components": components}
+        candidate_raw, source_raw = json.dumps(candidate).encode(), json.dumps(source).encode()
+        root = self.root / f"comparisons/{self.pid}"
+        root.mkdir(parents=True, exist_ok=True)
+        (root / f"{qid}.json").write_bytes(candidate_raw)
+        (root / f"{qid}.source.json").write_bytes(source_raw)
+        if cross:
+            for side in ("source", "candidate"):
+                (root / f"{qid}.{side}.figure-1.p2").write_bytes(visual)
+        digests = {"candidateSha256": self.sha(candidate_raw), "referenceSha256": self.sha(source_raw)}
+        self.evidence["comparisons"] = [x for x in self.evidence["comparisons"] if x["id"] != qid] + [{
+            "id": qid, "sourceSha256": self.sha(self.pdf), **digests, "decision": decision,
+            "differences": differences or {},
+            "review": self.scoped({**anchor, **digests, "purpose": "question_comparison",
+                                   "candidateAuthorId": author, "independence": "independent_source_transcription"},
+                                  digests["referenceSha256"]),
+        }]
+
+    def as_national(self, exam):
+        postgraduate = exam == "postgraduate_math"
+        self.pid = "kaoyan-math-1-2026" if postgraduate else "gaokao-2026-national-1"
+        host = "yankao.neea.edu.cn" if postgraduate else "gaokao.neea.edu.cn"
+        identity = {"year": 2026, "issuer": NATIONAL_ISSUER, "courseCode": "301" if postgraduate else None,
+                    "courseName": "数学（一）" if postgraduate else "数学", "variant": "math-1" if postgraduate else "national-1"}
+        self.paper["paperId"] = self.pid
+        self.paper["identity"].update(identity, exam=exam, subject="数学", editionType="national")
+        self.pdf = synthetic_pdf(b"2026 national mathematics I synthetic fixture")
+        self.paper["source"].update(kind="authority_original_publication", listing=f"https://{host}/index.html",
+                                    artifact=f"https://{host}/2026.pdf", sha256=self.sha(self.pdf))
+        self.evidence["artifactSha256"] = self.sha(self.pdf)
+        self.evidence["cover"] = identity.copy()
+        self.evidence["comparisons"] = []
+        self.catalog = [{"paperId": self.pid, "exam": "kaoyan" if postgraduate else "gaokao", "year": 2026,
+                         "source": {"url": self.paper["source"]["artifact"], "gitBlobSha": "1" * 40}}]
+        self.configure_source()
+
+    def inspect(self, access=None):
         ledger = {"schemaVersion": 2, "mathFiles": {}, "papers": [self.paper]}
-        return audit.audit_witnesses(ledger, [], self.root, reviews={self.pid: self.evidence})[self.pid]
+        return audit.audit_witnesses(ledger, self.catalog, self.root, reviews={self.pid: self.evidence},
+                                     access={self.pid: access or {}})[self.pid]
 
     def test_complete_synthetic_source_passes_all_gates_and_strict_exit(self):
         result = self.inspect()
@@ -316,7 +414,8 @@ class AcceptanceFixtureTest(unittest.TestCase):
         self.assertEqual([result[k] for k in ("expectedQuestions", "locatedQuestions",
                                               "sourceComparedQuestions", "sourceQualifiedQuestions")], [2] * 4)
         self.assertEqual(result["redistributionRights"], "restricted_metadata_only")
-        scope = accepted_scope([self.pid], {}, {self.pid: result})
+        self.assertEqual(result["publicRedistributionRights"], "denied")
+        scope = accepted_scope([self.pid], {self.pid: result})
         self.assertTrue(scope["complete"])
         self.assertEqual(audit.exit_status({"acceptance": scope}, require_complete=True), 0)
 
@@ -351,10 +450,10 @@ class AcceptanceFixtureTest(unittest.TestCase):
     def test_wrong_attachment_and_forged_listing_paths_block(self):
         original = self.paper["source"]["artifact"]
         self.paper["source"]["artifact"] = "https://issuer.example/2025.pdf"
-        self.assertEqual(self.inspect()["attachmentLink"], "conflict")
+        self.assertNotEqual(self.inspect()["attachmentLink"], "linked")
         self.paper["source"]["artifact"] = original
         self.paper["source"]["listing"] = "https://issuer.example/forged-index.html"
-        self.assertEqual(self.inspect()["issuerIdentity"], "unverified")
+        self.assertEqual(self.inspect()["publisherSnapshot"], "unverified")
         self.assertEqual(self.inspect()["G0"], "unverified")
 
     def test_missing_and_conflicting_review_proof_revoke_acceptance(self):
@@ -364,6 +463,62 @@ class AcceptanceFixtureTest(unittest.TestCase):
         (self.root / f"proofs/{self.pid}.original").write_bytes(b"contradictory proof")
         self.assertEqual(self.inspect()["G1"], "conflict")
 
+    def test_national_routes_accept_scoped_synthetic_issuer_publications(self):
+        for exam, route in (("gaokao", "gaokao_national"), ("postgraduate_math", "postgraduate_national")):
+            with self.subTest(exam=exam):
+                self.as_national(exam)
+                result = self.inspect()
+                self.assertEqual(result["publisherRoute"], route)
+                self.assertEqual(result["G0"], "passed")
+                self.assertEqual(result["G1"], "passed")
+                self.assertEqual(result["G3"], "unverified")
+                self.assertEqual(result["sourceQualifiedQuestions"], 0)
+
+    def test_national_notices_mirrors_wrong_variant_and_wrong_year_do_not_pass(self):
+        self.as_national("gaokao")
+        for kind in ("exam_notice", "commentary"):
+            self.evidence["issuerListing"]["kind"] = kind
+            self.assertEqual(self.inspect()["G0"], "unverified")
+        self.configure_source(title="2026年高考全国卷试题评析")
+        self.assertEqual(self.inspect()["G0"], "conflict")
+        self.configure_source()
+        self.evidence["cover"]["variant"] = "national-2"
+        self.assertEqual(self.inspect()["G0"], "conflict")
+        self.evidence["cover"]["variant"] = "national-1"
+        (self.root / f"{self.pid}.pdf").write_bytes(synthetic_pdf(b"2025 national mathematics I"))
+        self.assertEqual(self.inspect()["G2"], "conflict")
+        (self.root / f"{self.pid}.pdf").write_bytes(self.pdf)
+        self.paper["source"]["kind"] = "pinned_third_party"
+        self.paper["source"]["gitBlobSha"] = audit.git_blob_sha(self.pdf)
+        self.catalog[0]["source"]["gitBlobSha"] = self.paper["source"]["gitBlobSha"]
+        self.assertEqual(self.inspect()["G0"], "unverified")
+        self.paper["source"]["kind"] = "authority_original_publication"
+        self.paper["source"]["listing"] = "https://gaokao.neea.edu.cn.example/index.html"
+        self.assertEqual(self.inspect()["G0"], "unverified")
+
+    def test_live_page_with_same_attachment_and_new_bytes_requires_review(self):
+        (self.root / f"{self.pid}.html").write_bytes(self.html + b"<!-- changed publication -->")
+        result = self.inspect({"listing": "reachable"})
+        self.assertTrue(result["liveAnchorPresent"])
+        self.assertEqual(result["publisherSnapshot"], "snapshot_changed")
+        self.assertEqual(result["attachmentLink"], "unverified")
+        self.assertEqual(result["G0"], "unverified")
+        self.assertEqual(result["G1"], "unverified")
+
+    def test_proof_with_correct_hash_but_wrong_contents_is_rejected(self):
+        for alter in ({"paperId": "another-paper"}, {"year": 2025}, {"purpose": "publicRedistribution"},
+                      {"url": "https://issuer.example/different"}, {"issuer": "different issuer"},
+                      {"publicationSha256": "a" * 64}):
+            with self.subTest(alter=alter):
+                self.write_proof("researchRights", "rights", "rights", "allowed", alter)
+                self.assertEqual(self.inspect()["internalResearchRights"], "conflict")
+                self.assertEqual(self.inspect()["G1"], "conflict")
+        self.write_proof("researchRights", "rights", "rights", "denied")
+        self.assertEqual(self.inspect()["internalResearchRights"], "denied")
+        self.assertEqual(self.inspect()["G1"], "unverified")
+        self.assertEqual(self.inspect()["officialOriginal"], "confirmed")
+        self.assertEqual(self.inspect()["publicRedistributionRights"], "denied")
+
     def test_partial_and_conflicting_question_comparisons(self):
         (self.root / f"comparisons/{self.pid}/B.1.json").unlink()
         result = self.inspect()
@@ -371,11 +526,39 @@ class AcceptanceFixtureTest(unittest.TestCase):
         self.assertEqual(result["sourceComparedQuestions"], 1)
         self.assertEqual(result["sourceQualifiedQuestions"], 1)
         self.assertEqual(result["G3"], "unverified")
-        phase = accepted_scope([self.pid], {}, {self.pid: result})
-        self.assertEqual(audit.exit_status({"acceptance": phase}, require_complete=True), 1)
-        self.evidence["comparisons"][0]["decision"] = "mismatch"
-        self.assertEqual(self.inspect()["G3"], "conflict")
-        self.assertEqual(self.inspect()["sourceQualifiedQuestions"], 0)
+        self.assertEqual(audit.exit_status({"acceptance": accepted_scope([self.pid], {self.pid: result})},
+                                          require_complete=True), 1)
+        self.write_comparison("A.1", change={"formulas": ["x - 1"]}, decision="mismatch",
+                              differences={"formulas": "Synthetic sign differs"})
+        result = self.inspect()
+        self.assertEqual(result["comparisonFindings"]["A.1"]["fields"]["formulas"], "differs")
+        self.assertEqual(result["G3"], "conflict")
+        self.assertEqual(result["sourceQualifiedQuestions"], 0)
+
+    def test_match_label_cannot_override_component_difference_or_missing_visual(self):
+        for field, value in (("stem", "Different text"), ("conditions", []), ("symbols", ["y"]),
+                             ("formulas", ["x - 1"]), ("units", ["s"]), ("options", ["D", "C", "B", "A"]),
+                             ("subparts", ["Part one"]), ("visuals", [])):
+            with self.subTest(field=field):
+                self.write_comparison("A.1", change={field: value})
+                self.assertEqual(self.inspect()["G3"], "conflict")
+                self.assertEqual(self.inspect()["sourceQualifiedQuestions"], 0)
+        self.write_comparison("A.1")
+        (self.root / f"comparisons/{self.pid}/A.1.source.figure-1.p2").unlink()
+        self.assertEqual(self.inspect()["missingComparisonArtifacts"], ["A.1"])
+
+    def test_wrong_source_page_and_same_author_cannot_qualify(self):
+        self.write_comparison("A.1", reference_page=2)
+        self.assertEqual(self.inspect()["comparisonConflicts"], ["A.1"])
+        self.write_comparison("A.1", author="fixture-reviewer")
+        self.assertEqual(self.inspect()["comparisonConflicts"], ["A.1"])
+        self.write_comparison("A.1", change={"units": ["s"]}, decision="abstained",
+                              differences={"units": "Synthetic ambiguity requires review"})
+        result = self.inspect()
+        self.assertEqual(result["G3"], "abstained")
+        self.assertEqual(result["sourceQualifiedQuestions"], 1)
+        self.assertEqual(result["comparisonFindings"]["A.1"]["decision"], "abstained")
+
 
 if __name__ == "__main__":
     unittest.main()

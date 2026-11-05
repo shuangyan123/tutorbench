@@ -1,6 +1,8 @@
 """Review evidence and acceptance rules for the Phase 1 source inventory."""
 from datetime import date
 from html.parser import HTMLParser
+import hashlib
+import json
 import re
 from urllib.parse import urljoin, urlsplit
 
@@ -9,7 +11,8 @@ PAPER_ID = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 QUESTION_ID = re.compile(r"[A-Z]\.[1-9]\d?")
 FIGURE_ID = re.compile(r"(?:figure|table|diagram)-\d+")
 IDENTITY_FIELDS = ("year", "issuer", "courseCode", "courseName")
-COMPARISON_CHECKS = {"wording", "subparts", "options", "units", "formulas", "visuals"}
+PERSON_ID = re.compile(r"[a-z0-9][a-z0-9-]{2,99}")
+COMPARISON_FIELDS = {"stem", "conditions", "symbols", "formulas", "units", "options", "subparts", "visuals"}
 GATES = ("G0", "G1", "G2", "G3", "G4")
 
 
@@ -41,28 +44,72 @@ def reviewed(record):
     )
 
 
+def evidence_digest(document):
+    payload = json.dumps(document, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(payload.encode("utf8")).hexdigest()
+
+
+def scoped_review(record, scope, digest):
+    if (not isinstance(record, dict) or set(record) != {
+        "schemaVersion", "reviewerId", "date", "record", "scope", "evidenceSha256"
+    } or type(record["schemaVersion"]) is not int or record["schemaVersion"] != 2
+            or not isinstance(record["reviewerId"], str) or not PERSON_ID.fullmatch(record["reviewerId"])
+            or not isinstance(digest, str) or not SHA256.fullmatch(digest)):
+        return False
+    return (record["scope"] == scope and record["evidenceSha256"] == digest
+            and reviewed({"reviewer": record["reviewerId"], "date": record["date"], "record": record["record"]}))
+
+
 class ListingLinks(HTMLParser):
     def __init__(self):
         super().__init__()
         self.hrefs = []
+        self.titles = []
+        self.title_parts = None
 
     def handle_starttag(self, tag, attrs):
         if tag == "a":
             self.hrefs.extend(value for key, value in attrs if key == "href" and value)
+        if tag == "title":
+            self.title_parts = []
+
+    def handle_data(self, data):
+        if self.title_parts is not None:
+            self.title_parts.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "title" and self.title_parts is not None:
+            self.titles.append(" ".join("".join(self.title_parts).split()))
+            self.title_parts = None
+
+
+def parse_listing(html):
+    parser = ListingLinks()
+    parser.feed(html.decode("utf-8-sig"))
+    parser.close()
+    return parser
+
+
+def strict_json(raw):
+    def unique(pairs):
+        result = dict(pairs)
+        require(len(result) == len(pairs), "duplicate JSON evidence fields")
+        return result
+
+    return json.loads(raw, object_pairs_hook=unique)
 
 
 def exact_attachment(html, listing, artifact):
     """Resolve actual anchors against the requested listing, ignoring text and base tags."""
-    parser = ListingLinks()
-    parser.feed(html.decode("utf-8-sig"))
-    parser.close()
-    return any(urljoin(listing, href) == artifact for href in parser.hrefs)
+    return any(urljoin(listing, href) == artifact for href in parse_listing(html).hrefs)
 
 
 def observed_cover(observation, identity):
-    require(isinstance(observation, dict) and set(observation) == set(IDENTITY_FIELDS),
-            "invalid cover observation")
-    return all(observation[key] == identity[key] for key in IDENTITY_FIELDS)
+    fields = set(IDENTITY_FIELDS)
+    if identity["editionType"] == "national":
+        fields.add("variant")
+    return (isinstance(observation, dict) and set(observation) == fields
+            and all(type(observation[key]) is type(identity[key]) and observation[key] == identity[key] for key in fields))
 
 
 def page_index(observations, count):
@@ -149,67 +196,125 @@ def inventory_result(inventory, expected, page_count):
     return status, located, problems, missing
 
 
-def comparison_result(comparisons, located, source_sha, candidate_digest):
+def component_findings(reference, candidate):
+    require(set(reference) == set(candidate) == COMPARISON_FIELDS, "incomplete comparison components")
+    for parts in (reference, candidate):
+        require(isinstance(parts["stem"], str) and parts["stem"].strip(), "missing question stem")
+        require(all(isinstance(parts[key], list) and all(isinstance(text, str) and text.strip() for text in parts[key])
+                    for key in COMPARISON_FIELDS - {"stem", "visuals"}), "invalid comparison component content")
+        require(isinstance(parts["visuals"], list) and all(
+            set(asset) == {"id", "page", "sha256"} and FIGURE_ID.fullmatch(asset["id"])
+            and type(asset["page"]) is int and SHA256.fullmatch(asset["sha256"]) for asset in parts["visuals"]
+        ), "invalid comparison visual content")
+    return {field: "matches" if reference[field] == candidate[field] else "differs"
+            for field in sorted(COMPARISON_FIELDS)}
+
+
+def comparison_result(comparisons, paper_id, expected, located, inventory, source_sha, read_local):
     if comparisons is None:
-        return set(), set(), [], []
+        return set(), set(), [], [], {}
     require(isinstance(comparisons, list), "invalid comparison records")
-    compared, matched, conflicts, missing, seen = set(), set(), [], [], set()
+    compared, matched, conflicts, missing, findings = set(), set(), [], [], {}
+    seen = set()
+    items = {item["id"]: item for item in inventory}
     for entry in comparisons:
-        require(set(entry) == {"id", "sourceSha256", "candidateSha256", "checks", "decision", "review"},
-                "invalid question comparison evidence")
+        require(set(entry) == {"id", "sourceSha256", "candidateSha256", "referenceSha256",
+                              "decision", "differences", "review"}, "invalid question comparison evidence")
         qid = entry["id"]
         require(QUESTION_ID.fullmatch(qid) and qid not in seen, "duplicate or invalid question comparison")
         seen.add(qid)
-        if (qid not in located or entry["sourceSha256"] != source_sha
-                or not SHA256.fullmatch(entry["candidateSha256"]) or entry["candidateSha256"] == source_sha
-                or set(entry["checks"]) != COMPARISON_CHECKS or not reviewed(entry["review"])
-                or entry["decision"] not in {"match", "mismatch"}):
+        if qid not in located or entry["sourceSha256"] != source_sha:
             conflicts.append(qid)
             continue
-        actual = candidate_digest(qid)
-        if actual is None:
+        try:
+            result = compare_question(entry, paper_id, expected[qid], items[qid], read_local)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError):
+            conflicts.append(qid)
+            continue
+        if result is None:
             missing.append(qid)
             continue
-        if actual != entry["candidateSha256"]:
-            conflicts.append(qid)
+        fields, decision = result
+        findings[qid] = {"fields": fields, "decision": decision,
+                          "reviewerId": entry["review"]["reviewerId"],
+                         "candidateAuthorId": entry["review"]["scope"]["candidateAuthorId"]}
+        if decision == "abstained":
             continue
         compared.add(qid)
-        if entry["decision"] == "match":
+        if decision == "match":
             matched.add(qid)
         else:
             conflicts.append(qid)
-    return compared, matched, conflicts, missing
+    return compared, matched, conflicts, missing, findings
 
 
-def accepted_scope(known_ids, rosters, papers):
-    """A closed roster must account for every target and each paper must pass all gates."""
-    required = set(known_ids)
-    require(required, "empty phase target roster")
-    open_rosters = []
-    for kind, roster in rosters.items():
-        if roster["status"] == "open":
-            require(set(roster) == {"status", "reason"} and roster["reason"].strip(),
-                    "open roster lacks an explanation")
-            open_rosters.append(kind)
-            continue
-        require(set(roster) == {"status", "paperIds", "review"} and roster["status"] == "closed"
-                and reviewed(roster["review"]), "closed roster lacks reviewed evidence")
-        ids = roster["paperIds"]
-        require(isinstance(ids, list) and ids and all(PAPER_ID.fullmatch(i) for i in ids)
-                and len(ids) == len(set(ids)) and not (required & set(ids)), "invalid closed roster IDs")
-        required.update(ids)
-    missing = sorted(required - papers.keys())
-    extra = sorted(papers.keys() - required)
-    blocked = sorted(i for i in required & papers.keys() if any(papers[i][gate] != "passed" for gate in GATES))
-    denominator = None
-    if not open_rosters and not missing and not extra and all(papers[i]["expectedQuestions"] is not None for i in required):
-        denominator = sum(papers[i]["expectedQuestions"] for i in required)
+def compare_question(entry, paper_id, locator, item, read_local):
+    qid = entry["id"]
+    base = f"comparisons/{paper_id}/{qid}"
+    candidate_raw = read_local(f"{base}.json")
+    reference_raw = read_local(f"{base}.source.json")
+    if candidate_raw is None or reference_raw is None:
+        return None
+    digests = {key: hashlib.sha256(data).hexdigest() for key, data in (
+        ("candidateSha256", candidate_raw), ("referenceSha256", reference_raw))}
+    require(all(entry[key] == value for key, value in digests.items()), "comparison artifact drift")
+    question = {"paperId": paper_id, "questionId": qid}
+    anchor = {**question, "sourceSha256": entry["sourceSha256"], "stemPage": locator["stemPage"],
+              "pages": sorted(locator["pages"])}
+    ref, candidate = strict_json(reference_raw), strict_json(candidate_raw)
+    review_scope = {**anchor, **digests, "purpose": "question_comparison",
+                    "candidateAuthorId": candidate["authorId"], "independence": "independent_source_transcription"}
+    require(scoped_review(entry["review"], review_scope, digests["referenceSha256"]),
+            "unbound comparison review")
+    require(set(ref) == {"schemaVersion", "anchor", "reviewerId", "components"}
+            and type(ref["schemaVersion"]) is int and ref["schemaVersion"] == 1 and ref["anchor"] == anchor
+            and type(ref["anchor"]["stemPage"]) is int and all(type(n) is int for n in ref["anchor"]["pages"])
+            and ref["reviewerId"] == entry["review"]["reviewerId"], "invalid source-page reference")
+    require(set(candidate) == {"schemaVersion", "paperId", "questionId", "authorId", "components"}
+            and type(candidate["schemaVersion"]) is int and candidate["schemaVersion"] == 1
+            and all(candidate[key] == value for key, value in question.items())
+            and PERSON_ID.fullmatch(candidate["authorId"])
+            and candidate["authorId"] != ref["reviewerId"], "comparison reviewer is not independent")
+    fields = component_findings(ref["components"], candidate["components"])
+    visuals = ref["components"]["visuals"]
+    require({(v["id"], v["page"]) for v in visuals} == locator["figures"] and len(visuals) == len(locator["figures"])
+            and len(ref["components"]["options"]) == item["options"]
+            and len(ref["components"]["subparts"]) == item["numberedParts"]
+            and (item["notation"] != "seen" or ref["components"]["symbols"] or ref["components"]["formulas"]),
+            "reference omits source components")
+    for side, values in (("source", visuals), ("candidate", candidate["components"]["visuals"])):
+        for asset in values:
+            raw = read_local(f"{base}.{side}.{asset['id']}.p{asset['page']}")
+            if raw is None:
+                return None
+            require(hashlib.sha256(raw).hexdigest() == asset["sha256"], "unbound visual bytes")
+    differences = {field for field, status in fields.items() if status == "differs"}
+    require(isinstance(entry["differences"], dict) and set(entry["differences"]) == differences
+            and all(isinstance(note, str) and note.strip() for note in entry["differences"].values()),
+            "differences were not reviewed")
+    decision = entry["decision"]
+    require(decision == "abstained" or decision == ("mismatch" if differences else "match"),
+            "review conclusion contradicts component findings")
+    return fields, decision
+
+
+def accepted_scope(target_ids, papers):
+    """The versioned acceptance cohort is separate from discovery inventories."""
+    required = set(target_ids)
+    require(required and len(required) == len(target_ids), "empty or duplicate phase target roster")
+    present = required & papers.keys()
+    missing = sorted(required - present)
+    blocked = sorted(i for i in present if any(papers[i][gate] != "passed" for gate in GATES))
+    observed = sum(papers[i]["expectedQuestions"] or 0 for i in present)
+    denominator = observed if not missing and all(papers[i]["expectedQuestions"] is not None for i in present) else None
     return {
-        "complete": not open_rosters and not missing and not extra and not blocked and bool(denominator),
-        "openRosters": open_rosters,
-        "requiredKnownPapers": len(required),
+        "complete": not missing and not blocked and bool(denominator),
+        "targetPapers": len(required),
+        "papersWithWitness": len(present),
+        "papersPassingAllGates": len(present) - len(blocked),
         "missingPaperIds": missing,
-        "outsideClosedRosterIds": [] if open_rosters else extra,
+        "outsideTargetIds": sorted(papers.keys() - required),
         "blockedPaperIds": blocked,
+        "expectedQuestionsInReviewedWitnesses": observed,
         "phaseQuestionDenominator": denominator,
     }

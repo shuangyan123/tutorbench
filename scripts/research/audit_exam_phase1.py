@@ -14,9 +14,10 @@ from tempfile import TemporaryDirectory
 from urllib.parse import unquote, urlsplit
 
 from audit_pinned_exam_artifacts import MAX_BLOB_BYTES, git_blob_sha
+from exam_phase1_authority import AUTHORITY_SOURCE_KINDS, assess_proof, assess_publication
 from exam_phase1_evidence import (
-    PAPER_ID, SHA256, accepted_scope, comparison_result, exact_attachment,
-    inventory_result, observed_cover, page_index, require, reviewed, valid_https,
+    PAPER_ID, SHA256, accepted_scope, comparison_result, evidence_digest, inventory_result, page_index,
+    require, reviewed, scoped_review, valid_https,
 )
 
 from replay_exam_phase1_sources import replay_sources, witness_transport
@@ -24,7 +25,6 @@ from replay_exam_phase1_sources import replay_sources, witness_transport
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures/research"
 YEARS = range(2022, 2027)
 SUBJECTS = {"数学", "物理", "化学", "生物"}
-ISSUER_HOSTS = {"南京理工大学": "gs.njust.edu.cn"}
 SOURCE_PIN = {
     "repository": "qingshuo/China-Gaokao-Papers-Collection",
     "revision": "b33ea3dd5427afa963a944808d3a6c0183fc454e",
@@ -204,17 +204,10 @@ def check_pdf(path, source):
     require(match and int(match[1]) == source["pages"], "PDF page count mismatch")
 
 
-def local_digest(pdf_dir, relative):
+def local_bytes(pdf_dir, relative):
     if pdf_dir is None or not (path := pdf_dir / relative).is_file():
         return None
-    return hashlib.sha256(read_bounded(path)).hexdigest()
-
-
-def reviewed_proof(pdf_dir, relative, expected):
-    observed = local_digest(pdf_dir, relative)
-    if observed is None:
-        return "unavailable"
-    return "confirmed" if observed == expected else "conflict"
+    return read_bounded(path)
 
 
 def audit_paper(paper, evidence, pdf_dir, access):
@@ -222,7 +215,8 @@ def audit_paper(paper, evidence, pdf_dir, access):
     source, identity = paper["source"], paper["identity"]
     artifact_sha = source["sha256"]
     require(evidence is None or set(evidence) == {"artifactSha256", "issuerListing", "cover", "pages",
-            "pageReview", "editionResolution", "officialOriginal", "researchRights", "comparisons", "difficultyReview"},
+            "pageReview", "coverReview", "editionResolution", "officialOriginal", "researchRights",
+            "publicRedistribution", "comparisons", "difficultyReview"},
             "unexpected source evidence fields")
     evidence = evidence or {}
     issues = []
@@ -244,68 +238,37 @@ def audit_paper(paper, evidence, pdf_dir, access):
             issues.append("pdf_integrity_conflict")
             g2 = "conflict"
 
-    issuer = evidence.get("issuerListing")
-    issuer_host = ISSUER_HOSTS.get(identity["issuer"])
-    issuer_trusted = bool(source["kind"] == "issuer_past_paper_attachment" and issuer and
-        set(issuer) == {"url", "sha256", "review"} and issuer["url"] == source["listing"] and
-        issuer_host == urlsplit(source["listing"]).hostname == urlsplit(source["artifact"]).hostname
-        and SHA256.fullmatch(issuer["sha256"]) and reviewed(issuer["review"]))
-    attachment = "unavailable" if access.get("listing") == "unavailable" else "unverified"
-    listing_sha = None
-    if issuer_trusted and pdf_dir is not None and (listing := pdf_dir / f"{paper_id}.html").is_file():
+    def read_local(relative):
+        return local_bytes(pdf_dir, relative)
+
+    publisher, publication, source_issues = assess_publication(
+        paper, evidence, read_local, access, g2 == "passed", bound,
+    )
+    issues.extend(source_issues)
+    g0 = "conflict" if issues else publisher["G0"]
+    proofs = {}
+    for kind in ("officialOriginal", "researchRights", "publicRedistribution"):
         try:
-            html = read_bounded(listing)
-            listing_sha = hashlib.sha256(html).hexdigest()
-            # 离线 HTML 必须对应已审阅的快照，联网回放按当次官方页面的实际链接判断。
-            linked = (access.get("listing") == "reachable" or listing_sha == issuer["sha256"]) and exact_attachment(
-                html, source["listing"], source["artifact"])
-            attachment = "linked" if linked else "conflict"
-        except (ValueError, OSError):
-            attachment = "conflict"
-        if attachment == "conflict":
-            issues.append("listing_does_not_bind_exact_attachment")
-
-    cover = evidence.get("cover")
-    cover_status = "unverified"
-    if cover is not None and bound and reviewed(evidence.get("pageReview")):
-        if not observed_cover(cover, identity):
-            issues.append("cover_identity_conflict")
-            cover_status = "conflict"
-        elif g2 == "passed":
-            cover_status = "matches"
-        else:
-            cover_status = "recorded_match_not_replayed"
-
-    resolution = evidence.get("editionResolution")
-    resolved = bool(resolution and set(resolution) == {"decision", "review"}
-                    and resolution["decision"] in {"unique", "alternate_versions_resolved"}
-                    and reviewed(resolution["review"]))
-    g0 = ("conflict" if issues else "passed" if resolved and issuer_trusted and attachment == "linked"
-          and cover_status == "matches" else "unverified")
-    original = evidence.get("officialOriginal")
-    official = "unverified"
-    if original is not None:
-        require(set(original) == {"url", "sha256", "review"} and valid_https(original["url"])
-                and urlsplit(original["url"]).hostname == issuer_host
-                and original["url"] not in (source["artifact"], source["listing"])
-                and SHA256.fullmatch(original["sha256"]) and reviewed(original["review"]),
-                "invalid official-original evidence")
-        if g0 == "passed":
-            official = reviewed_proof(pdf_dir, f"proofs/{paper_id}.original", original["sha256"])
-    rights = evidence.get("researchRights")
-    research = "unverified"
-    if rights is not None:
-        require(set(rights) == {"decision", "basis", "sha256", "review"}
-                and rights["decision"] == "allowed_for_internal_research" and valid_https(rights["basis"])
-                and SHA256.fullmatch(rights["sha256"]) and reviewed(rights["review"]),
-                "invalid research rights evidence")
-        research = reviewed_proof(pdf_dir, f"proofs/{paper_id}.rights", rights["sha256"])
+            proofs[kind] = (assess_proof(evidence.get(kind), kind, paper_id, publication, read_local)
+                            if publisher["attachmentIdentity"] == "matches" else "unverified")
+        except (ValueError, OSError, TypeError, KeyError, AttributeError):
+            proofs[kind] = "conflict"
+    official, research = proofs["officialOriginal"], proofs["researchRights"]
     g1 = ("conflict" if "conflict" in (official, research) else
-          "passed" if official == research == "confirmed" else "unverified")
+          "passed" if g0 == "passed" and official == "confirmed" and research == "allowed" else "unverified")
 
     expected = None
-    if bound and evidence.get("pages") is not None and reviewed(evidence.get("pageReview")):
-        expected = page_index(evidence["pages"], source["pages"])
+    pages = evidence.get("pages")
+    page_review = evidence.get("pageReview")
+    page_review_conflict = False
+    if bound and pages is not None and page_review is not None:
+        scope = {"paperId": paper_id, "sourceSha256": artifact_sha, "pageCount": source["pages"],
+                 "purpose": "page_inventory"}
+        if scoped_review(page_review, scope, evidence_digest(pages)):
+            expected = page_index(pages, source["pages"])
+        else:
+            page_review_conflict = True
+            issues.append("page_inventory_review_binding_conflict")
     difficulty_review = evidence.get("difficultyReview")
     rated = identity["difficulty"] != "unrated"
     if rated:
@@ -320,28 +283,27 @@ def audit_paper(paper, evidence, pdf_dir, access):
                 and 2 * sum(x == identity["difficulty"] for x in question_bands.values()) > len(expected),
                 "difficulty classification lacks a full reviewed majority")
     inventory, located, locator_conflicts, missing = inventory_result(paper["inventory"], expected, source["pages"])
-    g4 = "unverified" if inventory == "passed" and g2 != "passed" else inventory
-    compared, matched, comparison_conflicts, comparison_missing = comparison_result(
-        evidence.get("comparisons") if g2 == "passed" else None, located, artifact_sha,
-        lambda qid: local_digest(pdf_dir, f"comparisons/{paper_id}/{qid}.json"),
+    g4 = ("conflict" if page_review_conflict else
+          "unverified" if inventory == "passed" and g2 != "passed" else inventory)
+    compared, matched, comparison_conflicts, comparison_missing, comparison_findings = comparison_result(
+        evidence.get("comparisons") if g2 == "passed" else None,
+        paper_id, expected, located, paper["inventory"]["questions"], artifact_sha, read_local,
     )
     g3 = ("conflict" if comparison_conflicts else "passed" if expected is not None and g2 == "passed"
-          and len(matched) == len(expected) else "unverified")
+          and len(matched) == len(expected) else "abstained" if any(
+              row["decision"] == "abstained" for row in comparison_findings.values()
+          ) else "unverified")
     qualified = len(matched) if g0 == g1 == g2 == "passed" and not comparison_conflicts and not locator_conflicts else 0
 
     return {
+        **publisher,
         "G0": g0, "G1": g1, "G2": g2, "G3": g3, "G4": g4,
         "listingUrlAccess": access.get("listing", "not_requested"),
         "pdfUrlAccess": access.get("pdf", "not_requested"),
-        "issuerIdentity": "reviewed_publisher" if issuer_trusted else "unverified",
-        "attachmentLink": attachment,
-        "observedListingSha256": listing_sha,
-        "coverIdentity": cover_status,
-        "attachmentIdentity": "matches" if attachment == "linked" and cover_status == "matches" else "unverified",
-        "editionResolution": "reviewed" if resolved else "unverified",
         "difficultyEvidence": "reviewed" if rated else "unrated",
         "officialOriginal": official,
         "internalResearchRights": research,
+        "publicRedistributionRights": proofs["publicRedistribution"],
         "redistributionRights": source["rights"],
         "inventoryAgainstPageReview": inventory,
         "expectedQuestions": None if expected is None else len(expected),
@@ -352,6 +314,7 @@ def audit_paper(paper, evidence, pdf_dir, access):
         "missingQuestionIds": missing,
         "locatorConflicts": locator_conflicts,
         "comparisonConflicts": comparison_conflicts,
+        "comparisonFindings": comparison_findings,
         "missingComparisonArtifacts": comparison_missing,
         "evidenceConflicts": issues,
     }
@@ -386,12 +349,13 @@ def audit_witnesses(ledger, catalog, pdf_dir=None, *, reviews=None, access=None)
         require(source["sha256"] not in hashes, "same whole-paper bytes assigned to distinct editions")
         hashes.add(source["sha256"])
         exam, course, edition = identity["exam"], identity["courseCode"], identity["editionType"]
-        require(source["kind"] in {"issuer_past_paper_attachment", "pinned_third_party"},
+        require(source["kind"] in AUTHORITY_SOURCE_KINDS | {"pinned_third_party"},
                 "source is not an exam-paper witness")
         if exam == "gaokao":
             require(course is None and edition in {"national", "provincial", "joint_province"}
                     and (identity["subject"] != "理科综合" or edition == "national"),
                     "invalid Gaokao edition type or course code")
+            require(paper_id == f"gaokao-{identity['year']}-{identity['variant']}", "Gaokao edition ID mismatch")
             if identity["subject"] == "数学":
                 known = catalog_by_id.get(paper_id)
                 require(known and known["exam"] == "gaokao" and known["year"] == identity["year"]
@@ -418,22 +382,60 @@ def audit_witnesses(ledger, catalog, pdf_dir=None, *, reviews=None, access=None)
     return results
 
 
+def acceptance_targets(manifest, catalog, identities):
+    groups = {
+        "gaokaoMath": ("gaokao", {"数学"}, "national"),
+        "gaokaoScience": ("gaokao", {"理科综合"}, "national"),
+        "postgraduateMath": ("postgraduate_math", {"数学"}, "national"),
+        "postgraduateScience": ("postgraduate_self_set", SUBJECTS - {"数学"}, "institution"),
+    }
+    require(set(manifest) == {"schemaVersion", "id", "missingSourcePolicy", "exclusions", "groups"}
+            and manifest["schemaVersion"] == 1 and manifest["id"] == "phase1-national-and-njust-v1"
+            and bool(manifest["missingSourcePolicy"].strip()) and set(manifest["groups"]) == set(groups),
+            "invalid acceptance scope version")
+    require(manifest["exclusions"] and all(
+        set(x) == {"id", "basis", "source"} and x["basis"].strip() and valid_https(x["source"])
+        for x in manifest["exclusions"]), "scope exclusion lacks evidence")
+    target_ids = []
+    for name, (exam, subjects, edition) in groups.items():
+        group = manifest["groups"][name]
+        require(set(group) == {"basis", "sources", "deferred", "papers"} and group["basis"].strip()
+                and group["deferred"].strip() and group["sources"] and all(map(valid_https, group["sources"]))
+                and group["papers"], "scope group lacks evidence or targets")
+        for target in group["papers"]:
+            require(set(target) == {"paperId", "year", "exam", "subject", "variant", "courseCode", "issuer", "editionType"}
+                    and PAPER_ID.fullmatch(target["paperId"]) and target["exam"] == exam and target["year"] in YEARS
+                    and target["subject"] in subjects and target["editionType"] == edition, "invalid acceptance target")
+            ident = target["paperId"]
+            if ident in identities:
+                require(all(identities[ident][key] == value for key, value in target.items() if key != "paperId"),
+                        "witness conflicts with versioned target identity")
+            target_ids.append(ident)
+    national_math = {p["paperId"] for p in catalog if p["exam"] == "gaokao"
+                     and p["paperId"].removeprefix(f"gaokao-{p['year']}-").startswith(("national-", "new-gaokao-"))}
+    for key, expected in (("gaokaoMath", national_math),
+                          ("postgraduateMath", {p["paperId"] for p in catalog if p["exam"] == "kaoyan"})):
+        require({p["paperId"] for p in manifest["groups"][key]["papers"]} == expected,
+                "acceptance scope drops a national mathematics target")
+    return target_ids
+
+
 def run_audit(raw_csv, pdf_dir=None, *, fetch=False):
     catalog = load("exam-source-expansion-2022-2026-v0.1.json")["papers"]
     snapshot = load("exam-science-upstream-intake-snapshot-2022-2026-v0.1.json")
     crosswalk = load("exam-science-source-reconciliation-2022-2026-v0.1.json")
     ledger = load("exam-phase1-witnesses-2022-2026-v0.1.json")
     reviews = load("exam-phase1-source-review-2022-2026-v0.1.json")
-    require(set(reviews) == {"schemaVersion", "rosters", "candidateDispositions", "papers"} and
-            reviews["schemaVersion"] == 1 and set(reviews["rosters"]) == {"gaokaoScience", "postgraduateScience"},
-            "invalid phase-1 review manifest")
+    require(set(reviews) == {"schemaVersion", "candidateDispositions", "papers"} and
+            reviews["schemaVersion"] == 2, "invalid phase-1 review manifest")
     counts, rows = reconcile(raw_csv, snapshot, crosswalk, catalog)
-    transport = replay_sources(pdf_dir, catalog, ledger, crosswalk, rows) if fetch else {}
+    transport = replay_sources(pdf_dir, catalog, ledger, crosswalk, rows, reviews["papers"]) if fetch else {}
     math_bytes = audit_math_files(ledger["mathFiles"], rows, crosswalk, catalog, pdf_dir, transport)
     witnesses = audit_witnesses(ledger, catalog, pdf_dir, reviews=reviews["papers"],
                                 access=witness_transport(ledger, transport))
     for paper in ledger["papers"]:
-        if paper["identity"]["exam"] == "gaokao" and paper["source"]["kind"] == "pinned_third_party":
+        if (paper["identity"]["exam"] == "gaokao" and paper["identity"]["subject"] == "数学"
+                and paper["source"]["kind"] == "pinned_third_party"):
             require(paper["source"]["sha256"] == ledger["mathFiles"]["catalogPdfSha256"][paper["paperId"]],
                     "Gaokao witness SHA-256 differs from catalog observation")
 
@@ -454,28 +456,16 @@ def run_audit(raw_csv, pdf_dir=None, *, fetch=False):
         else:
             require(disposition["decision"] == "out_of_scope" and disposition["paperId"] is None,
                     "invalid out-of-scope disposition")
-    for name, roster in reviews["rosters"].items():
-        if roster["status"] == "closed":
-            expected_exam = "gaokao" if name == "gaokaoScience" else "postgraduate_self_set"
-            ids = roster["paperIds"]
-            # 每条理科路线必须覆盖明确要求的年份与学科，不能以一个样本关闭整个范围。
-            science = SUBJECTS - {"数学"}
-            observed = {(by_id[i]["year"], subject) for i in ids if i in by_id
-                        for subject in (science if by_id[i]["subject"] == "理科综合" else [by_id[i]["subject"]])}
-            require(all(i in by_id and by_id[i]["exam"] == expected_exam for i in ids)
-                    and observed == {(year, subject) for year in YEARS for subject in SUBJECTS - {"数学"}},
-                    "closed science roster does not cover the requested exam/year/subject lanes")
-            if name == "postgraduateScience":
-                require(all(witnesses[i]["difficultyEvidence"] == "reviewed" for i in ids),
-                        "closed postgraduate science roster lacks reviewed difficulty strata")
-    phase = accepted_scope([p["paperId"] for p in catalog], reviews["rosters"], witnesses)
-    phase["unresolvedCandidateIds"] = sorted(open_candidates - dispositions.keys())
+    target = load("exam-phase1-acceptance-scope-2022-2026-v1.json")
+    target_ids = acceptance_targets(target, catalog, by_id)
+    phase = accepted_scope(target_ids, witnesses)
+    phase["scopeVersion"] = target["id"]
+    phase["unresolvedDiscoveryCandidateIds"] = sorted(open_candidates - dispositions.keys())
     byte_replay = (
         math_bytes["catalogPdfsRechecked"] == math_bytes["catalogPdfsWithObservedSha256"]
         and math_bytes["mirrorsRechecked"] == math_bytes["equalMirrorsRecorded"]
         and bool(witnesses) and all(x["G2"] == "passed" for x in witnesses.values())
     )
-    phase["complete"] = phase["complete"] and not phase["unresolvedCandidateIds"] and byte_replay
 
     prior = load("kaoyan-math1-2025-all-questions-review-v0.1.json")
     reviewed_count = prior["paper"]["expectedQuestions"]
@@ -493,7 +483,7 @@ def run_audit(raw_csv, pdf_dir=None, *, fetch=False):
         "witnesses": witnesses,
         "acceptance": phase,
         "phaseQuestionDenominator": phase["phaseQuestionDenominator"],
-        "sourceQualifiedQuestions": sum(x["sourceQualifiedQuestions"] for x in witnesses.values()),
+        "sourceQualifiedQuestions": sum(witnesses[i]["sourceQualifiedQuestions"] for i in target_ids if i in witnesses),
     }
 
 
