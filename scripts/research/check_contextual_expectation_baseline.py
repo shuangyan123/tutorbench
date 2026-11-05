@@ -85,7 +85,7 @@ def compatible_rounding(fraction_text,approx):
         return False
 
 
-def evaluate(raw,question,parse_function=mv.parse_without_gold):
+def evaluate(raw,question,parse_function=None):
     if not isinstance(raw,str) or not raw.strip():
         return abstain("empty_original_final_text")
     if len(raw.encode("utf8"))>mv.MAX_INPUT_BYTES:
@@ -97,6 +97,8 @@ def evaluate(raw,question,parse_function=mv.parse_without_gold):
     # Do NOT hand the entire Eq(E[X], ...) to Math-Verify: it can parse E[X]
     # as sympy E*x. Instead supply only the source-bound exact RHS, bounded
     # by Math-Verify's pre-existing isolated child and parent wall time.
+    if parse_function is None:
+        parse_function=mv.parse_without_gold
     worker=parse_function(r"\boxed{"+exact+"}")
     if worker.get("state")!="parsed":
         return abstain("mathverify_worker_not_parsed",workerState=worker.get("state"))
