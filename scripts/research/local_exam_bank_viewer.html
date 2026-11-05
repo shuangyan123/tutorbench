@@ -131,7 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
       appendRegions(answer, candidate.displayRegions, candidate.localPath, "参考答案");
       if (candidate.solutionRegions.length) {
         const solution = el("details");
-        solution.append(el("summary", candidate.solutionSeparation === "interleaved" ? "查看与答案交织的参考推导" : "查看参考解析"));
+        solution.append(el("summary", candidate.solutionSeparation === "interleaved" ? "查看与答案交织的参考推导" :
+          candidate.solutionSeparation === "grouped" ? "查看共用材料题组解析" : "查看参考解析"));
         appendRegions(solution, candidate.solutionRegions, candidate.localPath, "参考解析");
         answer.append(solution);
       }

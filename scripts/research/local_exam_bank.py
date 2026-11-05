@@ -174,18 +174,28 @@ def plausible_end(lines, locs, number):
     stop = min(following, default=len(lines))
     return range_end(lines, start, stop)
 
-def shared_prompt(doc, number):
-    lines = doc.lines
+def shared_prompts(lines, locs, manual=()):
+    groups = []
     for i, line in enumerate(lines):
-        if not line.text.startswith(("阅读下列材料", "阅读材料")):
-            continue
-        match = re.search(r"(\d{1,2})\s*[-—–~～至]\s*(\d{1,2})\s*题", line.text)
-        if not match or not int(match[1]) <= number <= int(match[2]):
-            continue
-        end = next((j for j in range(i + 1, len(lines)) if start_number(lines[j]) == int(match[1])), None)
-        if end is not None:
-            return source_spans(doc, i, end), "\n".join(l.text for l in lines[i:end])
-    return [], None
+        if line.text.startswith(("阅读下列材料", "阅读材料")):
+            match = re.search(r"(\d{1,2})\s*[-—–~～至]\s*(\d{1,2})\s*(?:小)?题", line.text)
+            if match:
+                groups.append((i, int(match[1]), int(match[2])))
+    for anchor in manual:
+        matches = [i for i, line in enumerate(lines)
+                   if line.page == anchor["page"] and abs(line.top - anchor["top"]) < 2]
+        if len(matches) != 1:
+            raise ValueError("shared prompt override does not identify a unique source line")
+        groups.append((matches[0], anchor["first"], anchor["last"]))
+    covered = set()
+    result = []
+    for i, first, last in groups:
+        numbers = set(range(first, last + 1))
+        if not numbers or not numbers <= locs.keys() or covered & numbers or not i < locs[first]:
+            raise ValueError("shared prompt does not precede its distinct source question range")
+        covered.update(numbers)
+        result.append((i, locs[first], numbers))
+    return result
 
 def pilot_components(pilot, pid, n, digest):
     if not pilot or not (pilot / "inventory.json").is_file():
@@ -228,12 +238,13 @@ def question_records(paper, selection, crops, pilot, overrides):
     count = paper["expectedQuestions"]
     layout = overrides.get(row["sha256"], {})
     locs = starts(doc, count, layout.get("questions"))
+    shared = shared_prompts(lines, locs, layout.get("sharedPrompts", []))
     questions = {}
     for n in sorted(locs):
         i = locs[n]
         if n > 1 and locs.get(n - 1, -1) >= i or n < count and locs.get(n + 1, len(lines)) <= i:
             continue
-        end = plausible_end(lines, locs, n)
+        end = min([plausible_end(lines, locs, n), *[j for j, _, _ in shared if j > i]])
         if end <= i:
             continue
         issues = list(layout.get("issues", []))
@@ -241,14 +252,15 @@ def question_records(paper, selection, crops, pilot, overrides):
             issues.append("following_question_boundary_uncertain")
         if not lines[i].text or end <= i:
             continue
-        assets, shared_text = shared_prompt(doc, n)
+        prompt = next(((j, k) for j, k, numbers in shared if n in numbers), None)
+        shared_spans = source_spans(doc, *prompt) if prompt else []
         spans = source_spans(doc, i, end)
-        assets = [crops.crop(row["sha256"], raw, page, box) for page, box in [*assets, *spans]]
+        assets = [crops.crop(row["sha256"], raw, page, box) for page, box in [*shared_spans, *spans]]
         if not assets:
             continue
         fields = extract_fields(lines[i:end])
-        if shared_text:
-            fields["sharedText"] = shared_text
+        if prompt:
+            fields["sharedText"] = "\n".join(line.text for line in lines[prompt[0]:prompt[1]])
         candidate = pilot_components(pilot, paper["paperId"], n, row["sha256"])
         if candidate:
             fields.update({k: v for k, v in candidate.items() if k not in {"visuals", "options", "subparts"}})
@@ -320,7 +332,7 @@ def answer_records(row, raw, doc, limit, paper, questions, crops, overrides):
     numbered = bool(anchor)
     tail = next((i for i, line in enumerate(lines) if i > 15 and KEY_HEADING.match(line.text)), None)
     key_start = 0 if row["role"] == "answer" else tail
-    table = {}
+    table, grouped = {}, {}
     if key_start is not None:
         for i in range(key_start, len(lines)):
             for n, choice in key_entries(lines[i].text):
@@ -347,6 +359,7 @@ def answer_records(row, raw, doc, limit, paper, questions, crops, overrides):
                 for number, choice in entries:
                     if 1 <= number <= count:
                         table[number] = (i, choice) if number not in table else (i, None)
+                        grouped[number] = max(n for n, _ in entries)
         for n, matches in candidates.items():
             if len(matches) == 1:
                 anchor[n] = matches[0][1]
@@ -361,6 +374,12 @@ def answer_records(row, raw, doc, limit, paper, questions, crops, overrides):
             end, begin = i + 1, i
             text, solution, method = choice, None, "explicit_numbered_key"
             solution_index, separation = None, "not_present"
+            if n in grouped:
+                solution_end = min((j for m, j in anchor.items() if m > grouped[n] and j > i), default=len(lines))
+                solution_index = next((j for j in range(end, solution_end) if ANALYSIS.search(lines[j].text)), None)
+                if solution_index is not None:
+                    separation = "grouped"
+                    solution = "\n".join(line.text for line in lines[solution_index:solution_end])
         elif n in anchor:
             i = anchor[n]
             end = min((j for m, j in anchor.items() if m > n and j > i), default=len(lines))
@@ -404,8 +423,9 @@ def answer_records(row, raw, doc, limit, paper, questions, crops, overrides):
             result[n] = None
             continue
         if solution_index is not None:
+            explanation_end = solution_end if separation == "grouped" else end
             solution_regions = [crops.crop(row["sha256"], raw, page, box)
-                                for page, box in source_spans(doc, solution_index, end)]
+                                for page, box in source_spans(doc, solution_index, explanation_end)]
         else:
             solution_regions = []
         result[n] = {"sourceSha256": row["sha256"], "localPath": row["localPath"], "locator": f"{lines[begin].page}:{lines[begin].top:.1f}",

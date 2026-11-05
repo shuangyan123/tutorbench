@@ -9,10 +9,10 @@ The tested Windows runtime used Python 3.12, `pdfplumber 0.11.9`, `pypdfium2 5.1
 ```powershell
 python -m pip install 'pdfplumber==0.11.9' 'pypdfium2==5.14.0' 'Pillow==13.0.0'
 $env:PYTHONUTF8 = '1'
-python -B scripts/research/local_exam_bank.py build --source 'E:/BaiduNetdiskDownload' --out data/private/exam-bank-release --pilot 'E:/AI/code save/re-pr344-phase1/data/private/pilot-2026-jiangsu'
-python -B scripts/research/local_exam_bank.py list --bank data/private/exam-bank-release/bank.json --exam gaokao --year 2026 --subject math --edition national-1
-python -B scripts/research/local_exam_bank.py get --bank data/private/exam-bank-release/bank.json --exam gaokao --year 2026 --subject physics --edition jiangsu-selection --number 7
-python -B scripts/research/local_exam_bank.py handoff --bank data/private/exam-bank-release/bank.json --question-id gaokao-2026-national-1/q19
+python -B scripts/research/local_exam_bank.py build --source 'E:/BaiduNetdiskDownload' --out data/private/exam-bank-release-v2 --pilot 'E:/AI/code save/re-pr344-phase1/data/private/pilot-2026-jiangsu'
+python -B scripts/research/local_exam_bank.py list --bank data/private/exam-bank-release-v2/bank.json --exam gaokao --year 2026 --subject math --edition national-1
+python -B scripts/research/local_exam_bank.py get --bank data/private/exam-bank-release-v2/bank.json --exam gaokao --year 2026 --subject physics --edition jiangsu-selection --number 7
+python -B scripts/research/local_exam_bank.py handoff --bank data/private/exam-bank-release-v2/bank.json --question-id gaokao-2026-national-1/q19
 python -B -m unittest scripts/research/test_local_exam_bank.py -v
 ```
 
@@ -21,7 +21,7 @@ Use a fresh output path under `data/private/` for each build. `--years 2026` res
 Open the generated `index.html` for the four filters and original-image rendering. A loopback server can serve the same files when the browser environment restricts file URLs.
 
 ```powershell
-python -B -m http.server 18764 --bind 127.0.0.1 --directory data/private/exam-bank-release
+python -B -m http.server 18764 --bind 127.0.0.1 --directory data/private/exam-bank-release-v2
 ```
 
 Use `http://127.0.0.1:18764/#year=2026&subject=physics&edition=jiangsu-selection&number=7` in that browser. The query CLI uses the same records. An ambiguous or missing single-item query returns an error.
@@ -36,7 +36,7 @@ Use `http://127.0.0.1:18764/#year=2026&subject=physics&edition=jiangsu-selection
 | `file-inventory.csv` and `file-inventory.json` | Local inputs with role, format, SHA-256, page and text extraction counts, and byte or content duplicate status. |
 | `exceptions.json` | Question IDs requiring transcription or answer-pairing work, with reasons. |
 
-Source display coordinates use points measured from the top-left of the physical PDF page. The per-question regions preserve formulas, tables, diagrams and layout without relying on reconstructed native text. Embedded image locations give finer coordinates where the PDF exposes them. Vector diagrams and tables remain in the question region. Candidate text, options and nested parts are separate from the rendered source. Empty formula or unit arrays on a `needs_manual_transcription` item indicate unfinished extraction. The four pilot drafts carry visually transcribed fields. They remain working assumptions.
+Source display coordinates use points measured from the top-left of the physical PDF page. The per-question regions preserve formulas, tables, diagrams and layout without relying on reconstructed native text. Embedded image locations give finer coordinates where the PDF exposes them. Vector diagrams and tables remain in the question region. Shared stimuli are linked separately to each affected question. The 2024 and 2025 Jiangsu chemistry layouts bind the shared materials for questions 5–7 using SHA-bound page anchors. Candidate text, options and nested parts are separate from the rendered source. Empty formula or unit arrays on a `needs_manual_transcription` item indicate unfinished extraction. The four pilot drafts carry visually transcribed fields. They remain working assumptions.
 
 Answer pairing uses explicit printed answer numbers or a repeated prompt with the same number in an annotated edition. An incompatible choice count or unresolved prompt remains pending. A matched reference uses `user_supplied_assumed_correct`. Conflicts use `disputed`, and absent or unreliable pairing uses `abstained`. The contract reserves `verified` for later checking. Explicit analysis and recognizable interleaved proofs have separately referenced solution regions. The handoff emits the question and candidate answer as a `tutorbench-correctness-input-candidate` with `verificationStatus: pending` and `formalScoringEligible: false`. It makes no verifier call.
 

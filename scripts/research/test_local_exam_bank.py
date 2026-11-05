@@ -6,7 +6,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from local_exam_bank import (  # noqa: E402
     ASSUMED, add_answers, answer_records, classify, find_items, handoff, key_entries,
-    question_type, roster, same_prompt,
+    question_type, roster, same_prompt, shared_prompts,
 )
 from local_exam_bank_pdf import (  # noqa: E402
     Document, Line, PdfPage, extract_fields, paper_body, source_spans, starts_for, structured_parts,
@@ -68,6 +68,15 @@ class ExamBankTest(unittest.TestCase):
         different = lines((1, 10, "1. 已知 x"), (1, 40, "A. 酸性溶液 B. 中性溶液 C. 碱性溶液 D. 混合溶液"))
         self.assertTrue(same_prompt(question, same))
         self.assertFalse(same_prompt(question, different))
+
+    def test_shared_material_bound_to_explicit_or_pinned_range(self):
+        src = lines((1, 80, "阅读材料，完成5–7题"), (1, 120, "材料和图示"),
+                    (1, 160, "5. 第一题"), (1, 200, "6. 第二题"), (1, 240, "7. 第三题"))
+        locs = {5: 2, 6: 3, 7: 4}
+        self.assertEqual(shared_prompts(src, locs), [(0, 2, {5, 6, 7})])
+        src[0] = lines((1, 80, "阅读材料，完成下列小题"))[0]
+        self.assertEqual(shared_prompts(src, locs, [{"page": 1, "top": 80, "first": 5, "last": 7}]),
+                         [(0, 2, {5, 6, 7})])
 
     def test_nested_subparts_keep_their_parent(self):
         roots = structured_parts(["（1）先求一项。", "（2）给定两个条件。", "（i）第一问。", "（ii）第二问。"])
