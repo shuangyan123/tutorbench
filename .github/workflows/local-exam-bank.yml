@@ -1,0 +1,26 @@
+name: Local Exam Bank
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/local-exam-bank.yml'
+      - 'fixtures/research/local-exam-bank-layout-2022-2026.json'
+      - 'fixtures/research/exam-source-expansion-2022-2026-v0.1.json'
+      - 'scripts/research/*local_exam_bank*'
+
+permissions:
+  contents: read
+
+jobs:
+  local-exam-bank-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Test import and query contracts with synthetic input
+        run: |
+          python3 -m venv "$RUNNER_TEMP/exam-bank"
+          "$RUNNER_TEMP/exam-bank/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'pdfplumber==0.11.9' 'pypdfium2==5.14.0' 'Pillow==13.0.0'
+          "$RUNNER_TEMP/exam-bank/bin/python" -B -m unittest scripts/research/test_local_exam_bank.py -v

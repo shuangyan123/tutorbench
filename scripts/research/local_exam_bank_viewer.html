@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TutorBench 私有试题库</title>
+<link rel="icon" href="data:,">
+<style>
+body { margin: 0; color: #17222c; background: #f3f5f6; font: 16px/1.55 system-ui, sans-serif; }
+main { max-width: 1200px; margin: auto; padding: 24px; }
+header, section { background: white; border: 1px solid #d5dce1; padding: 18px; margin-bottom: 16px; }
+h1, h2 { margin: 0 0 10px; } h3 { margin: 10px 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 12px; }
+label { display: grid; gap: 3px; } select { padding: 6px; min-width: 9em; }
+figure { margin: 12px 0; } img { display: block; max-width: 100%; border: 1px solid #d5dce1; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+a { color: #174f81; } .warn { padding: 8px; background: #fff2d9; }
+</style>
+<script src="bank-data.js" defer></script>
+</head>
+<body>
+<main>
+<header>
+<h1>TutorBench 私有试题库</h1>
+<p>仅限内部研究。题面和已配对的参考答案按用户提供材料作为工作基准。正式正确性验证待执行。</p>
+<p><a href="exam-coverage-2022-2026.csv">卷别覆盖表</a> · <a href="coverage-report.md">覆盖报告</a> · <a href="exceptions.json">异常题目清单</a></p>
+<div class="filters">
+<label>考试<select id="exam"><option value="gaokao">普通高考</option></select></label>
+<label>年份<select id="year"></select></label>
+<label>学科<select id="subject"></select></label>
+<label>卷别<select id="edition"></select></label>
+<label>题号<select id="number"></select></label>
+</div>
+<p id="paper-status" role="status"></p>
+</header>
+<div id="result"></div>
+</main>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const bank = globalThis.EXAM_BANK;
+  const $ = id => document.getElementById(id);
+  const labels = {
+    math: "数学", physics: "物理", chemistry: "化学", biology: "生物",
+    "national-1": "全国Ⅰ卷", "national-2": "全国Ⅱ卷", "new-gaokao-1": "新高考／新课标Ⅰ卷",
+    "new-gaokao-2": "新高考／新课标Ⅱ卷", "jiangsu-selection": "江苏选考卷",
+    "national-a-humanities": "全国甲卷（文）", "national-a-science": "全国甲卷（理）",
+    "national-b-humanities": "全国乙卷（文）", "national-b-science": "全国乙卷（理）",
+    "national-humanities": "全国甲卷（文）", "national-science": "全国甲卷（理）",
+    rendered: "可检索原页", partial: "部分题号待核", edition_conflict: "供卷编号或内容与目录冲突", missing_material: "缺试卷文件", unresolved: "试卷待识别",
+    matched: "参考答案已配对，正确性待验证", multiple_candidates: "存在多个候选答案，待消歧",
+    missing: "缺参考答案", unreliable_number: "答案题号无法可靠配对"
+  };
+  const keys = ["year", "subject", "edition", "number"];
+  if (!bank) {
+    $("paper-status").textContent = "题库数据缺失。请从构建输出目录打开本页。";
+    return;
+  }
+  const el = (tag, text) => {
+    const element = document.createElement(tag);
+    if (text !== undefined) element.textContent = text;
+    return element;
+  };
+  function select(id, values, wanted) {
+    const field = $(id);
+    field.replaceChildren(...values.map(v => new Option(labels[v] || v, v)));
+    if (values.includes(wanted)) field.value = wanted;
+  }
+  function appendRegions(section, assets, localPath, label) {
+    for (const asset of assets) {
+      const figure = el("figure");
+      const link = el("a");
+      link.href = localPath + "#page=" + asset.page;
+      link.textContent = label + " · PDF 第 " + asset.page + " 页";
+      const image = el("img");
+      image.src = asset.path;
+      image.alt = link.textContent;
+      const caption = el("figcaption");
+      caption.append(link);
+      figure.append(image, caption);
+      section.append(figure);
+    }
+  }
+  function render(wanted = {}) {
+    const years = [...new Set(bank.papers.map(p => String(p.year)))].sort().reverse();
+    select("year", years, wanted.year);
+    const papers = bank.papers.filter(p => String(p.year) === $("year").value);
+    select("subject", [...new Set(papers.map(p => p.subject))].sort((a,b) => a === "math" ? -1 : b === "math" ? 1 : a.localeCompare(b)), wanted.subject);
+    const editions = papers.filter(p => p.subject === $("subject").value);
+    select("edition", editions.map(p => p.edition), wanted.edition);
+    const paper = editions.find(p => p.edition === $("edition").value);
+    const byNumber = new Map(bank.questions.filter(q => q.paperId === paper.paperId).map(q => [q.number, q]));
+    const numbers = paper.expectedQuestions ? Array.from({length: paper.expectedQuestions}, (_,i) => String(i + 1)) : [];
+    select("number", numbers, wanted.number);
+    $("paper-status").textContent = labels[paper.status] + " · 已索引 " + paper.indexedQuestions + " / " + (paper.expectedQuestions ?? "未知");
+    const item = byNumber.get(Number($("number").value));
+    $("result").replaceChildren();
+    history.replaceState(null, "", "#" + new URLSearchParams(keys.map(k => [k, $(k).value])));
+    if (!item) {
+      const message = el("p", "该题号未入库或所在卷缺材料。请查看覆盖率报告。");
+      message.className = "warn";
+      $("result").append(message);
+      return;
+    }
+    const question = el("section");
+    question.append(el("h2", "第 " + item.number + " 题"), el("p", item.questionId));
+    if (item.transcriptionStatus === "needs_manual_transcription") {
+      const warning = el("p", "结构化文字待人工转写。公式、选项和图表请以以下原页裁切为准。");
+      warning.className = "warn";
+      question.append(warning);
+    }
+    if (item.issues.includes("following_question_boundary_uncertain")) {
+      const warning = el("p", "相邻题号的边界待核。此裁切可能包含下一题内容。");
+      warning.className = "warn";
+      question.append(warning);
+    }
+    if (item.issues.includes("edition_numbering_conflict")) {
+      const warning = el("p", "以下题号按用户提供的副本显示，卷别或正式题号待核。");
+      warning.className = "warn";
+      question.append(warning);
+    }
+    appendRegions(question, item.displayRegions, item.source.localPath, "题面");
+    const extract = el("details");
+    extract.append(el("summary", "查看候选文字和结构"), el("pre", JSON.stringify(item.fields, null, 2)));
+    question.append(extract);
+    const answer = el("section");
+    answer.append(el("h2", "参考答案"), el("p", labels[item.answer.pairing]));
+    const candidates = item.answer.pairing === "matched" ? [item.answer] : item.answer.candidates || [];
+    for (const [i, candidate] of candidates.entries()) {
+      if (candidates.length > 1) answer.append(el("h3", "候选 " + (i + 1)));
+      if (/^[A-D]{1,4}$/.test(candidate.nativeText)) answer.append(el("p", candidate.nativeText));
+      appendRegions(answer, candidate.displayRegions, candidate.localPath, "参考答案");
+      if (candidate.solutionRegions.length) {
+        const solution = el("details");
+        solution.append(el("summary", candidate.solutionSeparation === "interleaved" ? "查看与答案交织的参考推导" : "查看参考解析"));
+        appendRegions(solution, candidate.solutionRegions, candidate.localPath, "参考解析");
+        answer.append(solution);
+      }
+    }
+    $("result").append(question, answer);
+  }
+  for (const [index, key] of keys.entries()) {
+    $(key).addEventListener("change", () => render(Object.fromEntries(keys.slice(0, index + 1).map(k => [k, $(k).value]))));
+  }
+  function renderHash() {
+    const param = new URLSearchParams(location.hash.slice(1));
+    render(Object.fromEntries(keys.map(k => [k, param.get(k)])));
+  }
+  addEventListener("hashchange", renderHash);
+  renderHash();
+});
+</script>
+</body>
+</html>
