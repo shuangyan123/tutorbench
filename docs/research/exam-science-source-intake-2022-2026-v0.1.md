@@ -51,7 +51,7 @@ The reconciliation holds all matched/unmatched candidate IDs and collision-group
 
 A **2025 New Gaokao I mathematics Q14** question has been visibly located on page 2 of a [public third-party recollection PDF](gaokao-2025-i-q14-thirdparty-page-witness-v0.1.md), with semantic alignment to the existing five-label/three-draws-with-replacement typed question. This is an **external recollection**, not the pinned original-source PDF, and does not independently authenticate the official exam or release an answer key. The page locator and its limitations are recorded separately to avoid falsely upgrading all existing 2025 catalog records.
 
-## 2026-11-05 G0–G4 follow-up
+## Prior baseline at a0333fb7
 
 The [metadata-only evidence ledger](../../fixtures/research/exam-phase1-witnesses-2022-2026-v0.1.json) records source URLs, observed hashes, edition identity and page locators. The original four-subject snapshot and crosswalk remain historical inputs.
 
@@ -100,3 +100,66 @@ The CSV is [fixed at its upstream revision](https://github.com/qingshuo/China-Ga
 To replay the binary audit, use an ignored local directory. Save each PDF under its paper ID with a `.pdf` suffix. Use the exact catalog revision and source paths for the 36 PDFs, the pinned CSV revision and each matched row's `local_path` for the 25 PDFs under `mirrors/`, and the issuer attachment URLs for the three graduate PDFs. The fourth visual witness is already in the catalog. Run with `--pdf-dir <directory> --require-byte-recheck` and Poppler `pdfinfo` on PATH. The strict byte replay exits 1 if a required file is missing or differs. A successful byte replay preserves the phase block. Poppler rendering supports visual review. A structural PDF checker such as [qpdf](https://qpdf.readthedocs.io/en/stable/cli.html#option-check) can supplement parsing and rendering, while its checks do not establish question fidelity.
 
 The existing [pinned artifact audit](pinned-exam-artifact-identity-v0.1.md) and [prior Math I 2025 inventory](exam-math-real-paper-verification-pilot-2026-11-02.md) retain their separate assurance levels.
+
+## Review 5782061808 follow-up
+
+**Current phase status: blocked.** The versioned [source review manifest](../../fixtures/research/exam-phase1-source-review-2022-2026-v0.1.json) is separate from the question ledger. It records reviewed evidence and its artifact SHA-256. The [discovery ledger](../../fixtures/research/exam-phase1-source-leads-2022-2026-v0.1.json) records leads with their risk labels. Discovery records cannot satisfy the acceptance gate. [Independent review of the prior HEAD](https://github.com/shuangyan123/tutorbench/pull/344#pullrequestreview-5782061808)
+
+### Reviewed page evidence
+
+On 2026-11-05 Codex read the rendered cover and question pages, recorded top-level starts by PDF page, and separately recorded continuations and question-to-visual links. The page ledger was transcribed from the source pages separately from the prior inventory. It is a source-page review, with no claim of independent human review or original-to-candidate fidelity. The official listing links for the seven graduate files were read from the issuer HTML. The code checks the exact PDF URL in an anchor and compares the recorded cover year, issuer, subject name and subject code with the claimed identity after replaying the reviewed PDF hash. The cover of a scan is an attributed visual observation. Poppler supplies the PDF page count and supports rendering, while the code does not infer scan text through OCR.
+
+| Observed PDF | PDF pages | Source-page expected | Located |
+| --- | ---: | ---: | ---: |
+| 2025 Gaokao national I mathematics | 2 | 19 | 19 |
+| NJUST 2022 845 普通物理（B） | 4 | 25 | 25 |
+| NJUST 2022 814 分析化学 | 4 | 38 | 38 |
+| NJUST 2022 817 普通生物化学 | 2 | 36 | 36 |
+| NJUST 2023 614 普通物理（A） | 2 | 21 | 21 |
+| NJUST 2023 845 普通物理（B） | 2 | 23 | 23 |
+| NJUST 2023 817 普通生物化学 | 1 | 20 | 20 |
+| NJUST 2023 881 大学化学 | 2 | 42 | 42 |
+| **Total within these eight files** | **19** | **224** | **224** |
+
+The four 2023 files add 106 top-level items. The two physics courses and university chemistry are two-up scans. Each two-page PDF contains four printed pages. The biochemistry PDF has one printed page. The 2023 chemistry scan has separate inorganic and analytical blocks that restart section numbering. The ledger uses different section IDs for each block. The 2022 biology C.9 options are on the next PDF page, so that page and the observed count of four options are part of the independent locator. The prior 2025 Math I inventory still contributes 22 historical locators reported separately. [NJUST 2022 publisher listing](https://gs.njust.edu.cn/zsw/66/86/c4584a353926/page.htm) · [NJUST 2023 publisher listing](https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm)
+
+### Acceptance contract
+
+| Gate | Evidence that can satisfy it | Real witness status after local replay |
+| --- | --- | --- |
+| G0 | Reviewed publisher identity, an exact listing anchor and a cover observation tied to the replayed PDF. Edition and alternate-version disposition require a separate review. A shared national integrated-science PDF is one paper with three subject components. A self-set course code identifies one regular exam within an institution and year, even if separate scans use different file names. | Seven issuer links and covers match. Edition disposition is still pending. The Gaokao witness is third-party. |
+| G1 | G0 plus original authenticity and internal research permission reviewed against separately hashed evidence. Redistribution status remains separate and can restrict release even when internal research is permitted. | No original-authenticity or internal-rights approval. Redistribution remains unknown for the eight files. |
+| G2 | Replay signature and SHA-256, pinned Git blob where applicable, and Poppler page count for visual witnesses. Each run reports which bytes it actually read. | Local cache replay verified 36/36 catalog PDFs, 25/25 mirror PDFs and 8/8 witness PDFs. The national I witness also appears in the catalog. |
+| G3 | A reviewed match or mismatch per question tied to the source hash and replayed candidate hash, covering wording, subparts, options, units, formulas and visuals. | **0/224 compared and 0/224 qualified**. Locating and reading a question does not establish fidelity of a separate candidate. |
+| G4 | A SHA-bound reviewed page index covering the entire file. Section-qualified top-level starts define the denominator. Inventory IDs, stem pages, continuation pages and visuals must reconcile. Counted cross-page options must also agree. | **224/224** reconciled and all eight local binary witnesses replayed. The phase-wide question denominator remains unknown. |
+
+`expectedQuestions` derives from reviewed source starts. `locatedQuestions` counts matching inventory locators. `sourceComparedQuestions` counts the reviewed comparisons with both artifact digests replayed, including reviewed mismatches. `sourceQualifiedQuestions` counts eligible matches after G0, G1 and G2. Whole-phase acceptance requires both closed science rosters, reviewed candidate dispositions, complete binary replay, and G0–G4 for every required paper. A conflict blocks acceptance and an unavailable artifact never supplies a pass. The synthetic positive case exercises the same acceptance and exit logic as the real audit. Synthetic proofs and candidate bytes are generated only in the test temp directory.
+
+The review format uses a reviewer, date and record reference. The official confirmation and research-rights evidence are replayed from `proofs/<paperId>.original` and `proofs/<paperId>.rights` in the supplied local evidence directory. Per-question candidate artifacts are replayed from `comparisons/<paperId>/<section>.<number>.json`. Keep those evidence files in access-appropriate storage. The audit verifies the bindings and statuses in a review. Decisions about authenticity, permission and semantic fidelity require review of the underlying evidence.
+
+### Open scope and difficulty protocol
+
+- **Gaokao science.** The discovery ledger separates legacy national integrated science from provincial selection tests and unconfirmed joint-province labels. It has national scope leads for each of 2022–2026, plus Henan and Anhui provincial policy examples. The Northeast four-province group is still a candidate label. A complete provincial, joint-paper and session roster remains open across all 166 science candidate files. [2026 national science scope and jurisdictions](https://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/2026/2026_zt08/mtbd/202606/t20260610_1440059.html)
+- **Previously unassociated Gaokao math.** Reviewed all 26 metadata records. Shanghai spring math is a separate January sitting outside the regular-sitting catalog used here. Of the remaining 25, 24 have a plausible catalog link and Zhejiang still needs a session identification. The suggestions do not change the historical crosswalk or attest that the pages match. [Shanghai exam authority spring-session notice](https://www.shmeea.edu.cn/page/02300/20231206/18042.html)
+- **2026 postgraduate Math I/II/III.** Located and locally fingerprinted one third-party typeset candidate for each of the three targets. The first pages display the corresponding year and paper name. All include answer material. No authorized exam-authority copy or complete page-to-page comparison is established. Rendering II and III on Windows reported font substitutions, so the rendering is not formula-fidelity evidence. [Math I publisher file](https://static.kaoyan.cn/file/question/2025/12/27/f3a552ec0d163308d2ac28dc7a10bbd0.pdf) · [Math II and III provider index](https://m.hqwx.com/kaoyan-kaoshi/ziliaolm/0/34300/)
+- **Postgraduate science.** The verified listing-to-cover subset covers seven course-year records at one institution in 2022–2023. Further 2024 leads include issuer listings at Wuhan Institute of Technology and Sichuan University of Science & Engineering. The latter lists sample material alongside past-paper material. Link, cover and artifact verification are still needed for these leads. The discovery ledger also records separate 2025 and 2026 course leads, including syllabus-only courses. The 2022–2026 institution/course/year roster remains open. [Wuhan Institute of Technology 2024 listing](https://yjs.wit.edu.cn/info/1020/6754.htm) · [Sichuan University of Science & Engineering download index](https://yjs.suse.edu.cn/zlxz_2382/list.htm)
+
+`within-subject-demand-v1` is a proposed sampling protocol for task demand within a named subject and comparable syllabus, informed by the separation of cognitive complexity from score difficulty in Depth of Knowledge. A foundational task primarily uses recall or one routine procedure. An integrative task connects multiple concepts or representations and requires a justified method choice. An extended task needs a nonroutine derivation, investigation design, or evaluation of alternatives with several dependent steps. Record rubric version, question IDs, reasons for each decision, coverage of the paper, and review agreement. A whole-paper band requires a reviewed band for every top-level item and a strict majority in one band. Mixed or disputed papers remain unrated. Keep empirical difficulty separate until response data exist. School name, course code, paper name, question number and point value supply no rating. All seven real graduate records remain `unrated`. [Pennsylvania science assessment technical report, item development](https://www.education.pa.gov/Documents/K-12/Assessment%20and%20Accountability/PSSA/Technical%20Reports/2008%20PSSA%20Science%20Preliminary%20Technical%20Report.pdf)
+
+### Replay
+
+Use Python 3 and Poppler `pdfinfo` on PATH. The pinned index remains the same input.
+
+```sh
+curl --fail --silent --show-error \
+  https://raw.githubusercontent.com/qingshuo/China-Gaokao-Papers-Collection/b33ea3dd5427afa963a944808d3a6c0183fc454e/data/exams.csv \
+  --output exam-index.csv
+python -B -m unittest scripts/research/test_audit_exam_phase1.py -v
+python -B scripts/research/audit_exam_phase1.py --csv exam-index.csv --require-complete
+python -B scripts/research/audit_exam_phase1.py --csv path/to/pinned/exams.csv --pdf-dir path/to/private/replay --require-byte-recheck
+python -B scripts/research/audit_exam_phase1.py --csv path/to/pinned/exams.csv --fetch --require-byte-recheck
+```
+
+`--pdf-dir` replays local PDFs and reads optional `<paperId>.html` files matched to the reviewed publisher snapshots. Catalog and mirror paths follow the earlier instructions. If an issuer PDF and a separate catalog copy share a paper ID, place the issuer copy under `witnesses/`. `--fetch` downloads the allowlisted fixed catalog copies, mirrors, issuer listings and issuer PDFs into a temporary directory that is removed after the run. CI automatically exercises this path. Its step summary shows the counts and IDs for unavailable files. It fails on integrity or evidence conflicts. Transport failures remain visible as unavailable, and `--require-byte-recheck` makes any incomplete replay nonzero. Reports distinguish `metadata_only`, `local_files` and `public_fetch`. Neither the local files nor the CI run publishes PDFs.
+
+One local public replay fetched and verified 32/36 catalog PDFs, 23/25 mirrors and 8/8 witnesses. Four catalog requests and two mirror requests ended in a transport error. The separate complete local-cache replay verified all 36/25/8. Hosted results are tied to the check run and its step summary.

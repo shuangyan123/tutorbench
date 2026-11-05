@@ -1,9 +1,5 @@
 {
-  "schemaVersion": 1,
-  "openScope": {
-    "gaokaoScience": "2022–2026: provincial, joint-province and legacy integrated-science edition roster not established.",
-    "postgraduateScience": "2022–2026: institution/course/year target roster and comparable difficulty strata not established."
-  },
+  "schemaVersion": 2,
   "mathFiles": {
     "catalogPdfSha256": {
       "gaokao-2022-beijing": "87067dae2d627c1bb91a24b8e1be3b429d5c8def474a82ea8e95a226fbd28544",
@@ -82,7 +78,8 @@
         "courseCode": null,
         "courseName": "数学",
         "variant": "national-1",
-        "difficulty": "unrated"
+        "difficulty": "unrated",
+        "editionType": "national"
       },
       "source": {
         "kind": "pinned_third_party",
@@ -145,7 +142,8 @@
         "courseCode": "845",
         "courseName": "普通物理（B）",
         "variant": "初试自命题",
-        "difficulty": "unrated"
+        "difficulty": "unrated",
+        "editionType": "institution"
       },
       "source": {
         "kind": "issuer_past_paper_attachment",
@@ -245,7 +243,8 @@
         "courseCode": "814",
         "courseName": "分析化学",
         "variant": "初试自命题",
-        "difficulty": "unrated"
+        "difficulty": "unrated",
+        "editionType": "institution"
       },
       "source": {
         "kind": "issuer_past_paper_attachment",
@@ -330,7 +329,8 @@
         "courseCode": "817",
         "courseName": "普通生物化学",
         "variant": "初试自命题",
-        "difficulty": "unrated"
+        "difficulty": "unrated",
+        "editionType": "institution"
       },
       "source": {
         "kind": "issuer_past_paper_attachment",
@@ -404,6 +404,368 @@
           {"id":"D.10","pages":[2],"stemPage":2,"figures":[],"notation":"not_seen","numberedParts":0,"options":0},
           {"id":"E.1","pages":[2],"stemPage":2,"figures":[],"notation":"not_seen","numberedParts":5,"options":0},
           {"id":"F.1","pages":[2],"stemPage":2,"figures":[],"notation":"seen","numberedParts":0,"options":0}
+        ]
+      }
+    },
+    {
+      "paperId": "njust-2023-physics-a",
+      "identity": {
+        "exam": "postgraduate_self_set",
+        "year": 2023,
+        "subject": "物理",
+        "issuer": "南京理工大学",
+        "courseCode": "614",
+        "courseName": "普通物理（A）",
+        "variant": "初试自命题",
+        "difficulty": "unrated",
+        "editionType": "institution"
+      },
+      "source": {
+        "kind": "issuer_past_paper_attachment",
+        "listing": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm",
+        "artifact": "https://gs.njust.edu.cn/_upload/article/files/e3/86/bd4e5ac34400905a1d9324e71695/13520712-b525-4063-a653-29e5415166b4.pdf",
+        "rights": "unknown_metadata_only",
+        "sha256": "90365de6d87acc0f815f50cbec67ab631fe9adc93b2ee37708ff2aab432a6a7e",
+        "pages": 2
+      },
+      "inventory": {
+        "sections": {
+          "A": [
+            1,
+            9
+          ],
+          "B": [
+            1,
+            1
+          ],
+          "C": [
+            1,
+            1
+          ],
+          "D": [
+            1,
+            1
+          ],
+          "E": [
+            1,
+            1
+          ],
+          "F": [
+            1,
+            1
+          ],
+          "G": [
+            1,
+            1
+          ],
+          "H": [
+            1,
+            1
+          ],
+          "I": [
+            1,
+            1
+          ],
+          "J": [
+            1,
+            1
+          ],
+          "K": [
+            1,
+            1
+          ],
+          "L": [
+            1,
+            1
+          ],
+          "M": [
+            1,
+            1
+          ]
+        },
+        "questions": [
+          {"id":"A.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.3","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.4","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.5","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.6","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.7","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.8","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.9","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.1","pages":[1],"stemPage":1,"figures":[{"id":"figure-1","page":1}],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"C.1","pages":[1],"stemPage":1,"figures":[{"id":"figure-2","page":1}],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"D.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"E.1","pages":[1],"stemPage":1,"figures":[{"id":"figure-3","page":1}],"notation":"unreviewed","numberedParts":3,"options":0},
+          {"id":"F.1","pages":[2],"stemPage":2,"figures":[{"id":"figure-4","page":2}],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"G.1","pages":[2],"stemPage":2,"figures":[{"id":"figure-5","page":2}],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"H.1","pages":[2],"stemPage":2,"figures":[{"id":"figure-6","page":2}],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"I.1","pages":[2],"stemPage":2,"figures":[{"id":"figure-7","page":2}],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"J.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"K.1","pages":[2],"stemPage":2,"figures":[{"id":"figure-8","page":2}],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"L.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"M.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0}
+        ]
+      }
+    },
+    {
+      "paperId": "njust-2023-physics-b",
+      "identity": {
+        "exam": "postgraduate_self_set",
+        "year": 2023,
+        "subject": "物理",
+        "issuer": "南京理工大学",
+        "courseCode": "845",
+        "courseName": "普通物理（B）",
+        "variant": "初试自命题",
+        "difficulty": "unrated",
+        "editionType": "institution"
+      },
+      "source": {
+        "kind": "issuer_past_paper_attachment",
+        "listing": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm",
+        "artifact": "https://gs.njust.edu.cn/_upload/article/files/e3/86/bd4e5ac34400905a1d9324e71695/500ce736-616e-47d9-bfdc-0bc1aba15b4d.pdf",
+        "rights": "unknown_metadata_only",
+        "sha256": "4a9439104a17fc67c9d6108cf1d7051f5bbad6f3c42a933cf2f0e9c641c28b9b",
+        "pages": 2
+      },
+      "inventory": {
+        "sections": {
+          "A": [
+            1,
+            13
+          ],
+          "B": [
+            1,
+            1
+          ],
+          "C": [
+            1,
+            1
+          ],
+          "D": [
+            1,
+            1
+          ],
+          "E": [
+            1,
+            1
+          ],
+          "F": [
+            1,
+            1
+          ],
+          "G": [
+            1,
+            1
+          ],
+          "H": [
+            1,
+            1
+          ],
+          "I": [
+            1,
+            1
+          ],
+          "J": [
+            1,
+            1
+          ],
+          "K": [
+            1,
+            1
+          ]
+        },
+        "questions": [
+          {"id":"A.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.3","pages":[1],"stemPage":1,"figures":[{"id":"figure-1","page":1}],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.4","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.5","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.6","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.7","pages":[1],"stemPage":1,"figures":[{"id":"figure-2","page":1}],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.8","pages":[1],"stemPage":1,"figures":[{"id":"figure-3","page":1}],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.9","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.10","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.11","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.12","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.13","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":4,"options":0},
+          {"id":"C.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"D.1","pages":[1],"stemPage":1,"figures":[{"id":"figure-4","page":1}],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"E.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":3,"options":0},
+          {"id":"F.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"G.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":4,"options":0},
+          {"id":"H.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"I.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"J.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"K.1","pages":[2],"stemPage":2,"figures":[{"id":"figure-5","page":2}],"notation":"unreviewed","numberedParts":2,"options":0}
+        ]
+      }
+    },
+    {
+      "paperId": "njust-2023-biology",
+      "identity": {
+        "exam": "postgraduate_self_set",
+        "year": 2023,
+        "subject": "生物",
+        "issuer": "南京理工大学",
+        "courseCode": "817",
+        "courseName": "普通生物化学",
+        "variant": "初试自命题",
+        "difficulty": "unrated",
+        "editionType": "institution"
+      },
+      "source": {
+        "kind": "issuer_past_paper_attachment",
+        "listing": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm",
+        "artifact": "https://gs.njust.edu.cn/_upload/article/files/e3/86/bd4e5ac34400905a1d9324e71695/9ef95da1-0b20-41b1-a585-151bc92523ec.pdf",
+        "rights": "unknown_metadata_only",
+        "sha256": "ca537b24d673f8fa0dcf05a80ff934f39797916be1744cebe81d764cd0c35490",
+        "pages": 1
+      },
+      "inventory": {
+        "sections": {
+          "A": [
+            1,
+            10
+          ],
+          "B": [
+            1,
+            7
+          ],
+          "C": [
+            1,
+            2
+          ],
+          "D": [
+            1,
+            1
+          ]
+        },
+        "questions": [
+          {"id":"A.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.3","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.4","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.5","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.6","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.7","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.8","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.9","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"A.10","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.3","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.4","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.5","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.6","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.7","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"C.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"C.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"D.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":2,"options":0}
+        ]
+      }
+    },
+    {
+      "paperId": "njust-2023-chemistry",
+      "identity": {
+        "exam": "postgraduate_self_set",
+        "year": 2023,
+        "subject": "化学",
+        "issuer": "南京理工大学",
+        "courseCode": "881",
+        "courseName": "大学化学",
+        "variant": "初试自命题",
+        "difficulty": "unrated",
+        "editionType": "institution"
+      },
+      "source": {
+        "kind": "issuer_past_paper_attachment",
+        "listing": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm",
+        "artifact": "https://gs.njust.edu.cn/_upload/article/files/e3/86/bd4e5ac34400905a1d9324e71695/e4ac055b-a2e1-4386-bd62-6cc854748015.pdf",
+        "rights": "unknown_metadata_only",
+        "sha256": "6dc2ba24623cef0c8e0be107fe82d03777df7219eade54369b7813974eed7f94",
+        "pages": 2
+      },
+      "inventory": {
+        "sections": {
+          "A": [
+            1,
+            15
+          ],
+          "B": [
+            1,
+            5
+          ],
+          "C": [
+            1,
+            3
+          ],
+          "D": [
+            1,
+            2
+          ],
+          "E": [
+            1,
+            10
+          ],
+          "F": [
+            1,
+            4
+          ],
+          "G": [
+            1,
+            2
+          ],
+          "H": [
+            1,
+            1
+          ]
+        },
+        "questions": [
+          {"id":"A.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.3","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.4","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.5","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.6","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.7","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.8","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.9","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.10","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.11","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.12","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.13","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.14","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"A.15","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"B.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.3","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.4","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"B.5","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"C.1","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"C.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"C.3","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":3,"options":0},
+          {"id":"D.1","pages":[1],"stemPage":1,"figures":[{"id":"diagram-1","page":1},{"id":"diagram-2","page":1}],"notation":"unreviewed","numberedParts":3,"options":0},
+          {"id":"D.2","pages":[1],"stemPage":1,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"E.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.2","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.3","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.4","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.5","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.6","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.7","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.8","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.9","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"E.10","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":4},
+          {"id":"F.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"F.2","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"F.3","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"F.4","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":0,"options":0},
+          {"id":"G.1","pages":[2],"stemPage":2,"figures":[],"notation":"unreviewed","numberedParts":2,"options":0},
+          {"id":"G.2","pages":[2],"stemPage":2,"figures":[{"id":"figure-1","page":2}],"notation":"unreviewed","numberedParts":3,"options":0},
+          {"id":"H.1","pages":[2],"stemPage":2,"figures":[{"id":"figure-1","page":2},{"id":"figure-2","page":2}],"notation":"unreviewed","numberedParts":3,"options":0}
         ]
       }
     }

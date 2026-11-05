@@ -4,11 +4,12 @@ on:
   pull_request:
     paths:
       - '.github/workflows/exam-phase1-source-audit.yml'
-      - 'fixtures/research/exam-phase1-witnesses-2022-2026-v0.1.json'
+      - 'fixtures/research/exam-phase1-*-2022-2026-v0.1.json'
       - 'fixtures/research/exam-science-*-2022-2026-v0.1.json'
       - 'fixtures/research/exam-source-expansion-2022-2026-v0.1.json'
       - 'fixtures/research/kaoyan-math1-2025-all-questions-review-v0.1.json'
-      - 'scripts/research/*audit_exam_phase1.py'
+      - 'scripts/research/*exam_phase1*.py'
+      - 'scripts/research/exam_phase1_evidence.py'
       - 'scripts/research/audit_pinned_exam_artifacts.py'
 
 permissions:
@@ -21,16 +22,51 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - name: Exercise source-gate negative controls
+      - name: Ensure Poppler is available
+        run: |
+          if ! command -v pdfinfo; then
+            sudo apt-get update
+            sudo apt-get install -y poppler-utils
+          fi
+      - name: Exercise G0–G4 with synthetic positive and negative controls
         run: python3 -B -m unittest scripts/research/test_audit_exam_phase1.py -v
-      - name: Reconcile the pinned public metadata and enforce the phase block
+      - name: Fetch the pinned public candidate index
         run: |
           curl --fail --silent --show-error --max-time 60 --max-filesize 16777216 \
             'https://raw.githubusercontent.com/qingshuo/China-Gaokao-Papers-Collection/b33ea3dd5427afa963a944808d3a6c0183fc454e/data/exams.csv' \
             --output "$RUNNER_TEMP/exam-index.csv"
+      - name: Validate the current phase result from metadata
+        run: |
           result=0
           python3 -B scripts/research/audit_exam_phase1.py --csv "$RUNNER_TEMP/exam-index.csv" \
             --require-complete > "$RUNNER_TEMP/exam-audit.json" || result=$?
           test "$result" -eq 1
-          python3 -c 'import json,sys; d=json.load(open(sys.argv[1], encoding="utf8")); assert d["status"] == "phase_1_blocked" and d["phaseQuestionDenominator"] is None and d["sourceQualifiedQuestions"] == 0' "$RUNNER_TEMP/exam-audit.json"
-          cat "$RUNNER_TEMP/exam-audit.json"
+          python3 -c 'import json,sys; d=json.load(open(sys.argv[1], encoding="utf8")); assert d["status"] == "phase_1_blocked" and d["sourceQualifiedQuestions"] == 0' "$RUNNER_TEMP/exam-audit.json"
+      - name: Replay public binary and publisher-link evidence without keeping papers
+        timeout-minutes: 8
+        run: |
+          python3 -B scripts/research/audit_exam_phase1.py --csv "$RUNNER_TEMP/exam-index.csv" \
+            --fetch > "$RUNNER_TEMP/exam-replay.json"
+          cat "$RUNNER_TEMP/exam-replay.json"
+          python3 - "$RUNNER_TEMP/exam-replay.json" >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          from collections import Counter
+          import json
+          import sys
+          with open(sys.argv[1], encoding="utf8") as f:
+              report = json.load(f)
+          files = report["mathPathByteAudit"]["files"]
+          witnesses = report["witnesses"]
+          print("### Phase 1 binary replay")
+          for name, values in (
+              ("Catalog PDFs", [v for k, v in files.items() if not k.startswith("mirrors/")]),
+              ("Mirror PDFs", [v for k, v in files.items() if k.startswith("mirrors/")]),
+              ("Witness PDFs", [v["G2"] for v in witnesses.values()]),
+          ):
+              print(f"- {name} (n={len(values)}) — {dict(Counter(values))}")
+          unavailable = report["replay"]["transport"]
+          for name, state in unavailable.items():
+              if state["status"] != "reachable":
+                  print(f"- Unavailable: `{name}` ({state['reason']})")
+          assert "conflict" not in files.values()
+          assert all(not v["evidenceConflicts"] and not v["locatorConflicts"] and "conflict" not in (v["G0"], v["G1"], v["G2"], v["G3"], v["G4"]) for v in witnesses.values())
+          PY

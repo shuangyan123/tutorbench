@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "rosters": {
+    "gaokaoScience": {
+      "status": "open",
+      "reason": "2022–2026: provincial, joint-province and legacy integrated-science edition roster not established."
+    },
+    "postgraduateScience": {
+      "status": "open",
+      "reason": "2022–2026: institution/course/year target roster and comparable difficulty strata not established."
+    }
+  },
+  "candidateDispositions": {
+    "2024-sh-spring-math-51jiaoxi": {
+      "decision": "out_of_scope",
+      "review": {
+        "reviewer": "Codex source review",
+        "date": "2026-11-05",
+        "record": "https://www.shmeea.edu.cn/page/02300/20231206/18042.html"
+      },
+      "paperId": null
+    }
+  },
+  "papers": {
+    "gaokao-2025-national-1": {
+      "artifactSha256": "221aeea90ccb7fb26c181693d06618170931038a73732c1018b02aa7feb4379a",
+      "issuerListing": null,
+      "cover": null,
+      "pages": [
+        {"starts":{"A":[1,8],"B":[9,11],"C":[12,14],"D":[15,16]},"continuations":[],"figures":{"A.6":["table-1","figure-2"],"D.15":["table-1","table-2"]}},
+        {"starts":{"D":[17,19]},"continuations":[],"figures":{"D.17":["diagram-1"]}}
+      ],
+      "pageReview": {
+        "reviewer": "Codex visual source audit",
+        "date": "2026-11-05",
+        "record": "docs/research/exam-science-source-intake-2022-2026-v0.1.md#reviewed-page-evidence"
+      },
+      "editionResolution": null,
+      "officialOriginal": null,
+      "researchRights": null,
+      "comparisons": null,
+      "difficultyReview": null
+    },
+    "njust-2022-physics": {
+      "artifactSha256": "2d29ee0ca2e20dcd5292ce20f4b139f9dd2c295ddc1225609efe0a641ee5deb9",
+      "issuerListing": {
+        "url": "https://gs.njust.edu.cn/zsw/66/86/c4584a353926/page.htm",
+        "sha256": "5de19069c8b58f92179457797a1beab10995c1109504c7b1cbb751995eac7f50",
+        "review": {
+          "reviewer": "Codex visual source audit",
+          "date": "2026-11-05",
+          "record": "https://gs.njust.edu.cn/zsw/66/86/c4584a353926/page.htm"
+        }
+      },
+      "cover": {
+        "year": 2022,
+        "issuer": "南京理工大学",
+        "courseCode": "845",
+        "courseName": "普通物理（B）"
+      },
+      "pages": [
+        {"starts":{"A":[1,7]},"continuations":[],"figures":{"A.7":["figure-1"],"A.8":["figure-2"]}},
+        {"starts":{"A":[8,14],"B":[1,1],"C":[1,1]},"continuations":[],"figures":{"C.1":["figure-3"],"D.1":["figure-4"]}},
+        {"starts":{"D":[1,1],"E":[1,1],"F":[1,1],"G":[1,1]},"continuations":[],"figures":{"E.1":["figure-5"],"F.1":["figure-6"],"G.1":["figure-7"],"H.1":["figure-8"]}},
+        {"starts":{"H":[1,1],"I":[1,1],"J":[1,1],"K":[1,1],"L":[1,1]},"continuations":[],"figures":{}}
+      ],
+      "pageReview": {
+        "reviewer": "Codex visual source audit",
+        "date": "2026-11-05",
+        "record": "docs/research/exam-science-source-intake-2022-2026-v0.1.md#reviewed-page-evidence"
+      },
+      "editionResolution": null,
+      "officialOriginal": null,
+      "researchRights": null,
+      "comparisons": null,
+      "difficultyReview": null
+    },
+    "njust-2022-chemistry": {
+      "artifactSha256": "9b0bd6d90029f4593cc46e830b2434b4a13c8ec3b1505db889b8d47caf812483",
+      "issuerListing": {
+        "url": "https://gs.njust.edu.cn/zsw/66/86/c4584a353926/page.htm",
+        "sha256": "5de19069c8b58f92179457797a1beab10995c1109504c7b1cbb751995eac7f50",
+        "review": {
+          "reviewer": "Codex visual source audit",
+          "date": "2026-11-05",
+          "record": "https://gs.njust.edu.cn/zsw/66/86/c4584a353926/page.htm"
+        }
+      },
+      "cover": {
+        "year": 2022,
+        "issuer": "南京理工大学",
+        "courseCode": "814",
+        "courseName": "分析化学"
+      },
+      "pages": [
+        {"starts":{"A":[1,10],"B":[1,4]},"continuations":[],"figures":{}},
+        {"starts":{"B":[5,15],"C":[1,6],"D":[1,2]},"continuations":[],"figures":{"D.2":["table-1"]}},
+        {"starts":{"D":[3,5],"E":[1,1]},"continuations":["D.2"],"figures":{"D.2":["table-1"],"E.1":["diagram-1","diagram-2","diagram-3","diagram-4"]}},
+        {"starts":{"E":[2,2]},"continuations":[],"figures":{"E.1":["figure-1"],"E.2":["figure-1","figure-2"]}}
+      ],
+      "pageReview": {
+        "reviewer": "Codex visual source audit",
+        "date": "2026-11-05",
+        "record": "docs/research/exam-science-source-intake-2022-2026-v0.1.md#reviewed-page-evidence"
+      },
+      "editionResolution": null,
+      "officialOriginal": null,
+      "researchRights": null,
+      "comparisons": null,
+      "difficultyReview": null
+    },
+    "njust-2022-biology": {
+      "artifactSha256": "a19ccb4229b3dac776c60b11e4d5679b60e184310eca981a8031a1cfb54ae98b",
+      "issuerListing": {
+        "url": "https://gs.njust.edu.cn/zsw/66/86/c4584a353926/page.htm",
+        "sha256": "5de19069c8b58f92179457797a1beab10995c1109504c7b1cbb751995eac7f50",
+        "review": {
+          "reviewer": "Codex visual source audit",
+          "date": "2026-11-05",
+          "record": "https://gs.njust.edu.cn/zsw/66/86/c4584a353926/page.htm"
+        }
+      },
+      "cover": {
+        "year": 2022,
+        "issuer": "南京理工大学",
+        "courseCode": "817",
+        "courseName": "普通生物化学"
+      },
+      "pages": [
+        {"starts":{"A":[1,10],"B":[1,4],"C":[1,9]},"continuations":[],"figures":{}},
+        {"starts":{"C":[10,10],"D":[1,10],"E":[1,1],"F":[1,1]},"continuations":["C.9"],"figures":{},"optionCounts":{"C.9":4}}
+      ],
+      "pageReview": {
+        "reviewer": "Codex visual source audit",
+        "date": "2026-11-05",
+        "record": "docs/research/exam-science-source-intake-2022-2026-v0.1.md#reviewed-page-evidence"
+      },
+      "editionResolution": null,
+      "officialOriginal": null,
+      "researchRights": null,
+      "comparisons": null,
+      "difficultyReview": null
+    },
+    "njust-2023-physics-a": {
+      "artifactSha256": "90365de6d87acc0f815f50cbec67ab631fe9adc93b2ee37708ff2aab432a6a7e",
+      "issuerListing": {
+        "url": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm",
+        "sha256": "23d13f23d19efea459bd2ab27280a3192eb859d798dbcbbde436dbb965f30f39",
+        "review": {
+          "reviewer": "Codex visual source audit",
+          "date": "2026-11-05",
+          "record": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm"
+        }
+      },
+      "cover": {
+        "year": 2023,
+        "issuer": "南京理工大学",
+        "courseCode": "614",
+        "courseName": "普通物理（A）"
+      },
+      "pages": [
+        {"starts":{"A":[1,9],"B":[1,1],"C":[1,1],"D":[1,1],"E":[1,1]},"continuations":[],"figures":{"B.1":["figure-1"],"C.1":["figure-2"],"E.1":["figure-3"]}},
+        {"starts":{"F":[1,1],"G":[1,1],"H":[1,1],"I":[1,1],"J":[1,1],"K":[1,1],"L":[1,1],"M":[1,1]},"continuations":[],"figures":{"F.1":["figure-4"],"G.1":["figure-5"],"H.1":["figure-6"],"I.1":["figure-7"],"K.1":["figure-8"]}}
+      ],
+      "pageReview": {
+        "reviewer": "Codex visual source audit",
+        "date": "2026-11-05",
+        "record": "docs/research/exam-science-source-intake-2022-2026-v0.1.md#reviewed-page-evidence"
+      },
+      "editionResolution": null,
+      "officialOriginal": null,
+      "researchRights": null,
+      "comparisons": null,
+      "difficultyReview": null
+    },
+    "njust-2023-physics-b": {
+      "artifactSha256": "4a9439104a17fc67c9d6108cf1d7051f5bbad6f3c42a933cf2f0e9c641c28b9b",
+      "issuerListing": {
+        "url": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm",
+        "sha256": "23d13f23d19efea459bd2ab27280a3192eb859d798dbcbbde436dbb965f30f39",
+        "review": {
+          "reviewer": "Codex visual source audit",
+          "date": "2026-11-05",
+          "record": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm"
+        }
+      },
+      "cover": {
+        "year": 2023,
+        "issuer": "南京理工大学",
+        "courseCode": "845",
+        "courseName": "普通物理（B）"
+      },
+      "pages": [
+        {"starts":{"A":[1,13],"B":[1,1],"C":[1,1],"D":[1,1]},"continuations":[],"figures":{"A.3":["figure-1"],"A.7":["figure-2"],"A.8":["figure-3"],"D.1":["figure-4"]}},
+        {"starts":{"E":[1,1],"F":[1,1],"G":[1,1],"H":[1,1],"I":[1,1],"J":[1,1],"K":[1,1]},"continuations":[],"figures":{"K.1":["figure-5"]}}
+      ],
+      "pageReview": {
+        "reviewer": "Codex visual source audit",
+        "date": "2026-11-05",
+        "record": "docs/research/exam-science-source-intake-2022-2026-v0.1.md#reviewed-page-evidence"
+      },
+      "editionResolution": null,
+      "officialOriginal": null,
+      "researchRights": null,
+      "comparisons": null,
+      "difficultyReview": null
+    },
+    "njust-2023-biology": {
+      "artifactSha256": "ca537b24d673f8fa0dcf05a80ff934f39797916be1744cebe81d764cd0c35490",
+      "issuerListing": {
+        "url": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm",
+        "sha256": "23d13f23d19efea459bd2ab27280a3192eb859d798dbcbbde436dbb965f30f39",
+        "review": {
+          "reviewer": "Codex visual source audit",
+          "date": "2026-11-05",
+          "record": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm"
+        }
+      },
+      "cover": {
+        "year": 2023,
+        "issuer": "南京理工大学",
+        "courseCode": "817",
+        "courseName": "普通生物化学"
+      },
+      "pages": [
+        {"starts":{"A":[1,10],"B":[1,7],"C":[1,2],"D":[1,1]},"continuations":[],"figures":{}}
+      ],
+      "pageReview": {
+        "reviewer": "Codex visual source audit",
+        "date": "2026-11-05",
+        "record": "docs/research/exam-science-source-intake-2022-2026-v0.1.md#reviewed-page-evidence"
+      },
+      "editionResolution": null,
+      "officialOriginal": null,
+      "researchRights": null,
+      "comparisons": null,
+      "difficultyReview": null
+    },
+    "njust-2023-chemistry": {
+      "artifactSha256": "6dc2ba24623cef0c8e0be107fe82d03777df7219eade54369b7813974eed7f94",
+      "issuerListing": {
+        "url": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm",
+        "sha256": "23d13f23d19efea459bd2ab27280a3192eb859d798dbcbbde436dbb965f30f39",
+        "review": {
+          "reviewer": "Codex visual source audit",
+          "date": "2026-11-05",
+          "record": "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm"
+        }
+      },
+      "cover": {
+        "year": 2023,
+        "issuer": "南京理工大学",
+        "courseCode": "881",
+        "courseName": "大学化学"
+      },
+      "pages": [
+        {"starts":{"A":[1,15],"B":[1,5],"C":[1,3],"D":[1,2]},"continuations":[],"figures":{"D.1":["diagram-1","diagram-2"]}},
+        {"starts":{"E":[1,10],"F":[1,4],"G":[1,2],"H":[1,1]},"continuations":[],"figures":{"G.2":["figure-1"],"H.1":["figure-1","figure-2"]}}
+      ],
+      "pageReview": {
+        "reviewer": "Codex visual source audit",
+        "date": "2026-11-05",
+        "record": "docs/research/exam-science-source-intake-2022-2026-v0.1.md#reviewed-page-evidence"
+      },
+      "editionResolution": null,
+      "officialOriginal": null,
+      "researchRights": null,
+      "comparisons": null,
+      "difficultyReview": null
+    }
+  }
+}
