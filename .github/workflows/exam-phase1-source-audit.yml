@@ -1,0 +1,36 @@
+name: Phase 1 Exam Source Audit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/exam-phase1-source-audit.yml'
+      - 'fixtures/research/exam-phase1-witnesses-2022-2026-v0.1.json'
+      - 'fixtures/research/exam-science-*-2022-2026-v0.1.json'
+      - 'fixtures/research/exam-source-expansion-2022-2026-v0.1.json'
+      - 'fixtures/research/kaoyan-math1-2025-all-questions-review-v0.1.json'
+      - 'scripts/research/*audit_exam_phase1.py'
+      - 'scripts/research/audit_pinned_exam_artifacts.py'
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Exercise source-gate negative controls
+        run: python3 -B -m unittest scripts/research/test_audit_exam_phase1.py -v
+      - name: Reconcile the pinned public metadata and enforce the phase block
+        run: |
+          curl --fail --silent --show-error --max-time 60 --max-filesize 16777216 \
+            'https://raw.githubusercontent.com/qingshuo/China-Gaokao-Papers-Collection/b33ea3dd5427afa963a944808d3a6c0183fc454e/data/exams.csv' \
+            --output "$RUNNER_TEMP/exam-index.csv"
+          result=0
+          python3 -B scripts/research/audit_exam_phase1.py --csv "$RUNNER_TEMP/exam-index.csv" \
+            --require-complete > "$RUNNER_TEMP/exam-audit.json" || result=$?
+          test "$result" -eq 1
+          python3 -c 'import json,sys; d=json.load(open(sys.argv[1], encoding="utf8")); assert d["status"] == "phase_1_blocked" and d["phaseQuestionDenominator"] is None and d["sourceQualifiedQuestions"] == 0' "$RUNNER_TEMP/exam-audit.json"
+          cat "$RUNNER_TEMP/exam-audit.json"

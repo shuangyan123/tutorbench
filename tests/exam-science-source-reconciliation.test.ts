@@ -64,7 +64,7 @@ test('four-subject snapshot counts are self-consistent and never assert gold',()
     const byStatus={discovered:0,indexed:0,verified:0};
     const byLicense={unknown:0,permitted:0,restricted:0};
     for(const year of [2022,2023,2024,2025,2026]){
-      const entry=group.byYear[String(year)];
+      const entry: Counts | undefined = group.byYear[String(year)];
       assert.ok(entry,'missing year summary: '+name+'/'+year);
       subjectTotal+=entry.candidates; subjectWithSha+=entry.withSha256;
       for(const key of statusesKeys)byStatus[key]+=entry.upstreamDeclaredStatus[key];
