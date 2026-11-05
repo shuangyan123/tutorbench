@@ -53,3 +53,24 @@ Now inspect both **original** nonthinking and high-thinking saved results, witho
 The JSON displays two records, old TutorBench status, Math-Verify parsed expressions and exact-comparison result **only if the parsed output unambiguously constitutes one exact rational**. \`mathVerifyState=ambiguous_or_nonnumeric\`, \`no_expression_extracted\`, \`approximate_only_no_exact_comparison\` or \`parser_exception\` are valuable baseline evidence, not a failure to be hidden. There are **no model API calls**.
 
 For additional real holdout cases, pass their saved JSONL paths and select a case ID with \`--id\`. This stage requires separate independent human mathematical review for any false-positive/false-negative claims. The external baseline is optional research-only code; TutorBench's core remains on its pinned dependencies.
+
+
+## The next observed failure: equation-target semantics, not parser availability
+
+After the isolated-worker Windows fix, the operator's **same two genuine saved replies** were parsed by Math-Verify 0.9.0 as exactly one SymPy object per mode:
+
+    Eq(e*x, 671/216)
+
+The original model displayed \`\\boxed{E[X]=\\frac{671}{216}\\approx 3.1065}\`, correctly referring to the expected number of distinct labels. Here Math-Verify's generic LaTeX parser has **misinterpreted \`E[X]\` as \`e*x\`**; this is neither a numeric answer nor a faithful left-hand semantic representation. The prior baseline correctly returned \`ambiguous_or_nonnumeric\` on both. Never use \`Eq(...).rhs\` without a bound target, since unrelated equations and intermediate derivations can have arbitrary right sides.
+
+**Small, explicitly scoped follow-up:** \`scripts/research/check_contextual_expectation_baseline.py\` is a research-only contextual adapter, not a new mathematical expression parser. It recognizes **one uniquely boxed final answer** whose left side literally binds to \`E[X]\`, and only when the typed question requests \`finite_uniform_occupancy.query.metric=expected_value\`. It takes only the exact right-hand-side LaTeX expression and passes it to our already isolated, size- and time-bounded Math-Verify 0.9.0 worker. If Math-Verify produces exactly one rational number, an optional decimal approximation must agree within one-half of its final displayed place; any mismatch abstains. Only then does the existing typed mathematical verifier independently decide. All answer keys remain inaccessible until after extraction. No inference is made about intermediate derivation correctness.
+
+This adapter intentionally rejects \`x=...\`, \`E[Y]=...\`, multiple boxed answers, unclosed boxes, ambiguous parser results, contradictory approximations, unexpected family/metric and worker errors. It does **not** attempt to cover probability expressions, other statistics, complex LaTeX or natural-language proofs. All earlier unparsed results remain immutable historical evidence.
+
+Replay the original DeepSeek records **offline without new API calls** using the same independent Python environment as above:
+
+    & "$envPath\Scripts\python.exe" scripts/research/check_contextual_expectation_baseline.py --id h-occ-01 --input "E:\AI\code save\re\artifacts\research\natural-math-disabled-20261104T143209Z-1607902c.jsonl" --input "E:\AI\code save\re\artifacts\research\natural-math-high-20261104T143213Z-9fa5b5ef.jsonl"
+
+Expected semantics: if both records have one source-bound \`E[X]=671/216\` and compatible \`\\approx 3.1065\`, their *research-only contextual exact candidates* can be accepted by the typed verifier. The operator should verify actual returned \`contextualResult.state\`, not infer success from CI mocks. Any failure remains a research result and should not be hidden.
+
+The longer-term engineering choice remains **reuse a mature parser plus a small, independently tested semantic target binder**, instead of rewriting LaTeX or declaring all symbolic equalities numeric answers. These results cannot establish general natural-math parsing coverage or reliable automatic grading for tutoring dialogue.
