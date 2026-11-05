@@ -6,6 +6,8 @@ on:
       - '.github/workflows/math-verify-existing-baseline.yml'
       - 'scripts/research/compare_math_verify_baseline.py'
       - 'scripts/research/mathverify_parse_worker.py'
+      - 'scripts/research/check_contextual_expectation_baseline.py'
+      - 'scripts/research/test_check_contextual_expectation_baseline.py'
       - 'scripts/research/test_compare_math_verify_baseline.py'
       - 'scripts/research/run_real_natural_math_holdout.py'
       - 'docs/research/math-verify-baseline-stage-ii.md'
@@ -32,12 +34,13 @@ jobs:
       - name: Test real Math-Verify API and conservative handling of natural boxed answers
         run: |
           timeout 180s "$RUNNER_TEMP/mathverify/bin/python" \
-            -m unittest scripts/research/test_compare_math_verify_baseline.py -v
+            -m unittest scripts/research/test_compare_math_verify_baseline.py scripts/research/test_check_contextual_expectation_baseline.py -v
       - name: No-key syntax, dependency and reference docs checks
         run: |
           "$RUNNER_TEMP/mathverify/bin/python" -m py_compile \
             scripts/research/compare_math_verify_baseline.py \
-            scripts/research/mathverify_parse_worker.py
+            scripts/research/mathverify_parse_worker.py \
+            scripts/research/check_contextual_expectation_baseline.py
           python3 - <<'PY'
           from pathlib import Path
           index=Path("docs/README.md").read_text(encoding="utf8")
@@ -65,5 +68,5 @@ jobs:
       - name: Verify Windows worker parsing and failure classification without any provider
         shell: pwsh
         run: |
-          & "$env:RUNNER_TEMP\mathverify\Scripts\python.exe" -m unittest scripts/research/test_compare_math_verify_baseline.py -v
+          & "$env:RUNNER_TEMP\mathverify\Scripts\python.exe" -m unittest scripts/research/test_compare_math_verify_baseline.py scripts/research/test_check_contextual_expectation_baseline.py -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
