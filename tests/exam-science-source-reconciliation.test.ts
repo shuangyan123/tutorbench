@@ -3,10 +3,47 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 /** Research-only frozen metadata consistency; not an exam truth or byte audit. */
+type Status = 'discovered' | 'indexed' | 'verified';
+type License = 'unknown' | 'permitted' | 'restricted';
+interface Counts {
+  candidates:number;
+  withSha256:number;
+  upstreamDeclaredStatus:Record<Status,number>;
+  upstreamLicenseStatus:Record<License,number>;
+}
+interface Snapshot {
+  schemaVersion:number;id:string;status:string;
+  source:{repository:string;revision:string;path:string;gitBlobSha:string};
+  examWindow:{firstYear:number;lastYear:number;yearBasis:string};
+  subjects:Record<string,Counts & {byYear:Record<string,Counts>}>;
+  upstreamStats:Counts;
+  assurance:{certifiedExamGoldItems:number;filesDownloadedByTutorBench:boolean;
+    answerKeysIndependentlyVerifiedByTutorBench:boolean;liveModelCalls:number};
+}
+interface Crosswalk {
+  schemaVersion:number;status:string;source:Snapshot['source'];
+  existingTutorBench:{mathGaokaoEditions:number};
+  sample:{candidateRows:number;rowsWithSha256:number;
+    identicalSha256AcrossCandidateRecords:number;mathCandidateRows:number;
+    mathExactSourcePathMatches:number;mathUnresolvedRows:number;
+    coarseIdentityCollisionGroups:number};
+  mathExactSourcePathMatches:Array<{upstreamRecordId:string;tutorBenchPaperId:string;
+    sourceRepository:string;upstreamSourcePath:string;relation:string;artifactHashCompared:boolean}>;
+  mathUnresolved:Array<{upstreamRecordId:string}>;
+  coarseIdentityCollisions:Array<{disposition:string;recordIds:string[]}>;
+  boundaries:string[];
+}
+interface PriorPaper {
+  paperId:string;exam:string;source:{path:string;revision:string};answerGoldStatus:string;
+}
+interface Prior {papers:PriorPaper[];}
+const statusesKeys:Status[]=['discovered','indexed','verified'];
+const licenseKeys:License[]=['unknown','permitted','restricted'];
+
 const root = 'fixtures/research/';
-const input = JSON.parse(await readFile(root + 'exam-science-upstream-intake-snapshot-2022-2026-v0.1.json','utf8'));
-const cross = JSON.parse(await readFile(root + 'exam-science-source-reconciliation-2022-2026-v0.1.json','utf8'));
-const prior = JSON.parse(await readFile(root + 'exam-source-expansion-2022-2026-v0.1.json','utf8'));
+const input = JSON.parse(await readFile(root + 'exam-science-upstream-intake-snapshot-2022-2026-v0.1.json','utf8')) as Snapshot;
+const cross = JSON.parse(await readFile(root + 'exam-science-source-reconciliation-2022-2026-v0.1.json','utf8')) as Crosswalk;
+const prior = JSON.parse(await readFile(root + 'exam-source-expansion-2022-2026-v0.1.json','utf8')) as Prior;
 
 test('four-subject snapshot counts are self-consistent and never assert gold',()=>{
   assert.equal(input.schemaVersion,1);
@@ -28,8 +65,8 @@ test('four-subject snapshot counts are self-consistent and never assert gold',()
     for(const year of [2022,2023,2024,2025,2026]){
       const entry=group.byYear[String(year)];
       subjectTotal+=entry.candidates; subjectWithSha+=entry.withSha256;
-      for(const key of Object.keys(byStatus))byStatus[key]+=entry.upstreamDeclaredStatus[key];
-      for(const key of Object.keys(byLicense))byLicense[key]+=entry.upstreamLicenseStatus[key];
+      for(const key of statusesKeys)byStatus[key]+=entry.upstreamDeclaredStatus[key];
+      for(const key of licenseKeys)byLicense[key]+=entry.upstreamLicenseStatus[key];
       assert.equal(Object.values(entry.upstreamDeclaredStatus).reduce((a,b)=>a+b,0),entry.candidates);
       assert.equal(Object.values(entry.upstreamLicenseStatus).reduce((a,b)=>a+b,0),entry.candidates);
       assert.ok(entry.withSha256<=entry.candidates);
@@ -38,8 +75,8 @@ test('four-subject snapshot counts are self-consistent and never assert gold',()
     assert.deepEqual(byStatus,group.upstreamDeclaredStatus);
     assert.deepEqual(byLicense,group.upstreamLicenseStatus);
     total+=group.candidates;withSha+=group.withSha256;
-    for(const key of Object.keys(statuses))statuses[key]+=byStatus[key];
-    for(const key of Object.keys(licenses))licenses[key]+=byLicense[key];
+    for(const key of statusesKeys)statuses[key]+=byStatus[key];
+    for(const key of licenseKeys)licenses[key]+=byLicense[key];
   }
   assert.equal(total,217);assert.equal(withSha,216);
   assert.equal(input.upstreamStats.candidates,total);
