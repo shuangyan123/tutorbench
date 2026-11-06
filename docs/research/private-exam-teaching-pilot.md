@@ -89,3 +89,29 @@ Semantic correctness, alternate equivalent phrasing and pedagogical quality
 remain Judge or human-review work. The pilot invokes no Judge and supplies no
 substitute judgments. Corpus materials, authored dialogue, response packets
 and observed evidence remain in the Git-ignored private directory.
+
+## Focused private-case revision v0.1.1 (2026-11-06)
+
+The private authored pilot in the author's local ignored directory has a **separate**
+review-driven revision; it is not distributed in this repository. The revised
+mathematics first-offset learner turn now explicitly shows a valid perpendicular-
+distance-one calculation, rather than treating an ambiguous vertical translation
+as valid. For the chemistry diagram case, the duplicate keyword-only
+`contains_required_concept("lower arrow")` Actionability criterion was removed;
+the existing Judge-owned semantic Actionability criterion remains. This avoids
+passing an incorrect diagram claim merely because an arrow name appears.
+
+Revised private authoring scope: **6 questions, 9 scenarios, 10 checkpoints,
+57 criterion instances (17 deterministic, 40 Judge),** with the same explicit
+`PARTIAL COVERAGE` boundary when Judge is unavailable. The original
+`run.json` was produced from the **58-criterion v0.1.0** private pilot and must
+not be reported as a v0.1.1 rerun. A new local report must be generated using
+a new `--out` path and the private bank + Phase 2 inputs.
+
+A small private set of author-labelled semantic contrasts documents literal
+keyword false positives and valid-paraphrase false negatives. Such labels are
+provisional review expectations, not independently calibrated Judge/human Gold
+or a measured error rate. The public synthetic test specifically ensures that
+Judge-only Actionability is **unscored** without a Judge, including when a Tutor
+response mentions a superficial diagram cue. Neither this test nor CI executes
+any copyrighted private exam item.
