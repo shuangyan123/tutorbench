@@ -676,6 +676,7 @@ export function buildTutorHealthReport(options: {
           failureLocation.scenarioId,
           caseResult.runIndex,
           "critical",
+          caseResult.caseId,
           failure.type,
         ]),
         type: "critical_failure",
