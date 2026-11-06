@@ -1,0 +1,33 @@
+name: Private Exam Correctness
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/exam-correctness.yml'
+      - 'scripts/research/*exam_correctness*.py'
+      - 'scripts/research/verify_dual_path_math_answers.py'
+      - 'scripts/research/check_contextual_expectation_baseline.py'
+      - 'scripts/research/compare_math_verify_baseline.py'
+      - 'scripts/research/local_exam_bank*.py'
+
+permissions:
+  contents: read
+
+jobs:
+  exam-correctness-offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Run offline synthetic and existing research controls
+        run: |
+          python3 -m venv "$RUNNER_TEMP/correctness"
+          "$RUNNER_TEMP/correctness/bin/pip" install --disable-pip-version-check --no-cache-dir \
+            'sympy==1.14.0' 'math-verify[antlr4_13_2]==0.9.0' 'pdfplumber==0.11.9' 'pypdfium2==5.14.0' 'Pillow==13.0.0'
+          "$RUNNER_TEMP/correctness/bin/python" -B -m unittest \
+            scripts/research/test_exam_correctness.py \
+            scripts/research/test_verify_dual_path_math_answers.py \
+            scripts/research/test_check_contextual_expectation_baseline.py \
+            scripts/research/test_compare_math_verify_baseline.py \
+            scripts/research/test_local_exam_bank.py -v
