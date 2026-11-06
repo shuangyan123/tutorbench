@@ -131,7 +131,7 @@ test("private teaching runner replays H2, blocks unavailable packets, and retain
   assert.deepEqual(output.variants.adversarial!.byCapability.actionability,
     { assessed: 0, scored: 0, total: 10 });
   assert.equal(output.variants.adversarial!.evaluation.caseResults.find(
-    (row) => row.caseId === "example-1-0")?.rawTutorResponse?.text,
+    (row) => row.caseId === "example-1-0")?.rawTutorResponse,
   "The lower arrow proves your claim.");
   assert.equal(baseline.evaluation.caseResults.find((row) => row.caseId === "example-0-0")?.rawJudgeResult, null);
   assert.equal(baseline.evaluation.caseResults.find((row) => row.caseId === "example-0-0")?.passed, false);
