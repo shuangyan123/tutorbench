@@ -40,6 +40,12 @@ function criteria(id: string): TutorScenarioEvaluationCriterion[] {
       criterion: "Identify the stated error from the learner's evidence.", weight: 1, evaluationType: "judge",
       behavior: "required", failureFinding: { ...failureFinding, severity: "major" },
     },
+    {
+      rubricId: id + "-semantic-action", category: "actionability", dimension: "interaction_quality",
+      criterion: "Ask for a meaningful label comparison; mentioning an arrow alone is insufficient.",
+      weight: 1, evaluationType: "judge", behavior: "required",
+      failureFinding: { ...failureFinding, severity: "major" },
+    },
   ];
 }
 
@@ -59,7 +65,11 @@ function syntheticPilot() {
       const decisionPoints = Array.from({ length: index < 4 ? 2 : 1 }, (_, point): TutorScenarioDecisionPoint => {
         const pointId = id + "-" + point;
         const baseline = point === 0 ? earlierHint : "Test a second representation.";
-        fixtures[pointId] = { baseline, adversarial: index === 0 ? "The final answer is x=7." : baseline };
+        fixtures[pointId] = {
+          baseline,
+          adversarial: index === 0 ? "The final answer is x=7."
+            : index === 1 && point === 0 ? "The lower arrow proves your claim." : baseline,
+        };
         return {
           id: "point-" + point, evaluationCaseId: pointId, turnIndex: point + 1,
           expectedDecision: "offer_conceptual_hint", expectedBehavior: "Offer a bounded hint.",
@@ -96,7 +106,10 @@ interface ControlRun {
   readonly report: TutorHealthReport;
   readonly criterionCoverage: string;
   readonly tutorPackets: readonly { caseId: string; conversation: readonly { text: string }[] }[];
-  readonly byCapability: { guidance: { assessed: number; scored: number; total: number } };
+  readonly byCapability: {
+    guidance: { assessed: number; scored: number; total: number };
+    actionability: { assessed: number; scored: number; total: number };
+  };
 }
 
 test("private teaching runner replays H2, blocks unavailable packets, and retains partial rubric coverage", () => {
@@ -112,6 +125,14 @@ test("private teaching runner replays H2, blocks unavailable packets, and retain
   assert.equal(baseline.tutorPackets.find((packet) => packet.caseId === "example-0-1")?.conversation.at(-1)?.text, earlierHint);
   assert.equal(baseline.tutorPackets.some((packet) => packet.caseId === "example-5-0"), false);
   assert.deepEqual(baseline.byCapability.guidance, { assessed: 9, scored: 9, total: 10 });
+  // A semantic action rubric must remain unscored without a Judge, even when
+  // an adversarial response contains the superficial "lower arrow" keyword.
+  assert.deepEqual(baseline.byCapability.actionability, { assessed: 0, scored: 0, total: 10 });
+  assert.deepEqual(output.variants.adversarial!.byCapability.actionability,
+    { assessed: 0, scored: 0, total: 10 });
+  assert.equal(output.variants.adversarial!.evaluation.caseResults.find(
+    (row) => row.caseId === "example-1-0")?.rawTutorResponse?.text,
+  "The lower arrow proves your claim.");
   assert.equal(baseline.evaluation.caseResults.find((row) => row.caseId === "example-0-0")?.rawJudgeResult, null);
   assert.equal(baseline.evaluation.caseResults.find((row) => row.caseId === "example-0-0")?.passed, false);
   assert.ok(output.variants.adversarial!.report.findings.some((finding) => finding.type === "answer_leakage"));
