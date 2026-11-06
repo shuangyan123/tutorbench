@@ -75,7 +75,7 @@ import {
   renderWhyTeachingDoesNotScalePage,
 } from "../site/pages/blog.js";
 import { installSpectrumSite, isSpectrumSiteFile } from "./spectrum-site.js";
-import { learningAccessMetadataPages, publishLearningAccessRoutes } from "./blog-series.js";
+import { journalEssayMetadataPages, publishJournalEssayRoutes } from "./blog-series.js";
 
 const websiteRoot = resolve(process.cwd(), "website");
 const defaultOutputDirectory = resolve(websiteRoot, "dist");
@@ -491,8 +491,8 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
   }
 
   if (legacyPages !== undefined) {
-    // the newest essay has no generated page: its metadata comes from the essay itself
-    for (const [path, head] of learningAccessMetadataPages(options.siteUrl)) legacyPages.set(path, head);
+    // the newest essays have no generated page: their metadata comes from the essays themselves
+    for (const [path, head] of journalEssayMetadataPages(options.siteUrl)) legacyPages.set(path, head);
     await installSpectrumSite({
       prototypeRoot: spectrumPrototypeRoot,
       outputDirectory,
@@ -508,7 +508,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
     isPrivateBuild,
   );
   if (publishSpectrum) {
-    await publishLearningAccessRoutes({
+    await publishJournalEssayRoutes({
       outputDirectory,
       ...(options.siteUrl === undefined ? {} : { siteUrl: options.siteUrl }),
     });
