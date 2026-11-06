@@ -59,7 +59,7 @@ function syntheticPilot() {
       const decisionPoints = Array.from({ length: index < 4 ? 2 : 1 }, (_, point): TutorScenarioDecisionPoint => {
         const pointId = id + "-" + point;
         const baseline = point === 0 ? earlierHint : "Test a second representation.";
-        fixtures[pointId] = { baseline, adversarial: index === 0 && point === 0 ? "The final answer is x=7." : baseline };
+        fixtures[pointId] = { baseline, adversarial: index === 0 ? "The final answer is x=7." : baseline };
         return {
           id: "point-" + point, evaluationCaseId: pointId, turnIndex: point + 1,
           expectedDecision: "offer_conceptual_hint", expectedBehavior: "Offer a bounded hint.",
@@ -115,6 +115,15 @@ test("private teaching runner replays H2, blocks unavailable packets, and retain
   assert.equal(baseline.evaluation.caseResults.find((row) => row.caseId === "example-0-0")?.rawJudgeResult, null);
   assert.equal(baseline.evaluation.caseResults.find((row) => row.caseId === "example-0-0")?.passed, false);
   assert.ok(output.variants.adversarial!.report.findings.some((finding) => finding.type === "answer_leakage"));
+  // Two checkpoints within one scenario can report the same critical failure type.
+  // Their observation identities must remain distinct and the report must validate.
+  const critical = output.variants.adversarial!.report.observations.filter((observation) =>
+    observation.type === "critical_failure" && observation.scenarioId === "example-0" &&
+    observation.evidence.some((evidence) => evidence.kind === "critical_failure" &&
+      (evidence.caseId === "example-0-0" || evidence.caseId === "example-0-1")),
+  );
+  assert.equal(critical.length, 2);
+  assert.equal(new Set(critical.map((observation) => observation.id)).size, 2);
   for (const variant of ["missingResponse", "historyMismatch"]) {
     assert.deepEqual(output.variants[variant]!.byCapability.guidance, { assessed: 8, scored: 8, total: 10 });
   }
