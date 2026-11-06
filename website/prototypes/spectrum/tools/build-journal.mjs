@@ -10,6 +10,7 @@ import { PROTO, REPO, esc, Z, bi, biE, biP, frame } from "./site-kit.mjs";
 
 const { BLOG_POSTS: SITE_POSTS, articleHeadingId } = await import(join(REPO, "dist/src/site/pages/blog.js"));
 const { LEARNING_ACCESS_ESSAY: LA } = await import(join(REPO, "dist/src/cli/learning-access-essay.js"));
+const { ARROGANCE_ESSAY: AR } = await import(join(REPO, "dist/src/cli/arrogance-essay.js"));
 const { SITE_ZH_CN_COPY } = await import(join(REPO, "dist/src/site/locale-copy.js"));
 
 // "Why Good Learning Resources Fail to Reach the People Who Need Them" (2026-11-03) is written as two
@@ -45,21 +46,45 @@ LA.en.sections.forEach((sec, i) => {
   register(sec.heading, zh.heading);
   sec.paragraphs.forEach((para, k) => register(para, zh.paragraphs[k]));
 });
+// "Arrogance Is Not What You Need" (2026-11-06): the Chinese is the original, the English a parallel
+// translation (src/cli/arrogance-essay.ts). It opens with untitled paragraphs before §1.
+const arrogance = {
+  route: `/blog/${AR.slug}/`, category: "Perspective", publishedDate: "November 6, 2026",
+  title: AR.en.title, excerpt: AR.en.dek, description: AR.en.description, evidenceBoundary: AR.en.boundary,
+  intro: AR.en.intro,
+  sections: AR.en.sections.map((sec) => ({ heading: sec.heading, paragraphs: sec.paragraphs })),
+  sources: AR.sources,
+};
+register(AR.en.title, AR.zh.title); register(AR.en.dek, AR.zh.dek); register(AR.en.description, AR.zh.description);
+register(AR.en.boundary, AR.zh.boundary); register("November 6, 2026", "2026年11月6日");
+if (AR.zh.intro.length !== AR.en.intro.length) throw new Error("arrogance: the opening differs between languages");
+AR.en.intro.forEach((para, k) => register(para, AR.zh.intro[k]));
+AR.en.sections.forEach((sec, i) => {
+  const zh = AR.zh.sections[i];
+  if (zh === undefined || zh.paragraphs.length !== sec.paragraphs.length) throw new Error(`arrogance: section ${i + 1} differs between languages`);
+  register(sec.heading, zh.heading);
+  sec.paragraphs.forEach((para, k) => register(para, zh.paragraphs[k]));
+});
 // newest first, as the Journal has always been ordered
-const BLOG_POSTS = [learningAccess, ...SITE_POSTS];
+const BLOG_POSTS = [arrogance, learningAccess, ...SITE_POSTS];
 
 const slug = (p) => p.route.split("/").filter(Boolean).pop();
 const zhWords = (s) => s.replace(/\s/g, "").length;
 function readingTime(p) {
-  const all = [p.excerpt, ...p.sections.flatMap((s) => [s.heading, ...s.paragraphs, ...(s.progression ?? []).map((x) => x.text), s.callout?.body ?? ""])].filter(Boolean);
+  const all = [p.excerpt, ...(p.intro ?? []), ...p.sections.flatMap((s) => [s.heading, ...s.paragraphs, ...(s.progression ?? []).map((x) => x.text), s.callout?.body ?? ""])].filter(Boolean);
   const en = all.join(" ").split(/\s+/).length;
   const zh = all.map((x) => zhWords(Z(x))).reduce((a, b) => a + b, 0);
   return { en: Math.max(1, Math.round(en / 230)), zh: Math.max(1, Math.round(zh / 420)) };
 }
-const DATE_ISO = { "November 3, 2026": "2026-11-03", "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
+const DATE_ISO = { "November 6, 2026": "2026-11-06", "November 3, 2026": "2026-11-03", "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
 
 // ---------------------------------------------------------------- covers and figures (design content)
 const COVERS = {
+  [AR.slug]: {
+    img: "piano.webp",
+    alt: ["An upright piano with its lid closed over the keys and an open score on the music desk, in soft daylight through a sheer curtain.", "一架立式钢琴，琴盖合在琴键上，谱架上摊着一份打开的乐谱，薄纱窗帘透进柔和的日光。"],
+    cap: ["The tune is on the page. Through the closed lid, only knocks.", "旋律写在谱上；隔着合上的琴盖，只剩敲击声。"],
+  },
   [LA.slug]: {
     img: "ladder.webp",
     alt: ["A wall of library shelves at dusk with a rolling ladder hooked onto its brass rail; high up, one red book has been drawn half out of its row.", "黄昏的图书馆书墙，一架移动梯挂在黄铜横杆上；高处有一本红色的书被抽出了一半。"],
@@ -191,6 +216,37 @@ FIGS[LA.slug] = [
           </ol>`,
     cap: ["The three studies this section proposes, each with the result that would count against the idea it tests.", "本节提出的三项研究，以及会推翻各自设想的结果。"] },
 ];
+FIGS[AR.slug] = [
+  { at: "after:0.1", body: `<div class="odds">
+            <div class="od-col">
+              ${biP("p", "od-k", "The tappers’ guess", "敲的人估计")}
+              ${biP("p", "od-v", "about 1 in 2", "约一半")}
+              ${biP("p", "od-n", "of the songs would be named", "的歌能被猜出来")}
+            </div>
+            <div class="od-col od-real">
+              ${biP("p", "od-k", "What the listeners named", "听的人实际猜中")}
+              ${biP("p", "od-v", "fewer than 3 in 100", "不到百分之三")}
+              ${biP("p", "od-n", "almost none", "几乎全没猜出来")}
+            </div>
+            <p class="od-foot">${bi("The tapper hears the melody", "敲的人听见旋律")}<span aria-hidden="true">·</span>${bi("The listener hears knocks", "听的人只听见敲击")}</p>
+          </div>`,
+    cap: ["The tapping study in this section: what the tappers expected, and what the listeners managed. Figures from Newton’s 1990 dissertation.", "本节的敲歌实验：敲的人的估计，和听的人的实际结果。数字出自 Newton 1990 年的博士论文。"] },
+  { at: "after:1.4", body: `<ol class="probe">
+            ${[["Ask", "提问", "Which is bigger, 0.3 or 0.25?", "0.3 和 0.25，哪个大？", "“0.25.”", "“0.25。”"],
+               ["Guess", "猜测", "Is the student reading the digits after the point as a whole number? 25 is bigger than 3.", "是不是把小数点后面当成了整数？25 比 3 大。", "", ""],
+               ["Test", "检验", "What about 0.3 and 0.30?", "那 0.3 和 0.30 呢？", "“0.30.” The guess holds. “Equal” would have meant a new guess.", "“0.30。”猜测成立。如果答“一样大”，就换一个猜测。"],
+               ["Explain differently", "换个讲法", "Thirty cents or a quarter: which is more?", "三角和两角五分，哪个多？", "Answered at once.", "马上答对。"]].map(([ten, tzh, qen, qzh, aen, azh], i) => `<li${i === 3 ? ' class="now"' : ""}><span class="pb-tag">${bi(esc(ten), esc(tzh))}</span><span class="pb-q">${bi(esc(qen), esc(qzh))}</span>${aen ? `<span class="pb-a">${bi(esc(aen), esc(azh))}</span>` : ""}</li>`).join("")}
+          </ol>`,
+    cap: ["The decimal question from this section, followed through: guess, check, guess again, then explain it another way. The money is in dollars in English and in jiao and fen in Chinese.", "本节的小数题，一步步走下来：猜测、检验、再修正，然后换一种讲法。英文版换成了美元，中文版是角和分。"] },
+  { at: "after:2.1", body: `<ol class="leap">
+            ${[["Seen", "看到的", "Misses the same problem a few times in a row", "连着几次没听懂同一道题"],
+               ["Inferred", "推断", "“Slow to catch on”", "“反应慢”"],
+               ["Inferred", "推断", "“Lacks the ability to learn”", "“没有学习能力”"],
+               ["Inferred", "推断", "“Born that way”", "“天生就不行”"]].map(([ken, kzh, en, zh], i) => `<li${i === 0 ? ' class="seen"' : ""}><span class="lp-k">${bi(esc(ken), esc(kzh))}</span><span class="lp-v">${bi(esc(en), esc(zh))}</span></li>`).join("")}
+            <li class="lp-end"><span class="lp-k">${bi("Then", "然后")}</span><span class="lp-v">${bi("Patience ends", "耐心到此为止")}</span></li>
+          </ol>`,
+    cap: ["The chain of judgements this section describes. Only the first step is something anyone actually saw.", "本节描述的一连串判断。只有第一步是真正看到的。"] },
+];
 // the pull quote goes after this section (skipped when it repeats the dek or a callout)
 const PULL_AFTER = { "when-learning-starts-to-feel-like-failure": "after:5.0", "the-classroom-does-not-need-30-robots": "end:0" };
 
@@ -235,11 +291,20 @@ function essayPage(p, idx) {
   const pull = (key) => PULL_AFTER[s] === key ? `        <blockquote class="pull">${biE(p.pullQuote)}</blockquote>` : "";
 
   const body = [];
+  // a paragraph starting with "> " is a spoken line, set apart. The drop cap goes on the essay's first
+  // paragraph, or, when it opens with a lead-in and spoken lines, on the first full paragraph after them.
+  const dropAt = (p.intro ?? []).findIndex((x) => !x.startsWith("> ") && x.length > 80);
+  const para = (text, first) => {
+    const zh = Z(text), said = text.startsWith("> ");
+    const cls = said ? "said" : first ? "first" : "";
+    return "        " + biP("p", cls, prose(said ? text.slice(2) : text), prose(said ? zh.slice(2) : zh, true));
+  };
+  (p.intro ?? []).forEach((text, k) => body.push(para(text, k === dropAt)));
   p.sections.forEach((sec, i) => {
     body.push(`        <h2 id="${articleHeadingId(sec.heading)}"><span class="no">§${i + 1}</span><span>${biH(sec.heading)}</span></h2>`);
     body.push(figAt(`before:${i}`));
-    sec.paragraphs.forEach((para, k) => {
-      body.push("        " + biP("p", i === 0 && k === 0 ? "first" : "", prose(para), prose(Z(para), true)));
+    sec.paragraphs.forEach((text, k) => {
+      body.push(para(text, i === 0 && k === 0 && !p.intro));
       body.push(figAt(`after:${i}.${k}`)); body.push(pull(`after:${i}.${k}`));
     });
     if (sec.progression) body.push(`        <figure class="fig fig-steps">${steps(sec.progression)}</figure>`);

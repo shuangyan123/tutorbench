@@ -1,16 +1,18 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { articleHeadingId } from "../site/pages/blog.js";
+import { ARROGANCE_ESSAY } from "./arrogance-essay.js";
 import { LEARNING_ACCESS_ESSAY } from "./learning-access-essay.js";
 
 /**
- * The Journal essay "Why Good Learning Resources Fail to Reach the People Who Need Them".
+ * The Journal essays written after the generated site's four: "Arrogance Is Not What You Need" and
+ * "Why Good Learning Resources Fail to Reach the People Who Need Them".
  *
- * The page itself is built like every other essay, by the Spectrum Journal generator
- * (website/prototypes/spectrum/tools/build-journal.mjs, from LEARNING_ACCESS_ESSAY). The generated
- * site has no page for it, so this module supplies the search and sharing metadata the Spectrum
- * install takes from that site for each route, and after the install writes the sitemap entries
- * and the redirects from the five short essays it replaced.
+ * Their pages are built like every other essay, by the Spectrum Journal generator
+ * (website/prototypes/spectrum/tools/build-journal.mjs, from ARROGANCE_ESSAY and LEARNING_ACCESS_ESSAY).
+ * The generated site has no page for them, so this module supplies the search and sharing metadata the
+ * Spectrum install takes from that site for each route, and after the install writes their sitemap
+ * entries and the redirects from the five short essays the learning-access essay replaced.
  */
 export interface LearningAccessOptions {
   outputDirectory: string;
@@ -18,7 +20,22 @@ export interface LearningAccessOptions {
 }
 
 export const LEARNING_ACCESS_SLUG = LEARNING_ACCESS_ESSAY.slug;
-const PUBLISHED = "2026-11-03";
+export const ARROGANCE_SLUG = ARROGANCE_ESSAY.slug;
+
+interface JournalEssay {
+  slug: string;
+  published: string;
+  /** the cover, which is also the structured-data image */
+  image: string;
+  en: { title: string; description: string };
+  zh: { title: string; description: string };
+}
+
+/** Newest first. */
+const ESSAYS: readonly JournalEssay[] = [
+  { slug: ARROGANCE_SLUG, published: ARROGANCE_ESSAY.published, image: "assets/journal/piano.webp", en: ARROGANCE_ESSAY.en, zh: ARROGANCE_ESSAY.zh },
+  { slug: LEARNING_ACCESS_SLUG, published: "2026-11-03", image: "assets/journal/ladder.webp", en: LEARNING_ACCESS_ESSAY.en, zh: LEARNING_ACCESS_ESSAY.zh },
+];
 
 /** The short essays first published on 2026-11-03, each now a section of the full essay (by its heading). */
 const LEGACY_ARTICLE_SECTIONS = [
@@ -36,27 +53,34 @@ export function learningAccessSectionId(n: number): string {
   return articleHeadingId(heading);
 }
 
+/** The anchor of section `n` (1-based) of "Arrogance Is Not What You Need". */
+export function arroganceSectionId(n: number): string {
+  const heading = ARROGANCE_ESSAY.en.sections[n - 1]?.heading;
+  if (heading === undefined) throw new Error(`The essay has no section ${n}`);
+  return articleHeadingId(heading);
+}
+
 function esc(s: string): string {
   return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 
-const page = (zh: boolean): string => `${zh ? "zh-cn/" : ""}blog/${LEARNING_ACCESS_SLUG}/`;
+const page = (zh: boolean, slug: string = LEARNING_ACCESS_SLUG): string => `${zh ? "zh-cn/" : ""}blog/${slug}/`;
 
 /**
- * The essay's metadata block for the Spectrum install, keyed like the generated site's pages
+ * Each essay's metadata block for the Spectrum install, keyed like the generated site's pages
  * ("blog/<slug>/index.html" and its zh-cn twin). Each value runs from <title> to the icon link,
  * the shape the install reads; the preview image is added there from tools/share-cards.json.
  */
-export function learningAccessMetadataPages(siteUrl: string | undefined): Map<string, string> {
+export function journalEssayMetadataPages(siteUrl: string | undefined): Map<string, string> {
   const site = siteUrl?.replace(/\/$/u, "");
   const absolute = (path: string): string => (site === undefined ? `/${path}` : `${site}/${path}`);
   const pages = new Map<string, string>();
-  for (const zh of [false, true]) {
-    const copy = zh ? LEARNING_ACCESS_ESSAY.zh : LEARNING_ACCESS_ESSAY.en;
+  for (const essay of ESSAYS) for (const zh of [false, true]) {
+    const copy = zh ? essay.zh : essay.en;
     const title = `${copy.title} — ${zh ? "Teachometry 博客" : "Teachometry Blog"}`;
-    const url = absolute(page(zh));
-    const english = absolute(page(false));
-    const chinese = absolute(page(true));
+    const url = absolute(page(zh, essay.slug));
+    const english = absolute(page(false, essay.slug));
+    const chinese = absolute(page(true, essay.slug));
     const posting = {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
@@ -64,9 +88,9 @@ export function learningAccessMetadataPages(siteUrl: string | undefined): Map<st
       description: copy.description,
       url,
       mainEntityOfPage: url,
-      datePublished: PUBLISHED,
+      datePublished: essay.published,
       inLanguage: zh ? "zh-CN" : "en",
-      image: absolute("assets/journal/ladder.webp"),
+      image: absolute(essay.image),
       author: { "@type": "Organization", name: "Teachometry", url: absolute("") },
       publisher: { "@type": "Organization", name: "Teachometry", url: absolute("") },
     };
@@ -93,7 +117,7 @@ export function learningAccessMetadataPages(siteUrl: string | undefined): Map<st
       `<link rel="alternate" hreflang="en" href="${esc(english)}">`,
       `<link rel="alternate" hreflang="zh-CN" href="${esc(chinese)}">`,
       `<link rel="alternate" hreflang="x-default" href="${esc(english)}">`,
-      `<meta property="article:published_time" content="${PUBLISHED}">`,
+      `<meta property="article:published_time" content="${essay.published}">`,
       '<meta name="twitter:card" content="summary">',
       `<meta name="twitter:title" content="${esc(title)}">`,
       `<meta name="twitter:description" content="${esc(copy.description)}">`,
@@ -101,7 +125,7 @@ export function learningAccessMetadataPages(siteUrl: string | undefined): Map<st
       `<script type="application/ld+json">${json(breadcrumb)}</script>`,
       '<link rel="icon" href="/favicon.svg">',
     ];
-    pages.set(`${page(zh)}index.html`, lines.join("\n"));
+    pages.set(`${page(zh, essay.slug)}index.html`, lines.join("\n"));
   }
   return pages;
 }
@@ -125,17 +149,17 @@ function legacyRedirect(section: number, zh: boolean, canonical: string): string
 `;
 }
 
-function withSitemapEntries(sitemap: string, siteUrl: string): string {
+function withSitemapEntries(sitemap: string, siteUrl: string, slug: string): string {
   const base = siteUrl.replace(/\/$/u, "");
-  const en = `${base}/${page(false)}`;
-  const zh = `${base}/${page(true)}`;
+  const en = `${base}/${page(false, slug)}`;
+  const zh = `${base}/${page(true, slug)}`;
   const entries = [en, zh].filter((loc) => !sitemap.includes(`<loc>${loc}</loc>`)).map((loc) =>
     `<url><loc>${esc(loc)}</loc><xhtml:link rel="alternate" hreflang="en" href="${esc(en)}"/><xhtml:link rel="alternate" hreflang="zh-CN" href="${esc(zh)}"/><xhtml:link rel="alternate" hreflang="x-default" href="${esc(en)}"/></url>`);
   return entries.length === 0 ? sitemap : sitemap.replace("</urlset>", `${entries.join("\n")}\n</urlset>`);
 }
 
-/** After the Spectrum install: the old short essays' URLs point at their sections, and the sitemap lists the essay. */
-export async function publishLearningAccessRoutes(options: LearningAccessOptions): Promise<void> {
+/** After the Spectrum install: the old short essays' URLs point at their sections, and the sitemap lists the essays. */
+export async function publishJournalEssayRoutes(options: LearningAccessOptions): Promise<void> {
   const site = options.siteUrl?.replace(/\/$/u, "");
   for (const zh of [false, true]) {
     const canonical = site === undefined ? `/${page(zh)}` : `${site}/${page(zh)}`;
@@ -147,6 +171,8 @@ export async function publishLearningAccessRoutes(options: LearningAccessOptions
   }
   if (site !== undefined) {
     const sitemap = join(options.outputDirectory, "sitemap.xml");
-    await writeFile(sitemap, withSitemapEntries(await readFile(sitemap, "utf8"), site), "utf8");
+    let xml = await readFile(sitemap, "utf8");
+    for (const essay of ESSAYS) xml = withSitemapEntries(xml, site, essay.slug);
+    await writeFile(sitemap, xml, "utf8");
   }
 }

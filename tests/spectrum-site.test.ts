@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
 import { minifyCss, shareCardFor, withShareImage } from "../src/cli/spectrum-site.js";
-import { learningAccessSectionId } from "../src/cli/blog-series.js";
+import { arroganceSectionId, learningAccessSectionId } from "../src/cli/blog-series.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
 // generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
@@ -110,7 +110,7 @@ test("public data and discovery files are unchanged by the redesign", async () =
 
     const index = await page(`${locale}blog/index.html`);
     assert.ok(index.includes(`href="${slug}/"`), "new essay not linked on Journal index");
-    assert.ok(index.includes(locale ? "5 篇文章" : "5 essays"), "index count was not updated");
+    assert.ok(index.includes(locale ? "6 篇文章" : "6 essays"), "index count was not updated");
 
     for (const [oldSlug, section] of old) {
       const oldRoute = `${locale}blog/${oldSlug}/`;
@@ -121,6 +121,36 @@ test("public data and discovery files are unchanged by the redesign", async () =
       assert.ok(redirect.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), oldRoute);
       assert.ok(!spectrumSitemap.includes(`<loc>${SITE_URL}/${oldRoute}</loc>`), "old short essay should not remain indexed");
     }
+  }
+
+  // the newest essay: its own route, metadata, share card, sources, and place on the index and home page
+  const arrogance = "arrogance-is-not-what-you-need";
+  for (const locale of ["", "zh-cn/"]) {
+    const route = `${locale}blog/${arrogance}/`;
+    assert.ok(await isFile(join(spectrum, route, "index.html")), route);
+    assert.ok(spectrumSitemap.includes(`<loc>${SITE_URL}/${route}</loc>`), route);
+    const article = await page(route + "index.html");
+    assert.match(article, /<meta name="robots" content="index,follow(?:,|")/u);
+    assert.ok(article.includes(`id="${arroganceSectionId(8)}"`), "essay has all eight sections");
+    assert.doesNotMatch(article, /\*\*/u, "markdown emphasis left in the text");
+    assert.doesNotMatch(article, />&gt; /u, "quote marker left in the text");
+    assert.match(article, /<meta property="article:published_time" content="2026-11-06">/u);
+    assert.ok(article.includes("Arrogance Is Not What You Need"));
+    assert.ok(article.includes("傲慢是你所不需要的"));
+    assert.ok(article.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), route);
+    assert.ok(article.includes(`<link rel="alternate" hreflang="zh-CN" href="${SITE_URL}/zh-cn/blog/${arrogance}/">`), route);
+    const head = article.slice(0, article.indexOf("</head>"));
+    assert.ok(head.includes(`assets/share/essay-arrogance-${locale ? "zh" : "en"}.jpg`), `essay share card: ${route}`);
+    assert.ok(!head.includes(slug), `inherited prior essay metadata: ${route}`);
+    assert.match(article, /<a class="fn" href="#source-5"/u);
+    for (const doi of ["10.3102/00028312040004905", "10.1016/j.lmot.2024.102015", "10.1177/01461672231225364", "10.1073/pnas.2422633122"]) {
+      assert.ok(article.includes(`https://doi.org/${doi}`), `source link ${doi}`);
+    }
+    assert.ok(article.includes("assets/journal/piano.webp"), "cover plate");
+    const index = await page(`${locale}blog/index.html`);
+    assert.ok(index.indexOf(`href="${arrogance}/"`) >= 0 && index.indexOf(`href="${arrogance}/"`) < index.indexOf(`href="${slug}/"`), "newest essay leads the Journal index");
+    const home = await page(`${locale}index.html`);
+    assert.ok(home.includes(`blog/${arrogance}/`), "newest essay not on the home page");
   }
 });
 

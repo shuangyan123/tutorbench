@@ -308,3 +308,51 @@ a.issue:hover { color: var(--lead-deep); }
 .essay-text .sources .notes-list { columns: 1; }
 /* a phone column is too narrow to justify Chinese mixed with Latin words: Safari stretches the spaces around them */
 @media (max-width: 620px) { :root[data-lang="zh"] .essay-text .prose { text-align: start; } }
+
+/* ---- "Arrogance Is Not What You Need" */
+/* a spoken line, set apart from the prose */
+.essay-text .prose > p.said { margin: .3em 0 1.05em; padding-left: 1.1em; border-left: 1px solid var(--lead-line); font-family: var(--f-display); font-style: italic; font-size: 1.2em; line-height: 1.35; color: var(--ink); text-align: left; }
+.essay-text .prose > p.said + p.said { margin-top: -.45em; }
+:root[data-lang="zh"] .essay-text .prose > p.said { font-style: normal; font-weight: 500; font-size: 1.06em; line-height: 1.75; }
+/* the tapping study: the guess and the result */
+.odds { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--ink); }
+.od-col { padding: 16px 18px 18px 0; }
+.od-col + .od-col { padding-left: 18px; border-left: 1px solid var(--hair-2); }
+.od-k { margin: 0; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.od-v { margin: 12px 0 4px; font-family: var(--f-display); font-variant-numeric: lining-nums; font-size: clamp(30px, 3.2vw, 42px); line-height: 1.02; color: var(--ink-2); text-wrap: balance; }
+.od-n { margin: 0; font-family: var(--f-ui); font-size: 13.5px; line-height: 1.45; color: var(--ink-3); }
+.od-real .od-k, .od-real .od-v { color: var(--lead); }
+.od-foot { grid-column: 1 / -1; margin: 0; padding-top: 12px; border-top: 1px solid var(--hair); display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+/* the decimal question, followed through */
+.probe { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+.probe li { display: grid; grid-template-columns: 9em minmax(0, 1fr); column-gap: 14px; row-gap: 5px; padding: 13px 0 15px; border-bottom: 1px solid var(--hair); }
+.pb-tag { grid-row: span 2; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); padding-top: 6px; }
+.pb-q { font-family: var(--f-display); font-size: 21px; line-height: 1.25; color: var(--ink); }
+.pb-a { font-family: var(--f-text); font-style: italic; font-size: 15.5px; line-height: 1.45; color: var(--ink-2); }
+.probe li.now { background: rgba(255, 255, 255, .34); box-shadow: inset 0 2px 0 var(--lead); padding-inline: 12px; }
+.probe li.now .pb-tag { color: var(--lead); }
+/* from one problem to a verdict: one step seen, the rest inferred */
+.leap { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+.leap li { display: grid; grid-template-columns: 7em minmax(0, 1fr); column-gap: 14px; align-items: baseline; padding: 11px 0; border-bottom: 1px dashed rgba(14, 15, 20, .24); }
+.lp-k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.lp-v { font-family: var(--f-display); font-size: 21px; line-height: 1.2; color: var(--ink-2); }
+.leap li:nth-child(2) .lp-v { padding-left: 5%; }
+.leap li:nth-child(3) .lp-v { padding-left: 10%; }
+.leap li:nth-child(4) .lp-v { padding-left: 15%; }
+.leap li:nth-child(5) .lp-v { padding-left: 20%; }
+.leap li.seen { border-bottom: 1px solid var(--ink); }
+.leap li.seen .lp-k, .leap li.seen .lp-v { color: var(--ink); }
+.leap li.lp-end { border-bottom: 0; }
+.leap li.lp-end .lp-k, .leap li.lp-end .lp-v { color: var(--lead); }
+:root[data-lang="zh"] .od-v { font-weight: 600; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.25; }
+:root[data-lang="zh"] .pb-q, :root[data-lang="zh"] .lp-v { font-weight: 600; font-size: 18px; line-height: 1.5; }
+:root[data-lang="zh"] .pb-a { font-style: normal; line-height: 1.7; }
+@media (max-width: 620px) {
+  .odds { grid-template-columns: 1fr; }
+  .od-col + .od-col { padding-left: 0; border-left: 0; border-top: 1px solid var(--hair-2); }
+  .probe li { grid-template-columns: 1fr; }
+  .pb-tag { grid-row: auto; padding-top: 0; }
+  .probe li.now { padding-inline: 10px; }
+  .leap li { grid-template-columns: 1fr; row-gap: 2px; }
+  .leap li:nth-child(n) .lp-v { padding-left: 0; }
+}
