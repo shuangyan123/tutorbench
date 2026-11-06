@@ -1,0 +1,14 @@
+{
+  "573e7dc2d895215e347534bc3dda5e28c5bf518002e02c972fe693307b45e640": {
+    "questions": { "2": [1, 375.1] }
+  },
+  "20cd18073abb025ba5e397aedfacc96fe4a78297cdcc2905769c20f3bfde661e": {
+    "issues": ["edition_numbering_conflict"]
+  },
+  "2bd1d61716031eaf0edc43084be30b5bd56ca291645305286790352ce2139604": {
+    "sharedPrompts": [{ "page": 2, "top": 82.8, "first": 5, "last": 7 }]
+  },
+  "f195ba4994a6dd18a1e68cf9a7e22ba7cae5915c0f39ae1335771b30a3f31a95": {
+    "sharedPrompts": [{ "page": 2, "top": 223.6, "first": 5, "last": 7 }]
+  }
+}
