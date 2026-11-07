@@ -6,6 +6,8 @@ on:
       - '.github/workflows/learner-state-deepseek-contrast.yml'
       - 'scripts/research/run_deepseek_learner_state_contrasts.py'
       - 'scripts/research/test_run_deepseek_learner_state_contrasts.py'
+      - 'scripts/research/review_deepseek_learner_state_contrasts.py'
+      - 'scripts/research/test_review_deepseek_learner_state_contrasts.py'
       - 'scripts/research/run_deepseek_flash_math_25.py'
       - 'scripts/research/export-learner-state-contrasts.mjs'
       - 'src/experiments/learner-state-contrast.ts'
@@ -36,7 +38,7 @@ jobs:
           npm run build
       - name: Test offline DeepSeek high/max request builder and safety
         run: |
-          python3 -m unittest scripts/research/test_run_deepseek_learner_state_contrasts.py -v
+          python3 -m unittest scripts/research/test_run_deepseek_learner_state_contrasts.py scripts/research/test_review_deepseek_learner_state_contrasts.py -v
       - name: Export all ten frozen Tutor inputs, no provider calls
         run: |
           node scripts/research/export-learner-state-contrasts.mjs --out "$RUNNER_TEMP/learner-packets.json"
