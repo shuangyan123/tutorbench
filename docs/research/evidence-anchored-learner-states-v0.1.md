@@ -23,8 +23,10 @@ Each profile consists of literal **learner** excerpts, identified by one-based l
 | `unknown` | No sound claim yet, even if a numerical answer is wrong or a learner asks for help | Inventing a unique error cause or an ability level |
 | `explicit_gap` | Learner explicitly says they do not understand a named prerequisite | Global inability or every prerequisite being absent |
 | `misconception_stated` | Learner explicitly articulates a wrong *rule* | Treating one statement as a permanent trait |
-| `reported_only` | Learner says they know a concept | Inferring successful independent performance |
-| `demonstrated_local` | Learner gives a locally correct explanation in their turn | Durable mastery, transfer, or a fixed ceiling |
+| `reported_only` | Learner merely claims knowledge | Independent performance |
+| `stated_definition` | Learner says a correct definition | Worked application |
+| `supported_local` | Learner paraphrases a Tutor example after receiving it | Independent reconstruction or transfer |
+| `demonstrated_local` | Learner states locally correct reasoning without a prior authored Tutor hint about that step | Durable mastery, transfer or a ceiling |
 
 All other student characteristics, including general intelligence, motivation, emotional state, learning disability, maximum attainable ability, and trait-level mastery, are **unmeasured**. The matrix does not infer any of them.
 
@@ -34,8 +36,8 @@ All other student characteristics, including general intelligence, motivation, e
 | --- | --- | --- | --- |
 | `pai-unknown-cause` | Only `1/3 + 1/4 = 2/7` | Specific cause **unknown** | Check the student's method or correct cautiously; do not diagnose a denominator deficit from an answer alone |
 | `pai-whole-undefined` | "I do not know what that word means here." | Explicit gap in the term "whole" | Define the chosen whole with one concrete referent, then verify locally |
-| `pai-rule-misconception` | "I always add top numbers and bottom numbers separately" | Explicitly stated, incorrect fraction-addition rule; other stated knowledge remains only self-report | Address that rule, not an invented broader deficiency |
-| `pai-after-progress` | Accurately describes the whole sheet, asks why parts must be equal | Locally demonstrated meaning of whole; equal-parts reasoning still **unknown** | Build on demonstrated progress and address the newer question |
+| `pai-rule-misconception` | Stated separate-numerator/denominator rule, but also correctly defines the denominator | Explicit incorrect addition rule **and a stated correct definition**, not proof of application | Address that rule, not an invented broader deficiency |
+| `pai-after-progress` | Restates the whole-sheet meaning **after the Tutor supplied this example** | Prompt-supported paraphrase only; independent understanding and equal-parts reasoning still **unknown** | Build on demonstrated progress and address the newer question |
 | `pai-known-foundation` | Correctly describes a shared whole split into differently sized parts, asks how to rewrite them | Local evidence on fraction units; equivalent-fraction method **unknown**, not proved absent | Move to equivalent units; do not restart the entire foundation lesson |
 
 These are **five independent authored vignettes**, not five observed people, three actual groups, a single student's progression, or a measured pre/post gain.
@@ -44,7 +46,7 @@ These are **five independent authored vignettes**, not five observed people, thr
 
 A response such as `2/7` might arise from a guessed rule, copying, arithmetic carelessness, or a misunderstood question. It cannot justify any one underlying cause. A question such as "How do I rewrite these?" does not establish that the learner lacks every relevant prerequisite. A correct statement by a student may be useful local evidence; it is not proof of delayed retention.
 
-Thus the research comparison distinguishes *observable content* from *hypothesized diagnosis*. For evaluative use, a Tutor must not receive the matrix's `claims` or `decisionBoundary` as hidden answers. Only the existing vNext Tutor-visible conversation and known-concept projection are supplied to the Tutor. The matrix is an **evaluator/operator sidecar** and is not a secret injected learner memory.
+Thus the research comparison distinguishes *observable content* from *hypothesized diagnosis*. For evaluative use, a Tutor must not receive the matrix's `claims` or `decisionBoundary` as hidden answers. Only the existing vNext Tutor-visible conversation and projected context are supplied for original source scenarios. For paired counterfactuals, author-assigned known-concept values are **neutralized in both arms**, avoiding a hidden privileged-state confound. The matrix is an **evaluator/operator sidecar** and is not a secret injected learner memory.
 
 ## Validation: what the code actually checks
 
@@ -52,7 +54,7 @@ Thus the research comparison distinguishes *observable content* from *hypothesiz
 
 - An exact author-synthetic schema, versioned source suite and the five existing source scenario identities; one fixed learning objective across the snapshots.
 - Each evidence quote must literally occur in its declared **learner** turn. A Tutor utterance cannot be used as learner evidence.
-- Claims can reference only existing observations, with distinct observation and concept IDs. `misconception_stated` needs a `stated_rule`, `explicit_gap` needs an explicit-gap statement, `reported_only` needs a self-report, and `demonstrated_local` needs locally correct reasoning. An `incorrect_result` alone cannot silently promote a diagnosis.
+- Claims can reference only existing observations, with distinct observation and concept IDs. `misconception_stated` needs a `stated_rule`; `explicit_gap` an explicit gap; `reported_only` a self-report; `stated_definition` a verbal definition; `supported_local` a prompted paraphrase with a preceding Tutor turn; `demonstrated_local` locally correct reasoning. An `incorrect_result` alone cannot silently promote a diagnosis.
 - `unknown` cannot be disguised as an evidenced fact; source utterance or version changes invalidate quote anchors.
 - No field can claim real observed learning, stable student ability, an intervention effect, or linkage of the five vignettes into one real student's longitudinal history.
 
