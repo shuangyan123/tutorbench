@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "id": "phase1-national-and-njust-v1",
+  "missingSourcePolicy": "Retain the edition in the denominator and block acceptance until authoritative source evidence is available.",
+  "exclusions": [
+    {
+      "id": "shanghai-2024-spring",
+      "basis": "Separate January admission session outside the regular national sitting.",
+      "source": "https://www.shmeea.edu.cn/page/02300/20231206/18042.html"
+    }
+  ],
+  "groups": {
+    "gaokaoMath": {
+      "basis": "Regular national mathematics editions, including historical stream variants, in the pinned catalog.",
+      "sources": [
+        "https://jyj.changde.gov.cn/zhdt/jydt/content_917875",
+        "https://edu.people.com.cn/n1/2023/0607/c1006-40008595.html",
+        "https://www.sdqljy.cn/news/9792.html",
+        "https://education.news.cn/20250607/8c18a78606ae43e1affc28552a08154c/c.html",
+        "https://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/2026/2026_zt08/mtbd/202606/t20260608_1439853.html"
+      ],
+      "deferred": "Provincial and municipal mathematics editions, alternate sessions and unadjudicated duplicate scans.",
+      "papers": [
+        {"paperId":"gaokao-2022-national-a-humanities","year":2022,"exam":"gaokao","subject":"数学","variant":"national-a-humanities","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2022-national-a-science","year":2022,"exam":"gaokao","subject":"数学","variant":"national-a-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2022-national-b-humanities","year":2022,"exam":"gaokao","subject":"数学","variant":"national-b-humanities","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2022-national-b-science","year":2022,"exam":"gaokao","subject":"数学","variant":"national-b-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2022-new-gaokao-1","year":2022,"exam":"gaokao","subject":"数学","variant":"new-gaokao-1","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2022-new-gaokao-2","year":2022,"exam":"gaokao","subject":"数学","variant":"new-gaokao-2","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-national-a-humanities","year":2023,"exam":"gaokao","subject":"数学","variant":"national-a-humanities","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-national-a-science","year":2023,"exam":"gaokao","subject":"数学","variant":"national-a-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-national-b-humanities","year":2023,"exam":"gaokao","subject":"数学","variant":"national-b-humanities","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-national-b-science","year":2023,"exam":"gaokao","subject":"数学","variant":"national-b-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-new-gaokao-1","year":2023,"exam":"gaokao","subject":"数学","variant":"new-gaokao-1","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-new-gaokao-2","year":2023,"exam":"gaokao","subject":"数学","variant":"new-gaokao-2","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2024-national-humanities","year":2024,"exam":"gaokao","subject":"数学","variant":"national-humanities","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2024-national-science","year":2024,"exam":"gaokao","subject":"数学","variant":"national-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2024-new-gaokao-1","year":2024,"exam":"gaokao","subject":"数学","variant":"new-gaokao-1","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2024-new-gaokao-2","year":2024,"exam":"gaokao","subject":"数学","variant":"new-gaokao-2","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2025-national-1","year":2025,"exam":"gaokao","subject":"数学","variant":"national-1","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2025-national-2","year":2025,"exam":"gaokao","subject":"数学","variant":"national-2","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2026-national-1","year":2026,"exam":"gaokao","subject":"数学","variant":"national-1","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2026-national-2","year":2026,"exam":"gaokao","subject":"数学","variant":"national-2","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"}
+      ]
+    },
+    "gaokaoScience": {
+      "basis": "National integrated-science edition leads across 2022–2026. Each includes physics, chemistry and biology once per paper. Scope references establish reported families only.",
+      "sources": [
+        "https://paper.jyb.cn/zgjyb/images/2022-06/11/03/ZGJYB2022061103.pdf",
+        "https://www.thepaper.cn/newsDetail_forward_23404968",
+        "https://app.gaokaozhitongche.com/news/h/Ewj3krY2",
+        "https://www.btmc.edu.cn/__local/7/DE/1E/2C3516481F8E4927C9B42E1B2DD_EA1956B0_4C346.pdf",
+        "https://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/2026/2026_zt08/mtbd/202606/t20260610_1440059.html"
+      ],
+      "deferred": "Provincial selection tests, unresolved joint-province labels and other science candidates outside the listed national integrated families.",
+      "papers": [
+        {"paperId":"gaokao-2022-national-a-integrated-science","year":2022,"exam":"gaokao","subject":"理科综合","variant":"national-a-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2022-national-b-integrated-science","year":2022,"exam":"gaokao","subject":"理科综合","variant":"national-b-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-national-a-integrated-science","year":2023,"exam":"gaokao","subject":"理科综合","variant":"national-a-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-national-b-integrated-science","year":2023,"exam":"gaokao","subject":"理科综合","variant":"national-b-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2023-new-curriculum-integrated-science","year":2023,"exam":"gaokao","subject":"理科综合","variant":"new-curriculum-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2024-national-a-integrated-science","year":2024,"exam":"gaokao","subject":"理科综合","variant":"national-a-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2024-new-curriculum-integrated-science","year":2024,"exam":"gaokao","subject":"理科综合","variant":"new-curriculum-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2025-national-integrated-science","year":2025,"exam":"gaokao","subject":"理科综合","variant":"national-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"gaokao-2026-national-integrated-science","year":2026,"exam":"gaokao","subject":"理科综合","variant":"national-integrated-science","courseCode":null,"issuer":"教育部教育考试院","editionType":"national"}
+      ]
+    },
+    "postgraduateMath": {
+      "basis": "One regular national Math I, II and III target per admission year, including unavailable originals.",
+      "sources": [
+        "https://www.moe.gov.cn/srcsite/A15/moe_778/s3113/202209/t20220906_658894.html",
+        "https://www.moe.gov.cn/srcsite/A15/moe_778/s3261/202509/t20250918_1413836.html"
+      ],
+      "deferred": "Other national math subjects and sample or recollection copies as substitutes for originals.",
+      "papers": [
+        {"paperId":"kaoyan-math-1-2022","year":2022,"exam":"postgraduate_math","subject":"数学","variant":"math-1","courseCode":"301","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-2-2022","year":2022,"exam":"postgraduate_math","subject":"数学","variant":"math-2","courseCode":"302","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-3-2022","year":2022,"exam":"postgraduate_math","subject":"数学","variant":"math-3","courseCode":"303","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-1-2023","year":2023,"exam":"postgraduate_math","subject":"数学","variant":"math-1","courseCode":"301","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-2-2023","year":2023,"exam":"postgraduate_math","subject":"数学","variant":"math-2","courseCode":"302","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-3-2023","year":2023,"exam":"postgraduate_math","subject":"数学","variant":"math-3","courseCode":"303","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-1-2024","year":2024,"exam":"postgraduate_math","subject":"数学","variant":"math-1","courseCode":"301","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-2-2024","year":2024,"exam":"postgraduate_math","subject":"数学","variant":"math-2","courseCode":"302","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-3-2024","year":2024,"exam":"postgraduate_math","subject":"数学","variant":"math-3","courseCode":"303","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-1-2025","year":2025,"exam":"postgraduate_math","subject":"数学","variant":"math-1","courseCode":"301","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-2-2025","year":2025,"exam":"postgraduate_math","subject":"数学","variant":"math-2","courseCode":"302","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-3-2025","year":2025,"exam":"postgraduate_math","subject":"数学","variant":"math-3","courseCode":"303","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-1-2026","year":2026,"exam":"postgraduate_math","subject":"数学","variant":"math-1","courseCode":"301","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-2-2026","year":2026,"exam":"postgraduate_math","subject":"数学","variant":"math-2","courseCode":"302","issuer":"教育部教育考试院","editionType":"national"},
+        {"paperId":"kaoyan-math-3-2026","year":2026,"exam":"postgraduate_math","subject":"数学","variant":"math-3","courseCode":"303","issuer":"教育部教育考试院","editionType":"national"}
+      ]
+    },
+    "postgraduateScience": {
+      "basis": "Seven already inventoried NJUST publisher leads across exact course codes and 2022–2023.",
+      "sources": [
+        "https://gs.njust.edu.cn/zsw/66/86/c4584a353926/page.htm",
+        "https://gs.njust.edu.cn/zsw/a3/f2/c4584a369650/page.htm"
+      ],
+      "deferred": "Other institutions, 2024–2026 self-set courses, specialized national exams and broader difficulty sampling. The seven witnesses remain unrated.",
+      "papers": [
+        {"paperId":"njust-2022-physics","year":2022,"exam":"postgraduate_self_set","subject":"物理","variant":"初试自命题","courseCode":"845","issuer":"南京理工大学","editionType":"institution"},
+        {"paperId":"njust-2022-chemistry","year":2022,"exam":"postgraduate_self_set","subject":"化学","variant":"初试自命题","courseCode":"814","issuer":"南京理工大学","editionType":"institution"},
+        {"paperId":"njust-2022-biology","year":2022,"exam":"postgraduate_self_set","subject":"生物","variant":"初试自命题","courseCode":"817","issuer":"南京理工大学","editionType":"institution"},
+        {"paperId":"njust-2023-physics-a","year":2023,"exam":"postgraduate_self_set","subject":"物理","variant":"初试自命题","courseCode":"614","issuer":"南京理工大学","editionType":"institution"},
+        {"paperId":"njust-2023-physics-b","year":2023,"exam":"postgraduate_self_set","subject":"物理","variant":"初试自命题","courseCode":"845","issuer":"南京理工大学","editionType":"institution"},
+        {"paperId":"njust-2023-biology","year":2023,"exam":"postgraduate_self_set","subject":"生物","variant":"初试自命题","courseCode":"817","issuer":"南京理工大学","editionType":"institution"},
+        {"paperId":"njust-2023-chemistry","year":2023,"exam":"postgraduate_self_set","subject":"化学","variant":"初试自命题","courseCode":"881","issuer":"南京理工大学","editionType":"institution"}
+      ]
+    }
+  }
+}
