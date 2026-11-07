@@ -112,3 +112,45 @@ Remove-Item Env:\DEEPSEEK_API_KEY
 Summary enforces matching packet/prompt identities across files and refuses duplicate case/effort pairs. It reports coverage, errors, token totals and latency; it does not invent teaching quality, human Gold, model winner or real learner gain.
 
 **Limit:** student inputs are English-authored synthetic vignettes; Tutor output is requested in Simplified Chinese. This is engineering contrast evidence, not a validated Chinese-native learner cohort. Human/independent semantic adjudication remains necessary. CI and ChatGPT call **zero** paid DeepSeek requests; only local operator use of run --execute-live performs calls.
+
+
+## Frozen output validation and blind semantic review (after all attempts)
+
+Reuse the repository's existing **source/manifest/submission separation** for independent semantic review. This cohort has **one human reviewer at most**, so it is not human-human agreement, expert-consensus Gold, or observed learning improvement. The operator cannot claim blindness for the previously inspected high/max `ls-v01-p01-a` responses; disclose that exposure in any report.
+
+The new offline review tool reads the exact four saved JSONL files. It checks each header against the unchanged frozen Tutor packet, rejects duplicate `(caseId, effort)`, checks `inputSha256`, `messagesSha256`, `requestSha256`, and the SHA of stored final text, and confirms each header's selected-case list matches its actual rows. No API calls. Unlike the basic aggregate `summarize`, this validates **every response-to-request identity**.
+
+Use a fixed list of source files (PowerShell):
+
+~~~powershell
+$root = "artifacts/research/learner-state-contrasts-v0.1"
+$reviewer = "scripts/research/review_deepseek_learner_state_contrasts.py"
+$inputs = @(
+  "$root/deepseek-high-smoke.jsonl",
+  "$root/deepseek-high-rest.jsonl",
+  "$root/deepseek-max-smoke.jsonl",
+  "$root/deepseek-max-rest.jsonl"
+)
+$inputArgs = foreach ($file in $inputs) { "--input"; $file }
+
+# Works for partial sets too, but reports missing attempts explicitly.
+python $reviewer audit @inputArgs
+
+# Requires exactly 20 recorded attempts, including failed/truncated statuses.
+# Exports only successfully completed Tutor replies to the reviewer packet.
+python $reviewer prepare @inputArgs --out-dir "$root/reviewer-a-blind"
+~~~
+
+The `prepare` command refuses to overwrite an existing directory. It outputs `reviewer-packet.json`, `submission-template.json`, `REVIEWER-GUIDE.md` and a **separate operator-only** `operator-mapping.json`. Keep the latter closed until the reviewer has completed and frozen the template. The reviewer sees only student-visible context and Tutor final responses in opaque, shuffled task order, with no High/Max tags, author expectations, or pair mappings.
+
+For each completed response, the reviewer records four **descriptive** dimensions: `evidenceFit` (response tied to observable student evidence), `instructionalSupport` (conceptual and procedural bridge), `unsupportedDiagnosis` (unjustified claims about the student) and `factualIntegrity` (correct math). An unreviewable failed call is **not** a teaching FAIL. When no strong evidence exists, `ABSTAIN` is allowed. For non-PASS judgments, preserve verbatim textual reasons. Do not collapse these four dimensions to a single number or "model winner" automatically.
+
+After all review items are completed, save the edited template as a **new file** named `reviewer-a-completed.json`. Then unseal:
+
+~~~powershell
+python $reviewer unseal --packet-dir "$root/reviewer-a-blind" --submission "$root/reviewer-a-completed.json" --out-dir "$root/reviewer-a-analysis"
+~~~
+
+`unseal` rejects missing or unrated items, unknown IDs, duplicate tasks, changed task-set fingerprint and insufficient negative-rating evidence. It **freezes the submitted file byte-for-byte** before writing descriptive effort-level and paired results, preserving notes exactly. It does not call DeepSeek, Judge or a student. The mapping and fingerprints are local integrity checks, **not third-party digital signatures** authenticating the provider.
+
+If the reviewer prefers conversational annotation over editing JSON, preserve all four JSONL files untouched and hand them off for a separate review UI; do not use operator mapping or an author-predicted label to prefill a human score.
