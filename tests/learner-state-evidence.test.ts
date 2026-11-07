@@ -61,9 +61,9 @@ test("five existing synthetic learner states are quote-anchored, not five studen
   const unknown = parsed.profiles.find(p => p.scenarioId === "pai-unknown-cause")!;
   assert.deepEqual(unknown.claims.map(c => c.status), ["unknown", "unknown"]);
   const rule = parsed.profiles.find(p => p.scenarioId === "pai-rule-misconception")!;
-  assert.deepEqual(rule.claims.map(c => c.status), ["misconception_stated", "reported_only"]);
+  assert.deepEqual(rule.claims.map(c => c.status), ["misconception_stated", "stated_definition"]);
   const progress = parsed.profiles.find(p => p.scenarioId === "pai-after-progress")!;
-  assert.deepEqual(progress.claims.map(c => c.status), ["demonstrated_local", "unknown"]);
+  assert.deepEqual(progress.claims.map(c => c.status), ["supported_local", "unknown"]);
 });
 
 test("an incorrect answer cannot become a diagnosed misconception without a stated rule", async () => {
@@ -74,7 +74,7 @@ test("an incorrect answer cannot become a diagnosed misconception without a stat
   rejects(() => parseLearnerStateEvidenceMatrix(matrix, source), /claim_evidence_kind_mismatch/);
 });
 
-test("a self-report cannot be silently promoted to demonstrated understanding", async () => {
+test("a verbal definition cannot be silently promoted to independent demonstrated application", async () => {
   const { matrix, source } = await mutable();
   matrix.profiles[2]!.claims[1]!.status = "demonstrated_local";
   rejects(() => parseLearnerStateEvidenceMatrix(matrix, source), /claim_evidence_kind_mismatch/);
@@ -132,7 +132,7 @@ test("duplicate evidence IDs and concept claims are rejected", async () => {
   const { matrix, source } = await mutable();
   matrix.profiles[2]!.observations[1]!.id = "rule-explicit";
   rejects(() => parseLearnerStateEvidenceMatrix(matrix, source), /duplicate_observation_id/);
-  matrix.profiles[2]!.observations[1]!.id = "rule-self-report";
+  matrix.profiles[2]!.observations[1]!.id = "rule-definition";
   matrix.profiles[2]!.claims[1]!.conceptId = "fraction-addition-rule";
   rejects(() => parseLearnerStateEvidenceMatrix(matrix, source), /duplicate_concept_claim/);
 });
@@ -150,4 +150,25 @@ test("distinct profiles cannot be asserted to be successive observations of one 
   const { matrix, source } = await mutable();
   matrix.participantLinkage = "same_learner_longitudinal";
   rejects(() => parseLearnerStateEvidenceMatrix(matrix, source), /matrix_structure/);
+});
+
+test("a supported paraphrase cannot be misrepresented as independent work", async () => {
+  const { matrix, source } = await mutable();
+  matrix.profiles[3]!.claims[0]!.status = "demonstrated_local";
+  rejects(() => parseLearnerStateEvidenceMatrix(matrix, source), /claim_evidence_kind_mismatch/);
+});
+
+test("prompted-paraphrase evidence requires a preceding Tutor turn", async () => {
+  const { matrix, source } = await mutable();
+  const edited = structuredClone(source) as unknown as {
+    scenarios: Array<{
+      identity: { id: string };
+      trajectory: { conversationHistory: Array<{ role: "user" | "assistant"; content: string }> };
+    }>;
+  };
+  const s = edited.scenarios.find(x => x.identity.id === "pai-after-progress")!;
+  s.trajectory.conversationHistory = [s.trajectory.conversationHistory[2]!];
+  matrix.profiles[3]!.observations.forEach(o => { o.learnerTurnIndex = 1; });
+  rejects(() => parseLearnerStateEvidenceMatrix(matrix, edited as unknown as typeof source),
+    /prompted_paraphrase_requires_prior_tutor/);
 });
