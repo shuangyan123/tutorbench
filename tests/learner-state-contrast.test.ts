@@ -168,7 +168,9 @@ test("operator labels and artificial outcome values cannot enter a valid frozen 
 
 test("a source suite that has changed its objective cannot masquerade as controlled", async () => {
   const { source, plan } = await inputs();
-  const changed = structuredClone(source) as typeof source;
+  const changed = structuredClone(source) as unknown as {
+    scenarios: Array<{ learningContext: { learningObjective: string } }>;
+  };
   changed.scenarios[0]!.learningContext.learningObjective = "A different goal";
-  rejected(() => parseLearnerEvidenceContrastPlan(plan, changed), /objective_not_fixed/);
+  rejected(() => parseLearnerEvidenceContrastPlan(plan, changed as unknown as typeof source), /objective_not_fixed/);
 });
