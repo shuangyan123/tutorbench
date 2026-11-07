@@ -1,0 +1,63 @@
+name: Learner State DeepSeek Contrast (Offline)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/learner-state-deepseek-contrast.yml'
+      - 'scripts/research/run_deepseek_learner_state_contrasts.py'
+      - 'scripts/research/test_run_deepseek_learner_state_contrasts.py'
+      - 'scripts/research/run_deepseek_flash_math_25.py'
+      - 'scripts/research/export-learner-state-contrasts.mjs'
+      - 'src/experiments/learner-state-contrast.ts'
+      - 'scenarios/experimental/learner-state-evidence-v0.1/**'
+      - 'scenarios/experimental/prerequisite-aware-instruction-v0.1/**'
+      - 'docs/research/learner-state-contrast-experiment-v0.1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  no-api-high-max:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24.21.0
+          cache: npm
+      - name: Install and compile
+        run: |
+          npm ci
+          npm run build
+      - name: Test offline DeepSeek high/max request builder and safety
+        run: |
+          python3 -m unittest scripts/research/test_run_deepseek_learner_state_contrasts.py -v
+      - name: Export all ten frozen Tutor inputs, no provider calls
+        run: |
+          node scripts/research/export-learner-state-contrasts.mjs --out "$RUNNER_TEMP/learner-packets.json"
+      - name: Validate high/max plans have identical messages and no live calls
+        run: |
+          python3 scripts/research/run_deepseek_learner_state_contrasts.py plan --packet "$RUNNER_TEMP/learner-packets.json" --effort high --limit 10 > "$RUNNER_TEMP/high-plan.json"
+          python3 scripts/research/run_deepseek_learner_state_contrasts.py plan --packet "$RUNNER_TEMP/learner-packets.json" --effort max --limit 10 > "$RUNNER_TEMP/max-plan.json"
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import os
+          root = Path(os.environ["RUNNER_TEMP"])
+          high = json.loads((root / "high-plan.json").read_text(encoding="utf8"))
+          max_effort = json.loads((root / "max-plan.json").read_text(encoding="utf8"))
+          assert high["apiCalls"] == max_effort["apiCalls"] == 0
+          assert len(high["cases"]) == len(max_effort["cases"]) == 10
+          assert high["maxTokensPerRequest"] == max_effort["maxTokensPerRequest"] == 8192
+          for left, right in zip(high["cases"], max_effort["cases"]):
+              assert left["caseId"] == right["caseId"]
+              assert left["inputSha256"] == right["inputSha256"]
+              assert left["messagesSha256"] == right["messagesSha256"]
+              assert left["requestSha256"] != right["requestSha256"]
+          print("10 identical Tutor messages, high/max only parameter difference; 0 API calls")
+          PY
