@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "learner-state-evidence-matrix-v0.1",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "sourceSuite": {
     "id": "prerequisite-aware-instruction-v0.1",
     "version": "0.1.0"
@@ -53,7 +53,7 @@
         {
           "id": "whole-gap",
           "learnerTurnIndex": 2,
-          "quote": "I do not know what that word means here.",
+          "quote": "What does 'a whole' mean? I do not know what that word means here.",
           "kind": "explicit_gap"
         }
       ],
@@ -91,10 +91,10 @@
           "kind": "stated_rule"
         },
         {
-          "id": "rule-self-report",
+          "id": "rule-definition",
           "learnerTurnIndex": 1,
-          "quote": "I know a denominator tells how many equal parts the whole has.",
-          "kind": "self_report"
+          "quote": "a denominator tells how many equal parts the whole has.",
+          "kind": "verbal_definition"
         }
       ],
       "claims": [
@@ -107,9 +107,9 @@
         },
         {
           "conceptId": "equal-parts",
-          "status": "reported_only",
+          "status": "stated_definition",
           "observationIds": [
-            "rule-self-report"
+            "rule-definition"
           ]
         }
       ],
@@ -118,7 +118,7 @@
           "针对学生明确说出的分子、分母分别相加规则设计一个大小比较或相同单位的反例，再请学生解释。"
         ],
         "prohibitedInferences": [
-          "因为答案错就改称学生“完全不懂整体”；把学生自述的分母定义直接当作独立掌握证据。"
+          "因为答案错就改称学生“完全不懂整体”；把说出正确的分母定义直接当作独立运用证明。"
         ]
       }
     },
@@ -130,7 +130,7 @@
           "id": "progress-whole",
           "learnerTurnIndex": 2,
           "quote": "the whole is all of the sheet before we cut it.",
-          "kind": "local_reasoning"
+          "kind": "prompted_paraphrase"
         },
         {
           "id": "progress-question",
@@ -142,7 +142,7 @@
       "claims": [
         {
           "conceptId": "chosen-whole",
-          "status": "demonstrated_local",
+          "status": "supported_local",
           "observationIds": [
             "progress-whole"
           ]
@@ -155,10 +155,10 @@
       ],
       "decisionBoundary": {
         "acceptableNextMoves": [
-          "承接学生对“整体”的正确复述，解释为什么等大部分才能使用同一个分母计数，并要求一个可检验的小例子。"
+          "把学生在上一轮纸张例子后的正确复述当作局部理解迹象，先简短认可，再解释为什么各份等大并用一个可核查的小例子探问。"
         ],
         "prohibitedInferences": [
-          "重复完整解释“整体”并忽略新问题；因一次正确复述宣布长期掌握分数。"
+          "重复完整解释“整体”并忽略新问题；把提示后的复述写成无提示独立掌握或持久迁移。"
         ]
       }
     },
