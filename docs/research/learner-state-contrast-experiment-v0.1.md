@@ -48,3 +48,67 @@ Do not call paid providers automatically or rank models before semantic human re
 ## Stop conditions
 
 Keep this experiment outside the canonical Tutor Health aggregate, existing Rubric Gold, and learner outcome evidence. Stop and reopen a pair when literal source evidence changes, paired inputs differ in fields other than the evidence span and identity, evaluator-only state leaks into packets, or a plausible alternate teaching response is incorrectly forced into FAIL. The prior `learner-path-goal-and-cost-v0.1` baseline/immediate/transfer/delayed outcome checks remain entirely unmeasured.
+
+
+## Operator commands — DeepSeek Flash high vs max (Windows PowerShell)
+
+**Scope:** run only the frozen 10 Tutor inputs from this PR, not the canonical 48-case baseline or the unrelated 20-question math holdout. This is a direct Chat Completions research runner, because the canonical host intentionally rejects reasoning-effort generation controls. It reuses the bounded, no-redirect HTTP implementation in the existing DeepSeek research runner.
+
+Official parameter contract: model deepseek-flash; thinking.type enabled; reasoning_effort high or max; temperature is ignored. Both arms set the same max_tokens=8192. This cap includes reasoning tokens and final-answer tokens and is a ceiling, **not a monetary spend limit**. If max truncates disproportionately, report output_truncated and use a separately versioned sensitivity experiment with a larger but identical budget across both modes.
+
+Use the PR #349 research worktree. All commands below assume its root. Do **not** use baseline:local:* here: that command targets a different dataset and does not exercise high/max effort parity.
+
+### Step 1 — zero-cost preparation (no API key needed)
+
+~~~powershell
+npm ci
+npm run build
+python -m unittest scripts/research/test_run_deepseek_learner_state_contrasts.py -v
+
+# Original export is create-only; do this once on a fresh worktree.
+node scripts/research/export-learner-state-contrasts.mjs
+
+$runner = "scripts/research/run_deepseek_learner_state_contrasts.py"
+python $runner plan --effort high --limit 10
+python $runner plan --effort max --limit 10
+~~~
+
+These plan commands make **zero paid calls** and display input and request hashes. Prompts and messages are identical across high and max; the request effort differs. An existing output is never silently replaced.
+
+### Step 2 — explicitly opt in to two paid smoke calls
+
+The runner reads DEEPSEEK_API_KEY only from the current PowerShell process environment. Do not paste the key into chat, files, or command arguments.
+
+~~~powershell
+$secret = Read-Host "DeepSeek API Key" -AsSecureString
+$env:DEEPSEEK_API_KEY = [pscredential]::new("deepseek", $secret).GetNetworkCredential().Password
+Remove-Variable secret
+
+# ONE DeepSeek request per command: the same first frozen input.
+python $runner run --effort high --start-index 1 --limit 1 --execute-live --output "artifacts/research/learner-state-contrasts-v0.1/deepseek-high-smoke.jsonl"
+python $runner run --effort max --start-index 1 --limit 1 --execute-live --output "artifacts/research/learner-state-contrasts-v0.1/deepseek-max-smoke.jsonl"
+~~~
+
+Inspect whether the recorded status is ok and the final text is nonempty and untruncated, plus finishReason, elapsedMs and tokenUsage where available. Never count provider failure, timeout or output_truncated as a teaching FAIL. The raw reasoning_content is never saved.
+
+### Step 3 — remaining paired inputs (18 additional paid requests)
+
+Proceed only after reviewing the two smoke results. These commands start at index 2, avoiding duplicate charges for the smoke inputs:
+
+~~~powershell
+python $runner run --effort high --start-index 2 --limit 9 --execute-live --output "artifacts/research/learner-state-contrasts-v0.1/deepseek-high-rest.jsonl"
+python $runner run --effort max --start-index 2 --limit 9 --execute-live --output "artifacts/research/learner-state-contrasts-v0.1/deepseek-max-rest.jsonl"
+~~~
+
+No retries and no overwrite. Each file records prompt/request fingerprints, response text, usage and failure status. Use a new path for deliberate repetition.
+
+### Step 4 — offline summary (no API calls)
+
+~~~powershell
+python $runner summarize --input "artifacts/research/learner-state-contrasts-v0.1/deepseek-high-smoke.jsonl" --input "artifacts/research/learner-state-contrasts-v0.1/deepseek-high-rest.jsonl" --input "artifacts/research/learner-state-contrasts-v0.1/deepseek-max-smoke.jsonl" --input "artifacts/research/learner-state-contrasts-v0.1/deepseek-max-rest.jsonl"
+Remove-Item Env:\DEEPSEEK_API_KEY
+~~~
+
+Summary enforces matching packet/prompt identities across files and refuses duplicate case/effort pairs. It reports coverage, errors, token totals and latency; it does not invent teaching quality, human Gold, model winner or real learner gain.
+
+**Limit:** student inputs are English-authored synthetic vignettes; Tutor output is requested in Simplified Chinese. This is engineering contrast evidence, not a validated Chinese-native learner cohort. Human/independent semantic adjudication remains necessary. CI and ChatGPT call **zero** paid DeepSeek requests; only local operator use of run --execute-live performs calls.
