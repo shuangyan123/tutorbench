@@ -9,6 +9,8 @@ export type LearnerObservationKind =
   | "stated_rule"
   | "local_reasoning"
   | "self_report"
+  | "verbal_definition"
+  | "prompted_paraphrase"
   | "question";
 
 export type LearnerEpistemicStatus =
@@ -16,7 +18,9 @@ export type LearnerEpistemicStatus =
   | "explicit_gap"
   | "misconception_stated"
   | "demonstrated_local"
-  | "reported_only";
+  | "reported_only"
+  | "stated_definition"
+  | "supported_local";
 
 export interface LearnerStateObservation {
   readonly id: string;
@@ -47,7 +51,7 @@ export interface LearnerStateProfile {
 export interface LearnerStateEvidenceMatrix {
   readonly schemaVersion: 1;
   readonly id: "learner-state-evidence-matrix-v0.1";
-  readonly version: "0.1.0";
+  readonly version: "0.1.1";
   readonly sourceSuite: { readonly id: string; readonly version: string };
   readonly evidenceMode: "author_written_synthetic";
   readonly participantLinkage: "unlinked_profiles";
@@ -101,18 +105,21 @@ const concepts = new Set([
 ]);
 const observationKinds = new Set<LearnerObservationKind>([
   "incorrect_result", "explicit_gap", "stated_rule", "local_reasoning",
-  "self_report", "question",
+  "self_report", "verbal_definition", "prompted_paraphrase", "question",
 ]);
 const supportedEvidence: Readonly<Record<Exclude<LearnerEpistemicStatus, "unknown">, LearnerObservationKind>> = {
   explicit_gap: "explicit_gap",
   misconception_stated: "stated_rule",
   demonstrated_local: "local_reasoning",
   reported_only: "self_report",
+  stated_definition: "verbal_definition",
+  supported_local: "prompted_paraphrase",
 };
 
 function parseObservation(
   value: unknown,
   userTurns: readonly string[],
+  tutorBeforeLearnerTurn: readonly boolean[],
 ): LearnerStateObservation {
   if (!shape(value, ["id", "learnerTurnIndex", "quote", "kind"]) ||
       !id(value.id) || !Number.isInteger(value.learnerTurnIndex) ||
@@ -125,6 +132,10 @@ function parseObservation(
   const turn = userTurns[value.learnerTurnIndex - 1];
   if (turn === undefined || !turn.includes(value.quote)) {
     return invalid("evidence_quote_not_in_learner_turn");
+  }
+  if (value.kind === "prompted_paraphrase" &&
+      tutorBeforeLearnerTurn[value.learnerTurnIndex - 1] !== true) {
+    return invalid("prompted_paraphrase_requires_prior_tutor");
   }
   return value as unknown as LearnerStateObservation;
 }
@@ -165,7 +176,7 @@ export function parseLearnerStateEvidenceMatrix(
     "participantLinkage", "claimBoundary", "profiles",
   ]) || value.schemaVersion !== 1 ||
       value.id !== "learner-state-evidence-matrix-v0.1" ||
-      value.version !== "0.1.0" ||
+      value.version !== "0.1.1" ||
       value.evidenceMode !== "author_written_synthetic" ||
       value.participantLinkage !== "unlinked_profiles") {
     return invalid("matrix_structure");
@@ -204,15 +215,22 @@ export function parseLearnerStateEvidenceMatrix(
     if (!source || source.identity.version !== rawProfile.scenarioVersion) {
       return invalid("stale_scenario_version");
     }
-    const turns = source.trajectory.conversationHistory.filter(t => t.role === "user")
-      .map(t => t.content);
+    const history = source.trajectory.conversationHistory;
+    const turns = history.filter(t => t.role === "user").map(t => t.content);
+    const tutorBeforeLearnerTurn: boolean[] = [];
+    let tutorSeen = false;
+    for (const turn of history) {
+      if (turn.role === "assistant") tutorSeen = true;
+      else tutorBeforeLearnerTurn.push(tutorSeen);
+    }
     if (!Array.isArray(rawProfile.observations) ||
         rawProfile.observations.length === 0 || rawProfile.observations.length > 12 ||
         !Array.isArray(rawProfile.claims) || rawProfile.claims.length === 0 ||
         rawProfile.claims.length > concepts.size) {
       return invalid("empty_or_oversized_evidence");
     }
-    const observed = rawProfile.observations.map(v => parseObservation(v, turns));
+    const observed = rawProfile.observations.map(v =>
+      parseObservation(v, turns, tutorBeforeLearnerTurn));
     const evidence = new Map(observed.map(o => [o.id, o.kind] as const));
     if (evidence.size !== observed.length) return invalid("duplicate_observation_id");
     const claims = rawProfile.claims.map(v => parseClaim(v, evidence));
