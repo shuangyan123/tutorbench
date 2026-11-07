@@ -134,8 +134,9 @@ class ReviewTests(unittest.TestCase):
         self.assertTrue(comparison["notHumanHumanAgreement"])
         self.assertEqual(comparison["realLearnerOutcome"], "not_measured")
         self.assertNotIn("modelWinner", comparison)
-        self.assertIn("证据原文。 引号“原样”保留！ \n",
-                      json.dumps(comparison, ensure_ascii=False))
+        self.assertTrue(any(
+            row["evidence"] == "证据原文。 引号“原样”保留！ \n"
+            for pair in comparison["pairs"] for row in pair["responses"]))
         with self.assertRaises(FileExistsError):
             review.import_review(path, sub, self.root / "analysis")
 
