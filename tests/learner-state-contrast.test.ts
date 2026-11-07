@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 import { parseTutorScenarioSuiteVNext } from "../src/contracts/tutor-scenario-vnext-validation.js";
@@ -173,4 +176,28 @@ test("a source suite that has changed its objective cannot masquerade as control
   };
   changed.scenarios[0]!.learningContext.learningObjective = "A different goal";
   rejected(() => parseLearnerEvidenceContrastPlan(plan, changed as unknown as typeof source), /objective_not_fixed/);
+});
+
+test("offline CLI exports ten blind inputs and refuses to overwrite an existing export", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "tutorbench-learner-contrast-"));
+  try {
+    const out = join(dir, "visible.json");
+    const cli = resolve(process.cwd(), "scripts/research/export-learner-state-contrasts.mjs");
+    const args = [cli, "--out", out];
+    const first = spawnSync(process.execPath, args, { encoding: "utf8", timeout: 20000 });
+    assert.equal(first.status, 0, first.stderr);
+    const generated = JSON.parse(await readFile(out, "utf8")) as {
+      cases: unknown[];
+      tutorExecutionStatus: string;
+      blind: boolean;
+    };
+    assert.equal(generated.cases.length, 10);
+    assert.equal(generated.tutorExecutionStatus, "not_run");
+    assert.equal(generated.blind, true);
+    const second = spawnSync(process.execPath, args, { encoding: "utf8", timeout: 20000 });
+    assert.notEqual(second.status, 0);
+    assert.match(second.stderr, /EEXIST/u);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });
