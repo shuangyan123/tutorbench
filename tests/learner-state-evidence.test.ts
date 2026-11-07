@@ -114,7 +114,7 @@ test("changing the underlying learner utterance invalidates the quote anchor", a
   const scenario = amended.scenarios.find(s => s.identity.id === "pai-known-foundation")!;
   scenario.trajectory.conversationHistory[0]!.content = "I know what a fraction is.";
   rejects(
-    () => parseLearnerStateEvidenceMatrix(matrix, amended as typeof source),
+    () => parseLearnerStateEvidenceMatrix(matrix, amended as unknown as typeof source),
     /evidence_quote_not_in_learner_turn/,
   );
 });
