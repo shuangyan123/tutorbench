@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "id": "live-blind-occupancy-pilot-v0.1",
+  "status": "research_blind_numeric_only",
+  "cases": [
+    {
+      "id": "exam-linked-gaokao-2025-i-q14-typed-adaptation",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "provenanceKind": "exam_linked_typed_adaptation"
+    },
+    {
+      "id": "synthetic-seven-labels-four-draws-mean",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 7,
+          "numberOfDraws": 4,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "provenanceKind": "synthetic_typed_math"
+    },
+    {
+      "id": "synthetic-five-labels-three-draws-variance",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "variance"
+        }
+      },
+      "provenanceKind": "synthetic_typed_math"
+    },
+    {
+      "id": "synthetic-five-labels-probability-two",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_exact",
+          "k": 2
+        }
+      },
+      "provenanceKind": "synthetic_typed_math"
+    },
+    {
+      "id": "synthetic-five-labels-at-least-two",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 5,
+          "numberOfDraws": 3,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "probability_at_least",
+          "k": 2
+        }
+      },
+      "provenanceKind": "synthetic_typed_math"
+    },
+    {
+      "id": "synthetic-four-labels-zero-draws-mean",
+      "question": {
+        "kind": "finite_uniform_occupancy",
+        "model": {
+          "numberOfLabels": 4,
+          "numberOfDraws": 0,
+          "uniform": true,
+          "independent": true,
+          "withReplacement": true,
+          "randomVariable": "number_of_distinct_labels_seen"
+        },
+        "query": {
+          "metric": "expected_value"
+        }
+      },
+      "provenanceKind": "synthetic_typed_math"
+    }
+  ]
+}

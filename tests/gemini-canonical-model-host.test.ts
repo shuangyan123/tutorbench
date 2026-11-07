@@ -22,6 +22,7 @@ interface Configuration {
   readonly apiKey: string;
   readonly sessionToken: string;
   readonly model: string;
+  readonly thinkingLevel?: string;
   readonly timeoutMs: number;
   readonly port: number;
 }
@@ -61,12 +62,14 @@ async function fixture(t: TestContext, options: {
   readonly transport?: Transport;
   readonly timeoutMs?: number;
   readonly model?: string;
+  readonly thinkingLevel?: string;
 } = {}) {
   const calls: { url: string; init: RequestInit; body: Record<string, unknown> }[] = [];
   const warnings: unknown[][] = [];
   t.mock.method(console, "warn", (...args: unknown[]) => { warnings.push(args); });
   t.mock.method(console, "error", (...args: unknown[]) => { warnings.push(args); });
-  const server = await startServer({ ...readConfiguration({ ...environment, GEMINI_MODEL: options.model ?? environment.GEMINI_MODEL }), timeoutMs: options.timeoutMs ?? 2000 }, async (url, init) => {
+  const server = await startServer({ ...readConfiguration({ ...environment, GEMINI_MODEL: options.model ?? environment.GEMINI_MODEL,
+    ...(options.model === "gemini-3.8-flash" ? { GEMINI_THINKING_LEVEL: options.thinkingLevel ?? "medium" } : {}) }), timeoutMs: options.timeoutMs ?? 2000 }, async (url, init) => {
     assert.ok(init);
     // 唯一 SDK 网络入口完全替换，不允许回退到真实 fetch。
     calls.push({ url, init, body: JSON.parse(String(init.body)) as Record<string, unknown> });
@@ -148,10 +151,21 @@ test("Gemini 3.8 Flash SDK request omits unsupported candidateCount and makes on
     generationConfig: {
       maxOutputTokens: baselinePacket.generationSpec.maxOutputTokens,
       responseModalities: ["TEXT"],
+      thinkingConfig: { thinkingLevel: "medium" },
     },
   });
   assert.equal(Object.hasOwn(request.body.generationConfig as object, "candidateCount"), false);
   assert.deepEqual(host.warnings, []);
+});
+
+test("Gemini 3.8 Flash explicitly pins high thinking without sampling controls", async (t) => {
+  const host = await fixture(t, { model: "gemini-3.8-flash", thinkingLevel: "high" });
+  const result = await host.send();
+  assert.equal(result.status, 200);
+  assert.equal(host.calls.length, 1);
+  const body = host.calls[0]!.body;
+  assert.deepEqual((body.generationConfig as Record<string, unknown>).thinkingConfig, { thinkingLevel: "high" });
+  assert.equal(Object.hasOwn(body.generationConfig as object, "candidateCount"), false);
 });
 
 test("Gemini never invents missing or invalid token counts", async (t) => {
@@ -207,7 +221,7 @@ test("Gemini maps provider status failures with exactly one SDK attempt", async 
   for (const [status, expectedStatus, error] of [
     [401, 401, "provider_unauthorized"], [403, 403, "provider_forbidden"],
     [429, 429, "provider_rate_limited"], [500, 502, "provider_server_error"],
-    [503, 502, "provider_server_error"], [400, 502, "provider_http_error"],
+    [503, 503, "provider_unavailable"], [400, 502, "provider_http_error"],
   ] as const) {
     await t.test(String(status), async (subtest) => {
       const host = await fixture(subtest, { status, body: { error: { code: status, message: "provider-secret synthetic-secret-key rawPayload" } } });
@@ -264,7 +278,14 @@ test("Gemini rejects unsupported controls, hidden fields, invalid packets and un
 
 test("Gemini configuration fails closed without echoing values or accepting floating aliases", () => {
   assert.deepEqual(readConfiguration(environment), { apiKey: environment.GEMINI_API_KEY, sessionToken, model: environment.GEMINI_MODEL, timeoutMs: 60_000, port: 0, diagnostics: false });
-  for (const overrides of [
+  assert.deepEqual(readConfiguration({ ...environment, GEMINI_MODEL: "gemini-3.8-flash", GEMINI_THINKING_LEVEL: "medium" }), {
+    apiKey: environment.GEMINI_API_KEY, sessionToken, model: "gemini-3.8-flash", thinkingLevel: "medium", timeoutMs: 60_000, port: 0, diagnostics: false,
+  });
+  for (const overrides of [ 
+    { GEMINI_MODEL: "gemini-3.8-flash" },
+    { GEMINI_MODEL: "gemini-3.8-flash", GEMINI_THINKING_LEVEL: "minimal" },
+    { GEMINI_MODEL: "gemini-3.8-flash", GEMINI_THINKING_LEVEL: "HIGH" },
+    { GEMINI_THINKING_LEVEL: "medium" },
     { GEMINI_API_KEY: "" }, { GEMINI_MODEL: "" }, { GEMINI_MODEL: "gemini-flash-latest" },
     { GEMINI_MODEL: "gemini-2.5-flash-latest" }, { GEMINI_MODEL: "models/gemini-2.5-flash" },
     { GEMINI_MODEL: "provider-secret" }, { GEMINI_TIMEOUT_MS: "provider-secret" },
