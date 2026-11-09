@@ -5,6 +5,33 @@ exploration motivated these hypotheses. The eight inputs below are newly
 authored synthetic stimuli. They provide no independent expert consensus,
 Gold, Judge calibration, or evidence of real student learning.
 
+## Executable H1 fixtures (experimental only)
+
+The eight H1 input/decision checkpoints are now materialized in the
+[synthetic Scenario vNext suite](../../scenarios/experimental/prerequisite-accessibility-contrasts-v0.1/suite.json).
+They use the **existing** Scenario vNext validator, TutorEval compiler, and
+TutorEval runner; no new scoring category or runtime is introduced. Use the
+existing `tutorbench health --suite-file <path>` input rather than extending
+the canonical registered-suite list. The eight case IDs are
+`pac-{m,p,c,b}-{a,b}`; each has one H1 decision and two atomic, Judge-owned
+criteria (16 criteria total). The existing
+[no-provider execution tests](../../tests/prerequisite-accessibility-contrasts.test.ts)
+exercise the synthetic runner path and diagnostic-reference firewall.
+A synthetic all-PASS Judge fixture proves plumbing only, not teaching quality.
+
+The chemistry pair moves its identical O₂ prior-knowledge sentence into the
+shared visible prompt, then varies only the coefficient-evidence suffix.
+The other three pairs have a common prompt with an empty A evidence suffix
+and a single added B learner-evidence suffix. The Tutor sees only the authored
+student prompt, objective, and disclosure setting; expected behavior,
+references, and failure-finding templates remain evaluator-only.
+
+The H2 follow-up below and the four near-transfer prompts remain
+**pre-authored research designs**, not additional executed turns or observed
+learner outcomes. The cases have no real-model responses, independent subject
+review, calibrated Judge scores, or human learning measurements. Do not merge
+them into the canonical TutorEval or leaderboard cohort.
+
 ## Reuse and coverage
 
 Reuse the [Case System vNext](../case-system-vnext.md) learner-state,
