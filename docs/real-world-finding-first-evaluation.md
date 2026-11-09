@@ -85,6 +85,18 @@ this 13-scenario suite has no `content_correctness` or `reliability_policy`
 criteria and cannot establish complete `core-tutor` coverage. Organizations
 can pass another versioned profile.
 
+Default profile selection is provenance-aware: the Productive Struggle suite
+uses `productive-struggle-intervention@0.1.0`, the Case System executable
+pilot uses `case-system-vnext-executable-pilot@0.1.0`, and an unregistered
+or custom suite uses the explicitly unscoped
+`unscoped-equal-dimension@0.1.0` fallback unless the caller supplies a
+profile. All three current starter profiles use equal dimension weights, so
+this correction changes the recorded scoring identity rather than the numeric
+weighting mechanics. The legacy
+`DEFAULT_TUTOR_HEALTH_SCORING_PROFILE` export remains a compatibility alias
+for the Productive Struggle profile; it is not the fallback for arbitrary
+custom suites.
+
 Tutor Health Score is an attention summary. Findings and their evidence remain
 the diagnostic source of truth. The Release Gate fails when an existing
 non-error TutorEval case has `qualityGate: FAIL` or when a critical Finding
