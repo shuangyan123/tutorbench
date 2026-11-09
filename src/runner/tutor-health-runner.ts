@@ -1,11 +1,9 @@
 import {
-  CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SCORING_PROFILE,
   type TutorHealthReport,
   type TutorHealthScoringProfile,
   type TutorScenarioSuiteVNext,
 } from "../contracts/index.js";
 import {
-  CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID,
   loadTutorScenarioSuiteVNext,
   tutorScenarioSuiteToTutorEvalDataset,
 } from "../datasets/real-world.js";
@@ -33,16 +31,10 @@ export async function runTutorHealthEvaluation(
     ...runnerOptions,
     dataset: tutorScenarioSuiteToTutorEvalDataset(suite),
   });
-  const effectiveScoringProfile = scoringProfile ??
-    (suite.id === CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID
-      ? CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SCORING_PROFILE
-      : undefined);
   const report = buildTutorHealthReport({
     suite,
     evaluation,
-    ...(effectiveScoringProfile === undefined
-      ? {}
-      : { scoringProfile: effectiveScoringProfile }),
+    ...(scoringProfile === undefined ? {} : { scoringProfile }),
   });
   return { evaluation, report };
 }
