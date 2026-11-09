@@ -87,6 +87,7 @@ These connections exist and should be reused:
 - **Tutor-visible versus evaluator-only information:** tutorVisibleContext is projected to TutorTurnInput; misconception references remain evaluator-only and must cite learner turns.
 - **Criterion to report dimension:** each TutorScenarioEvaluationCriterion explicitly declares both its TutorEvalCategory and TutorHealthDimension. No implicit category-to-dimension conversion is intended.
 - **Case System source provenance:** caseSystemSource carries pilot, archetype and strategy-profile IDs and versions; registered Case System provenance is validated by the loader.
+- **Evaluator stress:** Case System evaluator-stress packets already combine source archetypes, task-specific strategy profiles and teaching-objective profiles for controlled comparisons. This is a measurement-validation path, not a second Tutor Health runner.
 - **Knowledge/exam coverage:** validateMathematicsExamCoverage checks that exam modules' node IDs exist in the knowledge map and case IDs exist in the selected Scenario suite.
 - **Tutor exposure to teach-back:** TeachBackTutorExposureRef can record suite ID/version, scenario ID and evaluation run ID.
 - **Outcome claim boundary:** Teach-back evidence is explicitly observational/proxy-only and remains outside the seven Tutor Health dimensions.
@@ -152,7 +153,7 @@ Never copy evaluator reference truth into TutorTurnInput merely to make the sche
 
 caseSystemSource preserves IDs and versions for the pilot, archetype and strategy profile. The executable Scenario does not itself carry the full D/P/H values, prerequisite boundary, reference reasoning, transfer references, or strategy-profile criteria.
 
-The source registries can be joined using those references, but the current compiler does not load and project them.
+The source registries can be joined using those references, but the current compiler does not load and project them. The separate teaching-objective contract (learning-oriented versus exam-oriented, with assessment context for exam-oriented work) is currently consumed by the Case System evaluator-stress packet path; it is not a field on Scenario vNext or part of the standard Tutor Health compiler projection.
 
 **Needed:** choose one explicit model:
 1. keep the archetype registry authoritative and resolve it through versioned source references when needed; or
@@ -166,9 +167,9 @@ The pedagogical-principles registry explicitly says its current principles are n
 
 **Needed:** when a principle is ready to influence evaluation, attach its ID/version as provenance to the relevant authored criterion or scenario. Do not automatically turn every research principle into a score or a mandatory teaching response.
 
-### G6. Knowledge maps and exam alignment are partially connected, not a learner-state engine
+### G6. Knowledge maps, exam alignment and academic navigation are connected metadata, not a learner-state engine
 
-The mathematics knowledge map contains nodes, prerequisite relations, evidence status, alternative paths and task-to-node mappings. Mathematics exam alignment separately links modules to node IDs and case IDs and validates those references against the map and Scenario suite.
+The mathematics knowledge map contains nodes, prerequisite relations, evidence status, alternative paths and task-to-node mappings. Mathematics exam alignment separately links modules to node IDs and case IDs and validates those references against the map and Scenario suite. AcademicStructure organizes discipline, knowledge-system and exam-system registry references for navigation; it is explicitly experimental authoring metadata, not an execution contract.
 
 This is a useful existing bridge. However, it does not yet make a knowledge-node reference part of every Tutor-visible learner state or every Tutor Health finding.
 
@@ -264,6 +265,8 @@ The architecture is sufficiently connected when all of the following can be demo
 - src/contracts/case-system-vnext-domain-taxonomy.ts
 - src/contracts/case-system-vnext-strategy-profile.ts
 - src/contracts/case-system-vnext-teaching-objective.ts
+- src/contracts/case-system-vnext-evaluator-stress.ts
+- src/case-system-vnext/evaluator-stress.ts
 - src/contracts/tutor-scenario-vnext.ts
 - src/contracts/tutor-eval.ts
 - src/contracts/tutor-eval-taxonomy.ts
