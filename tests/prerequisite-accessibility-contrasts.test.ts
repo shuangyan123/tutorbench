@@ -8,6 +8,9 @@ import { toTutorTurnInput, type TutorEvalJudgeInput } from "../src/contracts/ind
 import { tutorScenarioSuiteToTutorEvalDataset } from "../src/datasets/real-world.js";
 import { parseTutorHealthCliOptions } from "../src/cli/tutorbench-health.js";
 import { runTutorEval } from "../src/runner/tutor-eval-runner.js";
+import { runTutorHealthEvaluation } from "../src/runner/tutor-health-runner.js";
+import { buildTutorHealthReport } from "../src/reporting/tutor-health-reporters.js";
+import { UNSCOPED_TUTOR_HEALTH_SCORING_PROFILE } from "../src/contracts/tutor-health.js";
 
 const suiteUrl = new URL(
   "../../scenarios/experimental/prerequisite-accessibility-contrasts-v0.1/suite.json",
@@ -192,4 +195,80 @@ test("existing TutorEval runner executes all eight cases with synthetic adapters
   assert.deepEqual(seenJudge, seenTutor);
   // All-pass Judge is deliberately synthetic: these assertions test wiring,
   // NOT pedagogy validity, human agreement, or actual learning outcomes.
+});
+
+test("eight H1 cases retain source identities through TutorEval, Tutor Health, and finding evidence", async () => {
+  const suite = await loadSuite();
+  const { evaluation, report } = await runTutorHealthEvaluation({
+    suite,
+    tutor: {
+      id: "synthetic-evidence-traceability",
+      respond: async (input) => {
+        assert.deepEqual(input.studentState.misconceptions, []);
+        return { text: "A synthetic response. No pedagogical quality is claimed." };
+      },
+    },
+    tutorDescriptor: { provider: "synthetic", model: "fixture", promptVersion: "traceability-1" },
+    judge: {
+      provider: "synthetic-test",
+      model: "forced-fail-fixture",
+      promptVersion: "traceability-1",
+      evaluate: async (input: TutorEvalJudgeInput) => ({
+        schemaVersion: 1 as const,
+        caseId: input.caseId,
+        rubricResults: input.rubrics.map((rubric) => ({
+          rubricId: rubric.id,
+          result: "FAIL" as const,
+        })),
+        criticalFailures: [],
+        factualErrors: [],
+        insufficientInformation: false,
+      }),
+    },
+    runId: "eight-case-source-traceability-no-api",
+  });
+
+  assert.equal(evaluation.caseCount, 8);
+  assert.equal(evaluation.caseRunCount, 8);
+  assert.equal(evaluation.errorCount, 0);
+  assert.equal(report.sourceScenarioSuite.id, suite.id);
+  assert.equal(report.sourceScenarioSuite.version, suite.version);
+  assert.equal(report.sourceEvaluation.runId, evaluation.runId);
+  assert.equal(report.sourceEvaluation.datasetId, evaluation.datasetId);
+  assert.deepEqual(report.scoringProfile, UNSCOPED_TUTOR_HEALTH_SCORING_PROFILE);
+  assert.equal(report.coverage.evaluationScope.scenarioCount, 8);
+  assert.equal(report.coverage.evaluationScope.decisionPointCount, 8);
+  assert.equal(report.coverage.evaluationScope.presentCaseRunCount, 8);
+  assert.equal(report.coverage.evaluationScope.expectedCaseRunCount, 8);
+  assert.equal(report.unresolved.length, 0);
+
+  const sources = new Map(suite.scenarios.map((scenario) => [scenario.identity.id, scenario]));
+  const cases = new Map(tutorScenarioSuiteToTutorEvalDataset(suite).cases.map((item) => [item.id, item]));
+  assert.equal(report.findings.length, 16);
+  for (const finding of report.findings) {
+    const scenario = sources.get(finding.scenarioId);
+    assert.ok(scenario);
+    const point = scenario.decisionPoints.find((item) => item.id === finding.location.decisionPointId);
+    assert.ok(point);
+    assert.equal(finding.expectedBehavior, point.expectedBehavior);
+    assert.equal(finding.location.startTurn, point.turnIndex);
+    assert.ok(finding.regressionTargets.includes(`${scenario.identity.id}/${point.id}`));
+    const criterionRefs = finding.evidence.filter((e) => e.kind === "rubric_result");
+    assert.equal(criterionRefs.length, 1);
+    const ref = criterionRefs[0]!;
+    assert.equal(ref.kind, "rubric_result");
+    assert.equal(ref.scenarioId, scenario.identity.id);
+    assert.equal(ref.caseId, point.evaluationCaseId);
+    assert.equal(ref.result, "FAIL");
+    assert.ok(point.evaluationCriteria.some((criterion) =>
+      criterion.rubricId === ref.rubricId && criterion.dimension === finding.dimension));
+    assert.ok(cases.get(ref.caseId)?.evaluatorOnly.rubrics.some((rubric) => rubric.id === ref.rubricId));
+    const execution = evaluation.caseResults.find((item) =>
+      item.caseId === ref.caseId && item.runIndex === ref.runIndex);
+    assert.ok(execution);
+    assert.ok(execution.rubricResults.some((item) => item.rubricId === ref.rubricId && item.result === "FAIL"));
+  }
+  const recreated = buildTutorHealthReport({ suite, evaluation });
+  assert.deepEqual(recreated.scoringProfile, report.scoringProfile);
+  assert.deepEqual(recreated.findings, report.findings);
 });
