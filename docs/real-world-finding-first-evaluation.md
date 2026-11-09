@@ -75,15 +75,34 @@ category-to-dimension conversion is applied.
 The report uses the existing rubric result score and rubric weight. ERROR and
 missing results are excluded and listed as unresolved. Dimension scores are
 weighted means on a 0-100 integer scale; the summary score is the configured
-weighted mean of dimensions with scored evidence. The default
-`productive-struggle-intervention@0.1.0` profile is suite-specific. Report
-coverage states the assessed and total profile dimensions, scored and total
-profile weight, suite identity, and expected and present case-runs. The text
+weighted mean of dimensions with scored evidence. The Productive
+Struggle suite uses the suite-specific
+`productive-struggle-intervention@0.1.0` profile. Report coverage states the
+assessed and total profile dimensions, scored and total profile weight, suite
+identity, and expected and present case-runs. The text
 headline puts coverage next to the score. A high summary score with partial
 coverage is not presented as a complete Tutor Health profile. In particular,
 this 13-scenario suite has no `content_correctness` or `reliability_policy`
 criteria and cannot establish complete `core-tutor` coverage. Organizations
 can pass another versioned profile.
+
+Default profile selection is provenance-aware: the Productive Struggle suite
+uses `productive-struggle-intervention@0.1.0`, the Case System executable
+pilot uses `case-system-vnext-executable-pilot@0.1.0`, and an unregistered
+or custom suite uses the explicitly unscoped
+`unscoped-equal-dimension@0.1.0` fallback unless the caller supplies a
+profile. All three current starter profiles use equal dimension weights, so
+this correction changes the report's profile provenance rather than the
+numeric weighting mechanics. The legacy
+`DEFAULT_TUTOR_HEALTH_SCORING_PROFILE` export remains a compatibility alias
+for the Productive Struggle profile; it is not the fallback for arbitrary
+custom suites.
+
+The report keeps two provenance layers distinct:
+`sourceEvaluation.scoringIdentity` records TutorEval's case/rubric scoring
+provenance, while `scoringProfile.id` and `.version` identify the separate
+Tutor Health dimension-weighting profile. One must not be substituted for the
+other.
 
 Tutor Health Score is an attention summary. Findings and their evidence remain
 the diagnostic source of truth. The Release Gate fails when an existing

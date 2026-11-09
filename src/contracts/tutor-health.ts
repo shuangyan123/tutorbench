@@ -178,9 +178,33 @@ export interface TutorHealthScoringProfile {
  * Explicit starter weights for the Productive Struggle suite. This is a
  * suite-scoped reporting profile, not a complete core-tutor profile.
  */
-export const DEFAULT_TUTOR_HEALTH_SCORING_PROFILE: TutorHealthScoringProfile = {
+export const PRODUCTIVE_STRUGGLE_INTERVENTION_SCORING_PROFILE: TutorHealthScoringProfile = {
   schemaVersion: TUTOR_HEALTH_PROFILE_SCHEMA_VERSION,
   id: "productive-struggle-intervention",
+  version: "0.1.0",
+  dimensionWeights: {
+    content_correctness: 1,
+    learner_diagnosis: 1,
+    intervention_strategy: 1,
+    adaptation: 1,
+    learning_integrity: 1,
+    interaction_quality: 1,
+    reliability_policy: 1,
+  },
+};
+
+/** @deprecated Use PRODUCTIVE_STRUGGLE_INTERVENTION_SCORING_PROFILE explicitly. */
+export const DEFAULT_TUTOR_HEALTH_SCORING_PROFILE =
+  PRODUCTIVE_STRUGGLE_INTERVENTION_SCORING_PROFILE;
+
+/**
+ * Neutral fallback for custom/unregistered suites that have no authored
+ * suite-specific scoring profile. Equal weights are a reporting default,
+ * not a calibrated or validated measure of general tutor quality.
+ */
+export const UNSCOPED_TUTOR_HEALTH_SCORING_PROFILE: TutorHealthScoringProfile = {
+  schemaVersion: TUTOR_HEALTH_PROFILE_SCHEMA_VERSION,
+  id: "unscoped-equal-dimension",
   version: "0.1.0",
   dimensionWeights: {
     content_correctness: 1,
