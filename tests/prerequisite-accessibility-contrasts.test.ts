@@ -108,7 +108,12 @@ test("reference diagnosis remains evaluator-only; local correct reasoning is pre
 
 test("invalid evidence reference or duplicated case identity fails the existing parser", async () => {
   const suite = await loadSuite();
-  const invalid = structuredClone(suite);
+  const invalid = structuredClone(suite) as unknown as {
+    scenarios: Array<{
+      identity: { id: string };
+      evaluatorReferenceState: { misconceptions: Array<{ statement: string; evidenceLearnerTurns: number[] }> };
+    }>;
+  };
   const mA = invalid.scenarios.find((s) => s.identity.id === "pac-m-a");
   assert.ok(mA);
   mA.evaluatorReferenceState.misconceptions.push({
@@ -117,9 +122,11 @@ test("invalid evidence reference or duplicated case identity fails the existing 
   });
   assert.throws(() => parseTutorScenarioSuiteVNext(invalid), (error: unknown) =>
     error instanceof Error && "code" in error && error.code === "tutor_scenario_vnext_invalid");
-  const duplicates = structuredClone(suite);
+  const duplicates = structuredClone(suite) as unknown as {
+    scenarios: Array<{ identity: { id: string } }>;
+  };
   const last = duplicates.scenarios[7]!;
-  (last.identity as { id: string }).id = duplicates.scenarios[0]!.identity.id;
+  last.identity.id = duplicates.scenarios[0]!.identity.id;
   assert.throws(() => parseTutorScenarioSuiteVNext(duplicates), (error: unknown) =>
     error instanceof Error && "code" in error && error.code === "tutor_scenario_vnext_invalid");
 });
