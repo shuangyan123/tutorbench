@@ -28,6 +28,9 @@ Eight initial Tutor inputs represent **four concept families, with two
 contrasting starts per family**. The contrasts test sensitivity to visible
 learner evidence under fixed tasks. They do not establish an effect of wording
 length, domain coverage beyond these concepts, or general teaching competence.
+The contrast tests whether a response uses the available evidence appropriately,
+not whether the two arms receive different wording. A clear explanation can
+legitimately serve both arms; repeated wording alone is not an Adaptation failure.
 
 ## Eight initial inputs
 
@@ -92,16 +95,20 @@ elements in a formula such as `O₂` and `MgO`. Use D2/P2/H1 and
 **Shared prompt.** “I'm balancing `Mg + O₂ → MgO`. The instruction says to use
 coefficients and keep the formulas. Can you show me why that works?”
 
-- **C-A.** Append “I know the small 2 in O₂ tells me about one oxygen molecule.
-  I don't know what the number in front of a formula counts.”
-- **C-B.** Append “I know the small 2 in O₂ tells me about one oxygen molecule.
-  A number in front tells how many units of the entire formula I am counting.”
+- **C-A.** Append “I know O₂ represents one oxygen molecule containing two
+  oxygen atoms. I don't know what a number in front of a formula counts.”
+- **C-B.** Append “I know O₂ represents one oxygen molecule containing two
+  oxygen atoms. A number in front counts the specified entities: molecules
+  for O₂, formula units for MgO, and atoms for Mg.”
 
 The sole variable is evidence about the meaning of the leading coefficient.
-In C-A, bridge coefficient to a count of whole formula units and show the
-effect on each element count. In C-B, use the stated meaning to get to the
-atom inventory directly. Author check: `2Mg + O₂ → 2MgO` has two Mg and two O
-atoms on each side. Changing `MgO` to `MgO₂` would change the formula.
+In C-A, explain that a coefficient counts the indicated chemical entities
+(oxygen molecules for O₂, formula units for ionic MgO, or Mg atoms in this
+particle-count representation), then show the effect on the atom inventory.
+In C-B, preserve the stated distinction and proceed to atom counts without
+re-teaching the coefficient from scratch. Author check: `2Mg + O₂ → 2MgO`
+has two Mg and two O atoms on each side. Changing `MgO` to `MgO₂` would
+change the formula, not balance the original reaction.
 
 ### B-A / B-B · Biology · Net flow across a membrane
 
@@ -156,6 +163,30 @@ simulated answer leaves outcomes unmeasured.
 | Physics | An ideal battery drives one closed loop with a 1-ohm and a 3-ohm resistor. Compare their voltage drops and explain your reasoning. | Drops are in the ratio 1:3 because the steady current is shared. |
 | Chemistry | Balance `H₂ + O₂ → H₂O` and explain which element counts changed as you chose coefficients. | `2H₂ + O₂ → 2H₂O` gives four H and two O atoms on each side. |
 | Biology | In one minute 15 water molecules cross a membrane left-to-right and 22 cross right-to-left. Describe what happened in each direction and overall. | Both directions have traffic, with seven net crossings to the left. |
+
+The biology transfer prompt checks **bidirectional crossing and signed net
+counting only**. It does not independently test why a concentration gradient
+causes osmosis, water potential, or the learner's ability to predict direction
+in a new physical setup. Do not report the result as general osmosis mastery.
+
+## Acceptable alternative explanations and adverse controls
+
+These are response-review anchors, not required phrases or a single answer
+script. An equally correct alternative is acceptable if it addresses the
+observed learner need and respects `hint_only` or `full_solution_allowed`.
+
+| Family | Acceptable teaching routes | Unacceptable inference or behavior |
+| --- | --- | --- |
+| Mathematics | Test multiples methodically, reason about set inclusion, or use `4k = 2(2k)` to contrast directions, leaving the learner to supply the counterexample. | Infer an unstated reversal rule in M-A, affirm the false converse, or disclose the counterexample despite `hint_only`. |
+| Physics | Start from the single-path current, use `V = IR`, or reason with voltage-drop ratios proportional to resistance, without giving the learner the final comparison. | Assume series resistors have equal voltage drops, discard the correct P-B current reasoning, or complete the learner's requested choice under `hint_only`. |
+| Chemistry | Count atoms with a table, particle sketch, or stepwise coefficient comparison; distinguish O₂ molecules from ionic MgO formula units. | Change a subscript to balance the reaction, confuse molecular count with atomic count, or treat an MgO formula unit as a separate MgO molecule. |
+| Biology | Explain molecular crossings in both directions, net flux as a difference of rates, or use a two-way traffic analogy with its limitations. | Claim no water can cross from concentrated to dilute solution or confuse net direction with every molecule's direction. |
+
+Assess the **observable teaching decision**, not surface variation. A response
+can be suitable for both arms even if its wording is similar. A missing
+prerequisite bridge, failure to use demonstrated reasoning, unsupported
+diagnosis, and explicit scientific error require distinct evidence; do not
+penalize one act under several rubric labels.
 
 ## Review protocol and limits
 
