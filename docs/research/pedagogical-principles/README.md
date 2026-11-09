@@ -39,6 +39,49 @@ outcomes. Independent expert validation is not a prerequisite for self-testing
 and failure discovery, but claims beyond the observed scope still require
 appropriate evidence.
 
+## Cross-cutting prerequisite accessibility (candidate floor)
+
+**Disposition of proposed P-007: cross-cutting floor, no standalone principle
+ID assigned.** A Tutor should bridge the necessary concept or reasoning step
+that the learner's work or question shows is blocking the current objective.
+Use a focused clarification when the obstacle is uncertain. Confirm and reuse
+a demonstrated prerequisite. A reasonable objection can reveal an open
+explanatory question for that learner, without establishing a lasting deficit.
+The floor is relative to the goal and disclosure policy. It has no prescribed
+length, fixed teaching script, or separate score.
+
+| Existing construct | What remains distinct |
+| --- | --- |
+| P-001 and P-004 | Trace what symbols and operations mean and keep those meanings intact across representations. An accurate mapping can still use a term the learner has yet to understand. |
+| P-002 | Locate the break using visible evidence. Finding it and successfully explaining the missing step are distinct acts. |
+| P-003 | Preserve sound local reasoning. Use it as the starting point for the remaining bridge. |
+| P-005 | Decide the scope and depth of explanation. A necessary bridge is a lower bound on sufficiency in that context. |
+| P-006 | Check whether the learner can reconstruct or apply an idea independently. A repaired Tutor explanation or prompted paraphrase supplies no independent transfer evidence. |
+| Learner Starting Points | Study the learning path, independent capability and avoidable learning cost across checkpoints. The floor applies to a particular teaching decision. |
+
+A useful contrast holds the target and representation fixed while varying
+whether the needed concept is demonstrated. A short repair can succeed after
+accurate diagnosis and a longer explanation can fail when it restates the same
+assumption. This makes accessibility inspectable as a response property. The
+current examples can already be reviewed using Guidance for a missing bridge
+and Adaptation for a distinct mismatch to known work. Count each act once.
+Revisit an independent principle only if reviewed cross-domain contrasts
+show a recurring, actionable distinction these homes cannot express.
+
+For a synthetic fraction illustration, take area on the same reference sheet.
+The areas represented by one third and one quarter can be added by joining
+the pieces without overlap. The count “two pieces” alone does not specify the
+sum as a fraction of the sheet. Refining the partitions gives four and three
+units of one twelfth, for seven twelfths. Equal area does not require identical
+shape. When counting four bananas, each banana contributes one count even if
+their masses differ. A mass fraction uses total mass instead. Identify the
+reference whole and the measured attribute before transferring an analogy.
+
+This floor and the [four-domain contrast design](../prerequisite-accessibility-contrasts-v0.1.md)
+are candidate / non-canonical. Internal single-reviewer exploration motivates
+them. Independent expert consensus, Gold, Judge calibration, and learner
+outcomes have yet to be established.
+
 ## Authoring lifecycle and versioning
 
 `candidate → review-ready → empirically supported / contested` describes the
