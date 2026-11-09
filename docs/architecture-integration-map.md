@@ -100,7 +100,7 @@ The repository contains several taxonomies because they answer different questio
 
 | Taxonomy | Current size / examples | What it describes | What it does not mean |
 |---|---|---|---|
-| Case System domain taxonomy | 23 domain IDs | Subject-domain coverage and domain-specific evidence norms | A TutorEval subject bucket or learner state |
+| Case System domain taxonomy | 23 research-seeded domain IDs | Proposed subject-domain coverage and domain-specific evidence norms; pending expert validation | A validated ontology, TutorEval subject bucket or learner state |
 | TutorEval subject taxonomy | 5 broad buckets | Dataset-level subject grouping | The full 23-domain ontology |
 | Case System D/P/H | Content depth 1–5; pedagogical difficulty 1–5; interaction horizon 1–3 | Case complexity and interaction design | Tutor quality scores |
 | Case System learner states | 10 authored archetype labels | Intended learner situations to cover | A diagnosis of a real learner |
