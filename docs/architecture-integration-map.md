@@ -124,7 +124,7 @@ The repository contains several taxonomies because they answer different questio
 - Scenario vNext currently uses a free-form learningContext.subject.
 - The Scenario-to-TutorEval compiler copies that string into metadata.subject.
 
-This permits precise subjects such as physics, chemistry and biology, but there is no versioned rule for aggregating them into a broad TutorEval subject such as science, or for retaining specialization/practice distinctions.
+This permits precise subjects such as physics, chemistry and biology, but there is no versioned rule for aggregating them into a broad TutorEval subject such as science, or for retaining specialization/practice distinctions. In addition, TUTOR_EVAL_SUBJECTS is a declared taxonomy, while TutorEvalCaseMetadata.subject remains a string and the runtime parser only requires a non-empty string; the five taxonomy values are therefore not enforced on every Scenario-generated case.
 
 **Needed:** a versioned domain crosswalk with at least domainId, broad subject grouping, optional specialization and cross-cutting practice. Never replace the 23-domain source taxonomy with five buckets.
 
@@ -190,6 +190,12 @@ The open draft PR #349 (feature/learner-state-evidence-matrix-v0-1) contains a u
 At this audit, the branch had diverged from current main (25 commits ahead, 4 behind). Its concept IDs are a local allowlist rather than references to the mathematics knowledge-map node IDs.
 
 **Reuse decision:** preserve the exact-turn evidence mechanism as a candidate source for the canonical evidence model. Before merging or generalizing it, rebase/reconcile it against current main, map its concept IDs to versioned knowledge-node references where appropriate, and keep epistemic status distinct from learner archetype labels and mastery state. Do not treat the draft branch as already integrated.
+
+### G9. The eight new H1 cases are executable but not yet connected to the broader authoring registries
+
+The eight-case prerequisite-accessibility suite is a valid experimental Scenario vNext suite and uses the existing compiler/runner. It intentionally has no Case System source reference, knowledge-node reference, capability-tag metadata or pedagogical-principle reference. Its subject and topic labels are authored directly in the scenario.
+
+That is acceptable for a bounded synthetic contrast experiment. It does mean the suite should not be counted as full Case System, knowledge-map or principle-registry coverage. If these cases are later promoted into those coverage reports, add explicit versioned references rather than inferring links from their titles or prompt text.
 
 ## 4. Recommended integration sequence
 
