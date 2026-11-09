@@ -100,7 +100,7 @@ test("reference diagnosis remains evaluator-only; local correct reasoning is pre
     assert.doesNotMatch(JSON.stringify(input), /evaluationCriteria|expectedBehavior|failureFinding/);
     assert.ok(input.currentStudentMessage.length > 0);
   }
-  assert.match(toTutorTurnInput(mB).currentStudentMessage, /works in the other direction/);
+  assert.match(toTutorTurnInput(mB).currentStudentMessage, /must work in the other direction/);
   assert.match(toTutorTurnInput(pB).currentStudentMessage, /same steady current/);
   assert.match(toTutorTurnInput(cB).currentStudentMessage, /formula units for MgO/);
   assert.match(toTutorTurnInput(bB).currentStudentMessage, /cross from right to left/);
