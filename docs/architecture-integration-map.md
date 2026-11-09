@@ -1,7 +1,7 @@
 # TutorBench Architecture Integration Map
 
 **Status:** repository-grounded architecture audit and integration plan; not a new canonical schema or scoring policy.  
-**Audit baseline:** main at c4d067c5ec44c79229ca38bae44c406d5a4b67d (2026-11-09).  
+**Audit baseline:** main at c4d067c5ec44c79229cae38bae44c406d5a4b67d (2026-11-09).  
 **Purpose:** identify which existing assets already share a runtime path, which are separate by design, and where metadata or evidence stops crossing boundaries.
 
 ## Executive conclusion
