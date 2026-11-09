@@ -4,7 +4,7 @@ Every document in `docs/`, grouped by topic. Titles are the documents' own headi
 For the project overview, start with the [README](../README.md); for the full
 repository guide, see the [repository reference](repository-reference.md).
 
-Contents: [Start here](#start-here) · [Methodology and measurement claims](#methodology-and-measurement-claims) · [TutorEval versions](#tutoreval-versions) · [Evaluator integrity and audits](#evaluator-integrity-and-audits) · [Judges and real-model runs](#judges-and-real-model-runs) · [Human reference and calibration](#human-reference-and-calibration) · [Case System vNext (experimental)](#case-system-vnext-experimental) · [Mathematics knowledge and exams](#mathematics-knowledge-and-exams) · [Research notes](#research-notes) · [Community Review](#community-review) · [Design-partner pilots](#design-partner-pilots) · [Public site and publication](#public-site-and-publication)
+Contents: [Start here](#start-here) · [Architecture and integration](#architecture-and-integration) · [Methodology and measurement claims](#methodology-and-measurement-claims) · [TutorEval versions](#tutoreval-versions) · [Evaluator integrity and audits](#evaluator-integrity-and-audits) · [Judges and real-model runs](#judges-and-real-model-runs) · [Human reference and calibration](#human-reference-and-calibration) · [Case System vNext (experimental)](#case-system-vnext-experimental) · [Mathematics knowledge and exams](#mathematics-knowledge-and-exams) · [Research notes](#research-notes) · [Community Review](#community-review) · [Design-partner pilots](#design-partner-pilots) · [Public site and publication](#public-site-and-publication)
 
 ## Start here
 
@@ -17,6 +17,13 @@ New to TutorBench? Read these first.
 - [Roadmap](roadmap.md)
 - [TutorBench licensing and scope](licensing.md)
 - [npm publication and Trusted Publishing (P2B / H1A)](npm-publishing.md)
+
+## Architecture and integration
+
+The actual code/data flow, taxonomy boundaries, confirmed cross-layer gaps and
+recommended integration sequence.
+
+- [TutorBench Architecture Integration Map](architecture-integration-map.md)
 
 ## Methodology and measurement claims
 
