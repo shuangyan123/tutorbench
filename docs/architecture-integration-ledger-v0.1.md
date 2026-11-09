@@ -47,7 +47,7 @@ suite.id + suite.version
   -> scenario.identity.id + scenario.identity.version
      -> decisionPoint.id + evaluationCaseId + turnIndex
         -> TutorEval case id/version and rubric id
-           -> evaluation.runId + caseResult.caseId + runIndex + rubricResult.id
+           -> evaluation.runId + caseResult.caseId + runIndex + rubricResult.rubricId
               -> Health finding { scenarioId, decisionPointId, evidence, regressionTargets }
 ```
 
