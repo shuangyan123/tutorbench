@@ -24,6 +24,7 @@ What TutorBench measures and what it is allowed to claim.
 
 - [TutorBench Measurement Claim Specification](measurement-claim-specification.md)
 - [Tutor Benchmark Product Boundary](benchmark-product-boundary.md)
+- [Architecture integration ledger — source ownership and traceability v0.1](architecture-integration-ledger-v0.1.md)
 - [TutorBench Real-World Evaluation / Finding-First Model](real-world-finding-first-evaluation.md)
 - [Prerequisite-Aware Teaching Evaluation — Experimental Pilot](prerequisite-aware-teaching-evaluation.md)
 - [TutorEval scoring provenance](scoring-provenance.md)
