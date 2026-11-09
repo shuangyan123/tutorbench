@@ -75,10 +75,11 @@ category-to-dimension conversion is applied.
 The report uses the existing rubric result score and rubric weight. ERROR and
 missing results are excluded and listed as unresolved. Dimension scores are
 weighted means on a 0-100 integer scale; the summary score is the configured
-weighted mean of dimensions with scored evidence. The default
-`productive-struggle-intervention@0.1.0` profile is suite-specific. Report
-coverage states the assessed and total profile dimensions, scored and total
-profile weight, suite identity, and expected and present case-runs. The text
+weighted mean of dimensions with scored evidence. The Productive
+Struggle suite uses the suite-specific
+`productive-struggle-intervention@0.1.0` profile. Report coverage states the
+assessed and total profile dimensions, scored and total profile weight, suite
+identity, and expected and present case-runs. The text
 headline puts coverage next to the score. A high summary score with partial
 coverage is not presented as a complete Tutor Health profile. In particular,
 this 13-scenario suite has no `content_correctness` or `reliability_policy`
