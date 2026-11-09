@@ -9,7 +9,9 @@ import { BenchmarkConfigurationError } from "../contracts/errors.js";
 import {
   TUTOR_HEALTH_DIMENSIONS,
   TUTOR_HEALTH_DIMENSION_LABELS,
-  DEFAULT_TUTOR_HEALTH_SCORING_PROFILE,
+  CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SCORING_PROFILE,
+  PRODUCTIVE_STRUGGLE_INTERVENTION_SCORING_PROFILE,
+  UNSCOPED_TUTOR_HEALTH_SCORING_PROFILE,
   TUTOR_FINDING_SCHEMA_VERSION,
   TUTOR_HEALTH_REPORT_SCHEMA_VERSION,
   type TutorEvidenceRef,
@@ -22,7 +24,11 @@ import {
 } from "../contracts/index.js";
 import { assertValidTutorHealthReport, parseTutorHealthScoringProfile } from "../contracts/tutor-health-validation.js";
 import { hasMatchingTutorEvalAuthoredScoring } from "../scoring/provenance.js";
-import { tutorScenarioSuiteToTutorEvalDataset } from "../datasets/real-world.js";
+import {
+  CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID,
+  PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID,
+  tutorScenarioSuiteToTutorEvalDataset,
+} from "../datasets/real-world.js";
 import { assertValidTutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext-validation.js";
 import { hasValidAuthoredAbstention } from "./tutor-health-abstention-validation.js";
 import type {
@@ -472,6 +478,18 @@ function buildTutorHealthCoverage(
 }
 
 /** Builds a finding-first view from authored checkpoints and existing TutorEval evidence. */
+function defaultScoringProfileForSuite(
+  suite: TutorScenarioSuiteVNext,
+): TutorHealthScoringProfile {
+  if (suite.id === PRODUCTIVE_STRUGGLE_INTERVENTION_SUITE_ID) {
+    return PRODUCTIVE_STRUGGLE_INTERVENTION_SCORING_PROFILE;
+  }
+  if (suite.id === CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SUITE_ID) {
+    return CASE_SYSTEM_VNEXT_EXECUTABLE_PILOT_SCORING_PROFILE;
+  }
+  return UNSCOPED_TUTOR_HEALTH_SCORING_PROFILE;
+}
+
 export function buildTutorHealthReport(options: {
   readonly suite: TutorScenarioSuiteVNext;
   readonly evaluation: TutorEvalRunResult;
@@ -483,7 +501,7 @@ export function buildTutorHealthReport(options: {
     throw new BenchmarkConfigurationError("tutor_health_report_source_mismatch");
   }
   const profile = parseTutorHealthScoringProfile(
-    options.scoringProfile ?? DEFAULT_TUTOR_HEALTH_SCORING_PROFILE,
+    options.scoringProfile ?? defaultScoringProfileForSuite(options.suite),
   );
   const caseIndex = scenarioByEvaluationCaseId(options.suite);
   if (
