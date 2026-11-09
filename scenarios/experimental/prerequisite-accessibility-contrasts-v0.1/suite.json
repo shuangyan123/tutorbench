@@ -1,0 +1,985 @@
+{
+  "schemaVersion": 3,
+  "id": "prerequisite-accessibility-contrasts-v0.1",
+  "version": "0.1.0",
+  "title": "Prerequisite Accessibility: Four-Subject Evidence Contrasts",
+  "description": "Eight author-owned synthetic H1 evidence contrasts in mathematics, physics, chemistry and biology, non-canonical and not independently calibrated or learner-validated.",
+  "healthTaxonomyVersion": "0.1.0",
+  "scenarios": [
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pac-m-a",
+        "version": "0.1.0",
+        "title": "Unknown cause of false converse",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1"
+      },
+      "description": "Synthetic, non-canonical mathematics H1 / D2 / P3 evidence-contrast arm A. No mastery or learning outcome claim.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "one-way divisibility implication and its converse",
+        "learningObjective": "Test a divisibility converse by a learner-generated counterexample without disclosing that counterexample.",
+        "learnerLevel": "middle school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "If a positive integer is divisible by 4, it is divisible by 2. Is the reverse statement always true? I answered yes. Can you help me test it without giving me the counterexample?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pac-m-a",
+          "turnIndex": 1,
+          "expectedDecision": "ask_diagnostic_question",
+          "expectedBehavior": "Do not infer a specific misconception; help the learner examine the reverse without revealing an example.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pac-m-a-diagnosis",
+              "category": "diagnosis",
+              "dimension": "learner_diagnosis",
+              "criterion": "Do not infer an unstated reversal-of-implication rule from the wrong answer alone.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-m-a_diagnosis",
+                "title": "Unmet diagnosis behavior",
+                "severity": "minor",
+                "observedBehavior": "Asserts the learner holds a reversal rule without evidence.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Do not infer an unstated reversal-of-implication rule from the wrong answer alone."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-m-a/next-response"
+                ],
+                "confidence": 0.5
+              }
+            },
+            {
+              "rubricId": "pac-m-a-guidance",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Invite a methodical test of the converse while withholding the counterexample.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-m-a_guidance",
+                "title": "Unmet guidance behavior",
+                "severity": "minor",
+                "observedBehavior": "Provides the counterexample or no usable test.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Invite a methodical test of the converse while withholding the counterexample."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-m-a/next-response"
+                ],
+                "confidence": 0.5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pac-m-b",
+        "version": "0.1.0",
+        "title": "False converse with stated reversal rule",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1"
+      },
+      "description": "Synthetic, non-canonical mathematics H1 / D2 / P3 evidence-contrast arm B. No mastery or learning outcome claim.",
+      "learningContext": {
+        "subject": "mathematics",
+        "topic": "one-way divisibility implication and its converse",
+        "learningObjective": "Test a divisibility converse by a learner-generated counterexample without disclosing that counterexample.",
+        "learnerLevel": "middle school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": [
+          {
+            "statement": "The learner states an invalid rule that a one-way implication must also hold in reverse.",
+            "evidenceLearnerTurns": [
+              1
+            ]
+          }
+        ]
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 1,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "If a positive integer is divisible by 4, it is divisible by 2. Is the reverse statement always true? I answered yes. Can you help me test it without giving me the counterexample? My reason was that any rule that works in one direction must work in the other direction."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pac-m-b",
+          "turnIndex": 1,
+          "expectedDecision": "probe_understanding",
+          "expectedBehavior": "Address the stated reversal rule with a targeted test; do not disclose a counterexample.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pac-m-b-diagnosis",
+              "category": "diagnosis",
+              "dimension": "learner_diagnosis",
+              "criterion": "Identify the learner's explicitly stated reversal-of-implication rule as the issue.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-m-b_diagnosis",
+                "title": "Unmet diagnosis behavior",
+                "severity": "minor",
+                "observedBehavior": "Ignores the stated reversal rule or invents another cause.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Identify the learner's explicitly stated reversal-of-implication rule as the issue."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-m-b/next-response"
+                ],
+                "confidence": 0.5
+              }
+            },
+            {
+              "rubricId": "pac-m-b-guidance",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Guide comparison of multiples of 2 against both conditions without giving a counterexample.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-m-b_guidance",
+                "title": "Unmet guidance behavior",
+                "severity": "minor",
+                "observedBehavior": "Leaks a counterexample or supplies only the verdict.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Guide comparison of multiples of 2 against both conditions without giving a counterexample."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-m-b/next-response"
+                ],
+                "confidence": 0.5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pac-p-a",
+        "version": "0.1.0",
+        "title": "Voltage drop before shared current is evidenced",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1"
+      },
+      "description": "Synthetic, non-canonical physics H1 / D2 / P2 evidence-contrast arm A. No mastery or learning outcome claim.",
+      "learningContext": {
+        "subject": "physics",
+        "topic": "voltage drops across ideal series resistors",
+        "learningObjective": "Compare voltage drops in a steady ideal series circuit using common current and the V = IR relationship.",
+        "learnerLevel": "secondary school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "A 2-ohm resistor and a 4-ohm resistor are the only loads in one closed loop with an ideal 6-volt battery. How can I tell which resistor has the larger voltage drop? Give me a hint so I can choose."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pac-p-a",
+          "turnIndex": 1,
+          "expectedDecision": "ask_diagnostic_question",
+          "expectedBehavior": "Check or supply the shared-current bridge, then help the learner compare without supplying the final choice.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pac-p-a-guidance",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Check or bridge the shared steady-current relationship of this single-loop circuit.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-p-a_guidance",
+                "title": "Unmet guidance behavior",
+                "severity": "minor",
+                "observedBehavior": "Assumes the current relationship is known or teaches it incorrectly.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Check or bridge the shared steady-current relationship of this single-loop circuit."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-p-a/next-response"
+                ],
+                "confidence": 0.5
+              }
+            },
+            {
+              "rubricId": "pac-p-a-actionability",
+              "category": "actionability",
+              "dimension": "intervention_strategy",
+              "criterion": "Offer V = IR as a way to compare the drops while allowing the learner to make the choice.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-p-a_actionability",
+                "title": "Unmet actionability behavior",
+                "severity": "minor",
+                "observedBehavior": "Reveals the final choice or fails to offer a usable comparison.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Offer V = IR as a way to compare the drops while allowing the learner to make the choice."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-p-a/next-response"
+                ],
+                "confidence": 0.5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pac-p-b",
+        "version": "0.1.0",
+        "title": "Voltage drop after correct current reasoning",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1"
+      },
+      "description": "Synthetic, non-canonical physics H1 / D2 / P2 evidence-contrast arm B. No mastery or learning outcome claim.",
+      "learningContext": {
+        "subject": "physics",
+        "topic": "voltage drops across ideal series resistors",
+        "learningObjective": "Compare voltage drops in a steady ideal series circuit using common current and the V = IR relationship.",
+        "learnerLevel": "secondary school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "A 2-ohm resistor and a 4-ohm resistor are the only loads in one closed loop with an ideal 6-volt battery. How can I tell which resistor has the larger voltage drop? Give me a hint so I can choose. There is only one path for charge, so both resistors carry the same steady current."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "hint_only"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pac-p-b",
+          "turnIndex": 1,
+          "expectedDecision": "fade_support",
+          "expectedBehavior": "Preserve the correct common-current insight and guide the resistance comparison without disclosing which resistor.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pac-p-b-adaptation",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Explicitly build on the learner's demonstrated shared-current reasoning instead of starting it again as an unknown gap.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-p-b_adaptation",
+                "title": "Unmet adaptation behavior",
+                "severity": "minor",
+                "observedBehavior": "Dismisses the correct current reasoning or unnecessarily restarts it without using it.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Explicitly build on the learner's demonstrated shared-current reasoning instead of starting it again as an unknown gap."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-p-b/next-response"
+                ],
+                "confidence": 0.5
+              }
+            },
+            {
+              "rubricId": "pac-p-b-guidance",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Connect the held-fixed current to V = IR, leaving the final comparison to the learner.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-p-b_guidance",
+                "title": "Unmet guidance behavior",
+                "severity": "minor",
+                "observedBehavior": "Claims equal series voltage drops or gives away the choice.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Connect the held-fixed current to V = IR, leaving the final comparison to the learner."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-p-b/next-response"
+                ],
+                "confidence": 0.5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pac-c-a",
+        "version": "0.1.0",
+        "title": "Unknown leading coefficient meaning",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1"
+      },
+      "description": "Synthetic, non-canonical chemistry H1 / D2 / P2 evidence-contrast arm A. No mastery or learning outcome claim.",
+      "learningContext": {
+        "subject": "chemistry",
+        "topic": "atom conservation and chemical equation coefficients",
+        "learningObjective": "Balance Mg + O₂ → MgO with coefficients without changing formulas, and explain chemical entity and atom counting.",
+        "learnerLevel": "secondary school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I'm balancing Mg + O₂ → MgO. The instruction says to use coefficients and keep the formulas. Can you show me why that works? I know O₂ represents one oxygen molecule containing two oxygen atoms. I don't know what a number in front of a formula counts."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pac-c-a",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Explain the coefficient meaning before counting atoms and balance the equation without changing formulas.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pac-c-a-guidance",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Explain that coefficients count complete represented entities: O₂ molecules, MgO formula units, or Mg atoms.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-c-a_guidance",
+                "title": "Unmet guidance behavior",
+                "severity": "minor",
+                "observedBehavior": "Does not bridge the stated coefficient gap or calls MgO a separate molecule.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Explain that coefficients count complete represented entities: O₂ molecules, MgO formula units, or Mg atoms."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-c-a/next-response"
+                ],
+                "confidence": 0.5
+              }
+            },
+            {
+              "rubricId": "pac-c-a-correctness",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Balance the original reaction by changing coefficients while preserving formulas and atom totals.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-c-a_correctness",
+                "title": "Unmet correctness behavior",
+                "severity": "minor",
+                "observedBehavior": "Alters a chemical subscript or gives an incorrect balance.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Balance the original reaction by changing coefficients while preserving formulas and atom totals."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-c-a/next-response"
+                ],
+                "confidence": 0.5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pac-c-b",
+        "version": "0.1.0",
+        "title": "Demonstrated leading coefficient meaning",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1"
+      },
+      "description": "Synthetic, non-canonical chemistry H1 / D2 / P2 evidence-contrast arm B. No mastery or learning outcome claim.",
+      "learningContext": {
+        "subject": "chemistry",
+        "topic": "atom conservation and chemical equation coefficients",
+        "learningObjective": "Balance Mg + O₂ → MgO with coefficients without changing formulas, and explain chemical entity and atom counting.",
+        "learnerLevel": "secondary school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "I'm balancing Mg + O₂ → MgO. The instruction says to use coefficients and keep the formulas. Can you show me why that works? I know O₂ represents one oxygen molecule containing two oxygen atoms. A number in front counts the specified entities: molecules for O₂, formula units for MgO, and atoms for Mg."
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pac-c-b",
+          "turnIndex": 1,
+          "expectedDecision": "fade_support",
+          "expectedBehavior": "Preserve the learner's coefficient definition and work from it to the atom inventory directly.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pac-c-b-adaptation",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Use the correct demonstrated meaning of the coefficient to proceed directly to atom counts.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-c-b_adaptation",
+                "title": "Unmet adaptation behavior",
+                "severity": "minor",
+                "observedBehavior": "Ignores the definition and starts over as though the learner did not know it.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Use the correct demonstrated meaning of the coefficient to proceed directly to atom counts."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-c-b/next-response"
+                ],
+                "confidence": 0.5
+              }
+            },
+            {
+              "rubricId": "pac-c-b-correctness",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "Give correct magnesium and oxygen counts and balance Mg + O₂ → MgO by changing coefficients only.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-c-b_correctness",
+                "title": "Unmet correctness behavior",
+                "severity": "minor",
+                "observedBehavior": "Changes MgO to MgO₂ or miscounts atoms.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Give correct magnesium and oxygen counts and balance Mg + O₂ → MgO by changing coefficients only."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-c-b/next-response"
+                ],
+                "confidence": 0.5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pac-b-a",
+        "version": "0.1.0",
+        "title": "Net osmosis direction before an objection",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1"
+      },
+      "description": "Synthetic, non-canonical biology H1 / D2 / P2 evidence-contrast arm A. No mastery or learning outcome claim.",
+      "learningContext": {
+        "subject": "biology",
+        "topic": "osmosis, bidirectional crossings, and net flow",
+        "learningObjective": "Distinguish net water movement toward a more concentrated solution from individual water molecule crossings in both directions in an idealized membrane.",
+        "learnerLevel": "secondary school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "Two compartments begin at equal hydrostatic pressure and temperature. The membrane lets water through but blocks the dissolved solute. There is dilute solution on the left and concentrated solution on the right, with the same solute on both sides. My notes say water initially moves to the right. What does this mean?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pac-b-a",
+          "turnIndex": 1,
+          "expectedDecision": "offer_conceptual_hint",
+          "expectedBehavior": "Explain initial net rightward flux while allowing bidirectional molecular motion.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pac-b-a-guidance",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Explain that the stated rightward movement describes net flow, not exclusive single-direction molecular movement.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-b-a_guidance",
+                "title": "Unmet guidance behavior",
+                "severity": "minor",
+                "observedBehavior": "Equates rightward net flux with every water molecule crossing right.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Explain that the stated rightward movement describes net flow, not exclusive single-direction molecular movement."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-b-a/next-response"
+                ],
+                "confidence": 0.5
+              }
+            },
+            {
+              "rubricId": "pac-b-a-correctness",
+              "category": "correctness",
+              "dimension": "content_correctness",
+              "criterion": "State the initial net water flow toward the concentrated right compartment under the given ideal conditions.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-b-a_correctness",
+                "title": "Unmet correctness behavior",
+                "severity": "minor",
+                "observedBehavior": "Reverses the direction under the specified initial conditions.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: State the initial net water flow toward the concentrated right compartment under the given ideal conditions."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-b-a/next-response"
+                ],
+                "confidence": 0.5
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 3,
+      "identity": {
+        "id": "pac-b-b",
+        "version": "0.1.0",
+        "title": "Net osmosis direction with a valid objection",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1"
+      },
+      "description": "Synthetic, non-canonical biology H1 / D2 / P2 evidence-contrast arm B. No mastery or learning outcome claim.",
+      "learningContext": {
+        "subject": "biology",
+        "topic": "osmosis, bidirectional crossings, and net flow",
+        "learningObjective": "Distinguish net water movement toward a more concentrated solution from individual water molecule crossings in both directions in an idealized membrane.",
+        "learnerLevel": "secondary school"
+      },
+      "tutorVisibleContext": {
+        "knownConcepts": []
+      },
+      "evaluatorReferenceState": {
+        "misconceptions": []
+      },
+      "trajectory": {
+        "attemptCount": 1,
+        "failedAttempts": 0,
+        "priorHints": [],
+        "conversationHistory": [
+          {
+            "role": "user",
+            "content": "Two compartments begin at equal hydrostatic pressure and temperature. The membrane lets water through but blocks the dissolved solute. There is dilute solution on the left and concentrated solution on the right, with the same solute on both sides. My notes say water initially moves to the right. What does this mean? If the membrane lets water through, couldn't some water molecules also cross from right to left?"
+          }
+        ]
+      },
+      "teachingPolicy": {
+        "disclosure": "full_solution_allowed"
+      },
+      "decisionPoints": [
+        {
+          "id": "next-response",
+          "evaluationCaseId": "pac-b-b",
+          "turnIndex": 1,
+          "expectedDecision": "validate_partial_progress",
+          "expectedBehavior": "Confirm the valid objection and bridge individual molecule traffic to net rightward flux.",
+          "evaluationCriteria": [
+            {
+              "rubricId": "pac-b-b-adaptation",
+              "category": "adaptation",
+              "dimension": "adaptation",
+              "criterion": "Affirm the learner's expressed two-way crossing objection as valid rather than treating it as a misconception.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-b-b_adaptation",
+                "title": "Unmet adaptation behavior",
+                "severity": "minor",
+                "observedBehavior": "Calls the learner's valid objection false.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Affirm the learner's expressed two-way crossing objection as valid rather than treating it as a misconception."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-b-b/next-response"
+                ],
+                "confidence": 0.5
+              }
+            },
+            {
+              "rubricId": "pac-b-b-guidance",
+              "category": "guidance",
+              "dimension": "intervention_strategy",
+              "criterion": "Distinguish crossings in both directions from the difference in crossing rates that yields rightward net flux.",
+              "weight": 1,
+              "evaluationType": "judge",
+              "behavior": "required",
+              "failureFinding": {
+                "type": "pac-b-b_guidance",
+                "title": "Unmet guidance behavior",
+                "severity": "minor",
+                "observedBehavior": "Only repeats net direction or denies any leftward crossings.",
+                "diagnosis": "Synthetic checkpoint shows a mismatch with the authored evidence-bounded teaching requirement; inspect the reply before inferring why.",
+                "impact": "The learner may receive inaccessible support, an unsupported diagnosis, a factual error, or unrequested answer disclosure.",
+                "likelyCauses": [
+                  {
+                    "hypothesis": "The Tutor may have overlooked the latest visible learner evidence or disclosure policy.",
+                    "confidence": 0.4
+                  }
+                ],
+                "recommendations": [
+                  {
+                    "kind": "diagnostic",
+                    "text": "Review the learner-visible context and check this one act: Distinguish crossings in both directions from the difference in crossing rates that yields rightward net flux."
+                  },
+                  {
+                    "kind": "implementation_suggestion",
+                    "text": "Select the next instructional move from observed evidence rather than an assumed mastery label."
+                  }
+                ],
+                "regressionTargets": [
+                  "pac-b-b/next-response"
+                ],
+                "confidence": 0.5
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
