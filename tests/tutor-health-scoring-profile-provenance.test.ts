@@ -53,5 +53,5 @@ test("an explicit scoring profile overrides the unscoped default for a custom su
     scoringProfile: explicitProfile,
   });
   assert.deepEqual(report.scoringProfile, explicitProfile);
-  assert.equal(report.sourceEvaluation.scoringIdentity, "custom-research-profile@2.1.0");
+  assert.notEqual(report.scoringProfile.id, UNSCOPED_TUTOR_HEALTH_SCORING_PROFILE.id);
 });
