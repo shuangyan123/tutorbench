@@ -102,11 +102,13 @@ The repository contains several taxonomies because they answer different questio
 |---|---|---|---|
 | Case System domain taxonomy | 23 research-seeded domain IDs | Proposed subject-domain coverage and domain-specific evidence norms; pending expert validation | A validated ontology, TutorEval subject bucket or learner state |
 | TutorEval subject taxonomy | 5 broad buckets | Dataset-level subject grouping | The full 23-domain ontology |
-| Case System D/P/H | Content depth 1–5; pedagogical difficulty 1–5; interaction horizon 1–3 | Case complexity and interaction design | Tutor quality scores |
+| Case System D/P/H | Content depth 1–5; pedagogical difficulty 1–5; interaction horizon 1–3 | Case complexity and interaction design | Tutor quality scores or automatically equivalent TutorEval difficulty values |
+| TutorEval difficulty | Learner level plus task difficulty 1–5 and pedagogical difficulty 1–5 | Dataset-level task assumptions | Case System D/P/H without a reviewed scale crosswalk |
 | Case System learner states | 10 authored archetype labels | Intended learner situations to cover | A diagnosis of a real learner |
 | TutorEval student states | 8 case metadata labels | The intended state of a benchmark input | A longitudinal learner profile |
 | Tutor runtime learner model | Mastery: 4 labels; engagement: 4 labels | Optional context explicitly passed to the Tutor | Evaluator reference truth |
-| Learner-state evidence experiment (PR #349) | unknown, explicit_gap, misconception_stated, demonstrated_local, etc. | Epistemic status of a claim grounded in exact learner turns | A stable trait, mastery score or canonical state enum |
+| Learner-state evidence experiment (PR #349) | 8 observation kinds and epistemic statuses such as unknown, explicit_gap, misconception_stated, demonstrated_local | Exact-turn observations and evidence-bounded claims | A stable trait, mastery score or canonical state enum |
+| Learner Path protocol | 3 authored pathways; baseline, immediate, nearTransfer and delayed checkpoints | Planned learner starting points and independent assessment checkpoints | Teach-back recipient outcomes or observed learner results |
 | TutorEval categories | 5 categories | What a rubric judges: correctness, diagnosis, guidance, adaptation, actionability | A reporting dimension |
 | TutorEval capability tags | 27 tags | Which capability a case or rubric is intended to exercise | A mutually exclusive scoring category |
 | Tutor Health dimensions | 7 dimensions | Where evidence is aggregated for reporting | The full set of tutoring capabilities |
