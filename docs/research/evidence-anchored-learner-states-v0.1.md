@@ -60,6 +60,81 @@ Thus the research comparison distinguishes *observable content* from *hypothesiz
 
 These checks establish **data integrity and provenance boundaries, not the semantic correctness of our inferences**. The classification of a quoted phrase as `local_reasoning`, for example, is still an authored hypothesis requiring independent review.
 
+
+### Secondary evidence-construct audit (2026-11-10)
+
+**Provenance and limits.** This is a secondary, source-grounded desk review
+of the original synthetic `suite.json`, five authored profiles in
+`matrix.json@0.1.1`, the TypeScript validator and regression tests. It is
+**not** an independent human subject-matter review, Gold annotation,
+real-learner validation, High/Max output review or confirmation of the
+private reviewer ledger. The source suite remains `prerequisite-aware-instruction-v0.1@0.1.0`.
+The eight observations and ten concept-level claims are unchanged.
+
+| Status | Count in five authored profiles | Minimum local support observed | Ceiling on justified inference |
+| --- | ---: | --- | --- |
+| `unknown` | 5 | A named concept is not justified by the supplied observations; e.g. an incorrect `2/7` alone does not establish why the learner erred | Does **not** mean the learner has no misconception, the concept is absent, or the source reference is missing |
+| `explicit_gap` | 1 | `pai-whole-undefined`: the learner **says** they do not know what the term “a whole” means *here* | Reported word/context difficulty, **not** an independent demonstration that whole-number or fraction concepts are missing |
+| `misconception_stated` | 1 | `pai-rule-misconception`: explicit “add top numbers and bottom numbers separately”; the rule is mathematically false in the authored sum (`1/3 + 1/4 = 7/12`, not `2/7`) | One stated incorrect rule, not persistent inability or a complete cognitive diagnosis |
+| `reported_only` | **0** | **No original authored profile.** A separate in-memory test appends an explicit learner self-report to exercise this parser path | A self-report may express confidence but never demonstrates independent skill; synthetic test coverage is **not** a sixth student vignette |
+| `stated_definition` | 1 | The learner says a denominator counts equal parts of a whole, correct within the authored part–whole model | Correct verbal definition, not independent application |
+| `supported_local` | 1 | `pai-after-progress`: learner restates the same sheet-of-paper example after the Tutor supplied it | Prompt-supported paraphrase, not unprompted application, independent transfer or retention |
+| `demonstrated_local` | 1 | `pai-known-foundation`: learner articulates a locally correct shared-whole/differently-sized-parts comparison without an earlier Tutor turn in the authored vignette | Only this local statement; not proof of computing the sum, equivalent-fraction construction or durable mastery |
+
+**Coverage by observation kind:** `incorrect_result`, `explicit_gap`,
+`stated_rule`, `verbal_definition`, `prompted_paraphrase`, and
+`local_reasoning` occur once each; `question` occurs twice;
+`self_report` occurs **zero** times in the original matrix. The no-provider
+regression suite now checks all instantiated kind/status joins and exercises
+the missing `reported_only` path with an explicitly synthetic, in-memory
+source modification. No original observation, concept label, Judge result or
+scoring rule is changed.
+
+**Adversarial construct limitations (not repaired by matching strings):**
+
+1. A quoted `stated_rule` can be correct or wrong. The validator checks
+   only the author-supplied kind and quote, not mathematical correctness.
+   `misconception_stated` must be independently checked for the named
+   concept before an evaluator treats it as a diagnosis.
+2. A `verbal_definition` or `local_reasoning` string can itself be
+   scientifically false or unrelated to the claimed concept. The parser
+   checks neither semantic correctness nor concept-level relevance.
+3. `prompted_paraphrase` currently requires only **some** preceding Tutor
+   turn. It does not check that the paraphrase actually derives from that
+   Tutor's relevant example. `demonstrated_local` does not automatically
+   exclude semantic copying or help supplied by an earlier Tutor turn.
+   In the two current authored vignettes, the chronology and exact text
+   make the respective interpretations plausible, but this is a manual
+   judgment, not a proven general validator property.
+4. An `explicit_gap` is a learner's expressed difficulty; wording,
+   language unfamiliarity or uncertainty can explain the utterance without
+   proving objective prerequisite absence.
+5. Quote substring + suite/scenario **version** checks do not pin the entire
+   source's bytes. Changes retaining the cited substring may go unnoticed
+   if an author reuses the same version. Freeze the exact source revision or
+   content digest when comparing runs, and re-review meaning after contextual
+   edits.
+6. The source-only absence of evaluator references in the bridge from PR
+   #360 is an *absence of authored metadata*, not a `LearnerEpistemicStatus`
+   of `unknown`. Local fraction concepts also remain candidate, **not
+   automatic**, links to the separate mathematics knowledge map, as
+   discussed in the architecture crosswalk from PR #354.
+
+**Independent construct-acceptance gate before generalizing:** present all
+five vignette transcripts and a small adversarial set (correct rule labeled
+wrong; wrong reasoning labeled correct; copied and merely reported
+understanding; question-only “gap”) to a subject-competent reviewer **without
+the authored state labels**. For each candidate claim, record the exact
+learner-turn quote, intended concept, whether the label is *supported /
+ambiguous / contradicted*, alternative plausible interpretations and
+acceptable Tutor next moves. Have disagreements or ambiguous labels
+adjudicated rather than forcing a single label. Treat unreviewed cases as
+`unverified` in research notes, **not as a new runtime status or a failed
+learner**. Do not merge this draft on the basis of green structural CI alone,
+and do not count private model responses or synthetic continuation as
+learning outcomes.
+
+
 Run:
 
 ```bash
