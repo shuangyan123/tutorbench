@@ -244,7 +244,7 @@ test("reported_only accepts an explicitly authored self-report but not a questio
   };
   const s = sourceCopy.scenarios.find(x => x.identity.id === "pai-unknown-cause");
   assert.ok(s);
-  const quote = "I think I already understand fraction addition.";
+  const quote = "I think I already understand what a whole means.";
   s.trajectory.conversationHistory[0]!.content += ` ${quote}`;
 
   const profile = matrix.profiles.find(p => p.scenarioId === "pai-unknown-cause");
