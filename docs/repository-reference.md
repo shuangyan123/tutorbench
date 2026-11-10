@@ -49,10 +49,12 @@ cases it runs. Evaluator Stress and Expert Review validate TutorBench's own
 measurement machinery. Mastery, Transfer, and Teach-back remain experimental
 learner-outcome work and do not currently imply causal learning gains.
 
-For the concrete code/data flow, source-of-truth ownership, taxonomy
-distinctions, and cross-layer integration gaps, see the
-[Architecture Integration Map](architecture-integration-map.md). Use it before
-adding another learner-state, taxonomy, knowledge, or scoring contract.
+For the current Scenario → TutorEval → Tutor Health source of truth,
+see the [architecture integration ledger](architecture-integration-ledger-v0.1.md).
+For research classification boundaries, #349's synthetic learner evidence
+vocabulary and non-automatic concept links, see the
+[taxonomy and learner-evidence crosswalk](architecture-integration-map.md).
+Do not treat these documents as two independent runtime schemas.
 
 The approved T1 trajectory mark and its usage rules are documented in
 [`assets/brand/tutorbench/README.md`](../assets/brand/tutorbench/README.md).
