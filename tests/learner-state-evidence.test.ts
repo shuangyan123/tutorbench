@@ -172,3 +172,108 @@ test("prompted-paraphrase evidence requires a preceding Tutor turn", async () =>
   rejects(() => parseLearnerStateEvidenceMatrix(matrix, edited as unknown as typeof source),
     /prompted_paraphrase_requires_prior_tutor/);
 });
+
+
+test("every instantiated epistemic status has a quote-kind trace, with unused self-report kept distinct", async () => {
+  const { matrix, source } = await mutable();
+  const statuses = matrix.profiles.flatMap(p => p.claims.map(c => c.status));
+  const kinds = matrix.profiles.flatMap(p => p.observations.map(o => o.kind));
+  const count = (values: readonly string[], value: string) =>
+    values.filter(item => item === value).length;
+
+  assert.equal(matrix.profiles.length, 5);
+  assert.equal(statuses.length, 10);
+  assert.equal(kinds.length, 8);
+  assert.equal(count(statuses, "unknown"), 5);
+  assert.equal(count(statuses, "reported_only"), 0);
+  assert.equal(count(kinds, "self_report"), 0);
+  assert.equal(count(kinds, "question"), 2);
+  for (const status of [
+    "explicit_gap", "misconception_stated", "stated_definition",
+    "supported_local", "demonstrated_local",
+  ]) {
+    assert.equal(count(statuses, status), 1, `expected one authored ${status}`);
+  }
+
+  const observed: readonly {
+    scenarioId: string;
+    status: string;
+    kind: string;
+  }[] = [
+    { scenarioId: "pai-whole-undefined", status: "explicit_gap", kind: "explicit_gap" },
+    { scenarioId: "pai-rule-misconception", status: "misconception_stated", kind: "stated_rule" },
+    { scenarioId: "pai-rule-misconception", status: "stated_definition", kind: "verbal_definition" },
+    { scenarioId: "pai-after-progress", status: "supported_local", kind: "prompted_paraphrase" },
+    { scenarioId: "pai-known-foundation", status: "demonstrated_local", kind: "local_reasoning" },
+  ];
+
+  for (const item of observed) {
+    const profile = matrix.profiles.find(p => p.scenarioId === item.scenarioId);
+    assert.ok(profile);
+    const claim = profile.claims.find(c => c.status === item.status);
+    assert.ok(claim);
+    assert.equal(claim.observationIds.length, 1);
+    const cited = profile.observations.find(o => o.id === claim.observationIds[0]);
+    assert.ok(cited);
+    assert.equal(cited.kind, item.kind);
+
+    const attacked = structuredClone(matrix);
+    const target = attacked.profiles.find(p => p.scenarioId === item.scenarioId)!;
+    const observation = target.observations.find(o => o.id === cited.id)!;
+    observation.kind = "question";
+    rejects(
+      () => parseLearnerStateEvidenceMatrix(attacked, source),
+      /claim_evidence_kind_mismatch/,
+    );
+  }
+
+  // An authored UNKNOWN has no supporting evidence references. This is
+  // concept-level uncertainty, not proof that the student lacks that skill.
+  for (const claim of matrix.profiles.flatMap(p => p.claims)) {
+    if (claim.status === "unknown") assert.deepEqual(claim.observationIds, []);
+  }
+});
+
+test("reported_only accepts an explicitly authored self-report but not a question or independent demonstration", async () => {
+  const { matrix, source } = await mutable();
+  const sourceCopy = structuredClone(source) as unknown as {
+    scenarios: Array<{
+      identity: { id: string };
+      trajectory: { conversationHistory: Array<{ role: string; content: string }> };
+    }>;
+  };
+  const s = sourceCopy.scenarios.find(x => x.identity.id === "pai-unknown-cause");
+  assert.ok(s);
+  const quote = "I think I already understand fraction addition.";
+  s.trajectory.conversationHistory[0]!.content += ` ${quote}`;
+
+  const profile = matrix.profiles.find(p => p.scenarioId === "pai-unknown-cause");
+  assert.ok(profile);
+  profile.observations.push({
+    id: "author-synthetic-self-report",
+    learnerTurnIndex: 1,
+    quote,
+    kind: "self_report",
+  });
+  const claim = profile.claims.find(c => c.conceptId === "chosen-whole");
+  assert.ok(claim);
+  claim.status = "reported_only";
+  claim.observationIds = ["author-synthetic-self-report"];
+
+  const parsedSource = parseTutorScenarioSuiteVNext(sourceCopy);
+  const valid = parseLearnerStateEvidenceMatrix(matrix, parsedSource);
+  assert.equal(
+    valid.profiles.find(p => p.scenarioId === "pai-unknown-cause")?.claims
+      .find(c => c.conceptId === "chosen-whole")?.status,
+    "reported_only",
+  );
+
+  profile.observations[profile.observations.length - 1]!.kind = "question";
+  rejects(
+    () => parseLearnerStateEvidenceMatrix(matrix, parsedSource),
+    /claim_evidence_kind_mismatch/,
+  );
+
+  // Fixture mutates a source message in memory only. The checked-in five
+  // scenarios still have ZERO reported_only claims and zero real learners.
+});
