@@ -277,3 +277,140 @@ test("reported_only accepts an explicitly authored self-report but not a questio
   // Fixture mutates a source message in memory only. The checked-in five
   // scenarios still have ZERO reported_only claims and zero real learners.
 });
+
+
+const blindPacketUrl = new URL(
+  "../../scenarios/experimental/learner-state-evidence-v0.1/construct-blind-packet-v0.1.json",
+  import.meta.url,
+);
+const blankSubmissionUrl = new URL(
+  "../../scenarios/experimental/learner-state-evidence-v0.1/construct-blind-submission-template-v0.1.json",
+  import.meta.url,
+);
+
+interface BlindTask {
+  reviewTaskId: string;
+  learningObjective: string;
+  learnerLevel: string;
+  conversationHistory: Array<{ role: "user" | "assistant"; content: string }>;
+  reviewTargets: Array<{ targetId: string; concept: string }>;
+}
+
+test("blind construct packet contains source-exact trajectories without authored status or evaluator-reference leakage", async () => {
+  const { source } = await input();
+  const raw = await readFile(blindPacketUrl, "utf8");
+  const packet = JSON.parse(raw) as {
+    schemaVersion: number;
+    packetId: string;
+    version: string;
+    evidenceMode: string;
+    tasks: BlindTask[];
+  };
+  assert.equal(packet.schemaVersion, 1);
+  assert.equal(packet.packetId, "learner-state-evidence-construct-blind-packet");
+  assert.equal(packet.version, "0.1.0");
+  assert.equal(packet.evidenceMode, "author_written_synthetic");
+  assert.equal(packet.tasks.length, 9);
+  const taskIds = packet.tasks.map(task => task.reviewTaskId);
+  assert.deepEqual(taskIds, [
+    "LR-01", "LR-02", "LR-03", "LR-04", "LR-05",
+    "LR-06", "LR-07", "LR-08", "LR-09",
+  ]);
+  const sourceByOpaqueTask = new Map([
+    ["LR-01", "pai-known-foundation"],
+    ["LR-03", "pai-whole-undefined"],
+    ["LR-05", "pai-rule-misconception"],
+    ["LR-06", "pai-after-progress"],
+    ["LR-08", "pai-unknown-cause"],
+  ]);
+  for (const [opaqueId, originalId] of sourceByOpaqueTask) {
+    const task = packet.tasks.find(t => t.reviewTaskId === opaqueId);
+    const original = source.scenarios.find(s => s.identity.id === originalId);
+    assert.ok(task);
+    assert.ok(original);
+    assert.equal(task.learningObjective, original.learningContext.learningObjective);
+    assert.equal(task.learnerLevel, original.learningContext.learnerLevel);
+    assert.deepEqual(task.conversationHistory, original.trajectory.conversationHistory);
+  }
+  const targetIds = packet.tasks.flatMap(t => t.reviewTargets.map(x => x.targetId));
+  assert.equal(targetIds.length, 14);
+  assert.equal(new Set(targetIds).size, 14);
+  for (const task of packet.tasks) {
+    assert.ok(task.reviewTargets.length >= 1);
+    assert.ok(task.reviewTargets.every((target, i) =>
+      target.targetId === `${task.reviewTaskId}-${i + 1}` && target.concept.length > 0));
+    assert.ok(task.conversationHistory.length > 0);
+    assert.ok(task.conversationHistory.every(turn => turn.role === "user" || turn.role === "assistant"));
+  }
+  // A blind packet has prompts and transcript context only. Source case IDs,
+  // author expectations, hidden references and epistemic labels are separate.
+  for (const forbiddenField of [
+    "scenarioId", "sourceScenarioId", "sourceSuite", "expectedDecision",
+    "expectedBehavior", "evaluatorReferenceState", "claims", "observationIds",
+    "selectedStatus", "decisionBoundary", "misconceptions", "caseSystemSource",
+  ]) {
+    assert.equal(raw.includes(`"${forbiddenField}":`), false, forbiddenField);
+  }
+  for (const originalId of source.scenarios.map(s => s.identity.id)) {
+    assert.equal(raw.includes(originalId), false, originalId);
+  }
+});
+
+test("four interleaved adversarial controls and blank submissions do not manufacture review outcomes", async () => {
+  const packet = JSON.parse(await readFile(blindPacketUrl, "utf8")) as {
+    packetId: string;
+    version: string;
+    tasks: BlindTask[];
+  };
+  const byId = new Map(packet.tasks.map(task => [task.reviewTaskId, task]));
+  const controls = ["LR-02", "LR-04", "LR-07", "LR-09"] as const;
+  assert.equal(controls.length, 4);
+  assert.match(byId.get("LR-02")?.conversationHistory[0]?.content ?? "", /denominator is the top number/u);
+  assert.match(byId.get("LR-04")?.conversationHistory[0]?.content ?? "", /I think I already know/u);
+  assert.deepEqual(byId.get("LR-07")?.conversationHistory.map(x => x.role), [
+    "user", "assistant", "user",
+  ]);
+  assert.equal(
+    byId.get("LR-07")?.conversationHistory[1]?.content,
+    byId.get("LR-07")?.conversationHistory[2]?.content,
+  );
+  assert.match(byId.get("LR-09")?.conversationHistory[0]?.content ?? "", /How do I add/u);
+
+  const template = JSON.parse(await readFile(blankSubmissionUrl, "utf8")) as {
+    schemaVersion: number;
+    packetId: string;
+    packetVersion: string;
+    reviewerId: string;
+    independentReviewAcknowledgement: boolean;
+    reviews: Array<{
+      reviewTaskId: string;
+      targetId: string;
+      selectedStatus: string;
+      supportJudgment: string;
+      learnerTurnIndex: number | null;
+      exactLearnerQuote: string;
+      alternativeInterpretation: string;
+      acceptableNextMove: string;
+      notes: string;
+    }>;
+  };
+  assert.equal(template.schemaVersion, 1);
+  assert.equal(template.packetId, packet.packetId);
+  assert.equal(template.packetVersion, packet.version);
+  assert.equal(template.reviewerId, "");
+  assert.equal(template.independentReviewAcknowledgement, false);
+  const targets = packet.tasks.flatMap(t => t.reviewTargets.map(x =>
+    [t.reviewTaskId, x.targetId] as const));
+  assert.deepEqual(template.reviews.map(x =>
+    [x.reviewTaskId, x.targetId] as const), targets);
+  assert.equal(template.reviews.length, 14);
+  for (const review of template.reviews) {
+    assert.equal(review.selectedStatus, "");
+    assert.equal(review.supportJudgment, "");
+    assert.equal(review.learnerTurnIndex, null);
+    assert.equal(review.exactLearnerQuote, "");
+    assert.equal(review.alternativeInterpretation, "");
+    assert.equal(review.acceptableNextMove, "");
+    assert.equal(review.notes, "");
+  }
+});
