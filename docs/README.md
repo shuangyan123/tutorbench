@@ -20,10 +20,13 @@ New to TutorBench? Read these first.
 
 ## Architecture and integration
 
-The actual code/data flow, taxonomy boundaries, confirmed cross-layer gaps and
-recommended integration sequence.
+The [source ownership ledger](architecture-integration-ledger-v0.1.md)
+is the source for runtime provenance and evidence joins; the
+[taxonomy/learner-evidence crosswalk](architecture-integration-map.md)
+records distinct vocabularies, candidate relations and unresolved seams.
 
-- [TutorBench Architecture Integration Map](architecture-integration-map.md)
+- [Architecture integration ledger — source ownership and traceability v0.1](architecture-integration-ledger-v0.1.md)
+- [TutorBench taxonomy and learner-evidence crosswalk](architecture-integration-map.md)
 
 ## Methodology and measurement claims
 
