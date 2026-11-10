@@ -1,100 +1,19 @@
-# TutorBench Architecture Integration Map
+# TutorBench taxonomy and learner-evidence crosswalk
 
-**Status:** repository-grounded architecture audit and integration plan; not a new canonical schema or scoring policy.  
-**Audit baseline:** main at c4d067c5ec44c79229cae38bae44c406d5a4b67d (2026-11-09).  
-**Purpose:** identify which existing assets already share a runtime path, which are separate by design, and where metadata or evidence stops crossing boundaries.
+**Status:** reviewed architecture companion; **non-canonical** and not a
+scoring policy, Gold data, or learner-state implementation.
+**Original audit baseline:** `main@c4d067c5` (2026-11-09).
+**Reconciliation baseline:** `main@45a46cc1` (2026-11-10).
 
-## Executive conclusion
+**Division of responsibility:** the
+[architecture integration ledger](architecture-integration-ledger-v0.1.md)
+is authoritative for the executable Scenario → TutorEval → Tutor Health
+pipeline, source ownership, provenance joins and merge/refactor gates.
+This document owns the **taxonomy distinctions and unapproved mapping
+proposals** left after that ledger and the read-only bridge landed.
+Do not edit or count both documents as independent sources of runtime truth.
 
-TutorBench is not several unrelated evaluation engines. It already has one principal executable path:
-
-~~~text
-Scenario vNext
-  -> Scenario-to-TutorEval compiler
-  -> TutorTurnInput
-  -> TutorUnderTest adapter
-  -> TutorEval evaluator / Judge
-  -> TutorEvalRunResult
-  -> Tutor Health report
-~~~
-
-Case System vNext, knowledge/exam maps, evaluator stress and expert review, pedagogical-principle research, and learner-outcome research support different parts of that path. They should not all be collapsed into the runtime or into one large contract.
-
-The actual fragmentation is at the **joins**:
-
-1. Some authoring metadata is only reachable through provenance IDs and is not projected into executable case metadata.
-2. Several taxonomies describe different semantic axes but have no explicit crosswalk.
-3. Some reference-state fields are validated in Scenario vNext but are not consumed by the current TutorEval compiler.
-4. Pedagogical principles and knowledge-node references are not yet first-class references on executable criteria.
-5. Learner-outcome protocols can refer back to a Tutor exposure, but they do not yet form an end-to-end outcome execution and aggregation path.
-
-The correct response is a small number of versioned crosswalks and explicit references—not another runner, another scoring system, or one universal learner-state enum.
-
-## 1. Existing architecture and ownership
-
-### 1.1 Main executable evaluation path
-
-~~~text
-Case System vNext authoring                         Supporting research
-  Domain taxonomy                                  Knowledge map / exam alignment
-  Archetype (D/P/H, prerequisites,                 Pedagogical principles
-  reference reasoning, transfer)                   Evaluator stress / expert review
-  Strategy profile / teaching objective            Learner outcome protocols
-          |                                                |
-          | caseSystemSource provenance                   | independent references
-          v                                                v
-Scenario vNext suite
-  - learner-visible context
-  - evaluator-only reference state
-  - authored trajectory and disclosure policy
-  - decision points and evaluation criteria
-          |
-          v
-tutorScenarioSuiteToTutorEvalDataset
-  - Tutor input projection
-  - evaluator-only misconception / disclosure / rubrics
-          |
-          v
-TutorTurnInput -> TutorUnderTest -> TutorEval / Judge
-          |
-          v
-TutorEvalRunResult
-          |
-          v
-buildTutorHealthReport
-  - observations / findings / unresolved coverage
-  - seven reporting dimensions
-  - explicit scoring profile
-~~~
-
-The source of truth for each stage is:
-
-| Stage | Current owner | Responsibility |
-|---|---|---|
-| Authored case design | src/contracts/case-system-vnext.ts and its registries | Defines the task archetype, domain, content depth, pedagogical difficulty, interaction horizon, prerequisites, reference reasoning and transfer target |
-| Executable scenario | src/contracts/tutor-scenario-vnext.ts | Defines the specific authored trajectory, visible context, evaluator reference state, disclosure policy and decision points |
-| Runtime case projection | src/datasets/real-world.ts | Converts each Scenario vNext decision point into a TutorEval case |
-| Tutor boundary | src/contracts/tutor.ts | Defines exactly what the Tutor adapter receives |
-| Evaluation | src/contracts/tutor-eval.ts and src/runner/tutor-eval-runner.ts | Owns rubric routing, Judge evaluation, result aggregation and evaluator provenance |
-| Diagnostic report | src/contracts/tutor-health.ts and src/reporting/tutor-health-reporters.ts | Owns evidence-linked observations/findings, coverage, dimension scores and release gate |
-| Learner outcomes | src/contracts/learner-outcome-evidence.ts | Records separate post-exposure evidence; it is not a Tutor Health score |
-
-### 1.2 What is already integrated
-
-These connections exist and should be reused:
-
-- **Scenario to TutorEval:** each decision point's evaluationCaseId becomes a TutorEval case ID; the scenario and decision-point identity are retained in case version/provenance.
-- **Tutor-visible versus evaluator-only information:** tutorVisibleContext is projected to TutorTurnInput; misconception references remain evaluator-only and must cite learner turns.
-- **Criterion to report dimension:** each TutorScenarioEvaluationCriterion explicitly declares both its TutorEvalCategory and TutorHealthDimension. No implicit category-to-dimension conversion is intended.
-- **Case System source provenance:** caseSystemSource carries pilot, archetype and strategy-profile IDs and versions; registered Case System provenance is validated by the loader.
-- **Evaluator stress:** Case System evaluator-stress packets already combine source archetypes, task-specific strategy profiles and teaching-objective profiles for controlled comparisons. This is a measurement-validation path, not a second Tutor Health runner.
-- **Knowledge/exam coverage:** validateMathematicsExamCoverage checks that exam modules' node IDs exist in the knowledge map and case IDs exist in the selected Scenario suite.
-- **Tutor exposure to teach-back:** TeachBackTutorExposureRef can record suite ID/version, scenario ID and evaluation run ID.
-- **Outcome claim boundary:** Teach-back evidence is explicitly observational/proxy-only and remains outside the seven Tutor Health dimensions.
-
-Do not rebuild these paths merely to create a new umbrella abstraction.
-
-## 2. Taxonomies that must remain distinct
+## 1. Distinct vocabularies and owners
 
 The repository contains several taxonomies because they answer different questions. Similar labels do not make them interchangeable.
 
@@ -117,7 +36,64 @@ The repository contains several taxonomies because they answer different questio
 
 **Decision:** do not merge these into one enum. Add explicit mappings only where one layer must project into another. Keep the source vocabulary and version on every mapping.
 
-## 3. Confirmed cross-layer gaps
+
+## 2. Candidate evidence crosswalks — not executable conversions
+
+The following rows are **human-review candidates**, not ID aliases,
+validated concept equivalences or automatic transformations.
+
+### 2.1 Fraction evidence concepts vs mathematics knowledge map
+
+Source A: PR #349's synthetic matrix v0.1.1 (four fixed `conceptId`
+values). Source B: `mathematics-knowledge-map-v0.1` version **0.2.0**
+(44 authored nodes; source relation evidence remains author-hypothesis).
+The latter is the authoritative existing *knowledge-map* identifier space,
+but does not establish any real student's mastery.
+
+| PR #349 local concept | Knowledge-map node to inspect | Relation | Mapping decision |
+| --- | --- | --- | --- |
+| `chosen-whole` | `units-whole` | Choosing a common whole is a narrower behavior within whole/unit reference | **candidate narrower-than**, not identity |
+| `equal-parts` | `fractions-units` | Equal-sized fractional parts and denominator meaning form part of the node | **candidate partial**, not identity |
+| `fraction-addition-rule` | `fractions-units` and `fraction-equivalence` | The misconception overlaps the first node; actual fraction addition may require shared units from the second | **compound candidate**, no 1:1 mapping |
+| `equivalent-fraction-units` | `fraction-equivalence` | Closely related shared-unit method, with no independently established level equivalence | **candidate partial**, not identity |
+
+No `conceptId` should be rewritten automatically. A reviewed,
+versioned crosswalk must include the source/local ID and version,
+target map ID and version, relation strength, reviewer evidence,
+cardinality and explicit `unmapped` behavior. The current map covers
+mathematics only: do not infer physics/chemistry/biology node IDs.
+
+### 2.2 Observation, epistemic claim, and Tutor-visible context
+
+| Existing evidence | Maximum permitted conclusion without new review | Must not be converted into |
+| --- | --- | --- |
+| Source bridge has no authored evaluator reference | `reference_not_authored` — an **absence of metadata**, not a learner-state status | PR #349 `unknown`, `no misconception`, `mastered` |
+| `incorrect_result` | This response contains an authored incorrect result; cause requires investigation | `misconception_stated` or generic inability |
+| `question` | A question was asked; which prerequisite is missing is unresolved | `explicit_gap` |
+| `explicit_gap` | Learner states a specific gap; it may guide a next probe | Global missing foundations or independently confirmed lack |
+| `stated_rule` → `misconception_stated` | A rule was explicitly stated; scientific correctness still needs independent subject review | Stable student trait or blanket inability |
+| `self_report` → `reported_only` | Learner reports a fact about their understanding | Independently demonstrated competence |
+| `verbal_definition` → `stated_definition` | Learner uttered a definition; semantic correctness is a review task | Successful application or transfer |
+| `prompted_paraphrase` → `supported_local` | Locally supported paraphrase if a prior Tutor turn exists | Unprompted reasoning or retention |
+| `local_reasoning` → `demonstrated_local` | A locally articulated reasoning step, subject to semantic checking | Durable mastery or independent near-transfer |
+| PR #349 claim `unknown` | This **specific concept** is not justified by the supplied observations; no evidence refs allowed | An absent authored field, a false score or global unknown learner |
+
+These describe PR #349's own **authoring rules**, not a
+new canonical learner-state ontology. The research matrix's
+`LearnerEpistemicStatus`, TutorEval's dataset-level
+`TutorEvalStudentState`, Case System's authored learner archetypes
+and the optional `TutorLearnerModelContext.masteryState` are not
+interconvertible without independent evidence and an explicit purpose.
+
+**Allowed direction:** the versioned source + learner USER-turn index
+may locate a visible utterance; PR #349's quote validator may then
+validate a quote and the limited authored observation/claim pairing.
+**Forbidden direction:** a label, model/Judge verdict, missing
+reference, or knowledge-node edge may not manufacture a quotation,
+Tutor-visible misconception, mastered concept or measured learning gain.
+Continue to keep evaluator-only reference truth out of `TutorTurnInput`.
+
+## 3. Cross-layer gaps requiring explicit decisions
 
 ### G1. Domain taxonomy does not have an explicit TutorEval crosswalk
 
@@ -185,13 +161,30 @@ This is a useful existing bridge. However, it does not yet make a knowledge-node
 
 These contracts are complementary, not duplicates. The missing connection is an end-to-end, independently assessed outcome collection and aggregation path—not a reason to add an eighth Health dimension.
 
-### G8. PR #349 is an unmerged research branch and must be reconciled after this audit
+### G8. PR #349 is a scoped evidence experiment, not a universal state model
 
-The open draft PR #349 (feature/learner-state-evidence-matrix-v0-1) contains a useful exact-turn evidence overlay: observations quote learner-visible turns, claims cite observation IDs, and unknown claims must have no evidence references. It is author-synthetic and does not establish semantic truth, real learner outcomes or Gold.
+Open Draft [PR #349](https://github.com/shuangyan123/tutorbench/pull/349)
+contains a validated, author-synthetic matrix with five prerequisite-aware
+fraction scenarios, eight literal observations and ten concept claims.
+Its validator requires learner-turn quote inclusion, status/kind
+compatibility and explicit `unknown` claims with no evidence references.
+It validates **provenance structure**, not the semantic truth of diagnoses.
 
-At this audit, the branch had diverged from current main (25 commits ahead, 4 behind). Its concept IDs are a local allowlist rather than references to the mathematics knowledge-map node IDs.
+The bridge merged in
+[PR #360](https://github.com/shuangyan123/tutorbench/pull/360),
+`src/datasets/scenario-evidence-provenance.ts`, indexes the original
+suite/scenario/decision-point/case versions and evaluator-only learner-turn
+reference positions. It does not create the observation/claim semantics.
+A safe join requires the source suite version, source scenario version,
+one-based USER-turn position and PR #349's exact quote validation;
+`no authored misconception reference` must never be converted to
+`unknown` or `no misconception`.
 
-**Reuse decision:** preserve the exact-turn evidence mechanism as a candidate source for the canonical evidence model. Before merging or generalizing it, rebase/reconcile it against current main, map its concept IDs to versioned knowledge-node references where appropriate, and keep epistemic status distinct from learner archetype labels and mastery state. Do not treat the draft branch as already integrated.
+PR #349 intentionally hard-codes these five scenario identities and four
+fraction concept names. Do not turn its local enum into a cross-subject
+vocabulary, add it to `TutorTurnInput`, or merge its live provider workflow
+into canonical evaluation without a separate review. High/Max output review
+and private evidence are outside this architecture document's verification.
 
 ### G9. The eight new H1 cases are executable but not yet connected to the broader authoring registries
 
@@ -199,73 +192,23 @@ The eight-case prerequisite-accessibility suite is a valid experimental Scenario
 
 That is acceptable for a bounded synthetic contrast experiment. It does mean the suite should not be counted as full Case System, knowledge-map or principle-registry coverage. If these cases are later promoted into those coverage reports, add explicit versioned references rather than inferring links from their titles or prompt text.
 
-## 4. Recommended integration sequence
 
-### Phase 0 — provenance and runtime correctness
+## 4. Delivery gate and remaining research
 
-**Completed in PR #353.**
+The source-ownership and CI regression gates are already specified in the
+[architecture ledger](architecture-integration-ledger-v0.1.md).
+Before an adapter or schema proposal, require **independent construct
+review** for each concept relation above, correct source/version checks,
+negative tests for unsupported promotion, decision-point overrides,
+turn-index scope, and the Tutor-visible/reference firewall.
+Keep unobserved learner outcomes explicitly unobserved.
 
-- Bind default Tutor Health profile identity to the suite identity.
-- Preserve the Productive Struggle and Case System profiles.
-- Give unregistered suites an explicitly unscoped equal-dimension profile.
-- Keep TutorEval rubric-scoring provenance separate from Tutor Health dimension-profile provenance.
-
-### Phase 1 — publish and review the crosswalks before changing runtime contracts
-
-1. **Domain crosswalk:** Case System domain → TutorEval broad subject → optional specialization/practice.
-2. **Capability crosswalk:** capability tag → case/criterion owner → TutorEval category → Tutor Health dimension, where the mapping is actually justified.
-3. **Learner evidence crosswalk:** exact observation kind → epistemic status → claim → optional concept-node reference. Keep unknown explicit.
-4. **Case System projection policy:** specify which D/P/H, prerequisite, strategy and transfer fields remain registry-only and which are required at execution time.
-5. **Principle references:** identify which versioned principles inform which authored criteria, without making the principle registry itself a scoring system.
-6. **Outcome linkage:** standardize the source Tutor exposure reference and independent assessment task IDs used by learner-outcome evidence.
-
-Every crosswalk must state its owner, version, allowed direction, missing-data behavior and validation rule.
-
-### Phase 2 — extend the existing compiler, not create a second runner
-
-After Phase 1 is reviewed:
-
-- Add only optional, versioned fields to Scenario vNext or a referenced authoring overlay.
-- Keep the existing tutorScenarioSuiteToTutorEvalDataset as the sole projection into TutorEval.
-- Preserve the Tutor-visible/evaluator-only firewall.
-- Keep TutorEvalCategory, capability tags and TutorHealthDimension as separate fields with explicit mappings.
-- Validate source IDs and versions before projection; unknown or missing evidence remains unknown.
-- Preserve compatibility for existing suites and historical artifacts.
-
-### Phase 3 — connect outcome evidence without contaminating Tutor Health
-
-- Link independent outcome artifacts to the exact Tutor exposure and assessment task.
-- Keep learner identity pseudonymous and outcome evidence access-controlled.
-- Preserve baseline, immediate, near-transfer and far-transfer as outcome checkpoints.
-- Do not convert synthetic continuation, Judge opinion or Tutor Health score into observed learning gain.
-- Do not add learner outcomes to the Tutor Health aggregate.
-
-### Phase 4 — return to the core product objective
-
-Only after the crosswalks and compiler projection are stable should the next learner-state / knowledge-prerequisite objective be implemented. This prevents another standalone contract from becoming a parallel source of truth.
-
-## 5. Acceptance criteria for integration
-
-The architecture is sufficiently connected when all of the following can be demonstrated without paid model calls:
-
-1. A case can be traced from its source archetype and version to its Scenario, TutorEval case, decision point, rubric result and Health finding.
-2. Domain, task, capability and reporting labels are explicit and versioned; no field is inferred by lossy string conversion.
-3. Every learner-state claim points to exact visible evidence or is explicitly unknown.
-4. Evaluator-only reference state never appears in Tutor input.
-5. Every knowledge-node or principle reference resolves to a known ID and version, or is explicitly marked unavailable.
-6. TutorEval rubric provenance and Tutor Health dimension-profile provenance remain separate and reproducible.
-7. Independent learner outcomes link to the exact Tutor exposure and assessment task but remain outside the Tutor Health score.
-8. Existing canonical suites, historical artifacts, partial coverage and unresolved evidence continue to behave as before.
-
-## 6. Explicit non-goals
-
-- Do not merge all learner-state vocabularies into one universal state enum.
-- Do not replace the 23-domain Case System taxonomy with the five TutorEval subject buckets.
-- Do not infer capability tags, mastery, prerequisites or learning gain from free-form prompts.
-- Do not expose evaluator reference truth to the Tutor.
-- Do not convert pedagogical hypotheses into mandatory scoring rules without review.
-- Do not add another runner, another rubric engine, or another Health aggregate.
-- Do not claim causal learning effects from synthetic profiles, simulated transfer or post-Tutor proxy evidence.
+**PR disposition at this reconciliation:** use this PR as the
+taxonomy/semantic *companion* only; the existing ledger remains the
+source-ownership guide. Keep PR #349 **Draft** until its subject,
+evidence-kind semantics and local-concept scope have been independently
+reviewed; do not imply that its High/Max or private review evidence has
+been independently verified here. No new public model claims or paid calls.
 
 ## Source files inspected
 
