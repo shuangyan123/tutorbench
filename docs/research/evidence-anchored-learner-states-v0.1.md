@@ -135,6 +135,18 @@ and do not count private model responses or synthetic continuation as
 learning outcomes.
 
 
+
+**Blind review now prepared, not completed:** The
+[label-blind construct review protocol](learner-state-evidence-blind-review-protocol-v0.1.md)
+references a [nine-task synthetic packet](../../scenarios/experimental/learner-state-evidence-v0.1/construct-blind-packet-v0.1.json)
+and [14-row empty submission template](../../scenarios/experimental/learner-state-evidence-v0.1/construct-blind-submission-template-v0.1.json).
+Five original source transcripts are included verbatim; four adversarial
+controls are interleaved and are **not** additional learner observations.
+The existing test suite checks exact source fidelity, no leaked author labels,
+and that every proposed reviewer judgment remains blank. No independent
+qualified reviewer has submitted an assessment; all Gold, adjudication and
+promotion gates remain **unmet**.
+
 Run:
 
 ```bash
