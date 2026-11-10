@@ -93,6 +93,47 @@ If a required authoring source or version is unavailable, mark that provenance
    contracts. Do not copy or recreate its experimental source in a
    second mutable registry.
 
+## Read-only evidence source bridge (2026-11-10)
+
+The internal helper
+[`indexScenarioLearnerEvidence`](../src/datasets/scenario-evidence-provenance.ts)
+now joins **validated, authored** Scenario vNext decisions to the case
+identity/version produced by the existing TutorEval compiler. It does not add
+a learner-state contract, a new evaluator, a rubric dimension or Tutor input.
+
+Each index row keeps the source suite/scenario version, decision point, compiled
+case identity/version, Tutor-response turn index and **number of learner turns**.
+For authored evaluator-only misconception references it returns only a
+reference ordinal, its source scope (scenario versus decision-point override)
+and the **one-based USER-turn indexes**. It intentionally omits the reference
+statement and the source learner utterance text. To inspect a literal quote,
+an authorized reviewer must join back to the versioned source trajectory;
+this index is not a copy of user data or a secret prompt.
+
+An empty reference array means **no evaluator misconception reference was
+authored**. It must not be converted to "the learner has no misconception",
+`unknown` as a validated epistemic state, or evidence of mastery. The
+optional `caseSystemSource` remains a set of declared registry IDs/versions,
+not resolved D/P/H data or a runtime score. The registered Case System loader
+retains ownership of source-ID/version verification.
+
+**Reconciliation with open Draft PR #349:** its author-synthetic evidence
+matrix already uses exact literal learner quotes and distinct epistemic
+statuses. Do **not** import or reimplement that draft as canonical. A future
+reviewed adapter may use the existing join key
+`suiteId/version + scenarioId/version + learnerUserTurnIndex`, then ask
+PR #349's quote validator to verify the actual substring and claim type.
+Authoring source identity is a prerequisite for validation, not proof that
+the authored diagnosis is semantically correct.
+
+The new no-provider test
+[`scenario-evidence-provenance.test.ts`](../tests/scenario-evidence-provenance.test.ts)
+checks the eight synthetic H1 cases, real multi-turn learner indexing,
+the registered Case System pilot, point-level overrides and invalid turn
+references. Keep this an **internal audit view** until an actual consumer
+requires a stable public contract. It is not passed through
+`TutorTurnInput`, `TutorEvalRunResult` or `TutorHealthReport`.
+
 ## Controlled forward integration order
 
 1. **Keep completed P0 repair:** protect scoring-profile provenance and
