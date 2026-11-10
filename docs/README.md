@@ -4,7 +4,7 @@ Every document in `docs/`, grouped by topic. Titles are the documents' own headi
 For the project overview, start with the [README](../README.md); for the full
 repository guide, see the [repository reference](repository-reference.md).
 
-Contents: [Start here](#start-here) · [Methodology and measurement claims](#methodology-and-measurement-claims) · [TutorEval versions](#tutoreval-versions) · [Evaluator integrity and audits](#evaluator-integrity-and-audits) · [Judges and real-model runs](#judges-and-real-model-runs) · [Human reference and calibration](#human-reference-and-calibration) · [Case System vNext (experimental)](#case-system-vnext-experimental) · [Mathematics knowledge and exams](#mathematics-knowledge-and-exams) · [Research notes](#research-notes) · [Community Review](#community-review) · [Design-partner pilots](#design-partner-pilots) · [Public site and publication](#public-site-and-publication)
+Contents: [Start here](#start-here) · [Architecture and integration](#architecture-and-integration) · [Methodology and measurement claims](#methodology-and-measurement-claims) · [TutorEval versions](#tutoreval-versions) · [Evaluator integrity and audits](#evaluator-integrity-and-audits) · [Judges and real-model runs](#judges-and-real-model-runs) · [Human reference and calibration](#human-reference-and-calibration) · [Case System vNext (experimental)](#case-system-vnext-experimental) · [Mathematics knowledge and exams](#mathematics-knowledge-and-exams) · [Research notes](#research-notes) · [Community Review](#community-review) · [Design-partner pilots](#design-partner-pilots) · [Public site and publication](#public-site-and-publication)
 
 ## Start here
 
@@ -18,13 +18,22 @@ New to TutorBench? Read these first.
 - [TutorBench licensing and scope](licensing.md)
 - [npm publication and Trusted Publishing (P2B / H1A)](npm-publishing.md)
 
+## Architecture and integration
+
+The [source ownership ledger](architecture-integration-ledger-v0.1.md)
+is the source for runtime provenance and evidence joins; the
+[taxonomy/learner-evidence crosswalk](architecture-integration-map.md)
+records distinct vocabularies, candidate relations and unresolved seams.
+
+- [Architecture integration ledger — source ownership and traceability v0.1](architecture-integration-ledger-v0.1.md)
+- [TutorBench taxonomy and learner-evidence crosswalk](architecture-integration-map.md)
+
 ## Methodology and measurement claims
 
 What TutorBench measures and what it is allowed to claim.
 
 - [TutorBench Measurement Claim Specification](measurement-claim-specification.md)
 - [Tutor Benchmark Product Boundary](benchmark-product-boundary.md)
-- [Architecture integration ledger — source ownership and traceability v0.1](architecture-integration-ledger-v0.1.md)
 - [TutorBench Real-World Evaluation / Finding-First Model](real-world-finding-first-evaluation.md)
 - [Prerequisite-Aware Teaching Evaluation — Experimental Pilot](prerequisite-aware-teaching-evaluation.md)
 - [TutorEval scoring provenance](scoring-provenance.md)
