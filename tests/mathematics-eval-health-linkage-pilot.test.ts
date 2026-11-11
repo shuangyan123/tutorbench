@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { execFileSync, spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import { parseMathematicsKnowledgeMap } from "../src/contracts/mathematics-knowledge-map.js";
@@ -131,4 +133,29 @@ test("linkage projection never becomes a Tutor/Judge prompt, Eval score, or Heal
   const projected = JSON.stringify(report);
   assert.doesNotMatch(projected, /rawTutorResponse|rawJudgeResult|evaluatorOnly|studentMessage|healthScore|rubricResults/);
   assert.doesNotMatch(JSON.stringify(inputs.pilot), /rawTutorResponse|rawJudgeResult|evaluatorOnly|studentMessage|healthScore/);
+});
+
+
+test("provider-free pilot inspector resolves valid nodes and fails on unknown IDs", () => {
+  const script = fileURLToPath(new URL("../src/cli/mathematics-linkage-pilot.js", import.meta.url));
+  const json = execFileSync(process.execPath, [script, "--node", "conditional-events", "--json"], {
+    encoding: "utf8",
+  });
+  const parsed = JSON.parse(json) as {
+    scope: string;
+    reviewed: boolean;
+    modelRunsMeasured: boolean;
+    node: { nodeId: string; researchTasks: string[]; evalCases: unknown[]; healthDecisionPoints: unknown[] };
+  };
+  assert.equal(parsed.scope, "authored_links_only");
+  assert.equal(parsed.reviewed, false);
+  assert.equal(parsed.modelRunsMeasured, false);
+  assert.equal(parsed.node.nodeId, "conditional-events");
+  assert.ok(parsed.node.researchTasks.includes("conditional-two-red"));
+  assert.deepEqual(parsed.node.evalCases, []);
+  assert.deepEqual(parsed.node.healthDecisionPoints, []);
+
+  const bad = spawnSync(process.execPath, [script, "--node", "nonexistent-node"], { encoding: "utf8" });
+  assert.notEqual(bad.status, 0);
+  assert.match(bad.stderr, /Unknown knowledge node/);
 });
