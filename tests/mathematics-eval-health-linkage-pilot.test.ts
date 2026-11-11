@@ -4,6 +4,8 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { parseAcademicStructure } from "../src/contracts/academic-structure.js";
+import { parseMathematicsExamAlignment } from "../src/contracts/mathematics-exam-alignment.js";
 import { parseMathematicsKnowledgeMap } from "../src/contracts/mathematics-knowledge-map.js";
 import { parseMathChallengeEvidence } from "../src/contracts/math-challenge-evidence.js";
 import { parseTutorScenarioSuiteVNext } from "../src/contracts/tutor-scenario-vnext-validation.js";
@@ -20,7 +22,9 @@ import {
 
 const scenarioBase = new URL("../../scenarios/", import.meta.url);
 async function load(): Promise<MathematicsPilotInputs> {
-  const [graph, links, research, evidence, evaluation, health] = await Promise.all([
+  const [academic, exam, graph, links, research, evidence, evaluation, health] = await Promise.all([
+    readFile(new URL("case-system-vnext/academic-structure-v0.1.json", scenarioBase), "utf8"),
+    readFile(new URL("case-system-vnext/mathematics-exam-alignment-v0.1.json", scenarioBase), "utf8"),
     readFile(new URL("case-system-vnext/mathematics-knowledge-map-v0.1.json", scenarioBase), "utf8"),
     readFile(new URL("experimental/mathematics-eval-health-linkage-v0.1/links.json", scenarioBase), "utf8"),
     readFile(new URL("experimental/mathematics-challenge-v0.1/suite.json", scenarioBase), "utf8"),
@@ -29,6 +33,8 @@ async function load(): Promise<MathematicsPilotInputs> {
     loadTutorScenarioSuiteVNext(),
   ]);
   return {
+    academic: parseAcademicStructure(JSON.parse(academic) as unknown),
+    exam: parseMathematicsExamAlignment(JSON.parse(exam) as unknown),
     map: parseMathematicsKnowledgeMap(JSON.parse(graph) as unknown),
     pilot: JSON.parse(links) as MathematicsPilotRegistry,
     researchSuite: parseTutorScenarioSuiteVNext(JSON.parse(research) as unknown),
@@ -48,6 +54,8 @@ test("pilot pins sources, validates links, and distinguishes case presence from 
   assert.equal(report.learnerOutcomesMeasured, false);
   assert.deepEqual(report.counts, {
     graphNodes: 44,
+    examProfileCount: 16,
+    examLinkedNodeCount: 42,
     researchMappedNodes: 22,
     researchUnmappedNodes: 22,
     researchTaskCount: 16,
@@ -71,6 +79,7 @@ test("knowledge-node reverse lookup joins three existing source types without co
   assert.deepEqual(units.healthDecisionPoints.map(item => item.scenarioId), [
     "ps-false-confidence", "ps-same-misconception",
   ]);
+  assert.ok(units.examProfiles.includes("cn-zhongkao-math-general"));
   assert.ok(units.researchTasks.includes("fraction-unit-repair"));
   assert.ok(units.researchScenarios.includes("mc-fraction-units"));
 
@@ -85,6 +94,7 @@ test("knowledge-node reverse lookup joins three existing source types without co
   assert.ok(probability);
   assert.deepEqual(probability.evalCases, []);
   assert.deepEqual(probability.healthDecisionPoints, []);
+  assert.ok(probability.examProfiles.includes("cn-gaokao-math-national-2026"));
   assert.ok(probability.researchTasks.includes("conditional-two-red"));
   assert.deepEqual(probability.researchScenarios, [
     "mc-conditional-normalization", "mc-conditional-prerequisite", "mc-conditional-transfer",
@@ -110,6 +120,12 @@ test("pilot rejects stale sources, phantom concepts, duplicate links, or incorre
   })), /pilot_source_snapshot_invalid/);
   assert.throws(() => buildMathematicsPilotCoverage(altered(pilot => {
     (pilot.sources.researchEvidence as { version: string }).version = "0.0.0";
+  })), /pilot_source_snapshot_invalid/);
+  assert.throws(() => buildMathematicsPilotCoverage(altered(pilot => {
+    (pilot.sources.academicStructure as { version: string }).version = "0.0.0";
+  })), /pilot_source_snapshot_invalid/);
+  assert.throws(() => buildMathematicsPilotCoverage(altered(pilot => {
+    (pilot.sources.examAlignment as { version: string }).version = "0.0.0";
   })), /pilot_source_snapshot_invalid/);
   assert.throws(() => buildMathematicsPilotCoverage(altered(pilot => {
     (pilot.links as MathematicsPilotRegistry["links"][number][]).push(structuredClone(pilot.links[0]!));
