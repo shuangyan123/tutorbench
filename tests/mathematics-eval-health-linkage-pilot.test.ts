@@ -60,10 +60,10 @@ test("pilot pins sources, validates links, and distinguishes case presence from 
     researchUnmappedNodes: 22,
     researchTaskCount: 16,
     researchScenarioCount: 20,
-    linkedEvalCaseCount: 3,
-    linkedHealthDecisionPointCount: 4,
-    pilotLinkedNodeCount: 3,
-    combinedLinkedNodeCount: 23,
+    linkedEvalCaseCount: 12,
+    linkedHealthDecisionPointCount: 12,
+    pilotLinkedNodeCount: 5,
+    combinedLinkedNodeCount: 25,
   });
   assert.equal(inputs.pilot.links.find(link => link.source.id === "fraction-misconception-001")?.source.version, "1.2.0");
   assert.ok(report.nodes.every(row => inputs.map.nodes.some(node => node.id === row.nodeId)));
@@ -73,9 +73,9 @@ test("knowledge-node reverse lookup joins three existing source types without co
   const report = buildMathematicsPilotCoverage(await load());
   const units = findMathematicsPilotNode(report, "fractions-units");
   assert.ok(units);
-  assert.deepEqual(units.evalCases.map(item => item.id), [
-    "fraction-misconception-001", "paired-fraction-conceptual-001",
-  ]);
+  assert.equal(units.evalCases.length, 8);
+  assert.ok(units.evalCases.some(item => item.id === "fraction-misconception-001" && item.version === "1.2.0"));
+  assert.ok(units.evalCases.some(item => item.id === "fraction-misconception-001-zh-CN" && item.version === "1.2.0"));
   assert.deepEqual(units.healthDecisionPoints.map(item => item.scenarioId), [
     "ps-false-confidence", "ps-same-misconception",
   ]);
@@ -85,10 +85,11 @@ test("knowledge-node reverse lookup joins three existing source types without co
 
   const equation = findMathematicsPilotNode(report, "linear-equations");
   assert.ok(equation);
-  assert.deepEqual(equation.evalCases.map(item => item.id), ["hint-only-linear-equation-001"]);
-  assert.deepEqual(equation.healthDecisionPoints.map(item => item.scenarioId), [
-    "ps-first-mistake", "ps-repeated-mistake",
-  ]);
+  assert.equal(equation.evalCases.length, 4);
+  assert.ok(equation.evalCases.some(item => item.id === "hint-only-linear-equation-001-zh-CN"));
+  assert.equal(equation.healthDecisionPoints.length, 7);
+  assert.ok(equation.healthDecisionPoints.some(item => item.scenarioId === "ps-first-mistake"));
+  assert.ok(equation.healthDecisionPoints.some(item => item.scenarioId === "ps-repeated-mistake"));
 
   const probability = findMathematicsPilotNode(report, "conditional-events");
   assert.ok(probability);
