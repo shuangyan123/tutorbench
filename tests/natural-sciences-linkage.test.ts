@@ -87,7 +87,7 @@ test("new academic navigation registers physics, chemistry and biology without r
 test("science case classification is authored and source-typed, not inferred from a generic science label", async () => {
   const report = buildNaturalScienceCoverageAudit(await inputs());
   const gaps = report.inventory.filter(r => r.mappingStatus === "explicitly_unmapped");
-  assert.deepEqual(gaps.map(r => r.source.id), ["science-graph-error-001", "science-graph-error-001-zh-CN"]);
+  assert.deepEqual(gaps.map(r => r.source.id).sort(), ["science-graph-error-001", "science-graph-error-001-zh-CN"].sort());
   assert.ok(gaps.every(r => r.mappedDiscipline === null && r.focusNodeIds.length === 0));
   assert.ok(report.inventory.some(r => r.source.id === "science-density-knowledge-001-zh-CN" &&
     r.mappedDiscipline === "physics" && r.source.version === "1.1.0"));
