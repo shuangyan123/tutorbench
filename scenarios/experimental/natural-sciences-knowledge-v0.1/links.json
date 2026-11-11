@@ -1,0 +1,351 @@
+{
+  "schemaVersion": 1,
+  "id": "natural-sciences-case-knowledge-links-v0.1",
+  "version": "0.1.0",
+  "status": "author-proposed-unreviewed",
+  "purpose": "Candidate concept alignment for current science Eval and selected experimental vNext suites; no verified teaching or curriculum coverage.",
+  "sources": {
+    "academic": {
+      "id": "tutorbench-academic-structure-v0.2",
+      "version": "0.2.0"
+    },
+    "maps": [
+      {
+        "id": "physics-knowledge-seed-v0.1",
+        "version": "0.1.0"
+      },
+      {
+        "id": "chemistry-knowledge-seed-v0.1",
+        "version": "0.1.0"
+      },
+      {
+        "id": "biology-knowledge-seed-v0.1",
+        "version": "0.1.0"
+      }
+    ],
+    "evalDataset": {
+      "id": "tutor-eval-v0.2a",
+      "version": "0.2a.6"
+    },
+    "experimentalSuites": [
+      {
+        "id": "case-system-vnext-executable-pilot-v0.1",
+        "version": "0.3.0"
+      },
+      {
+        "id": "prerequisite-accessibility-contrasts-v0.1",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "links": [
+    {
+      "disciplineId": "physics",
+      "source": {
+        "kind": "eval_case",
+        "suiteId": "tutor-eval-v0.2a",
+        "suiteVersion": "0.2a.6",
+        "id": "science-density-knowledge-001",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "density-mass-volume",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Density learning objective explicitly asks for relationship of mass and volume.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "physics",
+      "source": {
+        "kind": "eval_case",
+        "suiteId": "tutor-eval-v0.2a",
+        "suiteVersion": "0.2a.6",
+        "id": "science-density-knowledge-001-zh-CN",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "density-mass-volume",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese density objective explicitly states mass and volume.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "physics",
+      "source": {
+        "kind": "eval_case",
+        "suiteId": "tutor-eval-v0.2a",
+        "suiteVersion": "0.2a.6",
+        "id": "science-force-transfer-001",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "force-equilibrium",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Balanced forces on a book at rest are central to the transfer target.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "physics",
+      "source": {
+        "kind": "eval_case",
+        "suiteId": "tutor-eval-v0.2a",
+        "suiteVersion": "0.2a.6",
+        "id": "science-force-transfer-001-zh-CN",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "force-equilibrium",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese force-transfer case explicitly concerns equilibrium.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "biology",
+      "source": {
+        "kind": "eval_case",
+        "suiteId": "tutor-eval-v0.2a",
+        "suiteVersion": "0.2a.6",
+        "id": "science-photosynthesis-concept-001",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "photosynthesis-matter-energy",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Objective concerns light energy, carbon dioxide and incorrect literal sunlight-eating explanation.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "biology",
+      "source": {
+        "kind": "eval_case",
+        "suiteId": "tutor-eval-v0.2a",
+        "suiteVersion": "0.2a.6",
+        "id": "science-photosynthesis-concept-001-zh-CN",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "photosynthesis-matter-energy",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese objective explicitly concerns photosynthesis mechanisms, light and carbon dioxide.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "physics",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1",
+        "suiteVersion": "0.3.0",
+        "id": "csvnext-physics-d1-graph",
+        "version": "0.1.0",
+        "decisionPointId": "separate-kinematics-from-cause"
+      },
+      "nodes": [
+        {
+          "id": "position-time-graph",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Distinguishes observable position-time kinematics from unsupported mechanism or force inference.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "chemistry",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1",
+        "suiteVersion": "0.3.0",
+        "id": "csvnext-chemistry-d5-kinetics",
+        "version": "0.1.0",
+        "decisionPointId": "separate-rate-factors"
+      },
+      "nodes": [
+        {
+          "id": "kinetics-factor-control",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Controls competing reaction conditions in a temperature/concentration rate comparison.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "biology",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "case-system-vnext-executable-pilot-v0.1",
+        "suiteVersion": "0.3.0",
+        "id": "csvnext-biology-d3-causal",
+        "version": "0.1.0",
+        "decisionPointId": "separate-association-mechanism-and-control"
+      },
+      "nodes": [
+        {
+          "id": "growth-association-causal-controls",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Causal inference requires distinguishing controls, associations, mechanisms and alternatives.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "physics",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1",
+        "suiteVersion": "0.1.0",
+        "id": "pac-p-a",
+        "version": "0.1.0",
+        "decisionPointId": "next-response"
+      },
+      "nodes": [
+        {
+          "id": "ideal-series-ohm",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Requires common-current ideal series circuit and V = IR voltage-drop comparison.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "physics",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1",
+        "suiteVersion": "0.1.0",
+        "id": "pac-p-b",
+        "version": "0.1.0",
+        "decisionPointId": "next-response"
+      },
+      "nodes": [
+        {
+          "id": "ideal-series-ohm",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Same physics objective with altered prerequisite accessibility and intervention; not independent knowledge coverage.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "chemistry",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1",
+        "suiteVersion": "0.1.0",
+        "id": "pac-c-a",
+        "version": "0.1.0",
+        "decisionPointId": "next-response"
+      },
+      "nodes": [
+        {
+          "id": "atom-conservation-balancing",
+          "role": "focus"
+        },
+        {
+          "id": "coefficient-vs-formula",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Balances Mg + O2 into MgO via atom conservation without altering formulas.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "chemistry",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1",
+        "suiteVersion": "0.1.0",
+        "id": "pac-c-b",
+        "version": "0.1.0",
+        "decisionPointId": "next-response"
+      },
+      "nodes": [
+        {
+          "id": "atom-conservation-balancing",
+          "role": "focus"
+        },
+        {
+          "id": "coefficient-vs-formula",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Same chemical equation with an alternative learner state; support node is not an independent measured concept.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "biology",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1",
+        "suiteVersion": "0.1.0",
+        "id": "pac-b-a",
+        "version": "0.1.0",
+        "decisionPointId": "next-response"
+      },
+      "nodes": [
+        {
+          "id": "osmosis-net-individual-motion",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Distinguishes net water flux and individual bidirectional water crossings.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "disciplineId": "biology",
+      "source": {
+        "kind": "experimental_decision_point",
+        "suiteId": "prerequisite-accessibility-contrasts-v0.1",
+        "suiteVersion": "0.1.0",
+        "id": "pac-b-b",
+        "version": "0.1.0",
+        "decisionPointId": "next-response"
+      },
+      "nodes": [
+        {
+          "id": "osmosis-net-individual-motion",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Same osmosis concept tested with a contrasting learner prerequisite condition.",
+      "reviewStatus": "author-proposed-unreviewed"
+    }
+  ]
+}

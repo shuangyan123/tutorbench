@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "natural-sciences-knowledge-unmapped-v0.1",
+  "version": "0.1.0",
+  "status": "author-proposed-unreviewed",
+  "purpose": "Explicit cross-discipline omissions from frozen current source inventory; never silently attribute generic science cases to a subject.",
+  "gaps": [
+    {
+      "source": {
+        "kind": "eval_case",
+        "suiteId": "tutor-eval-v0.2a",
+        "suiteVersion": "0.2a.6",
+        "id": "science-graph-error-001",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "reasonCode": "insufficient_discipline_attribution",
+      "candidateDisciplines": [
+        "chemistry",
+        "physics",
+        "biology"
+      ],
+      "rationale": "The original canonical label is generic science graph interpretation. A reaction-rate phrase alone does not establish a precise chemistry knowledge node or graph axes; retain as cross-disciplinary rather than force a discipline.",
+      "reviewStatus": "author-proposed-unreviewed"
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "suiteId": "tutor-eval-v0.2a",
+        "suiteVersion": "0.2a.6",
+        "id": "science-graph-error-001-zh-CN",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "reasonCode": "insufficient_discipline_attribution",
+      "candidateDisciplines": [
+        "chemistry",
+        "physics",
+        "biology"
+      ],
+      "rationale": "The original canonical label is generic science graph interpretation. A reaction-rate phrase alone does not establish a precise chemistry knowledge node or graph axes; retain as cross-disciplinary rather than force a discipline.",
+      "reviewStatus": "author-proposed-unreviewed"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "biology-knowledge-seed-v0.1",
+  "version": "0.1.0",
+  "disciplineId": "biology",
+  "status": "author-proposed-unreviewed",
+  "domainTaxonomy": {
+    "id": "case-system-vnext-domain-taxonomy",
+    "version": "0.1.0"
+  },
+  "purpose": "Small discipline-specific authored concept index for current test cases only. Not a curriculum, learning outcome claim, mandatory prerequisite chain, or externally validated ontology.",
+  "domains": [
+    {
+      "id": "cellular-metabolism",
+      "label": "Matter and energy in living systems"
+    },
+    {
+      "id": "biological-inference",
+      "label": "Experimental inference and mechanisms"
+    },
+    {
+      "id": "transport",
+      "label": "Membrane transport and net flux"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "photosynthesis-matter-energy",
+      "domainId": "cellular-metabolism",
+      "label": "Photosynthesis as matter transformation and energy use",
+      "reasoningFacet": "process-mechanism",
+      "scopeNote": "Carbon dioxide and other inputs, light energy, and non-literal use of 'eating sunlight'"
+    },
+    {
+      "id": "growth-association-causal-controls",
+      "domainId": "biological-inference",
+      "label": "Biological growth associations, controls and causal mechanisms",
+      "reasoningFacet": "experimental-inference",
+      "scopeNote": "Control differences, alternative hypotheses and mechanism-evidence boundaries"
+    },
+    {
+      "id": "osmosis-net-individual-motion",
+      "domainId": "transport",
+      "label": "Osmosis net movement versus microscopic bidirectional crossings",
+      "reasoningFacet": "multi-scale-mechanism",
+      "scopeNote": "Individual molecular movement in both directions and net water flux across an idealized membrane"
+    }
+  ],
+  "relationHypotheses": []
+}
