@@ -69,6 +69,7 @@ test("entire current canonical bilingual mathematics inventory and default Healt
     independentlyReviewedMappings: 0,
     graphNodes: 44,
     graphNodesWithCanonicalOrHealthCandidate: 5,
+    graphNodesWithPrimaryCanonicalOrHealthCandidate: 4,
     graphNodesWithResearchTask: 22,
   });
   assert.equal(result.inventory.length, 31);
@@ -85,6 +86,14 @@ test("entire current canonical bilingual mathematics inventory and default Healt
   assert.ok(fraction);
   assert.ok(fraction.candidateEvalCategories.includes("diagnosis"));
   assert.ok(fraction.candidateHealthDimensions.includes("learner_diagnosis"));
+  const whole = result.nodes.find(x => x.nodeId === "units-whole");
+  assert.ok(whole);
+  assert.equal(whole.focusEvalCaseCount, 0);
+  assert.ok(whole.supportingEvalCaseCount > 0);
+  const weak = result.inventory.find(x => x.source.id === "weak-foundation-fractions-001");
+  assert.ok(weak);
+  assert.deepEqual(weak.focusNodeIds, ["fractions-units"]);
+  assert.deepEqual(weak.supportingNodeIds, ["units-whole"]);
   assert.ok(result.nodes.find(x => x.nodeId === "conditional-events")!.researchTaskCount > 0);
   assert.equal(result.nodes.find(x => x.nodeId === "conditional-events")!.candidateEvalCaseCount, 0);
 });
