@@ -16,6 +16,14 @@
     "healthSuite": {
       "id": "productive-struggle-intervention-v0.1",
       "version": "0.2.0"
+    },
+    "researchEvidence": {
+      "id": "mathematics-challenge-evidence-v0.1",
+      "version": "0.2.0"
+    },
+    "researchSuite": {
+      "id": "mathematics-challenge-v0.1",
+      "version": "0.2.0"
     }
   },
   "links": [
