@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "id": "goal-aligned-assistance-contrasts",
+  "version": "0.1.0",
+  "status": "synthetic authoring pilot, non-canonical, no learner or Judge outcomes",
+  "cases": [
+    {
+      "id": "fractions-independent-concept-check",
+      "compareGroup": "fractions-same-calculation",
+      "learnerGoal": "Understand why unlike denominators require equivalent fractions; demonstrate an unaided attempt.",
+      "learnerEvidence": "Learner says 1/3 + 1/4 = 2/7 and asks for an opportunity to try again.",
+      "task": "Compute 1/3 + 1/4 in the learning activity.",
+      "teachingObjective": {
+        "mode": "learning_oriented",
+        "learningContext": {
+          "intent": "concept_mastery",
+          "assistancePolicy": "guided_attempt",
+          "permittedTools": [],
+          "outcomeEvidence": "independent",
+          "successCondition": "Learner explains the unit/whole and produces a justified sum unaided."
+        }
+      },
+      "supportedDecision": "Identify the unit confusion; ask a focused question or use a representation without providing the very sum reserved for an independent attempt.",
+      "failureProbe": "Tutor supplies 7/12 as if it were the learner's own independent answer.",
+      "evidenceBoundary": "The tutoring response itself cannot prove that the learner later performs unaided.",
+      "primaryObservationOwner": "Guidance"
+    },
+    {
+      "id": "fractions-open-inquiry-intermediate",
+      "compareGroup": "fractions-same-calculation",
+      "learnerGoal": "Investigate a separate experimental-design question; the fraction is merely an intermediate quantity.",
+      "learnerEvidence": "Learner explicitly asks AI to calculate 1/3 + 1/4 so they can continue reasoning about combined proportions.",
+      "task": "Compute 1/3 + 1/4 as a given substep in an open inquiry.",
+      "teachingObjective": {
+        "mode": "learning_oriented",
+        "learningContext": {
+          "intent": "open_inquiry",
+          "assistancePolicy": "direct_conclusions_permitted",
+          "permittedTools": [],
+          "outcomeEvidence": "tool_augmented",
+          "successCondition": "Learner uses a correctly stated intermediate sum to continue their separate inquiry.",
+          "verificationPlan": "Check by mapping both quantities to twelfths and state the reference whole before combining proportions."
+        }
+      },
+      "supportedDecision": "Give the justified 7/12 promptly; do not impose an uncued fraction test when the learner's target is the subsequent inquiry.",
+      "failureProbe": "Tutor withholds the arithmetic solely because ‘a good tutor never gives answers’.",
+      "evidenceBoundary": "The calculation is AI-provided; do not claim the learner independently learned fraction addition.",
+      "primaryObservationOwner": "Adaptation"
+    },
+    {
+      "id": "exam-with-time-and-tool-constraints",
+      "compareGroup": "exam-context",
+      "learnerGoal": "Prepare a reproducible legal approach to a timed, closed-book quantitative exam.",
+      "learnerEvidence": "Learner understands percentage change but loses marks by spending too long on exact division.",
+      "task": "Practice choosing safe estimation or exact computation given scoring and allowed tools.",
+      "teachingObjective": {
+        "mode": "exam_oriented",
+        "assessmentContext": {
+          "examFamily": "timed quantitative aptitude examination",
+          "questionType": "multiple-choice data interpretation",
+          "scoringPolicy": "one mark for the correct choice; no process credit",
+          "timePressure": "high",
+          "timeBudgetMinutes": 1.5,
+          "allowedTools": [],
+          "syllabusBoundary": [
+            "percent change",
+            "ratios",
+            "estimation"
+          ],
+          "requiredWork": [
+            "select one answer from provided options"
+          ]
+        }
+      },
+      "supportedDecision": "Teach reliable, legally executable estimation with a check for cases where approximation changes option ordering.",
+      "failureProbe": "Tutor suggests a calculator or AI lookup as a test-time step despite explicitly disallowed tools.",
+      "evidenceBoundary": "A plausible strategy is not evidence of actual score gain; timed learner trials are needed.",
+      "primaryObservationOwner": "Actionability"
+    },
+    {
+      "id": "learning-explains-exam-shortcut",
+      "compareGroup": "exam-learning-connection",
+      "learnerGoal": "Understand why an estimation shortcut works, with no imminent test deadline.",
+      "learnerEvidence": "Learner can apply a heuristic but cannot state when its error could reverse the choice.",
+      "task": "Explain a percentage-change estimation method and its limits.",
+      "teachingObjective": {
+        "mode": "learning_oriented",
+        "learningContext": {
+          "intent": "concept_mastery",
+          "assistancePolicy": "guided_attempt",
+          "permittedTools": [
+            "calculator for post-attempt verification"
+          ],
+          "outcomeEvidence": "both",
+          "successCondition": "Learner reasons about error bounds and then checks both unaided reasoning and the tool-based calculation separately."
+        }
+      },
+      "supportedDecision": "Show the structure behind the shortcut and invite a new case where it fails; distinguish student's explanation from calculator confirmation.",
+      "failureProbe": "Tutor calls a correct multiple-choice selection proof of deep conceptual mastery.",
+      "evidenceBoundary": "Tool-verified accuracy and an uncued reasoning attempt are distinct observations.",
+      "primaryObservationOwner": "Guidance"
+    },
+    {
+      "id": "biology-research-synthesis",
+      "compareGroup": "open-inquiry-evidence",
+      "learnerGoal": "Read a field's current literature and choose a scientifically tractable follow-up question.",
+      "learnerEvidence": "A non-biologist wants to learn mechanisms of cancer drug resistance and asks for a supported overview.",
+      "task": "Synthesize established mechanisms, uncertainties, and possible research questions.",
+      "teachingObjective": {
+        "mode": "learning_oriented",
+        "learningContext": {
+          "intent": "open_inquiry",
+          "assistancePolicy": "direct_conclusions_permitted",
+          "permittedTools": [
+            "literature search",
+            "AI-assisted synthesis"
+          ],
+          "outcomeEvidence": "tool_augmented",
+          "successCondition": "A source-grounded distinction between established mechanisms, disputed explanations, and testable follow-ups.",
+          "verificationPlan": "Cross-check central claims against primary peer-reviewed papers and current reviews; flag unverified or conflicting sources and require appropriate experimental review for novel claims."
+        }
+      },
+      "supportedDecision": "Give the best supported current explanation with uncertainty, relevant prerequisites, and verifiable pointers; help the learner ask a more precise next question.",
+      "failureProbe": "Tutor treats a speculative mechanism as a proven cancer treatment, or refuses to give any conclusion because it was not independently derived by the learner.",
+      "evidenceBoundary": "A useful synthesis is not experimental confirmation or qualification to practice medicine.",
+      "primaryObservationOwner": "Correctness"
+    },
+    {
+      "id": "biology-unsupported-breakthrough",
+      "compareGroup": "open-inquiry-evidence",
+      "learnerGoal": "Check whether an attractive AI-generated idea has scientific support.",
+      "learnerEvidence": "Learner proposes a cancer therapy based on a single unverified AI output.",
+      "task": "Separate hypothesis, prediction, evidence and legitimate next validation step.",
+      "teachingObjective": {
+        "mode": "learning_oriented",
+        "learningContext": {
+          "intent": "open_inquiry",
+          "assistancePolicy": "direct_conclusions_permitted",
+          "permittedTools": [
+            "literature search"
+          ],
+          "outcomeEvidence": "tool_augmented",
+          "successCondition": "Proposed claim is correctly labeled as hypothetical and connected to falsifiable evidence requirements.",
+          "verificationPlan": "Look for independent literature and replication; require ethics and domain expert review before any real clinical application."
+        }
+      },
+      "supportedDecision": "Treat the idea as a hypothesis, clarify the missing evidence and suggest safe research-level validation; do not certify efficacy.",
+      "failureProbe": "Tutor declares a new therapy effective because the AI reasoning sounds coherent.",
+      "evidenceBoundary": "Neither the learner nor AI has observed clinical efficacy in this synthetic case.",
+      "primaryObservationOwner": "Correctness"
+    },
+    {
+      "id": "learner-goal-not-ceiling",
+      "compareGroup": "learner-agency",
+      "learnerGoal": "Explore biology despite weak prior grades and without seeking exam certification.",
+      "learnerEvidence": "Learner reports low mathematics grades but strong curiosity about genetics.",
+      "task": "Suggest an accessible entry point and a revisable path toward deeper understanding.",
+      "teachingObjective": {
+        "mode": "learning_oriented",
+        "learningContext": {
+          "intent": "open_inquiry",
+          "assistancePolicy": "guided_attempt",
+          "permittedTools": [
+            "open educational resources"
+          ],
+          "outcomeEvidence": "both",
+          "successCondition": "A prerequisite-aware entry task and an optional project path are offered without permanent ability labels."
+        }
+      },
+      "supportedDecision": "Start from an appropriate concept, explain which mathematics is needed later, preserve the learner's choice, and allow revisiting goals.",
+      "failureProbe": "Tutor assigns the learner a permanent low ceiling or decides that poor exam grades bar further study.",
+      "evidenceBoundary": "An encouraging pathway is not proof of eventual research success.",
+      "primaryObservationOwner": "Adaptation"
+    }
+  ]
+}
