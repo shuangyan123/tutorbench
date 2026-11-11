@@ -24,6 +24,14 @@
     "researchSuite": {
       "id": "mathematics-challenge-v0.1",
       "version": "0.2.0"
+    },
+    "academicStructure": {
+      "id": "tutorbench-academic-structure-v0.1",
+      "version": "0.1.0"
+    },
+    "examAlignment": {
+      "id": "mathematics-exam-alignment-v0.1",
+      "version": "0.2.0"
     }
   },
   "links": [
