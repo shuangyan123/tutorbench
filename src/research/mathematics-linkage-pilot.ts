@@ -114,7 +114,7 @@ export function validateMathematicsPilotLinkage(inputs: MathematicsPilotInputs):
       }
       const match = evaluation.cases.find(item => item.id === source.id && item.version === source.version);
       if (!match || match.metadata.subject !== "mathematics" ||
-          (match.locale ?? "en") !== "en" || !match.tutorInput.learningObjective.trim()) {
+          !match.tutorInput.learningObjective.trim()) {
         throw new Error("pilot_eval_identity_invalid");
       }
     } else if (source.kind === "health_decision_point") {
