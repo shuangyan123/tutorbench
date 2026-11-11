@@ -1,4 +1,6 @@
 import { readFile } from "node:fs/promises";
+import { parseAcademicStructure } from "../contracts/academic-structure.js";
+import { parseMathematicsExamAlignment } from "../contracts/mathematics-exam-alignment.js";
 import { parseMathChallengeEvidence } from "../contracts/math-challenge-evidence.js";
 import { parseMathematicsKnowledgeMap } from "../contracts/mathematics-knowledge-map.js";
 import { parseTutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext-validation.js";
@@ -31,7 +33,9 @@ async function main(args: readonly string[]): Promise<void> {
   }
   const nodeId = nodeFlag >= 0 ? args[nodeFlag + 1]! : null;
   const base = new URL("../../../scenarios/", import.meta.url);
-  const [mapText, pilotText, evidenceText, researchText, evaluation, health] = await Promise.all([
+  const [academicText, examText, mapText, pilotText, evidenceText, researchText, evaluation, health] = await Promise.all([
+    readFile(new URL("case-system-vnext/academic-structure-v0.1.json", base), "utf8"),
+    readFile(new URL("case-system-vnext/mathematics-exam-alignment-v0.1.json", base), "utf8"),
     readFile(new URL("case-system-vnext/mathematics-knowledge-map-v0.1.json", base), "utf8"),
     readFile(new URL("experimental/mathematics-eval-health-linkage-v0.1/links.json", base), "utf8"),
     readFile(new URL("experimental/mathematics-challenge-v0.1/evidence.json", base), "utf8"),
@@ -40,6 +44,8 @@ async function main(args: readonly string[]): Promise<void> {
     loadTutorScenarioSuiteVNext(),
   ]);
   const report = buildMathematicsPilotCoverage({
+    academic: parseAcademicStructure(JSON.parse(academicText) as unknown),
+    exam: parseMathematicsExamAlignment(JSON.parse(examText) as unknown),
     map: parseMathematicsKnowledgeMap(JSON.parse(mapText) as unknown),
     pilot: JSON.parse(pilotText) as MathematicsPilotRegistry,
     evidence: parseMathChallengeEvidence(JSON.parse(evidenceText) as unknown),
@@ -60,6 +66,7 @@ async function main(args: readonly string[]): Promise<void> {
       }, null, 2));
     } else {
       console.log("Knowledge node: " + found.nodeId + " (" + found.domainId + ")");
+      console.log("Exam profile references (author-proposed): " + (found.examProfiles.join(", ") || "none linked"));
       console.log("Research tasks: " + (found.researchTasks.join(", ") || "none linked"));
       console.log("Research scenarios: " + (found.researchScenarios.join(", ") || "none linked"));
       console.log("Canonical Eval cases (English pilot links): " + (found.evalCases.map(c => c.id + "@" + c.version).join(", ") || "none linked"));
