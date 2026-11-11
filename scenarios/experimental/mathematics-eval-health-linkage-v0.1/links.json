@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 1,
+  "id": "mathematics-eval-health-knowledge-linkage-pilot-v0.1",
+  "version": "0.1.0",
+  "status": "author-proposed-unreviewed",
+  "purpose": "Read-only, version-bound candidate links from selected existing Eval cases and Health decision points to existing mathematics knowledge nodes. Not scores, official curriculum alignment, or proof of learner mastery.",
+  "sources": {
+    "knowledgeMap": {
+      "id": "mathematics-knowledge-map-v0.1",
+      "version": "0.2.0"
+    },
+    "evalDataset": {
+      "id": "tutor-eval-v0.2a",
+      "version": "0.2a.6"
+    },
+    "healthSuite": {
+      "id": "productive-struggle-intervention-v0.1",
+      "version": "0.2.0"
+    },
+    "researchEvidence": {
+      "id": "mathematics-challenge-evidence-v0.1",
+      "version": "0.2.0"
+    },
+    "researchSuite": {
+      "id": "mathematics-challenge-v0.1",
+      "version": "0.2.0"
+    },
+    "academicStructure": {
+      "id": "tutorbench-academic-structure-v0.1",
+      "version": "0.1.0"
+    },
+    "examAlignment": {
+      "id": "mathematics-exam-alignment-v0.1",
+      "version": "0.2.0"
+    }
+  },
+  "links": [
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "fraction-misconception-001",
+        "version": "1.2.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "fraction-equivalence",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "The authored objective checks unlike fractional units and asks for compatible units before addition."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "fraction-misconception-001-zh-CN",
+        "version": "1.2.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "fraction-equivalence",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese scenario explicitly diagnoses unlike fraction units and guides a common-denominator representation; mapping proposed independently of English version."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "full-solution-check-001",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Checks a proposed solution to a one-variable linear equation by inverse operations."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "full-solution-check-001-zh-CN",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese learning objective checks a proposed solution of a one-variable linear equation."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "hint-only-linear-equation-001",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "The authored objective guides an inverse-operation step in a one-variable linear equation."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "hint-only-linear-equation-001-zh-CN",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese learning objective gives a bounded first-step hint for a linear equation."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-fraction-conceptual-001",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "The authored objective explicitly addresses the meaning of denominator-sized units."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-fraction-conceptual-001-zh-CN",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese learning objective explicitly targets conceptual meaning of denominator as an equal part."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-fraction-procedural-001",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "fraction-equivalence",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Preserves a common-denominator understanding while repairing the numerator/denominator operation."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-fraction-procedural-001-zh-CN",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "fraction-equivalence",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese variant repairs a local fraction-addition procedure while preserving shared-unit understanding."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "weak-foundation-fractions-001",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "units-whole",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Introduces the meaning of 2/3 using a shared whole and equal fractional parts."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "weak-foundation-fractions-001-zh-CN",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "units-whole",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "Chinese learning objective introduces 2/3 concretely with the whole/unit reference."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-explicit-help-request",
+        "version": "0.1.0",
+        "decisionPointId": "honor-small-hint-request"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Explicit small-hint request concerns inverse operations in a linear equation."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-false-confidence",
+        "version": "0.1.0",
+        "decisionPointId": "test-reasoning-before-affirmation"
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The scenario probes denominator misconception and the meaning of compatible fraction units."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-first-mistake",
+        "version": "0.1.1",
+        "decisionPointId": "preserve-first-attempt"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The scenario concerns inverse operations and preservation of equality after a first error."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-frustration",
+        "version": "0.1.0",
+        "decisionPointId": "support-without-taking-over"
+      },
+      "nodes": [
+        {
+          "id": "integers-operations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The mathematical target is integer subtraction with a negative operand on a number line; the measured teaching target is emotional support."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-hint-fading",
+        "version": "0.1.0",
+        "decisionPointId": "withdraw-scaffold-and-transfer"
+      },
+      "nodes": [
+        {
+          "id": "fraction-equivalence",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Fades support after the learner demonstrates equivalent-fraction comparison."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-independent-progress",
+        "version": "0.1.0",
+        "decisionPointId": "invite-transfer-not-reteach"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Refrains from reteaching a successfully checked two-step equation."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-near-mastery",
+        "version": "0.1.0",
+        "decisionPointId": "fade-after-independent-work"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Fading scaffold after independent completion of a two-step linear equation."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-overhelping-answer-leak",
+        "version": "0.1.0",
+        "decisionPointId": "keep-final-answer-with-learner"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Protects a learner's remaining inverse-operation work in a linear equation."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-partial-progress",
+        "version": "0.1.0",
+        "decisionPointId": "reinforce-correct-step"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Validates an intermediate balanced equation before prompting a remaining inverse-operation step."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-repeated-mistake",
+        "version": "0.1.1",
+        "decisionPointId": "target-second-attempt"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The scenario targets repeated one-sided changes in a linear equation."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-same-misconception",
+        "version": "0.1.0",
+        "decisionPointId": "contrast-equal-whole-pieces"
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "fraction-equivalence",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The scenario contrasts same-whole fractional parts and permits equivalence-based explanation."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-underhelping",
+        "version": "0.1.0",
+        "decisionPointId": "escalate-after-four-failures"
+      },
+      "nodes": [
+        {
+          "id": "fraction-equivalence",
+          "role": "focus"
+        },
+        {
+          "id": "fractions-units",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "Escalates to a common-denominator or same-whole comparison to repair fraction-equivalence reasoning."
+    }
+  ]
+}
