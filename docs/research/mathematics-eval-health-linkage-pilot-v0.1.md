@@ -1,80 +1,76 @@
-# Mathematics Eval / Health knowledge linkage pilot (v0.1)
+# Mathematics academic-to-evaluation linkage — Stage 1 + Stage 2
 
-**Status: author-proposed, unreviewed; research-only.** This is an additive read-only case-to-knowledge crosswalk, **not** a new knowledge ontology, curriculum claim, scoring category, model experiment, or formal educational validation.
+**Status: technically auditable mathematics integration; author-proposed, unreviewed semantic mappings.** Read-only authoring index, **not** an exhaustive mathematics curriculum, a validated prerequisite graph, a learner mastery model, or a calibrated benchmark.
 
-## Reused sources and boundaries
+## Existing source ownership
 
-- Academic navigation: `scenarios/case-system-vnext/academic-structure-v0.1.json`, version `0.1.0`, with mathematics registered under formal sciences.
-- Mathematics exam alignment: `scenarios/case-system-vnext/mathematics-exam-alignment-v0.1.json`, version `0.2.0`, with 16 author-proposed exam profiles and their knowledge-node links. The exam modules are not actual scored assessment results.
-- Mathematics knowledge map: `scenarios/case-system-vnext/mathematics-knowledge-map-v0.1.json`, version `0.2.0`. All existing prerequisite relations in this map are author hypotheses.
-- Canonical TutorEval dataset: `tutor-eval-v0.2a@0.2a.6`, loaded with `loadTutorEvalDataset()`. Its current bilingual snapshot is assembled from 0.2a.5 files with 0.2a.6 overrides; **do not** use `cases.json` as the current snapshot.
-- Default Tutor Health scenario suite: `productive-struggle-intervention-v0.1@0.2.0`, loaded with `loadTutorScenarioSuiteVNext()`.
-- Existing mathematics research suite and evidence registry: `scenarios/experimental/mathematics-challenge-v0.1/`. Its `taskId` → `nodeIds` mapping already exists and remains authoritative for those **research tasks**. This pilot does **not** duplicate those mappings.
-- Existing architecture ownership / taxonomy audits: `docs/architecture-integration-ledger-v0.1.md` and `docs/architecture-integration-map.md` (particularly G1, G2, G6, G9). This document adds no new architecture authority.
+| Existing registry | Pinned identity | Responsibility |
+| --- | --- | --- |
+| Academic navigation | `tutorbench-academic-structure-v0.1@0.1.0` | Formal sciences → mathematics |
+| Mathematics graph | `mathematics-knowledge-map-v0.1@0.2.0` | 44 authored nodes, 8 branches, author-hypothesis relationships |
+| Exam overlay | `mathematics-exam-alignment-v0.1@0.2.0` | 16 **author-proposed** exam profiles; no scored assessments |
+| Research evidence | `mathematics-challenge-evidence-v0.1@0.2.0` | 16 task structures |
+| Research suite | `mathematics-challenge-v0.1@0.2.0` | 20 synthetic executable checkpoints |
+| Canonical Eval | `tutor-eval-v0.2a@0.2a.6` | English and Chinese cases; 18 mathematics cases |
+| Default Health | `productive-struggle-intervention-v0.1@0.2.0` | 13 mathematics decision points |
 
-The candidate links are stored at `scenarios/experimental/mathematics-eval-health-linkage-v0.1/links.json`. Each link pins the exact source ID and **case/scenario version**, links one or more existing knowledge-node IDs, and records a primary focus versus a supporting concept. The `evidenceAnchor` points to the exact **field**, not a copied source passage. The rationale is authored commentary for review; it is **not** a validated assertion of concept equivalence. The academic navigation registry, knowledge map, exam alignment, canonical Eval dataset, default Health suite, mathematical research evidence, and research suite identities/versions are pinned independently.
+Load Eval with `loadTutorEvalDataset()`; 0.2a.6 applies overrides to 0.2a.5 and raw `cases.json` is not the current canonical snapshot. Chinese cases have independently pinned IDs and versions. The existing `docs/architecture-integration-ledger-v0.1.md` (runtime/provenance) and `docs/architecture-integration-map.md` (taxonomy) remain authoritative. No new ontology or parallel source of truth is created.
 
-## Three sample regions
+## Stage 1: candidate knowledge links
 
-| Region | Existing Eval case IDs (not exhaustive) | Existing default Health scenario IDs | Existing math-research task |
-| --- | --- | --- | --- |
-| Fractional units / equivalent fractions | `fraction-misconception-001@1.2.0`; `paired-fraction-conceptual-001@1.1.0` | `ps-false-confidence@0.1.0`; `ps-same-misconception@0.1.0` | `fraction-unit-repair` → `mc-fraction-units` |
-| Linear equations | `hint-only-linear-equation-001@1.1.0` | `ps-first-mistake@0.1.1`; `ps-repeated-mistake@0.1.1` | Other graph tasks are not used as substitutes for this area |
-| Conditional probability | No **pilot-linked canonical Eval** case | No **pilot-linked default Health** scenario | `conditional-two-red` → `mc-conditional-normalization`, `mc-conditional-prerequisite`, `mc-conditional-transfer` |
+`scenarios/experimental/mathematics-eval-health-linkage-v0.1/links.json` contains exact case/scenario versions, decision-point references where relevant, focus/supporting knowledge nodes, source-objective anchors and authored rationales. These are **candidate topical relations**; they do not prove a Tutor succeeded or a learner mastered the target.
 
-An empty cell means **zero links within this pilot/scope**; it must not be presented as zero subject knowledge, zero total TutorBench cases, a demonstrated lack of model capability, or a gap in every research suite.
+The pre-existing mathematics research `taskId → nodeIds → scenarioIds` links remain owned by the original knowledge map and task evidence registry, and are derived without duplicating source records. Existing conditional-probability research cases must not be misrepresented as canonical Eval or default Health coverage.
 
-## Offline, version-pinned reverse lookup
+## Stage 2: complete, fail-closed mathematics case inventory
 
-The implementation is an internal read-only module at
-`src/research/mathematics-linkage-pilot.ts`, with a narrow research inspector
-`src/cli/mathematics-linkage-pilot.ts`. It reuses `loadTutorEvalDataset`,
-`loadTutorScenarioSuiteVNext`, `parseAcademicStructure`,
-`validateAcademicStructureReferences`, `parseMathematicsExamAlignment`,
-`validateMathematicsExamCoverage`, `parseMathematicsKnowledgeMap`,
-`validateMathematicsTaskCoverage`, and `validateMathChallengeCoverage`.
-It **derives**, rather than duplicates, research-task → knowledge-node links
-from the existing mathematics map and task evidence registry.
+`unmapped.json` records the sources that cannot responsibly be assigned to a current graph node. **Every current canonical mathematics Eval case and default Health decision point must have exactly one disposition: candidate link OR explicit unmapped reason.**
 
-After `npm run build`, run:
+| Source | Total in current scope | Candidate-linked | Explicitly unmapped |
+| --- | ---: | ---: | ---: |
+| Canonical Eval math (English + Chinese) | 18 | 12 | 6 |
+| Default Health mathematics decision points | 13 | 12 | 1 |
+| **Total** | **31** | **24** | **7** |
+
+The seven gaps are six multiplication/equal-groups Eval cases (with Chinese counterparts) and the Health square-root task requiring `x ≥ 0` for the unique solution of `x² = 9`. They must **not** be forced into generic integer arithmetic or quadratic discriminants. These are missing exact *authoring nodes*, not model failures.
+
+The knowledge graph contains 44 nodes. The 16 pre-existing research tasks touch 22 distinct nodes. Eval/Health candidate links touch 5. Their union touches **25 distinct nodes**, while 19 nodes have no research-task or canonical/default-Health candidate links in these frozen sources. The 16 exam profiles reference 42 nodes through a **separate proposed overlay**. These are *authored reference counts*, not validated mathematical curriculum coverage, measured teaching quality, or student-learning gains. Do not add unrelated denominators or describe 25/44 as a performance score.
+
+`src/research/mathematics-linkage-pilot.ts` performs version-pinned source joins. `src/research/mathematics-linkage-audit.ts` requires a mutually exclusive, complete canonical mathematics case inventory, and derives both the Eval category and the Health dimension for each linked node without translating one into the other.
+
+### Offline inspector (Node 24)
 
 ```sh
-node dist/src/cli/mathematics-linkage-pilot.js
+npm run build
 node dist/src/cli/mathematics-linkage-pilot.js --node fractions-units
 node dist/src/cli/mathematics-linkage-pilot.js --node linear-equations
 node dist/src/cli/mathematics-linkage-pilot.js --node conditional-events
-node dist/src/cli/mathematics-linkage-pilot.js --json
+node dist/src/cli/mathematics-linkage-pilot.js --audit
+node dist/src/cli/mathematics-linkage-pilot.js --audit --json
 ```
 
-The JSON report declares `scope: "authored_links_only"`,
-`reviewed: false`, `modelRunsMeasured: false`, and
-`learnerOutcomesMeasured: false`. No per-model scores or human performance
-claims are computed. All counts retain separate denominators: **44 graph nodes**, **16 proposed
-exam profiles (42 nodes referenced)**, **16 authored research tasks / 20
-research scenarios**, and **3 canonical English Eval cases / 4
-default-Health decision points** in
-this limited pilot. Across all three source types, 23 distinct knowledge nodes
-have at least one authored link: 22 from the pre-existing mathematics research
-mapping plus one additional linked linear-equations node. This is **not** 23
-validated knowledge areas or a 23/44 performance score. In particular, research-task nodes and direct Eval/Health
-links are not summed as independent verified learning coverage. Missing links
-mean only that the inspected authored source does not contain a link.
+The audited JSON explicitly reports `semanticsIndependentlyReviewed=false`, `runResultsInspected=false`, and `learnerOutcomesMeasured=false`. An `explicitly_unmapped` record is not a failed assessment; `candidate_linked` is not a passed assessment.
 
-## What is and is not verified
+## Independent review boundary: not yet completed
 
-`tests/mathematics-eval-health-linkage-pilot.test.ts` calls the shared projection and validates exact source identities against the current loaders, AcademicStructure → mathematics map, research evidence/suite matching, math exam alignment, known graph nodes and decision-point IDs; exercises reverse lookup, coverage counts, CLI smoke, and rejects stale source versions, phantom nodes, duplicate source records, and wrong decision points. It is designed to run offline under the normal Node 24 test suite.
+The existing `docs/case-system-vnext-expert-review.md` requires two independent domain-qualified reviewers, retained disagreements and adjudication for promoting evaluator expectations. Knowledge-link validity is a **different question** from its A/B Tutor preference judgments. Do not recycle A/B reviewer outcomes as concept-link approvals.
 
-- **Code-level validity:** a link refers to a known case, decision point and knowledge node at pinned versions; independently testable.
-- **Authored topical plausibility:** each proposed relation is supported by an explicitly named authoring field. This pilot is **not** independent subject-matter validation.
-- **Scientific/educational validity:** concept equivalence, assumed prerequisites, case representativeness, reliable teaching claims and learner outcome gains all remain **unverified**.
-- **Runtime isolation:** registry is not imported by Tutor/Judge runners, does not change Eval/Health Rubrics or scoring, and does not flow into Tutor-visible context, public leaderboards or historic artifacts.
+For any proposed link, two independent mathematics/assessment reviewers should separately inspect the exact source objective and version (including locale), graph node definition, focus/supporting distinction and evidence. Each should record one of `supported`, `partial`, `unsupported`, `insufficient_evidence`, plus source-field citations and any proposed missing knowledge node. Keep independent submissions separate; disagreements require adjudication or an explicitly unresolved status. Preserve source fingerprints and reviewer identity/qualification records. Developer rationales are not independent review. Even an accepted link does not establish mastery or student learning gain.
 
-## Recommended review gates before promotion
+**No independent mathematics review submissions have been received for this pilot. All 24 mappings remain author-proposed and unreviewed.** All 61 graph prerequisite relations remain author hypotheses; `curriculumStageMappings` are empty pending clause-by-clause official curriculum verification.
 
-1. Independently review and adjudicate the proposed fraction, equation and probability concept boundaries. Record disagreements, evidence and source/version provenance, and whether each link is focus, supporting, compound, or unsupported.
-2. Decide how to model *mathematics research task* → *scenario* → *decision point* versus *canonical Eval case* without conflating their IDs, and whether a reusable, typed crosswalk is necessary after the pilot.
-3. Add an explicit **versioned subject/domain mapping** only where a real consumer needs it. A free-form subject like `physics` must not be silently relabeled as canonical Eval `science` without a declared rule.
-4. Consider a read-only coverage query that displays distinct counts for: mapped nodes, linked authored cases, executable scored case-runs, independently reviewed source relationships, and validated learner outcomes. Never add these denominators together or infer outcomes from case existence.
-5. Re-run `npm run typecheck`, `npm run lint`, `npm test` and verify the exact PR HEAD CI before merging. Tests confirm structural wiring, **not** subject-matter validity.
+## Engineering acceptance gates and non-goals
 
-No provider API call or historical-data rewrite is intended in this pilot.
+- All 31 in-scope sources are linked or explicitly unmapped, and the audit rejects stale versions, phantom nodes, duplicate sources/gaps, missing coverage, inconsistent decision points and mapping/gap collisions.
+- Existing AcademicStructure, mathematics research evidence/suite, graph and exam-alignment validators remain the source of truth.
+- Reverse lookup preserves **exam references**, **research tasks/scenarios**, **Eval cases/categories** and **Health decision points/dimensions** as distinct types; none represents measured model or learner outcomes.
+- Do not change source suites, Rubrics, scoring thresholds, Judge prompts, Tutor-visible inputs, public benchmark, PR #349, or historic outputs. Zero provider API calls.
+- Require exact-HEAD Node 24 typecheck, lint, full tests, build, CodeQL and Dependency Review.
+
+**This code can be merged as experimental, read-only infrastructure after engineering gates pass.** Merging does not promote a candidate relation into independently reviewed subject truth or justify official coverage claims.
+
+## Boundary of “mathematics complete”
+
+This milestone completes the **present-source mathematics integration workflow**, not all mathematics from primary school to research level. The 44-node graph remains an experimental slice. Seven case gaps, 19 nodes without these task links, absence of official stage-mapping evidence, unreviewed semantic relations and unobserved learning outcomes remain explicit limitations.
+
+Next, extract domain-neutral references and apply them to subject-specific physics, chemistry, biology and other maps. Do not force mathematics-specific node hierarchies onto those disciplines. Preserve exact-source versioning and honest `unmapped` / `unreviewed` labels.
