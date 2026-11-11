@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "physics-knowledge-seed-v0.1",
+  "version": "0.1.0",
+  "disciplineId": "physics",
+  "status": "author-proposed-unreviewed",
+  "domainTaxonomy": {
+    "id": "case-system-vnext-domain-taxonomy",
+    "version": "0.1.0"
+  },
+  "purpose": "Small discipline-specific authored concept index for current test cases only. Not a curriculum, learning outcome claim, mandatory prerequisite chain, or externally validated ontology.",
+  "domains": [
+    {
+      "id": "physical-quantities",
+      "label": "Physical quantities and measurement"
+    },
+    {
+      "id": "mechanics",
+      "label": "Interactions and mechanical equilibrium"
+    },
+    {
+      "id": "representations",
+      "label": "Kinematics representations and interpretation"
+    },
+    {
+      "id": "circuits",
+      "label": "Idealized electrical circuits"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "density-mass-volume",
+      "domainId": "physical-quantities",
+      "label": "Density as mass per volume",
+      "reasoningFacet": "quantity-model",
+      "scopeNote": "Mass/volume relation, conditions of measurement, and correct units"
+    },
+    {
+      "id": "force-equilibrium",
+      "domainId": "mechanics",
+      "label": "Balanced forces on a system",
+      "reasoningFacet": "interaction-model",
+      "scopeNote": "System boundary, free-body forces and net-force equilibrium"
+    },
+    {
+      "id": "position-time-graph",
+      "domainId": "representations",
+      "label": "Position–time graphs and bounded inference",
+      "reasoningFacet": "representation-interpretation",
+      "scopeNote": "Slope/velocity from position versus time; forces cannot be inferred without additional assumptions"
+    },
+    {
+      "id": "ideal-series-ohm",
+      "domainId": "circuits",
+      "label": "Common current and voltage drops in ideal series circuits",
+      "reasoningFacet": "idealized-model",
+      "scopeNote": "Steady ideal series loop, Ohm's law and validity assumptions"
+    }
+  ],
+  "relationHypotheses": []
+}
