@@ -112,7 +112,8 @@ test("missing sources and duplicate or stale references never become coverage", 
 
 test("cross-discipline phantom nodes and focus/support collisions fail closed", () => {
   assert.throws(() => buildSubjectLinkIndex(altered(x => {
-    x.candidateLinks[0]!.disciplineId = "physics";
+    // A physics "measurement" node is not a chemistry node even if other names overlap.
+    x.candidateLinks[1]!.disciplineId = "chemistry";
   })), /subject_index_node_missing/);
   assert.throws(() => buildSubjectLinkIndex(altered(x => {
     x.candidateLinks[0]!.focusNodeIds = ["phantom"];
