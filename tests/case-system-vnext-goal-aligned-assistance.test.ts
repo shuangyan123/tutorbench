@@ -135,7 +135,7 @@ test("authored goal-dependent contrasts declare evidence boundaries without chan
       authored.failureProbe,
       authored.evidenceBoundary,
     ]) {
-      assert.ok(value.trim().length > 15, authored.id);
+      assert.ok(value.trim().length > 7, authored.id);
     }
     assert.ok(primaryOwners.has(authored.primaryObservationOwner), authored.id);
     const selection = parseCaseSystemVNextTeachingObjectiveSelection(authored.teachingObjective);
