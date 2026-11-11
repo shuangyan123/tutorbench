@@ -77,8 +77,9 @@ async function main(args: readonly string[]): Promise<void> {
       modelRunsMeasured: report.modelRunsMeasured, learnerOutcomesMeasured: report.learnerOutcomesMeasured,
       sources: report.sources, counts: report.counts,
       nodes: selected,
-      inventory: report.inventory.filter(r => subject === null || r.mappedDiscipline === subject ||
-        (r.mappingStatus === "explicitly_unmapped" && node === null)),
+      inventory: report.inventory.filter(r => subject === null || r.mappedDiscipline === subject),
+      unattributedGlobalCases: report.inventory.filter(r => r.mappingStatus === "explicitly_unmapped")
+        .map(r => r.source.id),
     }, null, 2));
   } else {
     console.log("Natural science concept linkage (author-proposed / unreviewed).");
