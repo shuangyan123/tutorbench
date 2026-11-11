@@ -7,6 +7,7 @@ import type { TutorEvalCategory, TutorEvalDataset } from "../contracts/tutor-eva
 import type { TutorHealthDimension } from "../contracts/tutor-health.js";
 import type { TutorScenarioSuiteVNext } from "../contracts/tutor-scenario-vnext.js";
 import { tutorScenarioSuiteToTutorEvalDataset } from "../datasets/real-world.js";
+import { buildSubjectLinkIndex } from "./subject-knowledge-linkage.js";
 
 /**
  * A minimal indexing boundary. Subject-specific scope, reasoning facets and
@@ -311,6 +312,22 @@ export function buildNaturalScienceCoverageAudit(i: NaturalScienceIntegrationInp
   }
   if (expected.size !== linked.size + explicitGaps.size) throw new Error("science_inventory_incomplete");
 
+  // Shared structural projection, with actual science identity/semantics kept
+  // in the existing science-specific validators above.
+  const sourceIndex = buildSubjectLinkIndex({
+    sourceKeys: [...expected.keys()],
+    knowledgeNodes: maps.flatMap(m => m.nodes.map(n => ({ disciplineId: m.disciplineId, id: n.id }))),
+    candidateLinks: [...linked.entries()].map(([sourceKey, link]) => ({
+      sourceKey,
+      disciplineId: link.disciplineId,
+      focusNodeIds: link.nodes.filter(n => n.role === "focus").map(n => n.id),
+      supportingNodeIds: link.nodes.filter(n => n.role === "supporting").map(n => n.id),
+    })),
+    explicitGapSourceKeys: [...explicitGaps.keys()],
+  });
+  const indexNode = new Map(sourceIndex.nodes.map(n =>
+    [JSON.stringify([n.disciplineId, n.id]), n]));
+
   const inventory: NaturalScienceInventoryRow[] = [...expected.entries()].map(([k, ctx]) => {
     const link = linked.get(k), gap = explicitGaps.get(k);
     if (!link && !gap) throw new Error("science_inventory_incomplete");
@@ -326,6 +343,7 @@ export function buildNaturalScienceCoverageAudit(i: NaturalScienceIntegrationInp
   }).sort((a, b) => scienceSourceKey(a.source).localeCompare(scienceSourceKey(b.source)));
 
   const nodes: NaturalScienceNodeRow[] = maps.flatMap(map => map.nodes.map(node => {
+    const indexedNode = indexNode.get(JSON.stringify([map.disciplineId, node.id]))!;
     const matching = inventory.filter(row => row.mappedDiscipline === map.disciplineId &&
       (row.focusNodeIds.includes(node.id) || row.supportingNodeIds.includes(node.id)));
     return {
@@ -333,8 +351,8 @@ export function buildNaturalScienceCoverageAudit(i: NaturalScienceIntegrationInp
       disciplineId: map.disciplineId,
       domainId: node.domainId,
       reasoningFacet: node.reasoningFacet,
-      focusCaseCount: matching.filter(r => r.focusNodeIds.includes(node.id)).length,
-      supportingCaseCount: matching.filter(r => r.supportingNodeIds.includes(node.id)).length,
+      focusCaseCount: indexedNode.focusSourceKeys.length,
+      supportingCaseCount: indexedNode.supportingSourceKeys.length,
       evalCategoryTags: orderedUnique(matching.flatMap(r => r.source.kind === "eval_case" ? r.evalCategories : [])),
       experimentalHealthDimensionTags: orderedUnique(matching.flatMap(r =>
         r.source.kind === "experimental_decision_point" ? r.experimentalHealthDimensions : [])),
@@ -354,9 +372,9 @@ export function buildNaturalScienceCoverageAudit(i: NaturalScienceIntegrationInp
       knowledgeNodes: nodes.length,
       canonicalScienceEvalCases: inventory.filter(r => r.source.kind === "eval_case").length,
       experimentalDecisionPoints: inventory.filter(r => r.source.kind === "experimental_decision_point").length,
-      candidateLinks: linked.size,
-      explicitlyUnmapped: explicitGaps.size,
-      focusNodes: nodes.filter(n => n.focusCaseCount > 0).length,
+      candidateLinks: sourceIndex.counts.candidateLinks,
+      explicitlyUnmapped: sourceIndex.counts.explicitGaps,
+      focusNodes: sourceIndex.counts.focusNodes,
       independentlyReviewed: 0,
     },
     subjects: NATURAL_SCIENCE_IDS.map(id => ({
