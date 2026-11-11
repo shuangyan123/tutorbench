@@ -78,8 +78,9 @@ export function buildSubjectLinkIndex(inputs: SubjectLinkIndexInputs): SubjectLi
         !Array.isArray(link.focusNodeIds) || !Array.isArray(link.supportingNodeIds) ||
         link.focusNodeIds.length === 0 ||
         !distinct(link.focusNodeIds) || !distinct(link.supportingNodeIds) ||
-        link.focusNodeIds.some(id => !valid(id)) || link.supportingNodeIds.some(id => !valid(id)) ||
-        link.focusNodeIds.some(id => link.supportingNodeIds.includes(id)))
+        link.focusNodeIds.some((id: string) => !valid(id)) ||
+        link.supportingNodeIds.some((id: string) => !valid(id)) ||
+        link.focusNodeIds.some((id: string) => link.supportingNodeIds.includes(id)))
       throw new Error("subject_index_candidate_invalid");
     if (!sourceSet.has(link.sourceKey)) throw new Error("subject_index_source_stale");
     if (candidateBySource.has(link.sourceKey)) throw new Error("subject_index_candidate_duplicate");
