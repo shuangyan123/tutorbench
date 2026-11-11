@@ -219,13 +219,13 @@ test("zh-CN copy catalog covers every major public surface and all published ess
   }
 
   for (const metadataSource of [
-    "Teachometry — Test how AI tutors behave before you ship them.",
+    "TutorBench by Teachometry — AI Tutor Evaluation",
     "Benchmark — Teachometry",
     "Methodology — Teachometry",
     "Results — Teachometry",
     "Cases — Teachometry",
     "Run — Teachometry",
-    "Docs — Teachometry",
+    "TutorBench Documentation — Teachometry",
     "About — Teachometry",
     "Models — Teachometry",
     "Blog — Teachometry",
@@ -591,7 +591,7 @@ test("Docs uses the Teachometry shell and a real repository reference center", a
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const docsHtml = renderPage(renderDocsPage(artifacts), { basePath: "/preview" });
 
-  assert.match(docsHtml, /<title>Docs — Teachometry<\/title>/);
+  assert.match(docsHtml, /<title>TutorBench Documentation — Teachometry<\/title>/);
   assert.match(docsHtml, /<body class="docs-page">/);
   assert.match(docsHtml, /<header class="site-header home-header">/);
   assert.match(docsHtml, /<footer class="home-footer">/);
@@ -966,7 +966,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.doesNotMatch(methodologyHtml, /L2-B PRIVATE STAGING.*PASS/);
     assert.match(docsHtml, /Participation application gate/);
     assert.match(docsHtml, /closed-to-open launch checklist/);
-    assert.match(docsHtml, /<title>Docs — Teachometry<\/title>/);
+    assert.match(docsHtml, /<title>TutorBench Documentation — Teachometry<\/title>/);
     assert.match(docsHtml, /<body class="docs-page">/);
     assert.match(docsHtml, /href="\/assets\/teachometry\.css"/);
     assert.match(docsHtml, /href="\/assets\/docs\.css"/);

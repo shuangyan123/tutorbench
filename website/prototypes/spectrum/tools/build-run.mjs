@@ -444,7 +444,7 @@ function docsPage() {
     </div>
   </section>
 </main>`;
-  return frame({ prefix: "../", title: "Docs — Teachometry", titleZh: Z("Docs — Teachometry"), description: "Repository documentation for TutorBench setup, benchmark contracts, execution workflows, evidence boundaries, and governance.", body, current: "docs", css: ["journal.css", "run.css"], scripts: ["run.js"] });
+  return frame({ prefix: "../", title: "TutorBench Documentation — Teachometry", titleZh: Z("TutorBench Documentation — Teachometry"), description: "Repository documentation for TutorBench setup, benchmark contracts, execution workflows, evidence boundaries, and governance.", body, current: "docs", css: ["journal.css", "run.css"], scripts: ["run.js"] });
 }
 
 const out = (rel, html) => { const f = join(PROTO, rel); mkdirSync(join(f, ".."), { recursive: true }); writeFileSync(f, html); };

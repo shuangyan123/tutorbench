@@ -164,10 +164,16 @@ test("each page keeps its route's title, description, robots and canonical metad
     assert.doesNotMatch(html, /Design prototype|设计原型|Teachometry · Spectrum/u);
   }
   const home = await page("index.html");
-  assert.match(home, /<title>Teachometry — Test how AI tutors behave before you ship them\.<\/title>/u);
+  assert.match(home, /<title>TutorBench by Teachometry — AI Tutor Evaluation<\/title>/u);
   assert.match(home, /<meta name="robots" content="index,follow/u);
   assert.match(home, /<link rel="canonical" href="https:\/\/example\.org\/tb\/">/u);
   assert.match(home, /<html lang="en" data-lang="en" data-route-lang="en" data-route-depth="0">/u);
+  const docs = await page("docs/index.html");
+  assert.match(docs, /<title>TutorBench Documentation — Teachometry<\/title>/u);
+  assert.ok(docs.includes('<link rel="canonical" href="https://example.org/tb/docs/">'));
+  const zhDocs = await page("zh-cn/docs/index.html");
+  assert.match(zhDocs, /<title>TutorBench 文档 — Teachometry<\/title>/u);
+  assert.ok(zhDocs.includes('<link rel="canonical" href="https://example.org/tb/zh-cn/docs/">'));
   const zhHome = await page("zh-cn/index.html");
   assert.match(zhHome, /<html lang="zh-CN" data-lang="zh" data-route-lang="zh" data-route-depth="0">/u);
   assert.match(zhHome, /<link rel="canonical" href="https:\/\/example\.org\/tb\/zh-cn\/">/u);
