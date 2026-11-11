@@ -77,7 +77,7 @@ test("knowledge-node reverse lookup joins three existing source types without co
   assert.ok(units.evalCases.some(item => item.id === "fraction-misconception-001" && item.version === "1.2.0"));
   assert.ok(units.evalCases.some(item => item.id === "fraction-misconception-001-zh-CN" && item.version === "1.2.0"));
   assert.deepEqual(units.healthDecisionPoints.map(item => item.scenarioId), [
-    "ps-false-confidence", "ps-same-misconception",
+    "ps-false-confidence", "ps-same-misconception", "ps-underhelping",
   ]);
   assert.ok(units.examProfiles.includes("cn-zhongkao-math-general"));
   assert.ok(units.researchTasks.includes("fraction-unit-repair"));
