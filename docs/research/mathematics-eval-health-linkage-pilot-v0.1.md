@@ -10,7 +10,7 @@
 - Existing mathematics research suite and evidence registry: `scenarios/experimental/mathematics-challenge-v0.1/`. Its `taskId` → `nodeIds` mapping already exists and remains authoritative for those **research tasks**. This pilot does **not** duplicate those mappings.
 - Existing architecture ownership / taxonomy audits: `docs/architecture-integration-ledger-v0.1.md` and `docs/architecture-integration-map.md` (particularly G1, G2, G6, G9). This document adds no new architecture authority.
 
-The candidate links are stored at `scenarios/experimental/mathematics-eval-health-linkage-v0.1/links.json`. Each link pins the exact source ID and **case/scenario version**, links one or more existing knowledge-node IDs, and records a primary focus versus a supporting concept. The `evidenceAnchor` points to the exact **field**, not a copied source passage. The rationale is authored commentary for review; it is **not** a validated assertion of concept equivalence. The source dataset, suite, and knowledge-map identities/versions are pinned independently.
+The candidate links are stored at `scenarios/experimental/mathematics-eval-health-linkage-v0.1/links.json`. Each link pins the exact source ID and **case/scenario version**, links one or more existing knowledge-node IDs, and records a primary focus versus a supporting concept. The `evidenceAnchor` points to the exact **field**, not a copied source passage. The rationale is authored commentary for review; it is **not** a validated assertion of concept equivalence. The source dataset, default Health suite, mathematical research evidence, research suite, and knowledge-map identities/versions are pinned independently.
 
 ## Three sample regions
 
@@ -22,9 +22,39 @@ The candidate links are stored at `scenarios/experimental/mathematics-eval-healt
 
 An empty cell means **zero links within this pilot/scope**; it must not be presented as zero subject knowledge, zero total TutorBench cases, a demonstrated lack of model capability, or a gap in every research suite.
 
+## Offline, version-pinned reverse lookup
+
+The implementation is an internal read-only module at
+\`src/research/mathematics-linkage-pilot.ts\`, with a narrow research inspector
+\`src/cli/mathematics-linkage-pilot.ts\`. It reuses \`loadTutorEvalDataset\`,
+\`loadTutorScenarioSuiteVNext\`, \`parseMathematicsKnowledgeMap\`,
+\`validateMathematicsTaskCoverage\`, and \`validateMathChallengeCoverage\`.
+It **derives**, rather than duplicates, research-task → knowledge-node links
+from the existing mathematics map and task evidence registry.
+
+After \`npm run build\`, run:
+
+\`\`\`sh
+node dist/src/cli/mathematics-linkage-pilot.js
+node dist/src/cli/mathematics-linkage-pilot.js --node fractions-units
+node dist/src/cli/mathematics-linkage-pilot.js --node linear-equations
+node dist/src/cli/mathematics-linkage-pilot.js --node conditional-events
+node dist/src/cli/mathematics-linkage-pilot.js --json
+\`\`\`
+
+The JSON report declares \`scope: "authored_links_only"\`,
+\`reviewed: false\`, \`modelRunsMeasured: false\`, and
+\`learnerOutcomesMeasured: false\`. No per-model scores or human performance
+claims are computed. All counts retain separate denominators: **44 graph
+nodes**, **16 authored research tasks / 20 research scenarios**, and
+**3 canonical English Eval cases / 4 default-Health decision points** in
+this limited pilot. In particular, research-task nodes and direct Eval/Health
+links are not summed as independent verified learning coverage. Missing links
+mean only that the inspected authored source does not contain a link.
+
 ## What is and is not verified
 
-`tests/mathematics-eval-health-linkage-pilot.test.ts` resolves exact source identities against the current loaders, checks known graph nodes and decision-point IDs, exercises reverse lookup, and rejects stale source versions, phantom nodes, duplicate source records, and wrong decision points. It is designed to run offline under the normal Node 24 test suite.
+`tests/mathematics-eval-health-linkage-pilot.test.ts` calls the shared projection and validates exact source identities against the current loaders, research evidence/suite matching, known graph nodes and decision-point IDs; exercises reverse lookup, coverage counts, and rejects stale source versions, phantom nodes, duplicate source records, and wrong decision points. It is designed to run offline under the normal Node 24 test suite.
 
 - **Code-level validity:** a link refers to a known case, decision point and knowledge node at pinned versions; independently testable.
 - **Authored topical plausibility:** each proposed relation is supported by an explicitly named authoring field. This pilot is **not** independent subject-matter validation.
