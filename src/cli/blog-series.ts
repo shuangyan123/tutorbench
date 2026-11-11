@@ -2,14 +2,16 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { articleHeadingId } from "../site/pages/blog.js";
 import { ARROGANCE_ESSAY } from "./arrogance-essay.js";
+import { BEYOND_WINNING_ESSAY } from "./beyond-winning-essay.js";
 import { LEARNING_ACCESS_ESSAY } from "./learning-access-essay.js";
 
 /**
- * The Journal essays written after the generated site's four: "Arrogance Is Not What You Need" and
- * "Why Good Learning Resources Fail to Reach the People Who Need Them".
+ * The Journal essays written after the generated site's four: "After You’ve Beaten Everyone, Then What?",
+ * "Arrogance Is Not What You Need" and "Why Good Learning Resources Fail to Reach the People Who Need Them".
  *
  * Their pages are built like every other essay, by the Spectrum Journal generator
- * (website/prototypes/spectrum/tools/build-journal.mjs, from ARROGANCE_ESSAY and LEARNING_ACCESS_ESSAY).
+ * (website/prototypes/spectrum/tools/build-journal.mjs, from BEYOND_WINNING_ESSAY, ARROGANCE_ESSAY and
+ * LEARNING_ACCESS_ESSAY).
  * The generated site has no page for them, so this module supplies the search and sharing metadata the
  * Spectrum install takes from that site for each route, and after the install writes their sitemap
  * entries and the redirects from the five short essays the learning-access essay replaced.
@@ -21,6 +23,7 @@ export interface LearningAccessOptions {
 
 export const LEARNING_ACCESS_SLUG = LEARNING_ACCESS_ESSAY.slug;
 export const ARROGANCE_SLUG = ARROGANCE_ESSAY.slug;
+export const BEYOND_WINNING_SLUG = BEYOND_WINNING_ESSAY.slug;
 
 interface JournalEssay {
   slug: string;
@@ -33,6 +36,7 @@ interface JournalEssay {
 
 /** Newest first. */
 const ESSAYS: readonly JournalEssay[] = [
+  { slug: BEYOND_WINNING_SLUG, published: BEYOND_WINNING_ESSAY.published, image: "assets/journal/podium.webp", en: BEYOND_WINNING_ESSAY.en, zh: BEYOND_WINNING_ESSAY.zh },
   { slug: ARROGANCE_SLUG, published: ARROGANCE_ESSAY.published, image: "assets/journal/piano.webp", en: ARROGANCE_ESSAY.en, zh: ARROGANCE_ESSAY.zh },
   { slug: LEARNING_ACCESS_SLUG, published: "2026-11-03", image: "assets/journal/ladder.webp", en: LEARNING_ACCESS_ESSAY.en, zh: LEARNING_ACCESS_ESSAY.zh },
 ];
@@ -56,6 +60,13 @@ export function learningAccessSectionId(n: number): string {
 /** The anchor of section `n` (1-based) of "Arrogance Is Not What You Need". */
 export function arroganceSectionId(n: number): string {
   const heading = ARROGANCE_ESSAY.en.sections[n - 1]?.heading;
+  if (heading === undefined) throw new Error(`The essay has no section ${n}`);
+  return articleHeadingId(heading);
+}
+
+/** The anchor of section `n` (1-based) of "After You’ve Beaten Everyone, Then What?". */
+export function beyondWinningSectionId(n: number): string {
+  const heading = BEYOND_WINNING_ESSAY.en.sections[n - 1]?.heading;
   if (heading === undefined) throw new Error(`The essay has no section ${n}`);
   return articleHeadingId(heading);
 }

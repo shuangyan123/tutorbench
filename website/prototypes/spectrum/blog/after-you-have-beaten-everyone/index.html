@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>After You’ve Beaten Everyone, Then What? · Teachometry Journal</title>
+<meta name="description" content="From exam competition to exploring the unknown with AI: what extra tutoring really buys, which mazes AI can carry you through, and what education could create besides deciding who wins.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="stylesheet" href="../../fonts.css" media="print" data-fonts>
+<noscript><link rel="stylesheet" href="../../fonts.css"></noscript>
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<script>
+  // Web fonts (fonts.css). On a reader's first visit the page paints at once in their own fonts and
+  // the site's fonts are fetched right after that first paint, so a slow connection never waits for
+  // text. Once the fonts are cached the next pages ask for them up front, as an ordinary stylesheet.
+  (function () {
+    var link = document.querySelector("link[data-fonts]");
+    if (!link) return;
+    var KEY = "teachometry-fonts";
+    var done = false;
+    function use() {
+      if (done) return;
+      done = true;
+      link.media = "all";
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+        try { window.localStorage.setItem(KEY, "1"); } catch (e) { /* storage is optional */ }
+      });
+    }
+    var cached = null;
+    try { cached = window.localStorage.getItem(KEY); } catch (e) { /* storage is optional */ }
+    var paint = window.PerformanceObserver && PerformanceObserver.supportedEntryTypes &&
+      PerformanceObserver.supportedEntryTypes.indexOf("paint") >= 0;
+    if (cached || !paint) { use(); return; }
+    var observer = new PerformanceObserver(function (list) {
+      if (list.getEntriesByName("first-contentful-paint").length) { observer.disconnect(); use(); }
+    });
+    observer.observe({ type: "paint", buffered: true });
+    // a page opened in a background tab does not paint until it is shown
+    window.setTimeout(function () { if (document.visibilityState === "visible") use(); }, 3000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") window.setTimeout(use, 3000); });
+  })();
+</script>
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    var wantZh = q ? q.indexOf("zh") === 0 : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    if (other) location.replace(location.origin + other);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106" fetchpriority="high"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html" aria-current="page"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu / 菜单"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle aria-label="中 / EN · Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <header class="essay-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><a class="issue" href="../index.html"><span class="en">Journal · Essay 1 of 7</span><span class="zh" lang="zh-CN">期刊 · 第 1 篇，共 7 篇</span></a><span class="rule" aria-hidden="true"></span><span><span class="en">Perspective</span><span class="zh" lang="zh-CN">观点</span></span><time datetime="2026-11-11"><span class="en">November 11, 2026</span><span class="zh" lang="zh-CN">2026年11月11日</span></time></p>
+        <h1 class="essay-title"><span class="en">After You’ve Beaten Everyone, Then What?</span><span class="zh" lang="zh-CN">当<wbr>你<wbr>赢过<wbr>所有人<wbr>之后<wbr>呢<wbr>？</span></h1>
+        <p class="en essay-dek">Education should teach more than how to beat other people.</p><p class="zh essay-dek" lang="zh-CN">教育不应该只教人如何赢过别人。</p>
+        <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">7 sections · about 16 min</span><span class="zh" lang="zh-CN">7 节 · 约 16 分钟</span></span></p>
+      </div>
+      <figure class="cover-plate">
+        <img src="../../assets/journal/podium.webp" alt="An empty wooden winners’ podium in a wet meadow at dawn, a medal hanging from the top step, the grass running on into fog." width="900" height="1100" data-alt-en="An empty wooden winners’ podium in a wet meadow at dawn, a medal hanging from the top step, the grass running on into fog." data-alt-zh="黎明时分，湿漉漉的草地上立着一座空的木制领奖台，最高一级挂着一枚奖牌，草地一直延伸进雾里。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">The top step stands empty. The meadow goes on into the fog.</span><span class="zh" lang="zh-CN">最高的一级空着，草地一直延伸进雾里。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap essay-body">
+    <nav class="essay-toc" aria-label="On this page">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <ol>
+        <li><a href="#when-everyone-stands-on-tiptoe"><span class="en">When everyone stands on tiptoe</span><span class="zh" lang="zh-CN">当所有人都踮起脚尖</span></a></li>
+        <li><a href="#why-start-with-exam-tutoring-anyway"><span class="en">Why start with exam tutoring anyway</span><span class="zh" lang="zh-CN">为什么还是从考试辅导开始</span></a></li>
+        <li><a href="#exams-have-a-syllabus-the-world-does-not"><span class="en">Exams have a syllabus. The world does not</span><span class="zh" lang="zh-CN">考试有大纲，世界没有</span></a></li>
+        <li><a href="#you-dont-have-to-walk-every-maze-yourself"><span class="en">You don’t have to walk every maze yourself</span><span class="zh" lang="zh-CN">不必亲自走完每一座迷宫</span></a></li>
+        <li><a href="#more-possibilities-not-another-ranking"><span class="en">More possibilities, not another ranking</span><span class="zh" lang="zh-CN">多一些可能，而不是多一张排行榜</span></a></li>
+        <li><a href="#dont-let-the-starting-point-become-the-end"><span class="en">Don’t let the starting point become the end</span><span class="zh" lang="zh-CN">别让起点变成终点</span></a></li>
+        <li><a href="#what-do-we-want-education-to-create"><span class="en">What do we want education to create?</span><span class="zh" lang="zh-CN">我们究竟希望教育创造什么</span></a></li>
+      </ol>
+    </nav>
+    <article class="essay-text">
+      <div class="prose">
+        <p class="en first">We spend years learning, pass exams, compete for university places, and then compete again for jobs. To raise their children’s marks, many families pay a great deal for extra classes, drills and tutoring.</p><p class="zh first" lang="zh-CN">我们投入大量时间学习知识，通过考试，竞争大学录取名额，再继续竞争工作机会。为了提高成绩，许多家庭愿意支付高额费用，购买额外的课程、训练和辅导。</p>
+        <p class="en">But one question keeps coming back to me:</p><p class="zh" lang="zh-CN">但我越来越想追问一个问题：</p>
+        <p class="en"><strong>When we spend more and more so that some students score higher than others, how much new educational value does all that spending actually create?</strong></p><p class="zh" lang="zh-CN"><strong>当我们花费越来越多的资源，让一部分学生比其他学生考得更好时，这些投入究竟创造了多少新的教育价值？</strong></p>
+        <p class="en">If more people reach higher scores through extra training, that may well mean they know more. But if the main point of learning is only ever to get ahead of others, education can turn into an ever more expensive contest over the opportunities that already exist.</p><p class="zh" lang="zh-CN">如果更多人因为额外训练得到了更高的分数，这当然可能意味着他们掌握了更多知识。但如果学习的主要目的始终只是超越别人，教育就可能变成一场围绕既有机会、越来越昂贵的竞争。</p>
+        <p class="en">I am not against exams, and I don’t deny that exam tutoring has value. It makes perfect sense that AI education may start there too.</p><p class="zh" lang="zh-CN">我并不反对考试，也不否认应试辅导的价值。AI 教育很可能也会从这里起步，这完全说得通。</p>
+        <p class="en">But I don’t want it to end there.</p><p class="zh" lang="zh-CN">但我不希望它的终点仍然只是这里。</p>
+        <h2 id="when-everyone-stands-on-tiptoe"><span class="no">§1</span><span><span class="en">When everyone stands on tiptoe</span><span class="zh" lang="zh-CN">当<wbr>所有人<wbr>都<wbr>踮起<wbr>脚<wbr>尖</span></span></h2>
+        <p class="en">Exams do not only measure what students have learned. They often decide how scarce educational opportunities are handed out.</p><p class="zh" lang="zh-CN">考试不只衡量学生掌握了什么，还经常决定稀缺的教育机会怎样分配。</p>
+        <p class="en">Suppose a university can admit a roughly fixed number of students. If some students raise their scores through extra training, their chances of admission may rise. But once more and more families buy the same service, everyone has to pay more just to hold the place they had.</p><p class="zh" lang="zh-CN">假设一所大学能录取的人数大致固定。一部分学生通过额外培训提高了成绩，他们被录取的机会也许会上升。可当越来越多的家庭购买同样的服务，每个人都要付出更高的成本，才能守住原来的位置。</p>
+        <p class="en">In Social Limits to Growth (1976), the economist Fred Hirsch called things like this “positional goods”: at least part of their value comes from the fact that only a few people can have them. His favourite image was a crowd on tiptoe. One person on tiptoe really does see better; when everyone stands on tiptoe, nobody sees better, and everyone is more tired<a class="fn" href="#source-1" aria-label="Source 1">1</a>. A place at a top university is very much this kind of thing.</p><p class="zh" lang="zh-CN">经济学家弗雷德·赫希（Fred Hirsch）在 1976 年的《增长的社会极限》里，把这类东西叫作“地位性商品”：它的价值，至少有一部分来自只有少数人能拥有。他常用的比喻是人群中踮脚：一个人踮起脚尖，确实看得更清楚；所有人都踮起脚尖，谁也没有看得更清楚，只是都更累了<a class="fn" href="#source-1" aria-label="资料 1">1</a>。名校的录取名额，就很像这样的东西。</p>
+        <p class="en">It is more than an image. The economists Garey and Valerie Ramey found that the time American parents spend on childcare began to rise sharply in the mid-1990s, most of all among college-educated parents. They tested the usual explanations, such as income, found that none held up, and concluded that growing competition for college places may be an important cause. They called it “the rug rat race”<a class="fn" href="#source-2" aria-label="Source 2">2</a>.</p><p class="zh" lang="zh-CN">这不只是一个比喻。经济学家 Garey Ramey 和 Valerie Ramey 发现，美国父母花在照顾孩子上的时间，从 1990 年代中期开始大幅增加，受过大学教育的父母尤其明显。他们检验了收入等常见解释，发现都站不住，转而认为大学录取竞争的加剧可能是重要原因，并把这个现象叫作“育儿竞赛”（The Rug Rat Race）<a class="fn" href="#source-2" aria-label="资料 2">2</a>。</p>
+        <p class="en">South Korea’s official survey keeps a plainer ledger. In 2024, spending on private tutoring for primary and secondary school students reached 29.2 trillion won, a record for the fourth year running, and 80% of students were taking part; over the same period the number of students fell by 1.5%<a class="fn" href="#source-3" aria-label="Source 3">3</a>. In 2025 the total fell after four years of growth, yet among students still being tutored, average monthly spending set another record<a class="fn" href="#source-4" aria-label="Source 4">4</a>.</p><p class="zh" lang="zh-CN">韩国的官方调查给出了更直接的账本。2024 年，韩国中小学生的校外教育支出总额达到 29.2 万亿韩元，连续第四年创下新高，参加校外辅导的学生比例达到 80%；而同一时期，中小学生人数减少了 1.5%<a class="fn" href="#source-3" aria-label="资料 3">3</a>。2025 年，总额在连续四年增长后回落，可仍在参加辅导的学生，平均每月的花费又创了新高<a class="fn" href="#source-4" aria-label="资料 4">4</a>。</p>
+        <p class="en">Fewer students, and more spent on each one still being tutored.</p><p class="zh" lang="zh-CN">学生越来越少，花在每个参加辅导的学生身上的钱却越来越多。</p>
+        <figure class="fig" id="fig1">
+          <table class="tally">
+            <thead><tr><th scope="col"><span class="en">South Korea, primary and secondary</span><span class="zh" lang="zh-CN">韩国中小学</span></th><th scope="col">2024</th><th scope="col">2025</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><span class="en">Students</span><span class="zh" lang="zh-CN">学生人数</span></th><td><span class="tl-v"><span class="en">5.13</span><span class="zh" lang="zh-CN">513</span></span><span class="tl-u"><span class="en">million · down 1.5%</span><span class="zh" lang="zh-CN">万人 · 减少 1.5%</span></span></td><td><span class="tl-v"><span class="en">5.02</span><span class="zh" lang="zh-CN">502</span></span><span class="tl-u"><span class="en">million · down 2.3%</span><span class="zh" lang="zh-CN">万人 · 减少 2.3%</span></span></td></tr>
+              <tr><th scope="row"><span class="en">Spent on private tutoring</span><span class="zh" lang="zh-CN">校外教育支出总额</span></th><td><span class="tl-v"><span class="en">29.2</span><span class="zh" lang="zh-CN">29.2</span></span><span class="tl-u"><span class="en">trillion won · a record, fourth year running</span><span class="zh" lang="zh-CN">万亿韩元 · 连续第四年新高</span></span></td><td><span class="tl-v"><span class="en">27.5</span><span class="zh" lang="zh-CN">27.5</span></span><span class="tl-u"><span class="en">trillion won · down 5.7%</span><span class="zh" lang="zh-CN">万亿韩元 · 减少 5.7%</span></span></td></tr>
+              <tr><th scope="row"><span class="en">Share of students tutored</span><span class="zh" lang="zh-CN">参加辅导的学生比例</span></th><td><span class="tl-v"><span class="en">80%</span><span class="zh" lang="zh-CN">80%</span></span></td><td><span class="tl-v"><span class="en">75.7%</span><span class="zh" lang="zh-CN">75.7%</span></span></td></tr>
+              <tr class="now"><th scope="row"><span class="en">Each month, per student tutored</span><span class="zh" lang="zh-CN">参加辅导的学生，每人每月</span></th><td><span class="tl-v"><span class="en">592,000</span><span class="zh" lang="zh-CN">59.2</span></span><span class="tl-u"><span class="en">won</span><span class="zh" lang="zh-CN">万韩元</span></span></td><td><span class="tl-v"><span class="en">604,000</span><span class="zh" lang="zh-CN">60.4</span></span><span class="tl-u"><span class="en">won · a record</span><span class="zh" lang="zh-CN">万韩元 · 新高</span></span></td></tr>
+            </tbody>
+          </table>
+          <figcaption><b><span class="en">Fig. 1</span><span class="zh" lang="zh-CN">图 1</span></b><span class="en">South Korea’s official survey of private education, as reported in sources 3 and 4. In 2025 the total fell, yet each student still being tutored cost more than ever.</span><span class="zh" lang="zh-CN">韩国官方的校外教育支出调查，数字据资料 3、4 的报道。2025 年总额回落，可仍在参加辅导的学生，每人每月的花费创了新高。</span></figcaption>
+        </figure>
+        <p class="en">That does not make all tutoring a waste. A meta-analysis of randomised tutoring experiments, from pre-kindergarten to the end of high school, found that tutoring raised students’ learning outcomes by about 0.37 standard deviations on average, with stronger effects when teachers and paraprofessionals did the tutoring; the authors call the effects “impressive” in the paper’s title<a class="fn" href="#source-5" aria-label="Source 5">5</a>. These experiments studied one-to-one and small-group tutoring, not commercial exam coaching. But they show that good tutoring really does teach people things, and can supply the individual attention schools find hard to give.</p><p class="zh" lang="zh-CN">但这不意味着所有补习都是浪费。一项汇总了从学前到高中各阶段辅导随机实验的元分析发现，辅导平均让学生的学业表现提高了约 0.37 个标准差，由教师和专业助教来辅导时效果更明显；研究者在论文标题里直接称之为“令人印象深刻的效果”<a class="fn" href="#source-5" aria-label="资料 5">5</a>。这些实验研究的是一对一或小组辅导，不等于商业应试培训；但它们说明，好的辅导确实能让人学到东西，也能弥补学校难以做到的个别化教学。</p>
+        <p class="en">So I think two things need to be kept apart:</p><p class="zh" lang="zh-CN">所以我认为，需要把两件事分开：</p>
+        <p class="en"><strong>Helping one person gain an edge in a competition is not the same as helping a whole society build more real ability.</strong></p><p class="zh" lang="zh-CN"><strong>帮助一个人在竞争中获得优势，与帮助整个社会形成更多真实能力，并不是同一回事。</strong></p>
+        <p class="en">An hour of tutoring often buys both. One is real learning, which stays with the student and stays in society. The other is relative position, which means something only in a ranking: when one person moves up a place, someone else moves down one.</p><p class="zh" lang="zh-CN">一小时补习，往往同时买到这两样东西。一样是真实的学习，它留在学生身上，也留在社会里；另一样是相对位置，它只在排名里有意义：一个人前进一名，就有另一个人后退一名。</p>
+        <p class="en">A tutoring company can raise its students’ scores by organising courses, adding practice hours, hiring strong teachers and analysing exam questions, and this work may have real value. But has it created better ways of teaching? Has a student who found the material hard really come to understand it? Can the courses and methods it builds up help more people at lower cost? Admission rates cannot answer these questions.</p><p class="zh" lang="zh-CN">一家教培机构可以通过组织课程、增加训练时间、聘请优秀教师、分析考试题型来提高学生成绩，这些工作可能有实际价值。但它是否因此创造了更好的教学方法？是否让原本很难理解知识的学生真正理解了？它积累的课程和方法，能否让更多人以更低的成本受益？这些问题，升学率回答不了。</p>
+        <p class="en">I have no reliable figures on the industry’s profits, and I won’t guess how much tutoring companies earn. Teachers’ work, course development and individual tutoring deserve fair pay. What I want to ask is whether an industry’s revenue and size match the new educational value it creates. If its commercial success comes mainly from parents’ fear of their children falling behind, rather than from better teaching, that prosperity deserves a second look.</p><p class="zh" lang="zh-CN">我手上没有可靠的行业利润数据，也不打算猜测教培机构赚了多少。教师的劳动、课程研发和个别化辅导，本来就值得合理的报酬。我真正想问的是：一个行业的收入和规模，与它创造的新增教育价值是否相称？如果商业上的成功主要来自父母对孩子落后的焦虑，而不是更好的教学成果，这种繁荣就值得重新审视。</p>
+        <h2 id="why-start-with-exam-tutoring-anyway"><span class="no">§2</span><span><span class="en">Why start with exam tutoring anyway</span><span class="zh" lang="zh-CN">为什么<wbr>还是<wbr>从<wbr>考试<wbr>辅导<wbr>开始</span></span></h2>
+        <p class="en">There seems to be a contradiction here. If I want to change an education system that leans too hard on exams, why do I still think AI education can start with exam tutoring?</p><p class="zh" lang="zh-CN">这里似乎有一个矛盾：既然我希望改变过度应试的教育环境，为什么还认为 AI 教育可以从考试辅导起步？</p>
+        <p class="en">Because students’ needs right now are real. Someone about to sit the gaokao, a postgraduate entrance exam or another important test cannot put the exam aside and spend years exploring the whole theory of a subject. They need to master what the exam requires in limited time, learn sound methods, get to know the question types, and perform steadily against the clock. Helping them do that properly is nothing to be ashamed of.</p><p class="zh" lang="zh-CN">因为学生当下的需求是真实的。一个即将参加高考、考研或其他重要考试的人，没有条件先放下考试，花几年时间去探索一门学科的全部理论。他需要在有限的时间里掌握考试要求的知识，形成正确的解题方法，熟悉题型，并在规定时间内稳定发挥。认真帮他达成这个目标，没有什么不正当。</p>
+        <p class="en">But first I have to answer a question: if AI makes tutoring cheaper, will it just make everyone stand on higher tiptoe?</p><p class="zh" lang="zh-CN">但我必须先回答一个问题：如果 AI 让辅导变得更便宜，会不会只是让所有人踮得更高？</p>
+        <p class="en">Honestly, it might. AI will not add a single place at a top university. If everyone has cheaper tutoring, the contest will not necessarily become any easier.</p><p class="zh" lang="zh-CN">老实说，有可能。AI 不会让名校多出一个录取名额。如果每个人都有了更便宜的辅导，这场比赛未必会因此变轻松。</p>
+        <p class="en">But at least two things can be different.</p><p class="zh" lang="zh-CN">但至少有两件事可以不同。</p>
+        <p class="en">The first is who gets good tutoring. Good one-to-one tutoring used to be something only some families could afford; if its price falls sharply, the gap between starting points may narrow. This is not wishful thinking. In a randomised controlled trial published by the World Bank in 2025, first-year senior secondary students in Nigeria used an AI assistant built on GPT-4 to support their English learning. After six weeks their English scores were 0.23 standard deviations higher than the control group’s, and the researchers’ cost-effectiveness analysis placed the programme among the most cost-effective ways to improve learning<a class="fn" href="#source-6" aria-label="Source 6">6</a>. It was a six-week pilot and cannot simply be extended to every subject and exam, but it shows that low-cost AI tutoring can bring real learning gains.</p><p class="zh" lang="zh-CN">第一，谁能得到好的辅导。过去，个别化的好辅导只有一部分家庭负担得起；如果它的价格大幅下降，起点的差距就可能缩小。这并非空想。世界银行 2025 年发布的一项随机对照试验里，尼日利亚的高中一年级学生用基于 GPT-4 的 AI 助手辅助学英语，六周后，英语成绩比对照组高出 0.23 个标准差；研究者的成本效益分析认为，它跻身提升学习成果最划算的一类项目<a class="fn" href="#source-6" aria-label="资料 6">6</a>。这只是一项为期六周的试点，不能直接推广到所有学科和考试，但它说明低成本的 AI 辅导确实可能带来学习收益。</p>
+        <p class="en">The second is what the hours buy. Good exam teaching should not just keep supplying questions and answers. What matters more is whether the AI can really understand the learner’s current problems: which concepts are not yet mastered, which reasoning is already right, which mistakes come from method, and which problems lie in speed and strategy rather than in the knowledge itself. It should help students understand why they went wrong, and how to judge correctly, on their own, in new questions. An hour spent like this buys more real learning, not just relative position.</p><p class="zh" lang="zh-CN">第二，花掉的时间换来什么。好的应试教学，不应只是不断提供题目和答案。更重要的是，AI 能否真正理解学习者当前的问题：哪些概念还没掌握，哪些推理已经正确，哪些错误来自方法，哪些问题出在速度和策略，而不是知识本身。它应该帮学生理解自己为什么会错，以及怎样在新的题目里独立作出正确的判断。同样一小时，花在这里，买到的就更多是真实的学习，而不只是相对位置。</p>
+        <p class="en">Of course, exam strategy and understanding are not the same thing. Someone may truly understand growth rates and proportions yet lose marks in a timed data-analysis test because of calculation speed, estimation methods and which questions they choose to attempt. What they need may not be to relearn the basic concepts, but to learn how to use what they already know efficiently under the exam’s rules.</p><p class="zh" lang="zh-CN">当然，应试策略和知识理解并不完全相同。一个人可能真正理解增长率和比例，却在限时的资料分析考试里，因为计算速度、估算方法和选题策略而失分。他需要的可能不是重新学习基础概念，而是学会在考试规则下，高效运用已经掌握的知识。</p>
+        <p class="en">So I prefer to treat learning as the foundation, and exam strategy as a further optimisation for a particular task. <strong>Learning for understanding and learning for exams can support each other; they need not exclude each other.</strong> Exam results show part of what someone knows, but they should not be mistaken for everything learning produces.</p><p class="zh" lang="zh-CN">所以我更愿意把学习理解为基础，把考试策略看作针对特定任务的进一步优化。<strong>学习导向和考试导向可以彼此支持，而不必互相排斥。</strong>考试成绩能体现一部分知识掌握水平，但不应该被误认为学习的全部成果。</p>
+        <h2 id="exams-have-a-syllabus-the-world-does-not"><span class="no">§3</span><span><span class="en">Exams have a syllabus. The world does not</span><span class="zh" lang="zh-CN">考试<wbr>有<wbr>大纲<wbr>，<wbr>世界<wbr>没有</span></span></h2>
+        <p class="en">Exams such as the gaokao or the postgraduate entrance exam usually have a fairly clear scope, clear requirements and a clear way of marking. You can study the syllabus, analyse past papers, make a revision plan, and steadily get better at this kind of task.</p><p class="zh" lang="zh-CN">高考、考研这样的考试，通常有相对明确的知识范围、能力要求和评价方式。你可以研究考试大纲，分析历年试题，制定复习计划，逐渐提高完成这类任务的能力。</p>
+        <p class="en">But many problems in the real world do not arrive according to a syllabus.</p><p class="zh" lang="zh-CN">但真实世界里的许多问题，并不会按照一份考试大纲出现。</p>
+        <p class="en">Take someone who becomes interested in cancer treatment. They may not be a student of medicine or biology, and at first may not even know where to begin. To understand the field further, they may need cell biology, genetics, biochemistry, statistics and much else they have never studied.</p><p class="zh" lang="zh-CN">比如，一个对癌症治疗产生兴趣的人，可能并不是医学或生物学专业的学生，起初甚至不知道该从哪里开始。想要进一步理解这个领域，他可能需要接触细胞生物学、遗传学、生物化学、统计学，以及许多此前没有学过的知识。</p>
+        <p class="en">As their understanding deepens, they will meet questions that have no settled answers yet. Why do some treatments work only for some patients? When studies reach conflicting conclusions, what should you believe? What have the existing experiments actually shown, and which explanations have not yet been ruled out?</p><p class="zh" lang="zh-CN">随着认识加深，他还会遇到尚无明确答案的问题：为什么某些治疗只对部分患者有效？不同研究得出矛盾的结论时，应该相信什么？现有实验到底证明了什么，还有哪些解释没有被排除？</p>
+        <p class="en">No fixed textbook can list in advance every question future research will face. Research asks not only for remembering existing answers, but for the ability to recognise what is unknown, look for evidence, propose hypotheses and test explanations.</p><p class="zh" lang="zh-CN">没有任何一套固定的教材，能事先列出未来研究要面对的所有问题。研究要求的不只是记住已有答案，还有辨认未知、寻找证据、提出假设和检验解释的能力。</p>
+        <p class="en">I hope the AI education of the future can help more people into fields like this. No one should be shut out of studying biology properly forever just because their degree was in something else.</p><p class="zh" lang="zh-CN">我希望未来的 AI 教育，能帮助更多人走进这样的领域。一个人不应该仅仅因为大学读的不是生物专业，就永远没有系统学习生物学的机会。</p>
+        <p class="en">People without specialist training have already entered biological research with the right tool. A protease from M-PMV, a monkey virus that causes an AIDS-like disease, had a crystal structure that defeated researchers for more than a decade. They handed the problem to players of Foldit, an online protein-folding game. The players’ models were accurate enough for the researchers to solve the structure. The result was published in 2011 in Nature Structural &amp; Molecular Biology, with two teams of players named among the authors<a class="fn" href="#source-7" aria-label="Source 7">7</a>. Their tool was a game.</p><p class="zh" lang="zh-CN">非专业的人借助合适的工具走进生物学研究，这样的事已经发生过。有一种蛋白酶，来自会让猴子患上类艾滋病的 M-PMV 病毒，它的晶体结构困住了研究者十多年。研究者把这个难题交给了蛋白质折叠游戏 Foldit 的玩家。玩家们做出的模型足够准确，研究者据此解出了结构。这项成果 2011 年发表在《自然·结构与分子生物学》上，两支玩家队伍的名字就列在作者名单里<a class="fn" href="#source-7" aria-label="资料 7">7</a>。他们手里的工具，是一个游戏。</p>
+        <p class="en">Of course, there is a long way between understanding biology and being able to do professional medical research. The latter needs laboratory skills, research ethics, collaboration and rigorous verification. But that should not stop anyone from starting to learn.</p><p class="zh" lang="zh-CN">当然，读懂生物学知识，和具备开展专业医学研究的能力之间，还有很大的距离。后者需要实验技能、研究伦理、专业协作和严格的验证。但这不应该成为阻止一个人开始学习的理由。</p>
+        <p class="en"><strong>I hope education does more than carry people to a set qualification and career position. I hope it also helps people, at any stage of life, rediscover the fields they want to explore.</strong></p><p class="zh" lang="zh-CN"><strong>我希望教育不只是帮助人到达某个既定的学历和职业位置，也帮助人在任何阶段，重新发现自己愿意探索的领域。</strong></p>
+        <h2 id="you-dont-have-to-walk-every-maze-yourself"><span class="no">§4</span><span><span class="en">You don’t have to walk every maze yourself</span><span class="zh" lang="zh-CN">不必<wbr>亲自<wbr>走<wbr>完<wbr>每一<wbr>座<wbr>迷宫</span></span></h2>
+        <p class="en">A common claim in discussions of AI education is that, to protect learners’ ability to think for themselves, AI should not give conclusions too early.</p><p class="zh" lang="zh-CN">讨论 AI 教育时，经常会出现一种说法：为了保护学习者的独立思考能力，AI 不应该过早给出结论。</p>
+        <p class="en">In some cases that is right. If a student is learning to add fractions and the aim is to understand fractional units, an AI that gives the answer to every question may take away thinking the student needs to do.</p><p class="zh" lang="zh-CN">这在某些情况下是对的。如果一个学生正在学分数加法，教学目标就是理解分数单位，那么 AI 直接给出每一道题的答案，可能让他失去必要的思考机会。</p>
+        <p class="en">But extend the rule to every kind of learning and research, and it runs into trouble: why must anyone personally repeat every exploration already completed before they can go deeper?</p><p class="zh" lang="zh-CN">但如果把这条规则推广到所有学习和研究场景，就会遇到问题：为什么一个人必须亲自重复所有已经完成的探索，才能进入更深的知识世界？</p>
+        <p class="en">I want to use a maze as a metaphor.</p><p class="zh" lang="zh-CN">我想用迷宫作一个比喻。</p>
+        <p class="en">Suppose someone has been stuck in a first maze for a long time. They can explore it alone, or find the way out slowly with hints from others. If learning to get out of mazes like this is itself the goal, the process is of course worth something.</p><p class="zh" lang="zh-CN">假设一个人一直困在第一座迷宫里。他可以独自探索，也可以借助别人的提示，慢慢找到出口。如果学会走出这类迷宫本身就是他的目标，这个过程当然有价值。</p>
+        <p class="en">But suppose the place they really want to reach lies outside the maze. The first maze is only an obstacle; beyond it waits a larger, more complex one.</p><p class="zh" lang="zh-CN">但假设他真正想去的地方在迷宫之外。第一座迷宫只是一道障碍，走出去之后，他将面对一座更庞大、更复杂的迷宫。</p>
+        <p class="en">If AI can carry them straight through the first maze, why must we stop it?</p><p class="zh" lang="zh-CN">这时，如果 AI 能帮他直接穿过第一座迷宫，为什么一定要阻止？</p>
+        <p class="en">“The gentleman is no different from others by birth,” wrote Xunzi; “he is simply good at making use of things.” Human progress has never rested entirely on individuals piling up knowledge alone. We read earlier papers, use instruments others designed, run software already written, and build on theories mathematicians established. We do not ask a scientist to reinvent the microscope before we accept that their research has value. In 1911 the mathematician Alfred North Whitehead put it more bluntly: “Civilization advances by extending the number of important operations which we can perform without thinking about them”<a class="fn" href="#source-8" aria-label="Source 8">8</a>.</p><p class="zh" lang="zh-CN">“君子生非异也，善假于物也。”人类的发展从来不是完全依靠个体独自积累知识。我们阅读前人的论文，使用别人设计的仪器，调用已经开发好的软件，利用数学家建立的理论。我们不会要求一位科学家重新发明显微镜，才承认他的研究有价值。数学家怀特海在 1911 年说得更直接：文明的进步，靠的是不断增加那些我们无需思考就能完成的重要操作<a class="fn" href="#source-8" aria-label="资料 8">8</a>。</p>
+        <p class="en">Protein structure is just such a maze, crossed with a tool. As we saw, the structure of a single protein can defeat researchers for over a decade. In 2020 Demis Hassabis and John Jumper presented an AI model called AlphaFold2, and with it they predicted the structures of virtually all of the roughly 200 million proteins researchers have identified. By the time they received the Nobel Prize in Chemistry in 2024, more than two million people in 190 countries had used it<a class="fn" href="#source-9" aria-label="Source 9">9</a>. Those who use it do not first have to learn to solve a protein structure by experiment; they can start from the structure and go on to study antibiotic resistance or enzymes that break down plastic, walking into the next maze.</p><p class="zh" lang="zh-CN">蛋白质结构，就是这样一座被工具穿过的迷宫。前面说到，一个蛋白质的结构可以困住研究者十多年。2020 年，Demis Hassabis 和 John Jumper 发布了 AI 模型 AlphaFold2，借助它，他们预测了研究者已知的约两亿种蛋白质中几乎所有的结构。2024 年他们获得诺贝尔化学奖时，已有来自 190 个国家的两百多万人用过它<a class="fn" href="#source-9" aria-label="资料 9">9</a>。用它的人，不必先学会用实验解出一个蛋白质的结构，就可以从结构出发，去研究抗生素耐药，去理解能分解塑料的酶，走进下一座迷宫。</p>
+        <p class="en">AI can be a tool like this, and perhaps an ever more powerful one. It need not act only as a cautious giver of hints. It can also explain existing knowledge directly, give conclusions, carry out derivations, and even help propose new hypotheses.</p><p class="zh" lang="zh-CN">AI 可以成为这样的工具，而且可能是一种越来越强大的工具。它不一定只能充当谨慎的提示者，也可以直接解释已有的知识、给出结论、执行推导，甚至参与提出新的假设。</p>
+        <p class="en">But the metaphor needs one more condition, or it is too easy.</p><p class="zh" lang="zh-CN">不过，这个比喻还需要补上一个条件，否则就太轻松了。</p>
+        <p class="en"><strong>Whether AI can carry you through a maze depends on whether, in the next maze, you will still need what this one was meant to teach you.</strong></p><p class="zh" lang="zh-CN"><strong>一座迷宫能不能交给 AI 带你穿过，要看在下一座迷宫里，你还用不用得上它本来要教会你的东西。</strong></p>
+        <p class="en">Someone researching cancer need not learn to solve protein structures by X-ray crystallography, because their next steps will rarely ask them to repeat that by hand. But they cannot afford not to know where a predicted structure might be wrong, because every judgement they make next rests on whether that structure can be trusted. The first is an obstacle that can be handed to a tool; the second is a foundation, and if they skip it they will not walk the next maze steadily.</p><p class="zh" lang="zh-CN">一个研究癌症的人，可以不必学会用 X 射线晶体学解出蛋白质结构，因为接下来的工作，很少要求他亲手重复这件事。但他不能不知道预测出来的结构可能在哪里出错，因为他接下来的每一个判断，都建立在这个结构是否可靠之上。前者是障碍，可以交给工具；后者是地基，跳过了，下一座迷宫就走不稳。</p>
+        <p class="en">For a child learning to add fractions, it is the other way round. Fractional units are the foundation of the next maze: ratio, probability and algebra are all built on them. There, an AI that hands over the answer is not helping the child past an obstacle; it is pulling out the foundation.</p><p class="zh" lang="zh-CN">学分数加法的孩子，情况正好相反。分数单位就是他下一座迷宫的地基，比例、概率、代数都建在它上面。在那里，AI 直接给出答案，不是在帮他越过障碍，而是在拆他的地基。</p>
+        <figure class="fig" id="fig2">
+          <div class="mazes">
+            <p class="en mz-q">In the next maze, will you still need what this one teaches?</p><p class="zh mz-q" lang="zh-CN">在下一座迷宫里，还用不用得上这一座要教的东西？</p>
+            <ol class="mz-list">
+              <li class="mz-pass"><span class="mz-who"><span class="en">A cancer researcher</span><span class="zh" lang="zh-CN">研究癌症的人</span></span><span class="mz-name"><span class="en">Solving a protein structure by X-ray crystallography</span><span class="zh" lang="zh-CN">用 X 射线晶体学解出蛋白质结构</span></span><span class="mz-a"><span class="en">Rarely: the work that follows seldom asks for it by hand</span><span class="zh" lang="zh-CN">很少：接下来的工作，很少要求亲手重复</span></span><span class="mz-v"><span class="en">Obstacle: hand it to a tool</span><span class="zh" lang="zh-CN">障碍：可以交给工具</span></span></li><li><span class="mz-who"><span class="en">A cancer researcher</span><span class="zh" lang="zh-CN">研究癌症的人</span></span><span class="mz-name"><span class="en">Knowing where a predicted structure might be wrong</span><span class="zh" lang="zh-CN">知道预测出来的结构可能在哪里出错</span></span><span class="mz-a"><span class="en">Always: every judgement after it rests on it</span><span class="zh" lang="zh-CN">一直需要：之后的每一个判断都建在它上面</span></span><span class="mz-v"><span class="en">Foundation: learn it</span><span class="zh" lang="zh-CN">地基：自己学会</span></span></li><li><span class="mz-who"><span class="en">A child adding fractions</span><span class="zh" lang="zh-CN">学分数加法的孩子</span></span><span class="mz-name"><span class="en">Fractional units</span><span class="zh" lang="zh-CN">分数单位</span></span><span class="mz-a"><span class="en">Always: ratio, probability and algebra are built on them</span><span class="zh" lang="zh-CN">一直需要：比例、概率、代数都建在它上面</span></span><span class="mz-v"><span class="en">Foundation: an answer handed over pulls it out</span><span class="zh" lang="zh-CN">地基：直接给答案，就是在拆它</span></span></li>
+            </ol>
+          </div>
+          <figcaption><b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b><span class="en">The test from this section, applied to its two examples. Whether a step can be handed to AI depends on the next maze, not on the step itself.</span><span class="zh" lang="zh-CN">本节的判断标准，用在文中的两个例子上。一步能不能交给 AI，看的不是这一步本身，而是下一座迷宫。</span></figcaption>
+        </figure>
+        <p class="en">So the point is not whether AI gives a conclusion, but where the conclusion takes a person. If an AI’s answer simply makes a student stop thinking, it may harm a particular learning goal. If the answer carries a learner past an obstacle they could not otherwise cross, so that they see new questions and go on to more complex exploration, it is helping learning too.</p><p class="zh" lang="zh-CN">所以，关键不在于 AI 有没有给出结论，而在于结论把人带向哪里。如果 AI 的回答只是让学生停止思考，它可能损害特定的学习目标；如果回答让学习者越过了原本无法越过的障碍，看到了新的问题，进而开展更复杂的探索，它同样是在促进学习。</p>
+        <p class="en">Even if AI’s conclusions become more and more accurate, their reliability still has to be tied to evidence, conditions of use and a process of verification. In science especially, new conclusions must survive reproducible testing. Verification can use tools too: a proof assistant such as Lean can check, step by step, whether each step of a mathematical proof holds. But when a tool does the checking, a person still needs to know what it checked, and what it did not.</p><p class="zh" lang="zh-CN">即使将来 AI 的结论正确率越来越高，可靠性仍然要与证据、适用条件和验证过程联系在一起。尤其在科学研究里，新结论还需要经受可复现的检验。验证本身也可以借助工具：比如 Lean 这样的证明助手，能逐步检查一个数学证明的每一步是否成立。但借助工具验证时，人仍然需要知道，它检查了什么，又没有检查什么。</p>
+        <p class="en"><strong>We should not mistake refusing to use AI for real independent thinking.</strong> A person can rely fully on outside tools for calculation, search and analysis, and still keep the ability to set goals, understand evidence, question results and decide what to do next.</p><p class="zh" lang="zh-CN"><strong>我们不应该把拒绝使用 AI，误认为真正的独立思考。</strong>一个人可以充分依赖外部工具完成计算、搜索与分析，同时仍然拥有提出目标、理解证据、质疑结果和决定下一步行动的能力。</p>
+        <p class="en">As the problems AI can solve grow more complex, new knowledge may keep leading us towards unknowns we could not even see before. The maze we walk out of today may be only the entrance to a larger one tomorrow.</p><p class="zh" lang="zh-CN">随着 AI 能解决的问题越来越复杂，新的知识可能继续把我们带向以前根本看不到的未知。今天走出的迷宫，明天或许只是另一座更大迷宫的入口。</p>
+        <h2 id="more-possibilities-not-another-ranking"><span class="no">§5</span><span><span class="en">More possibilities, not another ranking</span><span class="zh" lang="zh-CN">多<wbr>一些<wbr>可能<wbr>，<wbr>而不是<wbr>多<wbr>一张<wbr>排行榜</span></span></h2>
+        <p class="en">If the final aim of education is only to raise exam scores, AI may become a cheaper, more efficient tutoring tool. That can create value in itself, but it is not yet what I ultimately hope to see.</p><p class="zh" lang="zh-CN">如果教育的最终目标只是提高考试成绩，AI 可能成为一种更便宜、更高效的教培工具。这本身可以创造价值，但还不是我最终希望看到的样子。</p>
+        <p class="en">I hope that because of AI, more people get learning opportunities that were once hard to come by. Someone wants to study biology though they studied literature; someone is fascinated by nuclear fusion though they still lack higher mathematics and physics; someone wants to design new mechanisms, write software, make art, or fix a problem near them that nobody has solved for years. AI can help them find good courses, understand unfamiliar ideas, fill in the foundations they need, organise research material, and gradually take part in more complex work.</p><p class="zh" lang="zh-CN">我希望更多人能因为 AI，得到原本难以得到的学习机会。有人想研究生物学，即使他此前学的是文学；有人对核聚变充满兴趣，即使他现在还缺少高等数学和物理基础；有人想设计新的机械结构、开发软件、创作艺术，或者改善身边一个长期没人解决的问题。AI 可以帮他们找到好的课程、理解陌生的概念、补上必要的基础、整理研究资料，并逐渐参与更复杂的任务。</p>
+        <p class="en">But I don’t think everyone has to become a scientist, or that only breakthroughs like fusion and cancer treatment are worth pursuing. Making a worthwhile work of art, improving a public service, or understanding a field deeply out of pure interest are meaningful achievements too.</p><p class="zh" lang="zh-CN">但我不认为每个人都必须成为科学家，也不认为只有核聚变和癌症治疗这样的重大突破才值得追求。创作一件有价值的艺术作品、改善一项公共服务，或者纯粹因为兴趣而深入理解一个领域，同样是有意义的成果。</p>
+        <p class="en"><strong>Education should not replace “you must get into a top university” with “you must advance human technology”, and build a new ladder of success.</strong> What I really want to increase are the possibilities people can choose for themselves, and then realise.</p><p class="zh" lang="zh-CN"><strong>教育不应该用“必须推动人类科技进步”，取代“必须考上名校”，再建立一套新的成功等级。</strong>我真正希望增加的，是人们能够自己选择、并且实现的可能性。</p>
+        <p class="en">It also means we cannot judge whether this kind of education works by counting how many questions the AI answered or how many exercises students completed. Different goals need different evidence. When the goal is an exam, look at how knowledge and strategy are used under that exam’s conditions. When the goal is learning, look at understanding, retention and transfer. When the goal is research and creation, also look at what questions learners can ask with AI’s help, what hypotheses they can test, and what work they can finish that was out of reach before.</p><p class="zh" lang="zh-CN">这也意味着，我们不能只看 AI 回答了多少问题、学生完成了多少练习，来判断这种教育是否成功。目标不同，需要的证据也不同：目标是考试时，要看特定考试条件下的知识运用和策略表现；目标是学习时，要看知识的理解、保持和迁移；目标是研究和创造时，还要看学习者借助 AI 能提出什么问题、检验什么假设、完成什么原本做不到的工作。</p>
+        <figure class="fig" id="fig3">
+          <div class="aims">
+            <p class="am-not"><span class="am-k"><span class="en">Not enough on its own</span><span class="zh" lang="zh-CN">单看这些不够</span></span><span class="am-v"><span class="en">Questions the AI answered</span><span class="zh" lang="zh-CN">AI 回答了多少问题</span></span><span class="am-v"><span class="en">Exercises completed</span><span class="zh" lang="zh-CN">学生完成了多少练习</span></span></p>
+            <ol class="am-list">
+              <li><span class="am-k"><span class="en">Goal</span><span class="zh" lang="zh-CN">目标</span></span><span class="am-g"><span class="en">An exam</span><span class="zh" lang="zh-CN">考试</span></span><span class="am-k"><span class="en">Look at</span><span class="zh" lang="zh-CN">要看</span></span><span class="am-e"><span class="en">Knowledge and strategy, used under that exam’s conditions</span><span class="zh" lang="zh-CN">特定考试条件下的知识运用和策略表现</span></span></li><li><span class="am-k"><span class="en">Goal</span><span class="zh" lang="zh-CN">目标</span></span><span class="am-g"><span class="en">Learning</span><span class="zh" lang="zh-CN">学习</span></span><span class="am-k"><span class="en">Look at</span><span class="zh" lang="zh-CN">要看</span></span><span class="am-e"><span class="en">Understanding, retention and transfer</span><span class="zh" lang="zh-CN">知识的理解、保持和迁移</span></span></li><li class="now"><span class="am-k"><span class="en">Goal</span><span class="zh" lang="zh-CN">目标</span></span><span class="am-g"><span class="en">Research and creation</span><span class="zh" lang="zh-CN">研究和创造</span></span><span class="am-k"><span class="en">Look at</span><span class="zh" lang="zh-CN">要看</span></span><span class="am-e"><span class="en">The questions learners can ask with AI, the hypotheses they can test, the work they can finish that was out of reach before</span><span class="zh" lang="zh-CN">借助 AI 能提出什么问题、检验什么假设、完成什么原本做不到的工作</span></span></li>
+            </ol>
+          </div>
+          <figcaption><b><span class="en">Fig. 3</span><span class="zh" lang="zh-CN">图 3</span></b><span class="en">The evidence this section asks for, goal by goal. The last row adds to the ones above it rather than replacing them.</span><span class="zh" lang="zh-CN">本节按目标列出的证据。最后一行是在前两行之上再加的要求，不是取而代之。</span></figcaption>
+        </figure>
+        <p class="en">Above all, the ability to complete a task with a tool must not be confused with the ability to do it without one. In a randomised experiment published in 2025, 117 university students did a writing task with help from ChatGPT, a human expert or writing-analytics tools, or with no extra help. The ChatGPT group’s essay scores improved the most, yet in knowledge gained and knowledge transfer they did not differ significantly from the other groups. The researchers warn that such tools may encourage dependence on technology and trigger “metacognitive laziness”<a class="fn" href="#source-10" aria-label="Source 10">10</a>.</p><p class="zh" lang="zh-CN">尤其不能把借助工具完成任务的能力，和不借助工具的能力混为一谈。在 2025 年发表的一项随机实验里，117 名大学生完成一项写作任务，分别借助 ChatGPT、人类专家、写作分析工具，或者不借助额外工具。ChatGPT 组的作文分数提高得最多；但在知识的获得和迁移上，他们和其他组没有显著差别。研究者提醒，这类工具可能让人依赖技术，引发“元认知上的懒惰”<a class="fn" href="#source-10" aria-label="资料 10">10</a>。</p>
+        <p class="en">This does not mean AI is useless. It means the two abilities must be judged separately. A good piece of work done with AI shows what a person and a tool can do together; it cannot show what that person learned once the tool is gone. Both abilities matter, but neither can stand in for the other.</p><p class="zh" lang="zh-CN">这并不说明 AI 没用，而是说明两种能力要分开看。一份借助 AI 完成的好作品，证明的是人和工具合作的能力；它证明不了这个人离开工具以后学会了什么。两种能力都重要，但谁也不能冒充谁。</p>
+        <h2 id="dont-let-the-starting-point-become-the-end"><span class="no">§6</span><span><span class="en">Don’t let the starting point become the end</span><span class="zh" lang="zh-CN">别<wbr>让<wbr>起点<wbr>变成<wbr>终点</span></span></h2>
+        <p class="en">I know that building an AI education system able to serve a wide range of learning needs takes more than ideals. It takes money, technology, research, people and a sustainable business model. So it is understandable to start with exam tutoring, where the demand is clear. Giving more students a better education at lower cost is worth working for in itself.</p><p class="zh" lang="zh-CN">我知道，要建立一套能服务广泛学习需求的 AI 教育体系，不能只靠理想。它需要资金、技术、研究、人员，以及可持续的商业模式。所以，从市场需求明确的考试辅导开始，是可以理解的。如果能以更低的成本让更多学生得到更好的教育，这本身就值得努力。</p>
+        <p class="en">But I also worry about another possibility. Once exam tutoring turns a profit, a company will lean ever more towards putting its resources into the business that already earns. Sharper drills on question types, higher conversion rates and more paying users bring quicker returns than long-term curriculum research, cross-disciplinary exploration and open educational resources. In the end, the business model meant as a starting point may become an end the company can never leave.</p><p class="zh" lang="zh-CN">但我也担心另一种可能：当应试辅导开始盈利，企业会越来越倾向于把资源投进这项已经有收入的业务。开发更精准的题型训练、提高转化率、扩大付费用户，比投入长期的课程研究、跨学科探索和开放教育资源，更容易获得短期回报。最终，原本被设想为起点的商业模式，反而可能成为企业永远离不开的终点。</p>
+        <p class="en">So I hope AI education products build, from the start, capabilities that serve longer-term goals: really understanding what a student knows; judging whether a course suits people with different foundations; building learning paths that can keep growing; checking whether teaching produced real learning; and letting more people use high-quality resources at ever lower cost.</p><p class="zh" lang="zh-CN">所以，我希望 AI 教育产品从一开始就积累能服务更长远目标的能力：真正理解学生的知识状态；评估课程是否适合不同基础的人；建立可以持续扩展的知识路径；验证教学是否带来了实际的学习收益；让高质量的资源以越来越低的成本被更多人使用。</p>
+        <p class="en">These capabilities have one advantage: they are exactly what good exam tutoring needs anyway. Diagnosing where a student is stuck and helping someone into an unfamiliar subject draw on the same skill. Investing in them need not work against the business at hand; they can help people prepare for exams, and help them keep learning when there is no exam.</p><p class="zh" lang="zh-CN">这些能力有一个好处：它们本来就是做好应试辅导所需要的。诊断一个学生卡在哪里，和帮一个人走进陌生的学科，用的是同一套本事。投入它们，不必和眼前的生意对立；它们既能帮人准备考试，也能帮人在没有考试的时候继续学习。</p>
+        <p class="en">When someone no longer studies for the next exam, education should not lose its reason to exist. On the contrary, that may be when another kind of education truly begins.</p><p class="zh" lang="zh-CN">当一个人不再为了下一场考试而学习时，教育不应该因此失去存在的意义。恰恰相反，那可能是另一种教育真正开始的时候。</p>
+        <h2 id="what-do-we-want-education-to-create"><span class="no">§7</span><span><span class="en">What do we want education to create?</span><span class="zh" lang="zh-CN">我们<wbr>究竟<wbr>希望<wbr>教育<wbr>创造<wbr>什么</span></span></h2>
+        <p class="en">I don’t think exam competition can easily be done away with. Good universities, research opportunities and jobs are still scarce, and society needs some transparent, reasonable way of selecting.</p><p class="zh" lang="zh-CN">我并不认为考试竞争可以被轻易消除。重要的大学、研究机会和工作岗位仍然稀缺，社会也需要某些透明而合理的选拔方式。</p>
+        <p class="en">But if we put almost all of education’s value on the results of competition, it is easy to overlook a wider question:</p><p class="zh" lang="zh-CN">但如果我们把教育几乎全部的价值都放在竞争结果上，就容易忽略一个更广阔的问题：</p>
+        <p class="en"><strong>Besides deciding who gets the opportunities that already exist, how many new opportunities can education help humanity create?</strong></p><p class="zh" lang="zh-CN"><strong>除了决定谁能获得现有的机会，教育还能帮助人类创造多少新的机会？</strong></p>
+        <p class="en">We can train people who are ever more skilled at exams. We can also try to help more people enter fields they knew nothing about, ask the questions they truly care about, and, with ever more powerful tools, finish work that was once hard to do.</p><p class="zh" lang="zh-CN">我们可以培养出越来越熟练应对考试的人，也可以尝试让更多人有能力进入此前不了解的知识领域，提出自己真正关心的问题，借助越来越强大的工具，完成原本难以完成的工作。</p>
+        <p class="en">The two do not exclude each other. A student preparing for the gaokao can certainly work hard for better marks; someone who wants to understand mathematics deeply can keep learning beyond any exam’s scope. The same person, at different stages of life, may even hold both goals at once.</p><p class="zh" lang="zh-CN">两者并不互相排斥。一个正在准备高考的学生，当然可以认真追求更好的成绩；一个希望深入理解数学的人，也可以不受考试范围的限制继续学习。同一个人在不同的人生阶段，甚至可以同时拥有这两种目标。</p>
+        <p class="en">I hope AI education can respect this change. When someone needs exam tutoring, help them perform under the real rules. When someone wants to learn in depth, help them understand how the knowledge fits together. When someone wants to enter an unfamiliar subject, do research or create, help them use existing knowledge and tools to move towards a larger unknown.</p><p class="zh" lang="zh-CN">我希望 AI 教育能尊重这种变化。当一个人需要考试辅导，就帮他在现实规则中发挥能力；当一个人希望深入学习，就帮他理解知识体系；当一个人希望走进陌生学科、开展研究或创造，就帮他利用已有的知识和工具，向更大的未知前进。</p>
+        <p class="en">In the end, <strong>education should help people master the knowledge and abilities that already exist, and also make them good at using existing knowledge and tools to do what they could not do before.</strong> Exams, courses, AI and business models should all serve that goal, not become its limits.</p><p class="zh" lang="zh-CN">说到底，<strong>教育既应帮助人们掌握已有的知识和能力，也应让人们善于借助已有的知识与工具，去做到此前做不到的事情。</strong>考试、课程、AI 和商业模式，都应该服务于这个目标，而不是反过来成为它的边界。</p>
+        <p class="en">We need not ask everyone to walk through every maze humanity has already explored. What is more worth hoping for is that, as knowledge and tools keep advancing, more and more people can walk out of the places that once held them, and reach a wider world.</p><p class="zh" lang="zh-CN">我们不必要求每个人亲自走完人类已经探索过的每一座迷宫。更值得期待的是，随着知识和工具不断进步，越来越多的人能够走出原本困住自己的地方，抵达更广阔的世界。</p>
+        <p class="en">There, they may meet new mazes.</p><p class="zh" lang="zh-CN">在那里，他们或许会遇见新的迷宫。</p>
+        <p class="en">And there, new exploration begins.</p><p class="zh" lang="zh-CN">而新的探索，就从那里开始。</p>
+        <aside class="callout boundary">
+          <p class="kicker"><span class="en">Evidence boundary</span><span class="zh" lang="zh-CN">证据边界</span></p>
+          
+          <p class="en">This is an opinion essay, not a TutorBench result. The studies it cites support specific facts and mechanisms only; its views on the social value of the tutoring industry and its hopes for AI-assisted learning and research are judgements still to be tested, not empirical findings about industry profits or about any educational product.</p><p class="zh" lang="zh-CN">本文是观点文章，不是 TutorBench 的评测结果。文中引用的研究只用来支撑具体的事实和机制；关于教培行业的社会价值、AI 辅助学习和研究的设想，是有待检验的判断，不构成对行业利润或任何教育产品效果的实证结论。</p>
+        </aside>
+        <section class="sources" aria-labelledby="sources">
+          <h2 id="sources" class="src-h"><span class="en">Sources and further reading</span><span class="zh" lang="zh-CN">资料来源与延伸阅读</span></h2>
+          <ol class="notes-list"><li id="source-1"><span><a href="https://www.nybooks.com/articles/1977/03/03/the-false-promise-of-growth/" rel="noopener"><span class="en">Hirsch (1976), Social Limits to Growth: positional goods and the tiptoe image, as set out in Robert Heilbroner’s review, The New York Review of Books (1977)</span><span class="zh" lang="zh-CN">Hirsch（1976），《增长的社会极限》：“地位性商品”与人群中踮脚的比喻，见 Heilbroner 的书评，《纽约书评》（1977）</span></a></span></li><li id="source-2"><span><a href="https://www.nber.org/papers/w15284" rel="noopener"><span class="en">Ramey &amp; Ramey (2010), Brookings Papers on Economic Activity: The Rug Rat Race</span><span class="zh" lang="zh-CN">Ramey &amp; Ramey（2010），Brookings Papers on Economic Activity：The Rug Rat Race（育儿竞赛）</span></a></span></li><li id="source-3"><span><a href="https://www.koreatimes.co.kr/southkorea/society/20250313/private-education-spending-in-south-korea-hits-all-time-high-despite-falling-number-of-students" rel="noopener"><span class="en">The Korea Times (13 March 2025): private education spending hits an all-time high despite a falling number of students (Statistics Korea and Ministry of Education survey for 2024)</span><span class="zh" lang="zh-CN">《韩国时报》（2025-03-13）：学生人数减少，校外教育支出仍创新高（韩国统计厅与教育部 2024 年调查）</span></a></span></li><li id="source-4"><span><a href="https://www.koreatimes.co.kr/economy/20260312/private-education-spending-fell-after-hitting-record-high-in-2024" rel="noopener"><span class="en">The Korea Times (12 March 2026): private education spending fell after hitting a record high in 2024 (survey for 2025)</span><span class="zh" lang="zh-CN">《韩国时报》（2026-03-12）：校外教育支出在 2024 年创新高后回落（2025 年调查）</span></a></span></li><li id="source-5"><span><a href="https://www.nber.org/papers/w27476" rel="noopener"><span class="en">Nickow, Oreopoulos &amp; Quan (2020), NBER Working Paper 27476: The Impressive Effects of Tutoring on PreK-12 Learning</span><span class="zh" lang="zh-CN">Nickow、Oreopoulos &amp; Quan（2020），NBER 工作论文 27476：The Impressive Effects of Tutoring on PreK-12 Learning</span></a></span></li><li id="source-6"><span><a href="https://doi.org/10.1596/1813-9450-11125" rel="noopener"><span class="en">De Simone et al. (2025), World Bank Policy Research Working Paper 11125: From Chalkboards to Chatbots, generative AI and learning outcomes in Nigeria</span><span class="zh" lang="zh-CN">De Simone 等（2025），世界银行政策研究工作论文 11125：From Chalkboards to Chatbots（尼日利亚的生成式 AI 与学习成果）</span></a></span></li><li id="source-7"><span><a href="https://doi.org/10.1038/nsmb.2119" rel="noopener"><span class="en">Khatib et al. (2011), Nature Structural &amp; Molecular Biology: Crystal structure of a monomeric retroviral protease solved by protein folding game players</span><span class="zh" lang="zh-CN">Khatib 等（2011），《自然·结构与分子生物学》：Crystal structure of a monomeric retroviral protease solved by protein folding game players</span></a></span></li><li id="source-8"><span><a href="https://archive.org/details/introductiontoma00whitiala" rel="noopener"><span class="en">Whitehead (1911), An Introduction to Mathematics, chapter 5</span><span class="zh" lang="zh-CN">怀特海（1911），《数学导论》（An Introduction to Mathematics），第五章</span></a></span></li><li id="source-9"><span><a href="https://www.nobelprize.org/prizes/chemistry/2024/press-release/" rel="noopener"><span class="en">The Royal Swedish Academy of Sciences: press release for the Nobel Prize in Chemistry 2024</span><span class="zh" lang="zh-CN">瑞典皇家科学院：2024 年诺贝尔化学奖新闻稿</span></a></span></li><li id="source-10"><span><a href="https://doi.org/10.1111/bjet.13544" rel="noopener"><span class="en">Fan et al. (2025), British Journal of Educational Technology: Beware of metacognitive laziness</span><span class="zh" lang="zh-CN">Fan 等（2025），British Journal of Educational Technology：Beware of metacognitive laziness（警惕元认知上的懒惰）</span></a></span></li></ol>
+        </section>
+      </div>
+    </article>
+  </div>
+
+  <nav class="wrap essay-nav" aria-label="Article navigation">
+    <span></span>
+    <a class="all kicker" href="../index.html"><span class="en">Back to all posts</span><span class="zh" lang="zh-CN">返回全部文章</span></a>
+    <a class="next" href="../arrogance-is-not-what-you-need/index.html"><span class="kicker"><span class="en">Next article</span><span class="zh" lang="zh-CN">下一篇文章</span></span><span class="t"><span class="en">Arrogance Is Not What You Need</span><span class="zh" lang="zh-CN">傲慢是你所不需要的</span></span></a>
+  </nav>
+
+  <section class="wrap issue-row" aria-labelledby="issue-h">
+    <p class="kicker" id="issue-h"><span class="en">The Journal · 7 essays</span><span class="zh" lang="zh-CN">期刊 · 7 篇文章</span></p>
+    <ol class="issue-cards">
+      <li aria-current="page"><a href="../after-you-have-beaten-everyone/index.html"><img src="../../assets/journal/podium.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 1 · reading</span><span class="zh" lang="zh-CN">第 1 篇 · 正在读</span></span><span class="t"><span class="en">After You’ve Beaten Everyone, Then What?</span><span class="zh" lang="zh-CN">当你赢过所有人之后呢？</span></span></a></li>
+      <li><a href="../arrogance-is-not-what-you-need/index.html"><img src="../../assets/journal/piano.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 2</span><span class="zh" lang="zh-CN">第 2 篇</span></span><span class="t"><span class="en">Arrogance Is Not What You Need</span><span class="zh" lang="zh-CN">傲慢是你所不需要的</span></span></a></li>
+      <li><a href="../why-learning-resources-fail-to-reach-learners/index.html"><img src="../../assets/journal/ladder.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 3</span><span class="zh" lang="zh-CN">第 3 篇</span></span><span class="t"><span class="en">Why Good Learning Resources Fail to Reach the People Who Need Them</span><span class="zh" lang="zh-CN">为什么优质教育资源没有抵达需要它的人？</span></span></a></li>
+      <li><a href="../when-learning-starts-to-feel-like-failure/index.html"><img src="../../assets/journal/eraser.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 4</span><span class="zh" lang="zh-CN">第 4 篇</span></span><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a></li>
+      <li><a href="../the-classroom-does-not-need-30-robots/index.html"><img src="../../assets/journal/hooks.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 5</span><span class="zh" lang="zh-CN">第 5 篇</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a></li>
+      <li><a href="../why-teaching-does-not-scale/index.html"><img src="../../assets/journal/hourglass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 6</span><span class="zh" lang="zh-CN">第 6 篇</span></span><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a></li>
+      <li><a href="../teaching-and-supervision-are-different-jobs/index.html"><img src="../../assets/journal/chalk.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 7</span><span class="zh" lang="zh-CN">第 7 篇</span></span><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84" loading="lazy" decoding="async"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16" loading="lazy" decoding="async"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond and Newsreader; Chinese in Noto Serif SC. Covers rendered in Blender.</span><span class="zh" lang="zh-CN">英文以 Cormorant Garamond 与 Newsreader 排印，中文以思源宋体排印。封面由 Blender 渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204" loading="lazy" decoding="async">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "After You’ve Beaten Everyone, Then What? · Teachometry Journal", zh: "当你赢过所有人之后呢？ · Teachometry 期刊" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

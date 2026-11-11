@@ -104,13 +104,15 @@ try {
       // Chinese lines may only break between words, never inside one
       if (lang === "zh") await page.evaluate(() => {
         const seg = new Intl.Segmenter("zh", { granularity: "word" });
+        // a headline already cut into words (<wbr> between them, as the Journal sets its titles) keeps its cuts
+        const cut = document.querySelector("h1 .zh wbr, h1:not(:has(.zh)) wbr") !== null;
         const walker = document.createTreeWalker(document.querySelector("h1"), NodeFilter.SHOW_TEXT);
         const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
         for (const node of nodes) {
           if (node.parentElement.closest(".en")) continue;
           if (!node.data.trim()) { node.remove(); continue; }
           const frag = document.createDocumentFragment();
-          for (const { segment } of seg.segment(node.data)) {
+          for (const { segment } of cut ? [{ segment: node.data }] : seg.segment(node.data)) {
             const span = document.createElement("span"); span.className = "w"; span.textContent = segment; frag.append(span);
           }
           node.replaceWith(frag);
