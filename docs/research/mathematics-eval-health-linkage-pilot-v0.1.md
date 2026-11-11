@@ -4,13 +4,15 @@
 
 ## Reused sources and boundaries
 
+- Academic navigation: `scenarios/case-system-vnext/academic-structure-v0.1.json`, version `0.1.0`, with mathematics registered under formal sciences.
+- Mathematics exam alignment: `scenarios/case-system-vnext/mathematics-exam-alignment-v0.1.json`, version `0.2.0`, with 16 author-proposed exam profiles and their knowledge-node links. The exam modules are not actual scored assessment results.
 - Mathematics knowledge map: `scenarios/case-system-vnext/mathematics-knowledge-map-v0.1.json`, version `0.2.0`. All existing prerequisite relations in this map are author hypotheses.
 - Canonical TutorEval dataset: `tutor-eval-v0.2a@0.2a.6`, loaded with `loadTutorEvalDataset()`. Its current bilingual snapshot is assembled from 0.2a.5 files with 0.2a.6 overrides; **do not** use `cases.json` as the current snapshot.
 - Default Tutor Health scenario suite: `productive-struggle-intervention-v0.1@0.2.0`, loaded with `loadTutorScenarioSuiteVNext()`.
 - Existing mathematics research suite and evidence registry: `scenarios/experimental/mathematics-challenge-v0.1/`. Its `taskId` → `nodeIds` mapping already exists and remains authoritative for those **research tasks**. This pilot does **not** duplicate those mappings.
 - Existing architecture ownership / taxonomy audits: `docs/architecture-integration-ledger-v0.1.md` and `docs/architecture-integration-map.md` (particularly G1, G2, G6, G9). This document adds no new architecture authority.
 
-The candidate links are stored at `scenarios/experimental/mathematics-eval-health-linkage-v0.1/links.json`. Each link pins the exact source ID and **case/scenario version**, links one or more existing knowledge-node IDs, and records a primary focus versus a supporting concept. The `evidenceAnchor` points to the exact **field**, not a copied source passage. The rationale is authored commentary for review; it is **not** a validated assertion of concept equivalence. The source dataset, default Health suite, mathematical research evidence, research suite, and knowledge-map identities/versions are pinned independently.
+The candidate links are stored at `scenarios/experimental/mathematics-eval-health-linkage-v0.1/links.json`. Each link pins the exact source ID and **case/scenario version**, links one or more existing knowledge-node IDs, and records a primary focus versus a supporting concept. The `evidenceAnchor` points to the exact **field**, not a copied source passage. The rationale is authored commentary for review; it is **not** a validated assertion of concept equivalence. The academic navigation registry, knowledge map, exam alignment, canonical Eval dataset, default Health suite, mathematical research evidence, and research suite identities/versions are pinned independently.
 
 ## Three sample regions
 
@@ -27,7 +29,9 @@ An empty cell means **zero links within this pilot/scope**; it must not be prese
 The implementation is an internal read-only module at
 `src/research/mathematics-linkage-pilot.ts`, with a narrow research inspector
 `src/cli/mathematics-linkage-pilot.ts`. It reuses `loadTutorEvalDataset`,
-`loadTutorScenarioSuiteVNext`, `parseMathematicsKnowledgeMap`,
+`loadTutorScenarioSuiteVNext`, `parseAcademicStructure`,
+`validateAcademicStructureReferences`, `parseMathematicsExamAlignment`,
+`validateMathematicsExamCoverage`, `parseMathematicsKnowledgeMap`,
 `validateMathematicsTaskCoverage`, and `validateMathChallengeCoverage`.
 It **derives**, rather than duplicates, research-task → knowledge-node links
 from the existing mathematics map and task evidence registry.
@@ -45,9 +49,10 @@ node dist/src/cli/mathematics-linkage-pilot.js --json
 The JSON report declares `scope: "authored_links_only"`,
 `reviewed: false`, `modelRunsMeasured: false`, and
 `learnerOutcomesMeasured: false`. No per-model scores or human performance
-claims are computed. All counts retain separate denominators: **44 graph
-nodes**, **16 authored research tasks / 20 research scenarios**, and
-**3 canonical English Eval cases / 4 default-Health decision points** in
+claims are computed. All counts retain separate denominators: **44 graph nodes**, **16 proposed
+exam profiles (42 nodes referenced)**, **16 authored research tasks / 20
+research scenarios**, and **3 canonical English Eval cases / 4
+default-Health decision points** in
 this limited pilot. Across all three source types, 23 distinct knowledge nodes
 have at least one authored link: 22 from the pre-existing mathematics research
 mapping plus one additional linked linear-equations node. This is **not** 23
@@ -57,7 +62,7 @@ mean only that the inspected authored source does not contain a link.
 
 ## What is and is not verified
 
-`tests/mathematics-eval-health-linkage-pilot.test.ts` calls the shared projection and validates exact source identities against the current loaders, research evidence/suite matching, known graph nodes and decision-point IDs; exercises reverse lookup, coverage counts, and rejects stale source versions, phantom nodes, duplicate source records, and wrong decision points. It is designed to run offline under the normal Node 24 test suite.
+`tests/mathematics-eval-health-linkage-pilot.test.ts` calls the shared projection and validates exact source identities against the current loaders, AcademicStructure → mathematics map, research evidence/suite matching, math exam alignment, known graph nodes and decision-point IDs; exercises reverse lookup, coverage counts, CLI smoke, and rejects stale source versions, phantom nodes, duplicate source records, and wrong decision points. It is designed to run offline under the normal Node 24 test suite.
 
 - **Code-level validity:** a link refers to a known case, decision point and knowledge node at pinned versions; independently testable.
 - **Authored topical plausibility:** each proposed relation is supported by an explicitly named authoring field. This pilot is **not** independent subject-matter validation.
