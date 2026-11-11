@@ -31,6 +31,8 @@ export interface MathematicsSourceCoverageRow {
   readonly learningObjective: string;
   readonly mappingStatus: "candidate_linked" | "explicitly_unmapped";
   readonly knowledgeNodeIds: readonly string[];
+  readonly focusNodeIds: readonly string[];
+  readonly supportingNodeIds: readonly string[];
   readonly relationRationale: string;
   readonly evalCategories: readonly TutorEvalCategory[];
   readonly healthDimensions: readonly TutorHealthDimension[];
@@ -45,6 +47,10 @@ export interface MathematicsSubjectNodeCoverage {
   readonly examProfileCount: number;
   readonly candidateEvalCaseCount: number;
   readonly candidateHealthDecisionCount: number;
+  readonly focusEvalCaseCount: number;
+  readonly focusHealthDecisionCount: number;
+  readonly supportingEvalCaseCount: number;
+  readonly supportingHealthDecisionCount: number;
 }
 export interface MathematicsSubjectCoverageAudit {
   readonly scope: "canonical_mathematics_eval_and_default_health";
@@ -65,6 +71,7 @@ export interface MathematicsSubjectCoverageAudit {
     readonly independentlyReviewedMappings: 0;
     readonly graphNodes: number;
     readonly graphNodesWithCanonicalOrHealthCandidate: number;
+    readonly graphNodesWithPrimaryCanonicalOrHealthCandidate: number;
     readonly graphNodesWithResearchTask: number;
   };
   readonly inventory: readonly MathematicsSourceCoverageRow[];
@@ -144,7 +151,7 @@ export function buildMathematicsSubjectCoverageAudit(
     }
   }
 
-  const links = new Map<string, { nodes: readonly { readonly id: string }[]; rationale: string }>();
+  const links = new Map<string, { nodes: readonly { readonly id: string; readonly role: "focus" | "supporting" }[]; rationale: string }>();
   for (const link of pilot.links) {
     const k = key(link.source);
     if (!expected.has(k)) throw new Error("mathematics_link_not_in_canonical_inventory");
@@ -178,6 +185,8 @@ export function buildMathematicsSubjectCoverageAudit(
       ...ctx,
       mappingStatus: linked ? "candidate_linked" as const : "explicitly_unmapped" as const,
       knowledgeNodeIds: linked ? uniqueSorted(linked.nodes.map(n => n.id)) : [],
+      focusNodeIds: linked ? uniqueSorted(linked.nodes.filter(n => n.role === "focus").map(n => n.id)) : [],
+      supportingNodeIds: linked ? uniqueSorted(linked.nodes.filter(n => n.role === "supporting").map(n => n.id)) : [],
       relationRationale: linked?.rationale ?? gap!.rationale,
       independentReview: "not_reviewed" as const,
     };
@@ -186,8 +195,10 @@ export function buildMathematicsSubjectCoverageAudit(
   const pilotCoverage = buildMathematicsPilotCoverage(inputs);
   const contextsByKey = new Map(inventory.map(x => [key(x.source), x]));
   const nodeRows: MathematicsSubjectNodeCoverage[] = pilotCoverage.nodes.map(node => {
-    const mappedSources = pilot.links.filter(link => link.nodes.some(item => item.id === node.nodeId))
-      .map(link => contextsByKey.get(key(link.source))!);
+    const nodeLinks = pilot.links.filter(link => link.nodes.some(item => item.id === node.nodeId));
+    const mappedSources = nodeLinks.map(link => contextsByKey.get(key(link.source))!);
+    const focusLinks = nodeLinks.filter(link => link.nodes.some(item => item.id === node.nodeId && item.role === "focus"));
+    const supportingLinks = nodeLinks.filter(link => link.nodes.some(item => item.id === node.nodeId && item.role === "supporting"));
     return {
       nodeId: node.nodeId,
       domainId: node.domainId,
@@ -197,6 +208,10 @@ export function buildMathematicsSubjectCoverageAudit(
       examProfileCount: node.examProfiles.length,
       candidateEvalCaseCount: node.evalCases.length,
       candidateHealthDecisionCount: node.healthDecisionPoints.length,
+      focusEvalCaseCount: focusLinks.filter(x => x.source.kind === "eval_case").length,
+      focusHealthDecisionCount: focusLinks.filter(x => x.source.kind === "health_decision_point").length,
+      supportingEvalCaseCount: supportingLinks.filter(x => x.source.kind === "eval_case").length,
+      supportingHealthDecisionCount: supportingLinks.filter(x => x.source.kind === "health_decision_point").length,
     };
   });
   const evalCases = inventory.filter(x => x.source.kind === "eval_case");
@@ -223,6 +238,7 @@ export function buildMathematicsSubjectCoverageAudit(
       independentlyReviewedMappings: 0,
       graphNodes: nodeRows.length,
       graphNodesWithCanonicalOrHealthCandidate: nodeRows.filter(x => x.candidateEvalCaseCount + x.candidateHealthDecisionCount > 0).length,
+      graphNodesWithPrimaryCanonicalOrHealthCandidate: nodeRows.filter(x => x.focusEvalCaseCount + x.focusHealthDecisionCount > 0).length,
       graphNodesWithResearchTask: nodeRows.filter(x => x.researchTaskCount > 0).length,
     },
     inventory,
