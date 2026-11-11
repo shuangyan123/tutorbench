@@ -237,6 +237,20 @@ This prevents TutorBench from guessing what "exam strategy" means. A method can
 be suitable for an answer-only timed item but unsuitable for a proof question
 that awards process marks.
 
+The **optional experimental** `learningContext` within `learning_oriented`
+can further declare `concept_mastery` versus `open_inquiry`, whether guided
+attempts or direct AI conclusions are permitted, allowed tools, the outcome
+evidence target (`independent`, `tool_augmented`, or `both`) and a success
+condition. When direct conclusions are permitted for open inquiry, the author
+must also give a verification plan. **Permitted direct conclusions are not
+automatically answer leakage**, and tool-augmented accomplishment is not uncued
+learner mastery. The existing objective mode identities and schema version
+remain unchanged; a third objective mode is not introduced.
+
+See the [goal-aligned principles and contrasts](research/pedagogical-principles/goal-aligned-education-and-ai-assistance-v0.1.md)
+for the non-canonical research rationale and synthetic cases. These are
+candidate extensions, not additional mandatory case criteria or scoring rules.
+
 The same task may be authored as a counterfactual pair in which only the
 teaching objective changes. A preference reversal is legitimate when it is
 explained by the objective context rather than by response length or style.
