@@ -1,3 +1,7 @@
+import type { AcademicStructure } from "../contracts/academic-structure.js";
+import { validateAcademicStructureReferences } from "../contracts/academic-structure.js";
+import type { MathematicsExamAlignment } from "../contracts/mathematics-exam-alignment.js";
+import { validateMathematicsExamCoverage } from "../contracts/mathematics-exam-alignment.js";
 import type { MathChallengeEvidenceRegistry } from "../contracts/math-challenge-evidence.js";
 import { validateMathChallengeCoverage } from "../contracts/math-challenge-evidence.js";
 import type { MathematicsKnowledgeMap } from "../contracts/mathematics-knowledge-map.js";
@@ -28,7 +32,9 @@ export interface MathematicsPilotRegistry {
   readonly version: string;
   readonly status: "author-proposed-unreviewed";
   readonly sources: {
+    readonly academicStructure: { readonly id: string; readonly version: string };
     readonly knowledgeMap: { readonly id: string; readonly version: string };
+    readonly examAlignment: { readonly id: string; readonly version: string };
     readonly evalDataset: { readonly id: string; readonly version: string };
     readonly healthSuite: { readonly id: string; readonly version: string };
     readonly researchEvidence: { readonly id: string; readonly version: string };
@@ -37,6 +43,8 @@ export interface MathematicsPilotRegistry {
   readonly links: readonly MathematicsPilotLink[];
 }
 export interface MathematicsPilotInputs {
+  readonly academic: AcademicStructure;
+  readonly exam: MathematicsExamAlignment;
   readonly map: MathematicsKnowledgeMap;
   readonly pilot: MathematicsPilotRegistry;
   readonly evaluation: TutorEvalDataset;
@@ -54,11 +62,13 @@ function matchesIdentity(expected: { readonly id: string; readonly version: stri
 
 /** Ensures structural identity only. It cannot establish educational validity. */
 export function validateMathematicsPilotLinkage(inputs: MathematicsPilotInputs): void {
-  const { map, pilot, evaluation, health, evidence, researchSuite } = inputs;
+  const { academic, exam, map, pilot, evaluation, health, evidence, researchSuite } = inputs;
   if (pilot.schemaVersion !== 1 ||
       pilot.id !== "mathematics-eval-health-knowledge-linkage-pilot-v0.1" ||
       pilot.version !== "0.1.0" || pilot.status !== "author-proposed-unreviewed" ||
+      !matchesIdentity(pilot.sources.academicStructure, academic) ||
       !matchesIdentity(pilot.sources.knowledgeMap, map) ||
+      !matchesIdentity(pilot.sources.examAlignment, exam) ||
       !matchesIdentity(pilot.sources.evalDataset, evaluation) ||
       !matchesIdentity(pilot.sources.healthSuite, health) ||
       !matchesIdentity(pilot.sources.researchEvidence, evidence) ||
@@ -70,6 +80,10 @@ export function validateMathematicsPilotLinkage(inputs: MathematicsPilotInputs):
       researchSuite.id !== evidence.suiteId) {
     throw new Error("pilot_research_status_invalid");
   }
+  validateAcademicStructureReferences(academic, map, exam);
+  validateMathematicsExamCoverage(exam, map, researchSuite);
+  const mathDiscipline = academic.disciplines.find(item => item.id === "mathematics");
+  if (!mathDiscipline?.knowledgeSystemIds.includes(map.id)) throw new Error("pilot_academic_link_invalid");
   validateMathematicsTaskCoverage(map, evidence);
   validateMathChallengeCoverage(evidence, researchSuite);
   const compiledHealth = tutorScenarioSuiteToTutorEvalDataset(health);
@@ -124,6 +138,7 @@ export function validateMathematicsPilotLinkage(inputs: MathematicsPilotInputs):
 export interface MathematicsNodePilotCoverage {
   readonly nodeId: string;
   readonly domainId: string;
+  readonly examProfiles: readonly string[];
   readonly researchTasks: readonly string[];
   readonly researchScenarios: readonly string[];
   readonly evalCases: readonly { readonly id: string; readonly version: string }[];
@@ -141,6 +156,8 @@ export interface MathematicsPilotCoverageReport {
   readonly sources: MathematicsPilotRegistry["sources"];
   readonly counts: {
     readonly graphNodes: number;
+    readonly examProfileCount: number;
+    readonly examLinkedNodeCount: number;
     readonly researchMappedNodes: number;
     readonly researchUnmappedNodes: number;
     readonly researchTaskCount: number;
@@ -158,7 +175,7 @@ const sortedUnique = (items: readonly string[]) => [...new Set(items)].sort();
 /** Structured, deterministic reverse lookup. It never guesses links by label or topic similarity. */
 export function buildMathematicsPilotCoverage(inputs: MathematicsPilotInputs): MathematicsPilotCoverageReport {
   validateMathematicsPilotLinkage(inputs);
-  const { map, pilot, evidence } = inputs;
+  const { map, pilot, evidence, exam } = inputs;
   const tasksById = new Map(evidence.tasks.map(item => [item.id, item]));
   const taskNodes = new Map<string, string[]>();
   const scenarioNodes = new Map<string, string[]>();
@@ -174,6 +191,8 @@ export function buildMathematicsPilotCoverage(inputs: MathematicsPilotInputs): M
     return {
       nodeId: node.id,
       domainId: node.domainId,
+      examProfiles: sortedUnique(exam.profiles.filter(profile =>
+        profile.modules.some(module => module.nodeIds.includes(node.id))).map(profile => profile.id)),
       researchTasks: sortedUnique(taskNodes.get(node.id) ?? []),
       researchScenarios: sortedUnique(scenarioNodes.get(node.id) ?? []),
       evalCases: links.filter(link => link.source.kind === "eval_case")
@@ -195,6 +214,8 @@ export function buildMathematicsPilotCoverage(inputs: MathematicsPilotInputs): M
     sources: pilot.sources,
     counts: {
       graphNodes: rows.length,
+      examProfileCount: exam.profiles.length,
+      examLinkedNodeCount: rows.filter(row => row.examProfiles.length > 0).length,
       researchMappedNodes: researchMapped.length,
       researchUnmappedNodes: rows.length - researchMapped.length,
       researchTaskCount: evidence.tasks.length,
