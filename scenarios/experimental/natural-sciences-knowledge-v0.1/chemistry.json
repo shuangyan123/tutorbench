@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "chemistry-knowledge-seed-v0.1",
+  "version": "0.1.0",
+  "disciplineId": "chemistry",
+  "status": "author-proposed-unreviewed",
+  "domainTaxonomy": {
+    "id": "case-system-vnext-domain-taxonomy",
+    "version": "0.1.0"
+  },
+  "purpose": "Small discipline-specific authored concept index for current test cases only. Not a curriculum, learning outcome claim, mandatory prerequisite chain, or externally validated ontology.",
+  "domains": [
+    {
+      "id": "chemical-representations",
+      "label": "Chemical equations and entity counting"
+    },
+    {
+      "id": "experimental-kinetics",
+      "label": "Chemical kinetics and experimental identification"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "atom-conservation-balancing",
+      "domainId": "chemical-representations",
+      "label": "Atom conservation in balancing equations",
+      "reasoningFacet": "conservation",
+      "scopeNote": "Conserve atom counts across chemical species rather than alter formulas"
+    },
+    {
+      "id": "coefficient-vs-formula",
+      "domainId": "chemical-representations",
+      "label": "Stoichiometric coefficients versus fixed chemical formulas",
+      "reasoningFacet": "symbolic-interpretation",
+      "scopeNote": "Distinguish a formula's subscripts from equation coefficients"
+    },
+    {
+      "id": "kinetics-factor-control",
+      "domainId": "experimental-kinetics",
+      "label": "Separating temperature and concentration effects on reaction rate",
+      "reasoningFacet": "experimental-design",
+      "scopeNote": "Control competing reaction conditions, evidence quality and measurement variation"
+    }
+  ],
+  "relationHypotheses": []
+}
