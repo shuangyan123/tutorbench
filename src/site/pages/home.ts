@@ -116,7 +116,7 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: Si
   const { benchmark, cases } = artifacts;
   const initialIndex = Math.max(0, cases.cases.findIndex((item) => item.id === "fraction-misconception-001"));
   return {
-    title: "Teachometry — Test how AI tutors behave before you ship them.",
+    title: "TutorBench by Teachometry — AI Tutor Evaluation",
     description: "Scenario-based evaluation and regression infrastructure for observable AI tutoring behavior. Teachometry Developer Preview.",
     route: "/",
     content: `<section class="home-hero"><div class="shell home-hero-grid">
