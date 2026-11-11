@@ -25,26 +25,26 @@ An empty cell means **zero links within this pilot/scope**; it must not be prese
 ## Offline, version-pinned reverse lookup
 
 The implementation is an internal read-only module at
-\`src/research/mathematics-linkage-pilot.ts\`, with a narrow research inspector
-\`src/cli/mathematics-linkage-pilot.ts\`. It reuses \`loadTutorEvalDataset\`,
-\`loadTutorScenarioSuiteVNext\`, \`parseMathematicsKnowledgeMap\`,
-\`validateMathematicsTaskCoverage\`, and \`validateMathChallengeCoverage\`.
+`src/research/mathematics-linkage-pilot.ts`, with a narrow research inspector
+`src/cli/mathematics-linkage-pilot.ts`. It reuses `loadTutorEvalDataset`,
+`loadTutorScenarioSuiteVNext`, `parseMathematicsKnowledgeMap`,
+`validateMathematicsTaskCoverage`, and `validateMathChallengeCoverage`.
 It **derives**, rather than duplicates, research-task → knowledge-node links
 from the existing mathematics map and task evidence registry.
 
-After \`npm run build\`, run:
+After `npm run build`, run:
 
-\`\`\`sh
+```sh
 node dist/src/cli/mathematics-linkage-pilot.js
 node dist/src/cli/mathematics-linkage-pilot.js --node fractions-units
 node dist/src/cli/mathematics-linkage-pilot.js --node linear-equations
 node dist/src/cli/mathematics-linkage-pilot.js --node conditional-events
 node dist/src/cli/mathematics-linkage-pilot.js --json
-\`\`\`
+```
 
-The JSON report declares \`scope: "authored_links_only"\`,
-\`reviewed: false\`, \`modelRunsMeasured: false\`, and
-\`learnerOutcomesMeasured: false\`. No per-model scores or human performance
+The JSON report declares `scope: "authored_links_only"`,
+`reviewed: false`, `modelRunsMeasured: false`, and
+`learnerOutcomesMeasured: false`. No per-model scores or human performance
 claims are computed. All counts retain separate denominators: **44 graph
 nodes**, **16 authored research tasks / 20 research scenarios**, and
 **3 canonical English Eval cases / 4 default-Health decision points** in
