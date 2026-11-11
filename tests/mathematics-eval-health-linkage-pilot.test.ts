@@ -53,7 +53,7 @@ test("pilot pins sources, validates links, and distinguishes case presence from 
     linkedEvalCaseCount: 3,
     linkedHealthDecisionPointCount: 4,
     pilotLinkedNodeCount: 3,
-    combinedLinkedNodeCount: 22,
+    combinedLinkedNodeCount: 23,
   });
   assert.equal(inputs.pilot.links.find(link => link.source.id === "fraction-misconception-001")?.source.version, "1.2.0");
   assert.ok(report.nodes.every(row => inputs.map.nodes.some(node => node.id === row.nodeId)));
