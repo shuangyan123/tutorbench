@@ -82,6 +82,22 @@ are candidate / non-canonical. Internal single-reviewer exploration motivates
 them. Independent expert consensus, Gold, Judge calibration, and learner
 outcomes have yet to be established.
 
+## Goal-aligned learning and tool-augmented inquiry (candidate, not P-007)
+
+[Goal-Aligned Education and AI Assistance v0.1](goal-aligned-education-and-ai-assistance-v0.1.md)
+registers the 2026-11-10 discussion as a source-controlled, non-canonical
+research/product-direction record. It **reuses** P-001–P-006, the learner
+starting-point work and the two existing Case System vNext objective modes.
+It does not assign new P-series principle IDs or create rubric weights.
+
+The optional `learningContext` authoring refinement within
+`learning_oriented` distinguishes concept mastery from open inquiry, guided
+attempts from explicitly permitted direct conclusions, and uncued from
+tool-augmented outcome evidence. The [experimental contrast cases](../../../scenarios/experimental/goal-aligned-assistance-v0.1/contrasts.json)
+and [contract tests](../../../tests/case-system-vnext-goal-aligned-assistance.test.ts)
+turn those distinctions into inspectable input examples. They are **not**
+learner observations, independent review results or new scored fixtures.
+
 ## Authoring lifecycle and versioning
 
 `candidate → review-ready → empirically supported / contested` describes the
