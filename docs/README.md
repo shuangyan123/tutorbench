@@ -36,6 +36,7 @@ What TutorBench measures and what it is allowed to claim.
 - [Tutor Benchmark Product Boundary](benchmark-product-boundary.md)
 - [TutorBench Real-World Evaluation / Finding-First Model](real-world-finding-first-evaluation.md)
 - [Prerequisite-Aware Teaching Evaluation — Experimental Pilot](prerequisite-aware-teaching-evaluation.md)
+- [Goal-Aligned Education and AI Assistance v0.1 — Candidate principles and contrast cases](research/pedagogical-principles/goal-aligned-education-and-ai-assistance-v0.1.md)
 - [TutorEval scoring provenance](scoring-provenance.md)
 - [Statistics and signal availability](statistics-evidence-semantics.md)
 - [Canonical TutorEval rubric authoring QA](rubric-authoring-qa.md)
