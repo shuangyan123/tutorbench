@@ -176,10 +176,10 @@ export function buildMathematicsSubjectCoverageAudit(
     if (!linked && !gap) throw new Error("mathematics_source_inventory_incomplete");
     return {
       ...ctx,
-      mappingStatus: linked ? "candidate_linked" : "explicitly_unmapped",
+      mappingStatus: linked ? "candidate_linked" as const : "explicitly_unmapped" as const,
       knowledgeNodeIds: linked ? uniqueSorted(linked.nodes.map(n => n.id)) : [],
       relationRationale: linked?.rationale ?? gap!.rationale,
-      independentReview: "not_reviewed",
+      independentReview: "not_reviewed" as const,
     };
   }).sort((a, b) => key(a.source).localeCompare(key(b.source)));
 
