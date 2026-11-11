@@ -1,4 +1,5 @@
 import type { TutorEvalCategory } from "../contracts/tutor-eval.js";
+import { buildSubjectLinkIndex } from "./subject-knowledge-linkage.js";
 import type { TutorHealthDimension } from "../contracts/tutor-health.js";
 import {
   buildMathematicsPilotCoverage,
@@ -176,6 +177,20 @@ export function buildMathematicsSubjectCoverageAudit(
     throw new Error("mathematics_source_inventory_incomplete");
   }
 
+  // Shared source/disposition/primary-vs-supporting index. The mathematics
+  // compiler and semantic review remain exclusively owned by math modules.
+  const sourceIndex = buildSubjectLinkIndex({
+    sourceKeys: [...expected.keys()],
+    knowledgeNodes: inputs.map.nodes.map(n => ({ disciplineId: "mathematics", id: n.id })),
+    candidateLinks: [...links.entries()].map(([sourceKey, link]) => ({
+      sourceKey,
+      disciplineId: "mathematics",
+      focusNodeIds: link.nodes.filter(n => n.role === "focus").map(n => n.id),
+      supportingNodeIds: link.nodes.filter(n => n.role === "supporting").map(n => n.id),
+    })),
+    explicitGapSourceKeys: [...gaps.keys()],
+  });
+
   const inventory: MathematicsSourceCoverageRow[] = [...expected.values()].map(ctx => {
     const k = key(ctx.source);
     const linked = links.get(k);
@@ -237,8 +252,8 @@ export function buildMathematicsSubjectCoverageAudit(
       explicitGaps: gaps.size,
       independentlyReviewedMappings: 0,
       graphNodes: nodeRows.length,
-      graphNodesWithCanonicalOrHealthCandidate: nodeRows.filter(x => x.candidateEvalCaseCount + x.candidateHealthDecisionCount > 0).length,
-      graphNodesWithPrimaryCanonicalOrHealthCandidate: nodeRows.filter(x => x.focusEvalCaseCount + x.focusHealthDecisionCount > 0).length,
+      graphNodesWithCanonicalOrHealthCandidate: sourceIndex.counts.linkedNodes,
+      graphNodesWithPrimaryCanonicalOrHealthCandidate: sourceIndex.counts.focusNodes,
       graphNodesWithResearchTask: nodeRows.filter(x => x.researchTaskCount > 0).length,
     },
     inventory,
