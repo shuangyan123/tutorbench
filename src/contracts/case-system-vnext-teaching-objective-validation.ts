@@ -1,6 +1,10 @@
 import { BenchmarkConfigurationError } from "./errors.js";
 import {
   CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_MODES,
+  CASE_SYSTEM_VNEXT_LEARNING_INTENTS,
+  CASE_SYSTEM_VNEXT_ASSISTANCE_POLICIES,
+  CASE_SYSTEM_VNEXT_OUTCOME_EVIDENCE,
+  type CaseSystemVNextLearningContext,
   type CaseSystemVNextAssessmentContext,
   type CaseSystemVNextTeachingObjectiveSelection,
 } from "./case-system-vnext-teaching-objective.js";
@@ -55,23 +59,60 @@ function isAssessmentContext(value: unknown): value is CaseSystemVNextAssessment
     isTextArray(record.requiredWork, 50);
 }
 
+function isLearningContext(value: unknown): value is CaseSystemVNextLearningContext {
+  const record = asRecord(value);
+  if (
+    record === null ||
+    !hasOnlyKeys(record, [
+      "intent",
+      "assistancePolicy",
+      "permittedTools",
+      "outcomeEvidence",
+      "successCondition",
+      "verificationPlan",
+    ]) ||
+    !CASE_SYSTEM_VNEXT_LEARNING_INTENTS.includes(record.intent as never) ||
+    !CASE_SYSTEM_VNEXT_ASSISTANCE_POLICIES.includes(record.assistancePolicy as never) ||
+    !CASE_SYSTEM_VNEXT_OUTCOME_EVIDENCE.includes(record.outcomeEvidence as never) ||
+    !isTextArray(record.permittedTools, 50) ||
+    !isText(record.successCondition, 1_000) ||
+    (record.verificationPlan !== undefined && !isText(record.verificationPlan, 1_000))
+  ) {
+    return false;
+  }
+
+  // The permission to supply a research conclusion must have a stated
+  // falsification/verification path; it is not a license to fabricate results.
+  if (
+    record.intent === "open_inquiry" &&
+    record.assistancePolicy === "direct_conclusions_permitted" &&
+    !isText(record.verificationPlan, 1_000)
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function parseCaseSystemVNextTeachingObjectiveSelection(
   value: unknown,
 ): CaseSystemVNextTeachingObjectiveSelection {
   const record = asRecord(value);
   if (
     record === null ||
-    !hasOnlyKeys(record, ["mode", "assessmentContext"]) ||
+    !hasOnlyKeys(record, ["mode", "assessmentContext", "learningContext"]) ||
     !CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_MODES.includes(record.mode as never)
   ) {
     throw new BenchmarkConfigurationError("case_system_vnext_invalid");
   }
 
   if (record.mode === "exam_oriented") {
-    if (!isAssessmentContext(record.assessmentContext)) {
+    if (!isAssessmentContext(record.assessmentContext) || record.learningContext !== undefined) {
       throw new BenchmarkConfigurationError("case_system_vnext_invalid");
     }
-  } else if (record.assessmentContext !== undefined) {
+  } else if (
+    record.assessmentContext !== undefined ||
+    (record.learningContext !== undefined && !isLearningContext(record.learningContext))
+  ) {
     throw new BenchmarkConfigurationError("case_system_vnext_invalid");
   }
 
