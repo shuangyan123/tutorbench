@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "id": "mathematics-eval-health-knowledge-linkage-pilot-v0.1",
+  "version": "0.1.0",
+  "status": "author-proposed-unreviewed",
+  "purpose": "Read-only, version-bound candidate links from selected existing Eval cases and Health decision points to existing mathematics knowledge nodes. Not scores, official curriculum alignment, or proof of learner mastery.",
+  "sources": {
+    "knowledgeMap": {
+      "id": "mathematics-knowledge-map-v0.1",
+      "version": "0.2.0"
+    },
+    "evalDataset": {
+      "id": "tutor-eval-v0.2a",
+      "version": "0.2a.6"
+    },
+    "healthSuite": {
+      "id": "productive-struggle-intervention-v0.1",
+      "version": "0.2.0"
+    }
+  },
+  "links": [
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "fraction-misconception-001",
+        "version": "1.2.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "fraction-equivalence",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "The authored objective checks unlike fractional units and asks for compatible units before addition."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-fraction-conceptual-001",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "The authored objective explicitly addresses the meaning of denominator-sized units."
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "hint-only-linear-equation-001",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "tutorInput.learningObjective",
+      "rationale": "The authored objective guides an inverse-operation step in a one-variable linear equation."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-false-confidence",
+        "version": "0.1.0",
+        "decisionPointId": "test-reasoning-before-affirmation"
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The scenario probes denominator misconception and the meaning of compatible fraction units."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-same-misconception",
+        "version": "0.1.0",
+        "decisionPointId": "contrast-equal-whole-pieces"
+      },
+      "nodes": [
+        {
+          "id": "fractions-units",
+          "role": "focus"
+        },
+        {
+          "id": "fraction-equivalence",
+          "role": "supporting"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The scenario contrasts same-whole fractional parts and permits equivalence-based explanation."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-first-mistake",
+        "version": "0.1.1",
+        "decisionPointId": "preserve-first-attempt"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The scenario concerns inverse operations and preservation of equality after a first error."
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-repeated-mistake",
+        "version": "0.1.1",
+        "decisionPointId": "target-second-attempt"
+      },
+      "nodes": [
+        {
+          "id": "linear-equations",
+          "role": "focus"
+        }
+      ],
+      "evidenceAnchor": "learningContext.learningObjective",
+      "rationale": "The scenario targets repeated one-sided changes in a linear equation."
+    }
+  ]
+}
