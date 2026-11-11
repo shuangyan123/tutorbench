@@ -286,8 +286,9 @@ export function buildNaturalScienceCoverageAudit(i: NaturalScienceIntegrationInp
     if (link.evidenceAnchor !== expectedAnchor || !nonEmpty(ctx.objective))
       throw new Error("science_link_evidence_anchor_invalid");
     const known = new Set(mapByDiscipline.get(link.disciplineId)!.nodes.map(node => node.id));
-    if (link.nodes.some(n => !n || !known.has(n.id) || !["focus", "supporting"].includes(n.role)) ||
-        !unique(link.nodes.map(n => n.id)) || !link.nodes.some(n => n.role === "focus"))
+    const candidateNodes: readonly NaturalScienceCandidateLink["nodes"][number][] = link.nodes;
+    if (candidateNodes.some(n => !n || !known.has(n.id) || !["focus", "supporting"].includes(n.role)) ||
+        !unique(candidateNodes.map(n => n.id)) || !candidateNodes.some(n => n.role === "focus"))
       throw new Error("science_link_node_invalid");
     linked.set(k, link);
   }
@@ -297,7 +298,7 @@ export function buildNaturalScienceCoverageAudit(i: NaturalScienceIntegrationInp
         gap.reasonCode !== "insufficient_discipline_attribution" ||
         !nonEmpty(gap.rationale) || !Array.isArray(gap.candidateDisciplines) ||
         gap.candidateDisciplines.length < 2 ||
-        gap.candidateDisciplines.some(x => !NATURAL_SCIENCE_IDS.includes(x)) ||
+        gap.candidateDisciplines.some((x: NaturalScienceId) => !NATURAL_SCIENCE_IDS.includes(x)) ||
         !unique(gap.candidateDisciplines))
       throw new Error("science_gap_invalid");
     const k = scienceSourceKey(gap.source);
