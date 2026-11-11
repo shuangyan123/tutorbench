@@ -48,7 +48,10 @@ The JSON report declares `scope: "authored_links_only"`,
 claims are computed. All counts retain separate denominators: **44 graph
 nodes**, **16 authored research tasks / 20 research scenarios**, and
 **3 canonical English Eval cases / 4 default-Health decision points** in
-this limited pilot. In particular, research-task nodes and direct Eval/Health
+this limited pilot. Across all three source types, 23 distinct knowledge nodes
+have at least one authored link: 22 from the pre-existing mathematics research
+mapping plus one additional linked linear-equations node. This is **not** 23
+validated knowledge areas or a 23/44 performance score. In particular, research-task nodes and direct Eval/Health
 links are not summed as independent verified learning coverage. Missing links
 mean only that the inspected authored source does not contain a link.
 
