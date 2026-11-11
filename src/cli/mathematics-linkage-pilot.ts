@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { buildMathematicsSubjectCoverageAudit, type MathematicsExplicitGapRegistry } from "../research/mathematics-linkage-audit.js";
 import { parseAcademicStructure } from "../contracts/academic-structure.js";
 import { parseMathematicsExamAlignment } from "../contracts/mathematics-exam-alignment.js";
 import { parseMathChallengeEvidence } from "../contracts/math-challenge-evidence.js";
@@ -17,33 +18,36 @@ import {
  * and intentionally does not invoke any Tutor, Judge, or scoring engine.
  */
 async function main(args: readonly string[]): Promise<void> {
-  const help = "Usage: node dist/src/cli/mathematics-linkage-pilot.js [--node KNOWLEDGE_NODE_ID] [--json]\n" +
+  const help = "Usage: node dist/src/cli/mathematics-linkage-pilot.js [--node KNOWLEDGE_NODE_ID] [--audit] [--json]\n" +
     "Read-only authored knowledge links only: not scored runs or learner outcomes.";
   if (args.includes("--help")) {
     console.log(help);
     return;
   }
-  const unknown = args.filter((arg, i) => arg !== "--json" && arg !== "--node" &&
+  const unknown = args.filter((arg, i) => arg !== "--json" && arg !== "--audit" && arg !== "--node" &&
     !(i > 0 && args[i - 1] === "--node"));
   const nodeFlag = args.indexOf("--node");
   if (unknown.length > 0 || (nodeFlag >= 0 && (args[nodeFlag + 1] === undefined || args[nodeFlag + 1]!.startsWith("--"))) ||
       args.filter(arg => arg === "--node").length > 1 ||
-      args.filter(arg => arg === "--json").length > 1) {
+      args.filter(arg => arg === "--json").length > 1 ||
+      args.filter(arg => arg === "--audit").length > 1 ||
+      (args.includes("--audit") && nodeFlag >= 0)) {
     throw new Error(help);
   }
   const nodeId = nodeFlag >= 0 ? args[nodeFlag + 1]! : null;
   const base = new URL("../../../scenarios/", import.meta.url);
-  const [academicText, examText, mapText, pilotText, evidenceText, researchText, evaluation, health] = await Promise.all([
+  const [academicText, examText, mapText, pilotText, gapsText, evidenceText, researchText, evaluation, health] = await Promise.all([
     readFile(new URL("case-system-vnext/academic-structure-v0.1.json", base), "utf8"),
     readFile(new URL("case-system-vnext/mathematics-exam-alignment-v0.1.json", base), "utf8"),
     readFile(new URL("case-system-vnext/mathematics-knowledge-map-v0.1.json", base), "utf8"),
     readFile(new URL("experimental/mathematics-eval-health-linkage-v0.1/links.json", base), "utf8"),
+    readFile(new URL("experimental/mathematics-eval-health-linkage-v0.1/unmapped.json", base), "utf8"),
     readFile(new URL("experimental/mathematics-challenge-v0.1/evidence.json", base), "utf8"),
     readFile(new URL("experimental/mathematics-challenge-v0.1/suite.json", base), "utf8"),
     loadTutorEvalDataset(),
     loadTutorScenarioSuiteVNext(),
   ]);
-  const report = buildMathematicsPilotCoverage({
+  const inputs = {
     academic: parseAcademicStructure(JSON.parse(academicText) as unknown),
     exam: parseMathematicsExamAlignment(JSON.parse(examText) as unknown),
     map: parseMathematicsKnowledgeMap(JSON.parse(mapText) as unknown),
@@ -52,7 +56,23 @@ async function main(args: readonly string[]): Promise<void> {
     researchSuite: parseTutorScenarioSuiteVNext(JSON.parse(researchText) as unknown),
     evaluation,
     health,
-  });
+  };
+  const report = buildMathematicsPilotCoverage(inputs);
+  if (args.includes("--audit")) {
+    const audit = buildMathematicsSubjectCoverageAudit(inputs,
+      JSON.parse(gapsText) as MathematicsExplicitGapRegistry);
+    if (args.includes("--json")) {
+      console.log(JSON.stringify(audit, null, 2));
+    } else {
+      console.log("Mathematics case inventory complete; mappings are author-proposed, not independently reviewed.");
+      for (const [key, value] of Object.entries(audit.counts)) console.log(key + ": " + value);
+      for (const row of audit.inventory.filter(x => x.mappingStatus === "explicitly_unmapped")) {
+        console.log("UNMAPPED " + row.source.id + "@" + row.source.version +
+          (row.source.decisionPointId ? "/" + row.source.decisionPointId : "") + ": " + row.relationRationale);
+      }
+    }
+    return;
+  }
   if (nodeId !== null) {
     const found = findMathematicsPilotNode(report, nodeId);
     if (found === null) throw new Error("Unknown knowledge node: " + nodeId);
@@ -69,7 +89,7 @@ async function main(args: readonly string[]): Promise<void> {
       console.log("Exam profile references (author-proposed): " + (found.examProfiles.join(", ") || "none linked"));
       console.log("Research tasks: " + (found.researchTasks.join(", ") || "none linked"));
       console.log("Research scenarios: " + (found.researchScenarios.join(", ") || "none linked"));
-      console.log("Canonical Eval cases (English pilot links): " + (found.evalCases.map(c => c.id + "@" + c.version).join(", ") || "none linked"));
+      console.log("Canonical Eval cases (authored candidate links, all locales): " + (found.evalCases.map(c => c.id + "@" + c.version).join(", ") || "none linked"));
       console.log("Default Health decision points: " + (found.healthDecisionPoints.map(c => c.scenarioId + "@" + c.scenarioVersion + "/" + c.decisionPointId).join(", ") || "none linked"));
     }
   } else if (args.includes("--json")) {
@@ -79,7 +99,7 @@ async function main(args: readonly string[]): Promise<void> {
     for (const [key, value] of Object.entries(report.counts)) {
       console.log(key + ": " + value);
     }
-    console.log("Query with --node fractions-units | linear-equations | conditional-events");
+    console.log("Query with --node fractions-units | linear-equations | conditional-events, or --audit --json for complete mathematics inventory");
   }
 }
 
