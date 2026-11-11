@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "id": "mathematics-linkage-explicit-gaps-v0.1",
+  "version": "0.1.0",
+  "status": "author-proposed-unreviewed",
+  "purpose": "Explicit unmapped source inventory only: no inferred mapping, no mastery or curriculum claim. All remaining eligible mathematics sources must be represented by either a candidate link or one of these gaps.",
+  "gaps": [
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "correct-answer-wrong-reasoning-001",
+        "version": "1.1.0",
+        "decisionPointId": null
+      },
+      "reasonCode": "no_exact_existing_knowledge_node",
+      "suggestedConceptLabel": "multiplication-as-equal-groups",
+      "rationale": "Existing integer-operations node does not explicitly model the required conceptual distinction between equal groups and arbitrary numerical coincidence.",
+      "reviewStatus": "not_reviewed"
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "correct-answer-wrong-reasoning-001-zh-CN",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "reasonCode": "no_exact_existing_knowledge_node",
+      "suggestedConceptLabel": "multiplication-as-equal-groups",
+      "rationale": "The Chinese case tests conceptual meaning of multiplication; treating integer operations as equivalent would be over-broad.",
+      "reviewStatus": "not_reviewed"
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-multiplication-procedural-001",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "reasonCode": "no_exact_existing_knowledge_node",
+      "suggestedConceptLabel": "multiplication-as-equal-groups",
+      "rationale": "The case repairs repeated-addition notation grounded in equal groups; no exact knowledge node is currently authored.",
+      "reviewStatus": "not_reviewed"
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-multiplication-procedural-001-zh-CN",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "reasonCode": "no_exact_existing_knowledge_node",
+      "suggestedConceptLabel": "multiplication-as-equal-groups",
+      "rationale": "The Chinese variant checks grouping/repeated-addition representation, not general integer arithmetic.",
+      "reviewStatus": "not_reviewed"
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-multiplication-conceptual-001",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "reasonCode": "no_exact_existing_knowledge_node",
+      "suggestedConceptLabel": "multiplication-as-equal-groups",
+      "rationale": "The case requires constructing the equal-groups interpretation of multiplication before calculation.",
+      "reviewStatus": "not_reviewed"
+    },
+    {
+      "source": {
+        "kind": "eval_case",
+        "id": "paired-multiplication-conceptual-001-zh-CN",
+        "version": "1.0.0",
+        "decisionPointId": null
+      },
+      "reasonCode": "no_exact_existing_knowledge_node",
+      "suggestedConceptLabel": "multiplication-as-equal-groups",
+      "rationale": "The Chinese variant requires equal-groups understanding; no precise current graph node.",
+      "reviewStatus": "not_reviewed"
+    },
+    {
+      "source": {
+        "kind": "health_decision_point",
+        "id": "ps-multiturn-hint-escalation",
+        "version": "0.1.1",
+        "decisionPointId": "increase-specificity-at-third-attempt"
+      },
+      "reasonCode": "no_exact_existing_knowledge_node",
+      "suggestedConceptLabel": "nonnegative-square-root-solution-domain",
+      "rationale": "The required unique nonnegative solution to x^2=9 is not equivalent to a quadratic discriminant task; do not assign an incorrect graph node.",
+      "reviewStatus": "not_reviewed"
+    }
+  ]
+}
