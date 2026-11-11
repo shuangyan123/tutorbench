@@ -41,6 +41,45 @@ export interface CaseSystemVNextAssessmentContext {
   readonly requiredWork: readonly string[];
 }
 
+/** An optional authoring refinement within learning_oriented; not a third objective or a new score. */
+export const CASE_SYSTEM_VNEXT_LEARNING_INTENTS = [
+  "concept_mastery",
+  "open_inquiry",
+] as const;
+
+export const CASE_SYSTEM_VNEXT_ASSISTANCE_POLICIES = [
+  "guided_attempt",
+  "direct_conclusions_permitted",
+] as const;
+
+export const CASE_SYSTEM_VNEXT_OUTCOME_EVIDENCE = [
+  "independent",
+  "tool_augmented",
+  "both",
+] as const;
+
+export type CaseSystemVNextLearningIntent =
+  (typeof CASE_SYSTEM_VNEXT_LEARNING_INTENTS)[number];
+export type CaseSystemVNextAssistancePolicy =
+  (typeof CASE_SYSTEM_VNEXT_ASSISTANCE_POLICIES)[number];
+export type CaseSystemVNextOutcomeEvidence =
+  (typeof CASE_SYSTEM_VNEXT_OUTCOME_EVIDENCE)[number];
+
+/**
+ * Context is explicit to avoid applying a hint-only/uncued-mastery rule to
+ * research or a tool-augmented task. A permitted conclusion is not proof of
+ * learning, and a tool-assisted result is never automatically independent.
+ */
+export interface CaseSystemVNextLearningContext {
+  readonly intent: CaseSystemVNextLearningIntent;
+  readonly assistancePolicy: CaseSystemVNextAssistancePolicy;
+  readonly permittedTools: readonly string[];
+  readonly outcomeEvidence: CaseSystemVNextOutcomeEvidence;
+  readonly successCondition: string;
+  /** Required for direct-conclusion open inquiry to state how claims are checked. */
+  readonly verificationPlan?: string;
+}
+
 export interface CaseSystemVNextTeachingObjectiveSelection {
   readonly mode: CaseSystemVNextTeachingObjectiveMode;
   /**
@@ -48,6 +87,8 @@ export interface CaseSystemVNextTeachingObjectiveSelection {
    * evaluation so exam constraints are explicit rather than guessed.
    */
   readonly assessmentContext?: CaseSystemVNextAssessmentContext;
+  /** Optional, and only legal when mode is learning_oriented. */
+  readonly learningContext?: CaseSystemVNextLearningContext;
 }
 
 export const CASE_SYSTEM_VNEXT_TEACHING_OBJECTIVE_PROFILES = [
