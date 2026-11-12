@@ -121,7 +121,7 @@ export function validateCorpus(impl, corpus, ctx, effort) {
  * Transport failures do NOT prove whether DeepSeek actually saw the request.
  * This gate authorizes only one consciously acknowledged recovery attempt.
  */
-export function assertRecoverableSmoke(impl, ctx, effort, attempt, report) {
+export function assertRecoverableSmoke(ctx, effort, attempt, report) {
   const target = ctx.selectedCases[0];
   if (
     attempt?.protocol !== "deepseek-thinking-effort-tutor-v0.1" ||
