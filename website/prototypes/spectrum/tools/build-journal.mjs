@@ -11,6 +11,7 @@ import { PROTO, REPO, esc, Z, bi, biE, biP, frame } from "./site-kit.mjs";
 const { BLOG_POSTS: SITE_POSTS, articleHeadingId } = await import(join(REPO, "dist/src/site/pages/blog.js"));
 const { LEARNING_ACCESS_ESSAY: LA } = await import(join(REPO, "dist/src/cli/learning-access-essay.js"));
 const { ARROGANCE_ESSAY: AR } = await import(join(REPO, "dist/src/cli/arrogance-essay.js"));
+const { BEYOND_WINNING_ESSAY: BW } = await import(join(REPO, "dist/src/cli/beyond-winning-essay.js"));
 const { SITE_ZH_CN_COPY } = await import(join(REPO, "dist/src/site/locale-copy.js"));
 
 // "Why Good Learning Resources Fail to Reach the People Who Need Them" (2026-11-03) is written as two
@@ -65,8 +66,27 @@ AR.en.sections.forEach((sec, i) => {
   register(sec.heading, zh.heading);
   sec.paragraphs.forEach((para, k) => register(para, zh.paragraphs[k]));
 });
+// "After You’ve Beaten Everyone, Then What?" (2026-11-11): built the same way as the arrogance essay,
+// from parallel Chinese and English in src/cli/beyond-winning-essay.ts.
+const beyondWinning = {
+  route: `/blog/${BW.slug}/`, category: "Perspective", publishedDate: "November 11, 2026",
+  title: BW.en.title, excerpt: BW.en.dek, description: BW.en.description, evidenceBoundary: BW.en.boundary,
+  intro: BW.en.intro,
+  sections: BW.en.sections.map((sec) => ({ heading: sec.heading, paragraphs: sec.paragraphs })),
+  sources: BW.sources,
+};
+register(BW.en.title, BW.zh.title); register(BW.en.dek, BW.zh.dek); register(BW.en.description, BW.zh.description);
+register(BW.en.boundary, BW.zh.boundary); register("November 11, 2026", "2026年11月11日");
+if (BW.zh.intro.length !== BW.en.intro.length) throw new Error("beyond winning: the opening differs between languages");
+BW.en.intro.forEach((para, k) => register(para, BW.zh.intro[k]));
+BW.en.sections.forEach((sec, i) => {
+  const zh = BW.zh.sections[i];
+  if (zh === undefined || zh.paragraphs.length !== sec.paragraphs.length) throw new Error(`beyond winning: section ${i + 1} differs between languages`);
+  register(sec.heading, zh.heading);
+  sec.paragraphs.forEach((para, k) => register(para, zh.paragraphs[k]));
+});
 // newest first, as the Journal has always been ordered
-const BLOG_POSTS = [arrogance, learningAccess, ...SITE_POSTS];
+const BLOG_POSTS = [beyondWinning, arrogance, learningAccess, ...SITE_POSTS];
 
 const slug = (p) => p.route.split("/").filter(Boolean).pop();
 const zhWords = (s) => s.replace(/\s/g, "").length;
@@ -76,10 +96,15 @@ function readingTime(p) {
   const zh = all.map((x) => zhWords(Z(x))).reduce((a, b) => a + b, 0);
   return { en: Math.max(1, Math.round(en / 230)), zh: Math.max(1, Math.round(zh / 420)) };
 }
-const DATE_ISO = { "November 6, 2026": "2026-11-06", "November 3, 2026": "2026-11-03", "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
+const DATE_ISO = { "November 11, 2026": "2026-11-11", "November 6, 2026": "2026-11-06", "November 3, 2026": "2026-11-03", "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
 
 // ---------------------------------------------------------------- covers and figures (design content)
 const COVERS = {
+  [BW.slug]: {
+    img: "podium.webp",
+    alt: ["An empty wooden winners’ podium in a wet meadow at dawn, a medal hanging from the top step, the grass running on into fog.", "黎明时分，湿漉漉的草地上立着一座空的木制领奖台，最高一级挂着一枚奖牌，草地一直延伸进雾里。"],
+    cap: ["The top step stands empty. The meadow goes on into the fog.", "最高的一级空着，草地一直延伸进雾里。"],
+  },
   [AR.slug]: {
     img: "piano.webp",
     alt: ["An upright piano with its lid closed over the keys and an open score on the music desk, in soft daylight through a sheer curtain.", "一架立式钢琴，琴盖合在琴键上，谱架上摊着一份打开的乐谱，薄纱窗帘透进柔和的日光。"],
@@ -247,6 +272,38 @@ FIGS[AR.slug] = [
           </ol>`,
     cap: ["The chain of judgements this section describes. Only the first step is something anyone actually saw.", "本节描述的一连串判断。只有第一步是真正看到的。"] },
 ];
+// a cell of the Korea table: the number, then its unit and note on a smaller line
+const tallyCell = (ven, vzh, uen, uzh) => `<td><span class="tl-v">${bi(esc(ven), esc(vzh))}</span>${uen ? `<span class="tl-u">${bi(esc(uen), esc(uzh))}</span>` : ""}</td>`;
+FIGS[BW.slug] = [
+  { at: "after:0.5", body: `<table class="tally">
+            <thead><tr><th scope="col">${bi("South Korea, primary and secondary", "韩国中小学")}</th><th scope="col">2024</th><th scope="col">2025</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">${bi("Students", "学生人数")}</th>${tallyCell("5.13", "513", "million · down 1.5%", "万人 · 减少 1.5%")}${tallyCell("5.02", "502", "million · down 2.3%", "万人 · 减少 2.3%")}</tr>
+              <tr><th scope="row">${bi("Spent on private tutoring", "校外教育支出总额")}</th>${tallyCell("29.2", "29.2", "trillion won · a record, fourth year running", "万亿韩元 · 连续第四年新高")}${tallyCell("27.5", "27.5", "trillion won · down 5.7%", "万亿韩元 · 减少 5.7%")}</tr>
+              <tr><th scope="row">${bi("Share of students tutored", "参加辅导的学生比例")}</th>${tallyCell("80%", "80%", "", "")}${tallyCell("75.7%", "75.7%", "", "")}</tr>
+              <tr class="now"><th scope="row">${bi("Each month, per student tutored", "参加辅导的学生，每人每月")}</th>${tallyCell("592,000", "59.2", "won", "万韩元")}${tallyCell("604,000", "60.4", "won · a record", "万韩元 · 新高")}</tr>
+            </tbody>
+          </table>`,
+    cap: ["South Korea’s official survey of private education, as reported in sources 3 and 4. In 2025 the total fell, yet each student still being tutored cost more than ever.", "韩国官方的校外教育支出调查，数字据资料 3、4 的报道。2025 年总额回落，可仍在参加辅导的学生，每人每月的花费创了新高。"] },
+  { at: "after:3.13", body: `<div class="mazes">
+            ${biP("p", "mz-q", "In the next maze, will you still need what this one teaches?", "在下一座迷宫里，还用不用得上这一座要教的东西？")}
+            <ol class="mz-list">
+              ${[["A cancer researcher", "研究癌症的人", "Solving a protein structure by X-ray crystallography", "用 X 射线晶体学解出蛋白质结构", "Rarely: the work that follows seldom asks for it by hand", "很少：接下来的工作，很少要求亲手重复", "Obstacle: hand it to a tool", "障碍：可以交给工具", "pass"],
+                 ["A cancer researcher", "研究癌症的人", "Knowing where a predicted structure might be wrong", "知道预测出来的结构可能在哪里出错", "Always: every judgement after it rests on it", "一直需要：之后的每一个判断都建在它上面", "Foundation: learn it", "地基：自己学会", ""],
+                 ["A child adding fractions", "学分数加法的孩子", "Fractional units", "分数单位", "Always: ratio, probability and algebra are built on them", "一直需要：比例、概率、代数都建在它上面", "Foundation: an answer handed over pulls it out", "地基：直接给答案，就是在拆它", ""]].map(([wen, wzh, nen, nzh, aen, azh, ven, vzh, cls]) => `<li${cls ? ` class="mz-${cls}"` : ""}><span class="mz-who">${bi(esc(wen), esc(wzh))}</span><span class="mz-name">${bi(esc(nen), esc(nzh))}</span><span class="mz-a">${bi(esc(aen), esc(azh))}</span><span class="mz-v">${bi(esc(ven), esc(vzh))}</span></li>`).join("")}
+            </ol>
+          </div>`,
+    cap: ["The test from this section, applied to its two examples. Whether a step can be handed to AI depends on the next maze, not on the step itself.", "本节的判断标准，用在文中的两个例子上。一步能不能交给 AI，看的不是这一步本身，而是下一座迷宫。"] },
+  { at: "after:4.4", body: `<div class="aims">
+            <p class="am-not"><span class="am-k">${bi("Not enough on its own", "单看这些不够")}</span><span class="am-v">${bi("Questions the AI answered", "AI 回答了多少问题")}</span><span class="am-v">${bi("Exercises completed", "学生完成了多少练习")}</span></p>
+            <ol class="am-list">
+              ${[["An exam", "考试", "Knowledge and strategy, used under that exam’s conditions", "特定考试条件下的知识运用和策略表现"],
+                 ["Learning", "学习", "Understanding, retention and transfer", "知识的理解、保持和迁移"],
+                 ["Research and creation", "研究和创造", "The questions learners can ask with AI, the hypotheses they can test, the work they can finish that was out of reach before", "借助 AI 能提出什么问题、检验什么假设、完成什么原本做不到的工作"]].map(([gen, gzh, een, ezh], i) => `<li${i === 2 ? ' class="now"' : ""}><span class="am-k">${bi("Goal", "目标")}</span><span class="am-g">${bi(esc(gen), esc(gzh))}</span><span class="am-k">${bi("Look at", "要看")}</span><span class="am-e">${bi(esc(een), esc(ezh))}</span></li>`).join("")}
+            </ol>
+          </div>`,
+    cap: ["The evidence this section asks for, goal by goal. The last row adds to the ones above it rather than replacing them.", "本节按目标列出的证据。最后一行是在前两行之上再加的要求，不是取而代之。"] },
+];
 // the pull quote goes after this section (skipped when it repeats the dek or a callout)
 const PULL_AFTER = { "when-learning-starts-to-feel-like-failure": "after:5.0", "the-classroom-does-not-need-30-robots": "end:0" };
 
@@ -258,7 +315,17 @@ function prose(text, zh = false) {
 }
 // Chinese headings break only between words (a long one otherwise splits a word across lines)
 const seg = new Intl.Segmenter("zh-CN", { granularity: "word" });
-const zhHead = (en) => [...seg.segment(Z(en))].map((x) => esc(x.segment)).join("<wbr>");
+// words the segmenter splits but a reader does not: no line break inside these
+const ZH_KEEP = ["所有人"];
+function zhWordCuts(text) {
+  const cuts = []; let at = 0;
+  for (const { segment } of seg.segment(text)) { at += segment.length; cuts.push(at); }
+  const inside = (c) => ZH_KEEP.some((w) => { for (let i = text.indexOf(w); i >= 0; i = text.indexOf(w, i + 1)) if (c > i && c < i + w.length) return true; return false; });
+  const words = []; let from = 0;
+  for (const c of cuts) if (!inside(c)) { words.push(text.slice(from, c)); from = c; }
+  return words;
+}
+const zhHead = (en) => zhWordCuts(Z(en)).map(esc).join("<wbr>");
 const biH = (en) => bi(esc(en), zhHead(en));
 function sources(list) {
   return `<section class="sources" aria-labelledby="sources">
