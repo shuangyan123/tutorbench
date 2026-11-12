@@ -39,35 +39,48 @@ testable slice can proceed through normal review once its own gates pass.
 
 ## B. Research evidence status
 
-**Independent Research Review** evaluates a specific claim and version.
-Record the claim, scope (such as task, cohort, language, model or supported
-input type), evidence source and method, counterexamples or contrary evidence,
-and unresolved questions. Include the reviewer, evidence version, and
-disagreement or adjudication record when applicable.
+**Maintainer-led Evidence** can support accepting, revising, or dropping a
+hypothesis and making the corresponding engineering change. Use review of
+original Tutor replies, case analysis, counterexamples, independent
+derivations, tests, and experiments as appropriate. Record who reviewed the
+evidence, the exact case or claim version, its scope, the source and method,
+contrary evidence, and unresolved questions. Retain links to the original
+observations within their existing privacy boundary.
+
+**Evidence-Proportionate Decisions** match verification to the risk of the
+decision and the strength of the claim. A documented counterexample and
+targeted regression tests may justify a bounded correction. Changes affecting
+many cases, score comparability, or a stable interface warrant broader checks.
+Reviewer independence or a specified reviewer count applies where the claim or
+the governing protocol calls for it.
 
 | Evidence status | Minimum basis |
 | --- | --- |
 | **Hypothesis or design** | A testable claim or protocol with assumptions, intended observations and possible counterexamples. |
 | **Exploratory observation** | A replayable method and traceable observations with versions, denominators, missingness and failure modes recorded. |
 | **Independently reviewed finding** | A qualified reviewer independent of the claim's authorship evaluates the exact evidence and relevant counterexamples. Record the bounded finding, material disagreements and any unresolved claims. |
-| **Supported for a specified use** | Evidence addresses the proposed interpretation and use, including applicable validation on independent or held-out evidence, stability, and limits of generalization. |
+| **Supported for a specified use** | Evidence proportionate to the proposed interpretation and use. Record the validation performed, stability where relevant, and limits of generalization. |
 
-Choose review and validation by claim. Source identity or rights claims need
-authoritative and reproducible provenance. A correctness verifier needs
-independent references, adverse and unsupported cases, and repeatability
-within its declared domain. A rubric or learner-evidence construct needs
-domain-appropriate independent review of its meaning, alternatives and
-failure modes. Use the existing [Case System vNext review protocol](case-system-vnext-expert-review.md)
-where applicable and the [principles registry lifecycle](research/pedagogical-principles/README.md#authoring-lifecycle-and-versioning)
-for candidate principles. Preserve stricter artifact-specific requirements.
+**Stronger Claims Need Stronger Evidence.** Use Independent Research Review
+for claims of independent validation and evidence across the stated settings
+for claims of cross-context validity. Learning gains, transfer, retention,
+and causal effects require the learner outcome evidence and study design
+specified in the [measurement claim specification](measurement-claim-specification.md).
+CI, synthetic observations, and Judge agreement each support their own
+declared scope. Source identity and rights still need authoritative
+provenance.
 
-CI establishes software behavior. Single-author judgments, synthetic learner
-responses and Judge agreement each support only their declared evidence scope.
-Claims about learning, transfer, retention or causal effects require the
-corresponding learner outcome evidence and study design in the
-[measurement claim specification](measurement-claim-specification.md).
-Source checks and bounded software or verifier claims can be reviewed with
-evidence appropriate to those claims.
+Apply the [Case System vNext review protocol](case-system-vnext-expert-review.md#reference-evidence-gate)
+when promoting its authored expectations to reviewed reference evidence.
+Follow the [principles registry lifecycle](research/pedagogical-principles/README.md#authoring-lifecycle-and-versioning)
+for its candidate principles. Those scoped requirements govern their own
+artifacts and claims.
+
+**Evidence Can Overturn Design.** When an original Tutor reply exposes a
+flaw in a rule, preserve the reply, original evaluation, counterexample,
+and reason for revision. Show why the new rule better measures the intended
+behavior, check it against both valid and invalid responses, and report any
+new evaluation under the revised identity.
 
 ## C. Canonical adoption eligibility
 
@@ -75,8 +88,16 @@ evidence appropriate to those claims.
 maintainer approval recorded against the reviewed revision. Specify the exact
 artifact and intended use, then link the supporting evidence and disposition
 of every applicable gate. Record a reason for any gate marked inapplicable.
-The proposed use determines the required evidence. An experimental merge
-leaves this decision open.
+An experimental merge leaves this decision open.
+
+**Versioned Design Adoption.** Maintainers may approve a scoped revision to
+cases, rubrics, teaching principles, verifiers, or evaluation rules on the
+strength of recorded internal evidence when it supports the intended use.
+Run applicable engineering and evaluation regressions, record changed
+identities and compatibility effects, and keep historical scoring identities
+and results reproducible under their recorded versions. Apply any specific
+Human Reference, Gold, or calibration gate when the change adopts or makes
+claims about those artifacts.
 
 | Gate | Evidence to review |
 | --- | --- |
@@ -101,6 +122,6 @@ the evidence and a named next action when a decision is pending.
 - **A — Engineering:** experimental slice and entry points, exact revision and
   checks, shared-contract effects, and remaining blockers or split.
 - **B — Evidence:** claim and status, scope, source and method,
-  counterexamples, and independent review or evidence still needed.
+  counterexamples, and any additional validation needed for the stated use.
 - **C — Canonical:** no adoption requested, pending with applicable gates,
   or a separately reviewed proposal with the explicit approval record.
