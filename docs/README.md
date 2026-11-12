@@ -121,6 +121,7 @@ Knowledge maps and exam-system reviews, several in Chinese.
 
 Isolated research pilots and contracts. They do not change the canonical benchmark.
 
+- [TutorBench Research Promotion Policy v0.1](research-promotion-policy-v0.1.md)
 - [Exact complete solution sets: absolute values, radicals and finite piecewise branches](research/abs-radical-piecewise-solution-sets-v0.1.md)
 - [Immutable third-party examination artifact identity — research v0.1](research/pinned-exam-artifact-identity-v0.1.md)
 - [Mathematical wrong-answer detection and supported-type coverage (research v0.1)](research/math-wrong-answer-detection-v0.1.md)
