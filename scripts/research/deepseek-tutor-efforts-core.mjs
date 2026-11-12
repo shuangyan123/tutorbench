@@ -1,6 +1,7 @@
 // Research-only, provider-neutral evidence identities; no HTTP or Judge client.
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve, join } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 
 export const EFFORTS = ["low", "high", "max"];
 export const CASE_VERSIONS = new Map([
@@ -96,8 +97,8 @@ export function validateCorpus(impl, corpus, ctx, effort) {
       corpus.corpusVersion !== ctx.generationSpec.specVersion ||
       corpus.datasetId !== DATASET_ID || corpus.datasetVersion !== DATASET_VERSION ||
       corpus.provenance !== "recorded_model" || corpus.runsPerCase !== 1 ||
-      JSON.stringify(corpus.tutor) !== JSON.stringify(ctx.tutorDescriptor) ||
-      JSON.stringify(corpus.generationSpec) !== JSON.stringify(ctx.generationSpec) ||
+      !isDeepStrictEqual(corpus.tutor, ctx.tutorDescriptor) ||
+      !isDeepStrictEqual(corpus.generationSpec, ctx.generationSpec) ||
       corpus.responses.length < 1 || corpus.responses.length > CASE_VERSIONS.size ||
       !corpus.responses.every(r =>
         CASE_VERSIONS.get(r.caseId) === r.caseVersion &&
