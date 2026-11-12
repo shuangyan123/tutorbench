@@ -83,7 +83,7 @@ node scripts/research/deepseek-tutor-efforts.mjs complete --effort high --execut
 node scripts/research/deepseek-tutor-efforts.mjs complete --effort max --execute-live
 `§
 
-A complete run stores a **new** effort-specific corpus/report, reusing its exact previously successful first response; the original smoke files are immutable. It will not retry an already attempted continuation. Explicit restart/recovery design is a separate revision, not an automatic loop.
+A complete run stores a **new** effort-specific corpus/report, reusing its exact previously successful first response; the original smoke files are immutable. Every live stage first creates an exclusive private `*.attempt.json` marker **before** its first request. If the process crashes or the report is missing, the marker prevents that stage from being rerun and accidentally duplicating charged calls. Inspect the marker, corpus and report; deliberate recovery requires a separately audited procedure and is not an automatic retry. The first smoke and later continuation are independently bound to their exact effort.
 
 **4. Purely offline evaluation, ZERO DeepSeek/Judge calls:**
 
