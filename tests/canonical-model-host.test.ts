@@ -129,6 +129,7 @@ async function startChatCompletionsHost(
     readonly reasoningSplit?: "enabled" | "disabled";
     readonly requireReasoningSeparation?: boolean;
     readonly authMode?: "bearer" | "none";
+    readonly deepSeekThinking?: "enabled" | "disabled";
   } = {},
 ): Promise<HostProcess> {
   const child = spawn(
@@ -142,7 +143,8 @@ async function startChatCompletionsHost(
           ? { TUTOR_MODEL_API_KEY: undefined }
           : { TUTOR_MODEL_API_KEY: "synthetic-test-key" }),
         TUTOR_MODEL_AUTH_MODE: options.authMode ?? "bearer",
-        TUTOR_MODEL: "fake-model",
+        TUTOR_MODEL: options.deepSeekThinking === undefined ? "fake-model" : "deepseek-flash",
+        TUTOR_MODEL_DEEPSEEK_THINKING: options.deepSeekThinking,
         TUTOR_MODEL_BASE_URL: baseURL,
         TUTOR_MODEL_API_PATH: "/chat/completions",
         TUTOR_MODEL_MAX_OUTPUT_TOKENS_FIELD: "max_tokens",
@@ -510,4 +512,78 @@ test("generic Chat Completions canonical host fails closed for unsplit reasoning
     await host.close();
     await provider.close();
   }
+});
+
+
+test("DeepSeek Flash host explicitly disables thinking and keeps reasoning out of recorded Tutor text", async () => {
+  const provider = await startFakeProvider({
+    id: "upstream-provider-secret",
+    model: "deepseek-flash",
+    choices: [{
+      message: { content: "先比较分数单位，再寻找公分母。", reasoning_content: "private model reasoning" },
+      finish_reason: "stop",
+    }],
+    usage: { prompt_tokens: 17, completion_tokens: 19, total_tokens: 36 },
+  });
+  const host = await startChatCompletionsHost(provider.baseURL, { deepSeekThinking: "disabled" });
+  try {
+    const response = await fetch(host.endpoint, {
+      method: "POST", headers: hostHeaders, body: JSON.stringify(await packet()),
+    });
+    assert.equal(response.status, 200);
+    const body = await response.json() as { output: { text: string } };
+    assert.equal(body.output.text, "先比较分数单位，再寻找公分母。");
+    assert.deepEqual(provider.requests[0]?.thinking, { type: "disabled" });
+    assert.equal(provider.requests[0]?.model, "deepseek-flash");
+    assert.equal(provider.requests.length, 1);
+    assert.doesNotMatch(JSON.stringify(body), /private model reasoning|upstream-provider-secret|synthetic-test-key/u);
+  } finally {
+    await host.close();
+    await provider.close();
+  }
+});
+
+test("DeepSeek and generic host reject interrupted completions with nonempty partial text", async () => {
+  const provider = await startFakeProvider({
+    choices: [{
+      message: { content: "This partial output must not be considered complete." },
+      finish_reason: "insufficient_system_resource",
+    }],
+  });
+  const host = await startChatCompletionsHost(provider.baseURL, { deepSeekThinking: "disabled" });
+  try {
+    const response = await fetch(host.endpoint, {
+      method: "POST", headers: hostHeaders, body: JSON.stringify(await packet()),
+    });
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), { error: "provider_response_invalid" });
+    assert.equal(provider.requests.length, 1);
+  } finally {
+    await host.close();
+    await provider.close();
+  }
+});
+
+test("DeepSeek-specific thinking option fails closed for a non-DeepSeek model", async () => {
+  const child = spawn(
+    process.execPath,
+    [resolve(process.cwd(), "examples/canonical-model-host/chat-completions-server.mjs")],
+    {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        TUTOR_MODEL_API_KEY: "synthetic-test-key",
+        TUTOR_MODEL: "other-provider",
+        TUTOR_MODEL_BASE_URL: "https://api.example.com",
+        TUTOR_MODEL_DEEPSEEK_THINKING: "disabled",
+        CANONICAL_MODEL_HOST_TOKEN: sessionToken,
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  let stderr = "";
+  child.stderr.on("data", (b: Buffer) => { stderr += b.toString("utf8"); });
+  const [code] = await once(child, "exit") as [number | null, NodeJS.Signals | null];
+  assert.notEqual(code, 0);
+  assert.match(stderr, /requires an exact supported DeepSeek model ID/u);
 });
