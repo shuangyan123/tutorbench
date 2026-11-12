@@ -39,10 +39,17 @@ async function loadRuntime() {
 async function collect(impl, ctx, effort, stage, selected, resumeCorpus) {
   const output = artifactPath(effort, stage, "corpus");
   const reportPath = artifactPath(effort, stage, "report");
-  if (await exists(output) || await exists(reportPath)) {
-    throw new Error("Stage attempted or saved already; refuse repeat paid call.");
+  const attemptPath = artifactPath(effort, stage, "attempt");
+  if (await exists(output) || await exists(reportPath) || await exists(attemptPath)) {
+    throw new Error("Stage started or saved already; refuse duplicate paid calls even after interruption.");
   }
   const sessionToken = impl.parseCanonicalHostSessionToken(process.env.CANONICAL_MODEL_HOST_TOKEN);
+  // Durable pre-call marker: a killed process must never silently repeat paid requests.
+  await writeNew(attemptPath, {
+    protocol: "deepseek-thinking-effort-tutor-v0.1",
+    stage, effort, plannedCalls: selected.length - (resumeCorpus?.responses.length ?? 0),
+    corpusId: corpusId(effort), status: "attempted; not evidence of a successful provider call",
+  });
   const host = impl.createHttpTutorExecutionHost({
     endpoint: "http://127.0.0.1:9001/generate",
     sessionToken, timeoutMs: 270_000,
