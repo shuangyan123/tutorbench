@@ -587,3 +587,81 @@ test("DeepSeek-specific thinking option fails closed for a non-DeepSeek model", 
   assert.notEqual(code, 0);
   assert.match(stderr, /requires an exact supported DeepSeek model ID/u);
 });
+
+
+test("DeepSeek Host sends exactly low/high/max from the frozen execution spec", async () => {
+  for (const effort of ["low", "high", "max"] as const) {
+    const provider = await startFakeProvider({
+      choices: [{
+        message: { content: "Student-visible answer.", reasoning_content: "hidden reasoning canary" },
+        finish_reason: "stop",
+      }],
+      usage: { prompt_tokens: 3, completion_tokens: 190, total_tokens: 193 },
+    });
+    const host = await startChatCompletionsHost(provider.baseURL, { deepSeekThinking: "enabled" });
+    try {
+      const original = await packet();
+      const requestPacket = { ...original, generationSpec: {
+        ...original.generationSpec,
+        specId: "research-deepseek-tutor-effort", specVersion: "0.1.0",
+        maxOutputTokens: 32768, reasoningEffort: effort,
+      } };
+      const response = await fetch(host.endpoint, {
+        method: "POST", headers: hostHeaders, body: JSON.stringify(requestPacket),
+      });
+      assert.equal(response.status, 200, await response.text().catch(() => ""));
+      const upstream = provider.requests[0]!;
+      assert.equal(upstream.model, "deepseek-flash");
+      assert.equal(upstream.max_tokens, 32768);
+      assert.deepEqual(upstream.thinking, { type: "enabled" });
+      assert.equal(upstream.reasoning_effort, effort);
+      assert.equal(provider.requests.length, 1);
+    } finally {
+      await host.close();
+      await provider.close();
+    }
+  }
+});
+
+test("DeepSeek Host refuses research effort in non-thinking configuration", async () => {
+  const provider = await startFakeProvider({
+    choices: [{ message: { content: "Never reached." }, finish_reason: "stop" }],
+  });
+  const host = await startChatCompletionsHost(provider.baseURL, { deepSeekThinking: "disabled" });
+  try {
+    const original = await packet();
+    const requestPacket = { ...original, generationSpec: {
+      ...original.generationSpec, reasoningEffort: "high",
+    } };
+    const response = await fetch(host.endpoint, {
+      method: "POST", headers: hostHeaders, body: JSON.stringify(requestPacket),
+    });
+    assert.equal(response.status, 422);
+    assert.deepEqual(await response.json(), { error: "unsupported_generation_control" });
+    assert.equal(provider.requests.length, 0);
+  } finally {
+    await host.close();
+    await provider.close();
+  }
+});
+
+test("DeepSeek Host rejects unsupported research effort rather than silently remapping it", async () => {
+  const provider = await startFakeProvider({
+    choices: [{ message: { content: "Never reached." }, finish_reason: "stop" }],
+  });
+  const host = await startChatCompletionsHost(provider.baseURL, { deepSeekThinking: "enabled" });
+  try {
+    const original = await packet();
+    const requestPacket = { ...original, generationSpec: {
+      ...original.generationSpec, reasoningEffort: "medium",
+    } };
+    const response = await fetch(host.endpoint, {
+      method: "POST", headers: hostHeaders, body: JSON.stringify(requestPacket),
+    });
+    assert.equal(response.status, 422);
+    assert.equal(provider.requests.length, 0);
+  } finally {
+    await host.close();
+    await provider.close();
+  }
+});
