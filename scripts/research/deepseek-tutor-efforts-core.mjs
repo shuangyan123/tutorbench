@@ -40,19 +40,24 @@ export async function writeNew(path, value) {
 }
 export function parseOptions(args) {
   const [stage, ...rest] = args;
-  if (!["plan", "smoke", "complete", "inspect"].includes(stage)) {
-    throw new Error("Usage: deepseek-tutor-efforts.mjs plan|smoke|complete|inspect [--effort low|high|max] [--execute-live]");
+  if (!["plan", "smoke", "retry-smoke", "complete", "inspect"].includes(stage)) {
+    throw new Error("Usage: deepseek-tutor-efforts.mjs plan|smoke|retry-smoke|complete|inspect [--effort low|high|max] [--execute-live] [--acknowledge-possible-duplicate-charge]");
   }
-  let effort, live = false;
+  let effort, live = false, chargeAcknowledged = false;
   for (let i = 0; i < rest.length; i++) {
     if (rest[i] === "--effort" && effort === undefined) effort = rest[++i];
     else if (rest[i] === "--execute-live" && !live) live = true;
+    else if (rest[i] === "--acknowledge-possible-duplicate-charge" && !chargeAcknowledged) chargeAcknowledged = true;
     else throw new Error("Invalid or duplicate pilot argument.");
   }
   if (stage === "plan" && (effort || live)) throw new Error("plan includes every effort; paid calls forbidden.");
   if (stage !== "plan" && !EFFORTS.includes(effort)) throw new Error("--effort must be low|high|max.");
-  if (["plan", "inspect"].includes(stage) && live) throw new Error("Offline stages cannot execute live.");
-  return { stage, effort, live };
+  if (["plan", "inspect"].includes(stage) && (live || chargeAcknowledged)) throw new Error("Offline stages cannot execute live.");
+  if (stage !== "retry-smoke" && chargeAcknowledged) throw new Error("Duplicate-charge acknowledgment is only valid for retry-smoke.");
+  if (stage === "retry-smoke" && (!live || !chargeAcknowledged)) {
+    throw new Error("retry-smoke requires --execute-live and --acknowledge-possible-duplicate-charge: the first transport failure may already have reached DeepSeek.");
+  }
+  return { stage, effort, live, chargeAcknowledged };
 }
 export function requireLive(live) {
   if (!live) throw new Error("Paid model calls require --execute-live.");
@@ -105,5 +110,43 @@ export function validateCorpus(impl, corpus, ctx, effort) {
         r.runIndex === 1 && r.provenance === "recorded_model") ||
       new Set(corpus.responses.map(r => r.caseId)).size !== corpus.responses.length) {
     throw new Error("Frozen corpus identity, source version, or effort mismatched.");
+  }
+}
+
+/**
+ * Recovery is allowed only after the one-case, zero-success transport-failure
+ * report produced by this exact research pilot, and never after a completed
+ * response. All original attempt/report files remain untouched.
+ *
+ * Transport failures do NOT prove whether DeepSeek actually saw the request.
+ * This gate authorizes only one consciously acknowledged recovery attempt.
+ */
+export function assertRecoverableSmoke(ctx, effort, attempt, report) {
+  const target = ctx.selectedCases[0];
+  if (
+    attempt?.protocol !== "deepseek-thinking-effort-tutor-v0.1" ||
+    attempt.stage !== "smoke" || attempt.effort !== effort ||
+    attempt.plannedCalls !== 1 || attempt.corpusId !== corpusId(effort) ||
+    attempt.status !== "attempted; not evidence of a successful provider call" ||
+    report?.collectionMode !== "canonical_model" ||
+    report.manifest?.corpusId !== corpusId(effort) ||
+    report.manifest?.corpusVersion !== ctx.generationSpec.specVersion ||
+    report.manifest?.datasetId !== DATASET_ID ||
+    report.manifest?.datasetVersion !== DATASET_VERSION ||
+    !isDeepStrictEqual(report.manifest?.generationSpec, ctx.generationSpec) ||
+    !isDeepStrictEqual(report.manifest?.tutor, ctx.tutorDescriptor) ||
+    report.requestedCaseCount !== 1 ||
+    report.runsPerCase !== 1 ||
+    report.plannedTutorCallCount !== 1 ||
+    report.executedTutorCallCount !== 1 ||
+    report.completedResponseCount !== 0 ||
+    report.failedTutorCallCount !== 1 ||
+    report.failures?.length !== 1 ||
+    report.failures[0].code !== "execution_transport_error" ||
+    report.failures[0].caseId !== target.id ||
+    report.failures[0].caseVersion !== target.version ||
+    report.failures[0].runIndex !== 1
+  ) {
+    throw new Error("Original smoke is not an exact, zero-response transport failure; recovery denied.");
   }
 }

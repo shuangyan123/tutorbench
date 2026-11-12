@@ -76,3 +76,25 @@ test("offline inspection never treats missing genuine corpus as real model evide
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /No valid frozen one-case smoke/u);
 });
+
+test("a failed smoke recovery cannot be invoked without separate duplicate-charge acknowledgement", () => {
+  for (const args of [
+    ["retry-smoke", "--effort", "high"],
+    ["retry-smoke", "--effort", "high", "--execute-live"],
+    ["retry-smoke", "--effort", "high", "--acknowledge-possible-duplicate-charge"],
+    ["retry-smoke", "--effort", "high", "--execute-live", "--acknowledge-possible-duplicate-charge",
+      "--acknowledge-possible-duplicate-charge"],
+    ["smoke", "--effort", "high", "--acknowledge-possible-duplicate-charge"],
+    ["plan", "--acknowledge-possible-duplicate-charge"],
+  ]) {
+    const result = invoke(args);
+    assert.notEqual(result.status, 0, args.join(" ") + " unexpectedly passed");
+  }
+});
+
+test("authorized retry still fails closed without private local model credentials", () => {
+  const result = invoke(["retry-smoke", "--effort", "high",
+    "--execute-live", "--acknowledge-possible-duplicate-charge"]);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /private credentials|Missing exact DeepSeek/u);
+});

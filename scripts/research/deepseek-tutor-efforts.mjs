@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 import {
   EFFORTS, CASE_VERSIONS, MAX_OUTPUT_TOKENS, DATASET_ID, DATASET_VERSION, MODEL,
   corpusId, artifactPath, exists, readJson, writeNew, parseOptions,
-  requireLive, prepare, validateCorpus,
+  requireLive, prepare, validateCorpus, assertRecoverableSmoke,
 } from "./deepseek-tutor-efforts-core.mjs";
 
 async function loadRuntime() {
@@ -36,7 +36,7 @@ async function loadRuntime() {
     throw new Error("Build TutorBench first: npm ci && npm run build (Node 24).");
   }
 }
-async function collect(impl, ctx, effort, stage, selected, resumeCorpus) {
+async function collect(impl, ctx, effort, stage, selected, resumeCorpus, previousFailedSmoke) {
   const output = artifactPath(effort, stage, "corpus");
   const reportPath = artifactPath(effort, stage, "report");
   const attemptPath = artifactPath(effort, stage, "attempt");
@@ -49,6 +49,8 @@ async function collect(impl, ctx, effort, stage, selected, resumeCorpus) {
     protocol: "deepseek-thinking-effort-tutor-v0.1",
     stage, effort, plannedCalls: selected.length - (resumeCorpus?.responses.length ?? 0),
     corpusId: corpusId(effort), status: "attempted; not evidence of a successful provider call",
+    ...(previousFailedSmoke ? { recoveryOf: "smoke", originalFailure: "execution_transport_error",
+      potentialDuplicateProviderCharge: true } : {}),
   });
   const host = impl.createHttpTutorExecutionHost({
     endpoint: "http://127.0.0.1:9001/generate",
@@ -103,12 +105,43 @@ export async function main(args = process.argv.slice(2)) {
     await collect(impl, ctx, effort, "smoke", ctx.selectedCases.slice(0, 1));
     return;
   }
-  if (!await exists(smokeCorpus)) throw new Error("No valid frozen one-case smoke for " + effort);
-  const smoke = await readJson(smokeCorpus);
+  const recoveredCorpus = artifactPath(effort, "smoke-retry-1", "corpus");
+  const recoveredReport = artifactPath(effort, "smoke-retry-1", "report");
+  if (stage === "retry-smoke") {
+    requireLive(live);
+    if (await exists(smokeCorpus)) {
+      throw new Error("Original smoke already contains a response; no retry allowed.");
+    }
+    if (!await exists(artifactPath(effort, "smoke", "attempt")) ||
+        !await exists(smokeReport)) {
+      throw new Error("Original failed smoke attempt/report missing; no retry allowed.");
+    }
+    assertRecoverableSmoke(ctx, effort,
+      await readJson(artifactPath(effort, "smoke", "attempt")),
+      await readJson(smokeReport));
+    // This is a NEW, single, explicitly authorized attempt, with separate
+    // immutable .attempt/.report/.corpus paths. Original failure is untouched.
+    console.log("Explicitly acknowledged possible duplicate DeepSeek charge: at most ONE new " +
+      effort + " request. The original failed smoke remains intact.");
+    await collect(impl, ctx, effort, "smoke-retry-1", ctx.selectedCases.slice(0, 1),
+      undefined, true);
+    return;
+  }
+  const primaryExists = await exists(smokeCorpus);
+  const retryExists = await exists(recoveredCorpus);
+  if (primaryExists && retryExists) {
+    throw new Error("Multiple successful smokes for same cohort: manual provenance review required.");
+  }
+  if (!primaryExists && !retryExists) {
+    throw new Error("No valid frozen one-case smoke for " + effort);
+  }
+  const selectedSmokePath = primaryExists ? smokeCorpus : recoveredCorpus;
+  const selectedReportPath = primaryExists ? smokeReport : recoveredReport;
+  const smoke = await readJson(selectedSmokePath);
   validateCorpus(impl, smoke, ctx, effort);
   if (stage === "complete") {
     requireLive(live);
-    const prior = await readJson(smokeReport);
+    const prior = await readJson(selectedReportPath);
     if (smoke.responses.length !== 1 ||
         smoke.responses[0].caseId !== ctx.selectedCases[0].id ||
         prior.completedResponseCount !== 1 ||
@@ -122,7 +155,7 @@ export async function main(args = process.argv.slice(2)) {
     return;
   }
   const complete = artifactPath(effort, "complete", "corpus");
-  const source = await readJson(await exists(complete) ? complete : smokeCorpus);
+  const source = await readJson(await exists(complete) ? complete : selectedSmokePath);
   validateCorpus(impl, source, ctx, effort);
   const output = artifactPath(effort, "inspect", "offline-evaluation");
   if (await exists(output)) throw new Error("Offline evaluation exists; refuse overwrite.");

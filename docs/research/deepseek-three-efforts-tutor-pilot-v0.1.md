@@ -36,19 +36,19 @@ Run from TutorBench's repository root on Node 24. Never paste API credentials or
 
 **0. Zero-call plan:**
 
-`§powershell
+```powershell
 git switch main
 git pull --ff-only origin main
 npm ci
 npm run build
 node scripts/research/deepseek-tutor-efforts.mjs plan
-`§
+```
 
 Expect 3 supported levels, 5 cases each, exactly 15 *planned* API calls, **0 actual**.
 
 **1. Local credentials and Host, still zero calls:**
 
-`§powershell
+```powershell
 if (-not $env:DEEPSEEK_API_KEY) { throw "DEEPSEEK_API_KEY must be set privately." }
 $env:TUTOR_MODEL_API_KEY = $env:DEEPSEEK_API_KEY
 $env:TUTOR_MODEL_AUTH_MODE = "bearer"
@@ -60,48 +60,66 @@ $env:TUTOR_MODEL_DEEPSEEK_THINKING = "enabled"
 $env:TUTOR_MODEL_REASONING_SPLIT = "disabled"
 $env:TUTOR_MODEL_REQUIRE_REASONING_SEPARATION = "true"
 $env:TUTOR_MODEL_TIMEOUT_MS = "240000"
-$env:CANONICAL_MODEL_HOST_TOKEN = [Convert]::ToHexString(
-  [Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant()
+# Compatible with Windows PowerShell 5.1; never print credentials.
+$bytes = New-Object byte[] 32
+$rng = [Security.Cryptography.RandomNumberGenerator]::Create()
+try { $rng.GetBytes($bytes) } finally { $rng.Dispose() }
+$env:CANONICAL_MODEL_HOST_TOKEN = [BitConverter]::ToString($bytes).Replace("-", "").ToLowerInvariant()
+# Start exactly one Host; do not spawn a second process while port 9001 is in use.
 $hostProcess = Start-Process node -ArgumentList 'examples/canonical-model-host/chat-completions-server.mjs' -PassThru
-`§
+```
 
 **2. Small real smoke: perform only ONE authorized call for Low, then inspect its private .corpus and .report files before advancing. Repeat explicitly for High and Max:**
 
-`§powershell
+```powershell
 node scripts/research/deepseek-tutor-efforts.mjs smoke --effort low --execute-live
 node scripts/research/deepseek-tutor-efforts.mjs smoke --effort high --execute-live
 node scripts/research/deepseek-tutor-efforts.mjs smoke --effort max --execute-live
-`§
+```
 
 **STOP after every call to inspect** case identity, complete Tutor-visible response, provider error/finish status, tokens and whether a truncated output is wrongly marked successful. The script never silently queues the next strength. If a smoke produced no usable response, stop that arm: do not count it as a success. No retries happen automatically.
 
+### One explicitly audited recovery of a failed smoke
+
+If a `smoke` attempt produced **zero responses** with exactly `execution_transport_error`, and the originally saved `*.smoke.attempt.json` and `*.smoke.report.json` are present, the operator may choose **one** manually authorized retry, after separately verifying that the local Host accepts an intentionally invalid `{}` packet with HTTP 400. A local Host response does **not** prove that the original provider request never reached DeepSeek. **The first request may already have incurred a charge.** Check provider usage if available and explicitly accept possible duplicate charges before proceeding.
+
+The recovery gate verifies the exact model, dataset, generation spec, effort, original attempt status and original zero-success transport failure. It never deletes, renames or overwrites the original failed files. Recovery writes a separate immutable `*.smoke-retry-1.attempt.json` **before** the new API request, then `*.smoke-retry-1.report.json` and (only on success) `*.smoke-retry-1.corpus.json`. A second recovery is blocked, even if the first recovery crashes. A successful retry becomes the **sole first-case response** used by `complete` and `inspect`; the original failure is not a model response and is not scored.
+
+This exact command is **a real, potentially billable API request** (one request maximum), not a diagnostic command:
+
+```powershell
+node scripts/research/deepseek-tutor-efforts.mjs retry-smoke --effort high --execute-live --acknowledge-possible-duplicate-charge
+```
+
+Do not execute it until the Host is confirmed to be the expected active process with the same in-memory token. If the original failure was anything other than the exact transport failure, if any prior response exists, or if the initial report is absent, recovery fails closed. Never manually delete or rename attempt markers to bypass the gate.
+
 **3. Only after separately approving each of the three smokes, complete its other four case-runs once:**
 
-`§powershell
+```powershell
 node scripts/research/deepseek-tutor-efforts.mjs complete --effort low --execute-live
 node scripts/research/deepseek-tutor-efforts.mjs complete --effort high --execute-live
 node scripts/research/deepseek-tutor-efforts.mjs complete --effort max --execute-live
-`§
+```
 
-A complete run stores a **new** effort-specific corpus/report, reusing its exact previously successful first response; the original smoke files are immutable. Every live stage first creates an exclusive private `*.attempt.json` marker **before** its first request. If the process crashes or the report is missing, the marker prevents that stage from being rerun and accidentally duplicating charged calls. Inspect the marker, corpus and report; deliberate recovery requires a separately audited procedure and is not an automatic retry. The first smoke and later continuation are independently bound to their exact effort.
+A complete run stores a **new** effort-specific corpus/report, reusing its exact previously successful first response; the original smoke files are immutable. Every live stage first creates an exclusive private `*.attempt.json` marker **before** its first request. If the process crashes or the report is missing, the marker prevents that stage from being rerun and accidentally duplicating charged calls. Inspect the marker, corpus and report; recovery after the single-case transport failure is explicitly gated above and is never automatic; other interrupted cases require a separate research amendment. The first smoke and later continuation are independently bound to their exact effort.
 
 **4. Purely offline evaluation, ZERO DeepSeek/Judge calls:**
 
-`§powershell
+```powershell
 node scripts/research/deepseek-tutor-efforts.mjs inspect --effort low
 node scripts/research/deepseek-tutor-efforts.mjs inspect --effort high
 node scripts/research/deepseek-tutor-efforts.mjs inspect --effort max
-`§
+```
 
 Offline Eval is a preliminary provenance/coverage artifact; Judge-required rubrics are not evidence of successful teaching until an actual, distinct Judge run exists. Reports and frozen corpora remain private under ignored `artifacts/real-model/`, with three separate cohort identities. The `inspect` artifact uses exclusive write and will not silently replace prior results.
 
 **5. Clean up environment and Host:**
 
-`§powershell
+```powershell
 Stop-Process -Id $hostProcess.Id -ErrorAction SilentlyContinue
 Remove-Item Env:CANONICAL_MODEL_HOST_TOKEN -ErrorAction SilentlyContinue
 Remove-Item Env:TUTOR_MODEL_API_KEY -ErrorAction SilentlyContinue
-`§
+```
 
 ## Exit gates
 
