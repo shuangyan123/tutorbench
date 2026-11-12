@@ -1,5 +1,7 @@
 # DeepSeek Flash real Tutor cohort — five-case smoke v0.1
 
+> **Research status (2026-11-12):** This non-thinking-only smoke is retained as a versioned historical/efficiency control, **not** the primary DeepSeek teaching-capability benchmark. The formal comparison now uses the thinking `low`, `high`, and `max` conditions in [the three-effort research protocol](deepseek-three-efforts-tutor-pilot-v0.1.md). Do not run this older non-thinking procedure when intending to measure those three thinking conditions.
+
 **Status: ready for an operator-controlled live smoke; no real DeepSeek calls made by this PR or CI.** This is response collection, not Judge calibration, student learning measurement, or model ranking.
 
 ## Reuse instead of rebuilding
