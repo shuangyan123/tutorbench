@@ -116,7 +116,7 @@ export async function main(args = process.argv.slice(2)) {
         !await exists(smokeReport)) {
       throw new Error("Original failed smoke attempt/report missing; no retry allowed.");
     }
-    assertRecoverableSmoke(impl, ctx, effort,
+    assertRecoverableSmoke(ctx, effort,
       await readJson(artifactPath(effort, "smoke", "attempt")),
       await readJson(smokeReport));
     // This is a NEW, single, explicitly authorized attempt, with separate
