@@ -113,8 +113,16 @@ export function main(args = process.argv.slice(2)) {
       console.log("All five responses already present; no further paid calls.");
       return;
     }
-    console.log("Maximum NEW provider calls: " +
-      (DEEPSEEK_TUTOR_FIVE_CASES.length - data.responses.length) + " (no automatic retries)");
+    // Only the single-response smoke may precede the four-call continuation.
+    // A partial prior continuation is NOT silently retried on a later run.
+    if (!existsSync(report)) throw new Error("Missing smoke report: refuse to spend more quota.");
+    const prior = JSON.parse(readFileSync(report, "utf8"));
+    if (data.responses.length !== 1 || prior.requestedCaseCount !== 1 ||
+        prior.completedResponseCount !== 1 || prior.failedTutorCallCount !== 0 ||
+        prior.executedTutorCallCount !== 1) {
+      throw new Error("Continuation already attempted or smoke report inconsistent; no automatic retry permitted.");
+    }
+    console.log("Maximum NEW provider calls: 4 (one-time continuation; no automatic retries)");
     run(cli, [...collectArgs(DEEPSEEK_TUTOR_FIVE_CASES), "--resume", corpus]);
     const final = currentCorpus();
     run(validator, ["--corpus", corpus]);
