@@ -20,6 +20,13 @@ export const DEEPSEEK_TUTOR_FIVE_CASES = Object.freeze([
   "science-photosynthesis-concept-001-zh-CN",
 ]);
 const corpusId = "research-deepseek-flash-zh-tutor-5-v0.1";
+const caseVersions = new Map([
+  ["fraction-misconception-001-zh-CN", "1.2.0"],
+  ["hint-only-linear-equation-001-zh-CN", "1.1.0"],
+  ["science-density-knowledge-001-zh-CN", "1.1.0"],
+  ["science-force-transfer-001-zh-CN", "1.1.0"],
+  ["science-photosynthesis-concept-001-zh-CN", "1.1.0"],
+]);
 const base = resolve(process.cwd(), "artifacts", "real-model");
 const corpus = resolve(base, corpusId + ".corpus.json");
 const report = resolve(base, corpusId + ".report.json");
@@ -63,12 +70,14 @@ function currentCorpus() {
   const data = JSON.parse(readFileSync(corpus, "utf8"));
   const responses = data.responses;
   if (data.corpusId !== corpusId || data.datasetId !== "tutor-eval-v0.2a" ||
+      data.datasetVersion !== "0.2a.6" || data.corpusVersion !== "0.4a.3" ||
       data.tutor?.provider !== "deepseek" || data.tutor?.model !== "deepseek-flash" ||
       data.provenance !== "recorded_model" || data.runsPerCase !== 1 ||
       !Array.isArray(responses) || responses.length === 0 ||
       responses.length > DEEPSEEK_TUTOR_FIVE_CASES.length ||
       new Set(responses.map(r => r.caseId)).size !== responses.length ||
-      !responses.every(r => DEEPSEEK_TUTOR_FIVE_CASES.includes(r.caseId) && r.runIndex === 1) ||
+      !responses.every(r => DEEPSEEK_TUTOR_FIVE_CASES.includes(r.caseId) &&
+        r.caseVersion === caseVersions.get(r.caseId) && r.runIndex === 1) ||
       !responses.some(r => r.caseId === DEEPSEEK_TUTOR_FIVE_CASES[0])) {
     throw new Error("Corpus is not the expected bounded five-case DeepSeek smoke source.");
   }
