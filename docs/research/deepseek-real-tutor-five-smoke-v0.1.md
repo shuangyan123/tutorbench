@@ -58,24 +58,31 @@ $env:CANONICAL_MODEL_HOST_TOKEN = [Convert]::ToHexString(
   [Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant()
 ```
 
-**3. First real response (at most 1 paid request); verify before at most 4 additional requests:**
+**3. First real response — at most ONE paid request:**
 
 ```powershell
 $hostProcess = Start-Process node -ArgumentList 'examples/canonical-model-host/chat-completions-server.mjs' -PassThru
-try {
-  node scripts/research/deepseek-tutor-five.mjs smoke --execute-live
-  # STOP HERE to inspect the .report.json and .corpus.json before spending more.
-  # If the single response is complete, provenance-correct and useful, continue:
-  node scripts/research/deepseek-tutor-five.mjs complete --execute-live
-  node scripts/research/deepseek-tutor-five.mjs inspect
-} finally {
-  Stop-Process -Id $hostProcess.Id -ErrorAction SilentlyContinue
-  Remove-Item Env:CANONICAL_MODEL_HOST_TOKEN -ErrorAction SilentlyContinue
-  Remove-Item Env:TUTOR_MODEL_API_KEY -ErrorAction SilentlyContinue
-}
+node scripts/research/deepseek-tutor-five.mjs smoke --execute-live
 ```
 
-**4. Offline inspection, ZERO provider/Judge calls:**
+**STOP: manually inspect the saved corpus and collection report. Do not run the next block merely because the first command exited.** Confirm one successful `recorded_model` response, the expected case ID and version, a complete visible Tutor answer, no provider error, and no hidden reasoning. If the result is missing, partial or unsuitable, stop the host and record the failure; do not advance.
+
+**4. After inspection, explicitly approve at most FOUR additional paid requests:**
+
+```powershell
+node scripts/research/deepseek-tutor-five.mjs complete --execute-live
+node scripts/research/deepseek-tutor-five.mjs inspect
+```
+
+**5. Always stop the Host and clear its temporary credentials when finished:**
+
+```powershell
+Stop-Process -Id $hostProcess.Id -ErrorAction SilentlyContinue
+Remove-Item Env:CANONICAL_MODEL_HOST_TOKEN -ErrorAction SilentlyContinue
+Remove-Item Env:TUTOR_MODEL_API_KEY -ErrorAction SilentlyContinue
+```
+
+**Optional offline inspection, ZERO provider/Judge calls:**
 
 ```powershell
 node scripts/research/deepseek-tutor-five.mjs inspect
