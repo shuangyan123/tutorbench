@@ -223,11 +223,25 @@ function sanitizedTokenUsage(usage) {
   return Object.keys(result).length === 0 ? undefined : result;
 }
 
-function requestForPacket(packet, configuration) {
-  const spec = packet.generationSpec;
-  if (spec.seed !== undefined || spec.reasoningEffort !== undefined) {
+function deepSeekEffortForPacket(spec, configuration) {
+  if (spec.seed !== undefined) {
     throw new CanonicalHostRequestError("unsupported_generation_control");
   }
+  if (spec.reasoningEffort === undefined) return undefined;
+  // The canonical packet, not an ambient environment variable, owns the
+  // experiment's effort. Never silently reinterpret an unsupported effort.
+  if (configuration.deepSeekThinking !== "enabled" ||
+      !["deepseek-flash", "deepseek-v4-pro"].includes(configuration.model) ||
+      !["low", "high", "max"].includes(spec.reasoningEffort) ||
+      spec.temperature !== undefined) {
+    throw new CanonicalHostRequestError("unsupported_generation_control");
+  }
+  return spec.reasoningEffort;
+}
+
+function requestForPacket(packet, configuration) {
+  const spec = packet.generationSpec;
+  const effort = deepSeekEffortForPacket(spec, configuration);
   return {
     model: configuration.model,
     messages: packet.cases[0].messages,
@@ -237,17 +251,17 @@ function requestForPacket(packet, configuration) {
     ...(configuration.deepSeekThinking === undefined
       ? {}
       : { thinking: { type: configuration.deepSeekThinking } }),
+    ...(effort === undefined ? {} : { reasoning_effort: effort }),
     ...(spec.temperature === undefined ? {} : { temperature: spec.temperature }),
   };
 }
 
-function executionSupportForPacket(packet) {
+function executionSupportForPacket(packet, configuration) {
   const spec = packet.generationSpec;
-  if (spec.seed !== undefined || spec.reasoningEffort !== undefined) {
-    throw new CanonicalHostRequestError("unsupported_generation_control");
-  }
+  const effort = deepSeekEffortForPacket(spec, configuration);
   return {
     maxOutputTokens: true,
+    ...(effort === undefined ? {} : { reasoningEffort: true }),
     ...(spec.temperature === undefined ? {} : { temperature: true }),
   };
 }
@@ -324,7 +338,7 @@ async function executePacket(packet, configuration, fetchImplementation) {
           ...(tokenUsage === undefined ? {} : { tokenUsage }),
         },
       },
-      executionSupport: executionSupportForPacket(packet),
+      executionSupport: executionSupportForPacket(packet, configuration),
     };
   } catch (error) {
     if (error instanceof CanonicalHostRequestError) {
