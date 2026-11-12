@@ -107,6 +107,23 @@ function reasoningSplitEnvironment(environment) {
   return mode;
 }
 
+function deepSeekThinkingEnvironment(environment, model) {
+  const value = environment.TUTOR_MODEL_DEEPSEEK_THINKING?.trim();
+  if (value === undefined || value.length === 0) return undefined;
+  if (value !== "enabled" && value !== "disabled") {
+    throw new CanonicalHostConfigurationError(
+      "TUTOR_MODEL_DEEPSEEK_THINKING must be enabled or disabled.",
+    );
+  }
+  // Do not silently pass DeepSeek-specific generation controls to another provider.
+  if (model !== "deepseek-flash" && model !== "deepseek-v4-pro") {
+    throw new CanonicalHostConfigurationError(
+      "TUTOR_MODEL_DEEPSEEK_THINKING requires an exact supported DeepSeek model ID.",
+    );
+  }
+  return value;
+}
+
 function requireReasoningSeparationEnvironment(environment) {
   const value = environment.TUTOR_MODEL_REQUIRE_REASONING_SEPARATION?.trim();
   if (value === undefined || value.length === 0) {
@@ -162,13 +179,17 @@ function validateBaseUrl(environment, authMode) {
 
 export function readConfiguration(environment = process.env) {
   const authMode = authModeEnvironment(environment);
+  const model = requiredEnvironment("TUTOR_MODEL", environment);
   return {
     sessionToken: parseCanonicalHostSessionToken(environment.CANONICAL_MODEL_HOST_TOKEN),
     authMode,
     ...(authMode === "bearer"
       ? { apiKey: requiredEnvironment("TUTOR_MODEL_API_KEY", environment) }
       : {}),
-    model: requiredEnvironment("TUTOR_MODEL", environment),
+    model,
+    ...(deepSeekThinkingEnvironment(environment, model) === undefined
+      ? {}
+      : { deepSeekThinking: deepSeekThinkingEnvironment(environment, model) }),
     baseUrl: validateBaseUrl(environment, authMode),
     apiPath: endpointPathEnvironment(environment),
     maxOutputTokensField: maxOutputTokensFieldEnvironment(environment),
@@ -213,6 +234,9 @@ function requestForPacket(packet, configuration) {
     stream: false,
     [configuration.maxOutputTokensField]: spec.maxOutputTokens,
     ...(configuration.reasoningSplit === "enabled" ? { reasoning_split: true } : {}),
+    ...(configuration.deepSeekThinking === undefined
+      ? {}
+      : { thinking: { type: configuration.deepSeekThinking } }),
     ...(spec.temperature === undefined ? {} : { temperature: spec.temperature }),
   };
 }
@@ -238,6 +262,10 @@ function responseText(body, configuration) {
   const choice = choices[0];
   if (choice?.finish_reason === "length") {
     throw new CanonicalHostRequestError("provider_response_truncated");
+  }
+  // A visible partial answer is not a successful final tutor response.
+  if (choice?.finish_reason !== "stop") {
+    throw new CanonicalHostRequestError("provider_response_invalid");
   }
   const content = choice?.message?.content;
   if (typeof content !== "string" || content.trim().length === 0) {
