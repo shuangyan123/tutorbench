@@ -251,7 +251,7 @@ function heatmapPage() {
       <h1 class="essay-title">${bi("Evidence <em>Matrix</em>", esc(Z("Evidence Matrix")))}</h1>
       <p class="essay-dek">${bi("See the landscape at a glance.", "一眼看清整体图景。")}</p>
       ${biPE("p", "hm-desc", "The matrix will connect public benchmark cases with versioned public model runs and their trial evidence. Today, no public model trials are available yet.")}
-      <dl class="hm-stats">${stats.map(([v, k, n], i) => `<div><dd>${esc(v)}</dd><dt>${biE(k)}</dt><small>${statNote(i, n)}</small></div>`).join("")}</dl>
+      <dl class="hm-stats">${stats.map(([v, k, n], i) => `<div><dt>${biE(k)}</dt><dd>${esc(v)}</dd><dd class="sub">${statNote(i, n)}</dd></div>`).join("")}</dl>
     </div>
   </header>
 
@@ -338,7 +338,7 @@ function benchmarkPage() {
       </div>
       <aside class="bx-snap" aria-labelledby="snapshot-title">
         <p class="bx-snap-head kicker"><span id="snapshot-title">${biE("Dataset snapshot")}</span><span>${biE("Public development set")}</span></p>
-        <dl class="bx-facts">${facts.map(([n, k, note]) => `<div><dt>${bi(esc(k), esc(Zor(k, ZH_GAP[k])))}</dt><dd>${n}</dd><small>${biE(note)}</small></div>`).join("")}</dl>
+        <dl class="bx-facts">${facts.map(([n, k, note]) => `<div><dt>${bi(esc(k), esc(Zor(k, ZH_GAP[k])))}</dt><dd>${n}</dd><dd class="sub">${biE(note)}</dd></div>`).join("")}</dl>
         <table class="bx-matrix"><caption class="kicker">${biE("Subject × locale · authored case counts")}</caption>
           <thead><tr><th scope="col">${biE("Subject")}</th>${locales.map(([l]) => `<th scope="col">${esc(valueLabel(l) ?? l)}</th>`).join("")}</tr></thead>
           <tbody>${subjects.map(([s]) => `<tr><th scope="row">${tax(s)}</th>${locales.map(([l]) => cell(s, l)).join("")}</tr>`).join("")}</tbody></table>

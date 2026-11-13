@@ -111,7 +111,7 @@ function panel(p, i) {
         </div>
         <div class="term rn-term">
           <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · ${esc(p.label.toLowerCase())}</p><button class="rn-copy" type="button" data-copy-run ${attr2("aria-label", `Copy ${p.label} command`, p.copyZh)}><span class="en" data-copy-label>Copy</span><span class="zh" lang="zh-CN" data-copy-label>${esc(Z("Copy"))}</span></button></div>
-<pre><code>${code(p.commands)}</code></pre>
+<pre tabindex="0"><code>${code(p.commands)}</code></pre>
         </div>
         <ul class="rn-facts">${p.facts.map((f) => `<li>${CHECK}<span>${pairOf(f)}</span></li>`).join("")}</ul>
         ${pairP("p", "rn-note", p.note)}${pkg}
@@ -284,7 +284,7 @@ function entryPoint(title, summary, label, href, e = 0) {
 }
 function codeBlock(label, rows) {
   return `<div class="term dc-term"><div class="term-bar"><span></span><span></span><span></span><p>${esc(label)}</p><span class="dc-lang">bash</span></div>
-<pre><code>${rows.map(esc).join("\n")}</code></pre></div>`;
+<pre tabindex="0"><code>${rows.map(esc).join("\n")}</code></pre></div>`;
 }
 function indexEntry([label, href, e, summary, cat, path], i) {
   const search = [label, summary, CATS[cat], N(label), Z(summary), Z(CATS[cat]), path].join(" ");
