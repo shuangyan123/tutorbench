@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "packetId": "learner-state-evidence-construct-blind-packet",
+  "version": "0.1.0",
+  "evidenceMode": "author_written_synthetic",
+  "evaluationScope": "evidence_attribution_not_model_comparison",
+  "tasks": [
+    {
+      "reviewTaskId": "LR-01",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "I know that 1/3 and 1/4 use the same whole split into different-sized equal parts. How can I rewrite them to add them?"
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-01-1",
+          "concept": "Meaning of equal-sized parts in the same whole"
+        },
+        {
+          "targetId": "LR-01-2",
+          "concept": "Rewriting unlike fractions using equivalent-sized units"
+        }
+      ]
+    },
+    {
+      "reviewTaskId": "LR-02",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "I know a denominator is the top number in a fraction; it tells how many groups I have."
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-02-1",
+          "concept": "Meaning of the denominator in a part–whole fraction"
+        }
+      ]
+    },
+    {
+      "reviewTaskId": "LR-03",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "Why do we need a denominator?"
+        },
+        {
+          "role": "assistant",
+          "content": "A denominator tells how many equal parts a whole has been split into."
+        },
+        {
+          "role": "user",
+          "content": "What does 'a whole' mean? I do not know what that word means here."
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-03-1",
+          "concept": "Meaning of a chosen whole"
+        },
+        {
+          "targetId": "LR-03-2",
+          "concept": "Meaning of equal fractional parts"
+        }
+      ]
+    },
+    {
+      "reviewTaskId": "LR-04",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "I think I already know what a whole means, but I don't want to explain it."
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-04-1",
+          "concept": "Meaning of a chosen whole"
+        }
+      ]
+    },
+    {
+      "reviewTaskId": "LR-05",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "I know a denominator tells how many equal parts the whole has. I always add top numbers and bottom numbers separately, so 1/3 + 1/4 is 2/7. That rule must work for any fractions."
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-05-1",
+          "concept": "Method for adding fractions with unlike denominators"
+        },
+        {
+          "targetId": "LR-05-2",
+          "concept": "Meaning of the denominator in a part–whole fraction"
+        }
+      ]
+    },
+    {
+      "reviewTaskId": "LR-06",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "What do you mean by 'a whole' in the denominator explanation?"
+        },
+        {
+          "role": "assistant",
+          "content": "Think of one full sheet of paper. We can choose the entire sheet as the whole and then divide that sheet into equal pieces."
+        },
+        {
+          "role": "user",
+          "content": "Okay, the whole is all of the sheet before we cut it. But why do the pieces have to be equal?"
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-06-1",
+          "concept": "Meaning of a chosen whole"
+        },
+        {
+          "targetId": "LR-06-2",
+          "concept": "Why fractional parts must be equal-sized"
+        }
+      ]
+    },
+    {
+      "reviewTaskId": "LR-07",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "What do you mean by a whole?"
+        },
+        {
+          "role": "assistant",
+          "content": "The whole is an entire sheet of paper before cutting it."
+        },
+        {
+          "role": "user",
+          "content": "The whole is an entire sheet of paper before cutting it."
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-07-1",
+          "concept": "Meaning of a chosen whole"
+        }
+      ]
+    },
+    {
+      "reviewTaskId": "LR-08",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "I got 1/3 + 1/4 = 2/7. Is that right?"
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-08-1",
+          "concept": "Method for adding fractions with unlike denominators"
+        },
+        {
+          "targetId": "LR-08-2",
+          "concept": "Meaning of the chosen whole"
+        }
+      ]
+    },
+    {
+      "reviewTaskId": "LR-09",
+      "subject": "mathematics",
+      "learnerLevel": "upper primary",
+      "learningObjective": "Understand denominators as counts of equal-sized parts of a chosen whole, and apply that meaning to fraction addition.",
+      "conversationHistory": [
+        {
+          "role": "user",
+          "content": "How do I add a third and a fourth?"
+        }
+      ],
+      "reviewTargets": [
+        {
+          "targetId": "LR-09-1",
+          "concept": "Method for adding fractions with unlike denominators"
+        }
+      ]
+    }
+  ]
+}

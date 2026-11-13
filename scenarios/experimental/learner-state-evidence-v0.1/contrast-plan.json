@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "id": "learner-state-counterfactual-contrasts-v0.1",
+  "version": "0.1.0",
+  "sourceSuite": {
+    "id": "prerequisite-aware-instruction-v0.1",
+    "version": "0.1.0"
+  },
+  "evidenceMode": "author_written_counterfactual",
+  "tutorExecutionStatus": "not_run",
+  "learnerOutcomeStatus": "not_measured",
+  "pairs": [
+    {
+      "id": "evidence-for-rule",
+      "sourceScenarioId": "pai-unknown-cause",
+      "sourceScenarioVersion": "0.1.0",
+      "sourceLatestLearnerMessage": "I got 1/3 + 1/4 = 2/7. Is that right?",
+      "prefix": "I got 1/3 + 1/4 = 2/7.",
+      "suffix": " Is that right?",
+      "controls": {
+        "a": "",
+        "b": " I always add the top numbers and bottom numbers separately."
+      },
+      "researchQuestion": "同一错误答案下，显式错误规则是否改变可证实的诊断边界？",
+      "comparisonKind": "signal-added"
+    },
+    {
+      "id": "reported-vs-defined",
+      "sourceScenarioId": "pai-known-foundation",
+      "sourceScenarioVersion": "0.1.0",
+      "sourceLatestLearnerMessage": "I know that 1/3 and 1/4 use the same whole split into different-sized equal parts. How can I rewrite them to add them?",
+      "prefix": "I know what a whole is",
+      "suffix": ". How can I rewrite 1/3 and 1/4 to add them?",
+      "controls": {
+        "a": "",
+        "b": "; it is the complete sheet of paper before we divide it into equal parts"
+      },
+      "researchQuestion": "自述知道与给出正确的定义，能否得到不同且不过度的反馈？",
+      "comparisonKind": "signal-added"
+    },
+    {
+      "id": "echoed-progress",
+      "sourceScenarioId": "pai-after-progress",
+      "sourceScenarioVersion": "0.1.0",
+      "sourceLatestLearnerMessage": "Okay, the whole is all of the sheet before we cut it. But why do the pieces have to be equal?",
+      "prefix": "Okay",
+      "suffix": ". But why do the pieces have to be equal?",
+      "controls": {
+        "a": "",
+        "b": ", the whole is all of the sheet before we cut it"
+      },
+      "researchQuestion": "同一已给过示例的 Tutor 历史中，学生是否复述了整体，是否影响继续补课的量？",
+      "comparisonKind": "signal-added"
+    },
+    {
+      "id": "term-gap-negative-control",
+      "sourceScenarioId": "pai-whole-undefined",
+      "sourceScenarioVersion": "0.1.0",
+      "sourceLatestLearnerMessage": "What does 'a whole' mean? I do not know what that word means here.",
+      "prefix": "What does 'a whole' mean?",
+      "suffix": "",
+      "controls": {
+        "a": "",
+        "b": " I do not know what that word means here."
+      },
+      "researchQuestion": "明确问术语与再次申明不懂都应促成解释，不能因附加词而臆造新的缺陷。",
+      "comparisonKind": "expected-action-invariant"
+    },
+    {
+      "id": "wording-invariance",
+      "sourceScenarioId": "pai-rule-misconception",
+      "sourceScenarioVersion": "0.1.0",
+      "sourceLatestLearnerMessage": "I know a denominator tells how many equal parts the whole has. I always add top numbers and bottom numbers separately, so 1/3 + 1/4 is 2/7. That rule must work for any fractions.",
+      "prefix": "I got 1/3 + 1/4 = 2/7 because ",
+      "suffix": ". Is that right?",
+      "controls": {
+        "a": "I add the top numbers and bottom numbers separately",
+        "b": "I combine the numerators with each other and the denominators with each other"
+      },
+      "researchQuestion": "两种语义等价的错误规则描述应得到相同的诊断，不应被固定关键词牵引。",
+      "comparisonKind": "paraphrase-invariant"
+    }
+  ]
+}

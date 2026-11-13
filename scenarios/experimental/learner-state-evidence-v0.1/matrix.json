@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "id": "learner-state-evidence-matrix-v0.1",
+  "version": "0.1.1",
+  "sourceSuite": {
+    "id": "prerequisite-aware-instruction-v0.1",
+    "version": "0.1.0"
+  },
+  "evidenceMode": "author_written_synthetic",
+  "participantLinkage": "unlinked_profiles",
+  "claimBoundary": {
+    "observedLearnerOutcomes": false,
+    "stableAbilityInferred": false,
+    "interventionEffectProven": false
+  },
+  "profiles": [
+    {
+      "scenarioId": "pai-unknown-cause",
+      "scenarioVersion": "0.1.0",
+      "observations": [
+        {
+          "id": "unknown-incorrect",
+          "learnerTurnIndex": 1,
+          "quote": "I got 1/3 + 1/4 = 2/7.",
+          "kind": "incorrect_result"
+        }
+      ],
+      "claims": [
+        {
+          "conceptId": "fraction-addition-rule",
+          "status": "unknown",
+          "observationIds": []
+        },
+        {
+          "conceptId": "chosen-whole",
+          "status": "unknown",
+          "observationIds": []
+        }
+      ],
+      "decisionBoundary": {
+        "acceptableNextMoves": [
+          "指出 2/7 不正确，并询问学生如何得到 2/7；也可提供不预设原因的简短正确示范。"
+        ],
+        "prohibitedInferences": [
+          "仅凭 2/7 断言学生不懂分母、整数加法、整体概念或确有某一错误规则。"
+        ]
+      }
+    },
+    {
+      "scenarioId": "pai-whole-undefined",
+      "scenarioVersion": "0.1.0",
+      "observations": [
+        {
+          "id": "whole-gap",
+          "learnerTurnIndex": 2,
+          "quote": "What does 'a whole' mean? I do not know what that word means here.",
+          "kind": "explicit_gap"
+        }
+      ],
+      "claims": [
+        {
+          "conceptId": "chosen-whole",
+          "status": "explicit_gap",
+          "observationIds": [
+            "whole-gap"
+          ]
+        },
+        {
+          "conceptId": "equal-parts",
+          "status": "unknown",
+          "observationIds": []
+        }
+      ],
+      "decisionBoundary": {
+        "acceptableNextMoves": [
+          "先用一张完整纸、一块完整饼等明确参照物解释“整体”，再检查学生能否指出同一个整体。"
+        ],
+        "prohibitedInferences": [
+          "因为学生问“整体”就推断其所有分数先修知识均缺失；原样重复抽象定义。"
+        ]
+      }
+    },
+    {
+      "scenarioId": "pai-rule-misconception",
+      "scenarioVersion": "0.1.0",
+      "observations": [
+        {
+          "id": "rule-explicit",
+          "learnerTurnIndex": 1,
+          "quote": "I always add top numbers and bottom numbers separately",
+          "kind": "stated_rule"
+        },
+        {
+          "id": "rule-definition",
+          "learnerTurnIndex": 1,
+          "quote": "a denominator tells how many equal parts the whole has.",
+          "kind": "verbal_definition"
+        }
+      ],
+      "claims": [
+        {
+          "conceptId": "fraction-addition-rule",
+          "status": "misconception_stated",
+          "observationIds": [
+            "rule-explicit"
+          ]
+        },
+        {
+          "conceptId": "equal-parts",
+          "status": "stated_definition",
+          "observationIds": [
+            "rule-definition"
+          ]
+        }
+      ],
+      "decisionBoundary": {
+        "acceptableNextMoves": [
+          "针对学生明确说出的分子、分母分别相加规则设计一个大小比较或相同单位的反例，再请学生解释。"
+        ],
+        "prohibitedInferences": [
+          "因为答案错就改称学生“完全不懂整体”；把说出正确的分母定义直接当作独立运用证明。"
+        ]
+      }
+    },
+    {
+      "scenarioId": "pai-after-progress",
+      "scenarioVersion": "0.1.0",
+      "observations": [
+        {
+          "id": "progress-whole",
+          "learnerTurnIndex": 2,
+          "quote": "the whole is all of the sheet before we cut it.",
+          "kind": "prompted_paraphrase"
+        },
+        {
+          "id": "progress-question",
+          "learnerTurnIndex": 2,
+          "quote": "why do the pieces have to be equal?",
+          "kind": "question"
+        }
+      ],
+      "claims": [
+        {
+          "conceptId": "chosen-whole",
+          "status": "supported_local",
+          "observationIds": [
+            "progress-whole"
+          ]
+        },
+        {
+          "conceptId": "equal-parts",
+          "status": "unknown",
+          "observationIds": []
+        }
+      ],
+      "decisionBoundary": {
+        "acceptableNextMoves": [
+          "把学生在上一轮纸张例子后的正确复述当作局部理解迹象，先简短认可，再解释为什么各份等大并用一个可核查的小例子探问。"
+        ],
+        "prohibitedInferences": [
+          "重复完整解释“整体”并忽略新问题；把提示后的复述写成无提示独立掌握或持久迁移。"
+        ]
+      }
+    },
+    {
+      "scenarioId": "pai-known-foundation",
+      "scenarioVersion": "0.1.0",
+      "observations": [
+        {
+          "id": "ready-local",
+          "learnerTurnIndex": 1,
+          "quote": "1/3 and 1/4 use the same whole split into different-sized equal parts.",
+          "kind": "local_reasoning"
+        },
+        {
+          "id": "ready-question",
+          "learnerTurnIndex": 1,
+          "quote": "How can I rewrite them to add them?",
+          "kind": "question"
+        }
+      ],
+      "claims": [
+        {
+          "conceptId": "equal-parts",
+          "status": "demonstrated_local",
+          "observationIds": [
+            "ready-local"
+          ]
+        },
+        {
+          "conceptId": "equivalent-fraction-units",
+          "status": "unknown",
+          "observationIds": []
+        }
+      ],
+      "decisionBoundary": {
+        "acceptableNextMoves": [
+          "认可学生已正确区分同一个整体与不同大小的份，提示如何改写为相同大小的份并让学生完成一步。"
+        ],
+        "prohibitedInferences": [
+          "重新讲解最基本的“整体”概念而无新证据；把“怎么改写”直接解释为学生永久不会等值分数。"
+        ]
+      }
+    }
+  ]
+}
