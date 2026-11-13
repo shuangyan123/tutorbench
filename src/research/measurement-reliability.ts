@@ -10,6 +10,7 @@ import { toCalibrationCandidateResponseFile } from "../calibration/corpus.js";
 import { buildCalibrationReferenceSet } from "../calibration/reference.js";
 import type { ScoredCalibrationLabel } from "../contracts/calibration.js";
 import { measurementFingerprint, parseFrozenMeasurementSource } from "./measurement-reliability-source.js";
+import { summarizeMeasurementPairs } from "./paired-measurement.js";
 
 interface MeasurementRow {
   caseId: string; caseVersion: string; rubricId: string; runIndex: number;
@@ -43,25 +44,6 @@ function humanForUnit(input: CalibrationValidationInput, responseId: string, rub
   if (reference.dataKind !== "human-reference")
     return { label: null, status: "synthetic_fixture" as const, reviewers };
   return { label: reference.labels[0]!.finalLabel, status: "human_reference" as const, reviewers };
-}
-
-function pairedSummary(rows: readonly MeasurementRow[], right: "judge" | "humanReference", left: "strict" | "judge") {
-  const pairs = rows.filter(r => r[left] !== null && r[right] !== null);
-  const matrix: Record<string, number> = {};
-  for (const row of pairs) {
-    const key = `${row[left]}__${row[right]}`;
-    matrix[key] = (matrix[key] ?? 0) + 1;
-  }
-  const disagreements = pairs.filter(r => r[left] !== r[right]).length;
-  const rate = (count: number) => pairs.length === 0 ? null : count / pairs.length;
-  const leftPassCount = pairs.filter(r => r[left] === "PASS").length;
-  const rightPassCount = pairs.filter(r => r[right] === "PASS").length;
-  return {
-    validSamples: pairs.length, disagreements, disagreementRate: rate(disagreements),
-    leftPassRate: rate(leftPassCount), rightPassRate: rate(rightPassCount),
-    rightMinusLeftPassRatePoints: pairs.length === 0 ? null : 100 * (rightPassCount - leftPassCount) / pairs.length,
-    matrix: Object.fromEntries(Object.entries(matrix).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)),
-  };
 }
 
 /** Read-only paired observation. No providers, aggregate scores, or production result writes. */
@@ -153,9 +135,9 @@ export async function buildMeasurementReliabilityReport(
       pairedStrictJudge: count(r => r.strict !== null && r.judge !== null),
       completeThreeWay: count(r => r.strict !== null && r.judge !== null && r.humanReference !== null),
     },
-    strictVsJudge: pairedSummary(rows, "judge", "strict"),
-    strictVsHuman: pairedSummary(rows, "humanReference", "strict"),
-    judgeVsHuman: pairedSummary(rows, "humanReference", "judge"),
+    strictVsJudge: summarizeMeasurementPairs(rows, r => r.strict, r => r.judge),
+    strictVsHuman: summarizeMeasurementPairs(rows, r => r.strict, r => r.humanReference),
+    judgeVsHuman: summarizeMeasurementPairs(rows, r => r.judge, r => r.humanReference),
     evidenceIssues: Object.fromEntries(Object.entries(issues).sort()), rows,
     limitations: [
       "Strict is whole-response exact equality against authored acceptedAnswers (or finalAnswer), not semantic correctness.",
