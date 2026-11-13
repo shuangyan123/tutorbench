@@ -58,6 +58,7 @@ npm run build
 node --test dist/tests/learner-evidence-hint-pilot.test.js
 node scripts/research/learner-evidence-hint-pilot.mjs
 node scripts/research/learner-evidence-hint-pilot.mjs --frozen
+node scripts/research/learner-evidence-hint-pilot.mjs --before-after
 ```
 
 The default replay prints synthetic controls and traces. The optional frozen
@@ -78,6 +79,9 @@ There is no score or aggregation. The pilot has no default registry, public
 API export, Tutor Health, or publication integration.
 
 ## Results and interpretation
+
+The [Before / After Measurement Report](learner-evidence-hint-before-after-v0.1.md)
+tracks baseline provenance, comparison eligibility, and limits on accuracy claims.
 
 The synthetic cases include direct and indirect first steps, explicit transfer,
 two ways to address preservation of equality, unsupported learner diagnoses,

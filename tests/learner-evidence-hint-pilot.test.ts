@@ -4,6 +4,7 @@ import { test } from "node:test";
 import { toTutorTurnInput } from "../src/contracts/tutor-eval.js";
 import { loadTutorEvalDataset } from "../src/datasets/index.js";
 import { evaluateHintFit } from "../src/research/learner-evidence-hint-rubric.js";
+import { summarizeHintMeasurement, type HintMeasurementRow } from "../src/research/learner-evidence-hint-measurement.js";
 import {
   createHintPilot, hintPilotId, hintSource, resolveHintEvidence,
 } from "../src/research/learner-evidence-hint-scenarios.js";
@@ -112,4 +113,32 @@ test("candidate rubric yields one explained, repeatable verdict per case and res
     }
   }
   assert.equal(evaluateHintFit(c, "").verdict, "ABSTAIN");
+});
+
+test("before/after statistics compare the same referenced pairs and retain zero denominators", () => {
+  const rows = [
+    { condition: "unknown", baselineStatus: "eligible", baseline: "PASS", candidate: "FAIL", reference: "FAIL" },
+    { condition: "unknown", baselineStatus: "eligible", baseline: "PASS", candidate: "FAIL", reference: "PASS" },
+    { condition: "unknown", baselineStatus: "eligible", baseline: "FAIL", candidate: "ABSTAIN", reference: "PASS" },
+    { condition: "unknown", baselineStatus: "unavailable", baseline: null, candidate: "PASS", reference: null },
+    { condition: "local-understanding", baselineStatus: "not_comparable", baseline: null, candidate: "PASS", reference: "PASS" },
+    { condition: "unresolved-gap", baselineStatus: "not_comparable", baseline: null, candidate: "FAIL", reference: "FAIL" },
+  ] satisfies HintMeasurementRow[];
+  const { overall, byCondition } = summarizeHintMeasurement(rows);
+  assert.deepEqual(overall.comparableCoverage, { count: 2, denominator: 6, rate: 2 / 6 });
+  assert.deepEqual(overall.unresolvedComparison, { count: 4, denominator: 6, rate: 4 / 6 });
+  assert.deepEqual(overall.baselineCoverage, { count: 3, denominator: 6, rate: 0.5 });
+  assert.deepEqual(overall.candidateAbstentions, { count: 1, denominator: 6, rate: 1 / 6 });
+  assert.deepEqual(overall.agreement.baseline.agreement, { count: 1, denominator: 2, rate: 0.5 });
+  assert.deepEqual(overall.agreement.candidate.agreement, { count: 1, denominator: 2, rate: 0.5 });
+  assert.deepEqual(overall.agreement.baseline.falseAcceptance, { count: 1, denominator: 1, rate: 1 });
+  assert.deepEqual(overall.agreement.candidate.falseRejection, { count: 1, denominator: 1, rate: 1 });
+  assert.deepEqual(overall.fixes, { count: 1, denominator: 2, rate: 0.5 });
+  assert.deepEqual(overall.regressions, { count: 1, denominator: 2, rate: 0.5 });
+  for (const condition of [byCondition.B, byCondition.C]) {
+    assert.deepEqual(condition.notComparable, { count: 1, denominator: 1, rate: 1 });
+    assert.deepEqual(condition.agreement.candidate.agreement, { count: 0, denominator: 0, rate: null });
+    assert.deepEqual(condition.regressions, { count: 0, denominator: 0, rate: null });
+  }
+  assert.deepEqual(summarizeHintMeasurement([]).overall.referenceCoverage, { count: 0, denominator: 0, rate: null });
 });

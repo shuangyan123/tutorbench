@@ -27,6 +27,7 @@
       "effort": "low",
       "responseId": "tutor-response-9e00a227b63a478456882cced39c03ad",
       "corpusSha256": "17deaea9b5869746dac95af051ead8c597b3acb8e2bf1c9cf2d16909db0ab37f",
+      "offlineEvaluationSha256": "b40eb62795d7a8eabc1903ab38572a8d730452da9b7abfca58a7aa999f739e76",
       "responseSha256": "baf77f48b41cfb1a93b99204eccd1f6c74c8b9dbf6ab8d3234ee9dda101474dc",
       "strategySummary": "Prompts the learner to think about the inverse of +3."
     },
@@ -34,6 +35,7 @@
       "effort": "high",
       "responseId": "tutor-response-88bef452c2dc055c5bdeba6d54593043",
       "corpusSha256": "74cbb93eac115b5a10d38e85b1f5d82cbc9f99a540c8e9e0b273582f81bf016f",
+      "offlineEvaluationSha256": "84b877febdf6cf63ef6b6814312a18cc3a6c1ed40a2732fcf52c595d0e94351c",
       "responseSha256": "3aa5e3bd50c12373abfec417034cf41929e10c509cf58a5df84f84bb419a2a03",
       "strategySummary": "Names subtraction of 3 on both sides."
     },
@@ -41,6 +43,7 @@
       "effort": "max",
       "responseId": "tutor-response-fee97d029c8c24326e8d502a9caa4461",
       "corpusSha256": "fd9c29907d5f97c9550ebdd604b78691503aa41e38cd6cfccc55fd228225b03c",
+      "offlineEvaluationSha256": "5bfd445f8eaed0ccff58cea766c0a4bbe28c2276c0acc23aa45bc2d17fb03310",
       "responseSha256": "fb3803f8e45e2cf4aebb76a60ed8787bd53e2be0a83ab76c00e980255ae65070",
       "strategySummary": "Cues the inverse operation and asks the learner to carry out the first step."
     }
