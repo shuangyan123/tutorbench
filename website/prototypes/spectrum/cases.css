@@ -2,7 +2,7 @@
    to emerald. The library is a card catalogue: each public case is an index card (ruled head, the
    rod hole at the foot); a case file reads like a dossier; the evidence matrix stays deliberately empty. */
 :root {
-  --lead: #0b7a53;            /* emerald */
+  --lead: #086644;            /* emerald, deep enough for small type on the page light (4.8:1) */
   --lead-deep: #075a3c;
   --lead-soft: rgba(11, 122, 83, .24);
   --lead-line: rgba(11, 122, 83, .42);
@@ -197,9 +197,10 @@
 .hm-stats { margin: 36px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
 .hm-stats > div { display: grid; gap: 4px; align-content: start; padding: 18px 18px 6px 0; }
 .hm-stats > div + div { padding-left: 18px; border-left: 1px solid var(--hair); }
-.hm-stats dd { margin: 0; font-family: var(--f-display); font-size: clamp(48px, 5vw, 72px); line-height: .9; color: var(--ink); }
+/* each stat is a dt + dd group for assistive tech; the figure is drawn first */
+.hm-stats dd:not(.sub) { order: -1; margin: 0; font-family: var(--f-display); font-size: clamp(48px, 5vw, 72px); line-height: .9; color: var(--ink); }
 .hm-stats dt { font-family: var(--f-ui); font-size: 14px; color: var(--ink); }
-.hm-stats small { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); line-height: 1.5; }
+.hm-stats dd.sub { margin: 0; font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); line-height: 1.5; }
 .hm-body { display: grid; gap: clamp(48px, 6vw, 88px); padding-block: clamp(36px, 5vw, 64px) clamp(48px, 6vw, 88px); position: relative; }
 .hm-body::before { content: ""; position: absolute; top: 0; height: 1px; background: var(--ink); left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: max(var(--gutter), env(safe-area-inset-right, 0px)); }
 .hm-empty { max-width: 46em; }
@@ -255,9 +256,9 @@
 .bx-facts { margin: 0; display: grid; grid-template-columns: 1fr 1fr; }
 .bx-facts > div { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: baseline; padding: 14px 0 12px; border-bottom: 1px solid var(--hair); }
 .bx-facts > div:nth-child(even) { padding-left: 16px; border-left: 1px solid var(--hair); }
-.bx-facts dd { grid-row: span 2; margin: 0; font-family: var(--f-display); font-size: clamp(40px, 3.6vw, 54px); line-height: .9; color: var(--ink); }
+.bx-facts dd:not(.sub) { grid-row: span 2; margin: 0; font-family: var(--f-display); font-size: clamp(40px, 3.6vw, 54px); line-height: .9; color: var(--ink); }
 .bx-facts dt { font-family: var(--f-ui); font-size: 13.5px; color: var(--ink); }
-.bx-facts small { font-family: var(--f-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); line-height: 1.4; }
+.bx-facts dd.sub { margin: 0; font-family: var(--f-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); line-height: 1.4; }
 .bx-matrix { width: 100%; margin-top: 16px; border-collapse: collapse; font-family: var(--f-ui); font-size: 13.5px; }
 .bx-matrix caption { text-align: left; padding-bottom: 8px; color: var(--ink-3); }
 .bx-matrix th, .bx-matrix td { padding: 7px 0; border-bottom: 1px solid var(--hair); text-align: left; font-weight: 400; }
@@ -310,7 +311,7 @@
   .bx-coverage { grid-template-columns: 1fr; }
   .bx-cov-intro { position: static; }
 }
-@media (max-width: 620px) { .bx-dists { grid-template-columns: 1fr; } .bx-facts dd { font-size: 38px; } }
+@media (max-width: 620px) { .bx-dists { grid-template-columns: 1fr; } .bx-facts dd:not(.sub) { font-size: 38px; } }
 
 /* ---- 简体中文 */
 :root[data-lang="zh"] .cx-head .essay-title { font-size: clamp(36px, 5vw, 72px); }

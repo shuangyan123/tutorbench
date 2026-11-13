@@ -135,7 +135,9 @@
 .dc-head .essay-title { font-size: clamp(48px, 7vw, 108px); }
 .dc-head-note { margin: 14px 0 0; font: 400 15px/1.55 var(--f-ui); color: var(--ink-3); }
 .dc-trace { margin: 0; font-family: var(--f-display); font-size: clamp(26px, 2.6vw, 38px); line-height: 1.02; color: var(--ink-2); text-align: right; }
-.dc-controls { display: grid; gap: 14px; padding-block: 0 clamp(26px, 3vw, 40px); }
+/* minmax(0, 1fr): an auto column grows to the search field's preferred width, which is wider than a
+   phone in Chinese and pushed the last filters off the screen */
+.dc-controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; padding-block: 0 clamp(26px, 3vw, 40px); }
 .dc-search { position: relative; display: flex; align-items: center; max-width: 720px; border-bottom: 1px solid var(--ink); }
 .dc-search > svg { position: absolute; left: 2px; width: 20px; height: 20px; color: var(--ink-3); }
 .dc-search input { flex: 1; min-width: 0; height: 56px; padding: 0 44px 0 34px; border: 0; background: transparent; font: 400 clamp(19px, 1.8vw, 24px)/1 var(--f-text); color: var(--ink); appearance: none; }

@@ -603,6 +603,8 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .term-bar p { margin-left: 10px; font: 400 12px/1 var(--f-mono); color: #8c8f98; flex: 1; }
 .term-bar button { background: none; color: #e6e7ea; border: 1px solid rgba(255, 255, 255, .25); border-radius: 5px; height: 28px; padding: 0 10px; font: 500 12px/1 var(--f-ui); cursor: pointer; }
 .term pre { margin: 0; padding: 20px 22px 24px; overflow-x: auto; font: 400 14px/1.75 var(--f-mono); color: #e6e7ea; }
+/* the block scrolls sideways on a narrow screen, so the keyboard can focus and scroll it */
+.term pre:focus-visible { outline: 2px solid #e6e7ea; outline-offset: -4px; }
 .term .c { color: #8c8f98; }
 
 /* ---------------------------------------------------------------- notes */
@@ -626,7 +628,8 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .foot-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)) minmax(0, 1.6fr); gap: 32px; font-size: 14px; }
 .foot-word { font-family: "Instrument Serif", serif; font-size: 44px; line-height: 1; letter-spacing: -.02em; color: var(--ink); }
 .foot-grid nav, .colophon { display: grid; gap: 10px; align-content: start; }
-.foot-grid nav a { color: var(--ink-2); }
+/* 2px of padding taken back by the margin: the rows stay where they are, the links are 24px tall to tap */
+.foot-grid nav a { color: var(--ink-2); padding-block: 2px; margin-block: -2px; }
 .foot-grid nav a:hover { color: var(--ink); }
 .foot-brand { display: grid; gap: 12px; align-content: start; color: var(--ink-2); }
 .foot-brand p:nth-child(2) { font-family: var(--f-text); font-size: 18px; color: var(--ink); }

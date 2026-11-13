@@ -192,7 +192,7 @@ function contractRows() {
     traceability: pick([...TRACE, "promptId", "promptSha256", "maxOutputTokens", "runs"]),
   };
 }
-const schemaRows = (rows) => rows.map(([f, v, note]) => `<div data-schema-field="${f}"><dt>${fl(MODEL_FIELD, f)}</dt><dd>${v ?? DASH}</dd>${note ? `<small>${note}</small>` : ""}</div>`).join("");
+const schemaRows = (rows) => rows.map(([f, v, note]) => `<div data-schema-field="${f}"><dt>${fl(MODEL_FIELD, f)}</dt><dd>${v ?? DASH}</dd>${note ? `<dd class="sub">${note}</dd>` : ""}</div>`).join("");
 const schemaPanel = (title, desc, rows) => `<section class="md-panel"><p class="kicker">${biE(title)}</p><p class="md-desc">${biE(desc)}</p><dl>${schemaRows(rows)}</dl></section>`;
 
 function modelsPage() {
@@ -363,7 +363,7 @@ function trialsPage() {
       <h1 class="essay-title">${biE("Model Trials")}</h1>
       <p class="essay-dek">${bi("A transparent audit trail.", "透明的审计轨迹。")}</p>
       ${biPE("p", "hm-desc", "Future public trial records will connect model identity, case identity, execution context, Tutor response, evaluator evidence, and sanitized operational metrics.")}
-      <dl class="tr-stats">${stats.map(([v, k, n]) => `<div><dd>${/^\d+$/.test(v) ? esc(v) : biE(v)}</dd><dt>${biE(k)}</dt><small>${n}</small></div>`).join("")}</dl>
+      <dl class="tr-stats">${stats.map(([v, k, n]) => `<div><dt>${biE(k)}</dt><dd>${/^\d+$/.test(v) ? esc(v) : biE(v)}</dd><dd class="sub">${n}</dd></div>`).join("")}</dl>
       <p class="tr-motto">${bi("Shared evidence.<br>Stronger teaching.", "共享证据，<br>改进教学。")}</p>
     </div>
   </header>

@@ -180,7 +180,7 @@
         </div>
         <div class="term rn-term">
           <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · quickstart</p><button class="rn-copy" type="button" data-copy-run aria-label="Copy Quickstart command" data-aria-label-en="Copy Quickstart command" data-aria-label-zh="复制 Quickstart 命令"><span class="en" data-copy-label>Copy</span><span class="zh" lang="zh-CN" data-copy-label>复制</span></button></div>
-<pre><code><span class="c"># 1. Clone the repository</span>
+<pre tabindex="0"><code><span class="c"># 1. Clone the repository</span>
 git clone https://github.com/shuangyan123/tutorbench.git
 cd tutorbench
 
@@ -203,7 +203,7 @@ npm run quickstart</code></pre>
         </div>
         <div class="term rn-term">
           <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · tutor health</p><button class="rn-copy" type="button" data-copy-run aria-label="Copy Tutor Health command" data-aria-label-en="Copy Tutor Health command" data-aria-label-zh="复制 Tutor Health 命令"><span class="en" data-copy-label>Copy</span><span class="zh" lang="zh-CN" data-copy-label>复制</span></button></div>
-<pre><code>node dist/src/cli/tutorbench.js health \
+<pre tabindex="0"><code>node dist/src/cli/tutorbench.js health \
   --http https://partner.example.com/respond \
   --suite productive-struggle-intervention-v0.1 \
   --tutor-provider partner \
@@ -220,7 +220,7 @@ npm run quickstart</code></pre>
         </div>
         <div class="term rn-term">
           <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · benchmark</p><button class="rn-copy" type="button" data-copy-run aria-label="Copy Benchmark command" data-aria-label-en="Copy Benchmark command" data-aria-label-zh="复制基准命令"><span class="en" data-copy-label>Copy</span><span class="zh" lang="zh-CN" data-copy-label>复制</span></button></div>
-<pre><code>npm run benchmark</code></pre>
+<pre tabindex="0"><code>npm run benchmark</code></pre>
         </div>
         <ul class="rn-facts"><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg><span><span class="en">Current dataset: tutor-eval-v0.2a@0.2a.6</span><span class="zh" lang="zh-CN">当前数据集：tutor-eval-v0.2a@0.2a.6</span></span></li><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg><span><span class="en">48 public cases in the canonical artifact</span><span class="zh" lang="zh-CN">标准产物中的 48 个公开案例</span></span></li><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg><span><span class="en">Judge-required criteria stay unresolved without an explicit Judge</span><span class="zh" lang="zh-CN">没有显式 Judge 时，需要 Judge 的标准保持未解决</span></span></li><li><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg><span><span class="en">No score is reported when required evidence is unavailable</span><span class="zh" lang="zh-CN">所需证据不可用时不报告分数</span></span></li></ul>
         <p class="en rn-note">The canonical run is distinct from the four-case Quickstart and may report errors or no score without Judge configuration.</p><p class="zh rn-note" lang="zh-CN">标准运行不同于四案例 Quickstart；没有 Judge 配置时可能报告错误或不产生分数。</p>
@@ -231,7 +231,7 @@ npm run quickstart</code></pre>
         </div>
         <div class="term rn-term">
           <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · external tutor</p><button class="rn-copy" type="button" data-copy-run aria-label="Copy External Tutor command" data-aria-label-en="Copy External Tutor command" data-aria-label-zh="复制 HTTP 适配器命令"><span class="en" data-copy-label>Copy</span><span class="zh" lang="zh-CN" data-copy-label>复制</span></button></div>
-<pre><code>python examples/http-python-tutor/server.py
+<pre tabindex="0"><code>python examples/http-python-tutor/server.py
 
 tutorbench run --http http://127.0.0.1:8000/respond --limit 3</code></pre>
         </div>
@@ -244,7 +244,7 @@ tutorbench run --http http://127.0.0.1:8000/respond --limit 3</code></pre>
         </div>
         <div class="term rn-term">
           <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · advanced</p><button class="rn-copy" type="button" data-copy-run aria-label="Copy Advanced command" data-aria-label-en="Copy Advanced command" data-aria-label-zh="复制高级命令"><span class="en" data-copy-label>Copy</span><span class="zh" lang="zh-CN" data-copy-label>复制</span></button></div>
-<pre><code>tutorbench collect --http http://127.0.0.1:8000/respond --provider &lt;provider&gt; --model &lt;actual-model-id&gt; --prompt-version product-config-v3 --provenance external --limit 3 --output artifacts/product/product.json
+<pre tabindex="0"><code>tutorbench collect --http http://127.0.0.1:8000/respond --provider &lt;provider&gt; --model &lt;actual-model-id&gt; --prompt-version product-config-v3 --provenance external --limit 3 --output artifacts/product/product.json
 
 tutorbench collect-model --http http://127.0.0.1:9000/generate --provider &lt;provider&gt; --model &lt;actual-model-id&gt; --limit 3 --output artifacts/real-model/model.json
 

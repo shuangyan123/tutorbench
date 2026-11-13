@@ -143,7 +143,7 @@
 .cm-ledger-row small { grid-column: 1; font: 400 13.5px/1.45 var(--f-ui); color: var(--ink-3); }
 .cm-ledger-row .st { grid-column: 2; grid-row: 1 / span 2; align-self: center; display: inline-flex; align-items: center; gap: 6px; font: 500 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
 .cm-ledger-row .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid currentColor; }
-.cm-ledger-row .st-open { color: #0b7a53; }
+.cm-ledger-row .st-open { color: #086644; }
 .cm-ledger-row .st-open::before { background: currentColor; }
 .cm-ledger-row .st-pending { color: var(--ink-2); }
 .cm-ledger-row .st-planned { color: var(--ink-3); }
