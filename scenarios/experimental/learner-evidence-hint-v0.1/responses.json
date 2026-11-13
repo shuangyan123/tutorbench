@@ -1,0 +1,72 @@
+[
+  {
+    "id": "inverse-cue",
+    "text": "想一想 +3 的逆运算，再试着写出第一步。",
+    "expected": ["PASS", "PASS", "FAIL"]
+  },
+  {
+    "id": "direct-first-step",
+    "text": "等式两边同时减去 3，接下来你来算算两边会得到什么。",
+    "expected": ["PASS", "PASS", "FAIL"]
+  },
+  {
+    "id": "transfer-from-local-work",
+    "text": "像上一题那样，想想怎样抵消 +3，然后自己写出这次的第一步。",
+    "expected": ["ABSTAIN", "PASS", "ABSTAIN"]
+  },
+  {
+    "id": "equality-explanation",
+    "text": "两边本来相等，两边都减去 3 后仍然相等。试着自己写出减完后的等式。",
+    "expected": ["PASS", "PASS", "PASS"]
+  },
+  {
+    "id": "guided-equality-comparison",
+    "text": "试着从 7 = 7 开始。只改一边还相等吗？两边都减去 3 又会怎样？把这个办法用到你的题里，试着写出第一步。",
+    "expected": ["PASS", "PASS", "PASS"]
+  },
+  {
+    "id": "prior-work-without-revealing-operation",
+    "text": "照上一题的做法，试着自己写出这个方程的第一步。",
+    "expected": ["ABSTAIN", "PASS", "ABSTAIN"]
+  },
+  {
+    "id": "no-explicit-hand-off",
+    "text": "等式两边同时减去 3。",
+    "expected": ["PASS", "ABSTAIN", "FAIL"]
+  },
+  {
+    "id": "assumed-deficit",
+    "text": "你肯定不会逆运算。两边同时减去 3，再试着写出第一步。",
+    "expected": ["FAIL", "FAIL", "FAIL"]
+  },
+  {
+    "id": "assumed-stable-mastery",
+    "text": "你已经完全掌握了逆运算。自己写出第一步。",
+    "expected": ["FAIL", "FAIL", "FAIL"]
+  },
+  {
+    "id": "solution",
+    "text": "等式两边减去 3 再除以 2，答案是 x = 4。",
+    "expected": ["FAIL", "FAIL", "FAIL"]
+  },
+  {
+    "id": "vague-or-uncovered",
+    "text": "把算式倒着读一遍，你看到了什么？",
+    "expected": ["ABSTAIN", "ABSTAIN", "ABSTAIN"]
+  },
+  {
+    "id": "mixed-signals",
+    "text": "两边同时减去 3。等一下，不要在两边都减去 3。",
+    "expected": ["ABSTAIN", "ABSTAIN", "ABSTAIN"]
+  },
+  {
+    "id": "equality-slogan",
+    "text": "等式要保持相等。想一想 +3 的逆运算，再试着写出第一步。",
+    "expected": ["PASS", "PASS", "FAIL"]
+  },
+  {
+    "id": "worked-first-step",
+    "text": "两边减去 3，得到 2x = 8。接下来试试。",
+    "expected": ["ABSTAIN", "ABSTAIN", "ABSTAIN"]
+  }
+]

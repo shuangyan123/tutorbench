@@ -1,0 +1,48 @@
+{
+  "id": "learner-evidence-hint-maintainer-review",
+  "version": "0.1.0",
+  "reviewedOn": "2026-11-13",
+  "reviewer": {
+    "role": "TutorBench maintainer",
+    "identityBasis": "The commissioning user supplied the maintainer judgment in the 2026-11-13 task. The source does not specify a personal name or GitHub handle."
+  },
+  "source": "Maintainer-provided task brief, sections III and VI, dated 2026-11-13 Asia/Taipei.",
+  "case": {
+    "datasetId": "tutor-eval-v0.2a",
+    "datasetVersion": "0.2a.6",
+    "caseId": "hint-only-linear-equation-001-zh-CN",
+    "caseVersion": "1.1.0",
+    "learnerQuote": "我卡在 2x + 3 = 11。只给我一个提示，不要告诉我答案。"
+  },
+  "judgmentQuote": "我认为两种都合理：取决于学生是否真正掌握逆运算。",
+  "scope": "One original hint-only case and three final Tutor replies. The maintainer treats their strategies as potentially reasonable depending on observable learner evidence. The record contains no individual adjudicated labels.",
+  "evidenceBoundary": "The authored knownConcepts entry is not a record of independent application. The source learner utterance establishes being stuck and requesting one hint; the cause and mastery remain unknown.",
+  "unresolved": [
+    "How much previous evidence would support fading help beyond this checkpoint?",
+    "Which alternative explanations or diagnostic questions sufficiently address the equality-preservation difficulty?",
+    "Would independent reviewers agree on ambiguous replies and distinguish rubric coverage from actual learning?"
+  ],
+  "frozenReplies": [
+    {
+      "effort": "low",
+      "responseId": "tutor-response-9e00a227b63a478456882cced39c03ad",
+      "corpusSha256": "17deaea9b5869746dac95af051ead8c597b3acb8e2bf1c9cf2d16909db0ab37f",
+      "responseSha256": "baf77f48b41cfb1a93b99204eccd1f6c74c8b9dbf6ab8d3234ee9dda101474dc",
+      "strategySummary": "Prompts the learner to think about the inverse of +3."
+    },
+    {
+      "effort": "high",
+      "responseId": "tutor-response-88bef452c2dc055c5bdeba6d54593043",
+      "corpusSha256": "74cbb93eac115b5a10d38e85b1f5d82cbc9f99a540c8e9e0b273582f81bf016f",
+      "responseSha256": "3aa5e3bd50c12373abfec417034cf41929e10c509cf58a5df84f84bb419a2a03",
+      "strategySummary": "Names subtraction of 3 on both sides."
+    },
+    {
+      "effort": "max",
+      "responseId": "tutor-response-fee97d029c8c24326e8d502a9caa4461",
+      "corpusSha256": "fd9c29907d5f97c9550ebdd604b78691503aa41e38cd6cfccc55fd228225b03c",
+      "responseSha256": "fb3803f8e45e2cf4aebb76a60ed8787bd53e2be0a83ab76c00e980255ae65070",
+      "strategySummary": "Cues the inverse operation and asks the learner to carry out the first step."
+    }
+  ]
+}
