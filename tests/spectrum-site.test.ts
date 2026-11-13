@@ -287,6 +287,38 @@ test("the site serves its own fonts, and they cover every Chinese character on t
   assert.deepEqual(missing, [], "run: python3 website/prototypes/spectrum/tools/build-fonts.py");
 });
 
+/** The font file fonts.css sends a character of a family to (the last rule that claims it wins). */
+function fontFileFor(fonts: string, family: string, codePoint: number): string | undefined {
+  let file: string | undefined;
+  for (const rule of fonts.matchAll(/@font-face\s*\{[^}]*\}/gu)) {
+    if (!rule[0].includes(`font-family: "${family}"`)) continue;
+    const claimed = (/unicode-range:([^;}]+)/u.exec(rule[0])?.[1] ?? "").split(",").some((range) => {
+      const [from, to] = range.trim().replace(/^U\+/iu, "").split("-").map((value) => Number.parseInt(value, 16));
+      return from !== undefined && codePoint >= from && codePoint <= (to ?? from);
+    });
+    if (claimed) file = /url\(([^)]+)\)/u.exec(rule[0])?.[1];
+  }
+  return file;
+}
+
+test("an English page fetches a small file, not a whole Chinese face, for the language switch", async () => {
+  const fonts = await page("fonts.css");
+  const code = (char: string): number => char.codePointAt(0) ?? 0;
+  for (const family of ["Noto Sans SC", "Noto Serif SC"]) {
+    // every page shows the "中" of the language switch; it used to pull in about 360 KB
+    const core = fontFileFor(fonts, family, code("中"));
+    assert.match(core ?? "", /-core\.woff2$/u, family);
+    assert.ok((await stat(join(spectrum, core ?? ""))).size < 40 * 1024, `${core} should stay small`);
+    // Letters and punctuation are shaped with their neighbours (kerning, the tightening of "）。"),
+    // which only works inside one file: they must not be spread over several.
+    const base = fontFileFor(fonts, family, code("A"));
+    for (const char of ["z", "7", "，", "。", "：", "（", "）", "“", "”", "、"]) {
+      assert.equal(fontFileFor(fonts, family, code(char)), base, `${family}: ${char}`);
+    }
+    assert.notEqual(fontFileFor(fonts, family, code("教")), undefined);
+  }
+});
+
 test("published stylesheets are minified without changing strings or selectors", () => {
   assert.equal(
     minifyCss('a  { color : red ; /* note */ background: url("data:x;a  b") }\n@media (max-width: 4px) {\n  .a > .b, .c { x: calc(1px + 2px); }\n}\n'),
