@@ -32,8 +32,9 @@ across their lines, so this matches the full mirror render at a fraction of the 
 (`render/render_k.sh`, then `render/to_webp_k.py`). `cover.js` decodes each frame before using
 it (every 4th frame first, then every 2nd, then the rest), eases towards the scroll position and
 blends neighbouring frames. Near the end of the cover the masthead slides up over it as a sheet.
-The earlier three-mirror end-cap sequences (`R_*`, `Q_*`, `P_*`, `L_*`, `render/scene.py`) are
-kept but not shown. Dimension markers are five Blender cut gems (`assets/gems/`,
+The earlier three-mirror end-cap sequences (`R_*`, `Q_*`, `P_*`, `L_*`) are no longer in the
+repository; their scene script (`render/scene.py`) is kept. Dimension markers are five Blender cut
+gems (`assets/gems/`,
 `render/gems.py`): ruby oval, citrine pear, emerald step cut, sapphire cushion, amethyst trillion,
 each rendered in three IOR passes for fire. The earlier glass beads (`assets/beads/`) show with `#beads`. Two GPT photographs open §2 and §3 as framed
 plates, captioned as generated illustrations.
@@ -45,8 +46,12 @@ cover, re-render with `node website/prototypes/spectrum/tools/build-share-cards.
 
 Fonts and speed. The site serves its own fonts (`fonts.css`, `assets/fonts/`, all SIL OFL): the
 same Google Fonts files, limited to the weights the pages use and cut to the characters they contain
-(the Chinese faces hold only the ~1,100 characters on the pages). `tools/build-fonts.py` rebuilds
-them; `tests/spectrum-site.test.ts` fails when a page gains a Chinese character the fonts lack. On a
+(the Chinese faces hold only the ~1,100 characters on the pages). Each Chinese face is split into
+three files that `unicode-range` picks from: `-core` (the few Chinese characters English pages show,
+such as the "中" of the language switch, about 10 KB), `-base` (Latin and punctuation) and the large
+file with the other Chinese characters, so an English page no longer fetches a whole Chinese face
+for one character. `tools/build-fonts.py` rebuilds them; `tests/spectrum-site.test.ts` fails when a
+page gains a Chinese character the fonts lack. On a
 first visit the page paints in the reader's own fonts and `fonts.css` is switched on right after the
 first paint (the head script in `index.html`); once the fonts are cached, later pages load them up
 front. Below the cover, the home page's sections use `content-visibility: auto`, so a phone lays
