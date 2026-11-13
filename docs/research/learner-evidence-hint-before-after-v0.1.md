@@ -2,6 +2,10 @@
 
 **Experimental · Offline · Improvement undetermined**
 
+This report describes the original design-set comparison. The separate
+[held-out protocol](learner-evidence-hint-held-out-v0.1.md) now freezes the
+candidate as a regression baseline and prepares a new review cohort.
+
 ## Frozen sources and study split
 
 The comparison unit is one original response under one learner-evidence
