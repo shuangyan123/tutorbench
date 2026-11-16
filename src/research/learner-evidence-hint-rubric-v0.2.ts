@@ -35,6 +35,7 @@ const signals = {
   review: /不(?:能|要|应该)(?:再|只|同时|在)?.{0,10}(?:两边|减去?\s*3)|(?:只减一边|只在一边减).{0,10}(?:就行|就可以)|(?:不会|不能|无法)(?:继续)?保持(?:相等|平衡)/u,
   workedStep: /2\s*x\s*=\s*8/u,
   oneSidedPreservation: /(?:只|仅)(?:在|对|从)?(?:左边|右边|一边|一侧).{0,16}(?:减(?:去|掉)?|加(?:上)?|拿走|取走).{0,16}(?:仍然|依然|还是|保持).{0,8}(?:相等|平衡|成立)|(?:只减|只在).{0,8}(?:一边|左边|右边).{0,12}(?:就行|就可以|即可)/u,
+  oneSideOnly: /(?:左|右)(?:边|侧).{0,12}减(?:去|掉)?\s*(?:3|三).{0,16}(?:右|左)(?:边|侧).{0,8}(?:不用|不需要|不必|不动|不减)|(?:右|左)(?:边|侧).{0,12}(?:不用|不需要|不必|不动|不减).{0,16}(?:左|右)(?:边|侧).{0,12}减(?:去|掉)?\s*(?:3|三)/u,
   unequalSideOperations: /左(?:边|侧).{0,16}减(?:去|掉)?\s*(?:3|三).{0,24}右(?:边|侧).{0,16}减(?:去|掉)?\s*(?:2|二)|右(?:边|侧).{0,16}减(?:去|掉)?\s*(?:3|三).{0,24}左(?:边|侧).{0,16}减(?:去|掉)?\s*(?:2|二)/u,
 } as const;
 
@@ -104,9 +105,10 @@ export function evaluateHintFit(pilotCase: HintPilotCase, text: string) {
   }
 
   const oneSided = passage(text, signals.oneSidedPreservation);
+  const oneSideOnly = passage(text, signals.oneSideOnly);
   const unequal = passage(text, signals.unequalSideOperations);
-  if (oneSided || unequal) {
-    return decision("FAIL", "The reply describes unequal operations on the two sides of an equation.", [oneSided ?? unequal]);
+  if (oneSided || oneSideOnly || unequal) {
+    return decision("FAIL", "The reply describes unequal operations on the two sides of an equation.", [oneSided ?? oneSideOnly ?? unequal]);
   }
 
   const diagnosis = passage(text, signals.unsupported);
