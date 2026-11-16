@@ -108,7 +108,7 @@ test("A/B/C fixture keeps current dataset, case, rubric, and expectation identit
   assert.deepEqual(WORD_CONTEXT_DISCRIMINATION_JUDGE_IDENTITY, {
     promptId: "tutor-eval-pedagogy-judge-system",
     promptVersion: "0.9",
-    evaluatorVersion: "0.3a.5",
+    evaluatorVersion: "0.3a.6",
   });
 });
 
