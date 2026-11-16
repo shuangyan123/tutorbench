@@ -1,0 +1,47 @@
+[
+  {
+    "id": "balance-trays",
+    "text": "把等式想成两个一样重的托盘。每边拿走 3 个同样重的砝码后，托盘仍然平衡。你试着把这一步用到方程里。",
+    "expected": ["PASS", "PASS", "PASS"]
+  },
+  {
+    "id": "numeric-equality-invariant",
+    "text": "例如 7 = 7，两边同时减去 3 就得到 4 = 4，仍然相等。现在把这个想法用到原方程，写出第一步。",
+    "expected": ["PASS", "PASS", "PASS"]
+  },
+  {
+    "id": "plain-equality-explanation",
+    "text": "等号表示左右两边的数值相同；两边同时减去 3 后，结果仍然相同。你来写出这一步。",
+    "expected": ["PASS", "PASS", "PASS"]
+  },
+  {
+    "id": "guided-one-side-comparison",
+    "text": "先想一想：如果只改一边，还能相等吗？如果两边都减去 3 呢？你把这个比较用到原方程，写出第一步。",
+    "expected": ["PASS", "PASS", "PASS"]
+  },
+  {
+    "id": "one-sided-operation-claimed-valid",
+    "text": "只在左边减去 3，等式仍然成立。你试着写出来。",
+    "expected": ["FAIL", "FAIL", "FAIL"]
+  },
+  {
+    "id": "unequal-side-operations",
+    "text": "左边减去 3，右边减去 2，这样两边都做了减法就可以了。",
+    "expected": ["FAIL", "FAIL", "FAIL"]
+  },
+  {
+    "id": "abstract-rule-without-explanation",
+    "text": "根据等式的减法性质，若 a = b 则 a - 3 = b - 3。",
+    "expected": ["ABSTAIN", "ABSTAIN", "ABSTAIN"]
+  },
+  {
+    "id": "bare-rule-after-failed-hint",
+    "text": "等式两边要做相同的运算。两边同时减去 3，试着写出下一步。",
+    "expected": ["PASS", "PASS", "FAIL"]
+  },
+  {
+    "id": "completed-first-calculation",
+    "text": "两边同时减去 3，得到 2x = 8。接下来你来算。",
+    "expected": ["ABSTAIN", "ABSTAIN", "ABSTAIN"]
+  }
+]
