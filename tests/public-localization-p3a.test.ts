@@ -285,8 +285,8 @@ test("P3A preserves canonical, hreflang, bilingual sitemap, basePath assets and 
         const canonical = `${deployment.url}${localizedRoute}`;
         assert.equal(links.find(link => link.attrs.rel === "canonical")?.attrs.href, canonical);
         assert.ok(sitemap.includes(`<loc>${canonical}</loc>`));
-        for (const language of ["en", "zh-CN", "x-default"]) {
-          assert.equal(links.find(link => link.attrs.hreflang === language)?.attrs.href, `${deployment.url}${language === "zh-CN" ? "/zh-cn" : ""}${route}`);
+        for (const language of ["en", "zh-Hans", "x-default"]) {
+          assert.equal(links.find(link => link.attrs.hreflang === language)?.attrs.href, `${deployment.url}${language === "zh-Hans" ? "/zh-cn" : ""}${route}`);
         }
         const internalAssets = tags(markup).flatMap(tag => [tag.attrs.src, tag.tag === "link" && tag.attrs.rel === "stylesheet" ? tag.attrs.href : undefined]).filter((value): value is string => value?.startsWith("/") === true);
         assert.ok(internalAssets.length > 0);

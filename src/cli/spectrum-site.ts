@@ -141,8 +141,9 @@ function rewriteUrls(html: string, context: PageContext): string {
 }
 
 function rewriteAttributes(html: string, context: PageContext): string {
+  // data-poster-m: the phone poster that about.js swaps in for the film
   return html
-    .replace(/(\s(?:href|src|poster))="([^"]*)"/gu, (_match, attribute: string, value: string) => `${attribute}="${mapUrl(value, context)}"`)
+    .replace(/(\s(?:href|src|poster|data-poster-m))="([^"]*)"/gu, (_match, attribute: string, value: string) => `${attribute}="${mapUrl(value, context)}"`)
     .replace(/(\ssrcset)="([^"]*)"/gu, (_match, attribute: string, value: string) => `${attribute}="${value
       .split(",")
       .map((candidate) => {
@@ -150,6 +151,153 @@ function rewriteAttributes(html: string, context: PageContext): string {
         return [mapUrl(url, context), ...descriptor].join(" ");
       })
       .join(", ")}"`);
+}
+
+const VOID_ELEMENTS: ReadonlySet<string> = new Set([
+  "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr",
+]);
+
+/**
+ * Keeps one language of a bilingual page. The sources pair every piece of copy as `.en` / `.zh`
+ * elements and a stylesheet rule hides the other one; a published page has one language per URL,
+ * so the hidden half is removed here instead. What a reader sees does not change, and a reader
+ * that does not apply the stylesheet (reader modes, read-later tools, crawlers, translation) gets
+ * the page in one language rather than both, sentence by sentence.
+ *
+ * Scripts, styles and comments are passed over as they are. The removed elements must be
+ * well-formed (every start tag closed, in order): anything else stops the build.
+ */
+export function keepLanguage(html: string, language: "en" | "zh", source = "page"): string {
+  const drop = language === "en" ? "zh" : "en";
+  const token = /<!--[\s\S]*?-->|<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>|<\/([a-zA-Z][\w:-]*)\s*>|<([a-zA-Z][\w:-]*)((?:"[^"]*"|'[^']*'|[^'">])*)>/gu;
+  let out = "";
+  let kept = 0;
+  let open: string[] = [];
+  for (const match of html.matchAll(token)) {
+    const [text, , closing, opening, attributes = ""] = match;
+    const end = match.index + text.length;
+    if (opening !== undefined) {
+      const name = opening.toLowerCase();
+      const childless = VOID_ELEMENTS.has(name) || attributes.trimEnd().endsWith("/");
+      if (open.length > 0) {
+        if (!childless) open.push(name);
+        continue;
+      }
+      const classes = /\sclass="([^"]*)"/u.exec(attributes)?.[1]?.split(/\s+/u) ?? [];
+      if (!classes.includes(drop)) continue;
+      out += html.slice(kept, match.index);
+      kept = end;
+      if (!childless) open = [name];
+    } else if (closing !== undefined && open.length > 0) {
+      const name = open.pop();
+      if (name !== closing.toLowerCase()) {
+        throw new Error(`Spectrum page ${source}: </${closing}> closes <${name ?? "?"}> inside a .${drop} element.`);
+      }
+      if (open.length === 0) kept = end;
+    }
+  }
+  if (open.length > 0) throw new Error(`Spectrum page ${source}: a .${drop} element is never closed.`);
+  return out + html.slice(kept);
+}
+
+/** Attributes that the sources write once per language, as data-<name>-en / data-<name>-zh. */
+const LOCALIZED_ATTRIBUTES: readonly (readonly [string, string])[] = [
+  ["alt", "alt"],
+  ["aria-label", "aria-label"],
+  ["placeholder", "placeholder"],
+  ["ph", "placeholder"],
+];
+
+/**
+ * Gives a published page its own language's alt text, labels and placeholders in the markup
+ * itself (the page scripts set the same values, but only once they run), and marks code so that
+ * a browser's translation leaves commands and identifiers alone.
+ */
+export function localizeMarkup(html: string, language: "en" | "zh"): string {
+  const localized = html.replace(/<[a-zA-Z][^<>]*\sdata-(?:alt|aria-label|placeholder|ph)-(?:en|zh)="[^<>]*>/gu, (tag) => {
+    let out = tag;
+    for (const [key, attribute] of LOCALIZED_ATTRIBUTES) {
+      const value = new RegExp(`\\sdata-${key}-${language}="([^"]*)"`, "u").exec(tag)?.[1];
+      if (value === undefined) continue;
+      const current = new RegExp(`(\\s${attribute})="[^"]*"`, "u");
+      out = current.test(out)
+        ? out.replace(current, (_match, name: string) => `${name}="${value}"`)
+        : out.replace(/^<[a-zA-Z][\w:-]*/u, (start) => `${start} ${attribute}="${value}"`);
+    }
+    return out;
+  });
+  return localized
+    // an option holds plain text only, so its two languages are attributes too
+    .replace(/(<option\b[^<>]*>)[^<]*(<\/option>)/gu, (option, start: string, end: string) => {
+      const text = new RegExp(`\\sdata-text-${language}="([^"]*)"`, "u").exec(start)?.[1];
+      return text === undefined ? option : `${start}${text}${end}`;
+    })
+    .replace(/<(pre|code|kbd|samp)(?=[\s>])(?![^>]*\stranslate=)/gu, '<$1 translate="no"');
+}
+
+const JOURNAL_ESSAY = /^(?:zh-cn\/)?blog\/[^/]+\/index\.html$/u;
+const FEED_FILE = "blog/feed.xml";
+const xml = (value: string): string => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+/** The text of an HTML attribute (already escaped for HTML) as plain text. */
+const attributeText = (value: string): string => value
+  .replaceAll("&quot;", '"').replaceAll("&#39;", "'").replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+const metaContent = (head: string, attribute: string, name: string): string | undefined => {
+  const value = new RegExp(`<meta ${attribute}="${name}" content="([^"]*)">`, "u").exec(head)?.[1];
+  return value === undefined ? undefined : attributeText(value);
+};
+
+/**
+ * The Journal as an RSS 2.0 feed, one per language, from the essays' own search metadata (title,
+ * description, address, publication date). Without a site URL the pages have no absolute address,
+ * so there is no feed. Dates are the essays' own: the feed does not change between builds.
+ */
+export function journalFeed(legacyPages: ReadonlyMap<string, string>, zh: boolean): { url: string; title: string; xml: string } | undefined {
+  const index = legacyPages.get(`${zh ? ZH_PREFIX : ""}blog/index.html`);
+  const home = index === undefined ? undefined : metaContent(index, "property", "og:url");
+  if (index === undefined || home === undefined) return undefined;
+  const items = [...legacyPages]
+    .filter(([key]) => JOURNAL_ESSAY.test(key) && key.startsWith(ZH_PREFIX) === zh)
+    .map(([, head]) => ({
+      title: (metaContent(head, "property", "og:title") ?? "").replace(/\s+[—|]\s+Teachometry(?:\s+\S+)?$/u, ""),
+      description: metaContent(head, "name", "description") ?? "",
+      url: metaContent(head, "property", "og:url"),
+      published: metaContent(head, "property", "article:published_time"),
+    }))
+    .filter((item): item is { title: string; description: string; url: string; published: string } =>
+      item.url !== undefined && item.published !== undefined && /^\d{4}-\d{2}-\d{2}/u.test(item.published))
+    .sort((a, b) => b.published.localeCompare(a.published) || a.url.localeCompare(b.url));
+  if (items.length === 0) return undefined;
+  const url = `${home}feed.xml`;
+  const title = zh ? "Teachometry 札记" : "Teachometry Journal";
+  const lines = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    "<channel>",
+    `<title>${xml(title)}</title>`,
+    `<link>${xml(home)}</link>`,
+    `<description>${xml(metaContent(index, "name", "description") ?? title)}</description>`,
+    `<language>${zh ? "zh-CN" : "en"}</language>`,
+    `<atom:link href="${xml(url)}" rel="self" type="application/rss+xml"/>`,
+    ...items.map((item) => [
+      "<item>",
+      `<title>${xml(item.title)}</title>`,
+      `<link>${xml(item.url)}</link>`,
+      `<guid isPermaLink="true">${xml(item.url)}</guid>`,
+      `<pubDate>${new Date(`${item.published.slice(0, 10)}T00:00:00Z`).toUTCString()}</pubDate>`,
+      `<description>${xml(item.description)}</description>`,
+      "</item>",
+    ].join("\n")),
+    "</channel>",
+    "</rss>",
+  ];
+  return { url, title, xml: `${lines.join("\n")}\n` };
+}
+
+/** Tells link previews that the page exists in the other language as well. */
+export function withAlternateLocale(head: string): string {
+  if (!/<link rel="alternate" hreflang=/u.test(head)) return head;
+  return head.replace(/<meta property="og:locale" content="(en_US|zh_CN)">/u, (tag, locale: string) =>
+    `${tag}\n<meta property="og:locale:alternate" content="${locale === "en_US" ? "zh_CN" : "en_US"}">`);
 }
 
 function legacyHead(html: string, key: string): string {
@@ -234,10 +382,18 @@ function renderPage(html: string, context: PageContext, head: string): string {
     ? `<html lang="${context.zh ? "zh-CN" : "en"}" data-lang="${language}">`
     : `<html lang="${context.zh ? "zh-CN" : "en"}" data-lang="${language}" data-route-lang="${language}" data-route-depth="${depth}">`;
   if (!/<html lang="en" data-lang="en">/u.test(html)) throw new Error(`Spectrum page ${context.source} has an unexpected <html> tag.`);
-  return rewriteUrls(
-    html.replace(/<html lang="en" data-lang="en">/u, root).replace(metadata, () => head),
+  // the 404 page answers in either language at one address, so it keeps both
+  const body = context.absolute ? html : keepLanguage(html, language, context.source);
+  const page = rewriteUrls(
+    body.replace(/<html lang="en" data-lang="en">/u, root).replace(metadata, () => withAlternateLocale(head)),
     context,
   );
+  if (context.absolute) return page;
+  // scripts build markup from strings: only the page's own markup is touched
+  return page
+    .split(/(<script\b[^>]*>[\s\S]*?<\/script[^>]*>)/iu)
+    .map((part, index) => index % 2 === 1 ? part : localizeMarkup(part, language))
+    .join("");
 }
 
 function redirectPage(target: string, output: string, zh: boolean): string {
@@ -287,6 +443,15 @@ export async function installSpectrumSite(options: SpectrumSiteOptions): Promise
     else await copyFile(join(prototypeRoot, file), destination);
   }
 
+  // the Journal's feed, announced in the head of the Journal's own pages
+  const feeds = new Map<boolean, string>();
+  for (const zh of [false, true]) {
+    const feed = journalFeed(legacyPages, zh);
+    if (feed === undefined) continue;
+    await write(`${zh ? ZH_PREFIX : ""}${FEED_FILE}`, feed.xml);
+    feeds.set(zh, `<link rel="alternate" type="application/rss+xml" title="${escapeAttribute(feed.title)}" href="${escapeAttribute(feed.url)}">`);
+  }
+
   for (const source of pages) {
     const html = await readFile(join(prototypeRoot, source), "utf8");
     for (const target of PAGE_ALIASES[source] ?? [source]) {
@@ -299,7 +464,9 @@ export async function installSpectrumSite(options: SpectrumSiteOptions): Promise
         if (legacy === undefined) throw new Error(`Spectrum page ${output} has no existing page to take metadata from.`);
         const context: PageContext = { source, output, zh, absolute: source === NOT_FOUND, pages, basePath };
         const card = shareCardFor(cards, zh ? counterpart(output) : output);
-        const head = withShareImage(legacyHead(legacy, legacyKey), `assets/share/${card}-${zh ? "zh" : "en"}.jpg`, basePath);
+        const shared = withShareImage(legacyHead(legacy, legacyKey), `assets/share/${card}-${zh ? "zh" : "en"}.jpg`, basePath);
+        const feed = /^blog\//u.test(target) ? feeds.get(zh) : undefined;
+        const head = feed === undefined ? shared : `${shared}\n${feed}`;
         await write(output, renderPage(html, context, head));
       }
     }

@@ -278,7 +278,7 @@ npm run benchmark
 ```
 
 It runs the current `tutor-eval-v0.2a@0.2a.6` dataset with the existing
-`0.3a.5` evaluator semantics. The canonical cases include Judge-required
+`0.3a.6` evaluator semantics. The canonical cases include Judge-required
 semantic rubrics. Without an explicitly configured Judge, those criteria stay
 unresolved and the normal run reports Judge-unavailable errors with no score;
 it never silently turns missing evidence into a pass. Quickstart does not

@@ -155,9 +155,9 @@
 .md-panel dl > div, .md-context > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 7px 0; border-bottom: 1px solid var(--hair); }
 .md-context > div { border-bottom: 0; padding: 12px 0; }
 .md-panel dt, .md-context dt { font-family: var(--f-ui); font-size: 13.5px; color: var(--ink-2); }
-.md-panel dd, .md-context dd { margin: 0; text-align: right; font-family: var(--f-ui); font-size: 13.5px; color: var(--ink-3); }
-.md-context dd { color: var(--ink); }
-.md-panel small, .md-context small { grid-column: 1 / -1; font-family: var(--f-ui); font-size: 12px; line-height: 1.4; color: var(--ink-3); }
+.md-panel dd:not(.sub), .md-context dd:not(.sub) { margin: 0; text-align: right; font-family: var(--f-ui); font-size: 13.5px; color: var(--ink-3); }
+.md-context dd:not(.sub) { color: var(--ink); }
+.md-panel dd.sub, .md-context dd.sub { margin: 0; grid-column: 1 / -1; font-family: var(--f-ui); font-size: 12px; line-height: 1.4; color: var(--ink-3); }
 .md-context code, .md-panel code { font-family: var(--f-mono); font-size: 12px; }
 .md-status { margin: 22px 0 0; border-top: 1px solid var(--ink); }
 .md-status > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
@@ -181,10 +181,10 @@
 .tr-stats { margin: 36px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
 .tr-stats > div { display: grid; gap: 4px; align-content: start; padding: 18px 18px 6px 0; min-width: 0; }
 .tr-stats > div + div { padding-left: 18px; border-left: 1px solid var(--hair); }
-.tr-stats dd { margin: 0; font-family: var(--f-display); font-size: clamp(44px, 5vw, 72px); line-height: .9; color: var(--ink); }
-.tr-stats > div:last-child dd { font-size: clamp(24px, 2.4vw, 34px); line-height: 1.1; color: var(--lead); }
+.tr-stats dd:not(.sub) { order: -1; margin: 0; font-family: var(--f-display); font-size: clamp(44px, 5vw, 72px); line-height: .9; color: var(--ink); }
+.tr-stats > div:last-child dd:not(.sub) { font-size: clamp(24px, 2.4vw, 34px); line-height: 1.1; color: var(--lead); }
 .tr-stats dt { font-family: var(--f-ui); font-size: 14px; color: var(--ink); }
-.tr-stats small { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); line-height: 1.5; }
+.tr-stats dd.sub { margin: 0; font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); line-height: 1.5; }
 .tr-motto { margin: 28px 0 0; font-family: var(--f-display); font-style: italic; font-size: 22px; line-height: 1.2; color: var(--lead-deep); }
 .tr-tabs { display: flex; flex-wrap: wrap; gap: 6px 24px; margin-top: clamp(36px, 4vw, 56px); padding-block: 12px; border-block: 1px solid var(--hair-2); }
 .tr-tabs a { color: var(--ink-3); text-decoration: none; }
@@ -205,7 +205,7 @@
 .tr-chain small { font-family: var(--f-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); line-height: 1.4; }
 .tr-rel { margin-top: 28px; max-width: 56em; }
 .tr-rel p { margin: 0; }
-.tr-rel a { color: var(--lead-deep); }
+.tr-rel a { color: var(--lead-deep); border-bottom: 1px solid currentColor; }   /* links in running text need more than colour */
 
 @media (max-width: 1080px) {
   .md-head-grid { grid-template-columns: 1fr; align-items: start; }

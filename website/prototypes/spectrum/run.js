@@ -95,9 +95,10 @@
       if (status) {
         var all = visible === entries.length && active === "all" && !q;
         var k = all ? "all" : "f";
-        var spans = status.querySelectorAll(".en, .zh");
-        if (spans[0]) spans[0].textContent = fill(status.getAttribute("data-tpl-" + k + "-en"), visible);
-        if (spans[1]) spans[1].textContent = fill(status.getAttribute("data-tpl-" + k + "-zh"), visible);
+        // a published page carries one language only, so each span is looked up by its own class
+        var en = status.querySelector(".en"), zh = status.querySelector(".zh");
+        if (en) en.textContent = fill(status.getAttribute("data-tpl-" + k + "-en"), visible);
+        if (zh) zh.textContent = fill(status.getAttribute("data-tpl-" + k + "-zh"), visible);
       }
       if (empty) empty.hidden = visible !== 0;
       if (clear) clear.hidden = q.length === 0;
