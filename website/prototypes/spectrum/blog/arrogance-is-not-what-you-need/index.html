@@ -180,7 +180,19 @@
         <p class="essay-meta kicker"><a class="issue" href="../index.html"><span class="en">Journal · Essay 2 of 7</span><span class="zh" lang="zh-CN">期刊 · 第 2 篇，共 7 篇</span></a><span class="rule" aria-hidden="true"></span><span><span class="en">Perspective</span><span class="zh" lang="zh-CN">观点</span></span><time datetime="2026-11-06"><span class="en">November 6, 2026</span><span class="zh" lang="zh-CN">2026年11月6日</span></time></p>
         <h1 class="essay-title"><span class="en">Arrogance Is Not What You Need</span><span class="zh" lang="zh-CN">傲慢<wbr>是<wbr>你<wbr>所<wbr>不需要<wbr>的</span></h1>
         <p class="en essay-dek">When a student cannot learn something, what is it that should change?</p><p class="zh essay-dek" lang="zh-CN">当一个学生学不会，该被改变的是什么？</p>
-        <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">8 sections · about 17 min</span><span class="zh" lang="zh-CN">8 节 · 约 16 分钟</span></span></p>
+        <div class="essay-by">
+          <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">8 sections · about 17 min</span><span class="zh" lang="zh-CN">8 节 · 约 16 分钟</span></span></p>
+          <div class="essay-share" data-share hidden>
+            <button type="button" class="share-btn kicker" data-share-toggle aria-expanded="false" aria-controls="share-list"><svg class="share-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4a2.9 2.9 0 0 0 4.1 0l2.2-2.2a2.9 2.9 0 0 0-4.1-4.1l-.9.9"/><path d="M9.4 6.6a2.9 2.9 0 0 0-4.1 0L3.1 8.8a2.9 2.9 0 0 0 4.1 4.1l.9-.9"/></svg><span class="share-idle"><span class="en">Share</span><span class="zh" lang="zh-CN">分享</span></span><span class="share-done"><span class="en">Link copied</span><span class="zh" lang="zh-CN">链接已复制</span></span></button>
+            <div class="share-list" id="share-list" data-share-list role="group" aria-label="Share this essay" data-aria-label-en="Share this essay" data-aria-label-zh="分享这篇文章" hidden>
+              <button type="button" class="share-item" data-share-copy data-state="idle"><span class="share-idle"><span class="en">Copy link</span><span class="zh" lang="zh-CN">复制链接</span></span><span class="share-fail"><span class="en">Copy it from here</span><span class="zh" lang="zh-CN">请在下面复制</span></span></button>
+              <input class="share-field" data-share-field type="text" readonly hidden aria-label="Link to this essay" data-aria-label-en="Link to this essay" data-aria-label-zh="这篇文章的链接">
+              <a class="share-item" data-share-x href="https://x.com/intent/tweet" target="_blank" rel="noopener noreferrer" aria-label="Post on X (opens in a new tab)" data-aria-label-en="Post on X (opens in a new tab)" data-aria-label-zh="发到 X（在新标签页打开）"><span><span class="en">Post on X</span><span class="zh" lang="zh-CN">发到 X</span></span><svg class="share-out" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a>
+              <button type="button" class="share-item" data-share-native hidden><span><span class="en">More…</span><span class="zh" lang="zh-CN">更多…</span></span></button>
+            </div>
+            <span class="share-said" data-share-said role="status"></span>
+          </div>
+        </div>
       </div>
       <figure class="cover-plate">
         <img src="../../assets/journal/piano.webp" alt="An upright piano with its lid closed over the keys and an open score on the music desk, in soft daylight through a sheer curtain." width="900" height="1100" data-alt-en="An upright piano with its lid closed over the keys and an open score on the music desk, in soft daylight through a sheer curtain." data-alt-zh="一架立式钢琴，琴盖合在琴键上，谱架上摊着一份打开的乐谱，薄纱窗帘透进柔和的日光。">
@@ -407,6 +419,7 @@
 </footer>
 
 <script src="../../spectrum.js"></script>
+<script src="../../share.js"></script>
 <script>
   // bilingual alt text and tab title follow the language toggle
   (function () {
