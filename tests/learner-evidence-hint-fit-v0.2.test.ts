@@ -153,3 +153,11 @@ test("rejecting and correcting a false one-sided operation is not itself a false
   assert.ok(asserted);
   assert.deepEqual(evaluateAll(asserted.text).map(({ verdict }) => verdict), ["FAIL", "FAIL", "FAIL"]);
 });
+
+test("an arithmetic expression is not mistaken for an incorrect standalone equality", () => {
+  for (const expression of ["3×4=12", "3 × 4 = 12", "2+3=5", "2 + 3 = 5", "7=3+4", "7 = 3 + 4", "7/1=7"]) {
+    const results = evaluateAll(`例如 ${expression}。`);
+    assert.deepEqual(results.map(({ verdict }) => verdict), ["ABSTAIN", "ABSTAIN", "ABSTAIN"], expression);
+    assert.ok(results.every(({ reason }) => !reason.includes("incorrect integer equality")), expression);
+  }
+});
