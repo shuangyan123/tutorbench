@@ -258,6 +258,30 @@ test("product facts stay on the published pages", async () => {
   assert.match(await page("zh-cn/micro-review/index.html"), /<html lang="zh-CN"/u);
 });
 
+test("Work with us: one way in by email, in each language, with its limits kept on the page", async () => {
+  const pages = {
+    en: { file: "work-with-us/index.html", title: "Work with us — Teachometry", subject: "Project enquiry", url: `${SITE_URL}/work-with-us/`, preview: /Developer Preview\. Its results are not yet calibrated/u },
+    zh: { file: "zh-cn/work-with-us/index.html", title: "合作与服务 — Teachometry", subject: "合作项目咨询", url: `${SITE_URL}/zh-cn/work-with-us/`, preview: /开发者预览版。它的结果尚未校准/u },
+  };
+  for (const { file, title, subject, url, preview } of Object.values(pages)) {
+    const html = await page(file);
+    assert.ok(html.includes(`<title>${title}</title>`), file);
+    assert.ok(html.includes(`<link rel="canonical" href="${url}">`), file);
+    assert.ok(html.includes(`href="mailto:contact@teachometry.com?subject=${encodeURIComponent(subject)}"`), `${file}: mail link`);
+    assert.match(html, /class="nav-work" aria-current="page"/u, file);
+    assert.match(html, preview, `${file}: says what TutorBench cannot show yet`);
+    assert.match(html, /href="\.\.\/(?:\.\.\/)?methodology\/"/u, `${file}: links the methodology and its limits`);
+    // no form, no checkout, no published price
+    assert.doesNotMatch(withoutScripts(html), /<form\b|checkout|[$€£¥]\s?\d/iu, file);
+  }
+  assert.match(await page("work-with-us/index.html"), /See how your AI tutor/u);
+  assert.match(await page("zh-cn/work-with-us/index.html"), /讨论合作项目/u);
+  assert.match(await page("work-with-us/index.html"), /<link rel="alternate" hreflang="zh-Hans" href="https:\/\/example\.org\/tb\/zh-cn\/work-with-us\/">/u);
+  // every page's bar leads to it; Contact points there for project work
+  for (const file of ["index.html", "zh-cn/about/index.html", "data/cases/index.html"]) assert.match(await page(file), /<a href="[^"]*work-with-us\/" class="nav-work">/u, file);
+  assert.match(await page("contact/index.html"), /href="\.\.\/work-with-us\/"/u);
+});
+
 const PROTOTYPE = join(process.cwd(), "website", "prototypes", "spectrum");
 
 async function prototypeText(directory = PROTOTYPE, prefix = ""): Promise<string> {
@@ -343,6 +367,8 @@ test("every page shares its own section's preview card, in its own language", as
   assert.equal(await card("zh-cn/blog/why-teaching-does-not-scale/index.html"), "essay-scale-zh.jpg");
   assert.equal(await card("data/cases/fraction-misconception-001/index.html"), "cases-en.jpg");
   assert.equal(await card("zh-cn/models/[modelId]/index.html"), "models-zh.jpg");
+  assert.equal(await card("work-with-us/index.html"), "work-en.jpg");
+  assert.equal(await card("zh-cn/work-with-us/index.html"), "work-zh.jpg");
   assert.equal(await card("404.html"), "home-en.jpg");
 });
 

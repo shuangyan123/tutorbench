@@ -55,6 +55,7 @@ export function frame({ prefix, title, titleZh, description, body, current, css 
     bar = bar.replace(`<a href="${prefix}index.html#${anchor}">`, `<a href="${prefix}${page}"${current === key ? ' aria-current="page"' : ""}>`);
     foot = foot.replace(`<a href="${prefix}index.html#${anchor}">`, `<a href="${prefix}${page}">`);
   }
+  if (current === "work") bar = bar.replace(`<a href="${prefix}work-with-us/index.html" class="nav-work">`, `<a href="${prefix}work-with-us/index.html" class="nav-work" aria-current="page">`);
   bar = bar.replace(`<a class="run-btn" href="${prefix}index.html#reproduce">`, `<a class="run-btn" href="${prefix}run/index.html"${current === "run" ? ' aria-current="page"' : ""}>`);
   return `${head}</head>
 <body>
