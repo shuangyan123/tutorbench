@@ -24,6 +24,8 @@ export const WORK_WITH_US = {
     primary: "Discuss a project",
     secondary: "How we work",
     mailSubject: "Project enquiry",
+    /** shown before the address under the button, for readers with no mail app to open */
+    mailLabel: "Or write to",
   },
   cover: {
     caption: "Made to measure: a paper pattern pinned to wool, a tailor’s tape laid across it, five pins in the colours of the five dimensions. An evaluation is cut to the product in front of it.",
@@ -126,6 +128,7 @@ export function renderWorkWithUsPage(artifacts: PublicBenchmarkArtifacts): SiteP
             <h1 id="work-title">${e(c.hero.titleLead)}<br><em>${e(c.hero.titleAccent)}</em></h1>
             <p class="contact-lede">${e(c.hero.lede)}</p>
             <p><a class="button button-primary" href="${mailto}">${e(c.hero.primary)} ${icon("arrow")}</a> <a class="text-link" href="#work-how">${e(c.hero.secondary)}</a></p>
+            <p>${e(c.hero.mailLabel)} <a href="${mailto}">${e(SITE_CONTACT_EMAIL)}</a></p>
           </div>
           <div class="contact-note" aria-hidden="true"><span>${e(c.hero.line)}</span></div>
         </div>

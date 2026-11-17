@@ -1426,6 +1426,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "Discuss a project": "讨论合作项目",
   "How we work": "合作流程",
   "Project enquiry": "合作项目咨询",
+  "Or write to": "或直接发邮件至",
   "Made to measure: a paper pattern pinned to wool, a tailor’s tape laid across it, five pins in the colours of the five dimensions. An evaluation is cut to the product in front of it.": "量体裁衣：纸样别在呢料上，软尺搭过纸样，五枚大头针是五个维度的颜色。评测要按眼前的产品来裁。",
   "A paper pattern piece for the front of a bodice, drafted in pencil on white dot-and-cross pattern paper, lies on periwinkle wool twill. A yellow tailor’s tape measure runs from its brass end along the hem, off the paper and up in a half twist. Three glass-headed pins hold the side seam and two lie loose on the paper; the five heads are ruby, citrine, emerald, sapphire and amethyst.": "一片前衣片纸样平铺在雾蓝紫色的斜纹呢料上，白色打版纸印着蓝色的点和十字，轮廓用铅笔画成。一条黄色裁缝软尺从铜头开始沿着下摆铺开，离开纸样后翻了半圈向上延伸。三枚玻璃珠头大头针别住侧缝，另外两枚散放在纸上；五颗珠头分别是红宝石、黄水晶、祖母绿、蓝宝石和紫水晶的颜色。",
   "What we do": "我们做什么",

@@ -1,16 +1,19 @@
 /* global document, navigator, window */
-// Teachometry · Contact: the copy button beside the email address. The address is always shown as
-// selectable text, because a mailto: link may do nothing in some viewers; the button only adds a copy.
+// Teachometry · Contact and Work with us: the copy button beside the email address. The address is
+// always shown as selectable text, because a mailto: link may do nothing in some viewers (or open the
+// system's "choose an app" dialog); the button only adds a copy. data-state drives the copy mark / tick.
 (function () {
   "use strict";
   var zh = function () { return document.documentElement.getAttribute("data-lang") === "zh"; };
+  var apple = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || "");
   Array.prototype.forEach.call(document.querySelectorAll("[data-copy-text]"), function (button) {
     var label = button.querySelector("[data-copy-label]");
     var text = button.getAttribute("data-copy-text");
     var reset = null;
     var say = function (state) {
-      var key = "data-" + state + "-" + (zh() ? "zh" : "en");
-      if (label) label.textContent = button.getAttribute(key);
+      var words = button.getAttribute("data-" + state + "-" + (zh() ? "zh" : "en")) || "";
+      if (label) label.textContent = apple ? words.replace("Ctrl+C", "⌘C") : words;
+      button.setAttribute("data-state", state);
     };
     var selectFallback = function () {
       var target = document.getElementById(button.getAttribute("aria-controls"));
