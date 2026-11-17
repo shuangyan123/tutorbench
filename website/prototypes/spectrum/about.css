@@ -218,8 +218,14 @@ a.v:hover { color: var(--lead); }
 .wk-how > .wk-terms { grid-column: 2 / -1; }
 .wk-steps { list-style: none; margin: clamp(28px, 3.4vw, 48px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
 .wk-steps li { position: relative; padding: 18px clamp(14px, 2vw, 26px) 22px 0; }
-.wk-steps li + li { padding-left: clamp(14px, 2vw, 26px); border-left: 1px solid var(--hair-2); }
-.wk-steps li:not(:last-child)::after { content: ""; position: absolute; top: -5px; right: -4px; width: 8px; height: 8px; border-top: 1px solid var(--ink); border-right: 1px solid var(--ink); transform: rotate(45deg); }
+.wk-steps li + li { padding-left: clamp(14px, 2vw, 26px); }
+/* the divider between steps stops short of the rules above and below, so each arrow sits on its rule alone */
+.wk-steps li + li::before { content: ""; position: absolute; left: 0; top: 18px; bottom: 18px; width: 1px; background: var(--hair-2); }
+/* a drawn chevron centred on the rule (its 1px line is centred 0.5px above the step's top edge),
+   the point just past the divider; a mask keeps it in the ink colour */
+.wk-steps li:not(:last-child)::after { content: ""; position: absolute; top: -6.5px; right: -6px; width: 7px; height: 12px; background: var(--ink);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 12'%3E%3Cpath d='M.6.6 6 6 .6 11.4' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 12'%3E%3Cpath d='M.6.6 6 6 .6 11.4' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 .wk-steps .n { font: 400 11px/1 var(--f-mono); letter-spacing: .12em; color: var(--ink-3); }
 .wk-steps li:last-child .n { color: var(--lead); }
 .wk-steps h3 { margin: 12px 0 10px; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(30px, 2.8vw, 42px); line-height: 1; }
@@ -270,8 +276,9 @@ a.v:hover { color: var(--lead); }
 @media (max-width: 1180px) {
   .wk-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .wk-steps li + li { padding-left: clamp(14px, 2vw, 26px); }
-  .wk-steps li:nth-child(3) { padding-left: 0; border-left: 0; }
-  .wk-steps li:nth-child(-n + 2) { border-bottom: 1px solid var(--hair-2); }
+  .wk-steps li:nth-child(3) { padding-left: 0; }
+  .wk-steps li:nth-child(3)::before { display: none; }
+  .wk-steps li:nth-child(-n + 2) { border-bottom: 1px solid var(--ink); }
   .wk-steps li:nth-child(2)::after { display: none; }
   .wk-terms { grid-template-columns: minmax(0, 1fr); align-items: start; }
   .ab-principles, .cm-tasks, .cm-neq { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -295,7 +302,7 @@ a.v:hover { color: var(--lead); }
   .wk-core-list, .wk-rules, .wk-steps, .wk-tier { grid-template-columns: minmax(0, 1fr); }
   .wk-core-list li:nth-child(2n), .wk-rules li:nth-child(2n), .wk-steps li + li { padding-left: 0; border-left: 0; }
   .wk-steps li { border-bottom: 1px solid var(--hair-2); }
-  .wk-steps li::after { display: none; }
+  .wk-steps li::before, .wk-steps li::after { display: none; }
   .ab-principles, .cm-tasks, .cm-neq, .cm-obs, .ab-res { grid-template-columns: minmax(0, 1fr); }
   .ab-principles article + article, .cm-tasks article + article, .cm-neq article + article { padding-left: 0; border-left: 0; }
   .cm-steps { grid-template-columns: minmax(0, 1fr); }
