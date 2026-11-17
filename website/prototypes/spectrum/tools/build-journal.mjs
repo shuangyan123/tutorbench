@@ -344,6 +344,22 @@ function callout(c, cls = "") {
         </aside>`;
 }
 
+// Share, at the end of the byline strip (share.js): one "Share" control that opens a short list:
+// copy link, post on X, and the device's own share sheet where there is one. Hidden until the script
+// runs, because none of it works without script.
+const LINK_ICON = `<svg class="share-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4a2.9 2.9 0 0 0 4.1 0l2.2-2.2a2.9 2.9 0 0 0-4.1-4.1l-.9.9"/><path d="M9.4 6.6a2.9 2.9 0 0 0-4.1 0L3.1 8.8a2.9 2.9 0 0 0 4.1 4.1l.9-.9"/></svg>`;
+const ARROW_OUT = `<svg class="share-out" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg>`;
+const shareControl = () => `<div class="essay-share" data-share hidden>
+            <button type="button" class="share-btn kicker" data-share-toggle aria-expanded="false" aria-controls="share-list">${LINK_ICON}<span class="share-idle">${biE("Share", "分享")}</span><span class="share-done">${biE("Link copied", "链接已复制")}</span></button>
+            <div class="share-list" id="share-list" data-share-list role="group" aria-label="Share this essay" data-aria-label-en="Share this essay" data-aria-label-zh="分享这篇文章" hidden>
+              <button type="button" class="share-item" data-share-copy data-state="idle"><span class="share-idle">${biE("Copy link", "复制链接")}</span><span class="share-fail">${biE("Copy it from here", "请在下面复制")}</span></button>
+              <input class="share-field" data-share-field type="text" readonly hidden aria-label="Link to this essay" data-aria-label-en="Link to this essay" data-aria-label-zh="这篇文章的链接">
+              <a class="share-item" data-share-x href="https://x.com/intent/tweet" target="_blank" rel="noopener noreferrer" aria-label="Post on X (opens in a new tab)" data-aria-label-en="Post on X (opens in a new tab)" data-aria-label-zh="发到 X（在新标签页打开）"><span>${biE("Post on X", "发到 X")}</span>${ARROW_OUT}</a>
+              <button type="button" class="share-item" data-share-native hidden><span>${biE("More…", "更多…")}</span></button>
+            </div>
+            <span class="share-said" data-share-said role="status"></span>
+          </div>`;
+
 function essayPage(p, idx) {
   const s = slug(p), cover = COVERS[s], rt = readingTime(p), n = BLOG_POSTS.length;
   const figs = FIGS[s] ?? [];
@@ -388,7 +404,10 @@ function essayPage(p, idx) {
         <p class="essay-meta kicker"><a class="issue" href="../index.html">${bi(`Journal · Essay ${idx + 1} of ${n}`, `期刊 · 第 ${idx + 1} 篇，共 ${n} 篇`)}</a><span class="rule" aria-hidden="true"></span><span>${biE(p.category)}</span><time datetime="${DATE_ISO[p.publishedDate]}">${biE(p.publishedDate)}</time></p>
         <h1 class="essay-title">${biH(p.title)}</h1>
         ${biP("p", "essay-dek", esc(p.excerpt), esc(Z(p.excerpt)))}
-        <p class="essay-byline kicker"><span>Teachometry</span><span>${bi(`${p.sections.length} sections · about ${rt.en} min`, `${p.sections.length} 节 · 约 ${rt.zh} 分钟`)}</span></p>
+        <div class="essay-by">
+          <p class="essay-byline kicker"><span>Teachometry</span><span>${bi(`${p.sections.length} sections · about ${rt.en} min`, `${p.sections.length} 节 · 约 ${rt.zh} 分钟`)}</span></p>
+          ${shareControl()}
+        </div>
       </div>
       <figure class="cover-plate">
         <img src="../../assets/journal/${cover.img}" alt="${esc(cover.alt[0])}" width="900" height="1100" data-alt-en="${esc(cover.alt[0])}" data-alt-zh="${esc(cover.alt[1])}">
@@ -421,7 +440,7 @@ ${p.sources ? "        " + sources(p.sources) : ""}
 
 ${issueRow(idx, "../")}
 </main>`;
-  return frame({ prefix: "../../", title: `${p.title} · Teachometry Journal`, titleZh: `${Z(p.title)} · Teachometry 期刊`, description: p.description, body: main, current: "journal", css: ["journal.css"] });
+  return frame({ prefix: "../../", title: `${p.title} · Teachometry Journal`, titleZh: `${Z(p.title)} · Teachometry 期刊`, description: p.description, body: main, current: "journal", css: ["journal.css"], scripts: ["share.js"] });
 }
 
 function issueRow(current, base) {
