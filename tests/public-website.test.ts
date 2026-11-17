@@ -704,7 +704,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(contactHtml, /<title>Contact — Teachometry<\/title>/);
     assert.match(contactHtml, /<body class="about-page contact-page">/);
     assert.match(contactHtml, /href="\/assets\/contact\.css"/);
-    assert.match(contactHtml, /mailto:shuangyan12341234@gmail\.com/u);
+    assert.match(contactHtml, /mailto:contact@teachometry\.com/u);
     assert.match(contactHtml, /https:\/\/x\.com\/1Shuangyan36877/u);
     assert.match(contactHtml, /src="\/assets\/x-logo\.svg"/u);
     assert.match(contactHtml, /class="home-footer"/);
@@ -1185,7 +1185,7 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(homeHtml, /<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">/);
     assert.match(homeHtml, /"@type":"WebSite"/);
     assert.match(homeHtml, /"@type":"Organization"/);
-    assert.match(homeHtml, /"email":"shuangyan12341234@gmail\.com"/u);
+    assert.match(homeHtml, /"email":"contact@teachometry\.com"/u);
     assert.match(homeHtml, /"https:\/\/x\.com\/1Shuangyan36877"/u);
     assert.match(dataHtml, /"@type":"Dataset"/);
     assert.match(dataHtml, /"license":"https:\/\/creativecommons\.org\/licenses\/by\/4\.0\/"/);

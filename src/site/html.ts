@@ -17,7 +17,7 @@ import {
 import { SITE_ZH_CN_COPY } from "./locale-copy.js";
 
 export const SITE_GITHUB_URL = "https://github.com/shuangyan123/tutorbench";
-export const SITE_CONTACT_EMAIL = "shuangyan12341234@gmail.com";
+export const SITE_CONTACT_EMAIL = "contact@teachometry.com";
 export const SITE_X_URL = "https://x.com/1Shuangyan36877";
 export const TUTORBENCH_BRAND_ASSET_BASE_PATH = "/assets/brand/tutorbench";
 export const TUTORBENCH_BRAND_ASSET_PATHS = [

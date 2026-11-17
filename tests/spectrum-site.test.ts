@@ -252,7 +252,7 @@ test("every link and asset in every page resolves inside the published site", as
 
 test("product facts stay on the published pages", async () => {
   const contact = await page("contact/index.html");
-  assert.match(contact, /shuangyan12341234@gmail\.com/u);
+  assert.match(contact, /contact@teachometry\.com/u);
   assert.match(contact, /https:\/\/x\.com\/1Shuangyan36877/u);
   assert.match(await page("leaderboard/index.html"), /No calibrated public model runs yet\./u);
   assert.match(await page("zh-cn/micro-review/index.html"), /<html lang="zh-CN"/u);
