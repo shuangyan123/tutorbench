@@ -125,6 +125,11 @@ test("incorrect numerical equalities are not accepted as valid explanations", ()
   for (const result of results) {
     assert.ok(result.responseExcerpts.every((excerpt) => assertion.includes(excerpt)));
   }
+  const adjacentFalseAssertion = "例如7=8仍然相等。你试着写出第一步。";
+  assert.deepEqual(
+    evaluateAll(adjacentFalseAssertion).map(({ verdict }) => verdict),
+    ["FAIL", "FAIL", "FAIL"],
+  );
   const rejectedCounterexample = "例如 7 = 8 是错误的。想想为什么。";
   assert.deepEqual(
     evaluateAll(rejectedCounterexample).map(({ verdict }) => verdict),
