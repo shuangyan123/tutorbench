@@ -202,8 +202,8 @@ test("Final deployment integrity: canonical, hreflang, sitemap, route destinatio
         assert.ok(markup.includes(`<link rel="canonical" href="${deployment.url}${localRoute}">`));
         // 未解析的占位详情保持 noindex，不要求进入 sitemap。
         if (!route.includes("[")) assert.ok(sitemap.includes(`<loc>${deployment.url}${localRoute}</loc>`));
-        if (!route.includes("[")) for (const language of ["en", "zh-CN", "x-default"]) {
-          assert.ok(markup.includes(`<link rel="alternate" hreflang="${language}" href="${deployment.url}${language === "zh-CN" ? "/zh-cn" : ""}${route}">`));
+        if (!route.includes("[")) for (const language of ["en", "zh-Hans", "x-default"]) {
+          assert.ok(markup.includes(`<link rel="alternate" hreflang="${language}" href="${deployment.url}${language === "zh-Hans" ? "/zh-cn" : ""}${route}">`));
         }
         assert.ok(markup.includes(`data-locale-en-url="${deployment.basePath}${route}"`));
         assert.ok(markup.includes(`data-locale-zh-cn-url="${deployment.basePath}/zh-cn${route}"`));

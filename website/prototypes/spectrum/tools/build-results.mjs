@@ -28,6 +28,9 @@ const DASH = "—";
 const both = (fn) => bi(esc(fn("en")), esc(fn("zh-CN")));
 /** the live zh, or ours where the live site leaves an English label untranslated */
 const G = (en, zh) => biE(en, Zor(en, zh));
+// an attribute, or an option's text, in both languages: the build keeps the page's own (spectrum-site.ts)
+const attr2 = (name, en, zh = Z(en)) => `${name}="${esc(en)}" data-${name}-en="${esc(en)}" data-${name}-zh="${esc(zh)}"`;
+const option = (en, zh = Z(en)) => `<option data-text-en="${esc(en)}" data-text-zh="${esc(zh)}">${esc(en)}</option>`;
 const tax = (v) => bi(esc(L.displayTaxonomyLabel(v, "en")), esc(L.displayTaxonomyLabel(v, "zh-CN")));
 const evidence = (k) => both((l) => L.publicEvidenceCopy(k, l));
 const notice = (n) => both((l) => L.publicArtifactNotice(n, l));
@@ -192,7 +195,7 @@ function contractRows() {
     traceability: pick([...TRACE, "promptId", "promptSha256", "maxOutputTokens", "runs"]),
   };
 }
-const schemaRows = (rows) => rows.map(([f, v, note]) => `<div data-schema-field="${f}"><dt>${fl(MODEL_FIELD, f)}</dt><dd>${v ?? DASH}</dd>${note ? `<small>${note}</small>` : ""}</div>`).join("");
+const schemaRows = (rows) => rows.map(([f, v, note]) => `<div data-schema-field="${f}"><dt>${fl(MODEL_FIELD, f)}</dt><dd>${v ?? DASH}</dd>${note ? `<dd class="sub">${note}</dd>` : ""}</div>`).join("");
 const schemaPanel = (title, desc, rows) => `<section class="md-panel"><p class="kicker">${biE(title)}</p><p class="md-desc">${biE(desc)}</p><dl>${schemaRows(rows)}</dl></section>`;
 
 function modelsPage() {
@@ -227,10 +230,10 @@ function modelsPage() {
   <section class="wrap md-tools" aria-label="Public model registry controls">
     <div class="md-toolbar">
       <span class="kicker">${biE("Filter models")}</span>
-      <select disabled aria-label="Provider filter"><option>${esc("All providers")}</option></select>
-      <select disabled aria-label="Model type filter"><option>${esc("All model types")}</option></select>
-      <select disabled aria-label="Evidence status filter"><option>${esc("Evidence status")}</option></select>
-      <input type="search" disabled placeholder="Search models…" aria-label="Search models">
+      <select disabled ${attr2("aria-label", "Provider filter")}>${option("All providers")}</select>
+      <select disabled ${attr2("aria-label", "Model type filter")}>${option("All model types")}</select>
+      <select disabled ${attr2("aria-label", "Evidence status filter")}>${option("Evidence status")}</select>
+      <input type="search" disabled ${attr2("placeholder", "Search models…")} ${attr2("aria-label", "Search models")}>
     </div>
     <p class="md-tools-note">${both((l) => F.formatPublicCount(n, "publicModels", l))} · ${bi("Filters become available when public model profiles exist.", "有公开模型档案后开放筛选")}</p>
   </section>
@@ -363,7 +366,7 @@ function trialsPage() {
       <h1 class="essay-title">${biE("Model Trials")}</h1>
       <p class="essay-dek">${bi("A transparent audit trail.", "透明的审计轨迹。")}</p>
       ${biPE("p", "hm-desc", "Future public trial records will connect model identity, case identity, execution context, Tutor response, evaluator evidence, and sanitized operational metrics.")}
-      <dl class="tr-stats">${stats.map(([v, k, n]) => `<div><dd>${/^\d+$/.test(v) ? esc(v) : biE(v)}</dd><dt>${biE(k)}</dt><small>${n}</small></div>`).join("")}</dl>
+      <dl class="tr-stats">${stats.map(([v, k, n]) => `<div><dt>${biE(k)}</dt><dd>${/^\d+$/.test(v) ? esc(v) : biE(v)}</dd><dd class="sub">${n}</dd></div>`).join("")}</dl>
       <p class="tr-motto">${bi("Shared evidence.<br>Stronger teaching.", "共享证据，<br>改进教学。")}</p>
     </div>
   </header>

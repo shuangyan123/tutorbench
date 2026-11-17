@@ -31,6 +31,7 @@ import {
 import {
   resolveSiteLocale,
   SITE_LOCALES,
+  siteHreflang,
   type SiteLocale,
 } from "../site/i18n.js";
 import {
@@ -177,7 +178,7 @@ async function writeDiscoveryFiles(
         const alternates = [
           ...SITE_LOCALES.map(
             (alternateLocale) =>
-              `    <xhtml:link rel="alternate" hreflang="${alternateLocale}" href="${xmlEscape(`${normalizedSiteUrl}${siteLocaleRoute(page.route, alternateLocale)}`)}"/>`,
+              `    <xhtml:link rel="alternate" hreflang="${siteHreflang(alternateLocale)}" href="${xmlEscape(`${normalizedSiteUrl}${siteLocaleRoute(page.route, alternateLocale)}`)}"/>`,
           ),
           `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(`${normalizedSiteUrl}${siteLocaleRoute(page.route, "en")}`)}"/>`,
         ].join("\n");

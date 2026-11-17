@@ -45,22 +45,44 @@
     var place = null;
     try { place = JSON.parse(window.sessionStorage.getItem(PLACE) || "null"); window.sessionStorage.removeItem(PLACE); } catch { /* storage is optional */ }
     if (place && place.path !== location.pathname) place = null;
-    if ((nav && nav.type === "back_forward") || (location.hash && location.hash.length > 1)) return;
+    if (nav && nav.type === "back_forward") return;
     var touched = false;   // once the reader scrolls, leave the page where they put it
     ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) { window.addEventListener(t, function () { touched = true; }, { once: true, passive: true }); });
-    function toTop() {
-      if (touched || (location.hash && location.hash.length > 1)) return;
+    function jump(fn) {
       var before = root.style.scrollBehavior;
       root.style.scrollBehavior = "auto";
-      window.scrollTo(0, place ? placeY(place) : 0);
-      // when the host page scrolls instead of this frame, bring the frame's top into view as well
-      if (window.self !== window.top) { try { root.scrollIntoView({ block: "start", behavior: "instant" }); } catch { /* ignore */ } }
+      fn();
       root.style.scrollBehavior = before;
     }
-    toTop();
-    window.addEventListener("load", function () { toTop(); setTimeout(toTop, 60); }, { once: true });
+    // the heading or note a #anchor names
+    function target() {
+      if (!location.hash || location.hash.length < 2) return null;
+      try { return document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch { return null; }
+    }
+    var anchored = !!(location.hash && location.hash.length > 1);
+    function toTop() {
+      if (touched || (location.hash && location.hash.length > 1)) return;
+      jump(function () {
+        window.scrollTo(0, place ? placeY(place) : 0);
+        // when the host page scrolls instead of this frame, bring the frame's top into view as well
+        if (window.self !== window.top) { try { root.scrollIntoView({ block: "start", behavior: "instant" }); } catch { /* ignore */ } }
+      });
+    }
+    // A page opened at a #anchor: the browser goes there before the web fonts arrive, and the text
+    // above the anchor then changes length, so the reader would be left a paragraph or a screen
+    // away from it. Seat the anchor again once the page and its fonts have settled.
+    function toAnchor() {
+      var el = touched ? null : target();
+      if (el) jump(function () { el.scrollIntoView({ block: "start" }); });
+    }
+    var settle = anchored ? toAnchor : toTop;
+    if (!anchored) toTop();
+    window.addEventListener("load", function () { settle(); setTimeout(settle, 60); }, { once: true });
     // web fonts can change the page's length after load; keep the reader's place once they settle
-    if (place && document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(toTop, 30); });
+    if ((place || anchored) && document.fonts) {
+      if (document.fonts.ready) document.fonts.ready.then(function () { setTimeout(settle, 30); });
+      if (document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", function () { setTimeout(settle, 30); });
+    }
   })();
 
   /* ------------------------------------------------------------ 0b site menu */
@@ -84,6 +106,22 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) set(false, true); });
     document.addEventListener("click", function (e) { if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) set(false); });
     menu.addEventListener("click", function (e) { if (e.target.closest("a")) set(false); });
+  })();
+
+  /* ------------------------------------------------------------ 0c a missing page under /zh-cn/
+     The 404 page answers at any address. Under /zh-cn/ it answers in Chinese (the head script),
+     and its links lead on to the Chinese pages. */
+  (function () {
+    if (root.hasAttribute("data-route-lang") || lang() !== "zh") return;
+    var at = /^(.*?)\/zh-cn(\/|$)/.exec(location.pathname);
+    if (!at) return;
+    var base = at[1];   // the site's base path: "" at the domain root
+    Array.prototype.forEach.call(document.querySelectorAll("a[href]"), function (a) {
+      if (a.origin !== location.origin || a.pathname.indexOf(base + "/") !== 0) return;
+      var rest = a.pathname.slice(base.length);
+      if (/^\/zh-cn(\/|$)/.test(rest) || /\.[a-z0-9]+$/i.test(rest)) return;   // already Chinese, or a file
+      a.pathname = base + "/zh-cn" + rest;
+    });
   })();
 
   /* ------------------------------------------------------------ 1 language */
@@ -177,7 +215,7 @@
   };
   var T = {
     all: ["All", "全部"], state: ["Learner state", "学生状态"], no: ["Plate", "图版"],
-    count: function (n, total) { return lang() === "zh" ? ("显示 " + n + " / " + total + " 个情境 · 每个都有中英两版，共 48 个案例") : ("Showing " + n + " of " + total + " situations · each in English and 简体中文, 48 cases"); }
+    count: function (n, total) { return lang() === "zh" ? ("显示 " + n + " / " + total + " 个情境 · 每个都有中英两版，共 48 个案例") : ("Showing " + n + " of " + total + " situations · each in English and Chinese, 48 cases"); }
   };
   function L(pair) { return pair ? pair[lang() === "zh" ? 1 : 0] : ""; }
   var shelf = document.querySelector("[data-shelf]");

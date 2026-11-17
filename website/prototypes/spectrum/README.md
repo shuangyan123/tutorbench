@@ -10,8 +10,36 @@ generated pages instead (they also stay in use for the private audit build).
 
 Language: on the published site the URL decides (`/zh-cn/` is Chinese). A reader whose browser
 is set to Chinese and who lands on an English URL is sent to the Chinese page; the toggle opens
-the other language's URL and the choice is remembered. In this folder, `?lang=` or the toggle
-switches in place.
+the other language's URL and the choice is remembered; either way the `?query` and `#anchor` of
+the address go along. In this folder, `?lang=` or the toggle switches in place.
+
+One language per published page. The sources here write every passage twice (paired `.en` / `.zh`
+elements) and CSS hides one. The build keeps only the page's own language (`keepLanguage`), so
+reader views, read-later tools and crawlers that ignore CSS get one language, not both interleaved.
+The rules that follow from it:
+
+- Mark both halves of every pair, and do not write CSS that depends on the hidden twin being a
+  sibling (`span + span`, `:last-child` across a pair): the twin is not there on the published page.
+- A label, placeholder or alt text is written once per language as `data-aria-label-en` /
+  `data-aria-label-zh` (also `data-placeholder-*`, `data-alt-*`); an `<option>` uses `data-text-en`
+  / `data-text-zh`. The build writes the page's own language into the real attribute
+  (`localizeMarkup`), so it is right before any script runs.
+- `404.html` keeps both languages: it is served for any missing address, and its script picks the
+  language and points its links at `/zh-cn/` when the address is under it.
+- Chinese that is meant to show on an English page (the cover line, the "中" of the switch, a
+  language's own name) carries `lang="zh-CN"`. Brand names and code carry `translate="no"` (the
+  build adds it to `pre`, `code`, `kbd` and `samp`), so browser translation leaves them alone.
+
+Search metadata names the script, not one region: `hreflang="zh-Hans"` (and `x-default` for the
+English page), `og:locale:alternate` for the other language. The Journal has an RSS feed per
+language (`blog/feed.xml`, `zh-cn/blog/feed.xml`), written by the build from the essays' own
+metadata and linked from the Journal's pages.
+
+Privacy. The site sets no cookies and loads nothing from other hosts (no analytics, no fonts, no
+scripts), so it needs no consent banner. What it keeps in the reader's browser is three local notes
+(language, fonts already fetched, and the place on the page while switching language). The Contact
+page says so under `#privacy`, linked from every footer; update that text before adding anything
+that stores or sends data.
 
 Open it with any static server from this folder:
 
@@ -31,9 +59,12 @@ and nothing moves on its own. Each frame renders a single wedge without mirrors 
 across their lines, so this matches the full mirror render at a fraction of the cost
 (`render/render_k.sh`, then `render/to_webp_k.py`). `cover.js` decodes each frame before using
 it (every 4th frame first, then every 2nd, then the rest), eases towards the scroll position and
-blends neighbouring frames. Near the end of the cover the masthead slides up over it as a sheet.
-The earlier three-mirror end-cap sequences (`R_*`, `Q_*`, `P_*`, `L_*`, `render/scene.py`) are
-kept but not shown. Dimension markers are five Blender cut gems (`assets/gems/`,
+blends neighbouring frames. On a slow connection (the browser reports 2g/3g, or the first pass came
+in under 500 KB a second) it stops after every 4th frame, a quarter of the weight, and keeps
+blending between those. Near the end of the cover the masthead slides up over it as a sheet.
+The earlier three-mirror end-cap sequences (`R_*`, `Q_*`, `P_*`, `L_*`) are no longer in the
+repository; their scene script (`render/scene.py`) is kept. Dimension markers are five Blender cut
+gems (`assets/gems/`,
 `render/gems.py`): ruby oval, citrine pear, emerald step cut, sapphire cushion, amethyst trillion,
 each rendered in three IOR passes for fire. The earlier glass beads (`assets/beads/`) show with `#beads`. Two GPT photographs open §2 and §3 as framed
 plates, captioned as generated illustrations.
@@ -45,11 +76,18 @@ cover, re-render with `node website/prototypes/spectrum/tools/build-share-cards.
 
 Fonts and speed. The site serves its own fonts (`fonts.css`, `assets/fonts/`, all SIL OFL): the
 same Google Fonts files, limited to the weights the pages use and cut to the characters they contain
-(the Chinese faces hold only the ~1,100 characters on the pages). `tools/build-fonts.py` rebuilds
-them; `tests/spectrum-site.test.ts` fails when a page gains a Chinese character the fonts lack. On a
+(the Chinese faces hold only the ~1,100 characters on the pages). Each Chinese face is split into
+three files that `unicode-range` picks from: `-core` (the few Chinese characters English pages show,
+such as the "中" of the language switch, about 10 KB), `-base` (Latin and punctuation) and the large
+file with the other Chinese characters, so an English page no longer fetches a whole Chinese face
+for one character. `tools/build-fonts.py` rebuilds them; `tests/spectrum-site.test.ts` fails when a
+page gains a Chinese character the fonts lack. On a
 first visit the page paints in the reader's own fonts and `fonts.css` is switched on right after the
 first paint (the head script in `index.html`); once the fonts are cached, later pages load them up
-front. Below the cover, the home page's sections use `content-visibility: auto`, so a phone lays
+front. A face that is still on its way 3.4 seconds later (and has been asked for at least two
+seconds) is dropped for that page, so the text does not change under a reader on a slow connection;
+the next page tries again. Pages opened at an `#anchor` are re-seated on it after the fonts land
+(`spectrum.js`), unless the reader has already scrolled. Below the cover, the home page's sections use `content-visibility: auto`, so a phone lays
 out only the first screen. The build strips comments and spare whitespace from the stylesheets.
 Checked with Lighthouse (mobile): 91–99 across the sections, 98 on the Chinese home page.
 
@@ -167,7 +205,8 @@ Generated by `tools/build-run.mjs`, matching the live `/run/` and `/docs/` route
 (EN and the live zh; commands are printed exactly as the live page prints them). `run.js` ports the
 live `site.js` handlers: the run console tabs (click, arrow keys, Home, End), the copy button with its
 selection fallback, and the docs search, category filters and reference count. Labels, the count
-line and attributes (aria-label, placeholder) carry both languages and follow the toggle.
+line and attributes (aria-label, placeholder) carry both languages and follow the toggle; the
+published page gets its own language's values from the build.
 
 - Section colour: clear crystal (`run.css`); a glass slate `--lead` for text, pale glass for fills.
 - Cover: `render/tubes.py` (labels from `render/tubes_labels.py`), four test tubes of clear water in
