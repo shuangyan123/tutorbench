@@ -82,7 +82,7 @@ npm run benchmark
 ```
 
 The repository run uses the canonical `tutor-eval-v0.2a@0.2a.6` dataset and
-evaluator `0.3a.5`, recorded in the output. The published `0.1.0` snapshot
+evaluator `0.3a.6`, recorded in the output. The published `0.1.0` snapshot
 contains `tutor-eval-v0.2a@0.2a.5` and evaluator `0.3a.4` instead; it has no
 Tutor Health CLI or API. Judge-required semantic criteria remain unresolved when no explicit
 Judge is configured, so the normal no-Judge run reports Judge-unavailable
