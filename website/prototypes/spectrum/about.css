@@ -222,7 +222,7 @@ a.v:hover { color: var(--lead); }
 html[data-lang="zh"] .ab .essay-title em, html[data-lang="zh"] .cm .essay-title em, html[data-lang="zh"] .ct .essay-title em,
 html[data-lang="zh"] .ab-side-note em, html[data-lang="zh"] .ab-quote { font-style: normal; }
 html[data-lang="zh"] .ab .essay-title em, html[data-lang="zh"] .cm .essay-title em, html[data-lang="zh"] .ct .essay-title em { color: var(--lead); }
-html[data-lang="zh"] .ab-head .essay-title { font-size: clamp(40px, 6.4vw, 96px); line-height: 1.08; }
+html[data-lang="zh"] .ab-head .essay-title { font-size: clamp(36px, 5.2vw, 80px); line-height: 1.1; }
 
 /* ===================================================== About · the vision film and the letter */
 .ab-vision { padding-block: clamp(48px, 6vw, 96px); border-top: 1px solid var(--ink); }
