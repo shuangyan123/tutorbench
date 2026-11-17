@@ -126,7 +126,7 @@ export function journalEssayMetadataPages(siteUrl: string | undefined): Map<stri
       ...(site === undefined ? [] : [`<meta property="og:url" content="${esc(url)}">`]),
       `<link rel="canonical" href="${esc(url)}">`,
       `<link rel="alternate" hreflang="en" href="${esc(english)}">`,
-      `<link rel="alternate" hreflang="zh-CN" href="${esc(chinese)}">`,
+      `<link rel="alternate" hreflang="zh-Hans" href="${esc(chinese)}">`,
       `<link rel="alternate" hreflang="x-default" href="${esc(english)}">`,
       `<meta property="article:published_time" content="${essay.published}">`,
       '<meta name="twitter:card" content="summary">',
@@ -165,7 +165,7 @@ function withSitemapEntries(sitemap: string, siteUrl: string, slug: string): str
   const en = `${base}/${page(false, slug)}`;
   const zh = `${base}/${page(true, slug)}`;
   const entries = [en, zh].filter((loc) => !sitemap.includes(`<loc>${loc}</loc>`)).map((loc) =>
-    `<url><loc>${esc(loc)}</loc><xhtml:link rel="alternate" hreflang="en" href="${esc(en)}"/><xhtml:link rel="alternate" hreflang="zh-CN" href="${esc(zh)}"/><xhtml:link rel="alternate" hreflang="x-default" href="${esc(en)}"/></url>`);
+    `<url><loc>${esc(loc)}</loc><xhtml:link rel="alternate" hreflang="en" href="${esc(en)}"/><xhtml:link rel="alternate" hreflang="zh-Hans" href="${esc(zh)}"/><xhtml:link rel="alternate" hreflang="x-default" href="${esc(en)}"/></url>`);
   return entries.length === 0 ? sitemap : sitemap.replace("</urlset>", `${entries.join("\n")}\n</urlset>`);
 }
 

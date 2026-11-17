@@ -167,7 +167,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .menu-btn[aria-expanded="true"] { background: rgba(255, 255, 255, .75); border-color: var(--ink); }
 .menu-btn[aria-expanded="true"] i { height: 0; border-bottom: 0; transform: translateY(3px); }
 .menu-btn:focus-visible, .lang:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.menu { position: absolute; left: 0; right: 0; top: 100%; max-height: calc(100svh - var(--bar-h)); overflow-y: auto; overscroll-behavior: contain;
+.menu { position: absolute; left: 0; right: 0; top: 100%; max-height: calc(100vh - var(--bar-h)); max-height: calc(100svh - var(--bar-h)); overflow-y: auto; overscroll-behavior: contain;
   background: #d5ddef;
   border-bottom: 1px solid var(--ink); box-shadow: 0 40px 60px -40px rgba(14, 15, 20, .35); padding-block: clamp(20px, 3vw, 36px) clamp(28px, 4vw, 48px); }
 .menu[hidden] { display: none; }
@@ -185,7 +185,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 /* ---------------------------------------------------------------- cover · the work */
 .hero { position: relative; height: 460vh; overflow: clip; }  /* the turn takes about three screens of scroll */
 /* the cover sits on the page's own light (body::before), so the eyepiece floats in the haze */
-.hero-stage { position: sticky; top: 0; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate; }
+.hero-stage { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate; }
 .seq { position: absolute; z-index: 1; left: calc(var(--cx, 62%) - var(--d, 70vh) / 2); top: calc(var(--cy, 50%) - var(--d, 70vh) / 2);
   width: var(--d, 70vh); height: var(--d, 70vh); opacity: 0; transition: opacity 1s ease; }
 .hero[data-cover="on"] .seq { opacity: 1; }
@@ -289,7 +289,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
 .pp-cap { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 14px 0 18px; font: 14px/1.5 var(--f-text); color: #b9c0d2; }
 .pp-cap b { font: 500 10.5px/1.9 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: #eef1f8; }
 @media (max-aspect-ratio: 4/5) {
-  .photo-plate img { height: min(150vw, 94svh); object-position: 50% 0; }
+  .photo-plate img { height: min(150vw, 94vh); height: min(150vw, 94svh); object-position: 50% 0; }
   .pp-over { top: auto; bottom: 24px; left: 18px; transform: none; max-width: calc(100% - 36px); }
 }
 
@@ -669,7 +669,7 @@ mark { color: inherit; background: none; padding: 0 .06em; box-decoration-break:
   body { font-size: 16px; }
   .wordmark { font-size: 23px; }
   .run-btn { padding: 0 12px; }
-  .hero { min-height: max(100svh, 600px); }
+  .hero { min-height: max(100vh, 600px); min-height: max(100svh, 600px); }
   .hero-copy { gap: 12px; }
   .hero-corner-r { display: none; }
   .hero-hint { bottom: 18px; font-size: 10px; letter-spacing: .1em; }

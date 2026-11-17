@@ -171,7 +171,12 @@ a.v:hover { color: var(--lead); }
 .ct-copy:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .ct-bound { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 5vw, 80px); align-items: end; padding-block: clamp(32px, 4vw, 56px) clamp(56px, 7vw, 96px); }
 .ct-bound > * { min-width: 0; }
-.ct-bound > p { font-family: var(--f-text); font-size: 18px; line-height: 1.6; color: var(--ink-2); margin: 0; max-width: 32em; }
+.ct-bound > p, .ct-privacy-text p { font-family: var(--f-text); font-size: 18px; line-height: 1.6; color: var(--ink-2); margin: 0; max-width: 32em; }
+/* privacy: the same two columns as the boundary note below it */
+.ct-privacy { padding-bottom: clamp(8px, 1.4vw, 20px); scroll-margin-top: calc(var(--bar-h) + 12px); }
+.ct-privacy-text { display: grid; gap: 14px; }
+.ct-privacy-text a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--lead-line); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.ct-privacy-text a:hover { text-decoration-color: currentColor; }
 
 /* ======================================================================= 404: an errata slip */
 .nf { padding-block: calc(var(--bar-h) + clamp(40px, 7vw, 96px)) clamp(56px, 8vw, 110px); }

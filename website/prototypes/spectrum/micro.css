@@ -54,8 +54,10 @@
 .mr-dial { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--ink-3); font: 500 12px/1 var(--f-mono); color: var(--ink-2); transition: background .2s, border-color .2s, box-shadow .2s; }
 .mr-opt-l { font: 500 16px/1.35 var(--f-ui); color: var(--ink); }
 .mr-opt:has(input:checked) { border-color: var(--gem-deep); background: rgba(255, 255, 255, .78); }
-.mr-opt:has(input:checked) .mr-dial { background: var(--gem); border-color: var(--gem-deep); color: var(--ink); box-shadow: 0 0 0 4px var(--lead-soft); }
+/* the dial follows its input, so the chosen answer shows without :has() too (browsers from before 2023) */
+.mr-opt input:checked + .mr-dial { background: var(--gem); border-color: var(--gem-deep); color: var(--ink); box-shadow: 0 0 0 4px var(--lead-soft); }
 .mr-opt:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 3px; }
+@supports not selector(:has(a)) { .mr-opt:focus-within { outline: 2px solid var(--ink); outline-offset: 3px; } }
 .mr-judge fieldset:disabled .mr-opt { cursor: default; }
 .mr-judge fieldset:disabled .mr-opt:not(:has(input:checked)) { opacity: .5; }
 .mr-judge fieldset:disabled .mr-opt:hover { border-color: var(--hair-2); }

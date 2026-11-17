@@ -4,7 +4,7 @@ import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
-import { minifyCss, shareCardFor, withShareImage } from "../src/cli/spectrum-site.js";
+import { journalFeed, keepLanguage, localizeMarkup, minifyCss, shareCardFor, withAlternateLocale, withShareImage } from "../src/cli/spectrum-site.js";
 import { arroganceSectionId, beyondWinningSectionId, learningAccessSectionId } from "../src/cli/blog-series.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
@@ -99,7 +99,7 @@ test("public data and discovery files are unchanged by the redesign", async () =
     const chinese = `${SITE_URL}/zh-cn/blog/${slug}/`;
     assert.ok(article.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), route);
     assert.ok(article.includes(`<link rel="alternate" hreflang="en" href="${english}">`), route);
-    assert.ok(article.includes(`<link rel="alternate" hreflang="zh-CN" href="${chinese}">`), route);
+    assert.ok(article.includes(`<link rel="alternate" hreflang="zh-Hans" href="${chinese}">`), route);
     const head = article.slice(0, article.indexOf("</head>"));
     assert.ok(head.includes(`assets/share/essay-access-${locale ? "zh" : "en"}.jpg`), `essay share card: ${route}`);
     assert.match(head, /<meta name="twitter:card" content="summary_large_image">/u);
@@ -138,7 +138,7 @@ test("public data and discovery files are unchanged by the redesign", async () =
     assert.ok(article.includes("Arrogance Is Not What You Need"));
     assert.ok(article.includes("傲慢是你所不需要的"));
     assert.ok(article.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), route);
-    assert.ok(article.includes(`<link rel="alternate" hreflang="zh-CN" href="${SITE_URL}/zh-cn/blog/${arrogance}/">`), route);
+    assert.ok(article.includes(`<link rel="alternate" hreflang="zh-Hans" href="${SITE_URL}/zh-cn/blog/${arrogance}/">`), route);
     const head = article.slice(0, article.indexOf("</head>"));
     assert.ok(head.includes(`assets/share/essay-arrogance-${locale ? "zh" : "en"}.jpg`), `essay share card: ${route}`);
     assert.ok(!head.includes(slug), `inherited prior essay metadata: ${route}`);
@@ -168,7 +168,7 @@ test("public data and discovery files are unchanged by the redesign", async () =
     assert.ok(article.includes("After You’ve Beaten Everyone, Then What?"));
     assert.ok(article.includes("当你赢过所有人之后呢？"));
     assert.ok(article.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), route);
-    assert.ok(article.includes(`<link rel="alternate" hreflang="zh-CN" href="${SITE_URL}/zh-cn/blog/${winning}/">`), route);
+    assert.ok(article.includes(`<link rel="alternate" hreflang="zh-Hans" href="${SITE_URL}/zh-cn/blog/${winning}/">`), route);
     const head = article.slice(0, article.indexOf("</head>"));
     assert.ok(head.includes(`assets/share/essay-winning-${locale ? "zh" : "en"}.jpg`), `essay share card: ${route}`);
     assert.ok(!head.includes(arrogance), `inherited prior essay metadata: ${route}`);
@@ -177,7 +177,7 @@ test("public data and discovery files are unchanged by the redesign", async () =
       assert.ok(article.includes(`https://doi.org/${doi}`), `source link ${doi}`);
     }
     assert.ok(article.includes("assets/journal/podium.webp"), "cover plate");
-    assert.ok(article.includes("期刊 · 第 1 篇，共 7 篇"), "essay number");
+    assert.ok(article.includes(locale ? "期刊 · 第 1 篇，共 7 篇" : "Journal · Essay 1 of 7"), "essay number");
     const index = await page(`${locale}blog/index.html`);
     assert.ok(index.indexOf(`href="${winning}/"`) >= 0 && index.indexOf(`href="${winning}/"`) < index.indexOf(`href="${arrogance}/"`), "newest essay leads the Journal index");
     const home = await page(`${locale}index.html`);
@@ -368,4 +368,120 @@ test("an old page's own preview image is replaced by the card, not doubled", () 
   assert.equal(out.match(/og:image"/gu)?.length, 1);
   assert.equal(out.match(/twitter:image"/gu)?.length, 1);
   assert.match(out, /content="https:\/\/example\.org\/tb\/assets\/share\/essay-en\.jpg"/u);
+});
+
+// The sources write every passage twice (class "en" and class "zh"). A published page keeps its own
+// language only, so tools that ignore CSS (reader views, read-later apps, crawlers that do not render)
+// get one language, not both interleaved.
+const OTHER_LANGUAGE = { en: /<[a-zA-Z][^<>]*\sclass="(?:[^"]*\s)?zh(?:\s[^"]*)?"/u, zh: /<[a-zA-Z][^<>]*\sclass="(?:[^"]*\s)?en(?:\s[^"]*)?"/u };
+
+test("each published page holds one language; only the 404 pages keep both", async () => {
+  const files = (await htmlFiles(spectrum)).filter((file) => !file.startsWith("spectrum/"));
+  assert.ok(files.length > 100);
+  for (const file of files) {
+    const html = (await page(file)).replace(/<script\b[\s\S]*?<\/script>/gu, "");
+    if (html.includes('http-equiv="refresh"')) continue;   // an old address that only forwards
+    if (file.endsWith("404.html")) {
+      // served for any missing address, in either language
+      assert.match(html, OTHER_LANGUAGE.en, file);
+      assert.match(html, OTHER_LANGUAGE.zh, file);
+      continue;
+    }
+    const language = file.startsWith("zh-cn/") ? "zh" : "en";
+    assert.doesNotMatch(html, OTHER_LANGUAGE[language], file);
+    assert.match(html, OTHER_LANGUAGE[language === "en" ? "zh" : "en"], `${file} lost its own language`);
+    assert.doesNotMatch(html, /<(?:pre|code|kbd|samp)(?![^>]*\stranslate="no")[\s>]/u, `${file}: code without translate="no"`);
+  }
+  const home = await page("index.html");
+  const chineseHome = await page("zh-cn/index.html");
+  // what Chinese is left on an English page is meant to be there, and says so with lang="zh-CN"
+  const unmarked = home.replace(/<script\b[\s\S]*?<\/script>/gu, "").replace(/<[^>]*\slang="zh-CN"[^>]*>[^<]*/gu, "").replace(/<[^>]*>/gu, "");
+  assert.doesNotMatch(unmarked, /[一-鿿]/u, "Chinese text left on the English home page");
+  assert.match(chineseHome, /<html[^>]*\slang="zh-CN"/u);
+  assert.match(home, /<html[^>]*\slang="en"/u);
+});
+
+test("keepLanguage drops the other language's elements and nothing else", () => {
+  const source = [
+    '<p><span class="en">Hello <b>there</b></span><span class="zh" lang="zh-CN">你好<br><img src="a.png" alt=""></span></p>',
+    '<!-- <span class="zh"> stays, it is a comment -->',
+    '<script>var s = \'<span class="zh">kept</span>\';</script>',
+    '<div class="card zh wide"><div class="en">nested</div><div>x</div></div>',
+    '<a class="menu-zh" href="#">not a language class</a>',
+  ].join("\n");
+  const english = keepLanguage(source, "en");
+  assert.ok(english.includes('<p><span class="en">Hello <b>there</b></span></p>'));
+  assert.ok(english.includes("<!-- <span class=\"zh\"> stays, it is a comment -->"));
+  assert.ok(english.includes("<script>var s = '<span class=\"zh\">kept</span>';</script>"));
+  assert.doesNotMatch(english, /card zh wide|nested/u);
+  assert.ok(english.includes('<a class="menu-zh" href="#">not a language class</a>'));
+  const chinese = keepLanguage(source, "zh");
+  assert.ok(chinese.includes('<p><span class="zh" lang="zh-CN">你好<br><img src="a.png" alt=""></span></p>'));
+  assert.ok(chinese.includes('<div class="card zh wide"><div>x</div></div>'));
+  // markup that does not nest is a mistake in the source, not something to guess at
+  assert.throws(() => keepLanguage('<span class="zh"><b>broken</span>', "en", "broken.html"), /broken\.html/u);
+});
+
+test("labels, placeholders and option text are written in the page's language", async () => {
+  const tag = '<input type="search" aria-label="Search" data-aria-label-en="Search models" data-aria-label-zh="搜索模型" data-ph-en="Name" data-ph-zh="名称">';
+  assert.match(localizeMarkup(tag, "zh"), /^<input placeholder="名称" type="search" aria-label="搜索模型" /u);
+  assert.match(localizeMarkup(tag, "en"), /aria-label="Search models"/u);
+  assert.equal(
+    localizeMarkup('<option value="a" data-text-en="All" data-text-zh="全部">All</option>', "zh"),
+    '<option value="a" data-text-en="All" data-text-zh="全部">全部</option>',
+  );
+  assert.equal(localizeMarkup('<pre class="x">a</pre><code translate="yes">b</code><codex>', "en"), '<pre translate="no" class="x">a</pre><code translate="yes">b</code><codex>');
+  const models = await page("zh-cn/models/index.html");
+  assert.doesNotMatch(models.replace(/<script\b[\s\S]*?<\/script>/gu, ""), /(?:aria-label|placeholder)="(?:Search|Filter|All)[^"]*"/u);
+});
+
+test("the Chinese About page finds its film poster on phones, and the favicon exists", async () => {
+  const about = await page("zh-cn/about/index.html");
+  const poster = /data-poster-m="([^"]+)"/u.exec(about)?.[1];
+  assert.ok(poster, "no phone poster on the Chinese About page");
+  assert.ok(await isFile(join(spectrum, posix.join("zh-cn/about", poster))), `phone poster missing: ${poster}`);
+  assert.ok(await isFile(join(spectrum, "favicon.ico")));
+});
+
+test("search and share metadata name the script, not one region, and point at the other language", async () => {
+  for (const file of ["index.html", "zh-cn/index.html", "about/index.html", "zh-cn/blog/index.html"]) {
+    const html = await page(file);
+    assert.doesNotMatch(html, /hreflang="zh-CN"/u, file);
+    assert.match(html, /<link rel="alternate" hreflang="zh-Hans" href="https:\/\/example\.org\/tb\/zh-cn\//u, file);
+    const zh = file.startsWith("zh-cn/");
+    assert.ok(html.includes(`<meta property="og:locale:alternate" content="${zh ? "en_US" : "zh_CN"}">`), file);
+  }
+  assert.doesNotMatch(await readFile(join(spectrum, "sitemap.xml"), "utf8"), /hreflang="zh-CN"/u);
+  const plain = '<meta property="og:locale" content="en_US">';
+  assert.equal(withAlternateLocale(plain), plain, "a page without a translation names no alternate");
+});
+
+test("the language redirect keeps the reader's query and anchor", async () => {
+  const home = await page("index.html");
+  assert.ok(home.includes("location.replace(location.origin + other + location.search + location.hash)"));
+});
+
+test("the Journal has a feed in each language, linked from its pages", async () => {
+  for (const [prefix, language] of [["", "en"], ["zh-cn/", "zh-CN"]] as const) {
+    const address = `${SITE_URL}/${prefix}blog/feed.xml`;
+    const feed = await readFile(join(spectrum, prefix, "blog", "feed.xml"), "utf8");
+    assert.match(feed, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<rss version="2\.0"/u);
+    assert.ok(feed.includes(`<language>${language}</language>`));
+    assert.ok(feed.includes(`<atom:link href="${address}" rel="self" type="application/rss+xml"/>`));
+    const links = [...feed.matchAll(/<item>\n<title>([^<]+)<\/title>\n<link>([^<]+)<\/link>/gu)];
+    assert.ok(links.length >= 7, `${prefix}feed has ${links.length} essays`);
+    for (const [, title = "", link = ""] of links) {
+      assert.ok(link.startsWith(`${SITE_URL}/${prefix}blog/`), link);
+      assert.ok(await isFile(join(spectrum, link.slice(SITE_URL.length + 1), "index.html")), link);
+      assert.doesNotMatch(title, /Teachometry/u, "the site name belongs to the channel, not to each title");
+    }
+    const dates = [...feed.matchAll(/<pubDate>([^<]+)<\/pubDate>/gu)].map((match) => Date.parse(match[1] ?? ""));
+    assert.ok(dates.every((date) => Number.isFinite(date)));
+    assert.deepEqual(dates, [...dates].sort((a, b) => b - a), "newest essay first");
+    for (const file of [`${prefix}blog/index.html`, `${prefix}blog/after-you-have-beaten-everyone/index.html`]) {
+      assert.match(await page(file), new RegExp(`<link rel="alternate" type="application/rss\\+xml" title="[^"]+" href="${address.replaceAll(".", "\\.")}">`, "u"), file);
+    }
+    assert.doesNotMatch(await page(`${prefix}index.html`), /application\/rss\+xml/u);
+  }
+  assert.equal(journalFeed(new Map(), false), undefined);
 });

@@ -46,8 +46,9 @@
 .cx-opt:hover { color: var(--ink); }
 .cx-opt input { width: 14px; height: 14px; margin: 0; accent-color: var(--lead); }
 .cx-opt small { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
-.cx-opt:has(input:checked) { color: var(--ink); }
-.cx-opt:has(input:checked) small { color: var(--lead); }
+/* sibling selectors rather than :has(), so the ticked state also shows in browsers from before 2023 */
+.cx-opt input:checked ~ span { color: var(--ink); }
+.cx-opt input:checked ~ small { color: var(--lead); }
 .cx-reset { margin-top: 16px; height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--hair-2); background: transparent; font: 500 12.5px/1 var(--f-ui); color: var(--ink-2); cursor: pointer; }
 .cx-reset:hover { border-color: var(--lead); color: var(--lead); }
 

@@ -9,6 +9,7 @@ import {
 } from "../contracts/index.js";
 import {
   resolveSiteLocale,
+  siteHreflang,
   siteText,
   type SiteLocale,
   type SiteUiTextKey,
@@ -226,6 +227,7 @@ function structuredDataForPage(
       description: page.description,
       url: canonicalUrl,
       mainEntityOfPage: canonicalUrl,
+      inLanguage: locale,
       ...(page.seo.publishedDate === undefined ? {} : { datePublished: page.seo.publishedDate }),
       ...(page.seo.image === undefined ? {} : { image: absoluteSiteUrl(siteUrl, page.seo.image) }),
       author: {
@@ -705,7 +707,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <meta property="og:description" content="${escapeHtml(localizedPage.description)}">
     <meta property="og:locale" content="${locale === "zh-CN" ? "zh_CN" : "en_US"}">
     ${canonicalUrl === undefined ? "" : `<meta property="og:url" content="${escapeHtml(canonicalUrl)}"><link rel="canonical" href="${escapeHtml(canonicalUrl)}">`}
-    ${siteUrl === undefined || !localizedRoutes || shouldNoIndex ? "" : `<link rel="alternate" hreflang="en" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "en")))}"><link rel="alternate" hreflang="zh-CN" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "zh-CN")))}"><link rel="alternate" hreflang="x-default" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "en")))}">`}
+    ${siteUrl === undefined || !localizedRoutes || shouldNoIndex ? "" : `<link rel="alternate" hreflang="en" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "en")))}"><link rel="alternate" hreflang="${siteHreflang("zh-CN")}" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "zh-CN")))}"><link rel="alternate" hreflang="x-default" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "en")))}">`}
     ${socialImageUrl === undefined ? "" : `<meta property="og:image" content="${escapeHtml(socialImageUrl)}">`}
     ${page.seo?.publishedDate === undefined ? "" : `<meta property="article:published_time" content="${escapeHtml(page.seo.publishedDate)}">`}
     <meta name="twitter:card" content="${socialImageUrl === undefined ? "summary" : "summary_large_image"}">

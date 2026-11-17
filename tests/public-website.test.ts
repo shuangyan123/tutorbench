@@ -158,7 +158,7 @@ test("site-wide locale switch renders static zh-CN pages with direct route targe
   assert.match(chinese, /data-locale-en-url="\/" data-locale-zh-cn-url="\/zh-cn\//u);
   assert.match(chinese, /<link rel="canonical" href="https:\/\/teachometry\.com\/zh-cn\//u);
   assert.match(chinese, /hreflang="en" href="https:\/\/teachometry\.com\//u);
-  assert.match(chinese, /hreflang="zh-CN" href="https:\/\/teachometry\.com\/zh-cn\//u);
+  assert.match(chinese, /hreflang="zh-Hans" href="https:\/\/teachometry\.com\/zh-cn\//u);
   assert.doesNotMatch(chinese, /locale-zh-cn\.js/u);
 
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
@@ -1199,7 +1199,7 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/<\/loc>/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/blog\/when-learning-starts-to-feel-like-failure\/<\/loc>/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/zh-cn\/<\/loc>/u);
-    assert.match(sitemap, /hreflang="zh-CN" href="https:\/\/shuangyan123\.github\.io\/tutorbench\/zh-cn\/"/u);
+    assert.match(sitemap, /hreflang="zh-Hans" href="https:\/\/shuangyan123\.github\.io\/tutorbench\/zh-cn\/"/u);
     assert.match(sitemap, /xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml"/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/data\/cases\/fraction-misconception-001\/<\/loc>/u);
     assert.doesNotMatch(sitemap, /\[modelId\]|\[trialId\]|404\.html/u);
