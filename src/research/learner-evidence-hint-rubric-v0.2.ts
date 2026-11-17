@@ -52,7 +52,7 @@ function mathStatementNeedsReview(text: string): {
 } | undefined {
   // Only compare explicit integer equalities; this is not a general symbolic verifier.
   for (const clause of text.match(/[^。！？!?；;\n]+[。！？!?；;\n]?/gu) ?? []) {
-    for (const match of clause.matchAll(/(?<![\p{L}\p{N}_])(-?\d+)\s*[=＝]\s*(-?\d+)(?![\p{L}\p{N}_])/gu)) {
+    for (const match of clause.matchAll(/(?<![[\p{L}--\p{Script=Han}]\p{N}_])(-?\d+)\s*[=＝]\s*(-?\d+)(?![[\p{L}--\p{Script=Han}]\p{N}_])/gv)) {
       // A numeric tail in "3 × 4 = 12" or head in "7 = 3 + 4" is not
       // itself a standalone integer equality; do not verify it as one.
       const start = match.index ?? 0;
