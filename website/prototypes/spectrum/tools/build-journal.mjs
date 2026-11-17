@@ -453,7 +453,7 @@ function contentsPage() {
   const main = `<main id="main">
   <header class="wrap jx-head">
     <p class="kicker essay-meta"><span class="issue">${biE("The journal")}</span><span class="rule" aria-hidden="true"></span><span>${bi(`${BLOG_POSTS.length} essays`, `${BLOG_POSTS.length} 篇文章`)}</span></p>
-    <h1 class="essay-title">${bi(`${esc("Ideas that should become")} <em>${esc("testable questions.")}</em>`, `${esc(Z("Ideas that should become"))}<em>${esc(Z("testable questions."))}</em>`)}</h1>
+    <h1 class="essay-title">${bi(`${esc("Ideas that should become")} <em>${esc("testable questions.")}</em>`, `${esc(Z("Ideas that should become"))}<wbr><em>${esc(Z("testable questions."))}</em>`)}</h1>
     ${biP("p", "essay-dek", esc("The benchmark should stay evidence-first. The blog is where we make the underlying hypotheses explicit: what teaching is, what AI might change, and what would have to be measured before stronger claims are justified."), esc(Z("The benchmark should stay evidence-first. The blog is where we make the underlying hypotheses explicit: what teaching is, what AI might change, and what would have to be measured before stronger claims are justified.")))}
   </header>
 

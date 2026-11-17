@@ -165,7 +165,7 @@ function runPage() {
     <div class="wrap essay-grid">
       <div>
         <p class="essay-meta kicker"><span class="issue">${biE("Run · Get started")}</span><span class="rule" aria-hidden="true"></span><span>Node 24 · ${esc(DATASET)}</span></p>
-        <h1 class="essay-title" id="run-title">${bi("From research questions to <em>reproducible runs.</em>", `${esc(Z("From research"))}${esc(Zor("questions to", "问题走向"))}<em>${esc(Z("reproducible runs."))}</em>`)}</h1>
+        <h1 class="essay-title" id="run-title">${bi("From research questions to <em>reproducible runs.</em>", `从研究问题<wbr>走向<wbr><em>${esc(Z("reproducible runs."))}</em>`)}</h1>
         ${biPE("p", "rn-lede", "Run TutorBench locally, then connect an external Tutor to the Tutor Health workflow to diagnose concrete teaching failures in authored real-world scenarios. The canonical benchmark and frozen-evidence paths remain available as the underlying reproducibility layer.")}
         <p class="cx-actions"><a class="cta cta-ink" href="#quickstart">${biE("Run locally now")} ${ARROW}</a><a class="cta cta-line" href="../docs/index.html">${biE("View the documentation")}</a></p>
         <ul class="rn-signals" ${attr2("aria-label", "Run principles")}><li>${biE("Open source")}</li><li>${biE("Transparent evaluation")}</li><li>${biE("Evidence-first")}</li></ul>
