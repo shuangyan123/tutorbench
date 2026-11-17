@@ -162,7 +162,7 @@ function aboutPage() {
     <div class="wrap">
       <p class="essay-meta kicker"><span class="issue">${biE("About Teachometry")}</span><span class="rule" aria-hidden="true"></span><span>${bi("Open measurement infrastructure for AI tutoring", "面向 AI 教学的开放测量基础设施")}</span></p>
       <div class="ab-head-grid">
-        <h1 class="essay-title" id="about-title">${bi(`A model can know the answer <em>without being a good tutor.</em>`, `${esc(Z("A model can know"))}${esc(Z("the answer"))}<em>${esc(Z("without being"))}${esc(Z("a good tutor."))}</em>`)}</h1>
+        <h1 class="essay-title" id="about-title">${bi(`A model can know the answer <em>without being a good tutor.</em>`, `模型可以<wbr>知道答案<wbr><em>${esc(Z("without being"))}<wbr>${esc(Z("a good tutor.")).replace(" ", "&nbsp;")}</em>`)}</h1>
         <div>
           ${biPE("p", "ab-lede", "Teachometry is open measurement infrastructure for AI tutoring. We evaluate observable tutoring behavior in structured cases—not just whether the answer is right.")}
           <p class="cx-actions"><a class="cta cta-ink" href="../methodology/index.html">${biE("Read our approach")} ${ARROW}</a><a class="cta cta-line" href="../data/index.html">${biE("Explore the benchmark")}</a></p>

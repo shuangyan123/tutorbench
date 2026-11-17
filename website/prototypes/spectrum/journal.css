@@ -24,6 +24,56 @@ a.issue:hover { color: var(--lead-deep); }
 .essay-byline { margin-top: 30px; display: flex; gap: 22px; flex-wrap: wrap; }
 .essay-byline span { color: var(--ink-3); }
 
+/* the byline strip: who and how long on the left, Share at the far end, a hairline above both */
+.essay-by { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 24px; margin-top: 30px; padding-top: 12px; border-top: 1px solid var(--hair-2); }
+.essay-by .essay-byline { margin: 0; row-gap: 6px; }
+
+/* share: one control in the byline's kicker type; its list is a small sheet of hairline rows */
+.essay-share { position: relative; margin-left: auto; }
+.essay-share[hidden] { display: none; }
+.share-btn {
+  appearance: none; -webkit-appearance: none; background: none; border: 0; border-radius: 0; margin: 0 -2px 0 0; padding: 0 2px;
+  min-height: 32px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: var(--ink-2); transition: color .2s;
+}
+.share-btn:hover, .share-btn[aria-expanded="true"] { color: var(--lead-deep); }
+.share-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.share-icon { width: 15px; height: 15px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; }
+.share-btn .share-done, .share-btn[data-state="done"] .share-idle { display: none; }
+.share-btn[data-state="done"] { color: var(--lead); }
+.share-btn[data-state="done"] .share-done { display: inline; }
+
+.share-list {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: max-content; min-width: 216px; max-width: calc(100vw - 2 * var(--gutter));
+  padding: 4px 16px; border-radius: 0 0 4px 4px; border: 1px solid var(--hair-2); border-top-color: var(--ink);
+  background: rgba(236, 240, 250, .92); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 26px 50px -26px rgba(14, 15, 20, .45);
+}
+.share-list[hidden] { display: none; }
+.share-item {
+  appearance: none; -webkit-appearance: none; background: none; border: 0; border-radius: 0; margin: 0; padding: 0; width: 100%;
+  min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 18px; cursor: pointer; text-align: left;
+  font: 400 15px/1.3 var(--f-ui); color: var(--ink); text-decoration: none; transition: color .2s;
+}
+.share-item + .share-item, .share-field + .share-item { border-top: 1px solid var(--hair); }
+.share-item:hover { color: var(--lead-deep); }
+.share-item:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.share-item[hidden] { display: none; }
+.share-out { width: 10px; height: 10px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; color: var(--ink-3); }
+.share-item:hover .share-out { color: inherit; }
+.share-item .share-fail, .share-item[data-state="fail"] .share-idle { display: none; }
+.share-item[data-state="fail"] { color: var(--lead); }
+.share-item[data-state="fail"] .share-fail { display: inline; }
+.share-field { display: block; width: 100%; min-width: 15em; height: 34px; margin: 0 0 8px; padding: 0 2px; border: 0; border-bottom: 1px solid var(--lead); border-radius: 0; background: transparent; font: 400 13px/1 var(--f-mono); color: var(--ink); }
+.share-field[hidden] { display: none; }
+/* focus shows as a heavier rule under the field, in the same ink language */
+.share-field:focus { outline: none; border-bottom-width: 2px; }
+.share-said { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (pointer: coarse) { .share-btn { min-height: 44px; } .share-item { min-height: 48px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .share-list:not([hidden]) { animation: share-in .16s ease-out; }
+  @keyframes share-in { from { opacity: 0; transform: translateY(-4px); } }
+}
+
 /* each essay has its own cover photograph, lit for its own scene; sapphire stays in the interface */
 .cover-plate { margin: 0; justify-self: end; width: min(100%, 380px); }
 .cover-plate img { display: block; width: 100%; height: auto; border-radius: 3px; box-shadow: 0 34px 60px -30px rgba(14, 15, 20, .55), 0 2px 6px rgba(14, 15, 20, .18); }
@@ -301,7 +351,9 @@ a.issue:hover { color: var(--lead-deep); }
 .essay-text .sources .notes-list a:hover { color: var(--lead-deep); border-bottom-color: currentColor; }
 .essay-text .prose strong { font-weight: 600; color: var(--ink); }
 /* Chinese headings: break between words only */
-:root[data-lang="zh"] .essay-title .zh, :root[data-lang="zh"] .essay-text h2 .zh { word-break: keep-all; }
+/* Chinese titles break only where the source marks a word boundary (<wbr> or a space); a run too long for its
+   column still wraps rather than spilling over the column beside it */
+:root[data-lang="zh"] .essay-title .zh, :root[data-lang="zh"] .essay-text h2 .zh { word-break: keep-all; overflow-wrap: anywhere; }
 :root[data-lang="zh"] .ratio .rt-frac, :root[data-lang="zh"] .studies .s-name { font-weight: 600; font-size: 19px; line-height: 1.5; }
 :root[data-lang="zh"] .studies .s-v, :root[data-lang="zh"] .rt-log li { line-height: 1.7; }
 :root[data-lang="zh"] .essay-text .sources .src-h { font-weight: 500; font-size: 12px; line-height: 1.4; letter-spacing: .08em; }

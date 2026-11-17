@@ -138,6 +138,11 @@ covers, figures and captions are new, defined in the generator.
   finished with `render/photo_finish.py`; the rest are typographic exhibits built only from what
   the essay says (lists, progressions, the two-learner example). Constructed exchanges are labelled
   as such; no model output, no scores.
+- Share (`share.js`): the byline sits in a strip under a hairline, with one link-icon "Share" at its
+  far end, so it is there before the essay starts. It opens a short list: copy link, post on X (a
+  plain web intent, opened only when pressed) and the device's own share sheet where the browser
+  has one. It shares the page's canonical address in the page's language. No third-party script,
+  no counter, no tracking; the control stays hidden without script.
 - `journal-sample.html` now redirects to the essay page it became.
 
 ## Methodology (`methodology/`)

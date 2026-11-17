@@ -319,7 +319,7 @@ a.v:hover { color: var(--lead); }
 html[data-lang="zh"] .ab .essay-title em, html[data-lang="zh"] .cm .essay-title em, html[data-lang="zh"] .ct .essay-title em, html[data-lang="zh"] .wk .essay-title em,
 html[data-lang="zh"] .ab-side-note em, html[data-lang="zh"] .ab-quote { font-style: normal; }
 html[data-lang="zh"] .ab .essay-title em, html[data-lang="zh"] .cm .essay-title em, html[data-lang="zh"] .ct .essay-title em, html[data-lang="zh"] .wk .essay-title em { color: var(--lead); }
-html[data-lang="zh"] .ab-head .essay-title { font-size: clamp(40px, 6.4vw, 96px); line-height: 1.08; }
+html[data-lang="zh"] .ab-head .essay-title { font-size: clamp(36px, 5.2vw, 80px); line-height: 1.1; }
 html[data-lang="zh"] .wk-core h3 { font-weight: 600; font-size: clamp(30px, 3.2vw, 46px); line-height: 1.2; }
 html[data-lang="zh"] .wk-core-list h4, html[data-lang="zh"] .wk-rules h3, html[data-lang="zh"] .wk-tier h3 { font-weight: 600; font-size: clamp(19px, 1.7vw, 23px); line-height: 1.4; }
 html[data-lang="zh"] .wk-aside h3 { font-size: 15px; }

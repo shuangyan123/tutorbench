@@ -534,3 +534,34 @@ test("the Journal has a feed in each language, linked from its pages", async () 
   }
   assert.equal(journalFeed(new Map(), false), undefined);
 });
+
+test("every essay offers Share at its start, in its own language, with nothing loaded from elsewhere", async () => {
+  const essays = (await htmlFiles(spectrum)).filter((file) => /^(?:zh-cn\/)?blog\/[^/]+\/index\.html$/u.test(file));
+  let found = 0;
+  for (const file of essays) {
+    const html = await page(file);
+    if (!html.includes('class="essay-head"')) continue;   // an old address that redirects to its essay
+    found += 1;
+    const zh = file.startsWith("zh-cn/");
+    const row = /<div class="essay-share" data-share[^>]*>[\s\S]*?data-share-said[^>]*><\/span>/u.exec(html)?.[0] ?? "";
+    assert.ok(row, `${file}: no share control`);
+    // at the end of the byline strip, before the cover: the reader sees it before the essay starts
+    const at = html.indexOf(row);
+    assert.ok(html.indexOf("essay-byline") < at && at < html.indexOf('class="cover-plate"'), `${file}: share control out of place`);
+    // hidden until share.js runs, since none of its controls work without it; the list opens on demand
+    assert.match(row, /^<div class="essay-share" data-share hidden>/u, file);
+    assert.match(row, /<button type="button" class="share-btn kicker" data-share-toggle aria-expanded="false" aria-controls="share-list">/u, file);
+    assert.match(row, /<div class="share-list" id="share-list" data-share-list [^>]*hidden>/u, file);
+    assert.ok(row.includes(zh ? ">分享<" : ">Share<"), `${file}: share label language`);
+    assert.match(html, /<script src="(?:\.\.\/)+share\.js"><\/script>/u, file);
+    assert.ok(row.includes(zh ? "复制链接" : "Copy link") && !row.includes(zh ? "Copy link" : "复制链接"), `${file}: share row language`);
+    assert.ok(row.includes(`aria-label="${zh ? "分享这篇文章" : "Share this essay"}"`), file);
+    assert.match(row, /href="https:\/\/x\.com\/intent\/tweet" target="_blank" rel="noopener noreferrer"/u, file);
+    for (const [, src = ""] of html.matchAll(/<script\b[^>]*\ssrc="([^"]+)"/gu)) assert.doesNotMatch(src, /^(?:https?:)?\/\//u, `${file}: script from elsewhere`);
+  }
+  assert.ok(found >= 14, `share control on ${found} essay pages`);
+  // the script only copies, opens the share sheet, or builds the X link: it sends nothing anywhere
+  const script = await readFile(join(spectrum, "share.js"), "utf8");
+  assert.doesNotMatch(script, /fetch\(|XMLHttpRequest|sendBeacon|WebSocket|createElement\("script"\)|new Image/u);
+  assert.doesNotMatch(await page("blog/index.html"), /data-share/u, "the contents page has no share control");
+});
