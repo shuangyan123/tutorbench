@@ -1,4 +1,4 @@
-# Learner-evidence hint fit v0.2.0
+# Learner-evidence hint fit v0.2.1
 
 **Experimental · Offline · Deterministic · Not canonical**
 
@@ -12,13 +12,16 @@ three learner-evidence conditions on a single equation-hint case.
 
 Development used the 2026-11-13 maintainer review of the original equation-hint
 case, 14 original development replies, and the three authored learner-evidence
-contrasts. Nine additional authored replies exercise the v0.2.0 design. Each
+contrasts. Nine additional authored replies exercise the v0.2 development design. The
+v0.2.1 revision additionally has independent, author-written negative probes
+for factual contradictions, semantically unrelated explanation words, and
+explicitly corrected bad examples. Each
 of the 23 development replies has an expected judgment in each of the three
 conditions (69 judgments).
 
-The maintainer had completed and frozen 30 held-out judgments before v0.2.0
+The maintainer had completed and frozen 30 held-out judgments before v0.2.1
 was written. Aggregate information from that review had already entered the
-discussion and may have influenced the design. The v0.2.0 implementation did
+discussion and may have influenced the design. The v0.2.1 implementation did
 not directly inspect the frozen reference. The original review remains valid
 as a frozen record of the maintainer's judgments, and its audit trail remains
 intact. The existing cohort can support an exploratory paired comparison.
@@ -32,26 +35,37 @@ rule's development.
    one reasonable first-step cue. One local success supports transfer prompts
    while leaving stable mastery and equality understanding unestablished.
    A reported unresolved equality question requires a concept explanation.
-2. **Broaden explanation coverage.** Recognize signals for balances, trays,
-   weights, small numeric equalities, plain-language explanations, and guided
-   comparisons of changing one side versus both sides.
-3. **Reject recognized asymmetric operations.** The rule checks for a claimed
-   valid one-sided operation or unequal subtraction amounts.
+2. **Constrain explanation coverage.** Recognize balances, trays, weights,
+   numeric equalities, plain-language explanations and guided comparisons,
+   but require the relevant evidence in one clause or adjacent clauses,
+   rather than joining keywords across unrelated sentences.
+3. **Reject unambiguous mathematical errors.** Explicit false integer
+   equalities receive FAIL; possible counterexamples or hypothetical
+   statements receive ABSTAIN. This is not a general algebra verifier.
+   Recognized one-sided or unequal operations remain FAIL when presented
+   as valid instructions. If a reply explicitly rejects the incorrect
+   operation, use ABSTAIN pending assessment of the correction.
 4. **Retain conservative boundaries.** Contradictory text, unsupported claims
    about mastery, ungrounded references to earlier work, and completed first
    calculations follow the existing failure or abstention paths.
 5. **Use the shared answer-disclosure guard.** The rule calls the TutorEval
    deterministic evaluator with the experiment's configured disclosure rubric.
 
-These text signals have limited coverage of paraphrases, negation, and
-mathematical errors. In particular, numeric explanation recognition does not
-validate the arithmetic in the example. The controls measure the behavior of
-these specific rules. In a synthetic probe, the revision returned PASS for
-subtracting 3 from both sides of `7 = 8` and claiming `4 = 5` is still an
-equality. It also accepted a reply in the unresolved-gap condition where
-balance keywords appeared in separate statements about labels and the reply
-then repeated the operation. These cases remain open for independent review.
-The development checks do not establish held-out accuracy or learning gains.
+These text signals still have limited coverage of paraphrases, scope,
+negation and mathematics outside explicitly bounded integer equalities.
+In an independent pre-fix audit, v0.2.0 incorrectly passed `7 = 8` to
+`4 = 5` described as equal, assembled unrelated balance keywords into a
+spurious explanation, and failed a reply explicitly correcting an invalid
+one-sided operation. The v0.2.1 code now returns FAIL for the clear false
+equality and ABSTAIN for the scattered-keyword and corrective examples.
+Both the older v0.2.0 candidate and the regression evidence remain
+traceable by their Git SHAs. More complex errors and ambiguous corrective
+statements can still escape detection; this rubric is not a math solver.
+
+The 69 original authored A/B/C development judgments remain unchanged. New
+synthetic negative tests guard the three additional behaviors. The development
+checks do not establish held-out accuracy, reviewer independence, or learning
+gains.
 
 ## Compatibility and historical reproduction
 
@@ -69,9 +83,12 @@ This checkout combines the manifest's pinned v0.1.0 sources with the frozen
 packet tooling and evaluator `0.3a.5`. The original evaluator matters
 because the manifest hashes the rubric source but does not pin all its
 transitive imports. A build from a newer checkout has a different runtime
-even when every manifest file still hashes correctly.
+even when every manifest file still hashes correctly. The current
+`baseline` and `compare` commands on the #375 branch now refuse execution
+unless `TUTOR_EVAL_EVALUATOR_VERSION` is `0.3a.5`; the original historical
+checkout remains the reproducible reference.
 
-For a later authorized exploratory comparison, build v0.2.0 in its own
+For a later authorized exploratory comparison, build v0.2.1 in its own
 validated checkout and pass the absolute path to the compiled revision
 module to the existing comparison tool in the historical checkout. Keep the
 candidate's compiled dependency tree in place so its imports resolve to
