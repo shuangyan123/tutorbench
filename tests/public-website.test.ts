@@ -158,7 +158,7 @@ test("site-wide locale switch renders static zh-CN pages with direct route targe
   assert.match(chinese, /data-locale-en-url="\/" data-locale-zh-cn-url="\/zh-cn\//u);
   assert.match(chinese, /<link rel="canonical" href="https:\/\/teachometry\.com\/zh-cn\//u);
   assert.match(chinese, /hreflang="en" href="https:\/\/teachometry\.com\//u);
-  assert.match(chinese, /hreflang="zh-CN" href="https:\/\/teachometry\.com\/zh-cn\//u);
+  assert.match(chinese, /hreflang="zh-Hans" href="https:\/\/teachometry\.com\/zh-cn\//u);
   assert.doesNotMatch(chinese, /locale-zh-cn\.js/u);
 
   const siteScript = await readFile(join(process.cwd(), "website", "src", "site.js"), "utf8");
@@ -704,7 +704,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(contactHtml, /<title>Contact — Teachometry<\/title>/);
     assert.match(contactHtml, /<body class="about-page contact-page">/);
     assert.match(contactHtml, /href="\/assets\/contact\.css"/);
-    assert.match(contactHtml, /mailto:shuangyan12341234@gmail\.com/u);
+    assert.match(contactHtml, /mailto:contact@teachometry\.com/u);
     assert.match(contactHtml, /https:\/\/x\.com\/1Shuangyan36877/u);
     assert.match(contactHtml, /src="\/assets\/x-logo\.svg"/u);
     assert.match(contactHtml, /class="home-footer"/);
@@ -1185,7 +1185,7 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(homeHtml, /<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">/);
     assert.match(homeHtml, /"@type":"WebSite"/);
     assert.match(homeHtml, /"@type":"Organization"/);
-    assert.match(homeHtml, /"email":"shuangyan12341234@gmail\.com"/u);
+    assert.match(homeHtml, /"email":"contact@teachometry\.com"/u);
     assert.match(homeHtml, /"https:\/\/x\.com\/1Shuangyan36877"/u);
     assert.match(dataHtml, /"@type":"Dataset"/);
     assert.match(dataHtml, /"license":"https:\/\/creativecommons\.org\/licenses\/by\/4\.0\/"/);
@@ -1199,7 +1199,7 @@ test("static website build prefixes project-site paths without changing local de
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/<\/loc>/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/blog\/when-learning-starts-to-feel-like-failure\/<\/loc>/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/zh-cn\/<\/loc>/u);
-    assert.match(sitemap, /hreflang="zh-CN" href="https:\/\/shuangyan123\.github\.io\/tutorbench\/zh-cn\/"/u);
+    assert.match(sitemap, /hreflang="zh-Hans" href="https:\/\/shuangyan123\.github\.io\/tutorbench\/zh-cn\/"/u);
     assert.match(sitemap, /xmlns:xhtml="http:\/\/www\.w3\.org\/1999\/xhtml"/u);
     assert.match(sitemap, /<loc>https:\/\/shuangyan123\.github\.io\/tutorbench\/data\/cases\/fraction-misconception-001\/<\/loc>/u);
     assert.doesNotMatch(sitemap, /\[modelId\]|\[trialId\]|404\.html/u);

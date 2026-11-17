@@ -97,10 +97,11 @@
       if (blobs[j] && !pending[j] && (!bmps[j] || bmpSize[j] !== size)) start(j);
     }
   }
+  var got = 0;   // bytes of cover frames received so far
   function load(k) {
     return window.fetch(DIR + SEQ + pad(k) + ".webp", { priority: "low" })
       .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.blob(); })
-      .then(function (b) { blobs[k] = b; settle(); });
+      .then(function (b) { blobs[k] = b; got += b.size; settle(); });
   }
 
   load(0).catch(function () { hero.setAttribute("data-cover", "off"); });
@@ -108,17 +109,36 @@
   // they will scroll: a light warm-up of the first few frames after the page settles, then every
   // 4th frame so the whole scroll is covered early, then the frames in between. With reduced motion
   // or Save-Data nothing more is fetched.
+  // On a slow connection the sequence stops after every 4th frame (a quarter of the weight): those
+  // are the frames kept decoded for the whole turn, and the cover blends between them as it does
+  // while the others are still on their way. "Slow" is what the browser reports (2g/3g) or what
+  // the frames themselves measured: under 500 KB a second while they were being fetched.
   var queue = [];
   [4, 2, 1].forEach(function (step) {
     for (var j = 0; j < N; j += step) if (queue.indexOf(j) < 0 && j !== 0) queue.push(j);
   });
+  var FILL = queue.length - Math.ceil(N / STEP) + 1;   // what is left once every 4th frame is in
   var conn = window.navigator && window.navigator.connection;
   var saveData = !!(conn && conn.saveData);
-  var limit = 0, inflight = 0;
+  var limit = 0, inflight = 0, busy = 0, busyFrom = 0;
+  function slow() {
+    if (conn && /(^|-)[23]g$/.test(conn.effectiveType || "")) return true;
+    var ms = busy + (inflight ? Date.now() - busyFrom : 0);
+    return ms > 0 && got / ms < 500;
+  }
+  var decided = false;
   function pump() {
+    // the frames in between are asked for only once the first pass is in, and only if it was quick
+    if (!decided && queue.length <= FILL) {
+      if (inflight) return;
+      decided = true;
+      if (slow()) queue.length = 0;
+    }
     while (queue.length && inflight < 4 && limit > 0) {
-      var k = queue.shift(); inflight++; limit--;
-      var next = function () { inflight--; setTimeout(pump, 0); };
+      if (!decided && queue.length <= FILL) break;
+      var k = queue.shift(); limit--;
+      if (!inflight++) busyFrom = Date.now();
+      var next = function () { if (!--inflight) busy += Date.now() - busyFrom; setTimeout(pump, 0); };
       load(k).then(next, next);
     }
   }

@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import process from "node:process";
 import { join } from "node:path";
-import { PROTO, REPO, esc, Z, Zor, bi, biE, biPE, frame } from "./site-kit.mjs";
+import { PROTO, REPO, esc, Z, Zor, bi, biE, biP, biPE, frame } from "./site-kit.mjs";
 
 const { formatPublicCount } = await import(join(REPO, "dist/src/site/public-localization-formatters.js"));
 const { publicArtifactNotice } = await import(join(REPO, "dist/src/site/public-localization.js"));
@@ -430,6 +430,8 @@ function communityPage() {
 
 /* ------------------------------------------------------------------ Contact */
 
+const GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement";
+
 function contactPage() {
   const copyBtn = `<button class="ct-copy" type="button" data-copy-text="${esc(SITE_CONTACT_EMAIL)}" aria-controls="contact-email" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><span data-copy-label aria-live="polite">Copy</span></button>`;
   const CH = [
@@ -456,6 +458,16 @@ function contactPage() {
     <h2 class="jx-h2" id="contact-channels-title">${biE("Choose the channel that fits.")}</h2>
     <div class="ct-channels">
       ${CH.map(([k, h, p, v]) => `<article class="ct-ch"><p class="kicker">${k === "X" || k === "GitHub" ? k : biE(k)}</p><div><h3>${biE(h)}</h3>${biPE("p", "", p)}</div><div class="ct-addr">${v}</div></article>`).join("\n      ")}
+    </div>
+  </section>
+
+  <section class="wrap ct-bound ct-privacy" id="privacy" aria-labelledby="contact-privacy-title">
+    <div>
+      <p class="kicker">${bi("Privacy", "隐私")}</p>
+      <h2 class="jx-h2" id="contact-privacy-title">${bi("No cookies,<br><em>no tracking.</em>", "不设 cookie，<br><em>也不追踪你。</em>")}</h2>
+    </div>
+    <div class="ct-privacy-text">
+      ${biP("p", "", `No analytics, ads or third-party scripts. Settings such as your language stay on your own device. The site is hosted on GitHub Pages, which logs IP addresses for security (<a href="${GITHUB_PRIVACY}" rel="noreferrer">GitHub’s privacy statement</a>).`, `没有统计、广告和第三方脚本。语言等设置只存在你自己的设备上。网站托管在 GitHub Pages，GitHub 会出于安全记录 IP 地址（<a href="${GITHUB_PRIVACY}" rel="noreferrer">隐私声明</a>）。`)}
     </div>
   </section>
 
