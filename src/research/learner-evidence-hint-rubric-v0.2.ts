@@ -51,8 +51,14 @@ function mathStatementNeedsReview(text: string): {
   verdict: "FAIL" | "ABSTAIN"; excerpt: string;
 } | undefined {
   // Only compare explicit integer equalities; this is not a general symbolic verifier.
+  // Node 24 supports Unicode sets; the RegExp constructor avoids a literal
+  // v-flag restriction when compiling to the repository's TypeScript target.
+  const integerEquality = new RegExp(
+    String.raw`(?<![[\p{L}--\p{Script=Han}]\p{N}_])(-?\d+)\s*[=＝]\s*(-?\d+)(?![[\p{L}--\p{Script=Han}]\p{N}_])`,
+    "gv",
+  );
   for (const clause of text.match(/[^。！？!?；;\n]+[。！？!?；;\n]?/gu) ?? []) {
-    for (const match of clause.matchAll(/(?<![[\p{L}--\p{Script=Han}]\p{N}_])(-?\d+)\s*[=＝]\s*(-?\d+)(?![[\p{L}--\p{Script=Han}]\p{N}_])/gv)) {
+    for (const match of clause.matchAll(integerEquality)) {
       // A numeric tail in "3 × 4 = 12" or head in "7 = 3 + 4" is not
       // itself a standalone integer equality; do not verify it as one.
       const start = match.index ?? 0;
