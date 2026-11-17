@@ -467,8 +467,7 @@ function contactPage() {
       <h2 class="jx-h2" id="contact-privacy-title">${bi("No cookies,<br><em>no tracking.</em>", "不设 cookie，<br><em>也不追踪你。</em>")}</h2>
     </div>
     <div class="ct-privacy-text">
-      ${biP("p", "", `This site sets no cookies and runs no analytics, advertising or third-party scripts. Your browser keeps a few small notes on your own device (the language you chose, that the fonts have loaded, your place on the page while you switch language), and none of them is sent anywhere.`, `本站不设 cookie，不做访问统计，没有广告，也没有第三方脚本。浏览器只在你自己的设备上记下几件小事：你选的语言、字体是否已经加载、切换语言时你读到的位置，这些都不会发送到任何地方。`)}
-      ${biP("p", "", `The site is hosted on GitHub Pages, which logs visitors’ IP addresses for security, as <a href="${GITHUB_PRIVACY}" rel="noreferrer">GitHub’s privacy statement</a> describes. An answer you give in the <a href="../micro-review/index.html">Micro-Review</a> never leaves the page.`, `网站托管在 GitHub Pages 上，GitHub 会出于安全目的记录访问者的 IP 地址，详见 <a href="${GITHUB_PRIVACY}" rel="noreferrer">GitHub 的隐私声明</a>。你在<a href="../micro-review/index.html">微评审</a>里给出的回答不会离开页面。`)}
+      ${biP("p", "", `No analytics, ads or third-party scripts. Settings such as your language stay on your own device. The site is hosted on GitHub Pages, which logs IP addresses for security (<a href="${GITHUB_PRIVACY}" rel="noreferrer">GitHub’s privacy statement</a>).`, `没有统计、广告和第三方脚本。语言等设置只存在你自己的设备上。网站托管在 GitHub Pages，GitHub 会出于安全记录 IP 地址（<a href="${GITHUB_PRIVACY}" rel="noreferrer">隐私声明</a>）。`)}
     </div>
   </section>
 
