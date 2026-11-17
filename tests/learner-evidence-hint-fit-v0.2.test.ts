@@ -30,7 +30,7 @@ function evaluateAll(text: string) {
 }
 
 test("v0.2 has a distinct experimental identity and leaves v0.1 untouched", () => {
-  assert.deepEqual(hintRubric, { id: "learner-evidence-hint-fit", version: "0.2.0" });
+  assert.deepEqual(hintRubric, { id: "learner-evidence-hint-fit", version: "0.2.1" });
   assert.notEqual(evaluateV02, evaluateV01);
 });
 
@@ -115,4 +115,41 @@ test("the shared disclosure guard handles CJK adjacency without matching a longe
     assert.ok(result.responseExcerpts.every((excerpt) => leak.includes(excerpt)));
     assert.equal(evaluateV02(pilotCase, "这里用x=40作记号。").verdict, "ABSTAIN");
   }
+});
+
+
+test("incorrect numerical equalities are not accepted as valid explanations", () => {
+  const assertion = "例如 7 = 8，两边同时减去 3 后得到 4 = 5，仍然相等。你试着写出第一步。";
+  const results = evaluateAll(assertion);
+  assert.deepEqual(results.map(({ verdict }) => verdict), ["FAIL", "FAIL", "FAIL"]);
+  for (const result of results) {
+    assert.ok(result.responseExcerpts.every((excerpt) => assertion.includes(excerpt)));
+  }
+  const rejectedCounterexample = "例如 7 = 8 是错误的。想想为什么。";
+  assert.deepEqual(
+    evaluateAll(rejectedCounterexample).map(({ verdict }) => verdict),
+    ["ABSTAIN", "ABSTAIN", "ABSTAIN"],
+  );
+});
+
+test("unrelated balance keywords across sentences do not create an explanation", () => {
+  const scattered = "天平本来是平衡的。现在谈谈天气。每边拿走同样的东西。你试着写出第一步。";
+  assert.deepEqual(
+    evaluateAll(scattered).map(({ verdict }) => verdict),
+    ["ABSTAIN", "ABSTAIN", "ABSTAIN"],
+  );
+  const connected = v02Controls.find((item) => item.id === "balance-trays");
+  assert.ok(connected);
+  assert.equal(evaluateV02(gap, connected.text).verdict, "PASS");
+});
+
+test("rejecting and correcting a false one-sided operation is not itself a false instruction", () => {
+  const correction = "左边减去 3，右边不用动，这样不对。正确做法是两边都减去 3。你来写出第一步。";
+  assert.deepEqual(
+    evaluateAll(correction).map(({ verdict }) => verdict),
+    ["ABSTAIN", "ABSTAIN", "ABSTAIN"],
+  );
+  const asserted = v02Controls.find((item) => item.id === "one-sided-operation-claimed-valid");
+  assert.ok(asserted);
+  assert.deepEqual(evaluateAll(asserted.text).map(({ verdict }) => verdict), ["FAIL", "FAIL", "FAIL"]);
 });
