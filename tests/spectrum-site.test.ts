@@ -373,13 +373,37 @@ test("an old page's own preview image is replaced by the card, not doubled", () 
 // The sources write every passage twice (class "en" and class "zh"). A published page keeps its own
 // language only, so tools that ignore CSS (reader views, read-later apps, crawlers that do not render)
 // get one language, not both interleaved.
+/** The page without its scripts (whose strings may hold either language), cut by position, not by a pattern. */
+function withoutScripts(html: string): string {
+  const lower = html.toLowerCase();
+  let out = "";
+  let at = 0;
+  for (;;) {
+    const start = lower.indexOf("<script", at);
+    if (start < 0) return out + html.slice(at);
+    const end = lower.indexOf("</script", start);
+    if (end < 0) return out + html.slice(at, start);
+    out += html.slice(at, start);
+    at = lower.indexOf(">", end) + 1 || html.length;
+  }
+}
+
+/** The text a reader sees, leaving out text whose element says it is Chinese (lang="zh-CN"). */
+function unmarkedText(html: string): string {
+  let text = "";
+  for (const [, tag = "", after = ""] of withoutScripts(html).matchAll(/<([^>]*)>([^<]*)/gu)) {
+    if (!/\slang="zh-CN"/u.test(tag)) text += after;
+  }
+  return text;
+}
+
 const OTHER_LANGUAGE = { en: /<[a-zA-Z][^<>]*\sclass="(?:[^"]*\s)?zh(?:\s[^"]*)?"/u, zh: /<[a-zA-Z][^<>]*\sclass="(?:[^"]*\s)?en(?:\s[^"]*)?"/u };
 
 test("each published page holds one language; only the 404 pages keep both", async () => {
   const files = (await htmlFiles(spectrum)).filter((file) => !file.startsWith("spectrum/"));
   assert.ok(files.length > 100);
   for (const file of files) {
-    const html = (await page(file)).replace(/<script\b[\s\S]*?<\/script>/gu, "");
+    const html = withoutScripts(await page(file));
     if (html.includes('http-equiv="refresh"')) continue;   // an old address that only forwards
     if (file.endsWith("404.html")) {
       // served for any missing address, in either language
@@ -395,8 +419,7 @@ test("each published page holds one language; only the 404 pages keep both", asy
   const home = await page("index.html");
   const chineseHome = await page("zh-cn/index.html");
   // what Chinese is left on an English page is meant to be there, and says so with lang="zh-CN"
-  const unmarked = home.replace(/<script\b[\s\S]*?<\/script>/gu, "").replace(/<[^>]*\slang="zh-CN"[^>]*>[^<]*/gu, "").replace(/<[^>]*>/gu, "");
-  assert.doesNotMatch(unmarked, /[一-鿿]/u, "Chinese text left on the English home page");
+  assert.doesNotMatch(unmarkedText(home), /[一-鿿]/u, "Chinese text left on the English home page");
   assert.match(chineseHome, /<html[^>]*\slang="zh-CN"/u);
   assert.match(home, /<html[^>]*\slang="en"/u);
 });
@@ -432,7 +455,7 @@ test("labels, placeholders and option text are written in the page's language", 
   );
   assert.equal(localizeMarkup('<pre class="x">a</pre><code translate="yes">b</code><codex>', "en"), '<pre translate="no" class="x">a</pre><code translate="yes">b</code><codex>');
   const models = await page("zh-cn/models/index.html");
-  assert.doesNotMatch(models.replace(/<script\b[\s\S]*?<\/script>/gu, ""), /(?:aria-label|placeholder)="(?:Search|Filter|All)[^"]*"/u);
+  assert.doesNotMatch(withoutScripts(models), /(?:aria-label|placeholder)="(?:Search|Filter|All)[^"]*"/u);
 });
 
 test("the Chinese About page finds its film poster on phones, and the favicon exists", async () => {
