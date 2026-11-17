@@ -1,7 +1,7 @@
 import { evaluateTutorEvalRubric } from "../evaluators/tutor-eval.js";
 import type { HintPilotCase } from "./learner-evidence-hint-scenarios.js";
 
-export const hintRubric = { id: "learner-evidence-hint-fit", version: "0.2.0" } as const;
+export const hintRubric = { id: "learner-evidence-hint-fit", version: "0.2.1" } as const;
 
 const alternatives = {
   unknown: [
@@ -47,29 +47,49 @@ function passage(text: string, pattern: RegExp): string | undefined {
   return clauses.find((clause) => pattern.test(clause))?.trim();
 }
 
+function mathStatementNeedsReview(text: string): {
+  verdict: "FAIL" | "ABSTAIN"; excerpt: string;
+} | undefined {
+  // Only compare explicit integer equalities; this is not a general symbolic verifier.
+  for (const clause of text.match(/[^。！？!?；;\n]+[。！？!?；;\n]?/gu) ?? []) {
+    for (const match of clause.matchAll(/(?<![\p{L}\p{N}_])(-?\d+)\s*[=＝]\s*(-?\d+)(?![\p{L}\p{N}_])/gu)) {
+      if (BigInt(match[1]!) === BigInt(match[2]!)) continue;
+      const isDiscussedAsFalse = /(?:错(?:误|的|了)?|不成立|不相等|不对|不等于|不是|反例|假设|假如|如果|是否|吗[？?]?)/u.test(clause);
+      return { verdict: isDiscussedAsFalse ? "ABSTAIN" : "FAIL", excerpt: clause.trim() };
+    }
+  }
+  return undefined;
+}
+
 function explainsEquality(text: string): boolean {
-  const sameOperation = /(?:两边|左右(?:两)?边|两侧|双方|每边|各边).{0,22}(?:(?:同时|都|各自|各)?(?:减(?:去|掉)?|加(?:上)?|拿走|取走|移走|去掉)|(?:同样|相同|等量).{0,10}(?:减|加|拿走|取走))/u.test(text);
-  const equalityState = /(?:本来|原来|原本).{0,12}(?:相等|相同|一样重|平衡)|(?:仍然|依然|还是|保持).{0,10}(?:相等|相同|一样重|平衡|成立)/u.test(text);
+  // Do not construct a supposed explanation from keywords in unrelated clauses.
+  const clauses = (text.match(/[^。！？!?；;\n]+[。！？!?；;\n]?/gu) ?? [])
+    .map((clause) => clause.trim()).filter(Boolean);
+  const windows = clauses.flatMap((clause, index) =>
+    index + 1 < clauses.length ? [clause, clause + " " + clauses[index + 1]!] : [clause]);
+  return windows.some((passageText) => {
+  const sameOperation = /(?:两边|左右(?:两)?边|两侧|双方|每边|各边).{0,22}(?:(?:同时|都|各自|各)?(?:减(?:去|掉)?|加(?:上)?|拿走|取走|移走|去掉)|(?:同样|相同|等量).{0,10}(?:减|加|拿走|取走))/u.test(passageText);
+  const equalityState = /(?:本来|原来|原本).{0,12}(?:相等|相同|一样重|平衡)|(?:仍然|依然|还是|保持).{0,10}(?:相等|相同|一样重|平衡|成立)/u.test(passageText);
 
   const balanceAnalogy =
-    /天平|砝码|托盘|盘子/u.test(text) &&
-    /相等|一样重|等重|平衡/u.test(text) &&
-    /两边|左右|两侧|每边|各边/u.test(text) &&
-    /同样|相同|等量|一样/u.test(text) &&
-    /拿走|取走|移走|去掉|减去/u.test(text);
+    /天平|砝码|托盘|盘子/u.test(passageText) &&
+    /相等|一样重|等重|平衡/u.test(passageText) &&
+    /两边|左右|两侧|每边|各边/u.test(passageText) &&
+    /同样|相同|等量|一样/u.test(passageText) &&
+    /拿走|取走|移走|去掉|减去/u.test(passageText);
 
   const numericEquality =
-    /(?:\d+\s*[=＝]\s*\d+).{0,55}(?:两边|左右(?:两)?边|两侧).{0,18}(?:同时|都|各自).{0,10}(?:减|加).{0,22}(?:仍然|依然|还是|保持).{0,10}(?:相等|相同|成立)/u.test(text);
+    /(?:\d+\s*[=＝]\s*\d+).{0,55}(?:两边|左右(?:两)?边|两侧).{0,18}(?:同时|都|各自).{0,10}(?:减|加).{0,22}(?:仍然|依然|还是|保持).{0,10}(?:相等|相同|成立)/u.test(passageText);
 
   const guidedOneSideComparison =
-    /(?:只|仅)改(?:变)?一边.{0,16}(?:还|仍然|依然)?(?:能)?相等吗/u.test(text) && sameOperation;
+    /(?:只|仅)改(?:变)?一边.{0,16}(?:还|仍然|依然)?(?:能)?相等吗/u.test(passageText) && sameOperation;
 
-  const plainEqualityExplanation =
-    /(?:两边|左右(?:两)?边|等号两边).{0,18}(?:本来|原来|原本).{0,10}(?:相等|相同)|(?:等号|等式).{0,18}(?:表示|说明|意味着).{0,20}(?:两边|左右).{0,12}(?:相等|相同|数值相同)/u.test(text) &&
-    sameOperation && equalityState;
+  const plainEqualityExplanation = (/(?:两边|左右(?:两)?边|等号两边).{0,18}(?:本来|原来|原本).{0,10}(?:相等|相同)|(?:等号|等式).{0,18}(?:表示|说明|意味着).{0,20}(?:两边|左右).{0,12}(?:相等|相同|数值相同)/u.test(passageText)) && sameOperation && equalityState;
 
   return balanceAnalogy || numericEquality || guidedOneSideComparison ||
-    plainEqualityExplanation || legacyEqualityExplanation.test(text);
+    plainEqualityExplanation || legacyEqualityExplanation.test(passageText);
+
+  });
 }
 
 export function evaluateHintFit(pilotCase: HintPilotCase, text: string) {
@@ -104,11 +124,26 @@ export function evaluateHintFit(pilotCase: HintPilotCase, text: string) {
     ]);
   }
 
+  const numericIssue = mathStatementNeedsReview(text);
+  if (numericIssue) {
+    return decision(numericIssue.verdict,
+      numericIssue.verdict === "FAIL"
+        ? "The reply asserts an incorrect integer equality."
+        : "An incorrect integer equality may be a counterexample or an assertion; review its meaning.",
+      [numericIssue.excerpt]);
+  }
+
   const oneSided = passage(text, signals.oneSidedPreservation);
   const oneSideOnly = passage(text, signals.oneSideOnly);
   const unequal = passage(text, signals.unequalSideOperations);
   if (oneSided || oneSideOnly || unequal) {
-    return decision("FAIL", "The reply describes unequal operations on the two sides of an equation.", [oneSided ?? oneSideOnly ?? unequal]);
+    const excerpt = oneSided ?? oneSideOnly ?? unequal;
+    const explicitlyRejected = /(?:这样|这种|上述|这是|这个).{0,5}(?:不对|错误|不成立)|(?:错误|不对|不成立).{0,12}(?:做法|操作)|(?:不能|不可|不该)这样/u.test(excerpt ?? "");
+    return decision(explicitlyRejected ? "ABSTAIN" : "FAIL",
+      explicitlyRejected
+        ? "The reply may be rejecting a one-sided operation rather than recommending it."
+        : "The reply describes unequal operations on the two sides of an equation.",
+      [excerpt]);
   }
 
   const diagnosis = passage(text, signals.unsupported);
