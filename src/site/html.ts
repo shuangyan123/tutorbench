@@ -651,9 +651,9 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
   const isExplorerPage = isHeatmapPage || isTrialsPage || isTrialDetailRoute;
   const isNotFoundPage = page.route === "/404.html";
   const isMicroReviewPage = page.route === "/micro-review/";
-  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/contact/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
-  const usesHomeStyles = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/contact/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
-  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/contact/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
+  const isTeachometryPage = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/contact/" || page.route === "/work-with-us/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
+  const usesHomeStyles = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/about/" || page.route === "/contact/" || page.route === "/work-with-us/" || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage;
+  const usesTeachometryFooter = page.route === "/" || page.route === "/data/" || page.route === "/methodology/" || page.route === "/leaderboard/" || page.route === "/about/" || page.route === "/community/" || page.route === "/run/" || page.route === "/docs/" || page.route === "/contact/" || page.route === "/work-with-us/" || isNotFoundPage || page.route === "/data/cases/" || isCaseDetailRoute || isBlogPage || isModelsPage || isExplorerPage;
   const bodyClass = isMicroReviewPage
     ? ' class="home-page micro-review-page"'
     : isNotFoundPage
@@ -670,7 +670,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
             ? ' class="about-page"'
             : page.route === "/community/"
               ? ' class="about-page community-page"'
-              : page.route === "/contact/"
+              : page.route === "/contact/" || page.route === "/work-with-us/"
                 ? ' class="about-page contact-page"'
               : page.route === "/run/"
                 ? ' class="run-page"'
@@ -731,7 +731,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     ${page.route === "/community/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/community.css"))}">` : ""}
     ${page.route === "/run/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/run.css"))}">` : ""}
     ${page.route === "/docs/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/docs.css"))}">` : ""}
-    ${page.route === "/contact/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/contact.css"))}">` : ""}
+    ${page.route === "/contact/" || page.route === "/work-with-us/" ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/contact.css"))}">` : ""}
     ${isBlogPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/blog.css"))}">` : ""}
     ${isExplorerPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/explorers.css"))}">` : ""}
     ${isNotFoundPage ? `<link rel="stylesheet" href="${escapeHtml(sitePath(basePath, "/assets/not-found.css"))}">` : ""}

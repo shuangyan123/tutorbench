@@ -1,9 +1,10 @@
 // Builds the project pages of the Spectrum prototype: about/index.html, community/index.html,
-// contact/index.html and 404.html, in English and 简体中文 on one page.
+// contact/index.html, work-with-us/index.html and 404.html, in English and 简体中文 on one page.
 // The copy mirrors the live renderers: renderAboutPage (src/site/pages/developer.ts), renderCommunityPage
-// (community.ts, through the live siteText keys), renderContactPage (contact.ts) and renderNotFoundPage
-// (not-found.ts). English strings are looked up in the live SITE_ZH_CN_COPY, so a string that drifts from
-// the live page fails the build. Status lines (website, package, dataset, cases, model runs) come from the
+// (community.ts, through the live siteText keys), renderContactPage (contact.ts), renderWorkWithUsPage
+// (work-with-us.ts, whose WORK_WITH_US copy this page is set from) and renderNotFoundPage (not-found.ts).
+// English strings are looked up in the live SITE_ZH_CN_COPY, so a string that drifts from the live page
+// fails the build. Status lines (website, package, dataset, cases, model runs) come from the
 // public artifacts and package.json, as on the live About page. Applications stay closed: no form anywhere.
 // usage (from the repo root, after `npm run build` and `npm run website:build`):
 //   node website/prototypes/spectrum/tools/build-about.mjs
@@ -433,10 +434,11 @@ function communityPage() {
 const GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement";
 
 function contactPage() {
-  const copyBtn = `<button class="ct-copy" type="button" data-copy-text="${esc(SITE_CONTACT_EMAIL)}" aria-controls="contact-email" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><span data-copy-label aria-live="polite">Copy</span></button>`;
+  const copyBtn = `<button class="ct-copy" type="button" data-copy-text="${esc(SITE_CONTACT_EMAIL)}" aria-controls="contact-email" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><span data-copy-label aria-live="polite">${bi("Copy", "复制")}</span></button>`;
   const CH = [
     ["Email", "Project & collaboration", "For collaboration, research discussion, partnership questions, or longer-form project feedback.",
-      `<span class="v" id="contact-email">${esc(SITE_CONTACT_EMAIL)}</span>${copyBtn}`],
+      `<span class="v" id="contact-email">${esc(SITE_CONTACT_EMAIL)}</span>${copyBtn}`,
+      `<p class="ct-work">${biE("Planning a project with us?")} <a class="text-link" href="../work-with-us/index.html">${biE("See how we work together")} ${ARROW}</a></p>`],
     ["X", "Updates & short messages", "Follow project updates or send a short public message on X.",
       `<a class="v" href="${esc(SITE_X_URL)}" rel="noreferrer">@1Shuangyan36877</a>`],
     ["GitHub", "Issues & implementation", "Use GitHub issues for reproducible bugs, implementation questions, or repository-specific proposals.",
@@ -457,7 +459,7 @@ function contactPage() {
     <p class="kicker fount-k">${biE("Public channels")}</p>
     <h2 class="jx-h2" id="contact-channels-title">${biE("Choose the channel that fits.")}</h2>
     <div class="ct-channels">
-      ${CH.map(([k, h, p, v]) => `<article class="ct-ch"><p class="kicker">${k === "X" || k === "GitHub" ? k : biE(k)}</p><div><h3>${biE(h)}</h3>${biPE("p", "", p)}</div><div class="ct-addr">${v}</div></article>`).join("\n      ")}
+      ${CH.map(([k, h, p, v, more = ""]) => `<article class="ct-ch"><p class="kicker">${k === "X" || k === "GitHub" ? k : biE(k)}</p><div><h3>${biE(h)}</h3>${biPE("p", "", p)}${more}</div><div class="ct-addr">${v}</div></article>`).join("\n      ")}
     </div>
   </section>
 
@@ -480,6 +482,124 @@ function contactPage() {
   </section>
 </main>`;
   return frame({ prefix: "../", title: "Contact — Teachometry", titleZh: Z("Contact — Teachometry"), description: "Contact Teachometry about TutorBench, collaboration, research, or project questions.", body, current: "contact", css: ["journal.css", "about.css"], scripts: ["about.js"] });
+}
+
+/* ------------------------------------------------------------------ Work with us */
+
+const { WORK_WITH_US: W, workWithUsMailto } = await import(join(REPO, "dist/src/site/pages/work-with-us.js"));
+/** an English string and its Chinese from the live copy, as a pair */
+const WE = (en) => biE(en);
+const WP = (tag, cls, en) => biPE(tag, cls, en);
+/** the button that opens an email: one per language, so each carries a subject line in its own language */
+const mailButton = (cls, label) => [["en", W.hero.mailSubject, label], ["zh", Z(W.hero.mailSubject), Z(label)]]
+  .map(([lang, subject, text]) => `<a class="${cls} ${lang}"${lang === "zh" ? ' lang="zh-CN"' : ""} href="${esc(workWithUsMailto(subject))}">${esc(text)} ${ARROW}</a>`).join("");
+
+function workPage() {
+  const copyBtn = `<button class="ct-copy" type="button" data-copy-text="${esc(SITE_CONTACT_EMAIL)}" aria-controls="work-email" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><span data-copy-label aria-live="polite">${bi("Copy", "复制")}</span></button>`;
+  const two = (n) => String(n).padStart(2, "0");
+  const body = `<main id="main" class="wk">
+  <header class="essay-head wk-head">
+    <div class="wrap essay-grid wk-grid">
+      <div>
+        <p class="essay-meta kicker"><span class="issue">${WE(W.nav)}</span><span class="rule" aria-hidden="true"></span><span>${WE(W.hero.line)}</span></p>
+        <h1 class="essay-title" id="work-title">${bi(`${esc(W.hero.titleLead)} <em>${esc(W.hero.titleAccent)}</em>`, `${esc(Z(W.hero.titleLead))}${/[A-Za-z]$/.test(Z(W.hero.titleLead)) ? " " : ""}<em>${esc(Z(W.hero.titleAccent))}</em>`)}</h1>
+        ${WP("p", "ab-lede", W.hero.lede)}
+        <p class="cx-actions">${mailButton("cta cta-ink", W.hero.primary)}<a class="cta cta-line" href="#how">${WE(W.hero.secondary)}</a></p>
+      </div>
+      <figure class="cover-plate wk-plate">
+        <img src="../assets/work/measure.webp" alt="${esc(W.cover.alt)}" width="900" height="1100" data-alt-en="${esc(W.cover.alt)}" data-alt-zh="${esc(Z(W.cover.alt))}">
+        <figcaption class="kicker"><b>${bi("Cover", "封面")}</b> · ${WE(W.cover.caption)}</figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <section class="wrap ab-row" id="what" aria-labelledby="work-what-title">
+    <div>
+      <p class="kicker">${WE(W.what.kicker)}</p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="work-what-title">${WE(W.what.title)}</h2>
+      ${WP("p", "jx-p", W.what.intro)}
+      <article class="wk-core" aria-labelledby="work-core-title">
+        <header class="wk-tier-head">
+          <p class="kicker">${WE(W.what.core.label)}</p>
+          <h3 id="work-core-title">${WE(W.what.core.title)}</h3>
+          ${WP("p", "", W.what.core.audience)}
+        </header>
+        <ol class="wk-core-list">
+          ${W.what.core.items.map(([t, p], i) => `<li><span class="n">${two(i + 1)}</span><h4>${WE(t)}</h4>${WP("p", "", p)}</li>`).join("\n          ")}
+        </ol>
+      </article>
+      <article class="wk-tier" aria-labelledby="work-advisory-title">
+        <p class="kicker">${WE(W.what.advisory.label)}</p>
+        <h3 id="work-advisory-title">${WE(W.what.advisory.title)}</h3>
+        ${WP("p", "", W.what.advisory.text)}
+      </article>
+      <article class="wk-tier wk-aside" aria-labelledby="work-engineering-title">
+        <p class="kicker">${WE(W.what.engineering.label)}</p>
+        <h3 id="work-engineering-title">${WE(W.what.engineering.title)}</h3>
+        ${WP("p", "", W.what.engineering.text)}
+      </article>
+      ${WP("p", "ab-quote wk-open", W.what.open)}
+    </div>
+  </section>
+
+  <section class="wrap ab-row wk-how" id="how" aria-labelledby="work-how-title">
+    <div>
+      <p class="kicker">${WE(W.how.kicker)}</p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="work-how-title">${WE(W.how.title)}</h2>
+      ${WP("p", "jx-p", W.how.intro)}
+    </div>
+    <ol class="wk-steps">
+      ${W.how.steps.map(([name, p], i) => `<li><span class="n">${two(i + 1)}</span><h3><span class="en">${esc(name)}</span><span class="zh" lang="zh-CN">${esc(Z(name))}<small lang="en" aria-hidden="true">${esc(name)}</small></span></h3>${WP("p", "", p)}</li>`).join("\n      ")}
+    </ol>
+    <div class="wk-terms">
+      <div>
+        <p class="kicker">${WE(W.how.formsLabel)}</p>
+        <dl class="ab-ledger wk-forms">
+          ${W.how.forms.map(([k, v]) => `<div><dt>${WE(k)}</dt><dd>${WE(v)}</dd></div>`).join("\n          ")}
+        </dl>
+        ${WP("p", "wk-note", W.how.formsNote)}
+      </div>
+      ${WP("p", "wk-price", W.how.pricing)}
+    </div>
+  </section>
+
+  <section class="wrap ab-row" id="independence" aria-labelledby="work-independence-title">
+    <div>
+      <p class="kicker">${WE(W.independence.kicker)}</p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="work-independence-title">${bi(`${esc(W.independence.titleLead)}<br><em>${esc(W.independence.titleAccent)}</em>`, `${esc(Z(W.independence.titleLead))}<br><em>${esc(Z(W.independence.titleAccent))}</em>`)}</h2>
+      ${WP("p", "jx-p", W.independence.intro)}
+      <ol class="wk-rules">
+        ${W.independence.items.map(([t, p], i) => `<li><span class="n">§ ${i + 1}</span><h3>${WE(t)}</h3>${WP("p", "", p)}</li>`).join("\n        ")}
+      </ol>
+      <p class="cx-actions"><a class="text-link" href="../methodology/index.html">${WE(W.independence.link)} ${ARROW}</a></p>
+    </div>
+  </section>
+
+  <section class="jx-close wk-close" id="discuss" aria-labelledby="work-discuss-title">
+    <div class="wrap wk-close-grid">
+      <div>
+        <p class="kicker fount-k">${WE(W.discuss.kicker)}</p>
+        <h2 class="jx-h2" id="work-discuss-title">${WE(W.discuss.title)}</h2>
+        <div class="ct-addr wk-addr"><span class="v" id="work-email">${esc(SITE_CONTACT_EMAIL)}</span>${copyBtn}</div>
+        <p class="cx-actions">${mailButton("cta cta-ink", W.hero.primary)}<a class="text-link" href="../contact/index.html">${WE(W.discuss.other)} ${ARROW}</a></p>
+      </div>
+      <div class="wk-brief">
+        <p class="kicker">${WE(W.discuss.firstEmail)}</p>
+        <ul>
+          ${W.discuss.checklist.map((x) => `<li>${WE(x)}</li>`).join("\n          ")}
+        </ul>
+        ${WP("p", "wk-note", W.discuss.dataNote)}
+      </div>
+    </div>
+  </section>
+</main>`;
+  return frame({ prefix: "../", title: W.title, titleZh: Z(W.title), description: W.description, body, current: "work", css: ["journal.css", "about.css"], scripts: ["about.js"] });
 }
 
 /* ------------------------------------------------------------------ 404 */
@@ -509,6 +629,7 @@ function notFoundPage() {
 out("about/index.html", aboutPage());
 out("community/index.html", communityPage());
 out("contact/index.html", contactPage());
+out("work-with-us/index.html", workPage());
 out("404.html", notFoundPage());
 if (globalThis.__zmiss?.size) process.stdout.write(`missing zh:\n  ${[...globalThis.__zmiss].join("\n  ")}\n`);
-process.stdout.write("about + community + contact + 404: four pages\n");
+process.stdout.write("about + community + contact + work with us + 404: five pages\n");
