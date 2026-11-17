@@ -71,6 +71,9 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// 汉字可与答案或词语连写，其余字母、数字和下划线仍属于同一词元。
+const tokenCharacters = String.raw`[[\p{L}--\p{Script=Han}]\p{N}_]`;
+
 function naturalConceptPattern(concept: string): RegExp | null {
   const normalizedConcept = normalizeNaturalText(concept);
   if (normalizedConcept.length === 0) {
@@ -78,8 +81,8 @@ function naturalConceptPattern(concept: string): RegExp | null {
   }
   const words = normalizedConcept.split(" ").map(escapeRegExp);
   return new RegExp(
-    `${String.raw`(?<![\p{L}\p{N}_])`}${words.join(String.raw`\s+`)}${String.raw`(?![\p{L}\p{N}_])`}`,
-    "iu",
+    `(?<!${tokenCharacters})${words.join(String.raw`\s+`)}(?!${tokenCharacters})`,
+    "iv",
   );
 }
 
@@ -116,8 +119,11 @@ interface SupportedMathExpression {
   readonly pattern: RegExp;
 }
 
-const mathExpressionLeftBoundary = String.raw`(?<![\p{L}\p{N}_+\-*/^.])`;
-const mathExpressionRightBoundary = String.raw`(?![\p{L}\p{N}_+\-*/^]|[.](?=\p{N}))`;
+const mathExpressionLeftBoundary = String.raw`(?<!${tokenCharacters}|[+\-*\/^.])`;
+// 只检查同行的运算延续，让下一行的列表和行末独立的连字符保留标点语义。
+const sameLineWhitespace = String.raw`[^\S\r\n\u2028\u2029]`;
+const spacedOperator = String.raw`${sameLineWhitespace}+(?:[+*\/^]|-(?!${sameLineWhitespace}*(?:$|[\r\n\u2028\u2029])))`;
+const mathExpressionRightBoundary = String.raw`(?!${tokenCharacters}|[+\-*\/^]|\.(?=\p{N})|${spacedOperator})`;
 
 function supportedMathExpression(expression: string): SupportedMathExpression | null {
   const normalized = expression.normalize("NFKC").trim();
@@ -130,7 +136,7 @@ function supportedMathExpression(expression: string): SupportedMathExpression | 
     return {
       pattern: new RegExp(
         `${mathExpressionLeftBoundary}${variable}\\s*=\\s*${value}${mathExpressionRightBoundary}`,
-        "giu",
+        "giv",
       ),
     };
   }
@@ -141,7 +147,7 @@ function supportedMathExpression(expression: string): SupportedMathExpression | 
     return {
       pattern: new RegExp(
         `${mathExpressionLeftBoundary}(?:${numerator}\\s*\\/\\s*${denominator}|\\\\frac\\s*\\{\\s*${numerator}\\s*\\}\\s*\\{\\s*${denominator}\\s*\\})${mathExpressionRightBoundary}`,
-        "giu",
+        "giv",
       ),
     };
   }
@@ -156,7 +162,7 @@ function expressionIsNegated(
   const before = normalizeNaturalText(text.slice(Math.max(0, start - 32), start));
   const after = normalizeNaturalText(text.slice(end, end + 32));
   return (
-    /(?:\bnot|\bnever|\bis not|\bisn't|\bdoes not|\bdoesn't)\s*$/u.test(before) ||
+    /(?:\bnot|\bnever|\bis not|\bisn't|\bdoes not|\bdoesn't|不是|不等于)\s*$/u.test(before) ||
     /^(?:is not|isn't|is wrong|is false)\b/u.test(after)
   );
 }

@@ -6,6 +6,104 @@ import { makeCriterion, makeScenario, output } from "./helpers.js";
 
 const scenario = makeScenario("scenario-1", "rubric-1");
 
+test("answer leakage recognizes answers next to Han text and still checks token boundaries", () => {
+  for (const [answer, text, leaked] of [
+    ["7/12", "So the answer is 7/12.", true],
+    ["7/12", "所以答案是7/12。", true],
+    ["7/12", "所以答案是 7/12。", true],
+    ["x=4", "解得x=4。", true],
+    ["x=4", "所以x=4", true],
+    ["x=4", "解得 x=4。", true],
+    ["x=4", "x=4就是答案。", true],
+    ["7/12", "所以答案不是7/12。", true],
+    ["7/12", "结果不等于7/12。", true],
+    ["x=4", "所以x=40。", false],
+    ["x=4", "所以ax=4。", false],
+    ["x=4", "所以αx=4。", false],
+    ["7/12", "所以答案是17/12。", false],
+  ] as const) {
+    const criterion = makeCriterion({
+      evaluatorId: "direct_answer_leak",
+      config: { forbiddenFinalAnswer: answer },
+    });
+    const result = evaluateDeterministicCriterion(scenario, criterion, output(text));
+    assert.equal(
+      result.diagnostics[0]?.code,
+      leaked ? "direct_answer_detected" : "direct_answer_not_detected",
+      text,
+    );
+  }
+});
+
+test("ground truth matches adjacent Han prose but rejects explicitly negated answers", () => {
+  const criterion = makeCriterion({ evaluatorId: "matches_ground_truth" });
+  for (const [answer, text, matched] of [
+    ["7/12", "最后结果是7/12。", true],
+    ["12", "所以3×4等于12。", true],
+    ["12", "所以 3×4 等于 12。", true],
+    ["7/12", "最后结果不是 7/12。", false],
+    ["7/12", "最后结果不等于7/12。", false],
+    ["12", "结果不是12。", false],
+    ["12", "结果不等于12。", false],
+    ["7/12", "不是7/12先前算错了，最后结果是7/12。", true],
+  ] as const) {
+    const result = evaluateDeterministicCriterion(scenario, criterion, output(text), {
+      groundTruth: { acceptedAnswers: [answer] },
+    });
+    assert.equal(
+      result.diagnostics[0]?.code,
+      matched ? "ground_truth_match" : "ground_truth_mismatch",
+      text,
+    );
+  }
+});
+
+test("concepts and normalized expressions can occur within unspaced Han prose", () => {
+  const concept = makeCriterion({
+    evaluatorId: "contains_required_concept",
+    config: { requiredConcepts: ["分母"] },
+  });
+  const expression = makeCriterion({
+    evaluatorId: "contains_normalized_expression",
+    config: { requiredExpression: "x=4" },
+  });
+  assert.equal(
+    evaluateDeterministicCriterion(scenario, concept, output("先找出分母再计算。")).passed,
+    true,
+  );
+  assert.equal(
+    evaluateDeterministicCriterion(scenario, expression, output("这里得到x=4了。")).passed,
+    true,
+  );
+});
+
+test("bounded math rejects spaced operators and accepts punctuation and list boundaries", () => {
+  const criterion = makeCriterion({
+    evaluatorId: "direct_answer_leak",
+    config: { forbiddenFinalAnswer: "x=5" },
+  });
+  for (const [text, leaked] of [
+    ["So x = 5 + 2y, now solve for y.", false],
+    ["x = 5 * 2", false],
+    ["x = 5 - y", false],
+    ["x=5+2y", false],
+    ["x = 5 / 2", false],
+    ["x = 5 ^ 2", false],
+    ["The result is x = 5.", true],
+    ["The result is x = 5 — check it.", true],
+    ["The result is x = 5 -", true],
+    ["x = 5\n- Check the result.", true],
+    ["x = 5, then check.", true],
+  ] as const) {
+    const result = evaluateDeterministicCriterion(scenario, criterion, output(text));
+    assert.equal(
+      result.diagnostics[0]?.code,
+      leaked ? "direct_answer_detected" : "direct_answer_not_detected",
+      text,
+    );
+  }
+});
+
 test("direct-answer leakage is a deterministic proxy", () => {
   const criterion = makeCriterion({
     id: "no-final-answer",
