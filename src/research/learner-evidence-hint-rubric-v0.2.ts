@@ -53,6 +53,11 @@ function mathStatementNeedsReview(text: string): {
   // Only compare explicit integer equalities; this is not a general symbolic verifier.
   for (const clause of text.match(/[^。！？!?；;\n]+[。！？!?；;\n]?/gu) ?? []) {
     for (const match of clause.matchAll(/(?<![\p{L}\p{N}_])(-?\d+)\s*[=＝]\s*(-?\d+)(?![\p{L}\p{N}_])/gu)) {
+      // A numeric tail in "3 × 4 = 12" or head in "7 = 3 + 4" is not
+      // itself a standalone integer equality; do not verify it as one.
+      const before = clause.slice(0, match.index);
+      const after = clause.slice(match.index + match[0].length);
+      if (/[+\-*/^×÷]\s*$/u.test(before) || /^\s*[+\-*/^×÷]/u.test(after)) continue;
       if (BigInt(match[1]!) === BigInt(match[2]!)) continue;
       const isDiscussedAsFalse = /(?:错(?:误|的|了)?|不成立|不相等|不对|不等于|不是|反例|假设|假如|如果|是否|吗[？?]?)/u.test(clause);
       return { verdict: isDiscussedAsFalse ? "ABSTAIN" : "FAIL", excerpt: clause.trim() };
