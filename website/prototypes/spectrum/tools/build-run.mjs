@@ -111,7 +111,7 @@ function panel(p, i) {
         </div>
         <div class="term rn-term">
           <div class="term-bar"><span></span><span></span><span></span><p>tutorbench · ${esc(p.label.toLowerCase())}</p><button class="rn-copy" type="button" data-copy-run ${attr2("aria-label", `Copy ${p.label} command`, p.copyZh)}><span class="en" data-copy-label>Copy</span><span class="zh" lang="zh-CN" data-copy-label>${esc(Z("Copy"))}</span></button></div>
-<pre><code>${code(p.commands)}</code></pre>
+<pre tabindex="0"><code>${code(p.commands)}</code></pre>
         </div>
         <ul class="rn-facts">${p.facts.map((f) => `<li>${CHECK}<span>${pairOf(f)}</span></li>`).join("")}</ul>
         ${pairP("p", "rn-note", p.note)}${pkg}
@@ -165,7 +165,7 @@ function runPage() {
     <div class="wrap essay-grid">
       <div>
         <p class="essay-meta kicker"><span class="issue">${biE("Run · Get started")}</span><span class="rule" aria-hidden="true"></span><span>Node 24 · ${esc(DATASET)}</span></p>
-        <h1 class="essay-title" id="run-title">${bi("From research questions to <em>reproducible runs.</em>", `${esc(Z("From research"))}${esc(Zor("questions to", "问题走向"))}<em>${esc(Z("reproducible runs."))}</em>`)}</h1>
+        <h1 class="essay-title" id="run-title">${bi("From research questions to <em>reproducible runs.</em>", `从研究问题<wbr>走向<wbr><em>${esc(Z("reproducible runs."))}</em>`)}</h1>
         ${biPE("p", "rn-lede", "Run TutorBench locally, then connect an external Tutor to the Tutor Health workflow to diagnose concrete teaching failures in authored real-world scenarios. The canonical benchmark and frozen-evidence paths remain available as the underlying reproducibility layer.")}
         <p class="cx-actions"><a class="cta cta-ink" href="#quickstart">${biE("Run locally now")} ${ARROW}</a><a class="cta cta-line" href="../docs/index.html">${biE("View the documentation")}</a></p>
         <ul class="rn-signals" ${attr2("aria-label", "Run principles")}><li>${biE("Open source")}</li><li>${biE("Transparent evaluation")}</li><li>${biE("Evidence-first")}</li></ul>
@@ -284,7 +284,7 @@ function entryPoint(title, summary, label, href, e = 0) {
 }
 function codeBlock(label, rows) {
   return `<div class="term dc-term"><div class="term-bar"><span></span><span></span><span></span><p>${esc(label)}</p><span class="dc-lang">bash</span></div>
-<pre><code>${rows.map(esc).join("\n")}</code></pre></div>`;
+<pre tabindex="0"><code>${rows.map(esc).join("\n")}</code></pre></div>`;
 }
 function indexEntry([label, href, e, summary, cat, path], i) {
   const search = [label, summary, CATS[cat], N(label), Z(summary), Z(CATS[cat]), path].join(" ");

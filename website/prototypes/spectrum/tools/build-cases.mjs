@@ -23,8 +23,13 @@ const ALL = cases.cases, TOTAL = ALL.length;
 const GITHUB = "https://github.com/shuangyan123/tutorbench";
 const ARROW = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>`;
 
-/** a taxonomy value in both interface languages */
-const tax = (v) => bi(esc(L.displayTaxonomyLabel(v, "en")), esc(L.displayTaxonomyLabel(v, "zh-CN")));
+/** a taxonomy value in both interface languages; a Chinese case's own value (a learner level
+    such as 初中阶段) has no English name, so the English page marks it as Chinese */
+const HAN = /[\u3400-\u9fff]/;
+const tax = (v) => {
+  const en = L.displayTaxonomyLabel(v, "en");
+  return `<span class="en"${HAN.test(en) ? ' lang="zh-CN"' : ""}>${esc(en)}</span><span class="zh" lang="zh-CN">${esc(L.displayTaxonomyLabel(v, "zh-CN"))}</span>`;
+};
 const NS = ["Not specified", Z("Not specified")];
 const diff = (c, k) => (typeof c.metadata.difficulty === "object" && c.metadata.difficulty !== null ? String(c.metadata.difficulty[k]) : "");
 const level = (c) => { const v = diff(c, "learnerLevel"); return v ? tax(v) : bi(...NS.map(esc)); };
@@ -251,7 +256,7 @@ function heatmapPage() {
       <h1 class="essay-title">${bi("Evidence <em>Matrix</em>", esc(Z("Evidence Matrix")))}</h1>
       <p class="essay-dek">${bi("See the landscape at a glance.", "一眼看清整体图景。")}</p>
       ${biPE("p", "hm-desc", "The matrix will connect public benchmark cases with versioned public model runs and their trial evidence. Today, no public model trials are available yet.")}
-      <dl class="hm-stats">${stats.map(([v, k, n], i) => `<div><dd>${esc(v)}</dd><dt>${biE(k)}</dt><small>${statNote(i, n)}</small></div>`).join("")}</dl>
+      <dl class="hm-stats">${stats.map(([v, k, n], i) => `<div><dt>${biE(k)}</dt><dd>${esc(v)}</dd><dd class="sub">${statNote(i, n)}</dd></div>`).join("")}</dl>
     </div>
   </header>
 
@@ -303,7 +308,9 @@ const ZH_GAP = { Subjects: "学科", Capabilities: "能力", Heatmap: "热图", 
 const share = (n, total) => (total === 0 ? 0 : Math.round((n / total) * 100));
 const sorted = (counts) => Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "en"));
 const valueLabel = (v) => (v === "en" ? "English" : v === "zh-CN" ? "简体中文" : null);
-const labelBi = (v) => (valueLabel(v) ? esc(valueLabel(v)) : tax(v));
+// a language is named in itself, and marked as that language on either page
+const ownName = (v) => `<span lang="${v}">${esc(valueLabel(v))}</span>`;
+const labelBi = (v) => (valueLabel(v) ? ownName(v) : tax(v));
 function distribution(title, counts, total, multi = false) {
   const rows = sorted(counts);
   const row = ([k, n], other = false) => `<li><span class="bx-k">${other ? bi("Others", esc(L.publicUiCopy("Others", "zh-CN"))) : labelBi(k)}</span><span class="bx-bar" aria-hidden="true"><i style="width:${share(n, total)}%"></i></span><span class="bx-n">${n} <small>(${share(n, total)}%)</small></span></li>`;
@@ -338,9 +345,9 @@ function benchmarkPage() {
       </div>
       <aside class="bx-snap" aria-labelledby="snapshot-title">
         <p class="bx-snap-head kicker"><span id="snapshot-title">${biE("Dataset snapshot")}</span><span>${biE("Public development set")}</span></p>
-        <dl class="bx-facts">${facts.map(([n, k, note]) => `<div><dt>${bi(esc(k), esc(Zor(k, ZH_GAP[k])))}</dt><dd>${n}</dd><small>${biE(note)}</small></div>`).join("")}</dl>
+        <dl class="bx-facts">${facts.map(([n, k, note]) => `<div><dt>${bi(esc(k), esc(Zor(k, ZH_GAP[k])))}</dt><dd>${n}</dd><dd class="sub">${biE(note)}</dd></div>`).join("")}</dl>
         <table class="bx-matrix"><caption class="kicker">${biE("Subject × locale · authored case counts")}</caption>
-          <thead><tr><th scope="col">${biE("Subject")}</th>${locales.map(([l]) => `<th scope="col">${esc(valueLabel(l) ?? l)}</th>`).join("")}</tr></thead>
+          <thead><tr><th scope="col">${biE("Subject")}</th>${locales.map(([l]) => `<th scope="col">${valueLabel(l) ? ownName(l) : esc(l)}</th>`).join("")}</tr></thead>
           <tbody>${subjects.map(([s]) => `<tr><th scope="row">${tax(s)}</th>${locales.map(([l]) => cell(s, l)).join("")}</tr>`).join("")}</tbody></table>
         <p class="bx-note">${biE("Darker dots = a larger share of that subject. Counts, not model scores.")} <a class="text-link" href="#benchmark-taxonomies">${biE("View all coverage")} ${ARROW}</a></p>
       </aside>

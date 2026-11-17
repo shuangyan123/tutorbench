@@ -1,10 +1,11 @@
-import test from "node:test";
+import test, { before } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { findBrowser, launchBrowser } from "./website-browser.mjs";
 
 const driver = fileURLToPath(new URL("./fixtures/website-browser-fault.mjs", import.meta.url));
 const modes = [
@@ -22,6 +23,16 @@ const modes = [
   ["geometry", 0, /Content-only overflow PASS; covered target FAIL; overflowing header FAIL/],
   ["nojs-navigation", 0, /nojs-navigation: exit=0/],
 ];
+
+// The first Chrome start on a fresh runner can take longer than the 20 s that every start below is
+// held to (cold disk cache, first profile), and the first mode then failed with "Browser startup
+// timed out" although nothing was wrong. Start Chrome once with a generous budget first, so the
+// lifecycle checks measure the transport and not the runner's cold start. Their own deadlines and
+// assertions are unchanged.
+before(async () => {
+  const browser = await launchBrowser(findBrowser(), { startupMs: 90000 });
+  await browser.close();
+}, { timeout: 120000 });
 
 for (const [mode, expectedCode, diagnostic] of modes) {
   test(`real Chrome lifecycle: ${mode}`, { timeout: 45000 }, async () => {

@@ -301,7 +301,9 @@ a.issue:hover { color: var(--lead-deep); }
 .essay-text .sources .notes-list a:hover { color: var(--lead-deep); border-bottom-color: currentColor; }
 .essay-text .prose strong { font-weight: 600; color: var(--ink); }
 /* Chinese headings: break between words only */
-:root[data-lang="zh"] .essay-title .zh, :root[data-lang="zh"] .essay-text h2 .zh { word-break: keep-all; }
+/* Chinese titles break only where the source marks a word boundary (<wbr> or a space); a run too long for its
+   column still wraps rather than spilling over the column beside it */
+:root[data-lang="zh"] .essay-title .zh, :root[data-lang="zh"] .essay-text h2 .zh { word-break: keep-all; overflow-wrap: anywhere; }
 :root[data-lang="zh"] .ratio .rt-frac, :root[data-lang="zh"] .studies .s-name { font-weight: 600; font-size: 19px; line-height: 1.5; }
 :root[data-lang="zh"] .studies .s-v, :root[data-lang="zh"] .rt-log li { line-height: 1.7; }
 :root[data-lang="zh"] .essay-text .sources .src-h { font-weight: 500; font-size: 12px; line-height: 1.4; letter-spacing: .08em; }

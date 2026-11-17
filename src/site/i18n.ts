@@ -708,6 +708,15 @@ const translations: Record<SiteLocale, Record<SiteUiTextKey, string>> = {
   },
 };
 
+/**
+ * The language code search engines read on `hreflang` links. The Chinese pages are written in
+ * Simplified Chinese for readers anywhere, not only in mainland China, so they are announced by
+ * script ("zh-Hans") rather than by country ("zh-CN" would leave out Singapore or Malaysia).
+ */
+export function siteHreflang(locale: SiteLocale): string {
+  return locale === "zh-CN" ? "zh-Hans" : locale;
+}
+
 export function resolveSiteLocale(value: string | undefined): SiteLocale {
   return value?.toLowerCase().startsWith("zh") ? "zh-CN" : DEFAULT_SITE_LOCALE;
 }

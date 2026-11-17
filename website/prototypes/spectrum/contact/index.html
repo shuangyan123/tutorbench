@@ -28,9 +28,39 @@
       if (done) return;
       done = true;
       link.media = "all";
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+      if (!document.fonts || !document.fonts.ready) return;
+      var slow = false;
+      document.fonts.ready.then(function () {
+        if (slow) return;
         try { window.localStorage.setItem(KEY, "1"); } catch (e) { /* storage is optional */ }
       });
+      // A font that arrives late would change the text under a reader who is already reading. On a
+      // slow connection (a face still on its way two seconds after it was asked for) the faces that
+      // have not arrived are dropped for this page: the text keeps the reader's own font from
+      // first paint to last, and nothing is swapped late. The next page tries again.
+      var asked = [], since = [];
+      function faces() { var list = []; document.fonts.forEach(function (f) { list.push(f); }); return list; }
+      function plain(name) { return String(name).replace(/["']/g, "").trim(); }
+      // asked for and not here yet: Safari reports such a face as "error" until it arrives
+      function waiting(f) { return f.status === "loading" || f.status === "error"; }
+      var watch = window.setInterval(function () {
+        faces().forEach(function (f) { if (waiting(f) && asked.indexOf(f) < 0) { asked.push(f); since.push(Date.now()); } });
+      }, 250);
+      window.setTimeout(function () {
+        window.clearInterval(watch);
+        var now = Date.now(), sheet = null;
+        try { sheet = link.sheet && link.sheet.cssRules ? link.sheet : null; } catch (e) { /* not readable */ }
+        var late = asked.some(function (f, i) { return waiting(f) && now - since[i] >= 2000; });
+        if (sheet && !late) return;
+        slow = true;
+        try { window.localStorage.removeItem(KEY); } catch (e) { /* storage is optional */ }
+        if (!sheet) { link.media = "print"; return; }   // not even the list of fonts has arrived
+        // the page's faces are listed in the order of the @font-face rules in fonts.css
+        var all = faces(), rules = sheet.cssRules, i;
+        if (all.length !== rules.length) return;
+        for (i = 0; i < rules.length; i++) if (!rules[i].style || plain(rules[i].style.getPropertyValue("font-family")) !== plain(all[i].family)) return;
+        for (i = rules.length - 1; i >= 0; i--) if (all[i].status !== "loaded") sheet.deleteRule(i);
+      }, 3400);
     }
     var cached = null;
     try { cached = window.localStorage.getItem(KEY); } catch (e) { /* storage is optional */ }
@@ -69,12 +99,15 @@
     var saved = null;
     try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
     var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
-    var wantZh = q ? q.indexOf("zh") === 0 : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the 404 page answers at any address: under /zh-cn/ it answers in Chinese
+    var lost = !root.getAttribute("data-route-lang") && /\/zh-cn(\/|$)/.test(location.pathname);
+    var wantZh = q ? q.indexOf("zh") === 0 : lost ? true : saved ? saved === "zh" : browser.indexOf("zh") === 0;
     // the published site has one URL per language (/zh-cn/...): the build marks each page with
     // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
     var fixed = root.getAttribute("data-route-lang");
     var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
-    if (other) location.replace(location.origin + other);
+    // the reader keeps the place they were sent to: the #anchor and any ?query go across as well
+    if (other) location.replace(location.origin + other + location.search + location.hash);
     var zh = fixed ? fixed === "zh" : wantZh;
     root.setAttribute("data-lang", zh ? "zh" : "en");
     root.lang = zh ? "zh-CN" : "en";
@@ -101,14 +134,14 @@
   <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106" fetchpriority="high"></a>
   <nav class="nav" aria-label="Primary">
     <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
-    <a href="../index.html#methods" class="nav-tb"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../index.html#methods" class="nav-tb" translate="no"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
     <a href="../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
     <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
     <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
   </nav>
   <div class="bar-end">
-    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu / 菜单"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
-    <button class="lang" type="button" data-lang-toggle aria-label="中 / EN · Switch language / 切换语言">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle translate="no" aria-label="中 / EN · Switch language / 切换语言">
       <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
     </button>
     <a class="run-btn" href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
@@ -156,9 +189,19 @@
     <p class="kicker fount-k"><span class="en">Public channels</span><span class="zh" lang="zh-CN">公开渠道</span></p>
     <h2 class="jx-h2" id="contact-channels-title"><span class="en">Choose the channel that fits.</span><span class="zh" lang="zh-CN">选择最合适的联系渠道。</span></h2>
     <div class="ct-channels">
-      <article class="ct-ch"><p class="kicker"><span class="en">Email</span><span class="zh" lang="zh-CN">邮箱</span></p><div><h3><span class="en">Project &amp; collaboration</span><span class="zh" lang="zh-CN">项目与合作</span></h3><p class="en">For collaboration, research discussion, partnership questions, or longer-form project feedback.</p><p class="zh" lang="zh-CN">适合合作、研究讨论、伙伴关系问题或较长篇幅的项目反馈。</p></div><div class="ct-addr"><span class="v" id="contact-email">shuangyan12341234@gmail.com</span><button class="ct-copy" type="button" data-copy-text="shuangyan12341234@gmail.com" aria-controls="contact-email" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><span data-copy-label aria-live="polite">Copy</span></button></div></article>
+      <article class="ct-ch"><p class="kicker"><span class="en">Email</span><span class="zh" lang="zh-CN">邮箱</span></p><div><h3><span class="en">Project &amp; collaboration</span><span class="zh" lang="zh-CN">项目与合作</span></h3><p class="en">For collaboration, research discussion, partnership questions, or longer-form project feedback.</p><p class="zh" lang="zh-CN">适合合作、研究讨论、伙伴关系问题或较长篇幅的项目反馈。</p></div><div class="ct-addr"><span class="v" id="contact-email">contact@teachometry.com</span><button class="ct-copy" type="button" data-copy-text="contact@teachometry.com" aria-controls="contact-email" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><span data-copy-label aria-live="polite">Copy</span></button></div></article>
       <article class="ct-ch"><p class="kicker">X</p><div><h3><span class="en">Updates &amp; short messages</span><span class="zh" lang="zh-CN">更新与简短消息</span></h3><p class="en">Follow project updates or send a short public message on X.</p><p class="zh" lang="zh-CN">关注项目更新，或在 X 上发送简短公开消息。</p></div><div class="ct-addr"><a class="v" href="https://x.com/1Shuangyan36877" rel="noreferrer">@1Shuangyan36877</a></div></article>
       <article class="ct-ch"><p class="kicker">GitHub</p><div><h3><span class="en">Issues &amp; implementation</span><span class="zh" lang="zh-CN">Issue 与实现</span></h3><p class="en">Use GitHub issues for reproducible bugs, implementation questions, or repository-specific proposals.</p><p class="zh" lang="zh-CN">可通过 GitHub issue 提交可复现的错误、实现问题或与仓库相关的提案。</p></div><div class="ct-addr"><a class="v" href="https://github.com/shuangyan123/tutorbench/issues" rel="noreferrer"><span class="en">Project support</span><span class="zh" lang="zh-CN">项目支持</span></a></div></article>
+    </div>
+  </section>
+
+  <section class="wrap ct-bound ct-privacy" id="privacy" aria-labelledby="contact-privacy-title">
+    <div>
+      <p class="kicker"><span class="en">Privacy</span><span class="zh" lang="zh-CN">隐私</span></p>
+      <h2 class="jx-h2" id="contact-privacy-title"><span class="en">No cookies,<br><em>no tracking.</em></span><span class="zh" lang="zh-CN">不设 cookie，<br><em>也不追踪你。</em></span></h2>
+    </div>
+    <div class="ct-privacy-text">
+      <p class="en">No analytics, ads or third-party scripts. Settings such as your language stay on your own device. The site is hosted on GitHub Pages, which logs IP addresses for security (<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noreferrer">GitHub’s privacy statement</a>).</p><p class="zh" lang="zh-CN">没有统计、广告和第三方脚本。语言等设置只存在你自己的设备上。网站托管在 GitHub Pages，GitHub 会出于安全记录 IP 地址（<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noreferrer">隐私声明</a>）。</p>
     </div>
   </section>
 
@@ -177,7 +220,7 @@
       <div class="foot-brand">
         <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84" loading="lazy" decoding="async"></p>
         <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
-        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16" loading="lazy" decoding="async"><b>TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16" loading="lazy" decoding="async"><b translate="no">TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
       </div>
       <nav aria-label="Footer">
         <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
@@ -198,6 +241,7 @@
         <a href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
         <a href="../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
         <a href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="../contact/index.html#privacy"><span class="en">Privacy</span><span class="zh" lang="zh-CN">隐私</span></a>
       </nav>
       <div class="colophon">
         <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>

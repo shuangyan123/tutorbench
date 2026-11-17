@@ -51,7 +51,7 @@ test("combined normal Judge PASS/PARTIAL/FAIL retains normalization and complete
   const suite = await insufficientInformationSuite();
   for (const [result, score] of [["PASS", 1], ["PARTIAL", 0.5], ["FAIL", 0]] as const) {
     const run = reportChain(suite, await evaluate(suite, insufficientInformationJudge({ result })));
-    assert.equal(run.evaluation.evaluatorVersion, "0.3a.5");
+    assert.equal(run.evaluation.evaluatorVersion, "0.3a.6");
     assert.equal(run.evaluation.caseResults[0]!.rubricResults[0]!.score, score);
     assert.equal(run.report.healthScore, score * 100);
     assert.equal(run.report.unresolved.length, 0);
@@ -224,7 +224,7 @@ test("abstaining candidates cannot resolve baseline Findings and detached report
 });
 
 test("historical v1 optional fields and finite run aggregate parsing remain compatible", async () => {
-  assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.5");
+  assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.6");
   const suite = await insufficientInformationSuite();
   const evaluation = await evaluate(suite, insufficientInformationJudge());
   assert.equal(buildTutorHealthReport({ suite, evaluation }).releaseGate, "PASS");

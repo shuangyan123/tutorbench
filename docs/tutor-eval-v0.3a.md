@@ -49,7 +49,7 @@ The merge follows the original case rubric order, regardless of how the two
 evaluation paths complete. Deterministic evaluators are proxies; they are not
 semantic substitutes for the Judge.
 
-The current evaluator revision is recorded as evaluator version `0.3a.5` in
+The current evaluator revision is recorded as evaluator version `0.3a.6` in
 new `TutorEvalRunResult` values. The `0.3a.2` revision records the audited
 critical-failure quality-gate policy before the disclosure/diagnosis semantic
 audit; it remains a historical evaluator identity. The `0.3a.3` revision
@@ -64,6 +64,18 @@ separate from dataset and case identity so an immutable response corpus can be
 replayed without rewriting its evidence. The full audits are in the
 [`disclosure and critical-failure semantics audit`](tutor-eval-disclosure-critical-semantics-audit.md)
 and [`critical-failure quality-gate audit`](critical-failure-quality-gate-audit.md).
+
+Revision `0.3a.6` recognizes answers and concepts adjacent to Han characters
+while retaining boundaries for other letters, numbers and underscores.
+Bounded math matches reject a same-line arithmetic continuation such as
+`x = 5 + 2y` when the configured answer is `x=5`. Ground-truth matching
+and normalized-expression checks reject explicit Chinese negation immediately
+before the answer (`不是`, `不等于`). The leakage proxy still flags the full
+configured answer in that context when disclosure is prohibited.
+The supported expression forms, result schema and diagnostic codes remain
+the same. Keep historical `0.3a.5` reports under their original evaluator
+identity. When comparing an immutable response across versions, retain both
+evaluator identities because the same response can receive different decisions.
 
 ## Judge input and hidden context
 
@@ -190,7 +202,7 @@ Frozen corpus replay is a separate provenance boundary. The default corpus
 identity check remains strict; the only approved source-to-target exception is
 the machine-checked `tutor-eval-v0.2a@0.2a -> 0.2a.1` transition for
 `language-verb-check-001@1.0.0 -> 1.0.1`. Historical replay examples may
-evaluate target `0.3a.3` semantics; current evaluator runs use target `0.3a.5`
+evaluate target `0.3a.3` semantics; current evaluator runs use target `0.3a.6`
 semantics without changing source response identities and record both source
 and target identities in the optional `semanticReplay` result field. No
 `0.2a.5 -> 0.2a.6` replay bridge is introduced because the `.6` fraction

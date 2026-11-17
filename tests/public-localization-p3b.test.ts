@@ -86,8 +86,8 @@ test("P3B final routes preserve canonical, hreflang, locale destinations, sitema
         const localizedRoute = `${locale === "zh-CN" ? "/zh-cn" : ""}${route}`;
         assert.ok(markup.includes(`<link rel="canonical" href="${deployment.url}${localizedRoute}">`));
         assert.ok(sitemap.includes(`<loc>${deployment.url}${localizedRoute}</loc>`));
-        for (const language of ["en", "zh-CN", "x-default"]) {
-          assert.ok(markup.includes(`<link rel="alternate" hreflang="${language}" href="${deployment.url}${language === "zh-CN" ? "/zh-cn" : ""}${route}">`));
+        for (const language of ["en", "zh-Hans", "x-default"]) {
+          assert.ok(markup.includes(`<link rel="alternate" hreflang="${language}" href="${deployment.url}${language === "zh-Hans" ? "/zh-cn" : ""}${route}">`));
         }
         assert.ok(markup.includes(`data-locale-en-url="${deployment.basePath}${route}"`));
         assert.ok(markup.includes(`data-locale-zh-cn-url="${deployment.basePath}/zh-cn${route}"`));
