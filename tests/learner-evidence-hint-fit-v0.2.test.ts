@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import { TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/tutor-eval.js";
 import { loadTutorEvalDataset } from "../src/datasets/index.js";
 import { evaluateHintFit as evaluateV01 } from "../src/research/learner-evidence-hint-rubric.js";
 import { evaluateHintFit as evaluateV02, hintRubric } from "../src/research/learner-evidence-hint-rubric-v0.2.js";
@@ -11,10 +12,16 @@ const cases = createHintPilot(dataset);
 const [unknown, local, gap] = cases;
 assert.ok(unknown && local && gap);
 
-const v01Controls = JSON.parse(await readFile(
+interface DevelopmentControl {
+  readonly id: string;
+  readonly text: string;
+  readonly expected: readonly ("PASS" | "FAIL" | "ABSTAIN")[];
+}
+
+const v01Controls: readonly DevelopmentControl[] = JSON.parse(await readFile(
   "scenarios/experimental/learner-evidence-hint-v0.1/responses.json", "utf8",
 ));
-const v02Controls = JSON.parse(await readFile(
+const v02Controls: readonly DevelopmentControl[] = JSON.parse(await readFile(
   "scenarios/experimental/learner-evidence-hint-v0.2/responses.json", "utf8",
 ));
 
@@ -88,4 +95,24 @@ test("empty replies and completed first calculations remain conservative", () =>
   const fixture = v02Controls.find((item) => item.id === "completed-first-calculation");
   assert.ok(fixture);
   assert.deepEqual(evaluateAll(fixture.text).map((result) => result.verdict), ["ABSTAIN", "ABSTAIN", "ABSTAIN"]);
+});
+
+test("isolated balance and subtraction keywords do not establish a useful hint", () => {
+  assert.deepEqual(
+    evaluateAll("天平、两边、减去。").map((result) => result.verdict),
+    ["ABSTAIN", "ABSTAIN", "ABSTAIN"],
+  );
+  assert.equal(evaluateV02(gap, "想象一架天平。两边同时减去 3，你试着写出来。").verdict, "FAIL");
+});
+
+test("the shared disclosure guard handles CJK adjacency without matching a longer answer", () => {
+  assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.6");
+  for (const pilotCase of cases) {
+    const leak = "结果就是x=4哦。";
+    const result = evaluateV02(pilotCase, leak);
+    assert.equal(result.verdict, "FAIL");
+    assert.ok(result.responseExcerpts.length > 0);
+    assert.ok(result.responseExcerpts.every((excerpt) => leak.includes(excerpt)));
+    assert.equal(evaluateV02(pilotCase, "这里用x=40作记号。").verdict, "ABSTAIN");
+  }
 });
