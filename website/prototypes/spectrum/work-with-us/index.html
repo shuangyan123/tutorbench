@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Work with us — Teachometry</title>
+<meta name="description" content="Work with Teachometry on AI education evaluation, research and advisory, and selected engineering projects. Scope, deliverables and fees are agreed for each project.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../assets/logo/apple-touch-icon.png">
+<link rel="stylesheet" href="../fonts.css" media="print" data-fonts>
+<noscript><link rel="stylesheet" href="../fonts.css"></noscript>
+<link rel="stylesheet" href="../spectrum.css">
+<link rel="stylesheet" href="../journal.css">
+<link rel="stylesheet" href="../about.css">
+<script>
+  // Web fonts (fonts.css). On a reader's first visit the page paints at once in their own fonts and
+  // the site's fonts are fetched right after that first paint, so a slow connection never waits for
+  // text. Once the fonts are cached the next pages ask for them up front, as an ordinary stylesheet.
+  (function () {
+    var link = document.querySelector("link[data-fonts]");
+    if (!link) return;
+    var KEY = "teachometry-fonts";
+    var done = false;
+    function use() {
+      if (done) return;
+      done = true;
+      link.media = "all";
+      if (!document.fonts || !document.fonts.ready) return;
+      var slow = false;
+      document.fonts.ready.then(function () {
+        if (slow) return;
+        try { window.localStorage.setItem(KEY, "1"); } catch (e) { /* storage is optional */ }
+      });
+      // A font that arrives late would change the text under a reader who is already reading. On a
+      // slow connection (a face still on its way two seconds after it was asked for) the faces that
+      // have not arrived are dropped for this page: the text keeps the reader's own font from
+      // first paint to last, and nothing is swapped late. The next page tries again.
+      var asked = [], since = [];
+      function faces() { var list = []; document.fonts.forEach(function (f) { list.push(f); }); return list; }
+      function plain(name) { return String(name).replace(/["']/g, "").trim(); }
+      // asked for and not here yet: Safari reports such a face as "error" until it arrives
+      function waiting(f) { return f.status === "loading" || f.status === "error"; }
+      var watch = window.setInterval(function () {
+        faces().forEach(function (f) { if (waiting(f) && asked.indexOf(f) < 0) { asked.push(f); since.push(Date.now()); } });
+      }, 250);
+      window.setTimeout(function () {
+        window.clearInterval(watch);
+        var now = Date.now(), sheet = null;
+        try { sheet = link.sheet && link.sheet.cssRules ? link.sheet : null; } catch (e) { /* not readable */ }
+        var late = asked.some(function (f, i) { return waiting(f) && now - since[i] >= 2000; });
+        if (sheet && !late) return;
+        slow = true;
+        try { window.localStorage.removeItem(KEY); } catch (e) { /* storage is optional */ }
+        if (!sheet) { link.media = "print"; return; }   // not even the list of fonts has arrived
+        // the page's faces are listed in the order of the @font-face rules in fonts.css
+        var all = faces(), rules = sheet.cssRules, i;
+        if (all.length !== rules.length) return;
+        for (i = 0; i < rules.length; i++) if (!rules[i].style || plain(rules[i].style.getPropertyValue("font-family")) !== plain(all[i].family)) return;
+        for (i = rules.length - 1; i >= 0; i--) if (all[i].status !== "loaded") sheet.deleteRule(i);
+      }, 3400);
+    }
+    var cached = null;
+    try { cached = window.localStorage.getItem(KEY); } catch (e) { /* storage is optional */ }
+    var paint = window.PerformanceObserver && PerformanceObserver.supportedEntryTypes &&
+      PerformanceObserver.supportedEntryTypes.indexOf("paint") >= 0;
+    if (cached || !paint) { use(); return; }
+    var observer = new PerformanceObserver(function (list) {
+      if (list.getEntriesByName("first-contentful-paint").length) { observer.disconnect(); use(); }
+    });
+    observer.observe({ type: "paint", buffered: true });
+    // a page opened in a background tab does not paint until it is shown
+    window.setTimeout(function () { if (document.visibilityState === "visible") use(); }, 3000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") window.setTimeout(use, 3000); });
+  })();
+</script>
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    // the 404 page answers at any address: under /zh-cn/ it answers in Chinese
+    var lost = !root.getAttribute("data-route-lang") && /\/zh-cn(\/|$)/.test(location.pathname);
+    var wantZh = q ? q.indexOf("zh") === 0 : lost ? true : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    // the reader keeps the place they were sent to: the #anchor and any ?query go across as well
+    if (other) location.replace(location.origin + other + location.search + location.hash);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../index.html"><img src="../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106" fetchpriority="high"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../index.html#methods" class="nav-tb" translate="no"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+    <a href="../work-with-us/index.html" class="nav-work" aria-current="page"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle translate="no" aria-label="中 / EN · Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../work-with-us/index.html"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+        <a href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main" class="wk">
+  <header class="essay-head wk-head">
+    <div class="wrap essay-grid wk-grid">
+      <div>
+        <p class="essay-meta kicker"><span class="issue"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></span><span class="rule" aria-hidden="true"></span><span><span class="en">Evaluation first. Selected collaborations.</span><span class="zh" lang="zh-CN">以评测为核心，有选择地合作。</span></span></p>
+        <h1 class="essay-title" id="work-title"><span class="en">See how your AI tutor <em>actually teaches.</em></span><span class="zh" lang="zh-CN">看清你的 AI <em>究竟怎么教。</em></span></h1>
+        <p class="en ab-lede">Teachometry builds tools to understand and improve AI teaching quality. We also collaborate with teams on evaluation, technical research, advisory work, and selected engineering projects.</p><p class="zh ab-lede" lang="zh-CN">Teachometry 打造用于理解和改进 AI 教学质量的工具。我们也与团队合作，开展评测、技术研究、顾问工作，以及有选择的工程项目。</p>
+        <p class="cx-actions"><a class="cta cta-ink en" href="mailto:contact@teachometry.com?subject=Project%20enquiry">Discuss a project <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a class="cta cta-ink zh" lang="zh-CN" href="mailto:contact@teachometry.com?subject=%E5%90%88%E4%BD%9C%E9%A1%B9%E7%9B%AE%E5%92%A8%E8%AF%A2">讨论合作项目 <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a class="cta cta-line" href="#how"><span class="en">How we work</span><span class="zh" lang="zh-CN">合作流程</span></a></p>
+        <div class="wk-mail"><p class="kicker"><span class="en">Or write to</span><span class="zh" lang="zh-CN">或直接发邮件至</span></p><div class="ct-addr"><span class="v" id="work-email-top">contact@teachometry.com</span><button class="ct-copy" type="button" data-copy-text="contact@teachometry.com" aria-controls="work-email-top" data-state="idle" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><svg class="ic-copy" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.4"/><path d="M3.9 10.5h-.3a1.1 1.1 0 0 1-1.1-1.1V3.6a1.1 1.1 0 0 1 1.1-1.1h5.8a1.1 1.1 0 0 1 1.1 1.1v.3"/></svg><svg class="ic-done" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.4l3 3 6.6-7"/></svg><span data-copy-label aria-live="polite"><span class="en">Copy</span><span class="zh" lang="zh-CN">复制</span></span></button></div></div>
+      </div>
+      <figure class="cover-plate wk-plate">
+        <img src="../assets/work/measure.webp" alt="A paper pattern piece for the front of a bodice, drafted in pencil on white dot-and-cross pattern paper, lies on periwinkle wool twill. A yellow tailor’s tape measure runs from its brass end along the hem, off the paper and up in a half twist. Three glass-headed pins hold the side seam and two lie loose on the paper; the five heads are ruby, citrine, emerald, sapphire and amethyst." width="900" height="1100" data-alt-en="A paper pattern piece for the front of a bodice, drafted in pencil on white dot-and-cross pattern paper, lies on periwinkle wool twill. A yellow tailor’s tape measure runs from its brass end along the hem, off the paper and up in a half twist. Three glass-headed pins hold the side seam and two lie loose on the paper; the five heads are ruby, citrine, emerald, sapphire and amethyst." data-alt-zh="一片前衣片纸样平铺在雾蓝紫色的斜纹呢料上，白色打版纸印着蓝色的点和十字，轮廓用铅笔画成。一条黄色裁缝软尺从铜头开始沿着下摆铺开，离开纸样后翻了半圈向上延伸。三枚玻璃珠头大头针别住侧缝，另外两枚散放在纸上；五颗珠头分别是红宝石、黄水晶、祖母绿、蓝宝石和紫水晶的颜色。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">Made to measure: a paper pattern pinned to wool, a tailor’s tape laid across it, five pins in the colours of the five dimensions. An evaluation is cut to the product in front of it.</span><span class="zh" lang="zh-CN">量体裁衣：纸样别在呢料上，软尺搭过纸样，五枚大头针是五个维度的颜色。评测要按眼前的产品来裁。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <section class="wrap ab-row" id="what" aria-labelledby="work-what-title">
+    <div>
+      <p class="kicker"><span class="en">What we do</span><span class="zh" lang="zh-CN">我们做什么</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="work-what-title"><span class="en">Evaluation first.</span><span class="zh" lang="zh-CN">以评测为核心。</span></h2>
+      <p class="en jx-p">AI education evaluation is the core of our work. Research and advisory grow out of it, and engineering projects are taken on selectively.</p><p class="zh jx-p" lang="zh-CN">AI 教育评测是我们工作的核心。研究与顾问由它延伸而来，工程项目则有选择地承接。</p>
+      <article class="wk-core" aria-labelledby="work-core-title">
+        <header class="wk-tier-head">
+          <p class="kicker"><span class="en">Core</span><span class="zh" lang="zh-CN">核心</span></p>
+          <h3 id="work-core-title"><span class="en">AI education evaluation</span><span class="zh" lang="zh-CN">AI 教育评测</span></h3>
+          <p class="en">For teams building AI tutors and AI education products, education technology companies, and research groups.</p><p class="zh" lang="zh-CN">面向 AI Tutor 与 AI 教育产品的开发团队、教育科技企业和研究机构。</p>
+        </header>
+        <ol class="wk-core-list">
+          <li><span class="n">01</span><h4><span class="en">Teaching-quality evaluation and independent review</span><span class="zh" lang="zh-CN">AI 教学质量评测与独立审查</span></h4><p class="en">How your AI tutor behaves with learners, observed across structured cases. We can also act as an independent reviewer of its teaching.</p><p class="zh" lang="zh-CN">在结构化案例中观察你的 AI Tutor 面对学习者时的实际表现。我们也可以作为独立方，审查它的教学。</p></li>
+          <li><span class="n">02</span><h4><span class="en">Custom scenarios and evaluation criteria</span><span class="zh" lang="zh-CN">定制评测场景与评价标准</span></h4><p class="en">Scenarios built around your subject, your learners and your product, with the criteria agreed before any results are seen.</p><p class="zh" lang="zh-CN">围绕你的学科、学习者和产品设计场景；评价标准在看到任何结果之前就先商定。</p></li>
+          <li><span class="n">03</span><h4><span class="en">Diagnosis, evidence reports and regression tests</span><span class="zh" lang="zh-CN">教学行为诊断、证据报告与回归测试</span></h4><p class="en">Where the teaching goes wrong, shown case by case with the evidence, then kept as tests you can run again after every change.</p><p class="zh" lang="zh-CN">逐个案例指出教学在哪里出了问题、附上证据，再把它们留作每次改动后都能重跑的测试。</p></li>
+          <li><span class="n">04</span><h4><span class="en">Product-quality research and evaluation partnerships</span><span class="zh" lang="zh-CN">AI 教育产品质量研究与评测合作</span></h4><p class="en">Longer studies of the quality of AI education products, carried out together with your team.</p><p class="zh" lang="zh-CN">与你的团队一起，开展更长期的 AI 教育产品质量研究。</p></li>
+        </ol>
+      </article>
+      <article class="wk-tier" aria-labelledby="work-advisory-title">
+        <p class="kicker"><span class="en">Collaboration</span><span class="zh" lang="zh-CN">专业合作</span></p>
+        <h3 id="work-advisory-title"><span class="en">Research &amp; advisory</span><span class="zh" lang="zh-CN">研究与顾问</span></h3>
+        <p class="en">AI system evaluation, technical research, product-quality advice, prototype validation, research collaboration, and ongoing advisory work.</p><p class="zh" lang="zh-CN">AI 系统评价、技术研究、产品质量咨询、原型验证、研究合作，以及持续的顾问服务。</p>
+      </article>
+      <article class="wk-tier wk-aside" aria-labelledby="work-engineering-title">
+        <p class="kicker"><span class="en">Supplementary</span><span class="zh" lang="zh-CN">补充</span></p>
+        <h3 id="work-engineering-title"><span class="en">Selected engineering work</span><span class="zh" lang="zh-CN">有选择的工程项目</span></h3>
+        <p class="en">We take on a small number of remote software projects: API integrations, AI tools, automation and technical delivery. This work helps fund the research, so we only accept what leaves room for it.</p><p class="zh" lang="zh-CN">我们也少量承接远程软件工程项目：API 集成、AI 工具、自动化和技术交付。这些工作为研究提供资金支持，所以我们只接不挤占研究的项目。</p>
+      </article>
+      <p class="en ab-quote wk-open">Not sure where your question fits? Bring it as it is. Working out the scope together is part of the work.</p><p class="zh ab-quote wk-open" lang="zh-CN">不确定你的问题属于哪一类？照原样带来就好。一起把范围理清，本身就是合作的一部分。</p>
+    </div>
+  </section>
+
+  <section class="wrap ab-row wk-how" id="how" aria-labelledby="work-how-title">
+    <div>
+      <p class="kicker"><span class="en">How we work</span><span class="zh" lang="zh-CN">合作流程</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="work-how-title"><span class="en">From a first conversation to delivery.</span><span class="zh" lang="zh-CN">从第一次交流，到最终交付。</span></h2>
+      <p class="en jx-p">Every engagement is scoped with you and agreed in writing before work starts.</p><p class="zh jx-p" lang="zh-CN">每一次合作都先和你一起确定范围，并在开工前写成书面协议。</p>
+    </div>
+    <ol class="wk-steps">
+      <li><span class="n">01</span><h3><span class="en">Discuss</span><span class="zh" lang="zh-CN">沟通需求<small lang="en" aria-hidden="true">Discuss</small></span></h3><p class="en">You tell us what you are building and what you need to know. We ask questions until the problem is clear.</p><p class="zh" lang="zh-CN">你告诉我们你在做什么、想弄清楚什么。我们会一直追问，直到问题清楚为止。</p></li>
+      <li><span class="n">02</span><h3><span class="en">Scope</span><span class="zh" lang="zh-CN">确定范围<small lang="en" aria-hidden="true">Scope</small></span></h3><p class="en">Together we settle the scope, the deliverables, the timeline and the fee.</p><p class="zh" lang="zh-CN">我们一起确定范围、交付物、时间和费用。</p></li>
+      <li><span class="n">03</span><h3><span class="en">Agreement</span><span class="zh" lang="zh-CN">签订协议<small lang="en" aria-hidden="true">Agreement</small></span></h3><p class="en">The terms are put in writing and agreed by both sides before any work begins.</p><p class="zh" lang="zh-CN">条款写成书面协议，双方确认后才开始工作。</p></li>
+      <li><span class="n">04</span><h3><span class="en">Delivery</span><span class="zh" lang="zh-CN">交付成果<small lang="en" aria-hidden="true">Delivery</small></span></h3><p class="en">We carry out the work as agreed and hand over what was promised, with the evidence behind it.</p><p class="zh" lang="zh-CN">按协议开展工作，交付约定的成果，并附上背后的证据。</p></li>
+    </ol>
+    <div class="wk-terms">
+      <div>
+        <p class="kicker"><span class="en">Forms of engagement</span><span class="zh" lang="zh-CN">合作形式</span></p>
+        <dl class="ab-ledger wk-forms">
+          <div><dt><span class="en">By project</span><span class="zh" lang="zh-CN">按项目</span></dt><dd><span class="en">One defined piece of work with a fixed scope.</span><span class="zh" lang="zh-CN">一项范围明确的工作。</span></dd></div>
+          <div><dt><span class="en">In milestones</span><span class="zh" lang="zh-CN">分阶段里程碑</span></dt><dd><span class="en">Larger work in stages, each one agreed and delivered in turn.</span><span class="zh" lang="zh-CN">较大的工作分成几个阶段，逐段商定、逐段交付。</span></dd></div>
+          <div><dt><span class="en">Ongoing advisory</span><span class="zh" lang="zh-CN">长期顾问</span></dt><dd><span class="en">Regular advice over a longer period.</span><span class="zh" lang="zh-CN">在较长时间内定期提供建议。</span></dd></div>
+        </dl>
+        <p class="en wk-note">Which of these we can offer depends on the work and on our capacity at the time; not every form is always available.</p><p class="zh wk-note" lang="zh-CN">能提供哪种形式，取决于具体工作和我们当时的安排，并非每种形式都随时可选。</p>
+      </div>
+      <p class="en wk-price">We don’t publish fixed prices, and nothing is sold online. Fees are agreed for each piece of work.</p><p class="zh wk-price" lang="zh-CN">我们不公开固定价格，也不提供在线购买。费用针对每一项具体工作商定。</p>
+    </div>
+  </section>
+
+  <section class="wrap ab-row" id="independence" aria-labelledby="work-independence-title">
+    <div>
+      <p class="kicker"><span class="en">Independence and boundaries</span><span class="zh" lang="zh-CN">独立性与边界</span></p>
+    </div>
+    <div>
+      <h2 class="jx-h2" id="work-independence-title"><span class="en">Fees pay for the work,<br><em>not for the findings.</em></span><span class="zh" lang="zh-CN">费用买的是工作，<br><em>不是结论。</em></span></h2>
+      <p class="en jx-p">These rules apply to every engagement, whoever it is with.</p><p class="zh jx-p" lang="zh-CN">无论与谁合作，这些规则都适用。</p>
+      <ol class="wk-rules">
+        <li><span class="n">§ 1</span><h3><span class="en">Findings are not for sale.</span><span class="zh" lang="zh-CN">结论不出售。</span></h3><p class="en">Independent research and public results are never tied to sponsorship or consulting fees. An evaluation reports what the evidence shows, whoever pays for it.</p><p class="zh" lang="zh-CN">独立研究和公开结果从不与赞助或咨询报酬挂钩。无论谁付费，评测都只报告证据显示的内容。</p></li>
+        <li><span class="n">§ 2</span><h3><span class="en">Two roles, kept apart.</span><span class="zh" lang="zh-CN">两种角色，分开说明。</span></h3><p class="en">Evaluating a product independently and helping to build it are different roles, and they can conflict. We say up front which role we are in, and if we have helped build something, we say so before we evaluate it.</p><p class="zh" lang="zh-CN">独立评测一个产品，和参与开发它，是两种不同的角色，可能彼此冲突。我们会事先说明自己处于哪种角色；如果参与过开发，会在评测之前说明。</p></li>
+        <li><span class="n">§ 3</span><h3><span class="en">TutorBench stays whole.</span><span class="zh" lang="zh-CN">TutorBench 保持完整。</span></h3><p class="en">An engagement does not transfer the intellectual property of TutorBench as a whole. What each project delivers, and who owns it, is set out in the agreement.</p><p class="zh" lang="zh-CN">一次合作不会转让 TutorBench 整体的知识产权。每个项目交付什么、归谁所有，都写在协议里。</p></li>
+        <li><span class="n">§ 4</span><h3><span class="en">Honest about the instrument.</span><span class="zh" lang="zh-CN">如实说明工具的局限。</span></h3><p class="en">TutorBench is a Developer Preview. Its results are not yet calibrated, and it cannot show that learners learn more. No report of ours will claim otherwise.</p><p class="zh" lang="zh-CN">TutorBench 仍是开发者预览版。它的结果尚未校准，也不能证明学习者因此学得更好。我们的任何报告都不会作出相反的声明。</p></li>
+      </ol>
+      <p class="cx-actions"><a class="text-link" href="../methodology/index.html"><span class="en">Read the methodology and its limits</span><span class="zh" lang="zh-CN">阅读方法论及其局限</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+    </div>
+  </section>
+
+  <section class="jx-close wk-close" id="discuss" aria-labelledby="work-discuss-title">
+    <div class="wrap wk-close-grid">
+      <div>
+        <p class="kicker fount-k"><span class="en">Discuss a project</span><span class="zh" lang="zh-CN">讨论合作项目</span></p>
+        <h2 class="jx-h2" id="work-discuss-title"><span class="en">Tell us what you are building.</span><span class="zh" lang="zh-CN">告诉我们你在做什么。</span></h2>
+        <div class="ct-addr wk-addr"><span class="v" id="work-email">contact@teachometry.com</span><button class="ct-copy" type="button" data-copy-text="contact@teachometry.com" aria-controls="work-email" data-state="idle" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><svg class="ic-copy" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.4"/><path d="M3.9 10.5h-.3a1.1 1.1 0 0 1-1.1-1.1V3.6a1.1 1.1 0 0 1 1.1-1.1h5.8a1.1 1.1 0 0 1 1.1 1.1v.3"/></svg><svg class="ic-done" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.4l3 3 6.6-7"/></svg><span data-copy-label aria-live="polite"><span class="en">Copy</span><span class="zh" lang="zh-CN">复制</span></span></button></div>
+        <p class="cx-actions"><a class="cta cta-ink en" href="mailto:contact@teachometry.com?subject=Project%20enquiry">Discuss a project <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a class="cta cta-ink zh" lang="zh-CN" href="mailto:contact@teachometry.com?subject=%E5%90%88%E4%BD%9C%E9%A1%B9%E7%9B%AE%E5%92%A8%E8%AF%A2">讨论合作项目 <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a><a class="text-link" href="../contact/index.html"><span class="en">Other ways to reach us</span><span class="zh" lang="zh-CN">其他联系方式</span> <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a></p>
+      </div>
+      <div class="wk-brief">
+        <p class="kicker"><span class="en">A useful first email covers</span><span class="zh" lang="zh-CN">第一封邮件可以写这些</span></p>
+        <ul>
+          <li><span class="en">what your product does, and who its learners are</span><span class="zh" lang="zh-CN">你的产品做什么，学习者是谁</span></li>
+          <li><span class="en">the question you want answered</span><span class="zh" lang="zh-CN">你想回答的问题</span></li>
+          <li><span class="en">any timeline or budget you already have in mind</span><span class="zh" lang="zh-CN">已有的时间或预算设想</span></li>
+          <li><span class="en">constraints such as data, privacy, or who will see the results</span><span class="zh" lang="zh-CN">数据、隐私、结果给谁看等限制条件</span></li>
+        </ul>
+        <p class="en wk-note">Please don’t send real learner data or private transcripts in a first email. How data is handled is agreed before any of it is shared.</p><p class="zh wk-note" lang="zh-CN">请不要在第一封邮件里发送真实学习者数据或私密对话记录。数据如何处理，会在共享任何数据之前先商定。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84" loading="lazy" decoding="async"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../assets/tutorbench-mark-small.svg" alt="" width="16" height="16" loading="lazy" decoding="async"><b translate="no">TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../work-with-us/index.html"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+        <a href="../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="../contact/index.html#privacy"><span class="en">Privacy</span><span class="zh" lang="zh-CN">隐私</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond and Newsreader; Chinese in Noto Serif SC. Covers rendered in Blender.</span><span class="zh" lang="zh-CN">英文以 Cormorant Garamond 与 Newsreader 排印，中文以思源宋体排印。封面由 Blender 渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../assets/logo/teachometry-seal.svg" alt="" width="204" height="204" loading="lazy" decoding="async">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../spectrum.js"></script>
+<script src="../about.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Work with us — Teachometry", zh: "合作与服务 — Teachometry" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

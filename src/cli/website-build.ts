@@ -66,6 +66,7 @@ import {
 import { renderCommunityPage } from "../site/pages/community.js";
 import { renderMicroReviewPage } from "../site/pages/micro-review.js";
 import { renderContactPage } from "../site/pages/contact.js";
+import { renderWorkWithUsPage } from "../site/pages/work-with-us.js";
 import { renderTeachometryFooter } from "../site/pages/home.js";
 import { renderNotFoundPage } from "../site/pages/not-found.js";
 import {
@@ -293,6 +294,7 @@ function routePages(
     { outputRoute: "/community/", page: renderCommunityPage(artifacts, locale) },
     { outputRoute: "/micro-review/", page: renderMicroReviewPage(artifacts) },
     { outputRoute: "/contact/", page: renderContactPage(artifacts) },
+    { outputRoute: "/work-with-us/", page: renderWorkWithUsPage(artifacts) },
   ];
   const routePages = [
     ...pages,

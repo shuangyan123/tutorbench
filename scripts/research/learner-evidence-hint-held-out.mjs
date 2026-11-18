@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { TUTOR_EVAL_EVALUATOR_VERSION } from "../../dist/src/contracts/tutor-eval.js";
 import { loadTutorEvalDataset } from "../../dist/src/datasets/index.js";
 import { evaluateHintFit, hintRubric } from "../../dist/src/research/learner-evidence-hint-rubric.js";
 import { createHintPilot, hintSource } from "../../dist/src/research/learner-evidence-hint-scenarios.js";
@@ -12,6 +13,9 @@ import {
 import { measurementFingerprint } from "../../dist/src/research/measurement-reliability-source.js";
 import { writeNew } from "./deepseek-tutor-efforts-core.mjs";
 
+// The frozen baseline was captured before the CJK disclosure evaluator changed in 0.3a.6.
+// Never replay or create its historical decision identity with a newer runtime.
+const historicalEvaluatorVersion = "0.3a.5";
 const fixtures = "scenarios/experimental/learner-evidence-hint-v0.1";
 const privateDir = "artifacts/real-model";
 const sealedReviewPath = `${privateDir}/learner-evidence-hint-held-out-v0.1.0.reference.json`;
@@ -24,6 +28,10 @@ async function main([command, input, ...rest]) {
   if (rest.length || !["template", "baseline", "freeze-review", "compare"].includes(command) ||
       Boolean(input) !== ["freeze-review", "compare"].includes(command)) {
     throw new Error("Usage: learner-evidence-hint-held-out.mjs template|baseline|freeze-review <submission.json>|compare <local-revision.js>");
+  }
+  if ((command === "baseline" || command === "compare") &&
+      TUTOR_EVAL_EVALUATOR_VERSION !== historicalEvaluatorVersion) {
+    throw new Error(`hint_historical_evaluator_runtime_required: expected ${historicalEvaluatorVersion}, got ${TUTOR_EVAL_EVALUATOR_VERSION}`);
   }
   const manifest = await parse(`${fixtures}/baseline.json`);
   const identity = `${hintRubric.id}@${hintRubric.version}`;
@@ -96,7 +104,7 @@ async function main([command, input, ...rest]) {
   const revised = replayHintReviewPacket(packet, cases, revision.evaluateHintFit);
   const result = {
     experimental: true, packetFingerprint: packet.fingerprint,
-    baseline: { identity, sourceCommit: manifest.sourceCommit, fingerprint: captured.fingerprint },
+    baseline: { identity, sourceCommit: manifest.sourceCommit, evaluatorVersion: TUTOR_EVAL_EVALUATOR_VERSION, fingerprint: captured.fingerprint },
     revision: { identity: `${hintRubric.id}@${version}`, moduleSha256: sha256(await readFile(revisionPath)) },
     reference: { sourceSha256: sealedReview.sourceSha256, fingerprint: measurementFingerprint(reference) },
     units: summarizeHintReviewPacket(packet, cases),

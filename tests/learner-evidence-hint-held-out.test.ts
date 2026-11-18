@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { TUTOR_EVAL_EVALUATOR_VERSION } from "../src/contracts/tutor-eval.js";
 import { test } from "node:test";
 import { loadTutorEvalDataset } from "../src/datasets/index.js";
 import {
@@ -64,4 +66,18 @@ test("a source-bound reference and two different synthetic decisions retain fixe
     ...submission, judgments: submission.judgments.map((row) => ({ ...row, unitId: "h01" })),
   }), /hint_held_out_review_incomplete/u);
   assert.throws(() => compareHintRevisions(control, baseline, [...revision].reverse(), reference), /hint_held_out_pairing_mismatch/u);
+});
+
+
+test("historical baseline and comparison reject a newer evaluator before reading private data", () => {
+  assert.equal(TUTOR_EVAL_EVALUATOR_VERSION, "0.3a.6");
+  for (const args of [["baseline"], ["compare", "./does-not-exist.js"]]) {
+    const result = spawnSync(
+      process.execPath,
+      ["scripts/research/learner-evidence-hint-held-out.mjs", ...args],
+      { encoding: "utf8", cwd: process.cwd() },
+    );
+    assert.equal(result.status, 1, args.join(" "));
+    assert.match(result.stderr, /hint_historical_evaluator_runtime_required: expected 0\.3a\.5, got 0\.3a\.6/u);
+  }
 });

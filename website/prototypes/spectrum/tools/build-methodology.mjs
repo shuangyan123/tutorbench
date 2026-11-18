@@ -233,7 +233,7 @@ const body = `
         ${deck3("Five complementary", "lenses on tutoring", "behavior.")}
         ${biPE("p", "", "We evaluate AI tutors across the five score dimensions in the public benchmark artifact, capturing complementary aspects of observable tutoring behavior in structured cases.")}
         ${fig("fig-wide", `<ol class="dims">${dims.map((d, i) => `<li id="dim-${d.key}">
-            <img class="d-gem" src="../assets/gems/gem-${i}.webp" alt="" width="96" height="96">
+            <img class="d-gem" src="../assets/gems/gem-${i}.webp" srcset="../assets/gems/gem-${i}-2x.webp 2x" alt="" width="96" height="96">
             <span class="d-no">${bi(`Dimension ${String(i + 1).padStart(2, "0")}`, `维度 ${String(i + 1).padStart(2, "0")}`)} · ${biE("Score lens")}</span>
             <span class="d-name">${biE(d.label)}</span>
             <span class="d-desc">${biE(d.description)}</span>

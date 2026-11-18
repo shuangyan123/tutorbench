@@ -63,6 +63,9 @@
       "art": { "kind": "plate", "file": "assets/community/glasses.webp" } },
     { "id": "contact", "routes": ["contact/"], "source": "contact/index.html", "lead": "ink", "gems": [0, 1, 2, 3, 4],
       "kicker": [["Contact", "联系"], ["Teachometry", "Teachometry"]],
-      "art": { "kind": "plate", "file": "assets/about/letterbox.webp" } }
+      "art": { "kind": "plate", "file": "assets/about/letterbox.webp" } },
+    { "id": "work", "routes": ["work-with-us/"], "source": "work-with-us/index.html", "lead": "ink", "gems": [0, 1, 2, 3, 4],
+      "kicker": [["Work with us", "合作与服务"], ["Teachometry", "Teachometry"]],
+      "art": { "kind": "plate", "file": "assets/work/measure.webp", "position": "50% 62%" } }
   ]
 }

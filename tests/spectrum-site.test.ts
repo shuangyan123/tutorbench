@@ -258,6 +258,34 @@ test("product facts stay on the published pages", async () => {
   assert.match(await page("zh-cn/micro-review/index.html"), /<html lang="zh-CN"/u);
 });
 
+test("Work with us: one way in by email, in each language, with its limits kept on the page", async () => {
+  const pages = {
+    en: { file: "work-with-us/index.html", title: "Work with us — Teachometry", subject: "Project enquiry", url: `${SITE_URL}/work-with-us/`, preview: /Developer Preview\. Its results are not yet calibrated/u },
+    zh: { file: "zh-cn/work-with-us/index.html", title: "合作与服务 — Teachometry", subject: "合作项目咨询", url: `${SITE_URL}/zh-cn/work-with-us/`, preview: /开发者预览版。它的结果尚未校准/u },
+  };
+  for (const { file, title, subject, url, preview } of Object.values(pages)) {
+    const html = await page(file);
+    assert.ok(html.includes(`<title>${title}</title>`), file);
+    assert.ok(html.includes(`<link rel="canonical" href="${url}">`), file);
+    assert.ok(html.includes(`href="mailto:contact@teachometry.com?subject=${encodeURIComponent(subject)}"`), `${file}: mail link`);
+    // a reader with no mail app gets the address as text, with a copy button, under the first button too
+    const hero = html.slice(html.indexOf('id="work-title"'), html.indexOf('id="what"'));
+    assert.ok(hero.includes('<span class="v" id="work-email-top">contact@teachometry.com</span>'), `${file}: address shown under the first button`);
+    assert.ok(hero.includes('data-copy-text="contact@teachometry.com" aria-controls="work-email-top"'), `${file}: address can be copied`);
+    assert.match(html, /class="nav-work" aria-current="page"/u, file);
+    assert.match(html, preview, `${file}: says what TutorBench cannot show yet`);
+    assert.match(html, /href="\.\.\/(?:\.\.\/)?methodology\/"/u, `${file}: links the methodology and its limits`);
+    // no form, no checkout, no published price
+    assert.doesNotMatch(withoutScripts(html), /<form\b|checkout|[$€£¥]\s?\d/iu, file);
+  }
+  assert.match(await page("work-with-us/index.html"), /See how your AI tutor/u);
+  assert.match(await page("zh-cn/work-with-us/index.html"), /讨论合作项目/u);
+  assert.match(await page("work-with-us/index.html"), /<link rel="alternate" hreflang="zh-Hans" href="https:\/\/example\.org\/tb\/zh-cn\/work-with-us\/">/u);
+  // every page's bar leads to it; Contact points there for project work
+  for (const file of ["index.html", "zh-cn/about/index.html", "data/cases/index.html"]) assert.match(await page(file), /<a href="[^"]*work-with-us\/" class="nav-work">/u, file);
+  assert.match(await page("contact/index.html"), /href="\.\.\/work-with-us\/"/u);
+});
+
 const PROTOTYPE = join(process.cwd(), "website", "prototypes", "spectrum");
 
 async function prototypeText(directory = PROTOTYPE, prefix = ""): Promise<string> {
@@ -343,6 +371,8 @@ test("every page shares its own section's preview card, in its own language", as
   assert.equal(await card("zh-cn/blog/why-teaching-does-not-scale/index.html"), "essay-scale-zh.jpg");
   assert.equal(await card("data/cases/fraction-misconception-001/index.html"), "cases-en.jpg");
   assert.equal(await card("zh-cn/models/[modelId]/index.html"), "models-zh.jpg");
+  assert.equal(await card("work-with-us/index.html"), "work-en.jpg");
+  assert.equal(await card("zh-cn/work-with-us/index.html"), "work-zh.jpg");
   assert.equal(await card("404.html"), "home-en.jpg");
 });
 
@@ -507,4 +537,35 @@ test("the Journal has a feed in each language, linked from its pages", async () 
     assert.doesNotMatch(await page(`${prefix}index.html`), /application\/rss\+xml/u);
   }
   assert.equal(journalFeed(new Map(), false), undefined);
+});
+
+test("every essay offers Share at its start, in its own language, with nothing loaded from elsewhere", async () => {
+  const essays = (await htmlFiles(spectrum)).filter((file) => /^(?:zh-cn\/)?blog\/[^/]+\/index\.html$/u.test(file));
+  let found = 0;
+  for (const file of essays) {
+    const html = await page(file);
+    if (!html.includes('class="essay-head"')) continue;   // an old address that redirects to its essay
+    found += 1;
+    const zh = file.startsWith("zh-cn/");
+    const row = /<div class="essay-share" data-share[^>]*>[\s\S]*?data-share-said[^>]*><\/span>/u.exec(html)?.[0] ?? "";
+    assert.ok(row, `${file}: no share control`);
+    // at the end of the byline strip, before the cover: the reader sees it before the essay starts
+    const at = html.indexOf(row);
+    assert.ok(html.indexOf("essay-byline") < at && at < html.indexOf('class="cover-plate"'), `${file}: share control out of place`);
+    // hidden until share.js runs, since none of its controls work without it; the list opens on demand
+    assert.match(row, /^<div class="essay-share" data-share hidden>/u, file);
+    assert.match(row, /<button type="button" class="share-btn kicker" data-share-toggle aria-expanded="false" aria-controls="share-list">/u, file);
+    assert.match(row, /<div class="share-list" id="share-list" data-share-list [^>]*hidden>/u, file);
+    assert.ok(row.includes(zh ? ">分享<" : ">Share<"), `${file}: share label language`);
+    assert.match(html, /<script src="(?:\.\.\/)+share\.js"><\/script>/u, file);
+    assert.ok(row.includes(zh ? "复制链接" : "Copy link") && !row.includes(zh ? "Copy link" : "复制链接"), `${file}: share row language`);
+    assert.ok(row.includes(`aria-label="${zh ? "分享这篇文章" : "Share this essay"}"`), file);
+    assert.match(row, /href="https:\/\/x\.com\/intent\/tweet" target="_blank" rel="noopener noreferrer"/u, file);
+    for (const [, src = ""] of html.matchAll(/<script\b[^>]*\ssrc="([^"]+)"/gu)) assert.doesNotMatch(src, /^(?:https?:)?\/\//u, `${file}: script from elsewhere`);
+  }
+  assert.ok(found >= 14, `share control on ${found} essay pages`);
+  // the script only copies, opens the share sheet, or builds the X link: it sends nothing anywhere
+  const script = await readFile(join(spectrum, "share.js"), "utf8");
+  assert.doesNotMatch(script, /fetch\(|XMLHttpRequest|sendBeacon|WebSocket|createElement\("script"\)|new Image/u);
+  assert.doesNotMatch(await page("blog/index.html"), /data-share/u, "the contents page has no share control");
 });
