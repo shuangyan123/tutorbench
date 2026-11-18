@@ -1,0 +1,18 @@
+{
+  "identity": "learner-evidence-hint-fit@0.1.0",
+  "sourceCommit": "7fb88533f23166d1251c94e4720f8537daec6bbe",
+  "scoringIdentity": null,
+  "design": {"syntheticReplies": 14, "frozenModelReplies": 3, "syntheticJudgments": 42, "frozenReplayJudgments": 9},
+  "heldOut": {
+    "uniqueReplies": 10,
+    "plannedPairJudgments": 30,
+    "packetFingerprint": "432d0fcc20096d0af7d458374ae73e751225ef7ac7a6e1bcc01b7d10cbc66b63"
+  },
+  "lfNormalizedSha256": {
+    "src/research/learner-evidence-hint-rubric.ts": "550fd39e65bbfdf47a0f3b731be816f86a5f295261a2d57132dbecfd22cd6c97",
+    "src/research/learner-evidence-hint-scenarios.ts": "f154a56d0a90b003010a3c222462a761c08b3498213f272fbaf8e6b5f7e8ee29",
+    "scenarios/experimental/learner-evidence-hint-v0.1/responses.json": "2a4539e6d2edc353147b2bbf2b4b29de6125687544e0bda7b66abc093e8c3445",
+    "docs/research/learner-evidence-hint-maintainer-review-v0.1.json": "1d78ee7fae9600949fa1458680e5c7c435af5e986e9781767136f8cab40c2258",
+    "scenarios/experimental/learner-evidence-hint-v0.1/held-out-responses.json": "af4849509314e8588651bd860842902269a1e8e93aff9aa08c4c2b052b858598"
+  }
+}
