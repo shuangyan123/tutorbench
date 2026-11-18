@@ -39,6 +39,7 @@ export function renderContactPage(artifacts: PublicBenchmarkArtifacts): SitePage
               <h3>Project &amp; collaboration</h3>
               <p>For collaboration, research discussion, partnership questions, or longer-form project feedback.</p>
               <a href="mailto:${escapeHtml(SITE_CONTACT_EMAIL)}">${escapeHtml(SITE_CONTACT_EMAIL)} ${icon("arrow")}</a>
+              <p class="contact-work"><span>Planning a project with us?</span> <a href="/work-with-us/">See how we work together</a></p>
             </article>
             <article>
               <span class="contact-icon contact-icon-x"><img src="/assets/x-logo.svg" width="18" height="18" alt=""></span>

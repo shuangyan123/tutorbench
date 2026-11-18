@@ -281,7 +281,7 @@ function heatmapPage() {
       <p class="kicker">${biE("Evaluation dimensions")}</p>
       <h2 id="dimensions-title" class="jx-h2">${biE("Five lenses for future evidence.")}</h2>
       ${biPE("p", "jx-p", "Each dimension defines a future trial-linked view of observable tutoring behavior. None is scored on this page today.")}
-      <ol class="hm-dims">${dims.map((d, i) => `<li><img src="../../assets/gems/gem-${i}.webp" alt="" width="96" height="96"><b>${biE(humanize(d))}</b><span>${biE(DIM_COPY[d] ?? "Defined by the public evaluation contract")}</span></li>`).join("")}</ol>
+      <ol class="hm-dims">${dims.map((d, i) => `<li><img src="../../assets/gems/gem-${i}.webp" srcset="../../assets/gems/gem-${i}-2x.webp 2x" alt="" width="96" height="96"><b>${biE(humanize(d))}</b><span>${biE(DIM_COPY[d] ?? "Defined by the public evaluation contract")}</span></li>`).join("")}</ol>
     </section>
 
     <aside class="hm-source" aria-labelledby="source-title">

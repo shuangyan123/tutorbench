@@ -694,7 +694,7 @@ test("static website build emits the public artifact files and route shell", asy
     const zhHomeHtml = await readFile(join(outputDirectory, "zh-cn", "index.html"), "utf8");
     const zhNotFoundHtml = await readFile(join(outputDirectory, "zh-cn", "404.html"), "utf8");
 
-    assert.equal(routeCount, 64);
+    assert.equal(routeCount, 65);
     assert.match(zhHomeHtml, /<html lang="zh-CN" data-ui-locale="zh-CN">/);
     assert.match(zhHomeHtml, /部署之前，先看证据/);
     assert.match(zhHomeHtml, /href="\/zh-cn\/run\/">/);
@@ -708,6 +708,15 @@ test("static website build emits the public artifact files and route shell", asy
     assert.match(contactHtml, /https:\/\/x\.com\/1Shuangyan36877/u);
     assert.match(contactHtml, /src="\/assets\/x-logo\.svg"/u);
     assert.match(contactHtml, /class="home-footer"/);
+    assert.match(contactHtml, /href="\/work-with-us\/"/u);
+    const workHtml = await readFile(join(outputDirectory, "work-with-us", "index.html"), "utf8");
+    const zhWorkHtml = await readFile(join(outputDirectory, "zh-cn", "work-with-us", "index.html"), "utf8");
+    assert.match(workHtml, /<title>Work with us — Teachometry<\/title>/);
+    assert.match(workHtml, /<body class="about-page contact-page">/);
+    assert.match(workHtml, /href="mailto:contact@teachometry\.com\?subject=Project%20enquiry"/u);
+    assert.match(workHtml, /Developer Preview/u);
+    assert.match(zhWorkHtml, /<title>合作与服务 — Teachometry<\/title>/);
+    assert.match(zhWorkHtml, /讨论合作项目/u);
     assert.match(notFoundHtml, /<title>Page not found — Teachometry<\/title>/);
     assert.match(notFoundHtml, /<body class="home-page not-found-page">/);
     assert.match(notFoundHtml, /<header class="site-header home-header">/);
