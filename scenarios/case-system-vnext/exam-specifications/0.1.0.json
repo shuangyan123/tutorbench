@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "version": "0.1.0",
+  "graph": "mathematics-knowledge-map-v0.1@0.2.0",
+  "alignment": "mathematics-exam-alignment-v0.1@0.2.0",
+  "exams": [
+    {"id":"cn-gaokao","jurisdiction":"CN-ZJ","provider":"教育部教育考试院","subject":"数学","scope":"全国一卷","session":2025,"profile":null,"status":"partial"},
+    {"id":"cn-kaoyan-i","jurisdiction":"CN","provider":"教育部教育考试院","subject":"数学一","scope":"graduate-subject","session":null,"profile":"cn-kaoyan-math-1-2027","status":"pending"},
+    {"id":"cn-kaoyan-ii","jurisdiction":"CN","provider":"教育部教育考试院","subject":"数学二","scope":"graduate-subject","session":null,"profile":"cn-kaoyan-math-2-2027","status":"pending"},
+    {"id":"cn-kaoyan-iii","jurisdiction":"CN","provider":"教育部教育考试院","subject":"数学三","scope":"graduate-subject","session":null,"profile":"cn-kaoyan-math-3-2027","status":"pending"},
+    {"id":"cn-guokao-xingce","jurisdiction":"CN","provider":"国家公务员局","subject":"行政职业能力测验","scope":"public-subject","session":null,"profile":"cn-guokao-aptitude-2027","status":"pending"},
+    {"id":"cn-guokao-shenlun","jurisdiction":"CN","provider":"国家公务员局","subject":"申论","scope":"public-subject","session":null,"profile":null,"status":"pending"},
+    {"id":"cn-guokao-post","jurisdiction":"CN","provider":"招录机关（依职位而定）","subject":"类别或职位特定要求","scope":"post-specific","session":null,"profile":null,"status":"pending"},
+    {"id":"de-abitur","jurisdiction":"DE","provider":"KMK / IQB (common standards / pool)","subject":"Mathematik","scope":"common-framework","session":null,"profile":null,"status":"partial"},
+    {"id":"us-ap-calculus-ab","jurisdiction":"US","provider":"College Board","subject":"AP Calculus AB","scope":"subject-assessment","session":null,"profile":"us-ap-calculus-ab-2027","status":"partial"},
+    {"id":"us-ap-calculus-bc","jurisdiction":"US","provider":"College Board","subject":"AP Calculus BC","scope":"subject-assessment","session":null,"profile":"us-ap-calculus-bc-2027","status":"partial"},
+    {"id":"us-sat-math","jurisdiction":"US","provider":"College Board","subject":"SAT Math","scope":"admissions-assessment","session":null,"profile":"us-sat-math-digital-2026","status":"pending"}
+  ],
+  "landOverlays": {
+    "parent":"de-abitur","status":"pending","jurisdictions":["DE-BB","DE-BE","DE-BW","DE-BY","DE-HB","DE-HE","DE-HH","DE-MV","DE-NI","DE-NW","DE-RP","DE-SH","DE-SL","DE-SN","DE-ST","DE-TH"]
+  },
+  "specifications": [
+    {
+      "id":"zj-paper-i-analysis","version":"2025.1","exams":["cn-gaokao"],"jurisdiction":"CN-ZJ","session":2025,"paper":"全国一卷",
+      "publisher":"浙江省教育考试院 (publisher of signed teacher commentary)","publicationDate":"2025-06-07","effectiveTeachingPeriod":null,
+      "url":"https://www.zjzs.net/art/2025/6/7/art_31_11264.html","retrievedAt":"2026-11-18","sha256":"007165f2eb190cf545c84dfa793295099f7b9f8fa7606537a1609471ec2f0e96","reuse":"metadata-and-paraphrase-only",
+      "clauses":[{"id":"q18","locator":"二、关注能力 甄选创新人才; examples in sequence, item 18","kind":"item-evidence","requirement":"The published analysis identifies analytic geometry in item 18.","skill":"topic identification, not a syllabus mandate"}]
+    },
+    {
+      "id":"kmk-ahr-math","version":"2012.1","exams":["de-abitur"],"jurisdiction":"DE","session":null,"paper":null,
+      "publisher":"Kultusministerkonferenz","publicationDate":null,"effectiveTeachingPeriod":null,
+      "url":"https://www.kmk.org/fileadmin/Dateien/veroeffentlichungen_beschluesse/2012/2012_10_18-Bildungsstandards-Mathe-Abi.pdf","retrievedAt":"2026-11-18","sha256":"a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546","reuse":"metadata-and-paraphrase-only",
+      "clauses":[{"id":"l4-rate","locator":"2012-10-18 resolution, printed p. 20, L4, common basic/advanced list, third bullet","kind":"curriculum-requirement","requirement":"Interpret differentiation at a point in terms of local change.","skill":"interpretation on both levels"}]
+    },
+    {
+      "id":"ap-calculus-ced","version":"2020.1","exams":["us-ap-calculus-ab","us-ap-calculus-bc"],"jurisdiction":"US","session":null,"paper":null,
+      "publisher":"College Board","publicationDate":null,"effectiveTeachingPeriod":{"from":"2020-fall","through":null},
+      "url":"https://apcentral.collegeboard.org/media/pdf/ap-calculus-ab-and-bc-course-and-exam-description.pdf","retrievedAt":"2026-11-18","sha256":"fd571cdc252c24d33a75ed556ee20d9261ef1ad3dbb718d0caf78acecc8253ca","reuse":"metadata-and-paraphrase-only",
+      "clauses":[{"id":"cha-2-b-1","locator":"Printed p. 55, Unit 2, Topic 2.1, CHA-2.B.1","kind":"assessment-framework","requirement":"Express instantaneous change using a limiting quotient when the limit exists.","skill":"represent a derivative at a point"}]
+    }
+  ],
+  "mappings": [
+    {"spec":"zj-paper-i-analysis@2025.1","clause":"q18","concept":"coordinate-geometry","evidence":"clause-located","review":"author-proposed"},
+    {"spec":"kmk-ahr-math@2012.1","clause":"l4-rate","concept":"derivatives-rate","evidence":"clause-located","review":"author-proposed"},
+    {"spec":"ap-calculus-ced@2020.1","clause":"cha-2-b-1","concept":"derivatives-rate","evidence":"clause-located","review":"author-proposed"}
+  ]
+}
