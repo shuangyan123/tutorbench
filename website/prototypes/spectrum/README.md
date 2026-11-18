@@ -64,9 +64,13 @@ in under 500 KB a second) it stops after every 4th frame, a quarter of the weigh
 blending between those. Near the end of the cover the masthead slides up over it as a sheet.
 The earlier three-mirror end-cap sequences (`R_*`, `Q_*`, `P_*`, `L_*`) are no longer in the
 repository; their scene script (`render/scene.py`) is kept. Dimension markers are five Blender cut
-gems (`assets/gems/`,
-`render/gems.py`): ruby oval, citrine pear, emerald step cut, sapphire cushion, amethyst trillion,
-each rendered in three IOR passes for fire. The earlier glass beads (`assets/beads/`) show with `#beads`. Two GPT photographs open §2 and §3 as framed
+gems (`assets/gems/`, `render/gems.py`): ruby oval, citrine pear, emerald step cut, sapphire
+cushion, amethyst trillion. Each stone is cut as real facet planes at angles that suit its
+refractive index, and rendered spectrally (12 wavelength bins, each with the stone's own absorption
+bands and refractive index) in a jeweller's light tent in the site's colours. `gem-k.webp` is 96 px;
+`gem-k-2x.webp` (192 px) serves the larger markers (Methodology's five lenses, the heatmap legend) on
+high-density screens. The knowledge map's paler stones (`domain-*.webp`) come from the same script
+with `GEMSET=domains`. The earlier glass beads (`assets/beads/`) show with `#beads`. Two GPT photographs open §2 and §3 as framed
 plates, captioned as generated illustrations.
 Link previews. Every page shares a 1200×630 card (`assets/share/<id>-en.jpg` / `-zh.jpg`): the
 page's own headline in the site's type on the page light, beside its section's Blender cover. The
