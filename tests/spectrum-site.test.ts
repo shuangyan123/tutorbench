@@ -268,6 +268,10 @@ test("Work with us: one way in by email, in each language, with its limits kept 
     assert.ok(html.includes(`<title>${title}</title>`), file);
     assert.ok(html.includes(`<link rel="canonical" href="${url}">`), file);
     assert.ok(html.includes(`href="mailto:contact@teachometry.com?subject=${encodeURIComponent(subject)}"`), `${file}: mail link`);
+    // a reader with no mail app gets the address as text, with a copy button, under the first button too
+    const hero = html.slice(html.indexOf('id="work-title"'), html.indexOf('id="what"'));
+    assert.ok(hero.includes('<span class="v" id="work-email-top">contact@teachometry.com</span>'), `${file}: address shown under the first button`);
+    assert.ok(hero.includes('data-copy-text="contact@teachometry.com" aria-controls="work-email-top"'), `${file}: address can be copied`);
     assert.match(html, /class="nav-work" aria-current="page"/u, file);
     assert.match(html, preview, `${file}: says what TutorBench cannot show yet`);
     assert.match(html, /href="\.\.\/(?:\.\.\/)?methodology\/"/u, `${file}: links the methodology and its limits`);
