@@ -431,13 +431,19 @@ function communityPage() {
 
 /* ------------------------------------------------------------------ Contact */
 
+// The email address is always shown as text, because a mailto: link opens nothing (or the system's
+// "choose an app" dialog) for a reader with no mail app. Beside it, a button copies it (about.js):
+// a drawn copy mark that turns to a tick, and the label says "Copied".
+const COPY_ICONS = `<svg class="ic-copy" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.4"/><path d="M3.9 10.5h-.3a1.1 1.1 0 0 1-1.1-1.1V3.6a1.1 1.1 0 0 1 1.1-1.1h5.8a1.1 1.1 0 0 1 1.1 1.1v.3"/></svg><svg class="ic-done" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.4l3 3 6.6-7"/></svg>`;
+/** the copy button for the address shown in the element with this id */
+const copyButton = (target) => `<button class="ct-copy" type="button" data-copy-text="${esc(SITE_CONTACT_EMAIL)}" aria-controls="${target}" data-state="idle" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C">${COPY_ICONS}<span data-copy-label aria-live="polite">${bi("Copy", "复制")}</span></button>`;
+
 const GITHUB_PRIVACY = "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement";
 
 function contactPage() {
-  const copyBtn = `<button class="ct-copy" type="button" data-copy-text="${esc(SITE_CONTACT_EMAIL)}" aria-controls="contact-email" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><span data-copy-label aria-live="polite">${bi("Copy", "复制")}</span></button>`;
   const CH = [
     ["Email", "Project & collaboration", "For collaboration, research discussion, partnership questions, or longer-form project feedback.",
-      `<span class="v" id="contact-email">${esc(SITE_CONTACT_EMAIL)}</span>${copyBtn}`,
+      `<span class="v" id="contact-email">${esc(SITE_CONTACT_EMAIL)}</span>${copyButton("contact-email")}`,
       `<p class="ct-work">${biE("Planning a project with us?")} <a class="text-link" href="../work-with-us/index.html">${biE("See how we work together")} ${ARROW}</a></p>`],
     ["X", "Updates & short messages", "Follow project updates or send a short public message on X.",
       `<a class="v" href="${esc(SITE_X_URL)}" rel="noreferrer">@1Shuangyan36877</a>`],
@@ -495,7 +501,6 @@ const mailButton = (cls, label) => [["en", W.hero.mailSubject, label], ["zh", Z(
   .map(([lang, subject, text]) => `<a class="${cls} ${lang}"${lang === "zh" ? ' lang="zh-CN"' : ""} href="${esc(workWithUsMailto(subject))}">${esc(text)} ${ARROW}</a>`).join("");
 
 function workPage() {
-  const copyBtn = `<button class="ct-copy" type="button" data-copy-text="${esc(SITE_CONTACT_EMAIL)}" aria-controls="work-email" data-idle-en="Copy" data-idle-zh="复制" data-done-en="Copied" data-done-zh="已复制" data-select-en="Selected · press Ctrl+C" data-select-zh="已选中 · 请按 Ctrl+C"><span data-copy-label aria-live="polite">${bi("Copy", "复制")}</span></button>`;
   const two = (n) => String(n).padStart(2, "0");
   const body = `<main id="main" class="wk">
   <header class="essay-head wk-head">
@@ -505,6 +510,7 @@ function workPage() {
         <h1 class="essay-title" id="work-title">${bi(`${esc(W.hero.titleLead)} <em>${esc(W.hero.titleAccent)}</em>`, `${esc(Z(W.hero.titleLead))}${/[A-Za-z]$/.test(Z(W.hero.titleLead)) ? " " : ""}<em>${esc(Z(W.hero.titleAccent))}</em>`)}</h1>
         ${WP("p", "ab-lede", W.hero.lede)}
         <p class="cx-actions">${mailButton("cta cta-ink", W.hero.primary)}<a class="cta cta-line" href="#how">${WE(W.hero.secondary)}</a></p>
+        <div class="wk-mail"><p class="kicker">${WE(W.hero.mailLabel)}</p><div class="ct-addr"><span class="v" id="work-email-top">${esc(SITE_CONTACT_EMAIL)}</span>${copyButton("work-email-top")}</div></div>
       </div>
       <figure class="cover-plate wk-plate">
         <img src="../assets/work/measure.webp" alt="${esc(W.cover.alt)}" width="900" height="1100" data-alt-en="${esc(W.cover.alt)}" data-alt-zh="${esc(Z(W.cover.alt))}">
@@ -586,7 +592,7 @@ function workPage() {
       <div>
         <p class="kicker fount-k">${WE(W.discuss.kicker)}</p>
         <h2 class="jx-h2" id="work-discuss-title">${WE(W.discuss.title)}</h2>
-        <div class="ct-addr wk-addr"><span class="v" id="work-email">${esc(SITE_CONTACT_EMAIL)}</span>${copyBtn}</div>
+        <div class="ct-addr wk-addr"><span class="v" id="work-email">${esc(SITE_CONTACT_EMAIL)}</span>${copyButton("work-email")}</div>
         <p class="cx-actions">${mailButton("cta cta-ink", W.hero.primary)}<a class="text-link" href="../contact/index.html">${WE(W.discuss.other)} ${ARROW}</a></p>
       </div>
       <div class="wk-brief">

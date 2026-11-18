@@ -166,9 +166,13 @@ a.cm-ledger-row:hover strong { color: var(--lead); }
 .ct-addr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; }
 .ct-addr .v { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(19px, 2.6vw, 38px); line-height: 1.1; color: var(--ink); overflow-wrap: anywhere; user-select: all; }
 a.v:hover { color: var(--lead); }
-.ct-copy { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--hair-2); background: var(--sheet); font: 500 12.5px/1 var(--f-ui); color: var(--ink); cursor: pointer; }
+.ct-copy { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 14px 0 12px; border-radius: 999px; border: 1px solid var(--hair-2); background: var(--sheet); font: 500 12.5px/1 var(--f-ui); color: var(--ink); cursor: pointer; flex: none; }
 .ct-copy:hover { border-color: var(--ink); }
 .ct-copy:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ct .ct-copy svg, .wk .ct-copy svg { width: 13px; height: 13px; stroke-width: 1.25; }
+.ct-copy .ic-done, .ct-copy[data-state="done"] .ic-copy { display: none; }
+.ct-copy[data-state="done"] .ic-done { display: block; }
+.ct-copy[data-state="done"] { border-color: var(--lead-line); color: var(--lead); }
 .ct-bound { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 5vw, 80px); align-items: end; padding-block: clamp(32px, 4vw, 56px) clamp(56px, 7vw, 96px); }
 .ct-bound > * { min-width: 0; }
 .ct-bound > p, .ct-privacy-text p { font-family: var(--f-text); font-size: 18px; line-height: 1.6; color: var(--ink-2); margin: 0; max-width: 32em; }
@@ -247,6 +251,12 @@ a.v:hover { color: var(--lead); }
 .wk-rules h3 { margin: 10px 0 8px; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(24px, 2.3vw, 32px); line-height: 1.08; }
 .wk-rules p { margin: 0; font: 400 15px/1.55 var(--f-ui); color: var(--ink-2); max-width: 36em; }
 
+/* under the hero's buttons: the address as text, for a reader whose browser has no mail app to open */
+.wk-mail { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 18px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--hair-2); }
+.wk-mail .kicker { margin: 0; color: var(--ink-3); }
+.wk-mail .ct-addr { align-items: center; gap: 8px 14px; }
+.wk-mail .ct-addr .v { font-size: clamp(21px, 1.9vw, 26px); }
+
 /* the close: the address itself, then what to put in a first email */
 .wk-close { scroll-margin-top: var(--bar-h); }
 .wk-close-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 80px); align-items: start; }
@@ -313,6 +323,9 @@ a.v:hover { color: var(--lead); }
   .ab-core > svg { transform: rotate(90deg); }
   .ab-ledger div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .nf-slip { transform: none; }
+}
+@media (max-width: 560px) {
+  .wk-mail .ct-addr .v { font-size: 19px; }
 }
 
 /* Chinese: no faux italics; keep the emphasis by colour */
