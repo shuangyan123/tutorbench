@@ -1,0 +1,194 @@
+{
+  "version": "0.3.0",
+  "baseInventory": "0.2.0",
+  "baseGraph": "mathematics-knowledge-map-v0.1@0.2.0",
+  "graphVersion": "0.3.0",
+  "addedNodes": [
+    {
+      "id": "implication-conditions",
+      "domainId": "proof-structures",
+      "label": "Implication direction: necessary properties, sufficient criteria and equivalent characterizations",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [],
+      "commonMisconception": "Inferring the converse of a theorem without a second implication"
+    },
+    {
+      "id": "interval-average-rate",
+      "domainId": "functions",
+      "label": "Average rate over a nonzero interval as a difference quotient",
+      "stage": "upper-secondary",
+      "prerequisiteIds": [],
+      "commonMisconception": "Replacing a secant slope by the derivative at an endpoint"
+    }
+  ],
+  "dispositions": [
+    {
+      "requirement": "cn-logic/1.1",
+      "edition": "cn-moe-high-school-math@2020.1",
+      "sha256": "cc4d3a20daa09f5185037e93fbacd58f7df1147392e3dae4bf261c3700ba4195",
+      "category": "new-concept-needed",
+      "focus": "implication-conditions",
+      "missingConcept": "implication-conditions",
+      "fit": "full",
+      "neighbors": [
+        "logic-quantifiers",
+        "root-sign-conditions"
+      ],
+      "rationale": "A property follows from a hypothesis, not conversely. Quantification and sign constraints on roots do not express this direction in general."
+    },
+    {
+      "requirement": "cn-logic/1.2",
+      "edition": "cn-moe-high-school-math@2020.1",
+      "sha256": "cc4d3a20daa09f5185037e93fbacd58f7df1147392e3dae4bf261c3700ba4195",
+      "category": "new-concept-needed",
+      "focus": "implication-conditions",
+      "missingConcept": "implication-conditions",
+      "fit": "full",
+      "neighbors": [
+        "logic-quantifiers",
+        "root-sign-conditions"
+      ],
+      "rationale": "A criterion can establish the conclusion without being necessary. Testing a root constraint is an example, not the general implication."
+    },
+    {
+      "requirement": "cn-logic/1.3",
+      "edition": "cn-moe-high-school-math@2020.1",
+      "sha256": "cc4d3a20daa09f5185037e93fbacd58f7df1147392e3dae4bf261c3700ba4195",
+      "category": "new-concept-needed",
+      "focus": "implication-conditions",
+      "missingConcept": "implication-conditions",
+      "fit": "full",
+      "neighbors": [
+        "logic-quantifiers",
+        "variable-symbols"
+      ],
+      "rationale": "A characterization used as a definition needs both implications. Equality of expressions and quantification alone do not provide that test."
+    },
+    {
+      "requirement": "de-l4-common/01",
+      "edition": "kmk-ahr-math@2012.1",
+      "sha256": "a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546",
+      "category": "remain-unmapped",
+      "focus": null,
+      "missingConcept": null,
+      "fit": "partial",
+      "neighbors": [
+        "function-definition",
+        "exponential-laws"
+      ],
+      "rationale": "Knowing a domain or a growth family does not establish selection and use of suitable models. Leave the modeling behavior unlinked."
+    },
+    {
+      "requirement": "de-l4-common/05",
+      "edition": "kmk-ahr-math@2012.1",
+      "sha256": "a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546",
+      "category": "refine-concept-or-relation",
+      "focus": null,
+      "missingConcept": null,
+      "fit": "partial",
+      "neighbors": [
+        "derivatives-rate",
+        "polynomial-factorization"
+      ],
+      "rationale": "Local rate is not a calculation rule. A future operation relation would need separate evidence for constants, sums and application to the stated family of functions."
+    },
+    {
+      "requirement": "de-l4-common/06",
+      "edition": "kmk-ahr-math@2012.1",
+      "sha256": "a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546",
+      "category": "refine-concept-or-relation",
+      "focus": null,
+      "missingConcept": null,
+      "fit": "partial",
+      "neighbors": [
+        "derivatives-rate",
+        "polynomial-factorization"
+      ],
+      "rationale": "Algebraic multiplication does not justify differentiating a product. Consider a rule-application relation, not a broader meaning of the derivative node."
+    },
+    {
+      "requirement": "de-l4-common/08",
+      "edition": "kmk-ahr-math@2012.1",
+      "sha256": "a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546",
+      "category": "refine-concept-or-relation",
+      "focus": null,
+      "missingConcept": null,
+      "fit": "partial",
+      "neighbors": [
+        "coordinate-graph",
+        "derivatives-rate"
+      ],
+      "rationale": "Reading axes and interpreting a local slope only support parts. A bidirectional graph-inference relation would need to account for the undetermined vertical offset."
+    },
+    {
+      "requirement": "de-l4-common/09",
+      "edition": "kmk-ahr-math@2012.1",
+      "sha256": "a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546",
+      "category": "new-concept-needed",
+      "focus": null,
+      "missingConcept": "signed-accumulation",
+      "fit": "partial",
+      "neighbors": [
+        "length-area",
+        "derivatives-rate"
+      ],
+      "rationale": "Signed accumulation over an interval is neither unsigned area nor a local rate. A distinct accumulation concept is warranted; defer an integral-family design rather than equate area with stock."
+    },
+    {
+      "requirement": "de-l4-common/10",
+      "edition": "kmk-ahr-math@2012.1",
+      "sha256": "a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546",
+      "category": "remain-unmapped",
+      "focus": null,
+      "missingConcept": null,
+      "fit": "partial",
+      "neighbors": [
+        "derivatives-rate",
+        "length-area"
+      ],
+      "rationale": "The requested geometric argument for the fundamental theorem is more than naming its two objects. No current node or assessed explanation relation supports the argument."
+    },
+    {
+      "requirement": "de-l4-common/11",
+      "edition": "kmk-ahr-math@2012.1",
+      "sha256": "a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546",
+      "category": "new-concept-needed",
+      "focus": null,
+      "missingConcept": "antiderivatives",
+      "fit": "partial",
+      "neighbors": [
+        "derivatives-rate",
+        "inverse-functions"
+      ],
+      "rationale": "Finding a primitive is not inverting a function: the derivative is prescribed and the additive constant is free. Defer the antiderivative concept together with integral-family boundaries."
+    },
+    {
+      "requirement": "de-l4-common/12",
+      "edition": "kmk-ahr-math@2012.1",
+      "sha256": "a636ec6947dca2044618787a9e29116d88f68909d02e4547050e4d3fc9c77546",
+      "category": "remain-unmapped",
+      "focus": null,
+      "missingConcept": null,
+      "fit": "partial",
+      "neighbors": [
+        "statistics-variability",
+        "probability-events"
+      ],
+      "rationale": "Sample spread and event probabilities do not model an outcome-to-value function together with its induced law. The compound modeling task should not be assigned to either alone."
+    },
+    {
+      "requirement": "us-topic-2-1/CHA-2.A.1",
+      "edition": "ap-calculus-ced@2020.1",
+      "sha256": "fd571cdc252c24d33a75ed556ee20d9261ef1ad3dbb718d0caf78acecc8253ca",
+      "category": "new-concept-needed",
+      "focus": "interval-average-rate",
+      "missingConcept": "interval-average-rate",
+      "fit": "full",
+      "neighbors": [
+        "ratios",
+        "derivatives-rate"
+      ],
+      "rationale": "The difference quotient uses two distinct inputs, not a limiting slope or proportional growth. Its value can differ from the derivative at either endpoint."
+    }
+  ]
+}

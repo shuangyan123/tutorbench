@@ -29,7 +29,7 @@ test("archived inventory and CLI replay preserve scope-specific counts, shared A
     "374287aebae7842dc55f8f738a7ac5a67741824df0edc402547ba60878b694ec");
   const cli = (...args: string[]) => execFileSync(process.execPath,
     ["dist/src/cli/exam-specifications.js", "--requirements", ...args], { encoding: "utf8" });
-  assert.deepEqual(JSON.parse(cli()), report);
+  assert.deepEqual(JSON.parse(cli(base + file)), report);
   assert.deepEqual(JSON.parse(cli(base + file, base + file)), compareRequirementInventories(report, report));
   assert.equal(report.unique_source_clauses, 20);
   assert.equal(report.unique_linked_requirements, 8);
