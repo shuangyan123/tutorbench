@@ -124,9 +124,21 @@ function jsonLd(value: unknown): string {
   return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
 
+/**
+ * Section pages whose titles describe the page for search results ("How we evaluate AI tutors"):
+ * their breadcrumb keeps the short section name the navigation uses.
+ */
+const SECTION_BREADCRUMBS: Readonly<Record<string, string>> = {
+  "/methodology/": "Methodology",
+  "/data/cases/": "Cases",
+  "/run/": "Run",
+  "/about/": "About",
+  "/micro-review/": "Micro-Review",
+};
+
 function breadcrumbName(segment: string, page: SitePage, isLast: boolean): string {
   if (isLast) {
-    return page.title.replace(/\s+[—-]\s+Teachometry(?: Blog| 博客)?$/u, "");
+    return SECTION_BREADCRUMBS[page.route] ?? page.title.replace(/\s+[—-]\s+Teachometry(?: Blog| 博客)?$/u, "");
   }
   const names: Readonly<Record<string, string>> = {
     data: "Benchmark",

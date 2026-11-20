@@ -198,7 +198,7 @@ export function renderCasesPage(artifacts: PublicBenchmarkArtifacts, uiLocale: S
     ? escapeHtml(formatTeachingSituations(total, uiLocale)) + "<br><em>一套基准。</em>"
     : `${escapeHtml(String(total))} teaching<br>situations. <em>One benchmark.</em>`;
   return page(
-    "Cases — Teachometry",
+    "AI tutoring cases — Teachometry",
     "Browse structured, authored student–tutor situations from the public Teachometry development set.",
     "/data/cases/",
     `<div class="cases-main">
