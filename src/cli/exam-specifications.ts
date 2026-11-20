@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { compareExamSources, parseExamSpecifications } from "../research/exam-specifications.js";
+import { inspectCurriculumRevision } from "../research/exam-edition-comparison.js";
 import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
 
 const base = "scenarios/case-system-vnext/";
@@ -23,8 +24,15 @@ if (inventory) {
     }
     return inspectRequirements(input, registry, graph);
   };
-  const report = await inspect(paths[0] ?? `${base}exam-specifications/requirements-0.4.0.json`);
-  console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await inspect(paths[1])) : report, null, 2));
+  const current = `${base}exam-specifications/requirements-0.4.0.json`;
+  if (paths[0] === "--edition-diff") {
+    if (paths.length !== 1) throw new Error("--edition-diff takes no snapshot arguments");
+    const baseline = await inspect(current);
+    console.log(JSON.stringify(inspectCurriculumRevision(baseline), null, 2));
+  } else {
+    const report = await inspect(paths[0] ?? current);
+    console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await inspect(paths[1])) : report, null, 2));
+  }
 } else if (paths[1]) {
   console.log(JSON.stringify(compareExamSources(registry, await load(paths[1])), null, 2));
 } else {
