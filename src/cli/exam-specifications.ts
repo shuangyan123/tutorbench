@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { compareExamSources, parseExamSpecifications } from "../research/exam-specifications.js";
-import { compareRequirementInventories, inspectRequirements } from "../research/exam-requirements.js";
+import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
 
 const base = "scenarios/case-system-vnext/";
 const read = async (path: string): Promise<unknown> => JSON.parse(await readFile(path, "utf8")) as unknown;
@@ -13,8 +13,13 @@ const load = async (path: string) => parseExamSpecifications(await read(path), g
 const archived = `${base}exam-specifications/0.1.0.json`;
 const registry = await load(inventory ? archived : paths[0] ?? archived);
 if (inventory) {
-  const inspect = async (path: string) => inspectRequirements(await read(path), registry, graph);
-  const report = await inspect(paths[0] ?? `${base}exam-specifications/requirements-0.2.0.json`);
+  const inspect = async (path: string) => {
+    const input = await read(path);
+    if (input && typeof input === "object" && "version" in input && input.version === "0.3.0")
+      return inspectGapRequirements(input, await read(`${base}exam-specifications/requirements-0.2.0.json`), registry, graph);
+    return inspectRequirements(input, registry, graph);
+  };
+  const report = await inspect(paths[0] ?? `${base}exam-specifications/requirements-0.3.0.json`);
   console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await inspect(paths[1])) : report, null, 2));
 } else if (paths[1]) {
   console.log(JSON.stringify(compareExamSources(registry, await load(paths[1])), null, 2));

@@ -1,5 +1,6 @@
 import { parseMathematicsKnowledgeMap } from "../contracts/mathematics-knowledge-map.js";
 import { createHash } from "node:crypto";
+import { applyGapSnapshot } from "./exam-gap-audit.js";
 import { enumerationScopes, graduateBook, legacyClauses } from "./exam-inventory-scopes.js";
 import type { ExamSpecifications } from "./exam-specifications.js";
 
@@ -25,9 +26,20 @@ function metrics(denominator: number | null, inventoried = 0, linked = 0, unmapp
 
 export function inspectRequirements(input: unknown, registry: ExamSpecifications, graphInput: unknown) {
   const graph = parseMathematicsKnowledgeMap(graphInput);
+  check(registry.graph === graph.id + "@" + graph.version, "stale graph pin");
+  return inspectRows(input, registry, graph, false);
+}
+
+export function inspectGapRequirements(input: unknown, baseInput: unknown, registry: ExamSpecifications, graphInput: unknown) {
+  const base = inspectRequirements(baseInput, registry, graphInput);
+  const { inventory, extended, audit } = applyGapSnapshot(input, baseInput, parseMathematicsKnowledgeMap(graphInput), base);
+  return { ...inspectRows(inventory, registry, extended, true), gapAudit: audit };
+}
+
+function inspectRows(input: unknown, registry: ExamSpecifications, graph: ReturnType<typeof parseMathematicsKnowledgeMap>, extended: boolean) {
   const root = record(input, "version registryVersion manifestVersion scopes requirements");
   check(root.registryVersion === registry.version && registry.version === "0.1.0" && root.manifestVersion === "1" &&
-    registry.graph === graph.id + "@" + graph.version, "stale inventory pins");
+    (root.version === "0.3.0") === extended, "stale inventory pins");
   check(typeof root.version === "string" && /^\d+\.\d+\.\d+$/.test(root.version), "snapshot version");
   const manifest = enumerationScopes(registry);
   check(createHash("sha256").update(JSON.stringify(registry)).digest("hex") ===
@@ -95,7 +107,7 @@ export function inspectRequirements(input: unknown, registry: ExamSpecifications
         sum("requirements_with_concept_links"), sum("requirements_explicitly_unmapped"), pending) };
   });
   return { version: root.version, registryVersion: registry.version, manifestVersion: root.manifestVersion,
-    graph: registry.graph, unique_source_clauses: requirements.length, unique_linked_requirements: requirements.filter(row =>
+    graph: graph.id + "@" + graph.version, unique_source_clauses: requirements.length, unique_linked_requirements: requirements.filter(row =>
       row.alignment_status === "aligned-author-proposed").length, scopes, perExam: bounded, wholeExamViews,
     landOverlays: registry.landOverlays, requirements };
 }
