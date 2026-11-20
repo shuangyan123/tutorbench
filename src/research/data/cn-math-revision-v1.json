@@ -1,0 +1,228 @@
+{
+  "version": "cn-math-revision-0.5.0",
+  "baseInventory": "0.4.0",
+  "baselineReportSha256": "38386f3ae1c06dad4ceff8ca83ca12cc770d9b93a507de015f58dad9f43af5fe",
+  "oldSource": {
+    "edition": "cn-moe-high-school-math@2020.1",
+    "authority": "中华人民共和国教育部",
+    "title": "普通高中数学课程标准（2017年版2020年修订）",
+    "url": "https://www.ictr.edu.cn/Uploads/File/2025/02/07/3.%E6%99%AE%E9%80%9A%E9%AB%98%E4%B8%AD%E6%95%B0%E5%AD%A6%E8%AF%BE%E7%A8%8B%E6%A0%87%E5%87%86%EF%BC%882017%E5%B9%B4%E7%89%882020%E5%B9%B4%E4%BF%AE%E8%AE%A2%EF%BC%89.20250207213419.pdf",
+    "sha256": "cc4d3a20daa09f5185037e93fbacd58f7df1147392e3dae4bf261c3700ba4195",
+    "bytes": 10450629,
+    "issuer_authentication": "archived-institute-source",
+    "pdfPages": 188
+  },
+  "newSource": {
+    "edition": "cn-moe-high-school-math@2025-mirror.1",
+    "title": "普通高中数学课程标准日常修订版（2017年版2025年修订）",
+    "attributedAuthority": "中华人民共和国教育部",
+    "provenance": "public mirror",
+    "url": "https://qn1-next.xuetangonline.com/17853001792031.pdf",
+    "sha256": "f520c1645c88819af0b190192e4b2fc49bbba7da156a82f04adec56c6131c3e1",
+    "bytes": 9959570,
+    "pdfPages": 171,
+    "issuer_authentication": "pending",
+    "reuse": "metadata, locators and original summaries only",
+    "schoolListing": "https://www.scmlzx.net/news/202511/497838942620618752.html",
+    "schoolPdf": "https://www.scmlzx.net/uploadfile/2025/1110/%EF%BC%883%EF%BC%89%E6%99%AE%E9%80%9A%E9%AB%98%E4%B8%AD%E6%95%B0%E5%AD%A6%E8%AF%BE%E7%A8%8B%E6%A0%87%E5%87%86%E6%97%A5%E5%B8%B8%E4%BF%AE%E8%AE%A2%E7%89%88%EF%BC%882017%E5%B9%B4%E7%89%882025%E5%B9%B4%E4%BF%AE%E8%AE%A2%EF%BC%89.pdf",
+    "schoolPdfSha256": null
+  },
+  "applicability": {
+    "reportedPublicationMonth": "2025-10",
+    "documentClass": "senior-high curriculum",
+    "teachingIntake": "unknown",
+    "textbookAdoptionCohort": "unknown",
+    "provincePaperTransition": "unknown",
+    "firstGaokaoYear": "unknown",
+    "nationalPaper": "unknown",
+    "provinceEvidence": "https://jyt.fj.gov.cn/xxgk/gggs/202603/t20260313_7109906.htm",
+    "provinceEvidenceScope": "Fujian supplementary material submissions, III(1) and III(4)",
+    "implementationEvidence": "https://xbzprtjcyj.swu.edu.cn/info/1077/1335.htm"
+  },
+  "sections": [
+    {
+      "id": "cn-sets-2025-mirror",
+      "oldScope": "cn-sets-2020",
+      "oldPrintedPage": 15,
+      "oldPdfPage": 23,
+      "parent": "V / compulsory / theme 1 / content requirements / 1. 集合",
+      "status": "complete-within-candidate",
+      "pages": [
+        {
+          "printedPage": 15,
+          "pdfPage": 18,
+          "anchors": [
+            "1.1",
+            "1.2",
+            "1.3",
+            "2",
+            "3.1",
+            "3.2",
+            "3.3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cn-logic-2025-mirror",
+      "oldScope": "cn-logic",
+      "oldPrintedPage": 16,
+      "oldPdfPage": 24,
+      "parent": "V / compulsory / theme 1 / content requirements / 2. 常用逻辑用语",
+      "status": "complete-within-candidate",
+      "pages": [
+        {
+          "printedPage": 15,
+          "pdfPage": 18,
+          "anchors": [
+            "1.1",
+            "1.2",
+            "1.3"
+          ]
+        },
+        {
+          "printedPage": 16,
+          "pdfPage": 19,
+          "anchors": [
+            "2",
+            "3.1",
+            "3.2"
+          ]
+        }
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "old": [
+        "cn-sets-2020/1.1"
+      ],
+      "new": [
+        "cn-sets-2025-mirror/1.1"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Use examples for the meaning of a set and the element-membership relation."
+    },
+    {
+      "old": [
+        "cn-sets-2020/1.2"
+      ],
+      "new": [
+        "cn-sets-2025-mirror/1.2"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Represent a concrete set symbolically from natural language and graphical descriptions."
+    },
+    {
+      "old": [
+        "cn-sets-2020/1.3"
+      ],
+      "new": [
+        "cn-sets-2025-mirror/1.3"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Recognize both the universal set and the empty set in a given context."
+    },
+    {
+      "old": [
+        "cn-sets-2020/2"
+      ],
+      "new": [
+        "cn-sets-2025-mirror/2"
+      ],
+      "relationship": "unchanged",
+      "rationale": "The undivided clause retains inclusion, equality and identifying subsets."
+    },
+    {
+      "old": [
+        "cn-sets-2020/3.1"
+      ],
+      "new": [
+        "cn-sets-2025-mirror/3.1"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Both the meaning and calculation of union and intersection remain together."
+    },
+    {
+      "old": [
+        "cn-sets-2020/3.2"
+      ],
+      "new": [
+        "cn-sets-2025-mirror/3.2"
+      ],
+      "relationship": "unchanged",
+      "rationale": "The ambient set still determines the meaning and calculation of a subset complement."
+    },
+    {
+      "old": [
+        "cn-sets-2020/3.3"
+      ],
+      "new": [
+        "cn-sets-2025-mirror/3.3"
+      ],
+      "relationship": "unchanged",
+      "rationale": "The Venn diagram still represents relations and operations and supports abstraction."
+    },
+    {
+      "old": [
+        "cn-logic/1.1"
+      ],
+      "new": [
+        "cn-logic-2025-mirror/1.1"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Necessary conditions remain tied to property theorems through typical propositions."
+    },
+    {
+      "old": [
+        "cn-logic/1.2"
+      ],
+      "new": [
+        "cn-logic-2025-mirror/1.2"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Sufficient conditions retain the connection to criterion theorems through typical propositions."
+    },
+    {
+      "old": [
+        "cn-logic/1.3"
+      ],
+      "new": [
+        "cn-logic-2025-mirror/1.3"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Definitions retain the connection to necessary-and-sufficient conditions through typical propositions."
+    },
+    {
+      "old": [
+        "cn-logic/2"
+      ],
+      "new": [
+        "cn-logic-2025-mirror/2"
+      ],
+      "relationship": "unchanged",
+      "rationale": "The single examples-based clause retains both quantifiers."
+    },
+    {
+      "old": [
+        "cn-logic/3.1"
+      ],
+      "new": [
+        "cn-logic-2025-mirror/3.1"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Negating a universal proposition still requires the existential quantifier."
+    },
+    {
+      "old": [
+        "cn-logic/3.2"
+      ],
+      "new": [
+        "cn-logic-2025-mirror/3.2"
+      ],
+      "relationship": "unchanged",
+      "rationale": "Negating an existential proposition still requires the universal quantifier."
+    }
+  ],
+  "checkedOn": "2026-11-20"
+}

@@ -1,0 +1,153 @@
+{
+  "version": "0.4.0",
+  "baseInventory": "0.3.0",
+  "manifestVersion": "2",
+  "scopes": [
+    {
+      "id": "cn-sets-2020",
+      "status": "complete"
+    },
+    {
+      "id": "de-l4-elevated",
+      "status": "complete"
+    },
+    {
+      "id": "us-topic-2-2",
+      "status": "complete"
+    },
+    {
+      "id": "us-topic-2-3",
+      "status": "complete"
+    }
+  ],
+  "requirements": [
+    {
+      "scope": "cn-sets-2020",
+      "anchor": "1.1",
+      "summary": "Use examples to explain what constitutes a set and how an element belongs to one.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "cn-sets-2020",
+      "anchor": "1.2",
+      "summary": "Translate a concrete description or diagram into symbolic set notation.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "cn-sets-2020",
+      "anchor": "1.3",
+      "summary": "Interpret the universal set and the empty set in context.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "cn-sets-2020",
+      "anchor": "2",
+      "summary": "Interpret inclusion and equality of sets and recognize subsets of a given set.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "cn-sets-2020",
+      "anchor": "3.1",
+      "summary": "Explain and compute both intersection and union of two sets.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "cn-sets-2020",
+      "anchor": "3.2",
+      "summary": "Interpret and find the complement of a subset relative to the specified set.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "cn-sets-2020",
+      "anchor": "3.3",
+      "summary": "Use Venn diagrams for set relations and operations and explain how the visual representation aids abstraction.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "de-l4-elevated",
+      "anchor": "01",
+      "summary": "Interpret differentiation through local approximation by linear functions.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "de-l4-elevated",
+      "anchor": "02",
+      "summary": "Apply the chain rule to differentiate functions.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "de-l4-elevated",
+      "anchor": "03",
+      "summary": "Use the natural logarithm both as an antiderivative of the reciprocal function and as the inverse of the natural exponential.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "us-topic-2-2",
+      "anchor": "CHA-2.B.2",
+      "summary": "Define the derivative function at each input where the limiting difference quotient exists.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "us-topic-2-2",
+      "anchor": "CHA-2.B.3",
+      "summary": "Recognize equivalent prime and differential notations for the derivative.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "us-topic-2-2",
+      "anchor": "CHA-2.B.4",
+      "summary": "Express the derivative using graphs, numerical data, formulas and words.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "us-topic-2-2",
+      "anchor": "CHA-2.C.1",
+      "summary": "Relate the derivative value at a point to the slope of the tangent there.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "us-topic-2-3",
+      "anchor": "CHA-2.D.1",
+      "summary": "Estimate a pointwise derivative using a table or graph.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    },
+    {
+      "scope": "us-topic-2-3",
+      "anchor": "CHA-2.D.2",
+      "summary": "Use technology to compute or approximate a derivative value at a specified input.",
+      "status": "unmapped",
+      "concept": null,
+      "legacy": null
+    }
+  ]
+}

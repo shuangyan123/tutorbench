@@ -1,7 +1,7 @@
 import { parseMathematicsKnowledgeMap } from "../contracts/mathematics-knowledge-map.js";
 import { createHash } from "node:crypto";
 import { applyGapSnapshot } from "./exam-gap-audit.js";
-import { enumerationScopes, graduateBook, legacyClauses } from "./exam-inventory-scopes.js";
+import { enumerationScopes, expandedEnumerationScopes, graduateBook, legacyClauses, sourceObservations } from "./exam-inventory-scopes.js";
 import type { ExamSpecifications } from "./exam-specifications.js";
 
 function check(condition: unknown, reason: string): asserts condition {
@@ -27,21 +27,32 @@ function metrics(denominator: number | null, inventoried = 0, linked = 0, unmapp
 export function inspectRequirements(input: unknown, registry: ExamSpecifications, graphInput: unknown) {
   const graph = parseMathematicsKnowledgeMap(graphInput);
   check(registry.graph === graph.id + "@" + graph.version, "stale graph pin");
-  return inspectRows(input, registry, graph, false);
+  return inspectRows(input, registry, graph, "legacy");
 }
 
-export function inspectGapRequirements(input: unknown, baseInput: unknown, registry: ExamSpecifications, graphInput: unknown) {
+export function inspectGapRequirements(input: unknown, baseInput: unknown, registry: ExamSpecifications, graphInput: unknown,
+  expansion?: unknown) {
   const base = inspectRequirements(baseInput, registry, graphInput);
   const { inventory, extended, audit } = applyGapSnapshot(input, baseInput, parseMathematicsKnowledgeMap(graphInput), base);
-  return { ...inspectRows(inventory, registry, extended, true), gapAudit: audit };
+  if (expansion === undefined) return { ...inspectRows(inventory, registry, extended, "gap"), gapAudit: audit };
+  const delta = record(expansion, "version baseInventory manifestVersion scopes requirements");
+  check(delta.version === "0.4.0" && delta.baseInventory === inventory.version && delta.manifestVersion === "2", "expansion pins");
+  const report = inspectRows({ ...inventory, version: delta.version, manifestVersion: delta.manifestVersion,
+    scopes: [...inventory.scopes, ...array(delta.scopes)], requirements: [...inventory.requirements, ...array(delta.requirements)] },
+  registry, extended, "expanded");
+  check(createHash("sha256").update(JSON.stringify(expansion)).digest("hex") ===
+    "0840807dc8363e96d86da14abf7709d4e69f671cbba3d5313986c66d067d2672", "changed 0.4.0 snapshot");
+  return { ...report, gapAudit: audit, sourceObservations };
 }
 
-function inspectRows(input: unknown, registry: ExamSpecifications, graph: ReturnType<typeof parseMathematicsKnowledgeMap>, extended: boolean) {
+function inspectRows(input: unknown, registry: ExamSpecifications, graph: ReturnType<typeof parseMathematicsKnowledgeMap>,
+  mode: "legacy" | "gap" | "expanded") {
   const root = record(input, "version registryVersion manifestVersion scopes requirements");
-  check(root.registryVersion === registry.version && registry.version === "0.1.0" && root.manifestVersion === "1" &&
-    (root.version === "0.3.0") === extended, "stale inventory pins");
+  const expanded = mode === "expanded";
+  check(root.registryVersion === registry.version && registry.version === "0.1.0" && root.manifestVersion === (expanded ? "2" : "1") &&
+    (root.version === "0.3.0") === (mode === "gap") && (root.version === "0.4.0") === expanded, "stale inventory pins");
   check(typeof root.version === "string" && /^\d+\.\d+\.\d+$/.test(root.version), "snapshot version");
-  const manifest = enumerationScopes(registry);
+  const manifest = expanded ? expandedEnumerationScopes(registry) : enumerationScopes(registry);
   check(createHash("sha256").update(JSON.stringify(registry)).digest("hex") ===
     "66f4e05e93e01ebea4d1e8e9cfe9dd897c218f52d886e4cbeb0ac0c5915b2cd2", "changed base registry");
   const declared = new Map<string, "partial" | "complete">();
@@ -101,7 +112,7 @@ function inspectRows(input: unknown, registry: ExamSpecifications, graph: Return
     const pending = slices.reduce((total, slice) => total + slice.requirements_pending_review - slice.requirements_with_concept_links, 0);
     return { exam: exam.id, subject: exam.subject, jurisdiction: exam.jurisdiction, paper: exam.id === "cn-gaokao" ? exam.scope : null,
       session: slices[0]?.session ?? exam.session, entryCohort: graduate ? 2027 : null, scope: "whole subject (not enumerated)",
-      editions: slices.map(slice => slice.source.id + "@" + slice.source.version),
+      editions: [...new Set(slices.map(slice => slice.source.id + "@" + slice.source.version))],
       inventory_status: graduate ? "unavailable" : slices.length ? "partial" : "pending",
       availability: graduate ? graduateBook : null, ...metrics(null, sum("requirements_inventoried"),
         sum("requirements_with_concept_links"), sum("requirements_explicitly_unmapped"), pending) };
@@ -122,7 +133,15 @@ export function compareRequirementInventories(before: Inventory, after: Inventor
       .filter(key => JSON.stringify(old.get(key)) !== JSON.stringify(next.get(key)))
       .map(key => ({ key, before: old.get(key) ?? null, after: next.get(key) ?? null }));
   }
-  return { before: before.version, after: after.version,
+  const requirements = diff(before.requirements, after.requirements, row => row.requirement_id);
+  const result = { before: before.version, after: after.version,
     scopes: diff(before.scopes, after.scopes, scope => scope.id),
-    requirements: diff(before.requirements, after.requirements, row => row.requirement_id) };
+    requirements };
+  if (before.manifestVersion !== "2" && after.manifestVersion !== "2") return result;
+  return { ...result, changes: {
+    added: requirements.filter(row => row.before === null).map(row => row.key),
+    removed: requirements.filter(row => row.after === null).map(row => row.key),
+    relocated: requirements.filter(({ before, after }) => before && after &&
+      (before.locator !== after.locator || before.source_edition !== after.source_edition)).map(row => row.key),
+  } };
 }
