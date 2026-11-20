@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import manifest from "./data/exam-enumeration-v1.json" with { type: "json" };
+import expansion from "./data/exam-enumeration-v2.json" with { type: "json" };
 import type { ExamSpecifications } from "./exam-specifications.js";
 
 export const graduateBook = {
@@ -22,6 +23,20 @@ export function enumerationScopes(registry: ExamSpecifications, input: unknown =
     return { ...scope, source: { id, version, publisher, url, sha256, retrievedAt, effectiveTeachingPeriod, reuse } };
   });
 }
+
+export function expandedEnumerationScopes(registry: ExamSpecifications, input: unknown = expansion) {
+  if (createHash("sha256").update(JSON.stringify(input)).digest("hex") !==
+    "21c1e96e823bba1c2d93b5317cabc3ff5974765c554f63faa136acde011a7f63") throw new Error("inventory manifest v2 mismatch");
+  const baseline = enumerationScopes(registry);
+  const additions = expansion.scopes.map(({ sourceScope, ...section }) => {
+    const origin = baseline.find(scope => scope.id === sourceScope);
+    if (!origin) throw new Error("missing scope for source edition and applicability");
+    return { ...origin, ...section };
+  });
+  return [...baseline, ...additions];
+}
+
+export const sourceObservations = expansion.sourceObservations;
 
 export const legacyClauses: Readonly<Record<string, string>> = {
   "de-l4-common/03": "l4-rate", "us-topic-2-1/CHA-2.B.1": "cha-2-b-1",

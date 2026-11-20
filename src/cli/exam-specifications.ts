@@ -15,11 +15,15 @@ const registry = await load(inventory ? archived : paths[0] ?? archived);
 if (inventory) {
   const inspect = async (path: string) => {
     const input = await read(path);
-    if (input && typeof input === "object" && "version" in input && input.version === "0.3.0")
-      return inspectGapRequirements(input, await read(`${base}exam-specifications/requirements-0.2.0.json`), registry, graph);
+    if (input && typeof input === "object" && "version" in input && (input.version === "0.3.0" || input.version === "0.4.0")) {
+      const previous = await read(`${base}exam-specifications/requirements-0.2.0.json`);
+      if (input.version === "0.3.0") return inspectGapRequirements(input, previous, registry, graph);
+      const gap = await read(`${base}exam-specifications/requirements-0.3.0.json`);
+      return inspectGapRequirements(gap, previous, registry, graph, input);
+    }
     return inspectRequirements(input, registry, graph);
   };
-  const report = await inspect(paths[0] ?? `${base}exam-specifications/requirements-0.3.0.json`);
+  const report = await inspect(paths[0] ?? `${base}exam-specifications/requirements-0.4.0.json`);
   console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await inspect(paths[1])) : report, null, 2));
 } else if (paths[1]) {
   console.log(JSON.stringify(compareExamSources(registry, await load(paths[1])), null, 2));

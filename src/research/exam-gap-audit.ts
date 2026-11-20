@@ -54,7 +54,7 @@ export function applyGapSnapshot(input: unknown, baseInput: unknown, graph: Math
   check(digest(input) === "c0ab81307ebbda191161175c5205fda0b208225731d6bb9fc4e2863276e965e0", "changed 0.3.0 snapshot");
   const focusByLeaf = new Map(dispositions.map(row => [row.requirement, row.focus]));
   // 只覆盖旧版未映射行；不允许决定表替换既有候选、增删要求或改变分母。
-  const inventory = structuredClone(baseInput) as { version: string; requirements: Array<{ scope: string; anchor: string; concept: string | null; status: string }> };
+  const inventory = structuredClone(baseInput) as { version: string; scopes: unknown[]; requirements: Array<{ scope: string; anchor: string; concept: string | null; status: string }> };
   inventory.version = root.version;
   for (const row of inventory.requirements) {
     const focus = focusByLeaf.get(row.scope + "/" + row.anchor);
