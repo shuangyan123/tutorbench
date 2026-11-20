@@ -318,6 +318,14 @@ const escapeAttribute = (value: string): string => value.replaceAll("&", "&amp;"
 interface ShareCard {
   readonly id: string;
   readonly routes: readonly string[];
+  /** what the card shows; a "plate" is one cover render, such as an essay's */
+  readonly art?: { readonly kind: string; readonly file?: string };
+}
+
+/** The cover render a card is made from, when it shows a single one (an essay's cover, for example). */
+export function shareCardCover(cards: readonly ShareCard[], id: string): string | undefined {
+  const art = cards.find((card) => card.id === id)?.art;
+  return art?.kind === "plate" ? art.file : undefined;
 }
 
 export function shareCardFor(cards: readonly ShareCard[], englishOutput: string): string {
@@ -335,13 +343,17 @@ export function shareCardFor(cards: readonly ShareCard[], englishOutput: string)
 
 /**
  * Adds the page's preview card to its sharing metadata: og:image and twitter:image, with a large
- * card instead of the plain summary. Preview images need an absolute address, so a build without a
- * site URL (no og:url) leaves the metadata as it is.
+ * card instead of the plain summary. An essay's structured data (BlogPosting) shows the same card,
+ * then the essay's cover render when there is one, instead of an illustration from the old site.
+ * Preview images need an absolute address, so a build without a site URL (no og:url) leaves the
+ * metadata as it is.
  */
-export function withShareImage(head: string, image: string, basePath: string): string {
+export function withShareImage(head: string, image: string, basePath: string, cover?: string): string {
   const pageUrl = /<meta property="og:url" content="([^"]+)">/u.exec(head)?.[1];
   if (pageUrl === undefined) return head;
-  const src = `${new URL(pageUrl).origin}${basePath}/${image}`;
+  const origin = new URL(pageUrl).origin;
+  const src = `${origin}${basePath}/${image}`;
+  const postingImages = cover === undefined ? [src] : [src, `${origin}${basePath}/${cover}`];
   const title = /<meta property="og:title" content="([^"]*)">/u.exec(head)?.[1] ?? "Teachometry";
   const tags = [
     `<meta property="og:image" content="${escapeAttribute(src)}">`,
@@ -356,12 +368,25 @@ export function withShareImage(head: string, image: string, basePath: string): s
   const card = head
     .split("\n")
     .filter((line) => !/^<meta (?:property="og:image|name="twitter:image)/u.test(line))
+    .map((line) => withPostingImage(line, postingImages))
     .join("\n")
     .replace('<meta name="twitter:card" content="summary">', '<meta name="twitter:card" content="summary_large_image">');
   const anchor = /<meta name="twitter:description" content="[^"]*">/u.exec(card);
   if (anchor === null) return `${card}\n${tags}`;
   const end = anchor.index + anchor[0].length;
   return `${card.slice(0, end)}\n${tags}${card.slice(end)}`;
+}
+
+const JSON_LD_OPEN = '<script type="application/ld+json">';
+const JSON_LD_CLOSE = "</script>";
+
+/** A one-line structured-data script for a BlogPosting gets the given images; any other line is kept as it is. */
+function withPostingImage(line: string, images: readonly string[]): string {
+  if (!line.startsWith(JSON_LD_OPEN) || !line.endsWith(JSON_LD_CLOSE)) return line;
+  const data = JSON.parse(line.slice(JSON_LD_OPEN.length, -JSON_LD_CLOSE.length)) as Record<string, unknown>;
+  if (data["@type"] !== "BlogPosting") return line;
+  const json = JSON.stringify({ ...data, image: images.length === 1 ? images[0] : images }).replaceAll("<", "\\u003c");
+  return `${JSON_LD_OPEN}${json}${JSON_LD_CLOSE}`;
 }
 
 function counterpart(output: string): string {
@@ -464,7 +489,7 @@ export async function installSpectrumSite(options: SpectrumSiteOptions): Promise
         if (legacy === undefined) throw new Error(`Spectrum page ${output} has no existing page to take metadata from.`);
         const context: PageContext = { source, output, zh, absolute: source === NOT_FOUND, pages, basePath };
         const card = shareCardFor(cards, zh ? counterpart(output) : output);
-        const shared = withShareImage(legacyHead(legacy, legacyKey), `assets/share/${card}-${zh ? "zh" : "en"}.jpg`, basePath);
+        const shared = withShareImage(legacyHead(legacy, legacyKey), `assets/share/${card}-${zh ? "zh" : "en"}.jpg`, basePath, shareCardCover(cards, card));
         const feed = /^blog\//u.test(target) ? feeds.get(zh) : undefined;
         const head = feed === undefined ? shared : `${shared}\n${feed}`;
         await write(output, renderPage(html, context, head));

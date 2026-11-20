@@ -4,7 +4,7 @@ import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
-import { journalFeed, keepLanguage, localizeMarkup, minifyCss, shareCardFor, withAlternateLocale, withShareImage } from "../src/cli/spectrum-site.js";
+import { journalFeed, keepLanguage, localizeMarkup, minifyCss, shareCardCover, shareCardFor, withAlternateLocale, withShareImage } from "../src/cli/spectrum-site.js";
 import { arroganceSectionId, beyondWinningSectionId, learningAccessSectionId } from "../src/cli/blog-series.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
@@ -398,6 +398,45 @@ test("an old page's own preview image is replaced by the card, not doubled", () 
   assert.equal(out.match(/og:image"/gu)?.length, 1);
   assert.equal(out.match(/twitter:image"/gu)?.length, 1);
   assert.match(out, /content="https:\/\/example\.org\/tb\/assets\/share\/essay-en\.jpg"/u);
+});
+
+test("an essay's structured data shows its card and cover, not an old illustration", () => {
+  const posting = { "@context": "https://schema.org", "@type": "BlogPosting", headline: "x <y>", image: "https://example.org/tb/assets/home-blog-03.webp" };
+  const crumbs = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [] };
+  const ld = (value: unknown): string => `<script type="application/ld+json">${JSON.stringify(value).replaceAll("<", "\\u003c")}</script>`;
+  const head = [
+    '<meta property="og:url" content="https://example.org/tb/blog/x/">',
+    '<meta name="twitter:description" content="d">',
+    ld(posting),
+    ld(crumbs),
+  ].join("\n");
+  const json = (out: string, type: string): Record<string, unknown> => {
+    const blocks = [...out.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gu)].map((m) => JSON.parse(m[1] ?? "null") as Record<string, unknown>);
+    const found = blocks.find((block) => block["@type"] === type);
+    assert.ok(found, type);
+    return found;
+  };
+  const withCover = withShareImage(head, "assets/share/essay-en.jpg", "/tb", "assets/journal/podium.webp");
+  assert.doesNotMatch(withCover, /home-blog-03/u);
+  assert.deepEqual(json(withCover, "BlogPosting").image, [
+    "https://example.org/tb/assets/share/essay-en.jpg",
+    "https://example.org/tb/assets/journal/podium.webp",
+  ]);
+  assert.equal(json(withCover, "BlogPosting").headline, "x <y>");
+  assert.doesNotMatch(withCover, /<y>/u, "a < in the data stays escaped inside the script");
+  assert.ok(withCover.includes(ld(crumbs)), "other structured data is left as it is");
+  const cardOnly = withShareImage(head, "assets/share/essay-en.jpg", "/tb");
+  assert.equal(json(cardOnly, "BlogPosting").image, "https://example.org/tb/assets/share/essay-en.jpg");
+});
+
+test("an essay card names its cover render; a card made of several images names none", () => {
+  const cards = [
+    { id: "essay", routes: ["blog/x/"], art: { kind: "plate", file: "assets/journal/podium.webp" } },
+    { id: "journal", routes: ["blog/"], art: { kind: "grid" } },
+  ];
+  assert.equal(shareCardCover(cards, "essay"), "assets/journal/podium.webp");
+  assert.equal(shareCardCover(cards, "journal"), undefined);
+  assert.equal(shareCardCover(cards, "missing"), undefined);
 });
 
 // The sources write every passage twice (class "en" and class "zh"). A published page keeps its own
