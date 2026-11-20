@@ -1074,7 +1074,7 @@ export const SITE_ZH_CN_COPY: Readonly<Record<string, string>> = {
   "View the benchmark": "查看基准",
 
   "TutorBench by Teachometry — AI Tutor Evaluation": "TutorBench（Teachometry）— AI Tutor 教学评测",
-  "Scenario-based evaluation and regression infrastructure for observable AI tutoring behavior. Teachometry Developer Preview.": "面向可观察 AI 教学行为的情境化评测与回归基础设施。Teachometry 开发者预览。",
+  "Open instruments for teaching quality. Teachometry’s TutorBench tests how an AI tutor actually teaches, not just whether its answer is right.": "为教学质量造公开的仪器。Teachometry 的 TutorBench 检验 AI Tutor 实际怎么教，而不只是答案对不对。",
   "Benchmark — Teachometry": "基准 — Teachometry",
   "Explore authored cases, public dataset coverage, and transparent evaluation structure.": "探索人工编写案例、公开数据集覆盖与透明评测结构。",
   "Run — Teachometry": "运行 — Teachometry",

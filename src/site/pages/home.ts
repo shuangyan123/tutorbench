@@ -117,7 +117,7 @@ export function renderHomePage(artifacts: PublicBenchmarkArtifacts, uiLocale: Si
   const initialIndex = Math.max(0, cases.cases.findIndex((item) => item.id === "fraction-misconception-001"));
   return {
     title: "TutorBench by Teachometry — AI Tutor Evaluation",
-    description: "Scenario-based evaluation and regression infrastructure for observable AI tutoring behavior. Teachometry Developer Preview.",
+    description: "Open instruments for teaching quality. Teachometry’s TutorBench tests how an AI tutor actually teaches, not just whether its answer is right.",
     route: "/",
     content: `<section class="home-hero"><div class="shell home-hero-grid">
       <div class="home-thesis"><p class="eyebrow">Evidence before deployment</p><h1>Test how AI tutors<br><em>behave</em> before<br><span>you ship them.</span></h1><p class="home-lede">With TutorBench, Teachometry turns authored learning situations into reproducible Tutor Health evaluations: inspect teaching decisions, diagnose concrete failures, and keep the evidence needed to fix and retest them.</p>${renderHomeEntryPoints()}<div class="home-features"><span>${icon("leaf")} Open source</span><span>${icon("book")} Evidence-first</span><span>${icon("adaptation")} Developer Preview</span></div></div>
