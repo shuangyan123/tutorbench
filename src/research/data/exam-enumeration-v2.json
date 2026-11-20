@@ -1,0 +1,78 @@
+{
+  "version": "2",
+  "baseManifest": "1",
+  "sourceObservations": {
+    "checkedOn": "2026-11-20",
+    "cnHighSchool": {
+      "edition": "2017 edition revised 2025",
+      "authority": "中华人民共和国教育部",
+      "implementationEvidence": "https://xbzprtjcyj.swu.edu.cn/info/1077/1335.htm",
+      "status": "revision and implementation training confirmed",
+      "normativeTextSha256": null,
+      "entryCohort": null,
+      "nationalPaperSession": null
+    },
+    "cnGraduate": {
+      "entryCohort": 2027,
+      "isbn": "978-7-04-068404-9",
+      "catalogueSha256": "c1187ef0d9282e5701faca81f3af1d06f2b1a7b6117ca477adc98954ec94a572",
+      "catalogueBytes": 62304,
+      "outlineSha256": null,
+      "access": "Publisher print catalogue verified. Licensed full-text access and chapter inspection pending."
+    }
+  },
+  "scopes": [
+    {
+      "id": "cn-sets-2020",
+      "sourceScope": "cn-logic",
+      "parent": "Printed p. 15 / IV / compulsory / theme 1 / content requirements / 1. 集合",
+      "unit": "numbered statement, or sole statement under (2)",
+      "excludes": "introductory prose, §2 onward, teaching suggestions and paper/session selection",
+      "anchors": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "2",
+        "3.1",
+        "3.2",
+        "3.3"
+      ]
+    },
+    {
+      "id": "de-l4-elevated",
+      "sourceScope": "de-l4-common",
+      "parent": "Printed p. 20 / L4 / Erhöhtes Anforderungsniveau",
+      "unit": "bullet ordinal within elevated additions",
+      "excludes": "preceding common bullets, L5 onward, IQB tasks and Land requirements",
+      "anchors": [
+        "01",
+        "02",
+        "03"
+      ]
+    },
+    {
+      "id": "us-topic-2-2",
+      "sourceScope": "us-topic-2-1",
+      "parent": "Printed p. 56 / Unit 2 / Topic 2.2 / Essential Knowledge",
+      "unit": "EK code",
+      "excludes": "learning objectives, suggested skills and all adjacent topics",
+      "anchors": [
+        "CHA-2.B.2",
+        "CHA-2.B.3",
+        "CHA-2.B.4",
+        "CHA-2.C.1"
+      ]
+    },
+    {
+      "id": "us-topic-2-3",
+      "sourceScope": "us-topic-2-1",
+      "parent": "Printed p. 57 / Unit 2 / Topic 2.3 / Essential Knowledge",
+      "unit": "EK code",
+      "excludes": "learning objective, suggested skills and all adjacent topics",
+      "anchors": [
+        "CHA-2.D.1",
+        "CHA-2.D.2"
+      ]
+    }
+  ]
+}
