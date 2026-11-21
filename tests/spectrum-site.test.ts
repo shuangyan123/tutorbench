@@ -688,8 +688,8 @@ test("every page carries a security policy that lets only its own scripts run", 
     assert.deepEqual(directives.get("connect-src"), ["'self'"], file);
     // each inline script is allowed by its own hash: nothing else inline, and no eval
     const expected = new Set<string>();
-    for (const [, attributes = "", text = ""] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gu)) {
-      if (/\ssrc=|type="application\/ld\+json"/u.test(attributes)) continue;
+    for (const [, attributes = "", text = ""] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script(?=[\s/>])[^>]*>/giu)) {
+      if (/\ssrc=|type="application\/ld\+json"/iu.test(attributes)) continue;
       expected.add(`'sha256-${createHash("sha256").update(text).digest("base64")}'`);
     }
     inline += expected.size;
@@ -700,7 +700,7 @@ test("every page carries a security policy that lets only its own scripts run", 
 });
 
 test("the security policy hashes runnable scripts only, as the browser reads them", () => {
-  const html = '<meta charset="utf-8">\n<script type="application/ld+json">{"a":1}</script><script src="a.js"></script><script>a()\r\n</script><script type="module">b()</script>';
+  const html = '<meta charset="utf-8">\n<script type="application/ld+json">{"a":1}</script><script src="a.js"></script><script>a()\r\n</script><SCRIPT type="module">b()</SCRIPT\t\n x>';
   const hash = (text: string): string => `'sha256-${createHash("sha256").update(text).digest("base64")}'`;
   assert.ok(contentSecurityPolicy(html).includes(`; script-src 'self' ${hash("a()\n")} ${hash("b()")}; `));
   assert.ok(!contentSecurityPolicy(html).includes(hash('{"a":1}')));

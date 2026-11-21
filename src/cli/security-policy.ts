@@ -6,7 +6,8 @@ import { createHash } from "node:crypto";
 // Styles keep 'unsafe-inline': the pages set CSS custom properties in style attributes (--v, --c).
 // blob: images are the cover's scroll frames, which cover.js fetches and shows as object URLs.
 
-const SCRIPT_ELEMENT = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/giu;
+// as in the HTML parser, a script ends at the first "</script" followed by a space, "/" or ">", whatever comes after it
+const SCRIPT_ELEMENT = /<script\b([^>]*)>([\s\S]*?)<\/script(?=[\s/>])[^>]*>/giu;
 // a <script> runs only with no type, a JavaScript type or "module": any other type (JSON-LD) is a data block
 const RUNNABLE_TYPE = /^(?:module|(?:text|application)\/(?:java|ecma)script)$/iu;
 const CHARSET = /<meta charset="utf-8">/giu;
