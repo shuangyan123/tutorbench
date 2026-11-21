@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { compareExamSources, parseExamSpecifications } from "../research/exam-specifications.js";
 import { inspectCurriculumRevision } from "../research/exam-edition-comparison.js";
+import { inspectAssessmentGuidance } from "../research/exam-assessment-guidance.js";
 import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
 
 const base = "scenarios/case-system-vnext/";
@@ -26,9 +27,9 @@ if (inventory) {
   };
   const current = `${base}exam-specifications/requirements-0.4.0.json`;
   if (paths[0] === "--edition-diff") {
-    if (paths.length !== 1) throw new Error("--edition-diff takes no snapshot arguments");
+    if (paths[1] !== undefined && paths[1] !== "assessment-guidance") throw new Error("Unknown --edition-diff scope");
     const baseline = await inspect(current);
-    console.log(JSON.stringify(inspectCurriculumRevision(baseline), null, 2));
+    console.log(JSON.stringify(paths[1] ? inspectAssessmentGuidance(baseline) : inspectCurriculumRevision(baseline), null, 2));
   } else {
     const report = await inspect(paths[0] ?? current);
     console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await inspect(paths[1])) : report, null, 2));

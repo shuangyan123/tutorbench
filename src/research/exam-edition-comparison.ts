@@ -24,8 +24,8 @@ function cardinality(relation: Relation, oldCount: number, newCount: number) {
 }
 
 // 每侧的叶子只可消费一次，拆分、合并按决定计数；缺席本身不构成删除证据。
-export function reconcileEditionLeaves(before: Leaf[], after: Leaf[], decisions: Decision[]) {
-  function side(leaves: Leaf[]) {
+export function reconcileEditionLeaves<Old extends Leaf, New extends Leaf>(before: Old[], after: New[], decisions: Decision[]) {
+  function side<T extends Leaf>(leaves: T[]) {
     const remaining = new Map(leaves.map(leaf => [leaf.requirement_id, leaf]));
     check(remaining.size === leaves.length, "duplicate source anchor");
     return { remaining, take(ids: string[]) {
