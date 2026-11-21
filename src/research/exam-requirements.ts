@@ -1,6 +1,8 @@
 import { parseMathematicsKnowledgeMap } from "../contracts/mathematics-knowledge-map.js";
 import { createHash } from "node:crypto";
 import { applyGapSnapshot } from "./exam-gap-audit.js";
+import { internationalInventoryContext, verifyInventoryRelease } from "./exam-international-inventory.js";
+import { inspectCurriculumRevision } from "./exam-edition-comparison.js";
 import { enumerationScopes, expandedEnumerationScopes, graduateBook, legacyClauses, sourceObservations } from "./exam-inventory-scopes.js";
 import type { ExamSpecifications } from "./exam-specifications.js";
 
@@ -31,28 +33,52 @@ export function inspectRequirements(input: unknown, registry: ExamSpecifications
 }
 
 export function inspectGapRequirements(input: unknown, baseInput: unknown, registry: ExamSpecifications, graphInput: unknown,
-  expansion?: unknown) {
+  expansion?: unknown, international?: unknown) {
   const base = inspectRequirements(baseInput, registry, graphInput);
   const { inventory, extended, audit } = applyGapSnapshot(input, baseInput, parseMathematicsKnowledgeMap(graphInput), base);
-  if (expansion === undefined) return { ...inspectRows(inventory, registry, extended, "gap"), gapAudit: audit };
+  if (expansion === undefined) {
+    check(international === undefined, "missing 0.4.0 base");
+    return { ...inspectRows(inventory, registry, extended, "gap"), gapAudit: audit };
+  }
   const delta = record(expansion, "version baseInventory manifestVersion scopes requirements");
   check(delta.version === "0.4.0" && delta.baseInventory === inventory.version && delta.manifestVersion === "2", "expansion pins");
-  const report = inspectRows({ ...inventory, version: delta.version, manifestVersion: delta.manifestVersion,
-    scopes: [...inventory.scopes, ...array(delta.scopes)], requirements: [...inventory.requirements, ...array(delta.requirements)] },
-  registry, extended, "expanded");
+  const expanded = { ...inventory, version: delta.version, manifestVersion: delta.manifestVersion,
+    scopes: [...inventory.scopes, ...array(delta.scopes)], requirements: [...inventory.requirements, ...array(delta.requirements)] };
+  const report = inspectRows(expanded, registry, extended, "expanded");
   check(createHash("sha256").update(JSON.stringify(expansion)).digest("hex") ===
     "0840807dc8363e96d86da14abf7709d4e69f671cbba3d5313986c66d067d2672", "changed 0.4.0 snapshot");
-  return { ...report, gapAudit: audit, sourceObservations };
+  const historical = { ...report, gapAudit: audit, sourceObservations };
+  if (international === undefined) return historical;
+  const next = record(international, "version baseInventory manifestVersion scopes requirements");
+  check(next.version === "0.7.0" && next.baseInventory === report.version && next.manifestVersion === "3", "international pins");
+  const context = internationalInventoryContext(registry);
+  const updated = inspectRows({ ...expanded, version: next.version, registryVersion: context.supplement.version, manifestVersion: next.manifestVersion,
+    scopes: [...expanded.scopes, ...array(next.scopes)], requirements: [...expanded.requirements, ...array(next.requirements)] },
+  registry, extended, "international", context);
+  verifyInventoryRelease(international, "fd89e91160d9124790465b6474bd22e4dc62c8be74c3d817a83d556d825db6fa", "requirements");
+  const editions = new Map(updated.requirements.map(row => [row.requirement_id, row.source_edition]));
+  for (const link of context.crosswalks) {
+    check(editions.get(link.focus) === context.supplement.stateExamSource && link.curriculum.length > 0 &&
+      link.curriculum.every(id => editions.get(id) === context.supplement.requiredCurriculum) &&
+      link.national.every(id => editions.get(id) === "kmk-ahr-math@2012.1"), "crosswalk authority mismatch");
+  }
+  const { newSource, applicability } = inspectCurriculumRevision(historical);
+  return { ...updated, gapAudit: audit, sourceObservations, chineseRevision: { candidate: newSource, applicability },
+    sourceSupplement: context.supplement, crosswalks: context.crosswalks,
+    landOverlays: { ...updated.landOverlays, status: "partial", byJurisdiction: context.landStatus }, independentCrosswalkReviews: 0 };
 }
 
 function inspectRows(input: unknown, registry: ExamSpecifications, graph: ReturnType<typeof parseMathematicsKnowledgeMap>,
-  mode: "legacy" | "gap" | "expanded") {
+  mode: "legacy" | "gap" | "expanded" | "international", context?: ReturnType<typeof internationalInventoryContext>) {
   const root = record(input, "version registryVersion manifestVersion scopes requirements");
   const expanded = mode === "expanded";
-  check(root.registryVersion === registry.version && registry.version === "0.1.0" && root.manifestVersion === (expanded ? "2" : "1") &&
-    (root.version === "0.3.0") === (mode === "gap") && (root.version === "0.4.0") === expanded, "stale inventory pins");
+  const registryVersion = context?.supplement.version ?? registry.version;
+  check(root.registryVersion === registryVersion && registry.version === "0.1.0" && root.manifestVersion === (context ? "3" : expanded ? "2" : "1") &&
+    (root.version === "0.3.0") === (mode === "gap") && (root.version === "0.4.0") === expanded &&
+    (root.version === "0.7.0") === (mode === "international"), "stale inventory pins");
   check(typeof root.version === "string" && /^\d+\.\d+\.\d+$/.test(root.version), "snapshot version");
-  const manifest = expanded ? expandedEnumerationScopes(registry) : enumerationScopes(registry);
+  const manifest = context?.scopes ?? (expanded ? expandedEnumerationScopes(registry) : enumerationScopes(registry));
+  const exams = context?.exams ?? registry.exams;
   check(createHash("sha256").update(JSON.stringify(registry)).digest("hex") ===
     "66f4e05e93e01ebea4d1e8e9cfe9dd897c218f52d886e4cbeb0ac0c5915b2cd2", "changed base registry");
   const declared = new Map<string, "partial" | "complete">();
@@ -81,15 +107,17 @@ function inspectRows(input: unknown, registry: ExamSpecifications, graph: Return
     check(row.legacy === (legacyClauses[stableId] ?? null), "wrong legacy citation");
     if (row.legacy !== null) check(registry.mappings.some(link => link.spec === edition && link.clause === row.legacy &&
       link.concept === concept && link.review === "author-proposed"), "legacy mapping mismatch");
+    const location = context?.locations.get(stableId);
+    const locator = scope.parent + " / " + row.anchor;
     return { requirement_id: stableId, source_edition: edition, source_sha256: scope.source.sha256,
-      parent: scope.id, anchor: row.anchor, locator: scope.parent + " / " + row.anchor,
+      parent: scope.id, anchor: row.anchor, locator: location ? locator + ` (printed ${location.printedPage}, PDF ${location.pdfPage})` : locator, ...location,
       summary: row.summary, alignment_status: row.status, concept_id: concept, legacy_clause: row.legacy };
   }).sort((left, right) => left.requirement_id < right.requirement_id ? -1 : 1);
   const scopes = manifest.map(scope => {
     const rows = requirements.filter(row => row.parent === scope.id);
     const complete = declared.get(scope.id) === "complete";
     check(!complete || rows.length === scope.anchors.length, "incomplete leaf census");
-    for (const exam of scope.exams) check(registry.exams.some(entry => entry.id === exam), "missing exam");
+    for (const exam of scope.exams) check(exams.some(entry => entry.id === exam), "missing exam");
     const count = (status: string) => rows.filter(row => row.alignment_status === status).length;
     const excluded = scope.id === "us-topic-2-1" ? [{
       locator: "Printed p. 56 / Unit 2 / Topic 2.2 / CHA-2.B.2", source_edition: "ap-calculus-ced@2020.1",
@@ -100,13 +128,14 @@ function inspectRows(input: unknown, registry: ExamSpecifications, graph: Return
         count("unmapped"), count("awaiting-evidence")), explicit_exclusions: excluded, requirements_out_of_scope: excluded.length };
   });
   const bounded = scopes.flatMap(scope => scope.exams.map(id => {
-    const exam = registry.exams.find(entry => entry.id === id)!;
+    const exam = exams.find(entry => entry.id === id)!;
     return { exam: id, subject: exam.subject, ...scope };
   }));
   // 全卷视图绝不复用小节百分比；课程条目也不自动成为特定试卷条目。
-  const wholeExamViews = registry.exams.map(exam => {
+  const wholeExamViews = exams.map(exam => {
     const graduate = exam.id.startsWith("cn-kaoyan-");
-    const slices = bounded.filter(scope => scope.exam === exam.id && scope.jurisdiction === exam.jurisdiction);
+    const slices = bounded.filter(scope => scope.exam === exam.id && scope.jurisdiction === exam.jurisdiction &&
+      (exam.id !== context?.supplement.stateExam.id || scope.session === exam.session));
     const sum = (key: "requirements_inventoried" | "requirements_with_concept_links" | "requirements_explicitly_unmapped") =>
       slices.reduce((total, slice) => total + slice[key], 0);
     const pending = slices.reduce((total, slice) => total + slice.requirements_pending_review - slice.requirements_with_concept_links, 0);
@@ -117,7 +146,7 @@ function inspectRows(input: unknown, registry: ExamSpecifications, graph: Return
       availability: graduate ? graduateBook : null, ...metrics(null, sum("requirements_inventoried"),
         sum("requirements_with_concept_links"), sum("requirements_explicitly_unmapped"), pending) };
   });
-  return { version: root.version, registryVersion: registry.version, manifestVersion: root.manifestVersion,
+  return { version: root.version, registryVersion, manifestVersion: root.manifestVersion,
     graph: graph.id + "@" + graph.version, unique_source_clauses: requirements.length, unique_linked_requirements: requirements.filter(row =>
       row.alignment_status === "aligned-author-proposed").length, scopes, perExam: bounded, wholeExamViews,
     landOverlays: registry.landOverlays, requirements };
@@ -137,7 +166,7 @@ export function compareRequirementInventories(before: Inventory, after: Inventor
   const result = { before: before.version, after: after.version,
     scopes: diff(before.scopes, after.scopes, scope => scope.id),
     requirements };
-  if (before.manifestVersion !== "2" && after.manifestVersion !== "2") return result;
+  if (before.manifestVersion === "1" && after.manifestVersion === "1") return result;
   return { ...result, changes: {
     added: requirements.filter(row => row.before === null).map(row => row.key),
     removed: requirements.filter(row => row.after === null).map(row => row.key),

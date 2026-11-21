@@ -146,7 +146,7 @@ function libraryPage(cover) {
   </section>
 </main>`;
   void example;
-  return frame({ prefix: "../../", title: "Cases — Teachometry", titleZh: `${Z("Cases")} — Teachometry`, description: "Browse structured, authored student–tutor situations from the public Teachometry development set.", body, current: "cases", css: ["journal.css", "cases.css"], scripts: ["cases.js"] });
+  return frame({ prefix: "../../", title: "AI tutoring cases — Teachometry", titleZh: Z("AI tutoring cases — Teachometry"), description: "Browse structured, authored student–tutor situations from the public Teachometry development set.", body, current: "cases", css: ["journal.css", "cases.css"], scripts: ["cases.js"] });
 }
 
 // ---------------------------------------------------------------- one case file

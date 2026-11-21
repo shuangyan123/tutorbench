@@ -30,6 +30,8 @@ import {
   TUTORBENCH_BRAND_ASSET_PATHS,
   type SitePage,
 } from "../site/html.js";
+import { renderLlmsTxt } from "../site/llms-txt.js";
+import { INDEXNOW_KEY, INDEXNOW_KEY_FILE } from "./indexnow.js";
 import {
   resolveSiteLocale,
   SITE_LOCALES,
@@ -156,6 +158,7 @@ async function writeDiscoveryFiles(
   pages: readonly SitePage[],
   siteUrl: string | undefined,
   isPrivateBuild: boolean,
+  benchmark: PublicBenchmarkArtifacts["benchmark"],
 ): Promise<void> {
   if (isPrivateBuild) {
     await writeFile(join(outputDirectory, "robots.txt"), "User-agent: *\nDisallow: /\n", "utf8");
@@ -190,6 +193,9 @@ async function writeDiscoveryFiles(
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`,
     "utf8",
   );
+  await writeFile(join(outputDirectory, "llms.txt"), renderLlmsTxt({ siteUrl: normalizedSiteUrl, pages, benchmark }), "utf8");
+  // IndexNow: the engines fetch this file to confirm a submission came from the site (src/cli/indexnow.ts)
+  await writeFile(join(outputDirectory, INDEXNOW_KEY_FILE), INDEXNOW_KEY, "utf8");
 }
 
 /** Generated pages kept in memory, by output path, when the redesign is published in their place. */
@@ -507,6 +513,7 @@ export async function buildWebsite(options: BuildOptions = {}): Promise<number> 
     discoveryPages,
     options.siteUrl,
     isPrivateBuild,
+    artifacts.benchmark,
   );
   if (publishSpectrum) {
     await publishJournalEssayRoutes({

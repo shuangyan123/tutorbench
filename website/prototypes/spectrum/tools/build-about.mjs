@@ -17,6 +17,24 @@ const { formatPublicCount } = await import(join(REPO, "dist/src/site/public-loca
 const { publicArtifactNotice } = await import(join(REPO, "dist/src/site/public-localization.js"));
 const { siteText } = await import(join(REPO, "dist/src/site/i18n.js"));
 const { SITE_CONTACT_EMAIL, SITE_X_URL, SITE_GITHUB_URL } = await import(join(REPO, "dist/src/site/html.js"));
+const { siteFaq } = await import(join(REPO, "dist/src/site/faq.js"));
+
+// Chinese questions break only between words; balanced lines would otherwise split 结果 across two
+const zhSeg = new Intl.Segmenter("zh-CN", { granularity: "word" });
+// words the segmenter splits but a reader does not
+const ZH_KEEP = ["评测", "案例集"];
+// licence names stay on one line ("Apache-" / "2.0" reads as two things)
+const unbroken = (text) => esc(text).replace(/Apache-2\.0|CC BY 4\.0/gu, (name) => `<span class="ab-nobr">${name}</span>`);
+function zhHeading(text) {
+  const cuts = []; let at = 0;
+  for (const { segment } of zhSeg.segment(text)) { at += segment.length; cuts.push(at); }
+  const inside = (c) => ZH_KEEP.some((w) => { for (let i = text.indexOf(w); i >= 0; i = text.indexOf(w, i + 1)) if (c > i && c < i + w.length) return true; return false; });
+  // spaces already allow a break, and a line never starts with closing punctuation
+  const noCut = (c) => c >= text.length || /\s/u.test(text[c - 1] ?? "") || /[\s？。，、：！]/u.test(text[c] ?? "") || inside(c);
+  let out = ""; let from = 0;
+  for (const c of cuts) if (!noCut(c)) { out += `${esc(text.slice(from, c))}<wbr>`; from = c; }
+  return out + esc(text.slice(from));
+}
 const benchmark = JSON.parse(readFileSync(join(REPO, "website/dist/public-data/benchmark.json"), "utf8"));
 const models = JSON.parse(readFileSync(join(REPO, "website/dist/public-data/models.json"), "utf8"));
 const PKG = JSON.parse(readFileSync(join(REPO, "package.json"), "utf8")).version;
@@ -157,6 +175,9 @@ function aboutPage() {
     ["Calibration", ["Not completed; results remain preliminary and uncalibrated where applicable."].map((s) => [s, Z(s)])[0], true],
   ];
   const [neqA, neqB] = [Z("Answers"), Z("Teaching.")];
+  // the questions the live About page publishes as FAQPage data (src/site/faq.ts), one source
+  const faqZh = siteFaq(benchmark, "zh-CN");
+  const faqPairs = siteFaq(benchmark, "en").map((entry, i) => [entry, faqZh[i]]);
   const body = `<main id="main" class="ab">
   <header class="essay-head ab-head">
     <div class="wrap">
@@ -253,6 +274,16 @@ function aboutPage() {
     </div>
   </section>
 
+  <section class="wrap ab-row" id="questions" aria-labelledby="about-faq-title">
+    <div>
+      <p class="kicker" id="about-faq-title">${bi("Questions, answered", "常见问题")}</p>
+      <p class="ab-side-note">${bi("Plain answers<br><em>to fair questions.</em>", "直接回答<br><em>常被问到的问题。</em>")}</p>
+    </div>
+    <div class="ab-faq">
+      ${faqPairs.map(([en, zh]) => `<article><h3>${bi(esc(en.question), zhHeading(zh.question))}</h3>${biP("p", "", unbroken(en.answer), unbroken(zh.answer))}</article>`).join("\n      ")}
+    </div>
+  </section>
+
   <section class="jx-close" aria-labelledby="about-close-title">
     <div class="wrap">
       <p class="kicker fount-k">${bi("Write to us", "写信给我们")}</p>
@@ -261,7 +292,7 @@ function aboutPage() {
     </div>
   </section>
 </main>`;
-  return frame({ prefix: "../", title: "About — Teachometry", titleZh: Z("About — Teachometry"), description: "Teachometry measures observable AI tutoring behavior, not merely whether a model produces a correct answer.", body, current: "about", css: ["journal.css", "about.css"], scripts: ["about.js"] });
+  return frame({ prefix: "../", title: "About Teachometry: measuring how AI teaches", titleZh: Z("About Teachometry: measuring how AI teaches"), description: "Teachometry measures observable AI tutoring behavior, not merely whether a model produces a correct answer.", body, current: "about", css: ["journal.css", "about.css"], scripts: ["about.js"] });
 }
 
 function boundaryList(items) {

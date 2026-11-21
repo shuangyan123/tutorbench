@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      indexnow: ${{ steps.indexnow.outputs.payload }}
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -40,6 +42,12 @@ jobs:
         run: npm run website:build
       - name: Check deployment artifact
         run: node scripts/website-artifact-smoke.mjs
+      # compared with the live site before this deploy replaces it; a failure only skips the ping
+      - name: List the pages this deploy changes (IndexNow)
+        id: indexnow
+        if: github.ref == 'refs/heads/main' && steps.pages.outputs.base_url == 'https://teachometry.com'
+        continue-on-error: true
+        run: node dist/src/cli/indexnow.js website/dist https://teachometry.com >> "$GITHUB_OUTPUT"
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
@@ -61,3 +69,21 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  # Bing and the other IndexNow engines crawl the changed pages within hours; Google does not use IndexNow
+  indexnow:
+    name: Tell search engines which pages changed
+    if: github.ref == 'refs/heads/main' && needs.build.outputs.indexnow != ''
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Submit to IndexNow
+        continue-on-error: true
+        env:
+          PAYLOAD: ${{ needs.build.outputs.indexnow }}
+        run: >-
+          curl --fail-with-body --silent --show-error --max-time 30
+          -X POST https://api.indexnow.org/indexnow
+          -H 'Content-Type: application/json; charset=utf-8'
+          --data "$PAYLOAD"
