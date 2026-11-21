@@ -1,0 +1,390 @@
+{
+  "schemaVersion": 1,
+  "id": "exam-science-upstream-intake-snapshot-2022-2026-v0.1",
+  "status": "upstream_metadata_only_not_question_verified",
+  "examWindow": {
+    "firstYear": 2022,
+    "lastYear": 2026,
+    "yearBasis": "exam_year_not_collection_year"
+  },
+  "source": {
+    "repository": "qingshuo/China-Gaokao-Papers-Collection",
+    "revision": "b33ea3dd5427afa963a944808d3a6c0183fc454e",
+    "path": "data/exams.csv",
+    "gitBlobSha": "38d188f067065c597ad1e3903dd4130b10d653e2",
+    "sourceUrl": "https://github.com/qingshuo/China-Gaokao-Papers-Collection/blob/b33ea3dd5427afa963a944808d3a6c0183fc454e/data/exams.csv",
+    "filter": "material_type == 完整试卷 AND 2022 <= year <= 2026 AND subject in 数学,物理,化学,生物"
+  },
+  "countingCaveat": "Candidate file records only. Duplicate file variants and shared paper editions have NOT been deduplicated; do not add to TutorBench's 51 math paper-edition records.",
+  "upstreamStats": {
+    "candidates": 217,
+    "upstreamDeclaredStatus": {
+      "discovered": 1,
+      "indexed": 172,
+      "verified": 44
+    },
+    "withSha256": 216,
+    "upstreamLicenseStatus": {
+      "unknown": 191,
+      "permitted": 25,
+      "restricted": 1
+    }
+  },
+  "subjects": {
+    "数学": {
+      "candidates": 51,
+      "upstreamDeclaredStatus": {
+        "discovered": 1,
+        "indexed": 39,
+        "verified": 11
+      },
+      "withSha256": 50,
+      "upstreamLicenseStatus": {
+        "unknown": 25,
+        "permitted": 25,
+        "restricted": 1
+      },
+      "byYear": {
+        "2022": {
+          "candidates": 14,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 13,
+            "verified": 1
+          },
+          "withSha256": 14,
+          "upstreamLicenseStatus": {
+            "unknown": 5,
+            "permitted": 9,
+            "restricted": 0
+          }
+        },
+        "2023": {
+          "candidates": 9,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 0,
+            "verified": 9
+          },
+          "withSha256": 9,
+          "upstreamLicenseStatus": {
+            "unknown": 9,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2024": {
+          "candidates": 11,
+          "upstreamDeclaredStatus": {
+            "discovered": 1,
+            "indexed": 9,
+            "verified": 1
+          },
+          "withSha256": 10,
+          "upstreamLicenseStatus": {
+            "unknown": 3,
+            "permitted": 7,
+            "restricted": 1
+          }
+        },
+        "2025": {
+          "candidates": 7,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 7,
+            "verified": 0
+          },
+          "withSha256": 7,
+          "upstreamLicenseStatus": {
+            "unknown": 3,
+            "permitted": 4,
+            "restricted": 0
+          }
+        },
+        "2026": {
+          "candidates": 10,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 10,
+            "verified": 0
+          },
+          "withSha256": 10,
+          "upstreamLicenseStatus": {
+            "unknown": 5,
+            "permitted": 5,
+            "restricted": 0
+          }
+        }
+      }
+    },
+    "物理": {
+      "candidates": 118,
+      "upstreamDeclaredStatus": {
+        "discovered": 0,
+        "indexed": 106,
+        "verified": 12
+      },
+      "withSha256": 118,
+      "upstreamLicenseStatus": {
+        "unknown": 118,
+        "permitted": 0,
+        "restricted": 0
+      },
+      "byYear": {
+        "2022": {
+          "candidates": 22,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 21,
+            "verified": 1
+          },
+          "withSha256": 22,
+          "upstreamLicenseStatus": {
+            "unknown": 22,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2023": {
+          "candidates": 17,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 16,
+            "verified": 1
+          },
+          "withSha256": 17,
+          "upstreamLicenseStatus": {
+            "unknown": 17,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2024": {
+          "candidates": 36,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 26,
+            "verified": 10
+          },
+          "withSha256": 36,
+          "upstreamLicenseStatus": {
+            "unknown": 36,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2025": {
+          "candidates": 27,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 27,
+            "verified": 0
+          },
+          "withSha256": 27,
+          "upstreamLicenseStatus": {
+            "unknown": 27,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2026": {
+          "candidates": 16,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 16,
+            "verified": 0
+          },
+          "withSha256": 16,
+          "upstreamLicenseStatus": {
+            "unknown": 16,
+            "permitted": 0,
+            "restricted": 0
+          }
+        }
+      }
+    },
+    "化学": {
+      "candidates": 30,
+      "upstreamDeclaredStatus": {
+        "discovered": 0,
+        "indexed": 19,
+        "verified": 11
+      },
+      "withSha256": 30,
+      "upstreamLicenseStatus": {
+        "unknown": 30,
+        "permitted": 0,
+        "restricted": 0
+      },
+      "byYear": {
+        "2022": {
+          "candidates": 4,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 4,
+            "verified": 0
+          },
+          "withSha256": 4,
+          "upstreamLicenseStatus": {
+            "unknown": 4,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2023": {
+          "candidates": 1,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 0,
+            "verified": 1
+          },
+          "withSha256": 1,
+          "upstreamLicenseStatus": {
+            "unknown": 1,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2024": {
+          "candidates": 15,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 5,
+            "verified": 10
+          },
+          "withSha256": 15,
+          "upstreamLicenseStatus": {
+            "unknown": 15,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2025": {
+          "candidates": 9,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 9,
+            "verified": 0
+          },
+          "withSha256": 9,
+          "upstreamLicenseStatus": {
+            "unknown": 9,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2026": {
+          "candidates": 1,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 1,
+            "verified": 0
+          },
+          "withSha256": 1,
+          "upstreamLicenseStatus": {
+            "unknown": 1,
+            "permitted": 0,
+            "restricted": 0
+          }
+        }
+      }
+    },
+    "生物": {
+      "candidates": 18,
+      "upstreamDeclaredStatus": {
+        "discovered": 0,
+        "indexed": 8,
+        "verified": 10
+      },
+      "withSha256": 18,
+      "upstreamLicenseStatus": {
+        "unknown": 18,
+        "permitted": 0,
+        "restricted": 0
+      },
+      "byYear": {
+        "2022": {
+          "candidates": 3,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 2,
+            "verified": 1
+          },
+          "withSha256": 3,
+          "upstreamLicenseStatus": {
+            "unknown": 3,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2023": {
+          "candidates": 1,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 0,
+            "verified": 1
+          },
+          "withSha256": 1,
+          "upstreamLicenseStatus": {
+            "unknown": 1,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2024": {
+          "candidates": 10,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 2,
+            "verified": 8
+          },
+          "withSha256": 10,
+          "upstreamLicenseStatus": {
+            "unknown": 10,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2025": {
+          "candidates": 3,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 3,
+            "verified": 0
+          },
+          "withSha256": 3,
+          "upstreamLicenseStatus": {
+            "unknown": 3,
+            "permitted": 0,
+            "restricted": 0
+          }
+        },
+        "2026": {
+          "candidates": 1,
+          "upstreamDeclaredStatus": {
+            "discovered": 0,
+            "indexed": 1,
+            "verified": 0
+          },
+          "withSha256": 1,
+          "upstreamLicenseStatus": {
+            "unknown": 1,
+            "permitted": 0,
+            "restricted": 0
+          }
+        }
+      }
+    }
+  },
+  "assurance": {
+    "filesDownloadedByTutorBench": false,
+    "originalQuestionPagesReviewedByTutorBench": false,
+    "statementTranscriptionsCheckedByTutorBench": false,
+    "sourceEditionAuthenticatedByTutorBench": false,
+    "answerKeysIndependentlyVerifiedByTutorBench": false,
+    "certifiedExamGoldItems": 0,
+    "liveModelCalls": 0,
+    "upstreamVerifiedMeaning": "Upstream-declared content/version review only, not confirmed official publication or exam-question-level gold.",
+    "copyrightNote": "Do not redistribute exam paper files or treat upstream license_status=permitted as rights clearance for original examination questions."
+  }
+}

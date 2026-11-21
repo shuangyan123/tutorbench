@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 1,
+  "observedOn": "2026-11-05",
+  "status": "discovery_only",
+  "unmatchedMathTriage": [
+    {
+      "recordId": "2024-sh-spring-math-51jiaoxi",
+      "possibleCatalogId": null,
+      "basis": "separate_shanghai_spring_session",
+      "status": "out_of_scope"
+    },
+    {
+      "recordId": "2024-全国-数学-新高考I卷",
+      "possibleCatalogId": "gaokao-2024-new-gaokao-1",
+      "basis": "year_and_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "2025-全国-数学-全国一卷",
+      "possibleCatalogId": "gaokao-2025-national-1",
+      "basis": "year_and_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "2025-全国-数学-全国二卷",
+      "possibleCatalogId": "gaokao-2025-national-2",
+      "basis": "year_and_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "2025-BJ-数学-地方卷",
+      "possibleCatalogId": "gaokao-2025-beijing",
+      "basis": "year_and_region",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "2026-全国-数学-全国一卷",
+      "possibleCatalogId": "gaokao-2026-national-1",
+      "basis": "year_and_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2022-29-math",
+      "possibleCatalogId": "gaokao-2022-beijing",
+      "basis": "year_and_region",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-34-math",
+      "possibleCatalogId": "gaokao-2023-shanghai",
+      "basis": "year_region_and_autumn_session",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-35-math",
+      "possibleCatalogId": "gaokao-2023-national-b-humanities",
+      "basis": "year_family_and_stream",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-36-math",
+      "possibleCatalogId": "gaokao-2023-national-b-science",
+      "basis": "year_family_and_stream",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-37-math",
+      "possibleCatalogId": "gaokao-2023-national-a-humanities",
+      "basis": "year_family_and_stream",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-38-math",
+      "possibleCatalogId": "gaokao-2023-national-a-science",
+      "basis": "year_family_and_stream",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-39-math",
+      "possibleCatalogId": "gaokao-2023-beijing",
+      "basis": "year_and_region",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-40-math",
+      "possibleCatalogId": "gaokao-2023-tianjin",
+      "basis": "year_and_region",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-41-math",
+      "possibleCatalogId": "gaokao-2023-new-gaokao-1",
+      "basis": "year_and_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "deekur-2023-42-math",
+      "possibleCatalogId": "gaokao-2023-new-gaokao-2",
+      "basis": "year_and_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2022-数学-a016ca0bddd7",
+      "possibleCatalogId": "gaokao-2022-new-gaokao-2",
+      "basis": "year_and_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2022-数学-d00e85ebf75c",
+      "possibleCatalogId": "gaokao-2022-national-b-science",
+      "basis": "year_family_and_stream",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2022-数学-193147c003da",
+      "possibleCatalogId": "gaokao-2022-national-b-humanities",
+      "basis": "year_family_and_stream",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2022-数学-09dfad0d449a",
+      "possibleCatalogId": null,
+      "basis": "zhejiang_session_not_identified",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2024-数学-d7ffc6dab1af",
+      "possibleCatalogId": "gaokao-2024-tianjin",
+      "basis": "year_and_region",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2024-数学-3056423645c4",
+      "possibleCatalogId": "gaokao-2024-new-gaokao-1",
+      "basis": "year_and_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2026-数学-ef8099d5f60a",
+      "possibleCatalogId": "gaokao-2026-national-1",
+      "basis": "year_and_claimed_family",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2026-数学-b4cda6722b5f",
+      "possibleCatalogId": "gaokao-2026-beijing",
+      "basis": "year_and_region",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2026-数学-66df94475d50",
+      "possibleCatalogId": "gaokao-2026-shanghai",
+      "basis": "year_and_region",
+      "status": "metadata_only_unverified"
+    },
+    {
+      "recordId": "temp-2026-数学-9c9cb50bcd0c",
+      "possibleCatalogId": "gaokao-2026-tianjin",
+      "basis": "year_and_region",
+      "status": "metadata_only_unverified"
+    }
+  ],
+  "postgraduateMath2026": [
+    {
+      "paperId": "kaoyan-math-1-2026",
+      "sourceUrl": "https://static.kaoyan.cn/file/question/2025/12/27/f3a552ec0d163308d2ac28dc7a10bbd0.pdf",
+      "sha256": "d4280ee4fba64eb117a23073bd6be9f1bbd3e8e4c8708a304b4abb4b8f2df405",
+      "pdfPagesObserved": 8,
+      "firstPageLabelObserved": "2026 数学一",
+      "sourceKind": "third_party_retypeset_with_answers",
+      "officialIdentity": "unverified",
+      "questionDenominator": null
+    },
+    {
+      "paperId": "kaoyan-math-2-2026",
+      "sourceUrl": "https://oss-hqwx-video.hqwx.com/%E3%80%90%E5%AE%8C%E6%95%B4%E3%80%912026%E5%B9%B4%E8%80%83%E7%A0%94%E6%95%B0%E5%AD%A6%EF%BC%88%E4%BA%8C%EF%BC%89%E7%9C%9F%E9%A2%98%E5%8F%8A%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90_b66a6384117a91413863746ed9bec2997330fdb1.pdf",
+      "sha256": "b379489d393526cff4f39b62731f216fc031c8ffcca5926a070653e28df5d5a1",
+      "pdfPagesObserved": 10,
+      "firstPageLabelObserved": "2026 数学二",
+      "sourceKind": "third_party_retypeset_with_answers",
+      "officialIdentity": "unverified",
+      "questionDenominator": null
+    },
+    {
+      "paperId": "kaoyan-math-3-2026",
+      "sourceUrl": "https://oss-hqwx-video.hqwx.com/%E3%80%90%E5%AE%8C%E6%95%B4%E3%80%912026%E5%B9%B4%E8%80%83%E7%A0%94%E6%95%B0%E5%AD%A6%EF%BC%88%E4%B8%89%EF%BC%89%E7%9C%9F%E9%A2%98%E5%8F%8A%E7%AD%94%E6%A1%88%E8%A7%A3%E6%9E%90_dbfb69a4d8649a9700bf29397e62a74e3d6ff83e.pdf",
+      "sha256": "c459663e72360b0d11176166b16e7f1977ad46f31d4c45d4496e2284e80d149a",
+      "pdfPagesObserved": 12,
+      "firstPageLabelObserved": "2026 数学三",
+      "sourceKind": "third_party_retypeset_with_answers",
+      "officialIdentity": "unverified",
+      "questionDenominator": null
+    }
+  ],
+  "gaokaoScienceEditionLeads": [
+    {
+      "year": 2022,
+      "editionType": "national_integrated",
+      "variants": [
+        "全国甲卷",
+        "全国乙卷"
+      ],
+      "subjects": [
+        "物理",
+        "化学",
+        "生物"
+      ],
+      "evidenceKind": "published_scope_or_exam_commentary",
+      "source": "https://paper.jyb.cn/zgjyb/images/2022-06/11/03/ZGJYB2022061103.pdf",
+      "paperArtifact": "unverified"
+    },
+    {
+      "year": 2023,
+      "editionType": "national_integrated",
+      "variants": [
+        "全国甲卷",
+        "全国乙卷",
+        "新课标卷"
+      ],
+      "subjects": [
+        "物理",
+        "化学",
+        "生物"
+      ],
+      "evidenceKind": "published_scope_or_exam_commentary",
+      "source": "https://www.thepaper.cn/newsDetail_forward_23404968",
+      "paperArtifact": "unverified"
+    },
+    {
+      "year": 2024,
+      "editionType": "national_integrated",
+      "variants": [
+        "全国甲卷",
+        "新课标卷"
+      ],
+      "subjects": [
+        "物理",
+        "化学",
+        "生物"
+      ],
+      "evidenceKind": "published_scope_or_exam_commentary",
+      "source": "https://app.gaokaozhitongche.com/news/h/Ewj3rkY2",
+      "paperArtifact": "unverified"
+    },
+    {
+      "year": 2025,
+      "editionType": "national_integrated",
+      "variants": [
+        "旧高考理科综合"
+      ],
+      "subjects": [
+        "物理",
+        "化学",
+        "生物"
+      ],
+      "evidenceKind": "published_scope_or_exam_commentary",
+      "source": "https://www.btmc.edu.cn/__local/7/DE/1E/2C3516481F8E4927C9B42E1B2DD_EA1956B0_4C346.pdf",
+      "paperArtifact": "unverified"
+    },
+    {
+      "year": 2026,
+      "editionType": "national_integrated",
+      "variants": [
+        "理科综合卷"
+      ],
+      "subjects": [
+        "物理",
+        "化学",
+        "生物"
+      ],
+      "evidenceKind": "published_scope_or_exam_commentary",
+      "source": "https://www.moe.gov.cn/jyb_xwfb/xw_zt/moe_357/2026/2026_zt08/mtbd/202606/t20260610_1440059.html",
+      "paperArtifact": "unverified"
+    },
+    {
+      "year": 2025,
+      "editionType": "provincial",
+      "variants": [
+        "河南选择性考试"
+      ],
+      "subjects": [
+        "物理",
+        "化学",
+        "生物"
+      ],
+      "evidenceKind": "provincial_exam_policy",
+      "source": "https://jyj.nanyang.gov.cn/2024/03-07/398904.html",
+      "paperArtifact": "unverified"
+    },
+    {
+      "year": 2026,
+      "editionType": "provincial",
+      "variants": [
+        "安徽选择性考试"
+      ],
+      "subjects": [
+        "物理",
+        "化学",
+        "生物"
+      ],
+      "evidenceKind": "provincial_exam_policy",
+      "source": "https://www.wuhu.gov.cn/xwzx/zwyw/41163271.html",
+      "paperArtifact": "unverified"
+    },
+    {
+      "year": 2026,
+      "editionType": "joint_province_candidate",
+      "variants": [
+        "黑吉辽蒙"
+      ],
+      "subjects": [
+        "物理",
+        "化学"
+      ],
+      "evidenceKind": "pinned_candidate_labels_only",
+      "candidateIds": [
+        "deekur-2026-physics-062",
+        "temp-2026-化学-ca0d7dc21d6a"
+      ],
+      "paperArtifact": "unverified"
+    }
+  ],
+  "postgraduateScienceCourseLeads": [
+    {
+      "year": 2024,
+      "institution": "武汉工程大学",
+      "subject": "物理",
+      "courseCode": "805",
+      "courseName": "普通物理",
+      "status": "issuer_index_department_page_unavailable",
+      "source": "https://yjs.wit.edu.cn/info/1020/6754.htm",
+      "departmentPage": "https://ss.wit.edu.cn/info/1031/7175.htm"
+    },
+    {
+      "year": 2024,
+      "institution": "武汉工程大学",
+      "subject": "生物",
+      "courseCode": "338",
+      "courseName": "生物化学",
+      "status": "issuer_attachment_listed_bytes_unverified",
+      "source": "https://eebe.wit.edu.cn/info/1069/8007.htm"
+    },
+    {
+      "year": 2024,
+      "institution": "武汉工程大学",
+      "subject": "生物",
+      "courseCode": "839",
+      "courseName": "微生物学",
+      "status": "issuer_attachment_listed_bytes_unverified",
+      "source": "https://eebe.wit.edu.cn/info/1069/8007.htm"
+    },
+    {
+      "year": 2025,
+      "institution": "暨南大学",
+      "subject": "生物",
+      "courseCode": "814",
+      "courseName": "普通生物学",
+      "status": "issuer_hosted_pdf_without_listing_binding",
+      "source": "https://yz.jnu.edu.cn/_upload/article/files/df/c8/ce6e82794d15812f482df8904eb3/43f7f297-ecb0-42f0-b84e-482464f5ab63.pdf"
+    },
+    {
+      "year": 2025,
+      "institution": "复旦大学",
+      "subject": "物理",
+      "courseCode": "876",
+      "courseName": "基础物理",
+      "status": "syllabus_only",
+      "source": "https://gsao.fudan.edu.cn/9f/66/c15015a696166/page.htm"
+    },
+    {
+      "year": 2026,
+      "institution": "广东石油化工学院",
+      "subject": "物理",
+      "courseCode": "803",
+      "courseName": "普通物理",
+      "status": "syllabus_only",
+      "source": "https://site.gdupt.edu.cn/yjsb/info/1059/2806.htm"
+    },
+    {
+      "year": 2026,
+      "institution": "广东石油化工学院",
+      "subject": "化学",
+      "courseCode": "610",
+      "courseName": "食品化学",
+      "status": "syllabus_only",
+      "source": "https://site.gdupt.edu.cn/yjsb/info/1059/2806.htm"
+    },
+    {
+      "year": 2026,
+      "institution": "广东石油化工学院",
+      "subject": "生物",
+      "courseCode": "338",
+      "courseName": "生物化学",
+      "status": "syllabus_only",
+      "source": "https://site.gdupt.edu.cn/yjsb/info/1059/2806.htm"
+    }
+  ]
+}
