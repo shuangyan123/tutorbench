@@ -8,6 +8,7 @@ import {
   TUTOR_EVAL_DATASET_VERSION,
 } from "../contracts/index.js";
 import {
+  SITE_LOCALES,
   resolveSiteLocale,
   siteHreflang,
   siteText,
@@ -62,6 +63,19 @@ export interface SitePage {
   readonly route: string;
   readonly content: string;
   readonly seo?: SitePageSeo;
+  /**
+   * Set when the page's main text is source content written in one language, such as a public
+   * case. Each interface language has its own view of every page, so the same text appears at
+   * two addresses; search engines are told to index only the view whose interface matches the
+   * text, and that its other-language partner is the same content written in the other language.
+   */
+  readonly sourceContent?: SiteSourceContent;
+}
+
+export interface SiteSourceContent {
+  readonly locale: SiteLocale;
+  /** The route of this content as written in each language, this page's own included. */
+  readonly routes: Readonly<Partial<Record<SiteLocale, string>>>;
 }
 
 /**
@@ -101,6 +115,38 @@ export function siteLocaleRoute(route: string, locale: SiteLocale): string {
     return route;
   }
   return route === "/" ? "/zh-cn/" : `/zh-cn${route}`;
+}
+
+/** The address search engines should index for this page as shown in this interface language. */
+export function siteCanonicalRoute(page: Pick<SitePage, "route" | "sourceContent">, locale: SiteLocale): string {
+  return siteLocaleRoute(page.route, page.sourceContent?.locale ?? locale);
+}
+
+/**
+ * The hreflang partners, x-default last, that this view of a page declares. A view that is not
+ * its page's canonical address declares none: search engines read them from the canonical view.
+ */
+export function siteAlternateRoutes(
+  page: Pick<SitePage, "route" | "sourceContent">,
+  locale: SiteLocale,
+): readonly (readonly [hreflang: string, route: string])[] {
+  const source = page.sourceContent;
+  if (source === undefined) {
+    return [
+      ...SITE_LOCALES.map((language) => [siteHreflang(language), siteLocaleRoute(page.route, language)] as const),
+      ["x-default", siteLocaleRoute(page.route, "en")],
+    ];
+  }
+  if (locale !== source.locale) {
+    return [];
+  }
+  const routes: Partial<Record<SiteLocale, string>> = { ...source.routes, [source.locale]: page.route };
+  const partners = SITE_LOCALES.flatMap((language) => {
+    const route = routes[language];
+    return route === undefined ? [] : [[siteHreflang(language), siteLocaleRoute(route, language)] as const];
+  });
+  const fallback = partners.find(([hreflang]) => hreflang === siteHreflang("en")) ?? partners[0];
+  return fallback === undefined ? partners : [...partners, ["x-default", fallback[1]]];
 }
 
 function siteRoutePath(
@@ -644,8 +690,8 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
       }),
     }
     : page;
-  const publicRoute = localizedRoutes ? siteLocaleRoute(page.route, locale) : page.route;
-  const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${publicRoute}`;
+  const canonicalRoute = localizedRoutes ? siteCanonicalRoute(page, locale) : page.route;
+  const canonicalUrl = siteUrl === undefined ? undefined : `${siteUrl}${canonicalRoute}`;
   const isPlaceholderRoute = page.route.includes("[");
   const shouldNoIndex = page.seo?.noIndex === true || page.route === "/404.html" || page.route.startsWith("/audit/") || isPlaceholderRoute;
   const socialImageUrl = siteUrl === undefined || page.seo?.image === undefined
@@ -719,7 +765,7 @@ export function renderPage(page: SitePage, context: SiteRenderContext = {}): str
     <meta property="og:description" content="${escapeHtml(localizedPage.description)}">
     <meta property="og:locale" content="${locale === "zh-CN" ? "zh_CN" : "en_US"}">
     ${canonicalUrl === undefined ? "" : `<meta property="og:url" content="${escapeHtml(canonicalUrl)}"><link rel="canonical" href="${escapeHtml(canonicalUrl)}">`}
-    ${siteUrl === undefined || !localizedRoutes || shouldNoIndex ? "" : `<link rel="alternate" hreflang="en" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "en")))}"><link rel="alternate" hreflang="${siteHreflang("zh-CN")}" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "zh-CN")))}"><link rel="alternate" hreflang="x-default" href="${escapeHtml(absoluteSiteUrl(siteUrl, siteLocaleRoute(page.route, "en")))}">`}
+    ${siteUrl === undefined || !localizedRoutes || shouldNoIndex ? "" : siteAlternateRoutes(page, locale).map(([hreflang, route]) => `<link rel="alternate" hreflang="${hreflang}" href="${escapeHtml(absoluteSiteUrl(siteUrl, route))}">`).join("")}
     ${socialImageUrl === undefined ? "" : `<meta property="og:image" content="${escapeHtml(socialImageUrl)}">`}
     ${page.seo?.publishedDate === undefined ? "" : `<meta property="article:published_time" content="${escapeHtml(page.seo.publishedDate)}">`}
     <meta name="twitter:card" content="${socialImageUrl === undefined ? "summary" : "summary_large_image"}">

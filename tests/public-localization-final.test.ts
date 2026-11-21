@@ -195,7 +195,7 @@ test("Final deployment integrity: canonical, hreflang, sitemap, route destinatio
   } as const;
   for (const deployment of deployments) {
     const sitemap = await readFile(join(output, deployment.name, "sitemap.xml"), "utf8");
-    for (const route of [...routes, ...artifacts.cases.cases.map(item => `/data/cases/${item.id}/`)]) {
+    for (const route of routes) {
       for (const locale of ["en", "zh-CN"] as const) {
         const markup = await html(route, locale, deployment.name);
         const localRoute = `${locale === "zh-CN" ? "/zh-cn" : ""}${route}`;
@@ -204,6 +204,33 @@ test("Final deployment integrity: canonical, hreflang, sitemap, route destinatio
         if (!route.includes("[")) assert.ok(sitemap.includes(`<loc>${deployment.url}${localRoute}</loc>`));
         if (!route.includes("[")) for (const language of ["en", "zh-Hans", "x-default"]) {
           assert.ok(markup.includes(`<link rel="alternate" hreflang="${language}" href="${deployment.url}${language === "zh-Hans" ? "/zh-cn" : ""}${route}">`));
+        }
+        assert.ok(markup.includes(`data-locale-en-url="${deployment.basePath}${route}"`));
+        assert.ok(markup.includes(`data-locale-zh-cn-url="${deployment.basePath}/zh-cn${route}"`));
+        assert.doesNotMatch(markup, /locale-bundle|applyLocale|MutationObserver/u);
+      }
+    }
+    // 案例正文只有一种语言：只收录界面语言与正文一致的那一版；hreflang 指向同组（crossLocaleGroupId）另一语言写成的案例。
+    // 另一种界面下的同一正文照常可访问、可切换语言，但 canonical 指回收录版，不进 sitemap，也不声明 hreflang。
+    const address = (item: (typeof artifacts.cases.cases)[number]): string => `${deployment.url}${item.locale === "zh-CN" ? "/zh-cn" : ""}/data/cases/${item.id}/`;
+    for (const caseArtifact of artifacts.cases.cases) {
+      const route = `/data/cases/${caseArtifact.id}/`;
+      const partner = artifacts.cases.cases.find(item => item.crossLocaleGroupId === caseArtifact.crossLocaleGroupId && item.id !== caseArtifact.id);
+      assert.ok(partner !== undefined && (partner.locale === "zh-CN") !== (caseArtifact.locale === "zh-CN"), caseArtifact.id);
+      const [english, chinese] = caseArtifact.locale === "zh-CN" ? [partner, caseArtifact] : [caseArtifact, partner];
+      const indexed = address(caseArtifact);
+      for (const locale of ["en", "zh-CN"] as const) {
+        const markup = await html(route, locale, deployment.name);
+        const view = `${deployment.url}${locale === "zh-CN" ? "/zh-cn" : ""}${route}`;
+        assert.ok(markup.includes(`<link rel="canonical" href="${indexed}">`), view);
+        assert.ok(sitemap.includes(`<loc>${indexed}</loc>`), view);
+        if (view === indexed) {
+          assert.ok(markup.includes(`<link rel="alternate" hreflang="en" href="${address(english)}">`), view);
+          assert.ok(markup.includes(`<link rel="alternate" hreflang="zh-Hans" href="${address(chinese)}">`), view);
+          assert.ok(markup.includes(`<link rel="alternate" hreflang="x-default" href="${address(english)}">`), view);
+        } else {
+          assert.ok(!sitemap.includes(`<loc>${view}</loc>`), view);
+          assert.doesNotMatch(markup, /<link rel="alternate" hreflang=/u, view);
         }
         assert.ok(markup.includes(`data-locale-en-url="${deployment.basePath}${route}"`));
         assert.ok(markup.includes(`data-locale-zh-cn-url="${deployment.basePath}/zh-cn${route}"`));
