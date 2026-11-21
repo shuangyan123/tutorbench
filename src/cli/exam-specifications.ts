@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { compareExamSources, parseExamSpecifications } from "../research/exam-specifications.js";
 import { inspectCurriculumRevision } from "../research/exam-edition-comparison.js";
 import { inspectAssessmentGuidance } from "../research/exam-assessment-guidance.js";
+import { inspectSourceGovernance } from "../research/exam-source-governance.js";
 import { resolveInternationalSources } from "../research/exam-international-inventory.js";
 import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
 
@@ -28,7 +29,11 @@ if (inventory) {
     return inspectRequirements(input, registry, graph);
   };
   const current = `${base}exam-specifications/requirements-0.4.0.json`;
-  if (paths[0] === "--edition-diff") {
+  if (paths[0] === "--source-governance") {
+    if (paths.length !== 1) throw new Error("Unexpected source governance argument");
+    const baseline = await inspect(`${base}exam-specifications/requirements-0.7.0.json`);
+    console.log(JSON.stringify(inspectSourceGovernance(registry, baseline), null, 2));
+  } else if (paths[0] === "--edition-diff") {
     if (paths[1] !== undefined && paths[1] !== "assessment-guidance") throw new Error("Unknown --edition-diff scope");
     const baseline = await inspect(current);
     console.log(JSON.stringify(paths[1] ? inspectAssessmentGuidance(baseline) : inspectCurriculumRevision(baseline), null, 2));

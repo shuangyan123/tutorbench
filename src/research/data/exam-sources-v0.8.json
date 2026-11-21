@@ -1,0 +1,302 @@
+{
+  "version": "0.8.0",
+  "baseInventory": "0.7.0",
+  "sources": [
+    {
+      "edition": "cn-moe-high-school-math@2025-mirror.1",
+      "role": "national-curriculum",
+      "act": "教材〔2025〕1号 · 2025-10",
+      "acquisition": {
+        "channel": "public-mirror"
+      },
+      "evidence": {
+        "issuance": {
+          "kind": "issuer-interview",
+          "location": "https://www.pep.com.cn/rjdt/mtbd/202603/t20260330_2005956.shtml",
+          "locator": "教育部教材局局长访谈，日常修订答问，2025 年 10 月印发"
+        },
+        "circular": {
+          "kind": "authority-citation",
+          "location": "https://www.wuxi.gov.cn/doc/2026/04/10/4758325.shtml",
+          "locator": "无锡初中学业水平考查通知首段，引用教材〔2025〕1号"
+        },
+        "listing": {
+          "kind": "school-listing",
+          "location": "school-listing",
+          "locator": "木里中学公开转载，2025-11-10，数学附件；未取得该附件字节"
+        },
+        "artifact": {
+          "kind": "copy-inspection",
+          "location": "artifact",
+          "locator": "封面版次、目录附录 1/2、可见末段印刷页 167；0.5/0.6 的页图核读"
+        },
+        "training": {
+          "kind": "institutional-context",
+          "location": "https://xbzprtjcyj.swu.edu.cn/info/1077/1335.htm",
+          "locator": "西南大学高中数学培训报告首段，2026-05"
+        },
+        "textbooks": {
+          "kind": "institutional-context",
+          "location": "https://jyt.fj.gov.cn/xxgk/gggs/202603/t20260313_7109906.htm",
+          "locator": "福建送评教辅 III(1), III(4)，范围限于教辅送评"
+        }
+      },
+      "applicability": [
+        {
+          "field": "jurisdiction",
+          "value": "CN",
+          "evidence": "issuance"
+        },
+        {
+          "field": "track",
+          "value": "普通高中",
+          "evidence": "artifact"
+        },
+        {
+          "field": "subject",
+          "value": "数学",
+          "evidence": "artifact"
+        }
+      ],
+      "pages": null,
+      "inspection": "Cover, contents, appendices and bounded page images examined; expected issued pagination unknown.",
+      "wholeDocument": {
+        "status": "unknown",
+        "evidence": null
+      },
+      "fullTextReuse": {
+        "status": "unknown",
+        "evidence": null
+      }
+    },
+    {
+      "edition": "kmk-ahr-math@2012.1",
+      "role": "common-standard",
+      "act": "KMK resolution 2012-10-18",
+      "acquisition": {
+        "channel": "issuer-direct"
+      },
+      "evidence": {
+        "issuance": {
+          "kind": "issued-instrument",
+          "location": "artifact",
+          "locator": "Title page, resolution of 18 October 2012; L4 printed p. 20"
+        },
+        "implementation": {
+          "kind": "institutional-context",
+          "location": "https://www.kmk.org/bildungsministerkonferenz/bildungsthemen/bildungsstandards.html",
+          "locator": "Umsetzung der Bildungsstandards: Länder implement through their regulations; illustrative learning tasks"
+        },
+        "assessment": {
+          "kind": "institutional-context",
+          "location": "https://www.kmk.org/bildungsministerkonferenz/vertiefende-bildungsinhalte/bildungswege-und-schulabschluesse/gymnasiale-oberstufe-und-abitur.html",
+          "locator": "Abitur: common standards and coordinated pool, distinct from a specific administered paper"
+        }
+      },
+      "applicability": [
+        {
+          "field": "jurisdiction",
+          "value": "DE",
+          "evidence": "issuance"
+        },
+        {
+          "field": "track",
+          "value": "Allgemeine Hochschulreife",
+          "evidence": "issuance"
+        },
+        {
+          "field": "subject",
+          "value": "Mathematik",
+          "evidence": "issuance"
+        }
+      ],
+      "pages": null,
+      "inspection": "L4 printed p. 20 / PDF p. 17; full pagination not audited.",
+      "bytes": 1632984,
+      "wholeDocument": {
+        "status": "unknown",
+        "evidence": null
+      },
+      "fullTextReuse": {
+        "status": "unknown",
+        "evidence": null
+      }
+    },
+    {
+      "edition": "nrw-gost-math-klp@2023.1",
+      "role": "state-curriculum",
+      "act": "NRW decree 2023-05-24, Heft 4720",
+      "acquisition": {
+        "channel": "issuer-direct"
+      },
+      "evidence": {
+        "issuance": {
+          "kind": "issued-instrument",
+          "location": "artifact",
+          "locator": "Title and decree, printed/PDF p. 5; chapter 2.4, pp. 24–25 and 27–28"
+        },
+        "transition": {
+          "kind": "transition-instrument",
+          "location": "artifact",
+          "locator": "Decree p. 5, effective 2023-08-01 beginning with the introductory phase"
+        },
+        "implementation": {
+          "kind": "institutional-context",
+          "location": "https://www.kmk.org/bildungsministerkonferenz/bildungsthemen/bildungsstandards.html",
+          "locator": "Länder implement common standards in their own regulations"
+        }
+      },
+      "applicability": [
+        {
+          "field": "jurisdiction",
+          "value": "DE-NW",
+          "evidence": "issuance"
+        },
+        {
+          "field": "track",
+          "value": "Gymnasium/Gesamtschule, gymnasiale Oberstufe",
+          "evidence": "issuance"
+        },
+        {
+          "field": "subject",
+          "value": "Mathematik",
+          "evidence": "issuance"
+        },
+        {
+          "field": "effectiveFrom",
+          "value": "2023-08-01",
+          "evidence": "transition"
+        },
+        {
+          "field": "teachingIntake",
+          "value": "Einführungsphase starting 2023-08-01, then phased progression",
+          "evidence": "transition"
+        },
+        {
+          "field": "transitionInstrument",
+          "value": "Heft 4720, decree of 24 May 2023",
+          "evidence": "transition"
+        }
+      ],
+      "pages": null,
+      "inspection": "Course sections §2.4.1 and §2.4.2 inspected; complete instrument pagination not audited.",
+      "wholeDocument": {
+        "status": "unknown",
+        "evidence": null
+      },
+      "fullTextReuse": {
+        "status": "unknown",
+        "evidence": null
+      }
+    },
+    {
+      "edition": "nrw-abitur-math-gg@2027.1",
+      "role": "state-exam-focus",
+      "act": "Zentralabitur 2027, Mathematik, gymnasiale Oberstufe",
+      "acquisition": {
+        "channel": "issuer-direct"
+      },
+      "evidence": {
+        "issuance": {
+          "kind": "issued-instrument",
+          "location": "artifact",
+          "locator": "Title; I, p. 1 explicitly references KLP chapter 2; III, pp. 6–7 first column"
+        },
+        "session": {
+          "kind": "exam-year-instrument",
+          "location": "artifact",
+          "locator": "Title and I, p. 1: written examinations in 2027; III distinguishes Grundkurs and Leistungskurs"
+        }
+      },
+      "applicability": [
+        {
+          "field": "jurisdiction",
+          "value": "DE-NW",
+          "evidence": "issuance"
+        },
+        {
+          "field": "track",
+          "value": "gymnasiale Oberstufe (GG), GK/LK",
+          "evidence": "issuance"
+        },
+        {
+          "field": "subject",
+          "value": "Mathematik",
+          "evidence": "issuance"
+        },
+        {
+          "field": "examSession",
+          "value": "2027",
+          "evidence": "session"
+        },
+        {
+          "field": "examType",
+          "value": "central written Abitur",
+          "evidence": "session"
+        }
+      ],
+      "pages": 7,
+      "inspection": "I–III examined; focus bullets inspected in the first column on pp. 6–7.",
+      "wholeDocument": {
+        "status": "unknown",
+        "evidence": null
+      },
+      "fullTextReuse": {
+        "status": "unknown",
+        "evidence": null
+      }
+    },
+    {
+      "edition": "digital-sat-framework@4.0",
+      "role": "assessment-framework",
+      "act": "College Board, Digital SAT Suite Assessment Framework v4, September 2026",
+      "acquisition": {
+        "channel": "issuer-direct"
+      },
+      "evidence": {
+        "issuance": {
+          "kind": "issued-instrument",
+          "location": "artifact",
+          "locator": "Edition and revision history PDF pp. 2, 4; SAT-specific Tables 16, 21 and Appendix B Table A35"
+        },
+        "scope": {
+          "kind": "assessment-specification",
+          "location": "artifact",
+          "locator": "Table 16 SAT-specific math test; Table A35 SAT column, printed pp. 183–186 (PDF 192–195)"
+        }
+      },
+      "applicability": [
+        {
+          "field": "jurisdiction",
+          "value": "US (assessment provider)",
+          "evidence": "issuance"
+        },
+        {
+          "field": "track",
+          "value": "digital SAT",
+          "evidence": "scope"
+        },
+        {
+          "field": "subject",
+          "value": "SAT Math",
+          "evidence": "scope"
+        },
+        {
+          "field": "examType",
+          "value": "digital SAT",
+          "evidence": "scope"
+        }
+      ],
+      "pages": 245,
+      "inspection": "SAT column read separately from PSAT, sample questions and other domains.",
+      "wholeDocument": {
+        "status": "unknown",
+        "evidence": null
+      },
+      "fullTextReuse": {
+        "status": "unknown",
+        "evidence": null
+      }
+    }
+  ]
+}
