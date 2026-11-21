@@ -3,7 +3,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import sources from "../scenarios/case-system-vnext/exam-specifications/sources-0.7.0.json" with { type: "json" };
+import sources from "../src/research/data/exam-sources-v0.7.json" with { type: "json" };
 import delta from "../scenarios/case-system-vnext/exam-specifications/requirements-0.7.0.json" with { type: "json" };
 import manifest from "../src/research/data/exam-enumeration-v3.json" with { type: "json" };
 import { internationalInventoryContext } from "../src/research/exam-international-inventory.js";
@@ -20,7 +20,7 @@ const cli = (...args: string[]) => execFileSync(process.execPath, ["dist/src/cli
 
 test("the source-registry CLI resolves the three new editions against the archived registry", () => {
   const command = ["dist/src/cli/exam-specifications.js", base + "exam-specifications/0.1.0.json",
-    base + "exam-specifications/sources-0.7.0.json"];
+    "src/research/data/exam-sources-v0.7.json"];
   const diff = JSON.parse(execFileSync(process.execPath, command).toString()) as Array<{ spec: string; before: null; after: string }>;
   assert.deepEqual(diff.map(row => row.spec), ["digital-sat-framework@4.0", "nrw-abitur-math-gg@2027.1", "nrw-gost-math-klp@2023.1"]);
   assert.ok(diff.every(row => row.before === null && sources.specifications.some(spec => spec.sha256 === row.after)));

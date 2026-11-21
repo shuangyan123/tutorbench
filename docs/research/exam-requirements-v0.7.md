@@ -45,7 +45,7 @@ SAT 的顺序是单变量方程、线性函数、双变量方程、二元方程�
 
 ## 离线重放
 
-来源登记差异可直接通过 `npm run exam:inspect -- scenarios/case-system-vnext/exam-specifications/0.1.0.json scenarios/case-system-vnext/exam-specifications/sources-0.7.0.json` 查询。结果列出新增的三个文件版次与字节指纹。
+来源登记差异可直接通过 `npm run exam:inspect -- scenarios/case-system-vnext/exam-specifications/0.1.0.json src/research/data/exam-sources-v0.7.json` 查询。结果列出新增的三个文件版次与字节指纹。
 
 使用 Node 24，运行 `npm ci` 和 `npm run build` 后，在仓库根目录执行：
 

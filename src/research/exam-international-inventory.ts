@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import supplement from "../../scenarios/case-system-vnext/exam-specifications/sources-0.7.0.json" with { type: "json" };
+import supplement from "./data/exam-sources-v0.7.json" with { type: "json" };
 import manifest from "./data/exam-enumeration-v3.json" with { type: "json" };
 import { expandedEnumerationScopes } from "./exam-inventory-scopes.js";
 import type { ExamSpecifications } from "./exam-specifications.js";
