@@ -5,7 +5,7 @@ scenario suite, result transformation, and reports are implemented. This does
 not establish a validated general measure of tutoring quality or learner
 outcomes.
 
-Scenario contracts use schema v3 (suite data version `0.2.0`); Tutor Health
+Scenario contracts use schema v3 (suite data version `0.2.1`); Tutor Health
 reports use schema v2 to carry validated coverage and evaluation-scope fields.
 
 ## Why add a finding-first view

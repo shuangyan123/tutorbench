@@ -459,7 +459,7 @@ test("Tutor Health reports scored dimensions and incomplete suite runs beside it
   });
   const fullText = formatTutorHealthReport(report);
   assert.match(fullText, /Tutor Health Score: .*PARTIAL COVERAGE \(scored dimensions only: 5\/7 dimensions; weight 5\/7 \(71%\)\)/);
-  assert.match(fullText, /productive-struggle-intervention-v0\.1@0\.2\.0; 13 scenarios.*13\/13 case-runs/);
+  assert.match(fullText, /productive-struggle-intervention-v0\.1@0\.2\.1; 13 scenarios.*13\/13 case-runs/);
   assertErrorCode(
     () => parseTutorHealthReport({ ...report, coverage: { ...report.coverage, status: "complete" } }),
     "tutor_health_report_invalid",
@@ -633,7 +633,7 @@ test("report builder rejects evaluation artifacts from a different suite identit
   assertErrorCode(
     () =>
       buildTutorHealthReport({
-        suite: { ...suite, version: "0.2.1" },
+        suite: { ...suite, version: "99.0.0" },
         evaluation,
       }),
     "tutor_health_report_source_mismatch",
