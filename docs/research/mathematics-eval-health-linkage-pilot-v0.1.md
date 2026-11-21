@@ -12,7 +12,7 @@
 | Research evidence | `mathematics-challenge-evidence-v0.1@0.2.0` | 16 task structures |
 | Research suite | `mathematics-challenge-v0.1@0.2.0` | 20 synthetic executable checkpoints |
 | Canonical Eval | `tutor-eval-v0.2a@0.2a.6` | English and Chinese cases; 18 mathematics cases |
-| Default Health | `productive-struggle-intervention-v0.1@0.2.0` | 13 mathematics decision points |
+| Default Health | `productive-struggle-intervention-v0.1@0.2.1` | 13 mathematics decision points |
 
 Load Eval with `loadTutorEvalDataset()`; 0.2a.6 applies overrides to 0.2a.5 and raw `cases.json` is not the current canonical snapshot. Chinese cases have independently pinned IDs and versions. The existing `docs/architecture-integration-ledger-v0.1.md` (runtime/provenance) and `docs/architecture-integration-map.md` (taxonomy) remain authoritative. No new ontology or parallel source of truth is created.
 
