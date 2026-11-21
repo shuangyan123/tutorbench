@@ -1,5 +1,6 @@
 import { copyFile, mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, join, posix } from "node:path";
+import { withSecurityPolicy } from "./security-policy.js";
 
 /**
  * Publishes the Spectrum redesign (website/prototypes/spectrum) as the public site.
@@ -456,7 +457,7 @@ export async function installSpectrumSite(options: SpectrumSiteOptions): Promise
     written.add(output);
     const destination = join(outputDirectory, output);
     await mkdir(dirname(destination), { recursive: true });
-    await writeFile(destination, content, "utf8");
+    await writeFile(destination, output.endsWith(".html") ? withSecurityPolicy(content, output) : content, "utf8");
   };
 
   for (const file of files) {

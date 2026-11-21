@@ -4,6 +4,7 @@ import { articleHeadingId } from "../site/pages/blog.js";
 import { ARROGANCE_ESSAY } from "./arrogance-essay.js";
 import { BEYOND_WINNING_ESSAY } from "./beyond-winning-essay.js";
 import { LEARNING_ACCESS_ESSAY } from "./learning-access-essay.js";
+import { withSecurityPolicy } from "./security-policy.js";
 
 /**
  * The Journal essays written after the generated site's four: "After You’ve Beaten Everyone, Then What?",
@@ -177,7 +178,7 @@ export async function publishJournalEssayRoutes(options: LearningAccessOptions):
     for (const legacy of LEGACY_ARTICLE_SECTIONS) {
       const directory = join(options.outputDirectory, zh ? "zh-cn" : "", "blog", legacy.slug);
       await mkdir(directory, { recursive: true });
-      await writeFile(join(directory, "index.html"), legacyRedirect(legacy.section, zh, canonical), "utf8");
+      await writeFile(join(directory, "index.html"), withSecurityPolicy(legacyRedirect(legacy.section, zh, canonical), legacy.slug), "utf8");
     }
   }
   if (site !== undefined) {
