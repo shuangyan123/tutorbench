@@ -1,0 +1,80 @@
+{
+  "version": "0.7.0",
+  "baseRegistry": "0.1.0",
+  "specifications": [
+    {
+      "id": "nrw-gost-math-klp",
+      "version": "2023.1",
+      "publisher": "Ministerium für Schule und Bildung des Landes Nordrhein-Westfalen",
+      "url": "https://lehrplannavigator.nrw.de/system/files/media/document/file/gost_klp_m_2023_06_07.pdf",
+      "sha256": "211bad803486637f541447546073d0c7678f527b366da1ba63c5b9edc5d28533",
+      "bytes": 378228,
+      "retrievedAt": "2026-11-21",
+      "effectiveTeachingPeriod": null,
+      "reuse": "metadata-and-paraphrase-only",
+      "applicability": "Heft 4720; decree of 24 May 2023, phased in from introductory stage on 1 August 2023."
+    },
+    {
+      "id": "nrw-abitur-math-gg",
+      "version": "2027.1",
+      "publisher": "Ministerium für Schule und Bildung des Landes Nordrhein-Westfalen",
+      "url": "https://www.standardsicherung.schulministerium.nrw.de/system/files/media/document/file/mathematik_2027_gg.pdf",
+      "sha256": "3a7cc6d16084bc61e168974d91e7ecaa71ec9f41bb4974b7ec0e04702d6a9233",
+      "bytes": 167760,
+      "retrievedAt": "2026-11-21",
+      "effectiveTeachingPeriod": null,
+      "reuse": "metadata-and-paraphrase-only",
+      "applicability": "2027 written centralized mathematics examination, regular gymnasiale Oberstufe; references KLP chapter 2."
+    },
+    {
+      "id": "digital-sat-framework",
+      "version": "4.0",
+      "publisher": "College Board",
+      "url": "https://satsuite.collegeboard.org/media/pdf/assessment-framework-for-digital-sat-suite.pdf",
+      "sha256": "e1238b7840eb4c9af93a20e1bc415eafbf316b6a8adc6c131df5345ddca9549b",
+      "bytes": 2668223,
+      "retrievedAt": "2026-11-21",
+      "effectiveTeachingPeriod": null,
+      "reuse": "metadata-and-paraphrase-only",
+      "applicability": "Version 4, September 2026; digital SAT. First and last applicable test administrations unknown."
+    }
+  ],
+  "stateExam": {
+    "id": "de-nw-abitur-2027",
+    "jurisdiction": "DE-NW",
+    "provider": "Ministerium für Schule und Bildung NRW",
+    "subject": "Mathematik",
+    "scope": "gymnasiale Oberstufe / centralized written examination",
+    "session": 2027,
+    "profile": null,
+    "status": "partial"
+  },
+  "satDomains": [
+    {
+      "name": "Algebra",
+      "status": "complete-bounded"
+    },
+    {
+      "name": "Advanced Math",
+      "status": "pending"
+    },
+    {
+      "name": "Problem-Solving and Data Analysis",
+      "status": "pending"
+    },
+    {
+      "name": "Geometry and Trigonometry",
+      "status": "pending"
+    }
+  ],
+  "stateExamSource": "nrw-abitur-math-gg@2027.1",
+  "requiredCurriculum": "nrw-gost-math-klp@2023.1",
+  "examFormat": [
+    {
+      "source": "nrw-abitur-math-gg@2027.1",
+      "locator": "II(d), printed/PDF 4",
+      "kind": "exam-format-rule",
+      "summary": "Written working time including selection: GK 255 minutes; LK 300 minutes."
+    }
+  ]
+}
