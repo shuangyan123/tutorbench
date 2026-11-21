@@ -8,6 +8,7 @@ import { journalFeed, keepLanguage, localizeMarkup, minifyCss, shareCardCover, s
 import { arroganceSectionId, beyondWinningSectionId, learningAccessSectionId } from "../src/cli/blog-series.js";
 import { INDEXNOW_KEY, INDEXNOW_KEY_FILE } from "../src/cli/indexnow.js";
 import { siteFaq } from "../src/site/faq.js";
+import { escapeHtml } from "../src/site/html.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
 // generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
@@ -613,7 +614,8 @@ test("every essay offers Share at its start, in its own language, with nothing l
 
 const structuredData = (html: string): Record<string, unknown>[] =>
   [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gu)].map((match) => JSON.parse(match[1] ?? "{}") as Record<string, unknown>);
-const plainText = (html: string): string => html.replace(/<[^>]+>/gu, "").replaceAll("&amp;", "&");
+// the only markup the FAQ puts inside its text: word breaks in Chinese questions, unbroken licence names
+const faqText = (html: string): string => html.replaceAll("<wbr>", "").replaceAll('<span class="ab-nobr">', "").replaceAll("</span>", "");
 
 test("the About page answers its questions on the page and as FAQPage data, in each language", async () => {
   const benchmark = JSON.parse(await readFile(join(spectrum, "public-data/benchmark.json"), "utf8")) as Parameters<typeof siteFaq>[0];
@@ -628,8 +630,8 @@ test("the About page answers its questions on the page and as FAQPage data, in e
     // structured data has to match what the page shows: every question and answer is on the page itself
     const section = html.slice(html.indexOf('id="questions"'), html.indexOf("</section>", html.indexOf('id="questions"')));
     for (const { question, answer } of faq) {
-      assert.ok(plainText(section).includes(question), `${file}: question not shown: ${question}`);
-      assert.ok(plainText(section).includes(answer), `${file}: answer not shown: ${question}`);
+      assert.ok(faqText(section).includes(escapeHtml(question)), `${file}: question not shown: ${question}`);
+      assert.ok(faqText(section).includes(escapeHtml(answer)), `${file}: answer not shown: ${question}`);
     }
   }
   // the answers are counted from the published data, and say plainly that the two TutorBenches are unrelated
