@@ -380,7 +380,8 @@ html[data-lang="zh"] .wk-brief li { line-height: 1.6; }
 .ab-letter-honest { padding-left: 18px; border-left: 1px solid var(--ink); font-style: italic; color: var(--ink); }
 .ab-letter-sign { margin-top: 1.6em; font-family: var(--f-display); font-size: 1.5em; color: var(--ink); text-align: right; }
 .ab-letter-ps { font: 400 15px/1.6 var(--f-ui); color: var(--ink-3); }
-.ab-letter a { color: var(--lead); text-underline-offset: 3px; }
+.ab-letter a { color: var(--lead); text-decoration: underline; text-decoration-color: var(--lead-line); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.ab-letter a:hover { text-decoration-color: currentColor; }
 @media (max-width: 700px) {
   .ab-sub { bottom: 18%; }
   .ab-hopes li { grid-template-columns: 2.4em minmax(0, 1fr); }

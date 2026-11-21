@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
@@ -9,6 +10,7 @@ import { arroganceSectionId, beyondWinningSectionId, learningAccessSectionId } f
 import { INDEXNOW_KEY, INDEXNOW_KEY_FILE } from "../src/cli/indexnow.js";
 import { siteFaq } from "../src/site/faq.js";
 import { escapeHtml } from "../src/site/html.js";
+import { contentSecurityPolicy, withSecurityPolicy } from "../src/cli/security-policy.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
 // generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
@@ -665,4 +667,62 @@ test("each indexed case page has a title of its own: the topic and the learner's
   }
   assert.equal(titles.get("Linear Equations · Stuck Without Attempt — Teachometry"), `${SITE_URL}/data/cases/hint-only-linear-equation-001/`);
   assert.equal(titles.get("一元一次方程 · 未尝试便卡住 — Teachometry"), `${SITE_URL}/zh-cn/data/cases/hint-only-linear-equation-001-zh-CN/`);
+});
+
+test("every page carries a security policy that lets only its own scripts run", async () => {
+  const files = await htmlFiles(spectrum);
+  let inline = 0;
+  for (const file of files) {
+    const html = await page(file);
+    // first thing after the character set, so it covers every script, style and image that follows
+    const head = /^<!doctype html>\n<html [^>]*>\n<head>\n<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="([^"]+)">\n<meta name="referrer" content="strict-origin-when-cross-origin">\n/u.exec(html);
+    assert.ok(head, `${file}: no security policy right after <meta charset>`);
+    assert.equal(html.match(/http-equiv="Content-Security-Policy"/gu)?.length, 1, file);
+    const directives = new Map((head[1] ?? "").split("; ").map((directive) => {
+      const [name = "", ...sources] = directive.split(" ");
+      return [name, sources] as const;
+    }));
+    assert.deepEqual(directives.get("default-src"), ["'self'"], file);
+    assert.deepEqual(directives.get("object-src"), ["'none'"], file);
+    assert.deepEqual(directives.get("base-uri"), ["'self'"], file);
+    assert.deepEqual(directives.get("connect-src"), ["'self'"], file);
+    // each inline script is allowed by its own hash: nothing else inline, and no eval
+    const expected = new Set<string>();
+    for (const [, attributes = "", text = ""] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script(?=[\s/>])[^>]*>/giu)) {
+      if (/\ssrc=|type="application\/ld\+json"/iu.test(attributes)) continue;
+      expected.add(`'sha256-${createHash("sha256").update(text).digest("base64")}'`);
+    }
+    inline += expected.size;
+    assert.deepEqual(directives.get("script-src"), ["'self'", ...expected], file);
+    for (const sources of directives.values()) assert.ok(!sources.includes("'unsafe-eval'") && !sources.includes("*"), file);
+  }
+  assert.ok(files.length > 150 && inline > 400, `${files.length} pages, ${inline} inline scripts`);
+});
+
+test("the security policy hashes runnable scripts only, as the browser reads them", () => {
+  const html = '<meta charset="utf-8">\n<script type="application/ld+json">{"a":1}</script><script src="a.js"></script><script>a()\r\n</script><SCRIPT type="module">b()</SCRIPT\t\n x>';
+  const hash = (text: string): string => `'sha256-${createHash("sha256").update(text).digest("base64")}'`;
+  assert.ok(contentSecurityPolicy(html).includes(`; script-src 'self' ${hash("a()\n")} ${hash("b()")}; `));
+  assert.ok(!contentSecurityPolicy(html).includes(hash('{"a":1}')));
+  assert.throws(() => withSecurityPolicy("<head><title>x</title></head>"), /meta charset/u);
+  assert.throws(() => withSecurityPolicy(withSecurityPolicy(html)), /already has a security policy/u);
+});
+
+test("the home page's tables can be scrolled from the keyboard and are named in the page's language", async () => {
+  for (const [file, names] of [
+    ["index.html", ["Table 1: public cases by subject and language", "Table 2: public cases by learner level", "Table 3: public results on tutor-eval-v0.2a"]],
+    ["zh-cn/index.html", ["表 1：公开案例，按学科与语言统计", "表 2：公开案例，按学生水平统计", "表 3：tutor-eval-v0.2a 公开成绩"]],
+  ] as const) {
+    const wraps = [...(await page(file)).matchAll(/<div class="[^"]*\btbl-wrap\b[^"]*"[^>]*>/gu)].map((match) => match[0]);
+    assert.equal(wraps.length, 3, file);
+    wraps.forEach((wrap, index) => {
+      assert.match(wrap, /\stabindex="0" role="region"/u, `${file}: ${wrap}`);
+      assert.ok(wrap.includes(`aria-label="${names[index]}"`), `${file}: ${wrap}`);
+    });
+  }
+});
+
+test("links inside the About letter are underlined, not told apart by colour alone", async () => {
+  const css = await readFile(join(spectrum, "about.css"), "utf8");
+  assert.match(css, /\.ab-letter a\{[^}]*text-decoration: ?underline/u);
 });
