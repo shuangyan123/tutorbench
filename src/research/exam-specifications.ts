@@ -132,8 +132,9 @@ export function parseExamSpecifications(input: unknown, graphInput: unknown, ali
 export type ExamSpecifications = ReturnType<typeof parseExamSpecifications>;
 
 /** 比较固定快照的文件字节指纹，不将文件变化解释为要求或难度变化。 */
-export function compareExamSources(before: ExamSpecifications, after: ExamSpecifications) {
-  const index = (registry: ExamSpecifications) => new Map(registry.specifications.map(spec => [`${spec.id}@${spec.version}`, spec.sha256]));
+type FingerprintedSources = { specifications: ReadonlyArray<{ id: string; version: string; sha256: string }> };
+export function compareExamSources(before: FingerprintedSources, after: FingerprintedSources) {
+  const index = (registry: FingerprintedSources) => new Map(registry.specifications.map(spec => [`${spec.id}@${spec.version}`, spec.sha256]));
   const previous = index(before);
   const next = index(after);
   return [...new Set([...previous.keys(), ...next.keys()])].sort().filter(key => previous.get(key) !== next.get(key))
