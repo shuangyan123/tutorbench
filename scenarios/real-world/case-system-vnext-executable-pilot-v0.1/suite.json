@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
   "id": "case-system-vnext-executable-pilot-v0.1",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "title": "Case System vNext Executable Pilot",
   "description": "Six non-canonical executable Tutor scenarios materialized from the Case System vNext pilot across Physics, Computer Science, Mathematics, Biology, Chemistry, and History at selected D1/D3/D5 depths. They exercise the existing Scenario vNext -> TutorEval -> Tutor Health path and remain experimental authoring evidence, not calibrated benchmark cases.",
   "healthTaxonomyVersion": "0.1.0",
@@ -10,11 +10,11 @@
       "schemaVersion": 3,
       "identity": {
         "id": "csvnext-physics-d1-graph",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "title": "Physics D1 — Bound interpretation to graph evidence",
         "suiteId": "case-system-vnext-executable-pilot-v0.1"
       },
-      "description": "The learner interprets a steeper position-time segment as evidence of a stronger force. The Tutor should separate directly represented kinematics from unsupported causal claims.",
+      "description": "The learner reads a steeper straight position-time segment as proof that a stronger force acted throughout that interval. The Tutor should separate what the graph shows (a greater constant velocity, and a velocity change at the bend) from claims it cannot support (a force acting throughout the interval, or the source, mechanism or size of any force).",
       "caseSystemSource": {
         "pilotId": "case-system-vnext-pilot",
         "pilotVersion": "0.2.0",
@@ -39,7 +39,7 @@
       "evaluatorReferenceState": {
         "misconceptions": [
           {
-            "statement": "treats a steeper position-time segment as direct evidence of a stronger force",
+            "statement": "treats a steeper position-time segment as direct evidence of a stronger force acting throughout that interval, confusing greater velocity with acceleration",
             "evidenceLearnerTurns": [
               1
             ]
@@ -56,7 +56,7 @@
         "conversationHistory": [
           {
             "role": "user",
-            "content": "On a position-time graph, the line gets much steeper from 4 s to 6 s. I think that proves a stronger forward force started acting then. Is that the right way to read it?"
+            "content": "On a position-time graph, the line is straight up to 4 s. At 4 s it bends, and from 4 s to 6 s it is a much steeper straight line. I think that proves a stronger forward force was pushing the object the whole time from 4 s to 6 s. Is that the right way to read it?"
           }
         ]
       },
@@ -75,13 +75,13 @@
           "evaluationCaseId": "csvnext-physics-d1-graph",
           "turnIndex": 1,
           "expectedDecision": "protect_learning_integrity",
-          "expectedBehavior": "Explain that the steeper position-time segment supports a greater rate of position change on that interval, while explicitly withholding any force claim that the graph alone cannot establish.",
+          "expectedBehavior": "Explain that the steeper straight segment shows a greater, constant velocity from 4 s to 6 s, so the graph does not show a stronger force acting throughout that interval (constant velocity needs no net force). The bend at 4 s shows that the velocity changed, so a net forward force may be stated for that moment only; the graph cannot show which force it was, what caused it, or how large it was.",
           "evaluationCriteria": [
             {
               "rubricId": "csvnext-physics-d1-evidence-scope",
               "category": "correctness",
               "dimension": "content_correctness",
-              "criterion": "Correctly interpret the steeper position-time segment as faster position change and explicitly distinguish that kinematic claim from unsupported inference about force or cause.",
+              "criterion": "Correctly interpret the steeper straight segment as a greater constant velocity, correct the claim that a stronger force acted throughout 4 s to 6 s, and keep any force statement within what the graph supports: at most a brief net force at the bend, without naming its source, mechanism or size.",
               "weight": 1,
               "evaluationType": "judge",
               "behavior": "required",
@@ -89,7 +89,7 @@
                 "type": "physics_graph_scope_overreach",
                 "title": "Graph interpretation exceeded the available evidence",
                 "severity": "major",
-                "observedBehavior": "The response treats a position-time graph as direct evidence for a force or causal mechanism, or fails to correct that inference.",
+                "observedBehavior": "The response accepts that a stronger force acted throughout the steeper segment, attributes the motion to a specific force or mechanism the graph cannot identify, or fails to correct that inference.",
                 "diagnosis": "The response does not maintain representation fidelity and evidence-scope control for the authored kinematics task.",
                 "impact": "The learner may conflate what a graph directly represents with a causal explanation that requires additional physical evidence.",
                 "likelyCauses": [

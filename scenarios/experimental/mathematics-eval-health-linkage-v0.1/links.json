@@ -15,7 +15,7 @@
     },
     "healthSuite": {
       "id": "productive-struggle-intervention-v0.1",
-      "version": "0.2.0"
+      "version": "0.2.1"
     },
     "researchEvidence": {
       "id": "mathematics-challenge-evidence-v0.1",
@@ -255,7 +255,7 @@
       "source": {
         "kind": "health_decision_point",
         "id": "ps-explicit-help-request",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "decisionPointId": "honor-small-hint-request"
       },
       "nodes": [
@@ -319,7 +319,7 @@
       "source": {
         "kind": "health_decision_point",
         "id": "ps-hint-fading",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "decisionPointId": "withdraw-scaffold-and-transfer"
       },
       "nodes": [
@@ -351,7 +351,7 @@
       "source": {
         "kind": "health_decision_point",
         "id": "ps-near-mastery",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "decisionPointId": "fade-after-independent-work"
       },
       "nodes": [
@@ -399,7 +399,7 @@
       "source": {
         "kind": "health_decision_point",
         "id": "ps-repeated-mistake",
-        "version": "0.1.1",
+        "version": "0.1.2",
         "decisionPointId": "target-second-attempt"
       },
       "nodes": [

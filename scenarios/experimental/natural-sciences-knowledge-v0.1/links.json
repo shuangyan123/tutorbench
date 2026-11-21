@@ -30,7 +30,7 @@
     "experimentalSuites": [
       {
         "id": "case-system-vnext-executable-pilot-v0.1",
-        "version": "0.3.0"
+        "version": "0.4.0"
       },
       {
         "id": "prerequisite-accessibility-contrasts-v0.1",
@@ -164,9 +164,9 @@
       "source": {
         "kind": "experimental_decision_point",
         "suiteId": "case-system-vnext-executable-pilot-v0.1",
-        "suiteVersion": "0.3.0",
+        "suiteVersion": "0.4.0",
         "id": "csvnext-physics-d1-graph",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "decisionPointId": "separate-kinematics-from-cause"
       },
       "nodes": [
@@ -184,7 +184,7 @@
       "source": {
         "kind": "experimental_decision_point",
         "suiteId": "case-system-vnext-executable-pilot-v0.1",
-        "suiteVersion": "0.3.0",
+        "suiteVersion": "0.4.0",
         "id": "csvnext-chemistry-d5-kinetics",
         "version": "0.1.0",
         "decisionPointId": "separate-rate-factors"
@@ -204,7 +204,7 @@
       "source": {
         "kind": "experimental_decision_point",
         "suiteId": "case-system-vnext-executable-pilot-v0.1",
-        "suiteVersion": "0.3.0",
+        "suiteVersion": "0.4.0",
         "id": "csvnext-biology-d3-causal",
         "version": "0.1.0",
         "decisionPointId": "separate-association-mechanism-and-control"

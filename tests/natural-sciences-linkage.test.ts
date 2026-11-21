@@ -96,7 +96,7 @@ test("science case classification is authored and source-typed, not inferred fro
   assert.ok(report.inventory.some(r => r.source.id === "pac-c-a" &&
     r.mappedDiscipline === "chemistry" && r.source.suiteId === "prerequisite-accessibility-contrasts-v0.1"));
   assert.ok(report.inventory.some(r => r.source.id === "csvnext-physics-d1-graph" &&
-    r.mappedDiscipline === "physics" && r.source.suiteVersion === "0.3.0"));
+    r.mappedDiscipline === "physics" && r.source.suiteVersion === "0.4.0"));
   const coefficient = report.nodes.find(n => n.id === "coefficient-vs-formula");
   assert.ok(coefficient);
   assert.equal(coefficient.focusCaseCount, 0);
