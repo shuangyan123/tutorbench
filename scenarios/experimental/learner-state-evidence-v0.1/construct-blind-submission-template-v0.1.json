@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "packetId": "learner-state-evidence-construct-blind-packet",
+  "packetVersion": "0.1.0",
+  "reviewerId": "",
+  "independentReviewAcknowledgement": false,
+  "reviews": [
+    {
+      "reviewTaskId": "LR-01",
+      "targetId": "LR-01-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-01",
+      "targetId": "LR-01-2",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-02",
+      "targetId": "LR-02-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-03",
+      "targetId": "LR-03-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-03",
+      "targetId": "LR-03-2",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-04",
+      "targetId": "LR-04-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-05",
+      "targetId": "LR-05-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-05",
+      "targetId": "LR-05-2",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-06",
+      "targetId": "LR-06-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-06",
+      "targetId": "LR-06-2",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-07",
+      "targetId": "LR-07-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-08",
+      "targetId": "LR-08-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-08",
+      "targetId": "LR-08-2",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    },
+    {
+      "reviewTaskId": "LR-09",
+      "targetId": "LR-09-1",
+      "selectedStatus": "",
+      "supportJudgment": "",
+      "learnerTurnIndex": null,
+      "exactLearnerQuote": "",
+      "alternativeInterpretation": "",
+      "acceptableNextMove": "",
+      "notes": ""
+    }
+  ]
+}
