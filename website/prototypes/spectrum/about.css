@@ -84,6 +84,14 @@
 .ab-ledger dt { font: 500 11px/1.4 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); padding-top: 4px; }
 .ab-ledger dd { margin: 0; font: 400 16px/1.45 var(--f-ui); color: var(--ink); overflow-wrap: anywhere; }
 .ab-ledger .pending dd { color: var(--ink-2); }
+
+/* questions, answered: the question set like a principle heading, the answer like the ledger */
+.ab-faq { border-top: 1px solid var(--ink); }
+.ab-faq article { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 8px clamp(18px, 3vw, 44px); padding: 20px 0 22px; border-bottom: 1px solid var(--hair-2); }
+.ab-faq h3 { margin: 0; font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(21px, 1.8vw, 26px); line-height: 1.12; text-wrap: balance; }
+.ab-faq p { margin: 0; font: 400 15.5px/1.6 var(--f-ui); color: var(--ink-2); }
+:root[data-lang="zh"] .ab-faq h3 { word-break: keep-all; overflow-wrap: anywhere; }
+.ab-nobr { white-space: nowrap; }
 .ab-status-h { font-family: var(--f-display); font-weight: var(--serif-w, 500); font-size: clamp(40px, 4.6vw, 68px); line-height: 1; margin: 10px 0 16px; }
 
 /* open by design: resources */
@@ -322,6 +330,7 @@ a.v:hover { color: var(--lead); }
   .ab-core { grid-template-columns: minmax(0, 1fr); }
   .ab-core > svg { transform: rotate(90deg); }
   .ab-ledger div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .ab-faq article { grid-template-columns: minmax(0, 1fr); padding-block: 18px 20px; }
   .nf-slip { transform: none; }
 }
 @media (max-width: 560px) {

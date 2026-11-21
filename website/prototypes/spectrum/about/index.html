@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>About — Teachometry</title>
+<title>About Teachometry: measuring how AI teaches</title>
 <meta name="description" content="Teachometry measures observable AI tutoring behavior, not merely whether a model produces a correct answer.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="../assets/logo/favicon.svg" type="image/svg+xml">
@@ -325,6 +325,21 @@
     </div>
   </section>
 
+  <section class="wrap ab-row" id="questions" aria-labelledby="about-faq-title">
+    <div>
+      <p class="kicker" id="about-faq-title"><span class="en">Questions, answered</span><span class="zh" lang="zh-CN">常见问题</span></p>
+      <p class="ab-side-note"><span class="en">Plain answers<br><em>to fair questions.</em></span><span class="zh" lang="zh-CN">直接回答<br><em>常被问到的问题。</em></span></p>
+    </div>
+    <div class="ab-faq">
+      <article><h3><span class="en">What is Teachometry?</span><span class="zh" lang="zh-CN">Teachometry 是<wbr>什么？</span></h3><p class="en">Teachometry builds open instruments for measuring teaching quality. Its first instrument, TutorBench, evaluates how an AI tutor teaches: what it does with a learner in a structured case, not only whether its final answer is right.</p><p class="zh" lang="zh-CN">Teachometry 为教学质量造公开的测量仪器。第一件仪器 TutorBench 用来评测 AI Tutor 怎么教：在结构化的案例里，它对学习者做了什么，而不只是最后的答案对不对。</p></article>
+      <article><h3><span class="en">What does TutorBench measure?</span><span class="zh" lang="zh-CN">TutorBench 测<wbr>什么？</span></h3><p class="en">Five dimensions, kept separate: correctness, diagnosis, guidance, adaptation and actionability. Each finding stays tied to a case, a dimension and the evidence in the tutor’s reply.</p><p class="zh" lang="zh-CN">5 个维度，分开评：正确性、诊断、引导、适应和可执行性。每一条发现都对应具体的案例、维度，以及 Tutor 回复里的证据。</p></article>
+      <article><h3><span class="en">Is it related to Scale AI’s TutorBench?</span><span class="zh" lang="zh-CN">它<wbr>和 Scale AI 的 TutorBench 有<wbr>关系<wbr>吗？</span></h3><p class="en">No. Teachometry’s TutorBench is an independent project. It is not affiliated with Scale AI’s separately named TutorBench dataset.</p><p class="zh" lang="zh-CN">没有。Teachometry 的 TutorBench 是独立项目，与 Scale AI 另行发布的同名 TutorBench 数据集没有关联。</p></article>
+      <article><h3><span class="en">Are there results or rankings yet?</span><span class="zh" lang="zh-CN">现在<wbr>有<wbr>评测<wbr>结果<wbr>或<wbr>排名<wbr>了<wbr>吗？</span></h3><p class="en">Not yet. TutorBench is in Developer Preview: the cases and the method are public, but no calibrated public run has been published, so the results table is empty on purpose.</p><p class="zh" lang="zh-CN">还没有。TutorBench 目前是开发者预览版：案例和方法都已公开，但还没有发布经过校准的公开评测，所以结果表是有意留空的。</p></article>
+      <article><h3><span class="en">What is in the public case set?</span><span class="zh" lang="zh-CN">公开<wbr>案例集<wbr>里<wbr>有<wbr>什么？</span></h3><p class="en">48 cases across 5 subjects: 24 learning situations, each written in English and in Simplified Chinese, released under <span class="ab-nobr">CC BY 4.0</span> and downloadable as JSON. Each case is written from the learner’s side: what they say, what they believe and what they are trying to do.</p><p class="zh" lang="zh-CN">48 个案例，覆盖 5 个学科：24 个学习情境，每个都有英文版和简体中文版，以 <span class="ab-nobr">CC BY 4.0</span> 许可发布，可以下载 JSON。每个案例都站在学习者一边来写：说了什么、相信什么、想做到什么。</p></article>
+      <article><h3><span class="en">Can I run it myself?</span><span class="zh" lang="zh-CN">我<wbr>可以<wbr>自己<wbr>运行<wbr>吗？</span></h3><p class="en">Yes. The software is open source under <span class="ab-nobr">Apache-2.0</span>. The Quickstart runs four fixed cases with deterministic checks and needs no API key. After that you can connect your own tutor.</p><p class="zh" lang="zh-CN">可以。软件以 <span class="ab-nobr">Apache-2.0</span> 开源。Quickstart 用 4 个固定案例做确定性检查，不需要 API Key。之后可以接入你自己的 Tutor。</p></article>
+    </div>
+  </section>
+
   <section class="jx-close" aria-labelledby="about-close-title">
     <div class="wrap">
       <p class="kicker fount-k"><span class="en">Write to us</span><span class="zh" lang="zh-CN">写信给我们</span></p>
@@ -379,7 +394,7 @@
 <script>
   // bilingual alt text and tab title follow the language toggle
   (function () {
-    var T = { en: "About — Teachometry", zh: "关于 — Teachometry" };
+    var T = { en: "About Teachometry: measuring how AI teaches", zh: "关于 Teachometry：测量 AI 怎么教" };
     function apply() {
       var zh = document.documentElement.getAttribute("data-lang") === "zh";
       if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;

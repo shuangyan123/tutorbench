@@ -308,6 +308,17 @@ function caseSourceContent(cases: readonly TutorEvalPublicCase[], caseArtifact: 
   return { locale, routes: { ...routes, [locale]: `/data/cases/${encodeURIComponent(caseArtifact.id)}/` } };
 }
 
+/**
+ * A case page's title: its topic and the learner's state, in the case's own language. Several cases
+ * share a topic (the conceptual and procedural cases of a counterfactual pair, a hint-only and a
+ * full-solution case); the learner's state tells them apart in search results and tabs.
+ */
+export function caseTitle(caseArtifact: TutorEvalPublicCase): string {
+  const state = caseArtifact.metadata.studentState;
+  const topic = humanize(caseArtifact.metadata.topic);
+  return `${state === undefined ? topic : `${topic} · ${displayTaxonomyLabel(state, caseLocale(caseArtifact))}`} — Teachometry`;
+}
+
 function caseLocale(caseArtifact: TutorEvalPublicCase): SiteLocale {
   return caseArtifact.locale === "zh-CN" ? "zh-CN" : "en";
 }
@@ -340,7 +351,7 @@ export function renderCaseDetailPage(
     ["Disclosure policy", displayTaxonomyLabel(caseArtifact.disclosurePolicy ?? "Not specified", uiLocale), "shield"],
   ];
   const detail = page(
-    `${humanize(caseArtifact.metadata.topic)} — Teachometry`,
+    caseTitle(caseArtifact),
     formatCaseDescription(caseArtifact.id, caseArtifact.tutorInput.learningObjective, uiLocale),
     `/data/cases/${encodeURIComponent(caseArtifact.id)}/`,
     `<div class="case-detail-main">

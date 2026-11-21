@@ -114,7 +114,7 @@ function page() {
     </ul>
   </nav>
 </main>`;
-  return frame({ prefix: "../", title: "Micro-Review — Teachometry", titleZh: Z("Micro-Review — Teachometry"), description: "Try one AI teaching judgment in about 60 seconds. A constructed example, no account or installation needed.", body, current: "micro", css: ["journal.css", "micro.css"], scripts: ["micro.js"] });
+  return frame({ prefix: "../", title: "Micro-Review: judge an AI tutor reply — Teachometry", titleZh: Z("Micro-Review: judge an AI tutor reply — Teachometry"), description: "Try one AI teaching judgment in about 60 seconds. A constructed example, no account or installation needed.", body, current: "micro", css: ["journal.css", "micro.css"], scripts: ["micro.js"] });
 }
 
 const out = (rel, html) => { const f = join(PROTO, rel); mkdirSync(join(f, ".."), { recursive: true }); writeFileSync(f, html); };
