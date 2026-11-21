@@ -154,7 +154,8 @@ test("LC-43: dictionary collisions never translate authored messages, objectives
   const changed = { ...artifacts, cases: { ...artifacts.cases, cases: [item] } };
   const original = JSON.stringify(changed);
   const detail = renderPage(renderCaseDetailPage(changed, item, "zh-CN"), { locale: "zh-CN" });
-  assert.ok(detail.includes('<title>Benchmark — Teachometry</title>'));
+  // the title adds the learner's state, in the case's own language; the topic is never translated
+  assert.match(detail, /<title>Benchmark · Correct Answer Wrong Reasoning — Teachometry<\/title>/u);
   assert.ok(detail.includes('<h1 id="case-detail-title" data-source-content>Benchmark</h1>'));
   for (const value of [item.id, item.version, item.tutorInput.learningObjective, item.tutorInput.studentMessage, item.tutorInput.problemContext, ...item.tutorInput.conversationHistory.map(message => message.text)]) {
     assert.ok(detail.includes(escapeHtml(value)), value);

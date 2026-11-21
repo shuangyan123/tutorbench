@@ -6,6 +6,8 @@ import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
 import { journalFeed, keepLanguage, localizeMarkup, minifyCss, shareCardCover, shareCardFor, withAlternateLocale, withShareImage } from "../src/cli/spectrum-site.js";
 import { arroganceSectionId, beyondWinningSectionId, learningAccessSectionId } from "../src/cli/blog-series.js";
+import { INDEXNOW_KEY, INDEXNOW_KEY_FILE } from "../src/cli/indexnow.js";
+import { siteFaq } from "../src/site/faq.js";
 
 // The public site is the Spectrum redesign (website/prototypes/spectrum). It must keep every URL the
 // generated site had, in English and under /zh-cn/, keep the search metadata of each route, and every
@@ -607,4 +609,58 @@ test("every essay offers Share at its start, in its own language, with nothing l
   const script = await readFile(join(spectrum, "share.js"), "utf8");
   assert.doesNotMatch(script, /fetch\(|XMLHttpRequest|sendBeacon|WebSocket|createElement\("script"\)|new Image/u);
   assert.doesNotMatch(await page("blog/index.html"), /data-share/u, "the contents page has no share control");
+});
+
+const structuredData = (html: string): Record<string, unknown>[] =>
+  [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gu)].map((match) => JSON.parse(match[1] ?? "{}") as Record<string, unknown>);
+const plainText = (html: string): string => html.replace(/<[^>]+>/gu, "").replaceAll("&amp;", "&");
+
+test("the About page answers its questions on the page and as FAQPage data, in each language", async () => {
+  const benchmark = JSON.parse(await readFile(join(spectrum, "public-data/benchmark.json"), "utf8")) as Parameters<typeof siteFaq>[0];
+  for (const [file, locale] of [["about/index.html", "en"], ["zh-cn/about/index.html", "zh-CN"]] as const) {
+    const html = await page(file);
+    const faq = siteFaq(benchmark, locale);
+    assert.equal(faq.length, 6, file);
+    const data = structuredData(html).find((item) => item["@type"] === "FAQPage");
+    assert.ok(data, `${file}: no FAQPage data`);
+    assert.equal(data.url, `${SITE_URL}/${file.replace(/index\.html$/u, "")}`);
+    assert.deepEqual(data.mainEntity, faq.map(({ question, answer }) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })));
+    // structured data has to match what the page shows: every question and answer is on the page itself
+    const section = html.slice(html.indexOf('id="questions"'), html.indexOf("</section>", html.indexOf('id="questions"')));
+    for (const { question, answer } of faq) {
+      assert.ok(plainText(section).includes(question), `${file}: question not shown: ${question}`);
+      assert.ok(plainText(section).includes(answer), `${file}: answer not shown: ${question}`);
+    }
+  }
+  // the answers are counted from the published data, and say plainly that the two TutorBenches are unrelated
+  const [, , naming, , caseSet] = siteFaq(benchmark, "en");
+  assert.match(naming?.answer ?? "", /not affiliated with Scale AI’s separately named TutorBench dataset/u);
+  assert.ok(caseSet?.answer.startsWith(`${benchmark.dataset.caseCount} cases across ${benchmark.dataset.subjectCount} subjects`));
+});
+
+test("llms.txt maps the site for AI assistants from the pages' own words, and the IndexNow key is served", async () => {
+  const llms = await readFile(join(spectrum, "llms.txt"), "utf8");
+  assert.match(llms, /^# Teachometry\n\n> Open instruments for teaching quality\./u);
+  assert.ok(llms.includes("It is not affiliated with Scale AI’s separately named TutorBench dataset."));
+  for (const [title, route] of [["How we evaluate AI tutors", "/methodology/"], ["AI tutoring cases", "/data/cases/"], ["Run TutorBench locally", "/run/"], ["Work with us", "/work-with-us/"]]) {
+    assert.ok(llms.includes(`- [${title}](${SITE_URL}${route}): `), `llms.txt does not link ${route}`);
+  }
+  assert.ok(llms.includes(`(${SITE_URL}/public-data/cases.json)`));
+  assert.doesNotMatch(llms, /<[a-z]|undefined|⟦/u);
+  assert.equal(await readFile(join(spectrum, INDEXNOW_KEY_FILE), "utf8"), INDEXNOW_KEY);
+});
+
+test("each indexed case page has a title of its own: the topic and the learner's state", async () => {
+  const sitemap = await readFile(join(spectrum, "sitemap.xml"), "utf8");
+  const benchmark = JSON.parse(await readFile(join(spectrum, "public-data/benchmark.json"), "utf8")) as { dataset: { caseCount: number } };
+  const cases = [...sitemap.matchAll(/<loc>([^<]*\/data\/cases\/[^<]+\/)<\/loc>/gu)].map((match) => match[1] ?? "");
+  assert.equal(cases.length, benchmark.dataset.caseCount);
+  const titles = new Map<string, string>();
+  for (const url of cases) {
+    const title = /<title>([^<]*)<\/title>/u.exec(await page(`${url.slice(SITE_URL.length + 1)}index.html`))?.[1] ?? "";
+    assert.ok(!titles.has(title), `${url} repeats the title of ${titles.get(title)}: ${title}`);
+    titles.set(title, url);
+  }
+  assert.equal(titles.get("Linear Equations · Stuck Without Attempt — Teachometry"), `${SITE_URL}/data/cases/hint-only-linear-equation-001/`);
+  assert.equal(titles.get("一元一次方程 · 未尝试便卡住 — Teachometry"), `${SITE_URL}/zh-cn/data/cases/hint-only-linear-equation-001-zh-CN/`);
 });

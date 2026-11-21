@@ -16,6 +16,7 @@ import {
   type SiteUiTextKey,
 } from "./i18n.js";
 import { SITE_ZH_CN_COPY } from "./locale-copy.js";
+import type { SiteFaqEntry } from "./faq.js";
 
 export const SITE_GITHUB_URL = "https://github.com/shuangyan123/tutorbench";
 export const SITE_CONTACT_EMAIL = "contact@teachometry.com";
@@ -70,6 +71,8 @@ export interface SitePage {
    * text, and that its other-language partner is the same content written in the other language.
    */
   readonly sourceContent?: SiteSourceContent;
+  /** Questions the page answers in full; published as FAQPage structured data. */
+  readonly faq?: readonly SiteFaqEntry[];
 }
 
 export interface SiteSourceContent {
@@ -298,6 +301,19 @@ function structuredDataForPage(
         name: "Teachometry",
         url: absoluteSiteUrl(siteUrl, publicRoute("/")),
       },
+    });
+  }
+  if (page.faq !== undefined && page.faq.length > 0) {
+    graph.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      url: canonicalUrl,
+      inLanguage: siteHreflang(locale),
+      mainEntity: page.faq.map(({ question, answer }) => ({
+        "@type": "Question",
+        name: question,
+        acceptedAnswer: { "@type": "Answer", text: answer },
+      })),
     });
   }
   if (page.route !== "/") {

@@ -6,6 +6,7 @@ import {
   SITE_GITHUB_URL,
   type SitePage,
 } from "../html.js";
+import { siteFaq } from "../faq.js";
 import { siteIcon as icon } from "../icons.js";
 import { PUBLIC_SITE_BOTANICAL_ASSETS } from "../assets.js";
 import { renderBotanicalSvg } from "../illustrations.js";
@@ -807,7 +808,7 @@ export function renderAboutPage(
     ? formatPublicCount(models.entries.length, "modelRuns", uiLocale)
     : publicArtifactNotice(models.notice, uiLocale);
   const licenseRoot = `${SITE_GITHUB_URL}/blob/main`;
-  return page(
+  const about = page(
     "About Teachometry: measuring how AI teaches",
     "Teachometry measures observable AI tutoring behavior, not merely whether a model produces a correct answer.",
     "/about/",
@@ -819,4 +820,5 @@ export function renderAboutPage(
     <section class="about-open" aria-labelledby="about-open-title"><div class="shell about-open-layout"><div class="about-open-intro"><p class="eyebrow">Open by design</p><h2 id="about-open-title">A shared resource<br>for the AI tutoring community.</h2><p>Teachometry is developed in the open, with separate boundaries for software, authored benchmark content, and the TutorBench name and brand assets.</p></div><div class="about-resource-grid">${renderAboutResource("Licensing scope", "Read the boundaries", `${licenseRoot}/docs/licensing.md`, "document")}${renderAboutResource("Software license", "Apache-2.0", `${licenseRoot}/LICENSE`, "code")}${renderAboutResource("Benchmark content", "CC BY 4.0", `${licenseRoot}/LICENSES/CC-BY-4.0.txt`, "bookmark")}${renderAboutResource("TutorBench Brand Policy", "Usage guidelines", `${licenseRoot}/LICENSES/BRAND-POLICY.md`, "shield")}${renderAboutResource("Contributing", "Get involved", `${licenseRoot}/CONTRIBUTING.md`, "user")}${renderAboutResource("Security", "Report an issue", `${licenseRoot}/SECURITY.md`, "shield")}${renderAboutResource("GitHub", "View repository", SITE_GITHUB_URL, "github")}</div></div></section>
     ${renderTeachometryFooter(artifacts)}`,
   );
+  return { ...about, faq: siteFaq(benchmark, uiLocale) };
 }

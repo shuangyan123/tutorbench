@@ -237,7 +237,7 @@ function runPage() {
     </ul>
   </nav>
 </main>`;
-  return frame({ prefix: "../", title: "Run — Teachometry", titleZh: Z("Run — Teachometry"), description: "Run TutorBench locally, diagnose real-world tutoring behavior, and preserve reproducible evidence for retesting.", body, current: "run", css: ["journal.css", "run.css"], scripts: ["run.js"] });
+  return frame({ prefix: "../", title: "Run TutorBench locally — Teachometry", titleZh: Z("Run TutorBench locally — Teachometry"), description: "Run TutorBench locally, diagnose real-world tutoring behavior, and preserve reproducible evidence for retesting.", body, current: "run", css: ["journal.css", "run.css"], scripts: ["run.js"] });
 }
 
 /* ------------------------------------------------------------------ Docs */
