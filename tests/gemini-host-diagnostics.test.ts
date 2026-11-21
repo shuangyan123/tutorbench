@@ -127,7 +127,7 @@ test("Gemini diagnostics distinguish real SDK HTTP statuses and preserve public 
     for (const [status, publicStatus, code] of [
       [400, 502, "provider_http_error"], [404, 502, "provider_http_error"],
       [401, 401, "provider_unauthorized"], [403, 403, "provider_forbidden"],
-      [429, 429, "provider_rate_limited"], [500, 502, "provider_server_error"], [503, 502, "provider_server_error"],
+      [429, 429, "provider_rate_limited"], [500, 502, "provider_server_error"], [503, 503, "provider_unavailable"],
     ] as const) {
       await t.test(`${flag ?? "off"}-${status}`, async (subtest) => {
         const host = await fixture(subtest, { ...(flag === undefined ? {} : { flag }), status,
