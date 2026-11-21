@@ -56,9 +56,9 @@ test("Micro-Review reuses bilingual chrome, localizes visible and accessible tex
       assert.match(html, /aria-label="三分之一加四分之一等于七分之二"/u);
       assert.match(html, /aria-label="你的教学判断"/u);
       assert.doesNotMatch(html, /Your judgment is shown|Basically suitable|Has a teaching problem|Not sure|I think|I added the top|Yes, that's right|not a real model output|Contact the project|Teachers, education researchers|For now, we are only discussing|Formal Reviewer applications/u);
-      assert.match(html, /<title>微评审体验 — Teachometry<\/title>/u);
+      assert.match(html, /<title>微评审体验：判断一段 AI 教学回复 — Teachometry<\/title>/u);
     } else {
-      assert.match(html, /<title>Micro-Review — Teachometry<\/title>/u);
+      assert.match(html, /<title>Micro-Review: judge an AI tutor reply — Teachometry<\/title>/u);
       for (const text of ["Contact the project", "Teachers, education researchers, and others in education are welcome to contact us", "For now, we are only discussing interest in participating", "Formal Reviewer applications are not open yet"]) assert.ok(invitation.includes(text), text);
     }
   }

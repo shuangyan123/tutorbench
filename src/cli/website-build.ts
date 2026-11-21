@@ -24,6 +24,8 @@ import {
 import {
   normalizeSiteBasePath,
   renderPage,
+  siteAlternateRoutes,
+  siteCanonicalRoute,
   siteLocaleRoute,
   TUTORBENCH_BRAND_ASSET_PATHS,
   type SitePage,
@@ -31,7 +33,6 @@ import {
 import {
   resolveSiteLocale,
   SITE_LOCALES,
-  siteHreflang,
   type SiteLocale,
 } from "../site/i18n.js";
 import {
@@ -174,15 +175,12 @@ async function writeDiscoveryFiles(
   if (normalizedSiteUrl === undefined) return;
   const urls = publicIndexablePages(pages)
     .flatMap((page) =>
-      SITE_LOCALES.map((locale) => {
+      // a view that points search engines at another view of the same text is not listed
+      SITE_LOCALES.filter((locale) => siteCanonicalRoute(page, locale) === siteLocaleRoute(page.route, locale)).map((locale) => {
         const loc = `${normalizedSiteUrl}${siteLocaleRoute(page.route, locale)}`;
-        const alternates = [
-          ...SITE_LOCALES.map(
-            (alternateLocale) =>
-              `    <xhtml:link rel="alternate" hreflang="${siteHreflang(alternateLocale)}" href="${xmlEscape(`${normalizedSiteUrl}${siteLocaleRoute(page.route, alternateLocale)}`)}"/>`,
-          ),
-          `    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(`${normalizedSiteUrl}${siteLocaleRoute(page.route, "en")}`)}"/>`,
-        ].join("\n");
+        const alternates = siteAlternateRoutes(page, locale)
+          .map(([hreflang, route]) => `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${xmlEscape(`${normalizedSiteUrl}${route}`)}"/>`)
+          .join("\n");
         return `  <url>\n    <loc>${xmlEscape(loc)}</loc>\n${alternates}\n  </url>`;
       }),
     )

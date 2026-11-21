@@ -17,7 +17,7 @@ test("cases index is generated from public case data and uses the Teachometry sh
   const html = renderPage(page);
 
   assert.match(html, /<body class="cases-page">/);
-  assert.match(html, /Cases — Teachometry/);
+  assert.match(html, /AI tutoring cases — Teachometry/);
   assert.match(html, /href="\/assets\/home\.css"/);
   assert.match(html, /href="\/assets\/cases\.css"/);
   assert.match(html, /class="home-footer"/);

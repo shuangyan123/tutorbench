@@ -243,7 +243,7 @@ function renderRunArtifact(artifacts: PublicBenchmarkArtifacts): string {
 export function renderRunPage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en"): SitePage {
   const datasetLabel = artifacts.benchmark.dataset.id + "@" + artifacts.benchmark.dataset.version;
   return page(
-    "Run — Teachometry",
+    "Run TutorBench locally — Teachometry",
     "Run TutorBench locally, diagnose real-world tutoring behavior, and preserve reproducible evidence for retesting.",
     "/run/",
     `<section class="run-hero" aria-labelledby="run-title"><div class="shell run-hero-grid"><div class="run-hero-copy"><p class="eyebrow">Run · Get started</p><h1 id="run-title">From research<br>questions to<br><em>reproducible runs.</em></h1><p class="run-hero-lede">Run TutorBench locally, then connect an external Tutor to the Tutor Health workflow to diagnose concrete teaching failures in authored real-world scenarios. The canonical benchmark and frozen-evidence paths remain available as the underlying reproducibility layer.</p><div class="run-hero-actions"><a class="button button-primary" href="#quickstart">Run locally now ${icon("arrow")}</a><a class="button button-secondary" href="/docs/">${icon("book")} View the documentation</a></div><div class="run-hero-signals" aria-label="Run principles"><span>${icon("book")} Open source</span><span>${icon("shield")} Transparent evaluation</span><span>${icon("database")} Evidence-first</span></div></div><div class="run-hero-console"><p class="run-hero-annotation">Same questions.<br>Clearer evidence.</p>${renderRunConsole(artifacts, uiLocale)}</div></div></section>
@@ -440,7 +440,7 @@ function renderAboutBotanical(className: string): string {
 export function renderMethodologyPage(artifacts: PublicBenchmarkArtifacts, uiLocale: SiteLocale = "en"): SitePage {
   const scoreDimensions = artifacts.benchmark.dimensions.score;
   return page(
-    "Methodology — Teachometry",
+    "How we evaluate AI tutors — Teachometry",
     "How Teachometry evaluates observable tutoring behavior in structured authored benchmark cases using transparent and reproducible procedures.",
     "/methodology/",
     `<section class="method-hero" aria-labelledby="method-title">${renderMethodologyBotanical("hero")}<div class="shell method-hero-grid"><div class="method-hero-copy"><p class="eyebrow">Our methodology</p><h1 id="method-title">How do you<br>measure <em>teaching?</em></h1><p class="method-hero-lede">Teachometry evaluates observable tutoring behavior in structured authored benchmark cases using transparent and reproducible evaluation procedures.</p><div class="button-row"><a class="button button-primary" href="/data/">Explore the benchmark ${icon("arrow")}</a><a class="button button-secondary" href="#method-pipeline">${icon("book")} Read the methodology</a></div><div class="method-hero-principles"><span>${icon("diagnosis")} Transparent</span><span>${icon("guidance")} Research-grounded</span><span>${icon("document")} Openly documented</span></div></div>${renderMethodologyHeroArt(uiLocale)}</div></section>
@@ -808,7 +808,7 @@ export function renderAboutPage(
     : publicArtifactNotice(models.notice, uiLocale);
   const licenseRoot = `${SITE_GITHUB_URL}/blob/main`;
   return page(
-    "About — Teachometry",
+    "About Teachometry: measuring how AI teaches",
     "Teachometry measures observable AI tutoring behavior, not merely whether a model produces a correct answer.",
     "/about/",
     `<section class="about-hero" aria-labelledby="about-title"><div class="shell about-hero-grid"><div class="about-hero-copy"><p class="eyebrow">About Teachometry</p><h1 id="about-title">A model can know <br>the answer <br><em>without being <br>a good tutor.</em></h1><p class="about-hero-lede">Teachometry is open measurement infrastructure for AI tutoring. We evaluate observable tutoring behavior in structured cases—not just whether the answer is right.</p><div class="button-row"><a class="button button-primary" href="/methodology/">Read our approach ${icon("arrow")}</a><a class="button button-secondary" href="/data/">Explore the benchmark</a></div></div><div class="about-hero-art" aria-hidden="true">${renderAboutBotanical("about-botanical-hero")}<p class="about-handwritten about-hero-note">More than<br>correct answers.</p><p class="about-handwritten about-hero-note-two">Toward<br>truly helpful AI<br>tutors.</p><div class="about-hero-rail"><span>Better<br>measurement.<br>A more human<br>learning future.</span><i></i></div></div></div></section>

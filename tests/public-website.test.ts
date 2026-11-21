@@ -24,7 +24,7 @@ import { renderEditorialBotanical } from "../src/site/illustrations.js";
 import { renderHomePage } from "../src/site/pages/home.js";
 import { renderHeatmapPage, renderTrialDetailPage, renderTrialsPage } from "../src/site/pages/data.js";
 import { renderLeaderboardPage, renderModelDetailPage, renderModelsPage } from "../src/site/pages/overview.js";
-import { renderAboutPage, renderDocsPage, renderRunPage } from "../src/site/pages/developer.js";
+import { renderAboutPage, renderDocsPage, renderMethodologyPage, renderRunPage } from "../src/site/pages/developer.js";
 import { renderCommunityPage } from "../src/site/pages/community.js";
 import { renderNotFoundPage } from "../src/site/pages/not-found.js";
 
@@ -140,6 +140,30 @@ test("public navigation avoids an artificial page-entry delay and warms likely t
   assert.doesNotMatch(siteScript, /prefetch\.as = "document"/);
 });
 
+test("descriptive section titles keep the short section name in the breadcrumb", async () => {
+  const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
+  const crumbs = (html: string): unknown => {
+    for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gu)) {
+      const data = JSON.parse(match[1] ?? "null") as { "@type"?: string; itemListElement?: { name: string }[] };
+      if (data["@type"] === "BreadcrumbList") return data.itemListElement?.map((item) => item.name);
+    }
+    return undefined;
+  };
+  for (const [locale, title, crumb] of [
+    ["en", "How we evaluate AI tutors — Teachometry", "Methodology"],
+    ["zh-CN", "我们如何评测 AI Tutor — Teachometry", "方法论"],
+  ] as const) {
+    const html = renderPage(renderMethodologyPage(artifacts, locale), { locale, siteUrl: "https://teachometry.com" });
+    assert.ok(html.includes(`<title>${title}</title>`), `${locale} title`);
+    assert.deepEqual(crumbs(html), [crumb]);
+  }
+  const run = renderPage(renderRunPage(artifacts), { locale: "en", siteUrl: "https://teachometry.com" });
+  assert.deepEqual(crumbs(run), ["Run"]);
+  // a page without a short name still takes its title, as before
+  const docs = renderPage(renderDocsPage(artifacts), { locale: "en", siteUrl: "https://teachometry.com" });
+  assert.deepEqual(crumbs(docs), ["TutorBench Documentation"]);
+});
+
 test("site-wide locale switch renders static zh-CN pages with direct route targets", async () => {
   const artifacts = buildPublicBenchmarkArtifacts(await loadDataset());
   const english = renderPage(renderHomePage(artifacts), {
@@ -221,12 +245,12 @@ test("zh-CN copy catalog covers every major public surface and all published ess
   for (const metadataSource of [
     "TutorBench by Teachometry — AI Tutor Evaluation",
     "Benchmark — Teachometry",
-    "Methodology — Teachometry",
+    "How we evaluate AI tutors — Teachometry",
     "Results — Teachometry",
-    "Cases — Teachometry",
-    "Run — Teachometry",
+    "AI tutoring cases — Teachometry",
+    "Run TutorBench locally — Teachometry",
     "TutorBench Documentation — Teachometry",
-    "About — Teachometry",
+    "About Teachometry: measuring how AI teaches",
     "Models — Teachometry",
     "Blog — Teachometry",
     "Contact — Teachometry",
@@ -1053,7 +1077,7 @@ test("static website build emits the public artifact files and route shell", asy
     assert.ok(storyStrokeRule);
     assert.doesNotMatch(storyStrokeRule, /vector-effect/u);
     assert.doesNotMatch(storyScript, /classList\.toggle\('is-active'/);
-    assert.match(aboutHtml, /<title>About — Teachometry<\/title>/);
+    assert.match(aboutHtml, /<title>About Teachometry: measuring how AI teaches<\/title>/);
     assert.match(aboutHtml, /<body class="about-page">/);
     assert.match(aboutHtml, /href="\/assets\/home\.css"/);
     assert.match(aboutHtml, /href="\/assets\/about\.css"/);

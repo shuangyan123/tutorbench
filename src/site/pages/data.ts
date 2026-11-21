@@ -10,6 +10,7 @@ import {
   renderEmptyState,
   renderUiText,
   type SitePage,
+  type SiteSourceContent,
 } from "../html.js";
 import { siteIcon as icon } from "../icons.js";
 import { siteText, type SiteLocale } from "../i18n.js";
@@ -198,7 +199,7 @@ export function renderCasesPage(artifacts: PublicBenchmarkArtifacts, uiLocale: S
     ? escapeHtml(formatTeachingSituations(total, uiLocale)) + "<br><em>一套基准。</em>"
     : `${escapeHtml(String(total))} teaching<br>situations. <em>One benchmark.</em>`;
   return page(
-    "Cases — Teachometry",
+    "AI tutoring cases — Teachometry",
     "Browse structured, authored student–tutor situations from the public Teachometry development set.",
     "/data/cases/",
     `<div class="cases-main">
@@ -291,6 +292,26 @@ function renderCaseBotanical(): string {
   return `<svg class="case-detail-botanical" viewBox="0 0 280 220" fill="none" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision"><circle cx="184" cy="116" r="58" fill="currentColor" opacity=".08"/><path d="M150 196c-6-40 1-75 23-103 15-19 26-36 25-67" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M171 121c-28-7-46-22-55-46 24 3 43 16 55 46ZM175 101c-4-31 3-58 26-82 8 29 1 56-26 82ZM178 145c22-8 40-25 49-51-25 7-42 23-49 51ZM155 156c-27-1-48-12-64-33 26-4 48 7 64 33Z" stroke="currentColor" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round"/><path d="M168 124c-13 24-24 47-29 70" stroke="currentColor" stroke-width=".8" stroke-linecap="round" opacity=".7"/></svg>`;
 }
 
+/**
+ * A case is written in one language, and its partner in the other language shares its
+ * crossLocaleGroupId; that partner, not the same text under the other interface, is its translation.
+ */
+function caseSourceContent(cases: readonly TutorEvalPublicCase[], caseArtifact: TutorEvalPublicCase): SiteSourceContent {
+  const locale = caseLocale(caseArtifact);
+  const routes: Partial<Record<SiteLocale, string>> = {};
+  const group = caseArtifact.crossLocaleGroupId === undefined
+    ? [caseArtifact]
+    : cases.filter((item) => item.crossLocaleGroupId === caseArtifact.crossLocaleGroupId);
+  for (const item of group) {
+    routes[caseLocale(item)] ??= `/data/cases/${encodeURIComponent(item.id)}/`;
+  }
+  return { locale, routes: { ...routes, [locale]: `/data/cases/${encodeURIComponent(caseArtifact.id)}/` } };
+}
+
+function caseLocale(caseArtifact: TutorEvalPublicCase): SiteLocale {
+  return caseArtifact.locale === "zh-CN" ? "zh-CN" : "en";
+}
+
 export function renderCaseDetailPage(
   artifacts: PublicBenchmarkArtifacts,
   caseArtifact: TutorEvalPublicCase,
@@ -357,7 +378,7 @@ export function renderCaseDetailPage(
       </section>
     </div>${renderTeachometryFooter(artifacts)}`,
   );
-  return { ...detail, titleIsSourceContent: true };
+  return { ...detail, titleIsSourceContent: true, sourceContent: caseSourceContent(artifacts.cases.cases, caseArtifact) };
 }
 
 interface ExplorerStat {

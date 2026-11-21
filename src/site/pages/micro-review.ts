@@ -5,7 +5,7 @@ import { renderTeachometryFooter } from "./home.js";
 /** 构造体验仅属于网站展示层，不创建 Case、Expert Review 或评测结果。 */
 export function renderMicroReviewPage(artifacts: PublicBenchmarkArtifacts): SitePage {
   return {
-    title: "Micro-Review — Teachometry",
+    title: "Micro-Review: judge an AI tutor reply — Teachometry",
     description: "Try one AI teaching judgment in about 60 seconds. A constructed example, no account or installation needed.",
     route: "/micro-review/",
     content: `<div class="shell micro-review">

@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { runInNewContext } from "node:vm";
 import { buildWebsite } from "../src/cli/website-build.js";
 import { TUTOR_EVAL_DATASET_ID } from "../src/contracts/index.js";
-import { buildPublicBenchmarkArtifacts, loadTutorEvalDataset, type PublicBenchmarkArtifacts } from "../src/datasets/index.js";
+import { buildPublicBenchmarkArtifacts, loadTutorEvalDataset, type PublicBenchmarkArtifacts, type TutorEvalPublicCase } from "../src/datasets/index.js";
 import { escapeHtml, renderPage } from "../src/site/html.js";
 import type { SiteLocale } from "../src/site/i18n.js";
 import { renderCasesPage } from "../src/site/pages/data.js";
@@ -273,6 +273,18 @@ test("LC-30: parsed home Organization and ContactPoint fields are locale aware w
   }
 });
 
+/**
+ * A case is written in one language. It is indexed once, under the interface in that language,
+ * and its hreflang partner is the case written in the other language (same crossLocaleGroupId).
+ */
+function caseAddresses(caseArtifact: TutorEvalPublicCase, siteUrl: string): { canonical: string; alternates: Record<"en" | "zh-Hans" | "x-default", string> } {
+  const address = (item: TutorEvalPublicCase): string => `${siteUrl}${item.locale === "zh-CN" ? "/zh-cn" : ""}/data/cases/${item.id}/`;
+  const partner = artifacts.cases.cases.find(item => item.crossLocaleGroupId === caseArtifact.crossLocaleGroupId && item.id !== caseArtifact.id);
+  assert.ok(partner !== undefined && (partner.locale === "zh-CN") !== (caseArtifact.locale === "zh-CN"), caseArtifact.id);
+  const [english, chinese] = caseArtifact.locale === "zh-CN" ? [partner, caseArtifact] : [caseArtifact, partner];
+  return { canonical: address(caseArtifact), alternates: { en: address(english), "zh-Hans": address(chinese), "x-default": address(english) } };
+}
+
 test("P3A preserves canonical, hreflang, bilingual sitemap, basePath assets and raw public JSON", async () => {
   const routes = ["/", "/data/cases/", "/docs/", "/run/", ...BLOG_POSTS.map(post => post.route), ...artifacts.cases.cases.map(item => `/data/cases/${item.id}/`)];
   for (const deployment of deployments) {
@@ -282,11 +294,18 @@ test("P3A preserves canonical, hreflang, bilingual sitemap, basePath assets and 
         const markup = await html(route, locale, deployment.directory);
         const links = tags(markup).filter(tag => tag.tag === "link");
         const localizedRoute = `${locale === "zh-CN" ? "/zh-cn" : ""}${route}`;
-        const canonical = `${deployment.url}${localizedRoute}`;
+        const view = `${deployment.url}${localizedRoute}`;
+        const caseArtifact = artifacts.cases.cases.find(item => `/data/cases/${item.id}/` === route);
+        const expected = caseArtifact === undefined ? undefined : caseAddresses(caseArtifact, deployment.url);
+        const canonical = expected?.canonical ?? view;
         assert.equal(links.find(link => link.attrs.rel === "canonical")?.attrs.href, canonical);
         assert.ok(sitemap.includes(`<loc>${canonical}</loc>`));
-        for (const language of ["en", "zh-Hans", "x-default"]) {
-          assert.equal(links.find(link => link.attrs.hreflang === language)?.attrs.href, `${deployment.url}${language === "zh-Hans" ? "/zh-cn" : ""}${route}`);
+        if (canonical !== view) {
+          // the same case text under the other interface: reachable, but not indexed or paired
+          assert.ok(!sitemap.includes(`<loc>${view}</loc>`), view);
+          assert.equal(links.filter(link => link.attrs.hreflang !== undefined).length, 0, view);
+        } else for (const language of ["en", "zh-Hans", "x-default"] as const) {
+          assert.equal(links.find(link => link.attrs.hreflang === language)?.attrs.href, expected?.alternates[language] ?? `${deployment.url}${language === "zh-Hans" ? "/zh-cn" : ""}${route}`);
         }
         const internalAssets = tags(markup).flatMap(tag => [tag.attrs.src, tag.tag === "link" && tag.attrs.rel === "stylesheet" ? tag.attrs.href : undefined]).filter((value): value is string => value?.startsWith("/") === true);
         assert.ok(internalAssets.length > 0);
