@@ -152,7 +152,8 @@ function inspectRows(input: unknown, registry: ExamSpecifications, graph: Return
     landOverlays: registry.landOverlays, requirements };
 }
 
-type Inventory = ReturnType<typeof inspectRequirements>;
+type Inventory = { version: string; graph: string; manifestVersion: unknown; scopes: { id: string }[];
+  requirements: { requirement_id: string; source_edition: string; locator: string }[]; graphHistory?: Record<string, string[]> };
 
 export function compareRequirementInventories(before: Inventory, after: Inventory) {
   function diff<T>(left: T[], right: T[], id: (entry: T) => string) {
@@ -167,10 +168,17 @@ export function compareRequirementInventories(before: Inventory, after: Inventor
     scopes: diff(before.scopes, after.scopes, scope => scope.id),
     requirements };
   if (before.manifestVersion === "1" && after.manifestVersion === "1") return result;
-  return { ...result, changes: {
+  const changes = {
     added: requirements.filter(row => row.before === null).map(row => row.key),
     removed: requirements.filter(row => row.after === null).map(row => row.key),
     relocated: requirements.filter(({ before, after }) => before && after &&
       (before.locator !== after.locator || before.source_edition !== after.source_edition)).map(row => row.key),
-  } };
+  };
+  const history = after.graphHistory ?? before.graphHistory;
+  if (!history) return { ...result, changes };
+  const from = history[before.graph], to = history[after.graph];
+  check(from && to, "missing graph version for comparison");
+  const remaining = new Set(after.requirements.map(r => r.requirement_id));
+  return { ...result, changes: { ...changes, retained: before.requirements.map(r => r.requirement_id).filter(id => remaining.has(id)).sort() },
+    concepts: { added: to.filter(id => !from.includes(id)).sort(), removed: from.filter(id => !to.includes(id)).sort() } };
 }

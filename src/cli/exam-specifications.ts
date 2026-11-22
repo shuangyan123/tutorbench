@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { compareExamSources, parseExamSpecifications } from "../research/exam-specifications.js";
 import { inspectCurriculumRevision } from "../research/exam-edition-comparison.js";
 import { inspectAssessmentGuidance } from "../research/exam-assessment-guidance.js";
+import { inspectKnowledgeCoverage } from "../research/exam-knowledge-coverage.js";
 import { inspectSourceGovernance } from "../research/exam-source-governance.js";
 import { resolveInternationalSources } from "../research/exam-international-inventory.js";
 import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
@@ -17,8 +18,8 @@ const load = async (path: string) => parseExamSpecifications(await read(path), g
 const archived = `${base}exam-specifications/0.1.0.json`;
 const registry = await load(archived);
 if (inventory) {
-  const inspect = async (path: string) => {
-    const input = await read(path);
+  const inspect = async (path: string, provided?: unknown) => {
+    const input = provided ?? await read(path);
     if (input && typeof input === "object" && "version" in input && ["0.3.0", "0.4.0", "0.7.0"].includes(String(input.version))) {
       const previous = await read(`${base}exam-specifications/requirements-0.2.0.json`);
       if (input.version === "0.3.0") return inspectGapRequirements(input, previous, registry, graph);
@@ -38,8 +39,16 @@ if (inventory) {
     const baseline = await inspect(current);
     console.log(JSON.stringify(paths[1] ? inspectAssessmentGuidance(baseline) : inspectCurriculumRevision(baseline), null, 2));
   } else {
-    const report = await inspect(paths[0] ?? current);
-    console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await inspect(paths[1])) : report, null, 2));
+    const select = async (path: string) => {
+      const input = await read(path);
+      if (input && typeof input === "object" && "version" in input && input.version === "0.9.0") {
+        const baseline = await inspect(`${base}exam-specifications/requirements-0.7.0.json`);
+        return inspectKnowledgeCoverage(input, baseline, graph);
+      }
+      return inspect(path, input);
+    };
+    const report = await select(paths[0] ?? current);
+    console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await select(paths[1])) : report, null, 2));
   }
 } else {
   const sourceSnapshot = async (path: string) => {
