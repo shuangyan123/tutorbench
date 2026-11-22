@@ -3,6 +3,7 @@ import { compareExamSources, parseExamSpecifications } from "../research/exam-sp
 import { inspectCurriculumRevision } from "../research/exam-edition-comparison.js";
 import { inspectAssessmentGuidance } from "../research/exam-assessment-guidance.js";
 import { inspectKnowledgeCoverage } from "../research/exam-knowledge-coverage.js";
+import { inspectMathKnowledgeAudit } from "../research/math-knowledge-audit.js";
 import { inspectSourceGovernance } from "../research/exam-source-governance.js";
 import { resolveInternationalSources } from "../research/exam-international-inventory.js";
 import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
@@ -41,9 +42,11 @@ if (inventory) {
   } else {
     const select = async (path: string) => {
       const input = await read(path);
-      if (input && typeof input === "object" && "version" in input && input.version === "0.9.0") {
+      if (input && typeof input === "object" && "version" in input && (input.version === "0.9.0" || input.version === "1.0.0")) {
         const baseline = await inspect(`${base}exam-specifications/requirements-0.7.0.json`);
-        return inspectKnowledgeCoverage(input, baseline, graph);
+        if (input.version === "0.9.0") return inspectKnowledgeCoverage(input, baseline, graph);
+        const previous = await read(`${base}exam-specifications/requirements-0.9.0.json`);
+        return inspectMathKnowledgeAudit(input, inspectKnowledgeCoverage(previous, baseline, graph));
       }
       return inspect(path, input);
     };

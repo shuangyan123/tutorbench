@@ -14,7 +14,10 @@ function check(value: unknown, reason: string): asserts value {
   if (!value) throw new Error("knowledge_coverage_invalid: " + reason);
 }
 
-export function extendKnowledgeGraph(base: MathematicsKnowledgeMap, input = delta) {
+type GraphDelta = Omit<typeof delta, "aliases"> & { aliases: Record<string, string> };
+
+export function extendKnowledgeGraph(base: MathematicsKnowledgeMap, input: GraphDelta = delta,
+  inheritedAliases: Record<string, string> = {}) {
   check(base.version === input.baseGraph, "stale graph");
   const graph = parseMathematicsKnowledgeMap({ ...base, version: input.version, nodes: [...base.nodes, ...input.addedNodes],
     knowledgeRelations: [...base.knowledgeRelations ?? [], ...input.knowledgeRelations] });
@@ -30,6 +33,10 @@ export function extendKnowledgeGraph(base: MathematicsKnowledgeMap, input = delt
   for (const node of graph.nodes) {
     reserve(node.id, node.id);
     reserve(node.label, node.id);
+  }
+  for (const node of base.nodes) {
+    const alias = inheritedAliases[node.id];
+    if (alias !== undefined) reserve(alias, node.id);
   }
   for (const [id, alias] of Object.entries(input.aliases)) {
     check(additions.has(id), "unknown alias target");
