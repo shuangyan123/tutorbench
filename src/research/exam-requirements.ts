@@ -174,7 +174,8 @@ export function compareRequirementInventories(before: Inventory, after: Inventor
     relocated: requirements.filter(({ before, after }) => before && after &&
       (before.locator !== after.locator || before.source_edition !== after.source_edition)).map(row => row.key),
   };
-  const history = after.graphHistory ?? before.graphHistory;
+  const history = before.graphHistory || after.graphHistory
+    ? { ...before.graphHistory, ...after.graphHistory } : undefined;
   if (!history) return { ...result, changes };
   const from = history[before.graph], to = history[after.graph];
   check(from && to, "missing graph version for comparison");
