@@ -1,12 +1,20 @@
 import nodeDecisions from "./data/math-node-audit-v1.json" with { type: "json" };
 import dispositions from "./data/math-gap-dispositions-v1.json" with { type: "json" };
-import type release from "../../scenarios/case-system-vnext/exam-specifications/requirements-1.0.0.json";
 import { extendKnowledgeGraph, type inspectKnowledgeCoverage } from "./exam-knowledge-coverage.js";
 import { verifyInventoryRelease } from "./exam-international-inventory.js";
 
 type Baseline = ReturnType<typeof inspectKnowledgeCoverage>;
 type Leaf = Baseline["requirements"][number];
-type Snapshot = typeof release;
+type ContentItem = { anchor: string; summary: string; concepts: string[]; rationale?: string };
+type Snapshot = {
+  version: string; baseInventory: string; manifestVersion: string;
+  sourceScope: string; sourceEdition: string; sourceSha256: string;
+  scopes: { id: string; title: string; printedPage: number; pdfPage: number; starred: string; leaves: ContentItem[] }[];
+  graphDelta: NonNullable<Parameters<typeof extendKnowledgeGraph>[1]>;
+  aliasRefinement: { id: string; from: string; to: string; sourceRef: string };
+  specializations: { retained: string; specialized: string[]; relation: string }[];
+  reviewPriorities: { sourceId: string; candidate: string | null; alternative: string }[];
+};
 const actions = new Map(Object.entries({
   reuse: "Review the candidate against the full located operation and its restrictions.",
   new: "Review the new node against this rule and the narrower operations in other editions.",
