@@ -46,6 +46,22 @@ export function inspectDiagnosticContrasts(base: Geometry) {
 }
 
 type Challenge = ReturnType<typeof inspectDiagnosticContrasts>;
+/** Evidence-only view of the frozen, authored traces. No prediction on new responses. */
+export function diagnosticEvidence(report: Challenge) {
+  return report.cases.flatMap(task => task.traces.map(trace => ({
+    taskId: task.taskId,
+    traceId: trace.id,
+    observation: trace.fact,
+    conclusion: trace.answerStatus,
+    reasoning: trace.reasoning,
+    supportedStep: trace.claimEvidence === "observable" ? trace.inferenceClaim : null,
+    alternativeExplanations: trace.hypotheses,
+    causalAttribution: trace.causalAttribution,
+    cannotInfer: task.cannotInfer,
+    reviewStatus: task.clarificationStatus,
+  })));
+}
+
 type Dimension = "mathematics" | "construct" | "attribution";
 type ReviewItem = { sourceKey: string; evidence: Record<string, unknown> };
 const instructions = {

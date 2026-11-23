@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+import { caseErrorCodes } from "../src/reporting/execution-diagnostics.js";
+import { formatTutorEvalSummary } from "../src/reporting/tutor-eval-reporters.js";
 import { ScriptedTutor } from "../src/adapters/scripted-tutor.js";
 import {
   buildTutorEvalJudgeInput,
@@ -1115,4 +1117,39 @@ test("runner preserves dataset and case versions and supports repeated runs", as
     ["versioned-a@1.0.0", "versioned-a@1.0.0", "versioned-b@2.0.0", "versioned-b@2.0.0"],
   );
   assert.equal(result.caseRunCount, 4);
+});
+
+test("execution diagnosis separates adapter, evaluator and Judge errors, including simultaneous failures", async () => {
+  const cases = [
+    makeCase("adapter"),
+    makeCase("evaluator", "1", [{ evaluatorId: "contains_normalized_expression", config: { requiredExpression: "sin(x)" } }]),
+    ...["timeout", "transport", "invalid", "good"].map(id => makeCase(id, "1", [{ evaluationType: "judge" }])),
+    makeCase("both", "1", [
+      { evaluatorId: "contains_normalized_expression", config: { requiredExpression: "sin(x)" } },
+      { id: "semantic", evaluationType: "judge" },
+    ]),
+  ];
+  const result = await runTutorEval({
+    dataset: { id: "diagnostic-fixture", version: "1", cases },
+    tutor: new ScriptedTutor({ id: "fixture", responses: Object.fromEntries(cases.map(c => [c.id, "work"])),
+      failingScenarioIds: new Set(["adapter"]) }),
+    judge: { provider: "synthetic", model: "fixture", promptVersion: "1",
+      evaluate: async input => {
+        if (input.caseId === "timeout") throw new DOMException("fixture-secret", "TimeoutError");
+        if (input.caseId === "invalid") return {};
+        if (input.caseId === "good") return makeJudgeResult(input.caseId, [{ rubricId: "rubric-1", result: "PASS" }]);
+        throw new Error("fixture-secret");
+      } },
+  });
+  const byCase = Object.fromEntries(result.caseResults.map(row => [row.caseId, caseErrorCodes(row)]));
+  assert.deepEqual(byCase, {
+    adapter: ["adapter_failed"], evaluator: ["evaluation_failed"], timeout: ["judge_timeout"],
+    transport: ["judge_transport_error"], invalid: ["judge_result_invalid"], good: [],
+    both: ["judge_transport_error", "evaluation_failed"],
+  });
+  assert.equal(result.overallScore, null);
+  const summary = formatTutorEvalSummary(result);
+  assert.match(summary, /evaluation_failed: 2/);
+  assert.match(summary, /judge_transport_error: 2/);
+  assert.doesNotMatch(summary, /fixture-secret/);
 });

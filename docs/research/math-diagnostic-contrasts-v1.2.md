@@ -49,3 +49,7 @@ node dist/src/cli/exam-specifications.js --requirements --diagnostic-contrasts i
 4. 保留两份原始决定及理由。由另行授权的裁决者对分歧记录依据、所用版本和裁决，或将其留作未解决；先报告裁决前的一致性。此版本没有人类提交、裁决或学习者结果。通过导入、相同决定或自动化验算均不会生成 Gold、已审核标签或评测分数。
 
 如果以后研究真实作答，须另行取得授权、必要同意和适龄保护，限制用途、最小化采集、去标识化、限定访问和保留期限。此版本只用项目合成素材。#365 的 24 条既有 Eval/Health 关联与 #109 的双语分数题评审各有其范围。
+
+### 重放证据边界
+
+运行 `node dist/src/cli/exam-specifications.js --requirements --diagnostic-contrasts evidence` 可查看同一批 24 段合成作答的精简证据。每行给出可观察事实，并分别记录结论和论证。只有作者标为可从书面步骤核实的陈述才进入 `supportedStep`；与作答冲突或证据不足时该字段为 `null`。所有行都保留竞争解释，单份作答的因果归因均为 `insufficient-evidence`。此命令仅重放冻结样例中的作者标注。

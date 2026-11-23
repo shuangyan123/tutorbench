@@ -5,7 +5,7 @@ import { unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { inspectDiagnosticContrasts, inspectDiagnosticSubmission, prepareDiagnosticReview } from "../src/research/math-diagnostic-contrasts.js";
+import { diagnosticEvidence, inspectDiagnosticContrasts, inspectDiagnosticSubmission, prepareDiagnosticReview } from "../src/research/math-diagnostic-contrasts.js";
 
 const cli = (...args: string[]) => execFileSync(process.execPath, ["dist/src/cli/exam-specifications.js","--requirements",...args], { maxBuffer: 2_000_000 });
 const old = cli("scenarios/case-system-vnext/exam-specifications/requirements-1.1.0.json");
@@ -151,5 +151,55 @@ test("blind packets isolate claims, omit answer keys, reproduce assignments and 
       assert.throws(()=>inspectDiagnosticSubmission({...fixture,reviews:fixture.reviews.map(t=>({...t,...patch}))},a));
     assert.throws(()=>inspectDiagnosticSubmission({...fixture,packetFingerprint:"sha256:"+"0".repeat(64)},a));
     assert.throws(()=>inspectDiagnosticSubmission({...fixture,independenceVerified:true},a));
+  }
+});
+
+test("frozen evidence view abstains on causal attribution across all 24 contrasts", () => {
+  const evidence = diagnosticEvidence(report);
+  assert.deepEqual(JSON.parse(cli("--diagnostic-contrasts", "evidence").toString()), evidence);
+  // 每组三段共享原题。只有可从书面步骤核实的陈述可作为肯定判断输出。
+  const matrix = [
+    ["circle-normal", "circle-source", "circle-coincidence"],
+    ["roots-intersection", "roots-source", "roots-brief"],
+    ["domain-first", "domain-source", "domain-undefined"],
+    ["amgm-square", "amgm-source", "amgm-premise"],
+    ["price-factors", "price-source", "price-slip"],
+    ["system-parallel", "system-source", "system-brief"],
+    ["table-general", "table-transpose", "table-brief"],
+    ["plot-vertical", "plot-transpose", "plot-slope"],
+  ];
+  assert.deepEqual(new Set(evidence.map(row => row.traceId)), new Set(matrix.flat()));
+  for (const [supported, ...probes] of matrix) {
+    const reference = evidence.find(row => row.traceId === supported)!;
+    assert.equal(reference.supportedStep, trace(supported!).inferenceClaim);
+    for (const id of probes) {
+      const probe = evidence.find(row => row.traceId === id)!;
+      assert.equal(reference.taskId, probe.taskId);
+      assert.equal(probe.supportedStep, null);
+      assert.ok(!JSON.stringify(probe).includes(trace(id).inferenceClaim));
+    }
+  }
+  for (const row of evidence) {
+    assert.equal(row.observation, trace(row.traceId).fact);
+    assert.equal(row.causalAttribution, "insufficient-evidence");
+    assert.ok(new Set(row.alternativeExplanations).size >= 2);
+    assert.ok(row.cannotInfer);
+    assert.equal(row.reviewStatus, "pending-independent-review");
+  }
+  // 同一结论既可来自充分推理，也可来自错误、缺失或未呈现的推理。
+  for (const [complete, probe, reasoning] of [
+    ["circle-normal", "circle-coincidence", "invalid"],
+    ["domain-first", "domain-undefined", "invalid"],
+    ["roots-intersection", "roots-brief", "absent"],
+    ["amgm-square", "amgm-premise", "incomplete"],
+    ["system-parallel", "system-brief", "absent"],
+    ["table-transpose", "table-brief", "absent"],
+  ] as const) {
+    assert.equal(trace(complete).claim, trace(probe).claim);
+    const first = evidence.find(r => r.traceId === complete)!;
+    const second = evidence.find(r => r.traceId === probe)!;
+    assert.equal(first.conclusion, second.conclusion);
+    assert.notEqual(first.reasoning, second.reasoning);
+    assert.equal(second.reasoning, reasoning);
   }
 });

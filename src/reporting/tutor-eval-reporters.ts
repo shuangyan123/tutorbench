@@ -20,6 +20,7 @@ import {
   hasMatchingTutorEvalAuthoredScoring,
 } from "../scoring/index.js";
 import { buildTutorEvalAuthoredScoringInputs } from "../scoring/provenance.js";
+import { caseErrorCodes, countErrorCodes } from "./execution-diagnostics.js";
 
 const categories: readonly TutorEvalCategory[] = [
   "correctness",
@@ -317,6 +318,8 @@ export function formatTutorEvalSummary(
     `${labels.passed}: ${result.passedCount}`,
     `${labels.failed}: ${result.failedCount}`,
     `${labels.errors}: ${result.errorCount}`,
+    ...Object.entries(countErrorCodes(result.caseResults.map(row => ({ errorCodes: caseErrorCodes(row) }))))
+      .map(([code, count]) => `  ${code}: ${count}`),
     ...categoryLines,
     `${labels.overall}: ${formatScore(result.overallScore)}`,
     `${labels.criticalFailureRate}: ${formatFailureSignalRate(failureSignalMetrics.criticalFailures, reportLocale)}`,
