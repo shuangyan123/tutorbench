@@ -4,6 +4,7 @@ import { inspectCurriculumRevision } from "../research/exam-edition-comparison.j
 import { inspectAssessmentGuidance } from "../research/exam-assessment-guidance.js";
 import { inspectKnowledgeCoverage } from "../research/exam-knowledge-coverage.js";
 import { inspectMathKnowledgeAudit } from "../research/math-knowledge-audit.js";
+import { inspectGeometryPilot } from "../research/math-geometry-pilot.js";
 import { inspectSourceGovernance } from "../research/exam-source-governance.js";
 import { resolveInternationalSources } from "../research/exam-international-inventory.js";
 import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
@@ -42,11 +43,17 @@ if (inventory) {
   } else {
     const select = async (path: string) => {
       const input = await read(path);
-      if (input && typeof input === "object" && "version" in input && (input.version === "0.9.0" || input.version === "1.0.0")) {
+      if (input && typeof input === "object" && "version" in input && ["0.9.0", "1.0.0", "1.1.0"].includes(String(input.version))) {
         const baseline = await inspect(`${base}exam-specifications/requirements-0.7.0.json`);
         if (input.version === "0.9.0") return inspectKnowledgeCoverage(input, baseline, graph);
         const previous = await read(`${base}exam-specifications/requirements-0.9.0.json`);
-        return inspectMathKnowledgeAudit(input, inspectKnowledgeCoverage(previous, baseline, graph));
+        const coverage = inspectKnowledgeCoverage(previous, baseline, graph);
+        if (input.version === "1.0.0") return inspectMathKnowledgeAudit(input, coverage);
+        const challenge = "scenarios/experimental/mathematics-challenge-v0.1/";
+        const [audit, suite, evidence] = await Promise.all([
+          read(`${base}exam-specifications/requirements-1.0.0.json`), read(challenge + "suite.json"), read(challenge + "evidence.json"),
+        ]);
+        return inspectGeometryPilot(input, inspectMathKnowledgeAudit(audit, coverage), suite, evidence);
       }
       return inspect(path, input);
     };

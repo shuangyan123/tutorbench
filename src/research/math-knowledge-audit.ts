@@ -30,7 +30,7 @@ function check(ok: unknown, reason: string): asserts ok {
   if (!ok) throw new Error("math_knowledge_audit_invalid: " + reason);
 }
 
-function conceptsOf(row: { concepts?: string[]; concept_id?: unknown }) {
+export function conceptsOf(row: { concepts?: string[]; concept_id?: unknown }) {
   return row.concepts ?? (typeof row.concept_id === "string" ? [row.concept_id] : []);
 }
 
