@@ -294,6 +294,8 @@ function fingerprint(value: unknown): string {
     .digest("hex")}`;
 }
 
+export { fingerprint as expertReviewFingerprint };
+
 function reviewerId(value: string): string {
   if (!opaqueIdPattern.test(value) || value.includes("@")) invalid();
   return value;
@@ -627,10 +629,21 @@ function onlyKeys(record: Record<string, unknown>, allowed: readonly string[]): 
   return Object.keys(record).every((key) => keys.has(key));
 }
 
-export function parseCaseSystemVNextExpertReviewSubmission(
+interface ReviewBinding {
+  schemaVersion: number;
+  protocolId: string;
+  protocolVersion: string;
+  reviewerId: string;
+  taskSetFingerprint: string;
+  packetFingerprint: string;
+  tasks: readonly { readonly reviewTaskId: string }[];
+}
+
+/** Bind a complete set of rows to one frozen packet before interpreting its protocol-specific outcomes. */
+export function readBoundReviewRows(
   value: unknown,
-  packet: CaseSystemVNextExpertReviewPacket,
-): CaseSystemVNextExpertReviewSubmission {
+  packet: ReviewBinding,
+) {
   const record = asRecord(value);
   if (
     record === null ||
@@ -643,9 +656,9 @@ export function parseCaseSystemVNextExpertReviewSubmission(
       "packetFingerprint",
       "reviews",
     ]) ||
-    record.schemaVersion !== CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION ||
-    record.protocolId !== CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_ID ||
-    record.protocolVersion !== CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_VERSION ||
+    record.schemaVersion !== packet.schemaVersion ||
+    record.protocolId !== packet.protocolId ||
+    record.protocolVersion !== packet.protocolVersion ||
     record.reviewerId !== packet.reviewerId ||
     record.taskSetFingerprint !== packet.taskSetFingerprint ||
     record.packetFingerprint !== packet.packetFingerprint ||
@@ -657,14 +670,24 @@ export function parseCaseSystemVNextExpertReviewSubmission(
 
   const expectedIds = new Set(packet.tasks.map((task) => task.reviewTaskId));
   const seen = new Set<string>();
-  const reviews = record.reviews.map((value) => {
+  const rows = record.reviews.map((value) => {
     const item = asRecord(value);
+    if (!item || typeof item.reviewTaskId !== "string" || !expectedIds.has(item.reviewTaskId) || seen.has(item.reviewTaskId)) invalid();
+    seen.add(item.reviewTaskId);
+    return { ...item, reviewTaskId: item.reviewTaskId } as Record<string, unknown> & { reviewTaskId: string };
+  });
+  if (seen.size !== expectedIds.size) invalid();
+  return rows;
+}
+
+export function parseCaseSystemVNextExpertReviewSubmission(
+  value: unknown,
+  packet: CaseSystemVNextExpertReviewPacket,
+): CaseSystemVNextExpertReviewSubmission {
+  const reviews = readBoundReviewRows(value, { ...packet, schemaVersion: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION,
+    protocolId: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_ID, protocolVersion: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_PROTOCOL_VERSION }).map(item => {
     if (
-      item === null ||
       !onlyKeys(item, ["reviewTaskId", "outcome", "sufficientlyClear", "notes"]) ||
-      typeof item.reviewTaskId !== "string" ||
-      !expectedIds.has(item.reviewTaskId) ||
-      seen.has(item.reviewTaskId) ||
       typeof item.outcome !== "string" ||
       !outcomes.has(item.outcome as CaseSystemVNextStressRawOutcome) ||
       typeof item.sufficientlyClear !== "boolean" ||
@@ -673,7 +696,6 @@ export function parseCaseSystemVNextExpertReviewSubmission(
           item.notes.trim().length === 0 ||
           item.notes.length > 2_000))
     ) invalid();
-    seen.add(item.reviewTaskId);
     return {
       reviewTaskId: item.reviewTaskId,
       outcome: item.outcome as CaseSystemVNextStressRawOutcome,
@@ -681,7 +703,6 @@ export function parseCaseSystemVNextExpertReviewSubmission(
       ...(item.notes === undefined ? {} : { notes: item.notes }),
     };
   });
-  if (seen.size !== expectedIds.size) invalid();
 
   return {
     schemaVersion: CASE_SYSTEM_VNEXT_EXPERT_REVIEW_SCHEMA_VERSION,

@@ -5,6 +5,7 @@ import { inspectAssessmentGuidance } from "../research/exam-assessment-guidance.
 import { inspectKnowledgeCoverage } from "../research/exam-knowledge-coverage.js";
 import { inspectMathKnowledgeAudit } from "../research/math-knowledge-audit.js";
 import { inspectGeometryPilot } from "../research/math-geometry-pilot.js";
+import { inspectDiagnosticContrasts, inspectDiagnosticSubmission, prepareDiagnosticReview } from "../research/math-diagnostic-contrasts.js";
 import { inspectSourceGovernance } from "../research/exam-source-governance.js";
 import { resolveInternationalSources } from "../research/exam-international-inventory.js";
 import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
@@ -15,7 +16,8 @@ const [graph, alignment] = await Promise.all(["mathematics-knowledge-map-v0.1", 
 const args = process.argv.slice(2);
 const inventory = args[0] === "--requirements";
 const paths = inventory ? args.slice(1) : args;
-if (paths.length > 2) throw new Error("Usage: exam:inspect [--requirements] [snapshot.json [comparison.json]]");
+const diagnostic = inventory && paths[0] === "--diagnostic-contrasts";
+if (!diagnostic && paths.length > 2) throw new Error("Usage: exam:inspect [--requirements] [snapshot.json [comparison.json]]");
 const load = async (path: string) => parseExamSpecifications(await read(path), graph, alignment);
 const archived = `${base}exam-specifications/0.1.0.json`;
 const registry = await load(archived);
@@ -57,8 +59,24 @@ if (inventory) {
       }
       return inspect(path, input);
     };
-    const report = await select(paths[0] ?? current);
-    console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await select(paths[1])) : report, null, 2));
+    if (diagnostic) {
+      const baseReport = await select(`${base}exam-specifications/requirements-1.1.0.json`);
+      if (!("tasks" in baseReport)) throw new Error("missing task evidence");
+      const report = inspectDiagnosticContrasts(baseReport);
+      const [, action, dimension, slot, submission] = paths;
+      if (!action && paths.length === 1) console.log(JSON.stringify(report, null, 2));
+      else {
+        if (!dimension || !slot || !["export","manifest","import"].includes(action ?? "") ||
+          paths.length !== (action === "import" ? 5 : 4)) throw new Error("Expected export|manifest|import dimension reviewer-slot [submission.json]");
+        const frozen = prepareDiagnosticReview(report, dimension, slot);
+        const result = action === "export" ? { packet: frozen.packet, template: frozen.template } : action === "manifest"
+          ? frozen.manifest : inspectDiagnosticSubmission(await read(submission!), frozen);
+        console.log(JSON.stringify(result, null, 2));
+      }
+    } else {
+      const report = await select(paths[0] ?? current);
+      console.log(JSON.stringify(paths[1] ? compareRequirementInventories(report, await select(paths[1])) : report, null, 2));
+    }
   }
 } else {
   const sourceSnapshot = async (path: string) => {
