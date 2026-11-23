@@ -1,0 +1,446 @@
+{
+  "version": "1.2.0",
+  "baseTaskVersion": "1.1.0",
+  "groups": [
+    {
+      "taskId": "circle-line-tangency-constraint",
+      "proposedClarification": "联立求交点是可选途径。只须建立相切的充分必要条件，不应强制计算第二个根。",
+      "cannotInfer": "不能由一次作答判定是否掌握非线性方程组或全部圆几何。",
+      "traces": [
+        {
+          "id": "circle-normal",
+          "inferenceClaim": "作答展示了一个不依赖联立消元的充分证明。",
+          "claimEvidence": "observable",
+          "mode": "alternative-method",
+          "origin": "authored-counterfactual",
+          "response": "The radius to (0,5) is vertical. The tangent there is horizontal, so its slope is m=0. Every line in this family already goes through that point.",
+          "claim": "m=0",
+          "answerStatus": "correct",
+          "reasoning": "sufficient",
+          "fact": "用圆的切线垂直于过切点半径，在给定族内唯一确定水平线。",
+          "hypotheses": [
+            "可能借助半径方向直接构造切线。",
+            "也可能已用代数检验后只报告几何证明。"
+          ]
+        },
+        {
+          "id": "circle-source",
+          "inferenceClaim": "只要写过一个公共点，就证明作答者不会求非线性方程组。",
+          "claimEvidence": "underdetermined",
+          "mode": "false-criterion",
+          "origin": "project-prompt-excerpt",
+          "response": "I claimed every value of m makes a tangent because the line touches that point.",
+          "claim": "all m",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "把经过已知点作为相切的充分条件；m=1 时还有交点 (−5,0)。",
+          "hypotheses": [
+            "可能混同相交与相切。",
+            "也可能用 touches 表示经过，但没有核查第二个交点。"
+          ]
+        },
+        {
+          "id": "circle-coincidence",
+          "inferenceClaim": "正确报出零斜率足以说明其证明已经建立唯一性。",
+          "claimEvidence": "contradicted",
+          "mode": "correct-result-invalid-reason",
+          "origin": "authored-counterfactual",
+          "response": "m=0. Any line through (0,5) is tangent, and m=0 gives one of those lines, so it is the only value.",
+          "claim": "m=0",
+          "answerStatus": "correct",
+          "reasoning": "invalid",
+          "fact": "所报斜率正确；论据同时把其他斜率也判为相切，不能推出唯一性。",
+          "hypotheses": [
+            "可能从图形辨认水平线后补写了无效理由。",
+            "也可能只举出一个值，误将存在当作唯一。"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "quadratic-positive-roots",
+      "proposedClarification": "求根数的来源条款只支持判别式部分；应另查两根符号的证据。",
+      "cannotInfer": "不能由漏写一个符号条件推断不会判别实根，也无法从最终区间确定使用了哪种方法。",
+      "traces": [
+        {
+          "id": "roots-intersection",
+          "inferenceClaim": "作答明确把根的符号与实根个数分开检查。",
+          "claimEvidence": "observable",
+          "mode": "complete",
+          "origin": "authored-counterfactual",
+          "response": "Distinct real roots require 4(a−2)(a+1)>0. Their sum 2a and product a+2 must both be positive and then both roots are positive. Intersecting gives a>2.",
+          "claim": "a>2",
+          "answerStatus": "correct",
+          "reasoning": "sufficient",
+          "fact": "同时给出互异、和正、积正及交集。",
+          "hypotheses": [
+            "文字支持用韦达关系判定同正。",
+            "直接根公式也可能是检查途径。"
+          ]
+        },
+        {
+          "id": "roots-source",
+          "inferenceClaim": "这份作答的判别式计算本身就是错误的。",
+          "claimEvidence": "contradicted",
+          "mode": "missing-condition",
+          "origin": "project-prompt-excerpt",
+          "response": "I found that the discriminant is positive when a < -1 or a > 2. I concluded these all give two different positive roots.",
+          "claim": "a<-1 or a>2",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "判别式区间正确；a=−3 时两根和为负，故其结论不成立。",
+          "hypotheses": [
+            "可能只检验实根个数。",
+            "也可能把判别式为正误读成根值为正。"
+          ]
+        },
+        {
+          "id": "roots-brief",
+          "inferenceClaim": "只给出区间足以确定作答者使用了韦达关系。",
+          "claimEvidence": "underdetermined",
+          "mode": "insufficient-evidence",
+          "origin": "authored-counterfactual",
+          "response": "a>2.",
+          "claim": "a>2",
+          "answerStatus": "correct",
+          "reasoning": "absent",
+          "fact": "只给出开区间，未写符号判断或其他推导。",
+          "hypotheses": [
+            "可能心算了符号条件。",
+            "也可能猜中分支或漏掉了未写出的限制。"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "rational-equation-excluded-root",
+      "proposedClarification": "把候选值代回原式和在约分前限定定义域均可；核查可以发生在求解前。",
+      "cannotInfer": "不能把候选值写错推断为不会因式分解，也不能把是否记得某个术语当作定义域理解。",
+      "traces": [
+        {
+          "id": "domain-first",
+          "inferenceClaim": "域内等价变形及最后排除候选的步骤都可定位。",
+          "claimEvidence": "observable",
+          "mode": "complete",
+          "origin": "authored-counterfactual",
+          "response": "x≠1 is required. On that domain cancelling gives x+1=2, hence the only possible x is 1. It violates the restriction, so there is no solution.",
+          "claim": "empty",
+          "answerStatus": "correct",
+          "reasoning": "sufficient",
+          "fact": "先限定允许域，域内约分正确并排除唯一候选。",
+          "hypotheses": [
+            "可能显式保留了等价变形的条件。",
+            "也可通过原式无定义得到相同排除。"
+          ]
+        },
+        {
+          "id": "domain-source",
+          "inferenceClaim": "提问者已作最终决定：1 属于原方程解集。",
+          "claimEvidence": "underdetermined",
+          "mode": "domain-omission",
+          "origin": "project-prompt-excerpt",
+          "response": "For (x^2 - 1)/(x - 1) = 2, I cancelled x-1, got x+1=2, so x=1. The algebra is correct. Is 1 the solution?",
+          "claim": "candidate 1",
+          "answerStatus": "incorrect",
+          "reasoning": "incomplete",
+          "fact": "域内的约分和线性求解正确；1 使原分母为零。原话询问候选是否可接受。",
+          "hypotheses": [
+            "可能遗漏排除条件。",
+            "也可能正在主动请求核查该候选，并未接受它。"
+          ]
+        },
+        {
+          "id": "domain-undefined",
+          "inferenceClaim": "空解集正确就证明分母对每个输入均为零。",
+          "claimEvidence": "contradicted",
+          "mode": "correct-result-invalid-reason",
+          "origin": "authored-counterfactual",
+          "response": "No solutions, because the original denominator is zero for every x.",
+          "claim": "empty",
+          "answerStatus": "correct",
+          "reasoning": "invalid",
+          "fact": "最终解集正确；x=2 的分母等于 1，驳倒所给理由。",
+          "hypotheses": [
+            "可能将候选点的未定义性质推广到所有输入。",
+            "也可能省略了“候选”而说错量词。"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "inequality-conditions-and-counterexample",
+      "proposedClarification": "AM–GM 是可选工具；用恒等变形分析符号同样能建立精确适用域。",
+      "cannotInfer": "不能由引用某定理推断已掌握其前提，也不能由未引用该定理推断不会证明。",
+      "traces": [
+        {
+          "id": "amgm-square",
+          "inferenceClaim": "这个解法没有引用 AM–GM 也能建立所需结论。",
+          "claimEvidence": "observable",
+          "mode": "alternative-method",
+          "origin": "authored-counterfactual",
+          "response": "x+1/x−2=(x−1)²/x. For x>0 this is nonnegative, with equality exactly at 1. For x<0 the numerator is strictly positive and the quotient negative, so the original universal claim fails.",
+          "claim": "positive only",
+          "answerStatus": "correct",
+          "reasoning": "sufficient",
+          "fact": "平方在负数域严格为正，分母符号确定商，且识别唯一等号点。",
+          "hypotheses": [
+            "可能用代数恒等式绕开 AM–GM。",
+            "同一结论也可结合 AM–GM 与反例证明原断言错误。"
+          ]
+        },
+        {
+          "id": "amgm-source",
+          "inferenceClaim": "能报出 AM–GM 的名称就能说明其所有应用条件均已被检查。",
+          "claimEvidence": "contradicted",
+          "mode": "missing-condition",
+          "origin": "project-prompt-excerpt",
+          "response": "I proved x + 1/x >= 2 using AM-GM. I wrote 'for every real x except 0' because the expression exists there.",
+          "claim": "all nonzero",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "表达式在 −1 有定义，两项却都是负数，和为 −2。",
+          "hypotheses": [
+            "可能把定义域当作定理适用域。",
+            "也可能复制了非零限制而遗漏正性说明。"
+          ]
+        },
+        {
+          "id": "amgm-premise",
+          "inferenceClaim": "没有写负数反例就证明其不能构造反例。",
+          "claimEvidence": "underdetermined",
+          "mode": "missing-justification",
+          "origin": "authored-counterfactual",
+          "response": "Only positive x. AM–GM gives the bound for positive x, with equality at 1.",
+          "claim": "positive only",
+          "answerStatus": "correct",
+          "reasoning": "incomplete",
+          "fact": "正数情形及等号正确；未解释负数为何不能纳入其断言。",
+          "hypotheses": [
+            "可能只回答了可使用 AM–GM 的范围。",
+            "也可能有负数反例但没有呈现。"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "successive-percentage-base",
+      "proposedClarification": "区分选对百分数基数、计算金额与解释净变化三个动作。",
+      "cannotInfer": "不能由最终价格错误直接推断误把两个百分比相抵。",
+      "traces": [
+        {
+          "id": "price-factors",
+          "inferenceClaim": "文字明确以更新后的价格为第二次变化的基数。",
+          "claimEvidence": "observable",
+          "mode": "complete",
+          "origin": "authored-counterfactual",
+          "response": "Each percentage uses the current price: 200×(6/5)=240, then 240×(4/5)=192. The difference is −8, or −4% of the original price.",
+          "claim": "192",
+          "answerStatus": "correct",
+          "reasoning": "sufficient",
+          "fact": "基数从 200 变到 240，两个因子之积为 24/25。",
+          "hypotheses": [
+            "可能使用连续变化因子。",
+            "也可能先算金额再换写为乘法形式。"
+          ]
+        },
+        {
+          "id": "price-source",
+          "inferenceClaim": "最终报 200 可以确定是在何一步把哪个乘数写错了。",
+          "claimEvidence": "underdetermined",
+          "mode": "wrong-base",
+          "origin": "project-prompt-excerpt",
+          "response": "I said it must be back to 200 because the changes cancel.",
+          "claim": "200",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "将幅度相同的两次相对变化直接抵消。",
+          "hypotheses": [
+            "可能默认两次百分数以同一价格为基数。",
+            "也可能把相对变化误当固定金额变化。"
+          ]
+        },
+        {
+          "id": "price-slip",
+          "inferenceClaim": "第二步仍以 200 为基数，因而得到 202。",
+          "claimEvidence": "contradicted",
+          "mode": "arithmetic-slip",
+          "origin": "authored-counterfactual",
+          "response": "The new base is 200×1.2=240. The discount is 240/5=48. Final price: 240−48=202.",
+          "claim": "202",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "两个基数、折扣和减法设置正确；最后的减法差了 10。",
+          "hypotheses": [
+            "可能在减法中借位出错。",
+            "也可能计算正确但抄错最后一行。"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "linear-system-consistency-versus-rank",
+      "proposedClarification": "判定相容性不要求显式用秩。两条直线或消元矛盾均可完成论证。",
+      "cannotInfer": "不能将零行列式或无解两个词当作学生是否掌握矩阵秩的测量。",
+      "traces": [
+        {
+          "id": "system-parallel",
+          "inferenceClaim": "比较平行直线截距足以判断本方程组无解。",
+          "claimEvidence": "observable",
+          "mode": "alternative-method",
+          "origin": "authored-counterfactual",
+          "response": "The lines are y=−x/2+3/2 and y=−x/2+7/4. They are parallel with different intercepts, so there is no common solution.",
+          "claim": "empty",
+          "answerStatus": "correct",
+          "reasoning": "sufficient",
+          "fact": "两条斜率相同、截距不同的直线不相交。",
+          "hypotheses": [
+            "可能用直线图象性质判断。",
+            "也可能先消元再用直线语言解释。"
+          ]
+        },
+        {
+          "id": "system-source",
+          "inferenceClaim": "这位作答者在任何方程组中都不能区分相容性和系数相关。",
+          "claimEvidence": "underdetermined",
+          "mode": "false-criterion",
+          "origin": "project-prompt-excerpt",
+          "response": "That means the two equations depend on each other, so I said the system has infinitely many solutions.",
+          "claim": "infinite",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "结合原题可见这是由系数行列式为零作推论；常数项没有同倍变化。",
+          "hypotheses": [
+            "可能只检验系数行。",
+            "也可能知道平行与重合的区分但未检查截距。"
+          ]
+        },
+        {
+          "id": "system-brief",
+          "inferenceClaim": "可以从这两个词判定作答者算出了增广秩。",
+          "claimEvidence": "underdetermined",
+          "mode": "insufficient-evidence",
+          "origin": "authored-counterfactual",
+          "response": "No solution.",
+          "claim": "empty",
+          "answerStatus": "correct",
+          "reasoning": "absent",
+          "fact": "未报告消元、几何比较或秩的依据。",
+          "hypotheses": [
+            "可能心算出倍乘矛盾。",
+            "也可能从原题中提到的答案键复述。"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "line-from-value-table",
+      "proposedClarification": "斜率计算只在已正确配对两行之后提供证据；一般式法不要求算出斜率。",
+      "cannotInfer": "不能由转写得到的错误方程推断不会由给定两点建式。",
+      "traces": [
+        {
+          "id": "table-general",
+          "inferenceClaim": "通过两个线性约束求系数比是一条充分的替代路径。",
+          "claimEvidence": "observable",
+          "mode": "alternative-method",
+          "origin": "authored-counterfactual",
+          "response": "For Ax+By+C=0 the rows give −A+4B+C=0 and 2A−2B+C=0. Subtracting gives A=2B and C=−2B. With B=1 this is 2x+y−2=0, which both rows satisfy.",
+          "claim": "2x+y=2",
+          "answerStatus": "correct",
+          "reasoning": "sufficient",
+          "fact": "两个原始行约束均正确，消元确定比例，所得直线非退化。",
+          "hypotheses": [
+            "可能优先用一般式保留齐次系数。",
+            "也可能从斜率得到方程再用两行核查。"
+          ]
+        },
+        {
+          "id": "table-transpose",
+          "inferenceClaim": "这份作答连自己抄出的两点也没能拟合。",
+          "claimEvidence": "contradicted",
+          "mode": "transcription",
+          "origin": "authored-counterfactual",
+          "response": "I read the points as (4,−1) and (−2,2). Their slope is −1/2, so y=−x/2+1, or x+2y=2.",
+          "claim": "x+2y=2",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "读出的两点恰为原数据交换横纵坐标；后续方程对抄出的两点完全成立。",
+          "hypotheses": [
+            "可能颠倒了列的变量标签。",
+            "也可能知道列的意义但书写时交换次序。"
+          ]
+        },
+        {
+          "id": "table-brief",
+          "inferenceClaim": "这个式子足以唯一定位为列标签误读。",
+          "claimEvidence": "underdetermined",
+          "mode": "insufficient-evidence",
+          "origin": "authored-counterfactual",
+          "response": "x+2y=2.",
+          "claim": "x+2y=2",
+          "answerStatus": "incorrect",
+          "reasoning": "absent",
+          "fact": "式子不通过原表两点；没有中间步骤能定位错误。",
+          "hypotheses": [
+            "可能交换了两列。",
+            "也可能读点正确但在整理一般式时交换系数。"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "line-from-coordinate-plot",
+      "proposedClarification": "读坐标、确认点的横坐标相同与能否使用斜截式应分别观察。",
+      "cannotInfer": "单个错误式子不足以判定读图、方程表示或斜率概念哪一项需要支持。",
+      "traces": [
+        {
+          "id": "plot-vertical",
+          "inferenceClaim": "作答能由相同横坐标说明为何不能使用有限斜率。",
+          "claimEvidence": "observable",
+          "mode": "complete",
+          "origin": "authored-counterfactual",
+          "response": "The marks are (2,1) and (2,3). Their x-coordinates agree, so the unique line is x=2. Δx=0 and Δy≠0, hence it has no finite slope.",
+          "claim": "x=2",
+          "answerStatus": "correct",
+          "reasoning": "sufficient",
+          "fact": "坐标、竖直线方程及不存在有限斜率三者一致。",
+          "hypotheses": [
+            "可能通过共同横坐标直接判断。",
+            "也可能由两点的一般式化简。"
+          ]
+        },
+        {
+          "id": "plot-transpose",
+          "inferenceClaim": "所得直线并不经过作答者自己写下的两个点。",
+          "claimEvidence": "contradicted",
+          "mode": "transcription",
+          "origin": "authored-counterfactual",
+          "response": "I read (1,2) and (3,2); both y-values are 2 so the line is y=2.",
+          "claim": "y=2",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "读出的点与原图交换了坐标；对于所抄点，水平直线计算正确。",
+          "hypotheses": [
+            "可能把竖轴刻度当横坐标。",
+            "也可能读图正确但在写有序对时颠倒。"
+          ]
+        },
+        {
+          "id": "plot-slope",
+          "inferenceClaim": "错误发生在读取图上的两个点时。",
+          "claimEvidence": "contradicted",
+          "mode": "vertical-slope-trap",
+          "origin": "authored-counterfactual",
+          "response": "The points are (2,1) and (2,3). Slope=(3−1)/(2−2)=0. Through (2,1) the equation is y=1.",
+          "claim": "y=1",
+          "answerStatus": "incorrect",
+          "reasoning": "invalid",
+          "fact": "读点正确，2/0 不定义；水平线只经过第一个点。",
+          "hypotheses": [
+            "可能将横向增量为零误作斜率为零。",
+            "也可能误记竖直与水平斜率的约定。"
+          ]
+        }
+      ]
+    }
+  ]
+}
