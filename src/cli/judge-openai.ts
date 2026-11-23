@@ -23,7 +23,7 @@ import {
   type OpenAIJudgeEnvironmentConfig,
   type OpenAIJudgeRequestOptions,
 } from "../providers/openai/index.js";
-import { createGuidedTutor } from "./synthetic-guided-tutor.js";
+import { createGuidedTutor, guidedTutorDescriptor } from "./synthetic-guided-tutor.js";
 
 const DEFAULT_SMOKE_CASE_ID = "hint-only-linear-equation-001";
 
@@ -250,15 +250,7 @@ async function runLive(
   const result = await runTutorEval({
     dataset: { ...dataset, cases: selectedCases },
     tutor: createGuidedTutor(),
-    tutorDescriptor: {
-      provider: "synthetic",
-      model: "scripted-guided-tutor",
-      modelVersion: "foundation",
-      promptId: "synthetic-guided",
-      promptVersion: "1.0.0",
-      temperature: 0,
-      seed: 0,
-    },
+    tutorDescriptor: guidedTutorDescriptor,
     judge: {
       ...judge.descriptor,
       evaluate: judge.evaluate,

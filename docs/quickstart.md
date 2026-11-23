@@ -95,3 +95,37 @@ and calibration/review before any future public result eligibility. A
 Quickstart run is not calibrated evidence, an official benchmark result, a
 leaderboard submission, a substitute for a Judge, or evidence that
 deterministic proxies capture full tutoring quality.
+
+### Diagnosing the full offline run
+
+`npm run benchmark` runs the synthetic guided Tutor once on each of 24 English
+and 24 Chinese cases. Before running, it checks the exact selected IDs against
+the scripted replies. A missing or blank script stops the demo and identifies
+the affected cases. The demo reads no provider credentials and makes no network
+calls. The Chinese replies are authored demonstration fixtures.
+
+At base commit `3a9c6f8`, all 24 English IDs had a scripted response and all
+24 Chinese IDs lacked one. Running that revision produced 24 English
+`judge_unavailable` and 24 Chinese `adapter_failed` rows. Each Chinese adapter
+call stopped before evaluation. To inspect by case after running either
+revision, read `caseResults` in `artifacts/tutor-eval-v0.2a-result.json`
+and compare the case ID, recorded locale, response presence and diagnostic code.
+
+The full demo additionally writes `artifacts/tutor-eval-v0.2a-diagnosis.json`.
+It records the entrypoint, dataset edition, response counts and error codes by
+locale, each selected case and its unresolved Judge rubric IDs. Multiple
+categories can affect one case. The default run receives 48 responses, records
+48 cases with `judge_unavailable`, and yields `overallScore: null`. Exit 0
+means the run and report completed. Use `npm run quickstart` for the four-case
+deterministic smoke demonstration.
+
+| Diagnostic code | Where to look |
+| --- | --- |
+| `judge_unavailable` | The default command supplies no Judge executor. For an explicitly configured provider, check required configuration and credentials. |
+| `judge_timeout` | The Judge exceeded its deadline. |
+| `judge_transport_error` | A configured Judge execution failed before delivering a usable result. |
+| `judge_result_invalid`, `judge_output_truncated` | Check the Judge output contract or output limit. |
+| `judge_rubric_missing`, `judge_rubric_unexpected` | Compare returned and requested Judge-owned rubric IDs. |
+| `judge_insufficient_information` | The Judge returned a structured abstention. |
+| `adapter_failed` | The Tutor threw or returned an invalid response. |
+| `evaluation_failed` | A deterministic rubric could not be evaluated. |

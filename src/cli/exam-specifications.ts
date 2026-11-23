@@ -5,7 +5,7 @@ import { inspectAssessmentGuidance } from "../research/exam-assessment-guidance.
 import { inspectKnowledgeCoverage } from "../research/exam-knowledge-coverage.js";
 import { inspectMathKnowledgeAudit } from "../research/math-knowledge-audit.js";
 import { inspectGeometryPilot } from "../research/math-geometry-pilot.js";
-import { inspectDiagnosticContrasts, inspectDiagnosticSubmission, prepareDiagnosticReview } from "../research/math-diagnostic-contrasts.js";
+import { diagnosticEvidence, inspectDiagnosticContrasts, inspectDiagnosticSubmission, prepareDiagnosticReview } from "../research/math-diagnostic-contrasts.js";
 import { inspectSourceGovernance } from "../research/exam-source-governance.js";
 import { resolveInternationalSources } from "../research/exam-international-inventory.js";
 import { compareRequirementInventories, inspectGapRequirements, inspectRequirements } from "../research/exam-requirements.js";
@@ -65,6 +65,7 @@ if (inventory) {
       const report = inspectDiagnosticContrasts(baseReport);
       const [, action, dimension, slot, submission] = paths;
       if (!action && paths.length === 1) console.log(JSON.stringify(report, null, 2));
+      else if (action === "evidence" && paths.length === 2) console.log(JSON.stringify(diagnosticEvidence(report), null, 2));
       else {
         if (!dimension || !slot || !["export","manifest","import"].includes(action ?? "") ||
           paths.length !== (action === "import" ? 5 : 4)) throw new Error("Expected export|manifest|import dimension reviewer-slot [submission.json]");

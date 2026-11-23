@@ -4,8 +4,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
-import { createGuidedTutor } from "../src/cli/synthetic-guided-tutor.js";
+import { missingScriptedResponses, runScriptedBenchmark } from "../src/cli/scripted-benchmark.js";
 import {
+  partitionTutorEvalRubrics,
   TUTOR_EVAL_DATASET_ID,
   TUTOR_EVAL_DATASET_VERSION,
   TUTOR_EVAL_EVALUATOR_VERSION,
@@ -26,7 +27,6 @@ import {
   selectQuickstartCases,
   writeQuickstartSummary,
 } from "../src/quickstart.js";
-import { runTutorEval } from "../src/runner/tutor-eval-runner.js";
 
 test("Quickstart is a complete, non-official deterministic demonstration", async () => {
   const summary = await runQuickstart();
@@ -179,25 +179,13 @@ test("Quickstart writes an independent summary artifact without a score", async 
   }
 });
 
-test("full benchmark remains canonical and fail-closed without a Judge", async () => {
+test("full benchmark remains canonical and fail-closed without a Judge", async t => {
+  const network = t.mock.method(globalThis, "fetch", () => { throw new Error("unexpected network call"); });
   const dataset = await loadTutorEvalDataset(
     TUTOR_EVAL_DATASET_ID,
     TUTOR_EVAL_DATASET_VERSION,
   );
-  const result = await runTutorEval({
-    dataset,
-    tutor: createGuidedTutor(),
-    tutorDescriptor: {
-      provider: "synthetic",
-      model: "scripted-guided-tutor",
-      modelVersion: "foundation",
-      promptId: "synthetic-guided",
-      promptVersion: "1.0.0",
-      temperature: 0,
-      seed: 0,
-    },
-    runId: "tutor-eval-v0.2a-synthetic-guided",
-  });
+  const { result, diagnosis } = await runScriptedBenchmark();
 
   assert.equal(result.datasetId, TUTOR_EVAL_DATASET_ID);
   assert.equal(result.datasetVersion, TUTOR_EVAL_DATASET_VERSION);
@@ -208,9 +196,26 @@ test("full benchmark remains canonical and fail-closed without a Judge", async (
   assert.equal(result.overallScore, null);
   assert.equal(result.judge, null);
   assert.ok(result.caseResults.every((caseResult) => caseResult.rawJudgeResult === null));
-  assert.ok(
-    result.caseResults.some((caseResult) =>
-      caseResult.diagnostics.some((diagnostic) => diagnostic.code === "judge_unavailable"),
-    ),
-  );
+  assert.equal(network.mock.callCount(), 0);
+  assert.equal(diagnosis.networkUsed, false);
+  assert.equal(diagnosis.judgeConfigured, false);
+  assert.equal(diagnosis.overallScore, null);
+  assert.deepEqual(diagnosis.locales.map(l => [l.locale, l.selected, l.responses, l.missingResponses, l.errors]), [
+    ["en", 24, 24, 0, { judge_unavailable: 24 }],
+    ["zh-CN", 24, 24, 0, { judge_unavailable: 24 }],
+  ]);
+  for (const c of dataset.cases) {
+    const row = diagnosis.cases.find(row => row.caseId === c.id)!;
+    assert.equal(row.locale, c.locale ?? "en");
+    assert.deepEqual(row.errorCodes, ["judge_unavailable"]);
+    assert.deepEqual(row.unresolvedJudgeRubrics, partitionTutorEvalRubrics(c).judgeRubrics.map(r => r.id));
+    assert.ok(row.unresolvedJudgeRubrics.length && row.responseReceived);
+  }
+  assert.doesNotMatch(JSON.stringify(diagnosis), /rawTutorResponse|rawJudgeResult|studentMessage/);
+});
+
+test("scripted coverage checks exact selected IDs before running either locale", () => {
+  const cases = ["en-case", "zh-case", "empty", "toString"].map(id => ({ id }));
+  assert.deepEqual(missingScriptedResponses(cases, { "en-case": "ok", empty: "  " }),
+    ["zh-case", "empty", "toString"]);
 });

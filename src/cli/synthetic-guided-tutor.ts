@@ -1,6 +1,18 @@
 import { ScriptedTutor } from "../adapters/scripted-tutor.js";
+import { guidedChineseResponses } from "./synthetic-guided-zh.js";
+
+export const guidedTutorDescriptor = {
+  provider: "synthetic",
+  model: "scripted-guided-tutor",
+  modelVersion: "foundation",
+  promptId: "synthetic-guided",
+  promptVersion: "1.1.0",
+  temperature: 0,
+  seed: 0,
+} as const;
 
 export const guidedResponses: Readonly<Record<string, string>> = {
+  ...guidedChineseResponses,
   "fraction-misconception-001":
     "You noticed the denominators are different. First, find a common denominator. What could you find first?",
   "hint-only-linear-equation-001":
@@ -53,7 +65,7 @@ export const guidedResponses: Readonly<Record<string, string>> = {
 
 export function createGuidedTutor(): ScriptedTutor {
   return new ScriptedTutor({
-    id: "scripted-guided-tutor",
+    id: guidedTutorDescriptor.model,
     responses: guidedResponses,
   });
 }
