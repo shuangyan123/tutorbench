@@ -1,0 +1,372 @@
+{
+  "version": "1.1.0",
+  "suiteId": "mathematics-challenge-v0.1",
+  "suiteVersion": "0.2.0",
+  "tasks": [
+    {
+      "taskId": "circle-line-tangency-constraint",
+      "sourceKind": "existing-synthetic-project-case",
+      "scenarioId": "mc-circle-tangency",
+      "concepts": [
+        "coordinate-geometry",
+        "nonlinear-systems"
+      ],
+      "requirements": [
+        {
+          "sourceId": "cn-selective-analytic/2.2",
+          "fit": "线圆位置关系，未涉及两圆"
+        },
+        {
+          "sourceId": "sat-circles/01",
+          "fit": "仅取切线与半径的关系"
+        },
+        {
+          "sourceId": "sat-lines-angles/02",
+          "fit": "相邻论证动作；切线问题未覆盖该条款的全部几何证明"
+        }
+      ],
+      "operation": "classify-intersections",
+      "input": [
+        "symbolic"
+      ],
+      "target": [
+        "symbolic",
+        "words"
+      ],
+      "conversion": "将联立解的个数解释为交点数",
+      "practice": [
+        "reasoning",
+        "justification"
+      ],
+      "required": "说明经过圆上一点还不足以相切。",
+      "alternative": "半径垂直切线，顶点半径竖直，切线必水平。",
+      "restrictions": "实参数 m，直线族固定过 (0,5)。",
+      "solution": "代入得到 x[(1+m²)x+10m]=0。实数 m 下二次项系数恒正；第二个根与 0 重合恰当 m=0。",
+      "answer": {
+        "tangentSlopes": [
+          0
+        ]
+      },
+      "error": "把已知公共点当作唯一交点。",
+      "diagnosticLimit": "可能缺少相切的充分性论证，即使能正确写出圆方程。"
+    },
+    {
+      "taskId": "quadratic-positive-roots",
+      "sourceKind": "existing-synthetic-project-case",
+      "scenarioId": "mc-quadratic-condition",
+      "concepts": [
+        "quadratic-discriminant",
+        "root-sign-conditions"
+      ],
+      "requirements": [
+        {
+          "sourceId": "sat-nonlinear-equations/05",
+          "fit": "只覆盖判别根数；本题另需两根同正"
+        }
+      ],
+      "operation": "combine-root-conditions",
+      "input": [
+        "symbolic"
+      ],
+      "target": [
+        "symbolic",
+        "words"
+      ],
+      "conversion": "保持代数表示，交三个参数条件",
+      "practice": [
+        "reasoning",
+        "justification"
+      ],
+      "required": "两个实根相异且都正，须同时满足判别式、和与积条件。",
+      "alternative": "用根公式直接检查两个实根的符号。",
+      "restrictions": "a 为实数；重根与零根均排除。",
+      "solution": "Δ=4(a−2)(a+1)>0 给出 a<−1 或 a>2。两根和 2a>0 且积 a+2>0，交集为 (2,∞)。",
+      "answer": {
+        "lower": 2,
+        "lowerInclusive": false,
+        "upper": null
+      },
+      "error": "保留 a<−1 分支。",
+      "diagnosticLimit": "可能已正确求出判别式，仅漏掉符号条件。"
+    },
+    {
+      "taskId": "rational-equation-excluded-root",
+      "sourceKind": "existing-synthetic-project-case",
+      "scenarioId": "mc-rational-domain",
+      "concepts": [
+        "rational-domain",
+        "linear-equations"
+      ],
+      "requirements": [
+        {
+          "sourceId": "sat-nonlinear-equations/02",
+          "fit": "有理方程分支；其他方程族未验证"
+        }
+      ],
+      "operation": "validate-solution-domain",
+      "input": [
+        "symbolic"
+      ],
+      "target": [
+        "symbolic",
+        "words"
+      ],
+      "conversion": "约分前后同时记录定义域",
+      "practice": [
+        "reasoning"
+      ],
+      "required": "把候选解代回原式的定义域。",
+      "alternative": "先限制 x≠1，再在允许域内移项或因式分解。",
+      "restrictions": "实数；原分母 x−1 非零。",
+      "solution": "限定 x≠1 后，方程化为 x+1=2。唯一候选 1 被原式排除，解集为空。",
+      "answer": {
+        "realSolutions": []
+      },
+      "error": "把约分产生的 1 当成原方程解。",
+      "diagnosticLimit": "这与能否因式分解是两个可分别核查的动作。"
+    },
+    {
+      "taskId": "inequality-conditions-and-counterexample",
+      "sourceKind": "existing-synthetic-project-case",
+      "scenarioId": "mc-amgm-domain",
+      "concepts": [
+        "inequality-proofs",
+        "logic-quantifiers"
+      ],
+      "requirements": [
+        {
+          "sourceId": "cn-order/2",
+          "fit": "非负量的基本不等式，本题检验使用前提"
+        }
+      ],
+      "operation": "justify-domain",
+      "input": [
+        "symbolic",
+        "words"
+      ],
+      "target": [
+        "symbolic",
+        "words"
+      ],
+      "conversion": "在已有代数证明中指出前提并给反例",
+      "practice": [
+        "justification",
+        "reasoning"
+      ],
+      "required": "区分表达式有定义与 AM–GM 可用；反驳对所有非零实数的断言。",
+      "alternative": "考察 (x−1)²/x 的符号。",
+      "restrictions": "x 为非零实数；用基本不等式比较 x 与倒数时二者应为正。",
+      "solution": "x+1/x−2=(x−1)²/x。x>0 时非负且仅在 1 取零；x<0 时严格为负，取 −1 已构成反例。",
+      "answer": {
+        "validDomain": "positive-reals",
+        "equality": 1,
+        "counterexample": -1
+      },
+      "error": "以 x≠0 代替 x>0。",
+      "diagnosticLimit": "能复述基本不等式仍可能漏写适用前提。"
+    },
+    {
+      "taskId": "successive-percentage-base",
+      "sourceKind": "existing-synthetic-project-case",
+      "scenarioId": "mc-percent-reversal",
+      "concepts": [
+        "percent-base",
+        "successive-changes"
+      ],
+      "requirements": [
+        {
+          "sourceId": "sat-percentages/02",
+          "fit": "情境中的连续涨跌幅"
+        },
+        {
+          "sourceId": "sat-percentages/03",
+          "fit": "将相对变化转化为乘法因子"
+        }
+      ],
+      "operation": "model-successive-changes",
+      "input": [
+        "words"
+      ],
+      "target": [
+        "symbolic",
+        "words"
+      ],
+      "conversion": "将两次价格变动转成作用于不同基数的因子",
+      "practice": [
+        "modeling",
+        "reasoning"
+      ],
+      "required": "每一步都说明百分数所指的基数。",
+      "alternative": "逐步算出增加额和折扣额，再与原价比较。",
+      "restrictions": "初值 200，两次百分比幅度均为 20%，先涨后跌。",
+      "solution": "第一步增 40 到 240，第二步减 48 到 192，净减少 8，即原价的 4%。",
+      "answer": {
+        "afterIncrease": 240,
+        "finalPrice": 192,
+        "netPercent": -4
+      },
+      "error": "两次均以 200 为基数。",
+      "diagnosticLimit": "正确计算单次百分数与选择第二次的基数可分别观察。"
+    },
+    {
+      "taskId": "linear-system-consistency-versus-rank",
+      "sourceKind": "existing-synthetic-project-case",
+      "scenarioId": "mc-linear-dependence",
+      "concepts": [
+        "systems-equations",
+        "linear-algebra-rank"
+      ],
+      "requirements": [
+        {
+          "sourceId": "sat-algebra-systems/04",
+          "fit": "涉及解的个数，SAT 条款没有要求矩阵秩"
+        }
+      ],
+      "operation": "classify-intersections",
+      "input": [
+        "symbolic"
+      ],
+      "target": [
+        "words",
+        "symbolic"
+      ],
+      "conversion": "用消元矛盾解释不存在公共解",
+      "practice": [
+        "justification"
+      ],
+      "required": "区分系数成比例和增广行成比例。",
+      "alternative": "两直线斜率相同且截距不同；秩是可选说明。",
+      "restrictions": "实数 x,y；无需用行列式或矩阵求解。",
+      "solution": "首式倍乘得到 2x+4y=6，与第二式右端 7 矛盾；系数秩 1，增广秩 2，解集为空。",
+      "answer": {
+        "realSolutions": [],
+        "coefficientRank": 1,
+        "augmentedRank": 2
+      },
+      "error": "从零行列式推出无穷多解。",
+      "diagnosticLimit": "错判相容性不能表明不会解任意线性方程组。"
+    },
+    {
+      "taskId": "line-from-value-table",
+      "sourceKind": "original-exam-style",
+      "scenarioId": null,
+      "concepts": [
+        "coordinate-geometry"
+      ],
+      "requirements": [
+        {
+          "sourceId": "cn-selective-analytic/1.4",
+          "fit": "两点确定方程"
+        },
+        {
+          "sourceId": "sat-algebra-two/05b",
+          "fit": "无情境表格→方程"
+        },
+        {
+          "sourceId": "sat-algebra-two/08",
+          "fit": "两点分支"
+        }
+      ],
+      "operation": "construct-line-equation",
+      "input": [
+        "table"
+      ],
+      "target": [
+        "symbolic"
+      ],
+      "conversion": "从表格配对坐标并构建一般式",
+      "practice": [
+        "representation",
+        "reasoning"
+      ],
+      "required": "两点横坐标不同，可用增量比；检验两行均满足所得式。",
+      "alternative": "设一般式并代入两点，求系数比例。",
+      "restrictions": "直线、实平面；接受所有等价的非零倍数。",
+      "solution": "两点差为 (3,−6)，方向斜率 −2。代入任一点得截距 2，即 2x+y−2=0。",
+      "answer": {
+        "generalForm": [
+          2,
+          1,
+          -2
+        ]
+      },
+      "error": "把两列各自看成一个点。",
+      "diagnosticLimit": "错误可能出在配对表格，单看方程不能区分读表失误和建式失误。",
+      "prompt": "表中是同一直线上的两点。写出直线方程并核查两行数据。\n\n| x | y |\n|---|---|\n| −1 | 4 |\n| 2 | −2 |"
+    },
+    {
+      "taskId": "line-from-coordinate-plot",
+      "sourceKind": "original-exam-style",
+      "scenarioId": null,
+      "concepts": [
+        "coordinate-geometry"
+      ],
+      "requirements": [
+        {
+          "sourceId": "cn-selective-analytic/1.1",
+          "fit": "从图上找直线的确定条件"
+        },
+        {
+          "sourceId": "cn-selective-analytic/1.4",
+          "fit": "用一般式处理竖直线"
+        },
+        {
+          "sourceId": "sat-algebra-two/08",
+          "fit": "仅比较两点建式，不据此推断试卷要求"
+        }
+      ],
+      "operation": "construct-line-equation",
+      "input": [
+        "coordinate-plot"
+      ],
+      "target": [
+        "symbolic"
+      ],
+      "conversion": "按单位格读出两个标点的共同横坐标",
+      "practice": [
+        "representation",
+        "justification"
+      ],
+      "required": "解释斜率无定义时两点仍确定唯一的直线。",
+      "alternative": "用一般式 Ax+By+C=0 代入两点，消去 B。",
+      "restrictions": "各轴每格 1；方程不要求写成 y=f(x)。",
+      "solution": "两标点为 (2,1) 与 (2,3)，纵向差非零而横向差为零。共同横坐标给出 x−2=0。",
+      "answer": {
+        "generalForm": [
+          1,
+          0,
+          -2
+        ]
+      },
+      "error": "除以零或坚持写成斜截式。",
+      "diagnosticLimit": "能对正确读出的坐标写方程，却抄错坐标，是可区分的表示失败。",
+      "prompt": "读单位坐标格中的两个实心点，写出经过它们的直线方程并说明理由。\n\n```\ny\n3 | ·  ·  ●  ·\n2 | ·  ·  ·  ·\n1 | ·  ·  ●  ·\n0 +------------ x\n    0  1  2  3\n```"
+    }
+  ],
+  "contrasts": [
+    {
+      "pattern": "same-concept-different-operation",
+      "tasks": [
+        "circle-line-tangency-constraint",
+        "line-from-value-table"
+      ],
+      "reason": "坐标几何同时支撑判定交点数与从数据构造直线方程。"
+    },
+    {
+      "pattern": "same-operation-different-representation",
+      "tasks": [
+        "line-from-value-table",
+        "line-from-coordinate-plot"
+      ],
+      "reason": "建式操作相同，表格给非竖直线，坐标图给竖直线；斜率法只在前者可用。"
+    },
+    {
+      "pattern": "missing-justification",
+      "tasks": [
+        "circle-line-tangency-constraint",
+        "inequality-conditions-and-counterexample"
+      ],
+      "reason": "只证经过一点或只证表达式有定义，均未建立结论所需前提；仅由省略的理由无法推断概念掌握程度。"
+    }
+  ]
+}

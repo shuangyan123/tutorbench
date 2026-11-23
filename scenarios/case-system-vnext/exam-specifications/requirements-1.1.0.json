@@ -1,0 +1,421 @@
+{
+  "version": "1.1.0",
+  "baseInventory": "1.0.0",
+  "manifestVersion": "6",
+  "sourceScope": "cn-logic",
+  "sourceEdition": "cn-moe-high-school-math@2020.1",
+  "sourceSha256": "cc4d3a20daa09f5185037e93fbacd58f7df1147392e3dae4bf261c3700ba4195",
+  "scopes": [
+    {
+      "id": "cn-selective-spatial",
+      "title": "1. 空间向量与立体几何",
+      "excludes": "本单元无标星内容；章首概述与案例不另计。",
+      "leaves": [
+        {
+          "anchor": "1.1",
+          "printedPage": 42,
+          "throughPrintedPage": 42,
+          "summary": "从平面坐标推广到空间直角坐标系，说明建系的需要并用坐标定位点。",
+          "concepts": [
+            "spatial-cartesian-frame"
+          ],
+          "operation": "点的位置→坐标三元组"
+        },
+        {
+          "anchor": "1.2",
+          "printedPage": 42,
+          "throughPrintedPage": 42,
+          "summary": "利用各棱分别平行于坐标轴的长方体顶点，推导空间两点的距离公式。",
+          "concepts": [
+            "spatial-cartesian-frame",
+            "spatial-distance"
+          ],
+          "operation": "长方体→坐标距离公式"
+        },
+        {
+          "anchor": "2.1",
+          "printedPage": 42,
+          "throughPrintedPage": 42,
+          "summary": "通过二维到三维的推广理解空间向量。",
+          "concepts": [
+            "vector-linear-operations"
+          ],
+          "operation": "从平面对象类推至空间"
+        },
+        {
+          "anchor": "2.2",
+          "printedPage": 42,
+          "throughPrintedPage": 42,
+          "summary": "把平面向量的运算与相应法则推广到三维。",
+          "concepts": [
+            "vector-linear-operations",
+            "dot-product"
+          ],
+          "operation": "比较两种维数下的运算"
+        },
+        {
+          "anchor": "3.1",
+          "printedPage": 42,
+          "throughPrintedPage": 42,
+          "summary": "解释空间向量基本定理的意义，作正交分解并给出坐标。",
+          "concepts": [
+            "spatial-vector-basis",
+            "spatial-cartesian-frame"
+          ],
+          "operation": "一般基的唯一分解；正交分解的坐标表示"
+        },
+        {
+          "anchor": "3.2",
+          "printedPage": 42,
+          "throughPrintedPage": 42,
+          "summary": "用空间向量和相应的坐标形式进行线性运算。",
+          "concepts": [
+            "vector-linear-operations"
+          ],
+          "operation": "向量运算↔分量运算"
+        },
+        {
+          "anchor": "3.3",
+          "printedPage": 42,
+          "throughPrintedPage": 42,
+          "summary": "用向量及其空间坐标计算数量积。",
+          "concepts": [
+            "dot-product"
+          ],
+          "operation": "向量与坐标→标量"
+        },
+        {
+          "anchor": "3.4",
+          "printedPage": 42,
+          "throughPrintedPage": 42,
+          "summary": "区分空间向量的投影概念与投影向量的含义。",
+          "concepts": [
+            "vector-projection"
+          ],
+          "operation": "沿给定方向解释投影"
+        },
+        {
+          "anchor": "4.1",
+          "printedPage": 42,
+          "throughPrintedPage": 43,
+          "summary": "用向量描述直线与平面，解释直线方向向量及平面法向量。",
+          "concepts": [
+            "spatial-planes",
+            "vector-linear-operations"
+          ],
+          "operation": "几何对象→向量语言"
+        },
+        {
+          "anchor": "4.2",
+          "printedPage": 43,
+          "throughPrintedPage": 43,
+          "summary": "用向量刻画线线、线面和面面的角度以及垂直、平行关系。",
+          "concepts": [
+            "spatial-incidence",
+            "dot-product"
+          ],
+          "operation": "从方向或法向量描述夹角与位置"
+        },
+        {
+          "anchor": "4.3",
+          "printedPage": 43,
+          "throughPrintedPage": 43,
+          "summary": "用向量证明必修课程中关于空间直线、平面位置的判定定理。",
+          "concepts": [
+            "spatial-incidence"
+          ],
+          "operation": "以向量方法给出判定的证明"
+        },
+        {
+          "anchor": "4.4",
+          "printedPage": 43,
+          "throughPrintedPage": 43,
+          "summary": "用向量求点线、点面、平行线间和平行面间距离及简单夹角，并解释求解步骤。",
+          "concepts": [
+            "spatial-distance",
+            "dot-product"
+          ],
+          "operation": "以向量运算组织并陈述方法"
+        }
+      ]
+    },
+    {
+      "id": "cn-selective-analytic",
+      "title": "2. 平面解析几何",
+      "excludes": "§2(4) *平面解析几何的形成与发展，印刷 44 / PDF 52；不计其历史小论文。",
+      "leaves": [
+        {
+          "anchor": "1.1",
+          "printedPage": 43,
+          "throughPrintedPage": 43,
+          "summary": "在平面直角坐标图形中探究哪些几何数据能确定一条直线。",
+          "concepts": [
+            "coordinate-geometry"
+          ],
+          "operation": "图形→确定条件"
+        },
+        {
+          "anchor": "1.2",
+          "printedPage": 43,
+          "throughPrintedPage": 43,
+          "summary": "理解倾斜角和斜率，代数刻画斜率并由两点计算。",
+          "concepts": [
+            "coordinate-geometry"
+          ],
+          "operation": "几何倾斜→坐标增量比"
+        },
+        {
+          "anchor": "1.3",
+          "printedPage": 43,
+          "throughPrintedPage": 43,
+          "summary": "依据直线斜率判别平行或垂直。",
+          "concepts": [
+            "coordinate-geometry"
+          ],
+          "operation": "斜率关系→几何判断"
+        },
+        {
+          "anchor": "1.4",
+          "printedPage": 43,
+          "throughPrintedPage": 43,
+          "summary": "由直线的确定条件推导并运用点斜式、两点式与一般式。",
+          "concepts": [
+            "coordinate-geometry"
+          ],
+          "operation": "几何数据→直线方程"
+        },
+        {
+          "anchor": "1.5",
+          "printedPage": 43,
+          "throughPrintedPage": 43,
+          "summary": "联立两条直线的方程求其交点坐标。",
+          "concepts": [
+            "coordinate-geometry",
+            "systems-equations"
+          ],
+          "operation": "方程组的解→公共点"
+        },
+        {
+          "anchor": "1.6",
+          "printedPage": 43,
+          "throughPrintedPage": 44,
+          "summary": "推导并掌握平面两点距离与点线距离公式，用于求平行直线的间距。",
+          "concepts": [
+            "coordinate-geometry"
+          ],
+          "operation": "坐标条件→度量"
+        },
+        {
+          "anchor": "2.1",
+          "printedPage": 44,
+          "throughPrintedPage": 44,
+          "summary": "从确定圆的几何条件建立圆的标准式和一般式。",
+          "concepts": [
+            "coordinate-geometry"
+          ],
+          "operation": "圆心和半径等条件→方程"
+        },
+        {
+          "anchor": "2.2",
+          "printedPage": 44,
+          "throughPrintedPage": 44,
+          "summary": "从给出的方程判断直线与圆或两圆的相对位置。",
+          "concepts": [
+            "coordinate-geometry"
+          ],
+          "operation": "代数解或距离关系→位置判断"
+        },
+        {
+          "anchor": "2.3",
+          "printedPage": 44,
+          "throughPrintedPage": 44,
+          "summary": "以直线和圆的方程解决简单的数学问题和实际问题。",
+          "concepts": [
+            "coordinate-geometry"
+          ],
+          "operation": "提出坐标约束并解释结果"
+        },
+        {
+          "anchor": "3.1",
+          "printedPage": 44,
+          "throughPrintedPage": 44,
+          "summary": "联系实际背景辨识圆锥曲线的描述与应用价值。",
+          "concepts": [],
+          "operation": "情境解释，未指定某一曲线或求解操作"
+        },
+        {
+          "anchor": "3.2",
+          "printedPage": 44,
+          "throughPrintedPage": 44,
+          "summary": "从实例抽象椭圆，掌握其定义、标准式和简单几何性质。",
+          "concepts": [
+            "ellipse-locus"
+          ],
+          "operation": "实际对象→轨迹与方程"
+        },
+        {
+          "anchor": "3.3",
+          "printedPage": 44,
+          "throughPrintedPage": 44,
+          "summary": "了解抛物线、双曲线的定义、图形、标准式与简单性质。",
+          "concepts": [
+            "parabola-locus",
+            "hyperbola-locus"
+          ],
+          "operation": "两类轨迹分别联系图形与方程"
+        },
+        {
+          "anchor": "3.4",
+          "printedPage": 44,
+          "throughPrintedPage": 44,
+          "summary": "在曲线与方程的研究中联系数量关系和几何图形。",
+          "concepts": [],
+          "operation": "跨表示的思想要求，没有指定某一变形算法"
+        },
+        {
+          "anchor": "3.5",
+          "printedPage": 44,
+          "throughPrintedPage": 44,
+          "summary": "认识椭圆与抛物线的简单应用。",
+          "concepts": [
+            "ellipse-locus",
+            "parabola-locus"
+          ],
+          "operation": "解释两类曲线的应用场景"
+        }
+      ]
+    }
+  ],
+  "graphDelta": {
+    "baseGraph": "1.0.0",
+    "version": "1.1.0",
+    "addedNodes": [
+      {
+        "id": "spatial-cartesian-frame",
+        "label": "Three-dimensional Cartesian coordinates of points",
+        "domainId": "geometry",
+        "stage": "upper-secondary",
+        "prerequisiteIds": [
+          "coordinate-geometry"
+        ],
+        "commonMisconception": "Treating a spatial point as a pair of coordinates"
+      },
+      {
+        "id": "spatial-vector-basis",
+        "label": "Bases and unique decomposition of spatial vectors",
+        "domainId": "geometry",
+        "stage": "upper-secondary",
+        "prerequisiteIds": [
+          "vector-linear-operations"
+        ],
+        "commonMisconception": "Assuming any three nonzero vectors form a spatial basis"
+      },
+      {
+        "id": "ellipse-locus",
+        "label": "Ellipse as a locus and its standard equations",
+        "domainId": "geometry",
+        "stage": "upper-secondary",
+        "prerequisiteIds": [
+          "coordinate-geometry"
+        ],
+        "commonMisconception": "Using a constant difference of focal distances for an ellipse"
+      },
+      {
+        "id": "parabola-locus",
+        "label": "Focus-directrix parabola and its standard equations",
+        "domainId": "geometry",
+        "stage": "upper-secondary",
+        "prerequisiteIds": [
+          "coordinate-geometry"
+        ],
+        "commonMisconception": "Treating every parabola as a graph of y against x"
+      },
+      {
+        "id": "hyperbola-locus",
+        "label": "Hyperbola as a locus and its standard equations",
+        "domainId": "geometry",
+        "stage": "upper-secondary",
+        "prerequisiteIds": [
+          "coordinate-geometry"
+        ],
+        "commonMisconception": "Confusing the fixed absolute difference of distances with their sum"
+      }
+    ],
+    "aliases": {
+      "spatial-cartesian-frame": "空间直角坐标系与点的坐标",
+      "spatial-vector-basis": "空间向量基本定理与基底分解",
+      "ellipse-locus": "椭圆的轨迹与标准方程",
+      "parabola-locus": "抛物线的轨迹与标准方程",
+      "hyperbola-locus": "双曲线的轨迹与标准方程"
+    },
+    "knowledgeRelations": [
+      {
+        "fromNodeId": "coordinate-geometry",
+        "toNodeId": "spatial-cartesian-frame",
+        "relationType": "helpful",
+        "evidenceStatus": "author-hypothesis",
+        "sourceRefs": [
+          "cn-selective-spatial/1.1"
+        ]
+      },
+      {
+        "fromNodeId": "vector-linear-operations",
+        "toNodeId": "spatial-vector-basis",
+        "relationType": "helpful",
+        "evidenceStatus": "author-hypothesis",
+        "sourceRefs": [
+          "cn-selective-spatial/3.1"
+        ]
+      },
+      {
+        "fromNodeId": "coordinate-geometry",
+        "toNodeId": "ellipse-locus",
+        "relationType": "helpful",
+        "evidenceStatus": "author-hypothesis",
+        "sourceRefs": [
+          "cn-selective-analytic/3.2"
+        ]
+      },
+      {
+        "fromNodeId": "coordinate-geometry",
+        "toNodeId": "parabola-locus",
+        "relationType": "helpful",
+        "evidenceStatus": "author-hypothesis",
+        "sourceRefs": [
+          "cn-selective-analytic/3.3"
+        ]
+      },
+      {
+        "fromNodeId": "coordinate-geometry",
+        "toNodeId": "hyperbola-locus",
+        "relationType": "helpful",
+        "evidenceStatus": "author-hypothesis",
+        "sourceRefs": [
+          "cn-selective-analytic/3.3"
+        ]
+      }
+    ]
+  },
+  "gapReview": [
+    {
+      "sourceId": "sat-algebra-two/08",
+      "concept": "coordinate-geometry",
+      "reason": "由点、斜率、平行或垂直条件写直线方程可定位到坐标几何。两道试点题只落实其中的两点条件。"
+    },
+    {
+      "sourceId": "sat-algebra-two/05b",
+      "concept": null,
+      "reason": "从表格转成方程或图形有独立的转换动作，试点只演示其中一个方向。"
+    },
+    {
+      "sourceId": "sat-nonlinear-equations/02",
+      "concept": null,
+      "reason": "项目案例落实有理方程的定义域核查，同一 SAT 条款还含绝对值与根式方程。"
+    },
+    {
+      "sourceId": "sat-lines-angles/02",
+      "concept": null,
+      "reason": "辨识充分的证明前提是论证要求；圆的相切案例只提供相邻的推理示例。"
+    }
+  ]
+}
