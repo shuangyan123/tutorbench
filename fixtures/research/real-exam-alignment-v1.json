@@ -1,0 +1,1014 @@
+{
+  "version": "1.0.0",
+  "inventoryVersion": "1.1.0",
+  "status": "author-proposed",
+  "independentReviews": 0,
+  "learnerOutcomes": null,
+  "bankRelease": "local-exam-bank-release-v2",
+  "verifierVersion": "private-exam-correctness/1.0.0",
+  "planSha256": "eadeab0ae2e58b899f5f2b5c2c36fcbc46d60a606dcafef28fd9ab4900d28db6",
+  "referenceBindingsSha256": "02b5aa27193f0b2a0e74fe0249849b17b21ad4784e8a059d3f8893647b36696d",
+  "items": [
+    {
+      "questionId": "gaokao-2026-national-1/q04",
+      "family": "导数与最值",
+      "selection": "用局部变化率确定一条直线。",
+      "structure": "正半轴上的对数与一次项之和；在指定曲线上点求切线。",
+      "representation": "解析式、点 → 切线方程",
+      "operation": "求导、在切点代值、点斜式建线。",
+      "strategy": "导数给斜率，过点条件再定截距；可用局部差商。",
+      "observable": "检验候选直线既过指定点又具有导数斜率。",
+      "cannotInfer": "只选某条过点直线，无法知道是否求过导数。",
+      "requirements": [
+        {
+          "id": "cn-selective-derivatives/1.3",
+          "role": "primary",
+          "rationale": "切点导数给出局部斜率"
+        },
+        {
+          "id": "cn-selective-analytic/1.4",
+          "role": "supporting",
+          "rationale": "已有一点及方向才可建线"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "derivatives-rate",
+          "rationale": "切线斜率"
+        },
+        {
+          "id": "coordinate-geometry",
+          "rationale": "过点构造直线"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "source-evidence",
+          "reason": "截图经人工辨读，题库结构化转写仍待复核。"
+        }
+      ],
+      "source": {
+        "questionSha256": "1e0cf3892a2981728c1411208d8ce5f9976e46b8fb1ce93aefe1f409f30ced91",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "pages": [
+          1
+        ],
+        "regions": [
+          {
+            "page": 1,
+            "bboxPt": [
+              0,
+              541.81,
+              595.3,
+              608.81
+            ],
+            "sha256": "98f1eba59cbe966e616f087e06cc14d21b90e2f0493a8ee704983a038b5e3b7a",
+            "path": "assets/98db6dfd6df9cd416b5177e7959dd8c65eaa1b3c53c929b397b3af541edc132e.png"
+          }
+        ],
+        "transcription": "needs_manual_transcription"
+      },
+      "answer": {
+        "recordSha256": "27ea6cefeb6a2f7df3590ece2c8fd1e0dcfb41a3cc316520431cc7b7df9ec2a3",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "locator": "5:475.9",
+        "regions": [
+          {
+            "page": 5,
+            "bboxPt": [
+              0,
+              468.86,
+              595.3,
+              520.66
+            ],
+            "sha256": "095d3188278972f42da6a6c480ac2e4894454affa48b80320dbacccc1721b221",
+            "path": "assets/840ba1f8b48c7de06c0bbd110fc446d2a0c770b94bc1f5f92a75ac5735dc73b7.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "54bdbdd1ea0b49c005a40fddf35bc18cdab28f5381ac93a1315d3ece55f2009d",
+      "verifier": {
+        "method": null,
+        "whole": "abstained",
+        "scope": null,
+        "claims": 0,
+        "reason": "question_requires_unmodelled_reasoning"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2026,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2026-national-1",
+        "printedNumber": 4
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    },
+    {
+      "questionId": "gaokao-2026-national-1/q05",
+      "family": "解析几何",
+      "selection": "比较两种轴向的抛物线焦点。",
+      "structure": "两条开口轴相异的标准抛物线共过给定点，参数为正；求焦点间距离。",
+      "representation": "标准方程 → 焦点坐标 → 长度",
+      "operation": "代点求参，辨轴向，作坐标差。",
+      "strategy": "先确定焦距参数与焦点坐标的比例，再取欧氏距离。",
+      "observable": "可核查是否把两焦点都放在同一轴上，或将参数直接当作焦距。",
+      "cannotInfer": "错误距离无法区分读轴错误与开方失误。",
+      "requirements": [
+        {
+          "id": "cn-selective-analytic/3.3",
+          "role": "primary",
+          "rationale": "由抛物线标准式读取简单几何性质"
+        },
+        {
+          "id": "cn-selective-analytic/1.6",
+          "role": "supporting",
+          "rationale": "最后计算平面两点距离"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "parabola-locus",
+          "rationale": "标准式和焦点"
+        },
+        {
+          "id": "coordinate-geometry",
+          "rationale": "比较两轴上的点"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "source-evidence",
+          "reason": "截图经人工辨读，题库结构化转写仍待复核。"
+        }
+      ],
+      "source": {
+        "questionSha256": "2f0b3e8fafbad4b90bad1f253afd365db1232ae342ba938ccb59d36a99b4da11",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "pages": [
+          1
+        ],
+        "regions": [
+          {
+            "page": 1,
+            "bboxPt": [
+              0,
+              603.81,
+              595.3,
+              718.0
+            ],
+            "sha256": "9a6fd482ba588654a6be9ddbc86870a894493a929e5a378d337e8aa928c8acae",
+            "path": "assets/f49644b561ddcd1a384aa059315cc7da79b5d5894cfd20e4d055d63f983ece81.png"
+          }
+        ],
+        "transcription": "needs_manual_transcription"
+      },
+      "answer": {
+        "recordSha256": "863c9d9c9843f2a591d32cf901a82091971e17f395e378ba321bd1f578987b1f",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "locator": "5:522.7",
+        "regions": [
+          {
+            "page": 5,
+            "bboxPt": [
+              0,
+              515.66,
+              595.3,
+              567.46
+            ],
+            "sha256": "4001daece322d03621a8e22e60aff4f3caf6b4c1b697b1fab2866711404b73b5",
+            "path": "assets/e302294f379a85bd880a53c0fe413f60222ede232355f1b1953c2b3c440b29d3.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "d91b4680663d7653e177511857264b922e86c8b7140ee17d30a4e96c1a082672",
+      "verifier": {
+        "method": null,
+        "whole": "abstained",
+        "scope": null,
+        "claims": 0,
+        "reason": "question_requires_unmodelled_reasoning"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2026,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2026-national-1",
+        "printedNumber": 5
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    },
+    {
+      "questionId": "gaokao-2026-national-1/q06",
+      "family": "导数与最值",
+      "selection": "由已取到的最值反求参数，并反向验证。",
+      "structure": "仿射分子与含参数指数分母；最大值须在定义域内取到。",
+      "representation": "带参商式 → 驻点条件与全域不等式",
+      "operation": "联立等值及驻点条件，检查分母与等号。",
+      "strategy": "在取等点利用分子等于分母消元，再用指数函数的切线界证明充分性。",
+      "observable": "可检查是否只写驻点方程，遗漏候选参数的全局核验。",
+      "cannotInfer": "只报参数无法识别使用了求导还是不等式。",
+      "requirements": [
+        {
+          "id": "cn-selective-derivatives/3.2",
+          "role": "primary",
+          "rationale": "只覆盖内点必要条件，整题还要证明全域最大"
+        },
+        {
+          "id": "cn-selective-derivatives/2.2",
+          "role": "supporting",
+          "rationale": "对限定分母的商求导"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "optimization-boundary",
+          "rationale": "区分局部候选和全局可达"
+        },
+        {
+          "id": "differentiation-rules",
+          "rationale": "商的驻点条件"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "requirement-fit",
+          "reason": "全域指数商的最值超出清单中闭区间多项式限定。"
+        },
+        {
+          "kind": "source-evidence",
+          "reason": "截图经人工辨读，题库结构化转写仍待复核。"
+        }
+      ],
+      "source": {
+        "questionSha256": "90f5ed1ea40292fc6a58113b2fd37ec554bcea34626db63a34005d6d2ba45d82",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "pages": [
+          1,
+          2
+        ],
+        "regions": [
+          {
+            "page": 1,
+            "bboxPt": [
+              0,
+              713.0,
+              595.3,
+              841.9
+            ],
+            "sha256": "d445551f6f744cee81d7b862f5dff9be0adef5dbb40216da3defa563411597f8",
+            "path": "assets/5bcdccae53fccd215e4146f03f370425a832014d3bbd4767aa9c20ee776f72f7.png"
+          },
+          {
+            "page": 2,
+            "bboxPt": [
+              0,
+              0,
+              595.3,
+              91.66
+            ],
+            "sha256": "92edf0716fcb2ce51cc0acb59ea43754c83e4076d6c4c2b0a3800c46486703fe",
+            "path": "assets/ff1a4a31a60c82072e83d1e41ec7e84bd13a4da903639d9d75e20ffff003bf63.png"
+          }
+        ],
+        "transcription": "needs_manual_transcription"
+      },
+      "answer": {
+        "recordSha256": "750d10db3644cfdeb7b3238e4d75811f03adf73343723b27ed59dd8163c45593",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "locator": "5:569.5",
+        "regions": [
+          {
+            "page": 5,
+            "bboxPt": [
+              0,
+              562.46,
+              595.3,
+              614.26
+            ],
+            "sha256": "7f96a80d03b299a4900e76d8bfb07d2409b729a421da01add405d867515c3421",
+            "path": "assets/99708f8648c0a13c938670aeaa6e0f0b02395dcf96b5d06b10546be0b9fd3522.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "9e48295b6ce9c15c188fc6849e8bd481b7adb9ae03ac9457790761ea7086fc25",
+      "verifier": {
+        "method": null,
+        "whole": "abstained",
+        "scope": null,
+        "claims": 0,
+        "reason": "question_requires_unmodelled_reasoning"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2026,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2026-national-1",
+        "printedNumber": 6
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    },
+    {
+      "questionId": "gaokao-2026-national-1/q07",
+      "family": "数列与组合",
+      "selection": "将真实排列的重复数值配成指定等差结构。",
+      "structure": "给出分行计数，总量固定；每个出现次数必须恰用一次，组和异且等差递增。",
+      "representation": "实际行列 → 多重集 → 和数列",
+      "operation": "确定均值和首项，排除奇偶或不可达项，构造一组分配。",
+      "strategy": "总和固定只给必要条件；须用实际多重集构造可行配对。",
+      "observable": "可逐项复查配对是否重复使用或遗漏同值的一个出现。",
+      "cannotInfer": "猜中公差不能证明能构造分组或理解计数。",
+      "requirements": [
+        {
+          "id": "cn-selective-sequences/2.3",
+          "role": "primary",
+          "rationale": "从排布抽象并求解等差结构"
+        },
+        {
+          "id": "cn-selective-sequences/2.2",
+          "role": "supporting",
+          "rationale": "用有限和约束首末项"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "arithmetic-sequences",
+          "rationale": "等差通项与组和约束"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "operation-representation",
+          "reason": "等差节点未表达多重集配对证书，应记录为策略。"
+        }
+      ],
+      "source": {
+        "questionSha256": "a38c2a746cd0f3d22bfea4c2fc221da93387c6dd9cc40bd017aaf61c22b71f26",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "pages": [
+          2
+        ],
+        "regions": [
+          {
+            "page": 2,
+            "bboxPt": [
+              0,
+              86.66,
+              595.3,
+              254.87
+            ],
+            "sha256": "67f776ee35e5385f444d5a91ded302a7257b0aa36d6543fd3cdee5a8b46d1c41",
+            "path": "assets/2b1689d0b4bd975f14c702318963fc5a0b509561c07358a94891666206e76173.png"
+          }
+        ],
+        "transcription": "pilot_visual_transcription"
+      },
+      "answer": {
+        "recordSha256": "03997871e9c6aa15183671a01e80acdffbd0be5b853388eec9bc2449f9d529de",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "locator": "5:616.3",
+        "regions": [
+          {
+            "page": 5,
+            "bboxPt": [
+              0,
+              609.26,
+              595.3,
+              661.06
+            ],
+            "sha256": "7093a1ec39a3312fb66d7575795416fe8ac204b8c8c5d5c62bbf8043f8470fcf",
+            "path": "assets/8a02110c3e35f2beee16a0e808b536bff066553263df240291ea8a16da070754.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "e1b1406d3f46d7de2a9903ce6f2bc1eb57d0deaa0868501fdb3de62f13a838b3",
+      "verifier": {
+        "method": "pair_sum_progression",
+        "whole": "verified",
+        "scope": "whole-answer",
+        "claims": 1,
+        "reason": "exact_paths_agree"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2026,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2026-national-1",
+        "printedNumber": 7
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    },
+    {
+      "questionId": "gaokao-2026-national-1/q15",
+      "family": "空间几何",
+      "selection": "从含虚线的棱柱图证明位置关系，再由角反求距离。",
+      "structure": "直棱柱、等腰直角底面及两中点。先证线面平行；再给棱高、另一线面角求平行距离。",
+      "representation": "立体示意图 → 中点、方向及法向分量",
+      "operation": "辨认跨面的中点，排除直线含于面，用角确定尺度。",
+      "strategy": "中位线或方向向量均可证明平行；平行后取线上任一点量垂距。",
+      "observable": "可查是否混用两平面，是否把空间斜长当法向距离。",
+      "cannotInfer": "不能由是否画辅助线判定空间想象能力。",
+      "requirements": [
+        {
+          "id": "cn-selective-spatial/4.2",
+          "role": "primary",
+          "rationale": "刻画线面平行与夹角"
+        },
+        {
+          "id": "cn-selective-spatial/4.4",
+          "role": "supporting",
+          "rationale": "平行后归约到点面距离"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "spatial-incidence",
+          "rationale": "证明平行且不含于面"
+        },
+        {
+          "id": "spatial-distance",
+          "rationale": "法向距离"
+        },
+        {
+          "id": "vector-projection",
+          "rationale": "坐标解用切向与法向分量"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "operation-representation",
+          "reason": "图中中点、隐线到坐标的转换是解法操作。"
+        },
+        {
+          "kind": "source-evidence",
+          "reason": "截图经人工辨读，题库结构化转写仍待复核。"
+        }
+      ],
+      "source": {
+        "questionSha256": "c6123c300582dd471cf3e20a1a73df081875d05adef2bc732f94c0c0c43f6c95",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "pages": [
+          3
+        ],
+        "regions": [
+          {
+            "page": 3,
+            "bboxPt": [
+              0,
+              268.7,
+              595.3,
+              500.25
+            ],
+            "sha256": "a2f1cc08a17dc96ba52e56dac823a8fb059d85f4885cf6fe69d559a6dec409d7",
+            "path": "assets/f2e7d2ca3388beedbe1e1df4c2b55fc6096b2cf25f9cf4fc9d03347edd966e06.png"
+          }
+        ],
+        "transcription": "needs_manual_transcription"
+      },
+      "answer": {
+        "recordSha256": "9cd54b61cd415967c52eae1d9a4b69cb50770c9288c04a3bb0cb27e324648f9e",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "locator": "6:444.7",
+        "regions": [
+          {
+            "page": 6,
+            "bboxPt": [
+              0,
+              437.66,
+              595.3,
+              841.9
+            ],
+            "sha256": "d66a68a7741eb0211830a0bf80e80c11df38d8da9dba943de90f3ab70bf2467e",
+            "path": "assets/3c8f824433589c0f30189159a77bc99dac4104f4640956d0b83347b62a7b8ef2.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "c2aea624b7b3a6a526443c55405c6704024e556e5b02da5d334b776f92c03293",
+      "verifier": {
+        "method": null,
+        "whole": "abstained",
+        "scope": null,
+        "claims": 0,
+        "reason": "question_requires_unmodelled_reasoning"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2026,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2026-national-1",
+        "printedNumber": 15
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    },
+    {
+      "questionId": "gaokao-2026-national-1/q17",
+      "family": "概率建模",
+      "selection": "有限次停止试验，末次质量与内点不同。",
+      "structure": "独立同分布的命中试验，有次数上限。先作指定参数的分布列；再求截断前的尾概率，最后证明限定范围内的条件等式。",
+      "representation": "停止规则 → 事件序列 → 分布表、条件概率",
+      "operation": "将尚未停止写成连续未命中，在末次汇总两种终止方式。",
+      "strategy": "先辨别最大次数处的概率质量，再利用尾事件嵌套和独立性取比。",
+      "observable": "可检查是否在末项多乘一次命中率，或跨过截断点外推等式。",
+      "cannotInfer": "仅看分布表缺项不能归因为不懂独立性。",
+      "requirements": [
+        {
+          "id": "cn-probability-2020/1.3",
+          "role": "supporting",
+          "rationale": "使用概率运算；该条不覆盖截断分布和条件尾概率"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "independence",
+          "rationale": "重复试验相乘"
+        },
+        {
+          "id": "conditional-events",
+          "rationale": "嵌套事件取比"
+        },
+        {
+          "id": "discrete-distribution",
+          "rationale": "截断分布有末端质量"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "requirement-fit",
+          "reason": "尚无本版中国选择性必修条款完整描述截断试验及其条件分布。"
+        },
+        {
+          "kind": "source-evidence",
+          "reason": "截图经人工辨读，题库结构化转写仍待复核。"
+        }
+      ],
+      "source": {
+        "questionSha256": "9f377c63364255d7ce4f02c4cf66b584027d1f31ba58423b9ac043543e201941",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "pages": [
+          3,
+          4
+        ],
+        "regions": [
+          {
+            "page": 3,
+            "bboxPt": [
+              0,
+              585.67,
+              595.3,
+              841.9
+            ],
+            "sha256": "01e02bb7fea00905271f9600b58472fe2783c6bbb55ee0694e1c0dd7131c0b5d",
+            "path": "assets/3f3b38f696c7574c67ddf7a47146f0f3afaa6c0d638fb5033a9a8276c7b8f388.png"
+          },
+          {
+            "page": 4,
+            "bboxPt": [
+              0,
+              0,
+              595.3,
+              100.37
+            ],
+            "sha256": "f8b5f081fec958dc63059e0db0b197226db4dfb3987a654f0c798a1d1b5842be",
+            "path": "assets/f9b8ad030cb77c4cefa0b2fab6ba1760659dcc1077952aff4ec9c24959b57a1c.png"
+          }
+        ],
+        "transcription": "needs_manual_transcription"
+      },
+      "answer": {
+        "recordSha256": "5e32ccb8e21f7b07dc34901f9c356da662f8d831dff598717ca3abb37f9d8d86",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "locator": "7:148.3",
+        "regions": [
+          {
+            "page": 7,
+            "bboxPt": [
+              0,
+              141.26,
+              595.3,
+              428.74
+            ],
+            "sha256": "3804464724b2dfe155bc9bb97f7dac84b8ca0b43363ab28c23a3d3b079b947f3",
+            "path": "assets/4ac3da4cc3a5ff0d73abf239e7c332750f9ec656338749cd5095dd9e4738eadc.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "c566aef59f5b5eeaccaa4796076e492b180da67da9d6d09e36db75b372bc34b2",
+      "verifier": {
+        "method": null,
+        "whole": "abstained",
+        "scope": null,
+        "claims": 0,
+        "reason": "question_requires_unmodelled_reasoning"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2026,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2026-national-1",
+        "printedNumber": 17
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    },
+    {
+      "questionId": "gaokao-2026-national-1/q18",
+      "family": "解析几何",
+      "selection": "同一动弦分别导出面积约束和角度最值。",
+      "structure": "焦点与离心率定椭圆；正斜率过焦点，端点有象限限制，通过中心得对径点。先建曲线，再分两问求特殊弦与动角最值。",
+      "representation": "椭圆及点线关系 → 焦半径、面积比、角正切",
+      "operation": "恢复半轴，按方向分解两半弦；利用中心对称求高比，另对正斜率优化。",
+      "strategy": "两小问共用动弦但约束不同；用方向余弦或联立二次式，须证明最值可达。",
+      "observable": "可检查第二小问是否沿用了第一小问的特定斜率。",
+      "cannotInfer": "只写最终最值无法据此判断是否理解焦点性质。",
+      "requirements": [
+        {
+          "id": "cn-selective-analytic/3.2",
+          "role": "primary",
+          "rationale": "焦点、离心率、标准式及中心对称"
+        },
+        {
+          "id": "cn-selective-analytic/3.4",
+          "role": "supporting",
+          "rationale": "在弦的几何关系和代数约束间转换"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "ellipse-locus",
+          "rationale": "恢复椭圆并求焦弦"
+        },
+        {
+          "id": "optimization-boundary",
+          "rationale": "正斜率的可达下界"
+        },
+        {
+          "id": "inequality-proofs",
+          "rationale": "正变量不等式的等号"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "operation-representation",
+          "reason": "两小问重用图形但释放上一问约束，不宜编码为知识节点。"
+        },
+        {
+          "kind": "source-evidence",
+          "reason": "截图经人工辨读，题库结构化转写仍待复核。"
+        }
+      ],
+      "source": {
+        "questionSha256": "8d378ab53f49a1a627cf5c94d5be8544daf29b6a44678435a05aa79861d3e689",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "pages": [
+          4
+        ],
+        "regions": [
+          {
+            "page": 4,
+            "bboxPt": [
+              0,
+              95.37,
+              595.3,
+              271.93
+            ],
+            "sha256": "4985bbd84670e65cbb17902233ecae328fbe9115da548058947d67c27f5d5628",
+            "path": "assets/f3db04792aa2668f415bcc0671ebcf1ce417b208261da93368479d1c1a230fba.png"
+          }
+        ],
+        "transcription": "needs_manual_transcription"
+      },
+      "answer": {
+        "recordSha256": "473bbffd1d65a5dac744805fe4ba45cf525e812d1c8de5d0fb79eb9902e13c56",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "locator": "7:430.7",
+        "regions": [
+          {
+            "page": 7,
+            "bboxPt": [
+              0,
+              423.74,
+              595.3,
+              545.74
+            ],
+            "sha256": "804f0a4dc5e38f69874420057acc42b5fc362b6b2fe4c42068078a81513ffc68",
+            "path": "assets/5bdac4e72389edefc88e7d68a7260dfa2bc68a59748313ad197d1764de808bd9.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "d42265de302ff004ed1846c9c09c9041b5095ba12ab0cd4b88e4f568bcfb9232",
+      "verifier": {
+        "method": null,
+        "whole": "abstained",
+        "scope": null,
+        "claims": 0,
+        "reason": "question_requires_unmodelled_reasoning"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2026,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2026-national-1",
+        "printedNumber": 18
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    },
+    {
+      "questionId": "gaokao-2026-national-1/q19",
+      "family": "函数与集合",
+      "selection": "从平移增量集的包含关系证明函数性质。",
+      "structure": "共有负半轴指数支。第一问指定正支求开区间；第二问独立增加奇性证明包含；第三问改给包含公理与近零不等式，先证零点下界再证正轴严格递增。",
+      "representation": "分段函数 → 严格上升平移量集合 → 集合包含",
+      "operation": "分域合并端点，区分基点符号，把包含的逆否命题用于移动基点。",
+      "strategy": "第二问奇性不能带入第三问；从短区间推出全正轴上界，再借负支上升转移任意正增量。",
+      "observable": "可定位交界点取舍、包含方向倒置或跨问误用假设。",
+      "cannotInfer": "漏一个端点不能据以诊断不会分类讨论或证明。",
+      "requirements": [
+        {
+          "id": "cn-sets-2020/2",
+          "role": "primary",
+          "rationale": "识别和证明增量集合的包含方向"
+        },
+        {
+          "id": "cn-function-properties/2.2",
+          "role": "primary",
+          "rationale": "仅第二问使用奇性确定另一支"
+        },
+        {
+          "id": "cn-function-properties/1.3",
+          "role": "supporting",
+          "rationale": "第一问按分段定义取原像"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "piecewise-functions",
+          "rationale": "分域判别严格不等式"
+        },
+        {
+          "id": "function-parity",
+          "rationale": "奇性只约束第二问"
+        },
+        {
+          "id": "function-monotonicity",
+          "rationale": "第三问结论是全正轴严格递增"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "concept",
+          "reason": "98 节点中缺集合包含本身；奇偶性、单调性均不能代替有方向的子集关系。",
+          "disposition": "unmapped"
+        }
+      ],
+      "source": {
+        "questionSha256": "01dafb662c4f71ca2c871f910be373b07c1ba41b96e6878ee7edd3c03ff24940",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "pages": [
+          4
+        ],
+        "regions": [
+          {
+            "page": 4,
+            "bboxPt": [
+              0,
+              266.93,
+              595.3,
+              841.9
+            ],
+            "sha256": "fe6f87155f1ad255cf7adfcbdf3b48b6c575a75cb8e089c2d73ad8b447511319",
+            "path": "assets/636886502bd02be8b17c94fee4f4e71b0f8db30c3bbafd52cb94bb5e9a4bcc97.png"
+          }
+        ],
+        "transcription": "pilot_visual_transcription"
+      },
+      "answer": {
+        "recordSha256": "8ad6e85ff097002834123a0cc8599f892be0a84006906275383fd6d2bd89336b",
+        "pdfSha256": "fe7e5d0b4031d50c85a34d98a6ddecbc7bb4b955a0f3a6afc37e10e7576e6cbd",
+        "locator": "7:547.7",
+        "regions": [
+          {
+            "page": 7,
+            "bboxPt": [
+              0,
+              540.74,
+              595.3,
+              841.9
+            ],
+            "sha256": "9dc6d8b569a71936442526b0d5fe40bb18f5ce29891ee6151c95cd21aeeaa660",
+            "path": "assets/26191b918abeaea69961dfb62cf8ec0d34bc2c11e37827758701d33cd002f445.png"
+          },
+          {
+            "page": 8,
+            "bboxPt": [
+              0,
+              0,
+              595.3,
+              841.9
+            ],
+            "sha256": "c3c4c8871514ce0a0e48adc1be99fca8d0dfa483a738e27cc39f1350a86ef154",
+            "path": "assets/c46876fd1ff98b478e602cf0653a8609095e79e66aa074b8713b7e8b42db54c3.png"
+          },
+          {
+            "page": 9,
+            "bboxPt": [
+              0,
+              0,
+              595.3,
+              841.9
+            ],
+            "sha256": "9ccde9c859f590b5d8f495ffc1a21589912c4a37975e305dccf38b57f908e2ef",
+            "path": "assets/37b1ae8e277a9b073fbeabde850ee8b56926c9df9e7569bf4a42c411bec64058.png"
+          },
+          {
+            "page": 10,
+            "bboxPt": [
+              0,
+              0,
+              595.3,
+              841.9
+            ],
+            "sha256": "3ce3f9129e4093ec431ac8211616346b88446cdcaf7160430bd879d4722ec5d9",
+            "path": "assets/8227be2e83895b4dc98d8f1fa5e828cf8b95c0a66479d430b4bbe42a15a24ed7.png"
+          },
+          {
+            "page": 11,
+            "bboxPt": [
+              0,
+              0,
+              595.3,
+              841.9
+            ],
+            "sha256": "1e30bec886c84ee4f14f4dd58059b95a73d1c11432083304b15023ef702e2943",
+            "path": "assets/f8e111da11b54b21c11e5fe6e0493959e97739bf5022785c6e7970a981a080d0.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "59b0026c10f888cec976736239ddf25cb72e7deac6071f942c9081e9bf744b98",
+      "verifier": {
+        "method": "piecewise_shift_interval",
+        "whole": "abstained",
+        "scope": "part-1",
+        "claims": 1,
+        "reason": "partial_claim_only"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2026,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2026-national-1",
+        "printedNumber": 19
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    },
+    {
+      "questionId": "gaokao-2025-national-1/q14",
+      "family": "概率建模",
+      "selection": "补充指示量线性求期望，与停止次数分布不同。",
+      "structure": "有放回等可能重复抽取；统计曾出现的不同标签数。",
+      "representation": "抽样文字 → 标签指示量之和",
+      "operation": "对单个标签取未出现的补事件，再合计边缘概率。",
+      "strategy": "期望可直接相加；不要求各标签出现事件相互独立。也可枚举有序抽样结果。",
+      "observable": "可检查是否把抽取次数当不同标签数，或错误相加重复计数。",
+      "cannotInfer": "数值正确无法辨别是枚举还是期望线性性。",
+      "requirements": [
+        {
+          "id": "cn-probability-2020/1.2",
+          "role": "supporting",
+          "rationale": "仅支撑等可能有序样本空间，不规定指示量期望"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "urn-sampling",
+          "rationale": "有放回抽样"
+        },
+        {
+          "id": "distribution-moments",
+          "rationale": "以指示量的期望求和"
+        }
+      ],
+      "gaps": [
+        {
+          "kind": "requirement-fit",
+          "reason": "清单内未找到直接覆盖占位期望的中国条款；保留支持性概率条款。"
+        },
+        {
+          "kind": "source-evidence",
+          "reason": "截图经人工辨读，题库结构化转写仍待复核。"
+        }
+      ],
+      "source": {
+        "questionSha256": "63adec52ce1a4538440f739b683b77c4c2f9b63d2e92c87e2a60812f5534339b",
+        "pdfSha256": "a58e6eeb280faaa314e37538fc2c7277aece3d7597105fe8c812f1347fd6cd25",
+        "pages": [
+          3
+        ],
+        "regions": [
+          {
+            "page": 3,
+            "bboxPt": [
+              0,
+              263.44,
+              595.3,
+              322.3
+            ],
+            "sha256": "0f7fe7259c74ea912668e8276afbfca4579ed729a9ab75274716fbf6d19bd8f2",
+            "path": "assets/e02f7a7b971b3fe8c582a5ba4e89f6b853cd82061ca3744edce57ecf6e8b5ea7.png"
+          }
+        ],
+        "transcription": "needs_manual_transcription"
+      },
+      "answer": {
+        "recordSha256": "6146e266de184a1c9136d9c63c330b3b233beee83af985aa5cb8067d49b23852",
+        "pdfSha256": "0e70a893f0e6d59386eacb25298f79ca4a42f87b070a4644d1cdb5d32c48f59e",
+        "locator": "15:671.7",
+        "regions": [
+          {
+            "page": 15,
+            "bboxPt": [
+              0,
+              664.7,
+              595.3,
+              841.9
+            ],
+            "sha256": "3337ad0b5c3756dd94d2dd863bfaba23ca670a5bfb81a636bf2693b9dab6115e",
+            "path": "assets/1f93214ba9e1bb1c3f38a6cca40511b0f59498afb968c6592f80e0326c981aba.png"
+          },
+          {
+            "page": 16,
+            "bboxPt": [
+              0,
+              0,
+              595.3,
+              841.9
+            ],
+            "sha256": "e54138ebe0ce1cc3b0c04ddf86faf92363c7bf585088aba4aa4b0fd6709ebdb2",
+            "path": "assets/ea5aa9f8992784cf4a8794cbe582ca8e848eb29033c16b7447c310de47de9411.png"
+          },
+          {
+            "page": 17,
+            "bboxPt": [
+              0,
+              0,
+              595.3,
+              135.84
+            ],
+            "sha256": "cc5de1ad705af05a32bffd1d21e4212caba049238c70116afdcf95ff97836f84",
+            "path": "assets/6d6f2456f394cfd67a33cc9ddf4cdfaacf87c60c951b840067f5bd3aae5bac40.png"
+          }
+        ],
+        "pairing": "matched",
+        "status": "user_supplied_assumed_correct"
+      },
+      "derivationSha256": "2def84c3dcdd7db9a1fa4f3e603f76bdde4d916e90c6301e21a17005a3e6c8ea",
+      "verifier": {
+        "method": "occupancy_expectation",
+        "whole": "verified",
+        "scope": "whole-answer",
+        "claims": 1,
+        "reason": "exact_paths_agree"
+      },
+      "identity": {
+        "exam": "gaokao",
+        "session": "regular",
+        "year": 2025,
+        "subject": "math",
+        "edition": "national-1",
+        "paperId": "gaokao-2025-national-1",
+        "printedNumber": 14
+      },
+      "manualCheck": "author-derived-from-question-before-reference-comparison"
+    }
+  ],
+  "inventorySha256": "b91860edf967ab9fe299a45c69961a896295c655425701f53bf2194839eb724d"
+}
