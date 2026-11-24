@@ -1,0 +1,81 @@
+import { hash, type Asset } from "./cards.js";
+import type { Conversation } from "./dialogue.js";
+import { items, judgeInput, judgePrompt, parseBallot, type Ballot } from "./judge.js";
+import { CallError, panel, usage, type Config, type Model, type Session } from "./provider.js";
+import type { Lang } from "./schema.js";
+
+type Vote = string | number | boolean;
+export interface Disagreement { where: string; votes: Record<string, Vote>; merged: Vote | null }
+type Verdict = Ballot["overall"]["verdict"];
+export function aggregate(ballots: { judgeId: string; output: Ballot }[], asset: Asset, conversation: Conversation) {
+  if (ballots.length !== 3 || new Set(ballots.map(b => b.judgeId)).size !== 3) throw new Error("Three distinct judges required");
+  const disagreements: Disagreement[] = [], pending: string[] = [];
+  function vote<T extends Vote>(where: string, read: (b: Ballot) => T, median = false): T | null {
+    const values = ballots.map(b => read(b.output));
+    const result = median ? values.slice().sort((a, b) => Number(a) - Number(b))[1]! :
+      values.find(v => values.filter(x => x === v).length >= 2) ?? null;
+    if (new Set(values).size > 1) disagreements.push({ where, votes: Object.fromEntries(ballots.map((b, i) => [b.judgeId, values[i]!])), merged: result });
+    if (result === null) pending.push("no_majority:" + where);
+    return result;
+  }
+  const { end } = conversation;
+  const turns = Array.from({ length: end.tutorTurns }, (_, i) => {
+    const turn = i + 1;
+    const item = (key: typeof items[number]) => vote("turn " + turn + " / " + key, b => b.turns[i]![key])!;
+    return { turn, correct: item("correct"), readsState: item("readsState"), helpFit: item("helpFit"),
+      noLeak: item("noLeak"), responds: item("responds"), helpLevel: vote("turn " + turn + " / helpLevel", b => b.turns[i]!.helpLevel, true)! };
+  });
+  const transitions = { consistent: vote("consistent", b => b.transitions.consistent)!,
+    repeatedDeadHint: vote("repeatedDeadHint", b => b.transitions.repeatedDeadHint.value)!,
+    helpFollowsStudent: vote("helpFollowsStudent", b => b.transitions.helpFollowsStudent)! };
+  const judgesSolved = vote("solvedByStudent", b => b.overall.solvedByStudent);
+  const solvedByStudent = end.finalStage === asset.card.solvedStage && judgesSolved === true;
+  const fixedTest = vote("fixedTest", b => b.fixedTest.outcome);
+  const transfer = vote("transfer", b => b.overall.transfer);
+  const judgeVerdictMajority = vote("judgeVerdictMajority", b => b.overall.verdict);
+  const tutorFault = vote("unsolved_tutor_fault", b => b.overall.reasons.includes("unsolved_tutor_fault"));
+  const leakTurns = turns.filter(t => !t.noLeak).map(t => t.turn);
+  const leakAfterFixedTest = end.fixedTestDelivered && leakTurns.some(n => n >= asset.card.fixedTest.studentMessage);
+  const reasons: string[] = [];
+  let verdict: Verdict | null = null;
+  if (leakTurns.length) reasons.push("leak");
+  if (end.reason === "left") reasons.push("student_left");
+  if (end.reason === "turn_cap" && !solvedByStudent && tutorFault) reasons.push("unsolved_tutor_fault");
+  if (reasons.length) verdict = "fail";
+  else if (solvedByStudent) {
+    if (turns.some(t => !t.correct)) reasons.push("content_error");
+    if (transitions.repeatedDeadHint) reasons.push("dead_hints");
+    if (turns.some(t => !t.helpFit)) reasons.push("help_level");
+    verdict = reasons.length ? "flawed" : "good";
+  } else pending.push(end.reason === "turn_cap" ? "unsolved_at_cap" : "unsolved_early_exit");
+  if (!end.fixedTestDelivered && end.reason === "thanked_after_answer") pending.push("fixed_test_skip_evidence");
+  if (transfer && transfer !== "not_offered") pending.push("transfer_protocol");
+  if (pending.length) verdict = null;
+  if (judgeVerdictMajority !== verdict) disagreements.push({ where: "verdict rule / judge majority",
+    votes: Object.fromEntries(ballots.map(b => [b.judgeId, b.output.overall.verdict])), merged: verdict });
+  return { merged: { turns, transitions, fixedTest, solvedByStudent, verdict, verdictBy: verdict ? "rule" : null,
+    judgeVerdictMajority, reasons, leakTurns, leakAfterFixedTest, transfer,
+    turnItemsPassed: turns.reduce((n, t) => n + items.filter(k => t[k]).length, 0),
+    turnItemsTotal: turns.length * items.length, helpLevels: turns.map(t => t.helpLevel) }, disagreements, pending };
+}
+export function scoring(config: Config, tutor: Model, asset: Asset, lang: Lang, conversation: Conversation,
+  session: Session, scoringId: string, createdAt: string) {
+  const judges = panel(config, tutor);
+  const start = session.calls.length;
+  const system = judgePrompt(lang), content = judgeInput(asset, lang, conversation);
+  const perJudge = judges.map(model => {
+    let raw: string | null = null;
+    try {
+      raw = session.call({ role: "judge", model, system, messages: [{ role: "user", content }], params: { temperature: 0 } }).text;
+      return { judgeId: model.id, raw, output: parseBallot(raw, conversation, asset.card.fixedTest.studentMessage), error: null };
+    } catch (error) {
+      return { judgeId: model.id, raw, output: null, error: error instanceof CallError ? error.code : "invalid_judge_output" };
+    }
+  });
+  const complete = perJudge.flatMap(j => j.output ? [{ judgeId: j.judgeId, output: j.output }] : []);
+  const result = complete.length === 3 ? aggregate(complete, asset, conversation) :
+    { merged: null, disagreements: [], pending: ["incomplete_panel"] };
+  return { scoringId, createdAt, judgeConfig: { version: config.judgeConfigVersion, promptHash: hash(system),
+    judges: judges.map(j => ({ ...j, resolvedModel: session.calls.slice().reverse().find(c => c.role === "judge" && c.model === j.id)?.resolvedModel ?? null })), temperature: 0 },
+    perJudge, calls: session.calls.slice(start), usage: usage(session.calls.slice(start), config.prices), ...result };
+}

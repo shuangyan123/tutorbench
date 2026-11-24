@@ -1,0 +1,73 @@
+{
+  "batchId": "offline-tiles",
+  "purpose": "synthetic smoke",
+  "languages": [
+    "en",
+    "zh-CN"
+  ],
+  "repeats": 1,
+  "budgetUsd": 1,
+  "reserveUsd": 0.01,
+  "prices": {
+    "version": "mock-prices-v1",
+    "inputUsdPerMillion": 1,
+    "outputUsdPerMillion": 2
+  },
+  "tutors": [
+    {
+      "id": "tiles",
+      "developer": "tiles",
+      "provider": "mock-host",
+      "requestedModel": "tiles",
+      "pinnedVersion": "tiles-v1",
+      "label": "Synthetic tutor"
+    }
+  ],
+  "student": {
+    "id": "learner",
+    "developer": "deepseek",
+    "provider": "mock-host",
+    "requestedModel": "DeepSeek-V4.1-Flash",
+    "pinnedVersion": "mock-learner-v1"
+  },
+  "judges": [
+    {
+      "id": "j1",
+      "developer": "alibaba",
+      "provider": "mock-host",
+      "requestedModel": "Qwen4-Max",
+      "pinnedVersion": "mock-j1-v1"
+    },
+    {
+      "id": "j2",
+      "developer": "mistral-ai",
+      "provider": "mock-host",
+      "requestedModel": "Mistral-Large-3",
+      "pinnedVersion": "mock-j2-v1"
+    },
+    {
+      "id": "j3",
+      "developer": "minimax",
+      "provider": "mock-host",
+      "requestedModel": "MiniMax-M3",
+      "pinnedVersion": "mock-j3-v1"
+    }
+  ],
+  "alternates": [
+    {
+      "id": "alternate1",
+      "developer": "zhipu-ai",
+      "provider": "mock-host",
+      "requestedModel": "GLM-5.3",
+      "pinnedVersion": "mock-alternate1-v1"
+    },
+    {
+      "id": "alternate2",
+      "developer": "moonshot-ai",
+      "provider": "mock-host",
+      "requestedModel": "Kimi-K3.1-Pro",
+      "pinnedVersion": "mock-alternate2-v1"
+    }
+  ],
+  "judgeConfigVersion": "synthetic-panel-v1"
+}

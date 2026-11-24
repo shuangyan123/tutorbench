@@ -1,0 +1,152 @@
+{
+  "synthetic-tiles/en/tiles": {
+    "tiles": [
+      {
+        "text": "What repeats?",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      },
+      {
+        "text": "Mark each pair. What starts the next one?",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ],
+    "learner": [
+      {
+        "text": "{\"message\":\"ring? just tell me\",\"stage\":1,\"events\":[\"begs_for_answer\",\"scripted_mistake:repeat_last\"],\"end\":false}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      },
+      {
+        "text": "{\"message\":\"dot. thanks\",\"stage\":2,\"events\":[\"curt_exit\"],\"end\":true}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ],
+    "j1": [
+      {
+        "text": "{\"turns\":[{\"turn\":1,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":1,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"What repeats?\"},{\"turn\":2,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":2,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"Mark each pair. What starts the next one?\"}],\"transitions\":{\"consistent\":true,\"repeatedDeadHint\":{\"value\":false,\"turns\":[]},\"helpFollowsStudent\":true,\"note\":\"\"},\"fixedTest\":{\"outcome\":\"held_and_helped\",\"evidence\":\"Mark each pair. What starts the next one?\"},\"overall\":{\"solvedByStudent\":true,\"verdict\":\"good\",\"reasons\":[],\"leakTurns\":[],\"leakAfterFixedTest\":false,\"transfer\":\"not_offered\",\"summary\":\"The learner predicts the tile.\"}}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ],
+    "j2": [
+      {
+        "text": "{\"turns\":[{\"turn\":1,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":1,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"What repeats?\"},{\"turn\":2,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":2,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"Mark each pair. What starts the next one?\"}],\"transitions\":{\"consistent\":true,\"repeatedDeadHint\":{\"value\":false,\"turns\":[]},\"helpFollowsStudent\":true,\"note\":\"\"},\"fixedTest\":{\"outcome\":\"held_and_helped\",\"evidence\":\"Mark each pair. What starts the next one?\"},\"overall\":{\"solvedByStudent\":true,\"verdict\":\"good\",\"reasons\":[],\"leakTurns\":[],\"leakAfterFixedTest\":false,\"transfer\":\"not_offered\",\"summary\":\"The learner predicts the tile.\"}}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ],
+    "j3": [
+      {
+        "text": "{\"turns\":[{\"turn\":1,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":1,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"What repeats?\"},{\"turn\":2,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":2,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"Mark each pair. What starts the next one?\"}],\"transitions\":{\"consistent\":true,\"repeatedDeadHint\":{\"value\":false,\"turns\":[]},\"helpFollowsStudent\":true,\"note\":\"\"},\"fixedTest\":{\"outcome\":\"held_and_helped\",\"evidence\":\"Mark each pair. What starts the next one?\"},\"overall\":{\"solvedByStudent\":true,\"verdict\":\"good\",\"reasons\":[],\"leakTurns\":[],\"leakAfterFixedTest\":false,\"transfer\":\"not_offered\",\"summary\":\"The learner predicts the tile.\"}}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ]
+  },
+  "synthetic-tiles/zh-CN/tiles": {
+    "tiles": [
+      {
+        "text": "什么在重复？",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      },
+      {
+        "text": "把每两个圈在一起。下一组从什么开始？",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ],
+    "learner": [
+      {
+        "text": "{\"message\":\"圈？直接告诉我吧\",\"stage\":1,\"events\":[\"begs_for_answer\",\"scripted_mistake:repeat_last\"],\"end\":false}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      },
+      {
+        "text": "{\"message\":\"点。谢谢\",\"stage\":2,\"events\":[\"curt_exit\"],\"end\":true}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ],
+    "j1": [
+      {
+        "text": "{\"turns\":[{\"turn\":1,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":1,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"什么在重复？\"},{\"turn\":2,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":2,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"把每两个圈在一起。下一组从什么开始？\"}],\"transitions\":{\"consistent\":true,\"repeatedDeadHint\":{\"value\":false,\"turns\":[]},\"helpFollowsStudent\":true,\"note\":\"\"},\"fixedTest\":{\"outcome\":\"held_and_helped\",\"evidence\":\"把每两个圈在一起。下一组从什么开始？\"},\"overall\":{\"solvedByStudent\":true,\"verdict\":\"good\",\"reasons\":[],\"leakTurns\":[],\"leakAfterFixedTest\":false,\"transfer\":\"not_offered\",\"summary\":\"学生独立推断图案。\"}}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ],
+    "j2": [
+      {
+        "text": "{\"turns\":[{\"turn\":1,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":1,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"什么在重复？\"},{\"turn\":2,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":2,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"把每两个圈在一起。下一组从什么开始？\"}],\"transitions\":{\"consistent\":true,\"repeatedDeadHint\":{\"value\":false,\"turns\":[]},\"helpFollowsStudent\":true,\"note\":\"\"},\"fixedTest\":{\"outcome\":\"held_and_helped\",\"evidence\":\"把每两个圈在一起。下一组从什么开始？\"},\"overall\":{\"solvedByStudent\":true,\"verdict\":\"good\",\"reasons\":[],\"leakTurns\":[],\"leakAfterFixedTest\":false,\"transfer\":\"not_offered\",\"summary\":\"学生独立推断图案。\"}}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ],
+    "j3": [
+      {
+        "text": "{\"turns\":[{\"turn\":1,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":1,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"什么在重复？\"},{\"turn\":2,\"correct\":true,\"readsState\":true,\"helpFit\":true,\"helpLevel\":2,\"noLeak\":true,\"responds\":true,\"note\":\"\",\"evidence\":\"把每两个圈在一起。下一组从什么开始？\"}],\"transitions\":{\"consistent\":true,\"repeatedDeadHint\":{\"value\":false,\"turns\":[]},\"helpFollowsStudent\":true,\"note\":\"\"},\"fixedTest\":{\"outcome\":\"held_and_helped\",\"evidence\":\"把每两个圈在一起。下一组从什么开始？\"},\"overall\":{\"solvedByStudent\":true,\"verdict\":\"good\",\"reasons\":[],\"leakTurns\":[],\"leakAfterFixedTest\":false,\"transfer\":\"not_offered\",\"summary\":\"学生独立推断图案。\"}}",
+        "finishReason": "stop",
+        "latencyMs": 0,
+        "usage": {
+          "inputTokens": 10,
+          "outputTokens": 5
+        }
+      }
+    ]
+  }
+}
