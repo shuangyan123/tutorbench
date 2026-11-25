@@ -1,8 +1,11 @@
-# Premium runs dashboard
+# TutorBench Observatory（观测台）
 
 A local page for reading the premium runner's output: `index.jsonl`, `batches/<batchId>.json` and `records/<runId>.json`.
 It reads record and batch schema v1 and v2.
+It is laid out like a printed atlas: numbered plates, one drawn specimen per conversation, and the words kept to titles, hovers and the run drawer.
 It shows the formal pass rate, what still needs a person, the evidence behind each deterministic failure, the simulated student's checks, and where the three judges disagreed.
+
+The folder keeps its old name, `tools/premium-dashboard/`, so links and scripts do not break.
 
 ## Open it
 
@@ -17,13 +20,26 @@ The files are read inside the browser tab. Nothing is uploaded, and the page mak
 
 The page has three views. The filters (judge configuration, batch, language, card versions) sit at the right end of the view bar.
 
-- **Overview** has two charts and two numbers:
-  - *Who teaches well* has one row per tutor: its formal pass rate, then one mark per conversation. Good, flawed and fail come first; hollow rings at the end still need review and are not counted.
-  - *Which cards separate the tutors* is a card × tutor grid in one hue, where a stronger colour means a higher pass rate. The cards with the widest spread between tutors come first. A small ring in a cell means some of its conversations still need review.
-  - *Needs you* shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, or tied judges).
-  - Hovering a mark or a cell gives the detail. Clicking a mark opens that conversation. Clicking a cell, a tutor name or a number opens the matching list.
-- **All conversations** is the full list, with state tabs and the run drawer. Tabs for superseded and calibration runs appear when such runs are loaded.
+- **Overview** has three plates:
+  - *Plate I, Who teaches well*, has one row per tutor: a letter, the name, the formal pass rate, then one specimen per conversation. Counted specimens come first (good, flawed, fail). After a small gap come the ones that still need review; they stand on a dashed ground and are not counted.
+  - *Plate II, Which cards separate the tutors*, is a dot plot. Each card is a row, each tutor is its letter, placed at its pass rate on that card, and a hairline joins the lowest to the highest. Tutors at the same rate stack upward. The cards with the widest spread come first, and the spread is printed at the right. A small dashed ring on a letter means some of that tutor's runs on that card still need review.
+  - *Plate III, Needs you*, shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, review flags or tied judges).
+  - Hovering a specimen or a letter gives the detail. Clicking a specimen opens that conversation. Clicking a letter, a tutor name or a number opens the matching list.
+- **All conversations** is the full list, with state tabs and the run drawer. The drawer shows the conversation's own specimen, large; clicking a leaf scrolls to that tutor turn. Tabs for superseded and calibration runs appear when such runs are loaded.
 - **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate.
+
+### How to read a specimen
+
+Each conversation is drawn as one small plant, standing on the plate's ground line.
+
+| Part | Means |
+| --- | --- |
+| Stem | One node per tutor turn. Every specimen in a view uses the same scale (at least 15 turns), so heights compare. |
+| Leaf | The judges' merged help level for that turn, 0 to 3: a longer leaf gives more help. A stub means the level is unknown. |
+| Red leaf | The judges marked that turn as leaking the answer. |
+| Head | The outcome: a filled dot is good, a half dot is flawed, a cross is fail, a dashed ring still needs review. A head lifted off the stem means the student left. |
+
+Letters follow the tutor, never its rank: they are given in name order over all loaded evaluation runs, so a filter never reletters anyone.
 
 The overview compares tutors, so it reads evaluation runs only. Calibration and superseded runs appear in the lists and the drawer.
 

@@ -8,12 +8,14 @@
   const T = {
     zh: {
       viewOverview: "概览", viewRuns: "全部对话", viewChecks: "运行检查", allBatches: "全部批次", allLangs: "中英文", latestShort: "最新版卡片", changeFilters: "更改", doneFilters: "收起",
-      kicker: "TutorBench · 精品集", chartTutors: "谁教得好", chartCards: "哪张卡拉开了差距", rampLow: "通过率 低", rampHigh: "高", legendPending: "待审（不计入）",
+      kicker: "Teachometry · TutorBench 精品集", chartTutors: "谁教得好", chartCards: "哪张卡拉开了差距", legendPending: "待审（不计入）",
+      plate: "图版 {n}", keyHead: "头", keyHeadIs: "结局", keyStem: "茎", keyStemIs: "一节是导师的一轮", keyLeaf: "叶", keyLeafIs: "这一轮的帮助力度 0–3",
+      keyRed: "红叶", keyRedIs: "这一轮泄露了答案", turnsN: "{n} 轮", spreadNote: "字母是导师，横向位置是它在这张卡上的通过率。右上角带小虚圈的，这张卡还有待审对话。", spreadCol: "差距", unratedN: "{n} 位未计分",
       rateTip: "已计分 {n} 段：好 {g} · 有问题 {f} · 不合格 {x}", rateTipReview: "；另有 {r} 段待审，不计入", allOfTutor: "看这位导师的全部对话",
       cellTip: "通过 {p}/{n}", cellNone: "还没有已计分的对话", cellReview: "待审 {r}", noRate: "暂无", langZh: "中", langEn: "英",
       attentionTitle: "需要你看的", askPending: "段待审，还没有结论", askSpot: "段已计分，建议抽查", onlySpot: "建议抽查",
       costLine: "按价格表估算共花费 {cost}，其中重新评审 {re}。", opsTitle: "运行检查", opsNote: "看评测本身靠不靠得住：三位评审是否一致，批次是否跑完。", ties: "平票", topItems: "分歧最多的项：{list}",
-      title: "评测运行", openFolder: "打开 runs 文件夹", loadSample: "载入合成示例", dropHere: "松开鼠标，载入这个 runs 文件夹",
+      title: "观测台", openFolder: "打开 runs 文件夹", loadSample: "载入合成示例", dropHere: "松开鼠标，载入这个 runs 文件夹",
       sourceSample: "合成示例 · {runs} 段对话 · {batches} 个批次", sourceFolder: "「{name}」· {runs} 段对话 · {batches} 个批次",
       sourceNone: "还没有数据。打开 runner 写出的 runs 文件夹（含 index.jsonl、batches/、records/），或者把文件夹拖进这个页面。",
       sampleBanner: "合成示例数据，由 runner 离线回放生成，不是任何模型的真实结果。",
@@ -52,12 +54,14 @@
     },
     en: {
       viewOverview: "Overview", viewRuns: "All conversations", viewChecks: "Run checks", allBatches: "all batches", allLangs: "both languages", latestShort: "latest cards", changeFilters: "Change", doneFilters: "Done",
-      kicker: "TutorBench · Premium set", chartTutors: "Who teaches well", chartCards: "Which cards separate the tutors", rampLow: "Pass rate low", rampHigh: "high", legendPending: "Needs review (not counted)",
+      kicker: "Teachometry · TutorBench premium set", chartTutors: "Who teaches well", chartCards: "Which cards separate the tutors", legendPending: "Needs review (not counted)",
+      plate: "Plate {n}", keyHead: "Head", keyHeadIs: "outcome", keyStem: "Stem", keyStemIs: "one node per tutor turn", keyLeaf: "Leaf", keyLeafIs: "help level that turn, 0–3",
+      keyRed: "Red leaf", keyRedIs: "that turn leaked the answer", turnsN: "{n} turns", spreadNote: "Letters are tutors, placed at their pass rate on this card. A small dashed ring means some of its runs on this card still need review.", spreadCol: "Spread", unratedN: "{n} not scored",
       rateTip: "{n} scored: good {g} · flawed {f} · fail {x}", rateTipReview: "; {r} more need review and are not counted", allOfTutor: "All conversations for this tutor",
       cellTip: "pass {p}/{n}", cellNone: "nothing scored yet", cellReview: "{r} need review", noRate: "none yet", langZh: "zh", langEn: "en",
       attentionTitle: "Needs you", askPending: "need review, no verdict yet", askSpot: "scored, worth a spot check", onlySpot: "Worth a spot check",
       costLine: "Price-table estimate: {cost}, of which rescoring {re}.", opsTitle: "Run checks", opsNote: "Whether the evaluation itself can be trusted: do the three judges agree, did the batches finish.", ties: "Ties", topItems: "Most splits: {list}",
-      title: "Evaluation runs", openFolder: "Open runs folder", loadSample: "Load synthetic sample", dropHere: "Drop to load this runs folder",
+      title: "Observatory", openFolder: "Open runs folder", loadSample: "Load synthetic sample", dropHere: "Drop to load this runs folder",
       sourceSample: "Synthetic sample · {runs} conversations · {batches} batches", sourceFolder: "“{name}” · {runs} conversations · {batches} batches",
       sourceNone: "No data yet. Open the runs folder the runner wrote (index.jsonl, batches/, records/), or drop the folder on this page.",
       sampleBanner: "Synthetic sample made by the runner in offline replay. Not a real result from any model.",
@@ -181,7 +185,6 @@
     if (m) return (st.lang === "zh" ? "第 " + m[1] + " 轮 · " : "turn " + m[1] + " · ") + code(m[2]);
     return CODES[st.lang][s] ?? CODES.en[s] ?? s;
   };
-  const pct = x => (x == null ? "—" : Math.round(x * 100) + "%");
   const usd = x => (x == null ? "—" : "$" + (x < 1 ? x.toFixed(4) : x.toFixed(2)));
   const usdDiff = x => (x == null ? "—" : (x < 0 ? "−" : "+") + usd(Math.abs(x)));
   const when = iso => { try { return new Date(iso).toLocaleString(st.lang === "zh" ? "zh-CN" : "en-GB", { dateStyle: "medium", timeStyle: "short" }); } catch { return String(iso); } };
@@ -299,9 +302,9 @@
     if (!d) return;
     if (st.showFilters) filters.append(renderFilters());
     if (show.board) {
-      const ev = vs.filter(isEval), rows = tutorRows(ev);
-      renderBoard(ev, rows, !ev.length && vs.some(v => v.state === "calibration") ? t("onlyCalibration") : t("noData"));
-      renderCards(ev, rows); renderAttention(ev);
+      const ev = vs.filter(isEval), rows = tutorRows(ev), keys = tutorKeys();
+      renderBoard(ev, rows, !ev.length && vs.some(v => v.state === "calibration") ? t("onlyCalibration") : t("noData"), keys);
+      renderSpread(ev, rows, keys); renderAttention(ev);
     }
     if (show.runs) renderRuns(vs);
     if (show.ops) renderOps(vs);
@@ -362,11 +365,6 @@
     if (v.state === "calibration") return [v.record.status !== "unscored" ? attemptReason(v.record) : null, spotText(v)].filter(Boolean).join("、");
     return attemptReason(v.record);
   }
-  function legend() {
-    return el("div", { class: "legend" },
-      ["good", "flawed", "fail"].map(k => el("span", null, pip(k), t(k))),
-      el("span", null, pip("needs_review"), t("legendPending")));
-  }
   function setView(view) {
     st.view = view;
     render();
@@ -382,26 +380,71 @@
     nav.append(filterSummary());
   }
 
-  // ---------- Overview ----------
-  // Chart 1: one row per tutor, one mark per conversation. Counted marks first (good, flawed, fail),
-  // then a small gap and the hollow rings that still need review. Length of the green run is the pass rate.
-  const UNIT = 16;
-  function glyph(kind, cx, cy, attrs) {
-    const g = svg("g", Object.assign({ class: "u " + kind }, attrs || {}));
-    g.append(svg("rect", { class: "hit", x: cx - UNIT / 2, y: 0, width: UNIT, height: UNIT, rx: 3 }));
-    if (kind === "good") g.append(svg("circle", { cx, cy, r: 5 }));
-    else if (kind === "flawed") { g.append(svg("circle", { class: "ring", cx, cy, r: 4.4 })); g.append(svg("path", { d: `M${cx} ${cy - 4.4} A4.4 4.4 0 0 0 ${cx} ${cy + 4.4} Z` })); }
-    else if (kind === "fail") g.append(svg("path", { d: `M${cx - 3.6} ${cy - 3.6} L${cx + 3.6} ${cy + 3.6} M${cx + 3.6} ${cy - 3.6} L${cx - 3.6} ${cy + 3.6}` }));
-    else g.append(svg("circle", { cx, cy, r: 4.2 }));
+  // ---------- Overview: the plates ----------
+  // Every conversation is drawn as one specimen. The head is the outcome. The stem grows one node per tutor turn,
+  // and each turn puts out a leaf whose length is that turn's help level (0 to 3). A leaked turn is a red leaf.
+  // When the student left, the head has come away from its stem. Shape always carries the state, never colour alone.
+  const SPW = 20, SPH = 60, SP_ROOM = 46, HEAD = 4;
+  function specimenData(v) {
+    const r = v.record, m = v.scoring && v.scoring.merged;
+    const n = Math.max(0, (r.end && r.end.tutorTurns) || 0);
+    const levels = m && Array.isArray(m.helpLevels) && m.helpLevels.length === n ? m.helpLevels : null;
+    return { n, levels, leaks: new Set((m && m.leakTurns) || []), left: !!(r.end && r.end.reason === "left"), kind: kindOf(v) };
+  }
+  function head(kind, cx, cy) {
+    const g = svg("g", { class: "head " + kind });
+    if (kind === "good") g.append(svg("circle", { cx, cy, r: HEAD }));
+    else if (kind === "flawed") { g.append(svg("circle", { class: "ring", cx, cy, r: HEAD - .4 })); g.append(svg("path", { d: `M${cx} ${cy - HEAD + .4} A${HEAD - .4} ${HEAD - .4} 0 0 0 ${cx} ${cy + HEAD - .4} Z` })); }
+    else if (kind === "fail") { const k = HEAD - .9; g.append(svg("path", { d: `M${cx - k} ${cy - k} L${cx + k} ${cy + k} M${cx + k} ${cy - k} L${cx - k} ${cy + k}` })); }
+    else g.append(svg("circle", { cx, cy, r: HEAD - .3 }));
     return g;
   }
+  // Draws into a SPW × SPH box standing on the ground line (y = SPH). maxTurns keeps heights comparable.
+  function drawSpecimen(target, d, maxTurns, big) {
+    const step = SP_ROOM / Math.max(1, maxTurns), cx = SPW / 2;
+    const top = SPH - d.n * step;
+    const ns = big ? { "vector-effect": "non-scaling-stroke" } : {};
+    target.append(svg("line", Object.assign({ class: "stem", x1: cx, x2: cx, y1: SPH, y2: top }, ns)));
+    for (let i = 1; i <= d.n; i++) {
+      const y = SPH - (i - .5) * step, side = i % 2 ? 1 : -1;
+      const level = d.levels ? d.levels[i - 1] : null;
+      const len = level == null ? 1.6 : 1.4 + level * 2.5;
+      const leak = d.leaks.has(i);
+      const leaf = svg("line", Object.assign({ class: "leaf" + (leak ? " leak" : "") + (level == null ? " unknown" : ""), x1: cx, y1: y, x2: cx + side * len, y2: y - len * .45 }, ns));
+      if (big) {
+        const g = svg("g", { class: "turn", "data-turn": i, "data-tip": t("turnN", { n: i }) + (level == null ? "" : " · " + t("level", { h: level })) + (leak ? " · " + code("leak") : "") });
+        g.append(svg("rect", { class: "hit", x: 0, y: y - step / 2, width: SPW, height: step }));
+        g.append(leaf);
+        target.append(g);
+      } else target.append(leaf);
+    }
+    target.append(head(d.kind, cx, top - HEAD - .6 - (d.left ? 3.4 : 0)));
+    return target;
+  }
+  function specimen(v, maxTurns) {
+    const s = svg("svg", { class: "sp " + kindOf(v), viewBox: `0 0 ${SPW} ${SPH}`, preserveAspectRatio: "xMidYMax meet", "data-run": v.record.runId, "data-tip": specimenTip(v) });
+    return drawSpecimen(s, specimenData(v), maxTurns, false);
+  }
+  function specimenTip(v) {
+    const r = v.record, m = v.scoring && v.scoring.merged;
+    const leaks = (m && m.leakTurns) || [];
+    return [r.card.id, langShort(r.card.lang) + " #" + r.repeat.index, kindLabel(v), code(r.end.reason), t("turnsN", { n: r.end.tutorTurns }),
+      leaks.length ? t("leakAt", { t: leaks.join(", ") }) : null, v.state === "needs_review" ? whyText(v) : null].filter(Boolean).join(" · ");
+  }
+  const maxTurnsOf = vs => Math.max(15, ...vs.map(v => (v.record.end && v.record.end.tutorTurns) || 0));
+
   const VERDICT_ORDER = { good: 0, flawed: 1, fail: 2 };
   const byCard = (a, b) => a.record.card.id.localeCompare(b.record.card.id) || String(a.record.card.lang).localeCompare(String(b.record.card.lang)) || a.record.repeat.index - b.record.repeat.index;
-  const runLabel = v => [v.record.card.id, langShort(v.record.card.lang) + " #" + v.record.repeat.index, kindLabel(v)].join(" · ");
   const isSpot = v => isEval(v) && v.state !== "needs_review" && (softCount(v) > 0 || v.reviewFlags.length > 0);
   function tutorRows(vs) {
     return [...M.groupBy(vs, v => v.record.tutor.label)].map(([tutor, group]) => ({ tutor, group, g: M.summarize(group) }))
       .sort((a, b) => (b.g.passRate ?? -1) - (a.g.passRate ?? -1) || b.g.scored - a.g.scored || a.tutor.localeCompare(b.tutor));
+  }
+  // A letter per tutor, shared by both plates. It follows the tutor, never its rank, so filters never reletter anyone.
+  function tutorKeys() {
+    const names = [...new Set(st.dataset.runs.filter(r => !r.batchKind || r.batchKind !== "calibration").map(r => r.tutor.label))].sort();
+    const letter = i => (i < 26 ? "" : String.fromCharCode(65 + Math.floor(i / 26) - 1)) + String.fromCharCode(65 + (i % 26));
+    return new Map(names.map((n, i) => [n, letter(i)]));
   }
   function showRuns(filter) {
     st.runFilter = Object.assign({ state: "all", disagree: false, spot: false, focus: null }, filter);
@@ -409,74 +452,97 @@
     setView("runs");
     window.scrollTo({ top: 0 });
   }
+  function plateHead(no, id, title, extra) {
+    return el("header", { class: "plate-head" }, el("div", { class: "title" }, el("span", { class: "plate-no", text: t("plate", { n: no }) }), el("h2", { id, text: title })), extra || null);
+  }
 
-  function renderBoard(vs, rows, emptyNote) {
+  // Plate I: who teaches well. One row per tutor; counted specimens first (good, flawed, fail), then a break
+  // and the specimens that still need review, which stand on a dashed ground because they are not counted.
+  function specimenKey() {
+    const example = { n: 7, levels: [1, 2, 1, 2, 3, 1, 1], leaks: new Set([5]), left: false, kind: "fail" };
+    const fig = drawSpecimen(svg("svg", { class: "sp key-sp", viewBox: `0 0 ${SPW} ${SPH}`, "aria-hidden": "true" }), example, 9, true);
+    fig.querySelectorAll("[data-tip]").forEach(n => n.removeAttribute("data-tip"));
+    return el("figure", { class: "key" }, fig,
+      el("dl", null,
+        el("div", null, el("dt", { text: t("keyHead") }), el("dd", { text: t("keyHeadIs") })),
+        el("div", null, el("dt", { text: t("keyStem") }), el("dd", { text: t("keyStemIs") })),
+        el("div", null, el("dt", { text: t("keyLeaf") }), el("dd", { text: t("keyLeafIs") })),
+        el("div", { class: "crit" }, el("dt", { text: t("keyRed") }), el("dd", { text: t("keyRedIs") }))),
+      el("div", { class: "heads" }, ["good", "flawed", "fail", "needs_review"].map(k => el("span", null, pip(k), k === "needs_review" ? t("legendPending") : t(k)))));
+  }
+  function renderBoard(vs, rows, emptyNote, keys) {
     const box = $("board");
-    box.append(el("header", { class: "sec-head" }, el("h2", { id: "board-title", text: t("chartTutors") }), legend()));
+    box.append(plateHead("I", "board-title", t("chartTutors"), specimenKey()));
     if (!vs.length) { box.append(el("p", { class: "empty-note", text: emptyNote })); return; }
-    const strips = rows.map(({ group }) => {
+    const maxTurns = maxTurnsOf(vs);
+    const list = el("div", { class: "tutors" });
+    for (const { tutor, group, g } of rows) {
       const counted = group.filter(v => v.state === "scored").sort((a, b) => VERDICT_ORDER[a.verdict] - VERDICT_ORDER[b.verdict] || byCard(a, b));
       const pending = group.filter(v => v.state === "needs_review").sort(byCard);
-      return { counted, pending, units: counted.length + (pending.length ? pending.length + 0.75 : 0) };
-    });
-    const width = Math.max(1, ...strips.map(s => s.units)) * UNIT;
-    const list = el("div", { class: "tutors" });
-    rows.forEach(({ tutor, group, g }, i) => {
-      const { counted, pending } = strips[i];
       const models = [...new Set(group.map(v => v.record.tutor.resolvedModel).filter(Boolean))];
       const summary = t("rateTip", { n: g.scored, g: g.good, f: g.flawed, x: g.fail }) + (pending.length ? t("rateTipReview", { r: pending.length }) : "");
-      const strip = svg("svg", { class: "strip", viewBox: `0 0 ${width} ${UNIT}`, preserveAspectRatio: "xMinYMid meet", style: `max-width:${width * 1.125}px`, role: "img", "aria-label": tutor + " · " + summary });
-      counted.forEach((v, k) => strip.append(glyph(kindOf(v), k * UNIT + UNIT / 2, UNIT / 2, { "data-tip": runLabel(v), "data-run": v.record.runId })));
-      const x0 = (counted.length + (counted.length ? 0.75 : 0)) * UNIT;
-      pending.forEach((v, k) => strip.append(glyph("needs_review", x0 + k * UNIT + UNIT / 2, UNIT / 2, { "data-tip": runLabel(v) + (whyText(v) ? " · " + whyText(v) : ""), "data-run": v.record.runId })));
-      strip.addEventListener("click", e => { const n = e.target.closest("[data-run]"); if (n) openRun(n.getAttribute("data-run")); });
+      const field = el("div", { class: "field", role: "img", "aria-label": tutor + " · " + summary });
+      counted.forEach(v => field.append(specimen(v, maxTurns)));
+      if (counted.length && pending.length) field.append(el("span", { class: "break", "aria-hidden": "true" }));
+      pending.forEach(v => field.append(specimen(v, maxTurns)));
+      field.addEventListener("click", e => { const n = e.target.closest("[data-run]"); if (n) openRun(n.getAttribute("data-run")); });
       list.append(el("div", { class: "tutor" },
         el("button", { type: "button", class: "who", onclick: () => showRuns({ focus: { tutor } }), "data-tip": t("allOfTutor") },
-          el("strong", { text: tutor }), models.length ? el("span", { class: "faint mono", text: models.join(", ") }) : null),
-        el("span", { class: "rate" + (g.passRate == null ? " none" : ""), "data-tip": summary, text: g.passRate == null ? t("noRate") : pct(g.passRate) }),
-        el("div", { class: "strip-box" }, strip)));
-    });
+          el("span", { class: "tkey", text: keys.get(tutor) || "?" }),
+          el("span", { class: "name" }, el("strong", { text: tutor }), models.length ? el("span", { class: "faint mono", text: models.join(", ") }) : null)),
+        el("span", { class: "rate" + (g.passRate == null ? " none" : ""), "data-tip": summary },
+          g.passRate == null ? t("noRate") : String(Math.round(g.passRate * 100)), g.passRate == null ? null : el("small", { text: "%" })),
+        field));
+    }
     box.append(list);
   }
 
-  // Chart 2: card × tutor. One hue, lighter = lower pass rate. Cards that separate the tutors most come first.
-  const step = rate => Math.min(4, Math.floor(rate * 5));
-  function ramp() {
-    return el("div", { class: "ramp", "aria-hidden": "true" }, el("span", { text: t("rampLow") }),
-      el("span", { class: "sw" }, [0, 1, 2, 3, 4].map(k => el("i", { class: "s" + k }))), el("span", { text: t("rampHigh") }));
-  }
-  function renderCards(vs, rows) {
+  // Plate II: which cards separate the tutors. One row per card on a 0–100% pass-rate scale. Each tutor is its
+  // lettered key; a hairline spans the lowest to the highest tutor. Cards with the widest spread come first.
+  function renderSpread(vs, rows, keys) {
     const box = $("cards");
+    box.append(plateHead("II", "cards-title", t("chartCards"), el("p", { class: "plate-note", text: t("spreadNote") })));
     const tutors = rows.map(r => r.tutor);
     const cards = cardsOf(vs).map(card => {
-      const cells = tutors.map(tutor => { const runs = vs.filter(v => v.record.card.id === card && v.record.tutor.label === tutor); return { tutor, runs, s: M.summarize(runs) }; });
-      const rates = cells.map(c => c.s.passRate).filter(x => x != null);
-      return { card, cells, spread: rates.length > 1 ? Math.max(...rates) - Math.min(...rates) : -1 };
+      const cells = tutors.map(tutor => { const runs = vs.filter(v => v.record.card.id === card && v.record.tutor.label === tutor); return { tutor, runs, s: M.summarize(runs) }; })
+        .filter(c => c.runs.length);
+      const rated = cells.filter(c => c.s.passRate != null);
+      const rates = rated.map(c => c.s.passRate);
+      return { card, cells, rated, lo: rates.length ? Math.min(...rates) : null, hi: rates.length ? Math.max(...rates) : null, spread: rates.length > 1 ? Math.max(...rates) - Math.min(...rates) : -1 };
     }).sort((a, b) => b.spread - a.spread || a.card.localeCompare(b.card));
-    box.append(el("header", { class: "sec-head" }, el("h2", { id: "cards-title", text: t("chartCards") }), ramp()));
-    const grid = el("div", { class: "heat", role: "table", "aria-labelledby": "cards-title", style: "--n:" + tutors.length });
-    grid.append(el("div", { class: "hrow", role: "row" }, el("span", { class: "corner", role: "columnheader" }),
-      tutors.map(name => el("span", { class: "th", role: "columnheader", text: name }))));
-    for (const { card, cells } of cards) {
-      grid.append(el("div", { class: "hrow", role: "row" },
-        el("span", { class: "card", role: "rowheader", text: card }),
-        cells.map(({ tutor, runs, s }) => {
-          const langs = ["zh-CN", "en"].map(l => { const ls = M.summarize(runs.filter(v => v.record.card.lang === l)); return ls.scored ? langShort(l) + " " + (ls.good + ls.flawed) + "/" + ls.scored : null; }).filter(Boolean);
-          const tip = tutor + " · " + card + " · " + (s.scored ? t("cellTip", { p: s.good + s.flawed, n: s.scored }) + (langs.length > 1 ? "（" + langs.join("，") + "）" : "") : t("cellNone"))
-            + (s.needsReview ? " · " + t("cellReview", { r: s.needsReview }) : "");
-          const cls = "hc " + (s.scored ? "s" + step(s.passRate) : "empty") + (s.needsReview ? " pending" : "");
-          return el("span", { role: "cell" }, el("button", { type: "button", class: cls, "data-tip": tip, "aria-label": tip, onclick: () => showRuns({ focus: { tutor, card } }) },
-            s.scored ? (s.good + s.flawed) + "/" + s.scored : "—"));
-        })));
+    if (!cards.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
+    const chart = el("div", { class: "spread", role: "table", "aria-labelledby": "cards-title" });
+    chart.append(el("div", { class: "srow axis-row", role: "row" }, el("span", { role: "columnheader" }),
+      el("div", { class: "track axis", role: "columnheader" }, [0, 25, 50, 75, 100].map(x => el("span", { style: "left:" + x + "%", text: x + (x === 100 ? "%" : "") }))),
+      el("span", { class: "delta", role: "columnheader", text: t("spreadCol") })));
+    for (const c of cards) {
+      // Tutors at the same pass rate stack upward instead of hiding each other.
+      const buckets = new Map();
+      for (const cell of c.rated) { const k = Math.round(cell.s.passRate * 50); buckets.set(k, [...(buckets.get(k) || []), cell]); }
+      const tallest = Math.max(1, ...[...buckets.values()].map(b => b.length));
+      const track = el("div", { class: "track", role: "cell", style: "--stack:" + tallest });
+      if (c.rated.length > 1) track.append(el("i", { class: "range", style: `left:${c.lo * 100}%;width:${(c.hi - c.lo) * 100}%` }));
+      for (const list of buckets.values()) list.forEach((cell, k) => {
+        const { tutor, runs, s } = cell;
+        const langs = ["zh-CN", "en"].map(l => { const ls = M.summarize(runs.filter(v => v.record.card.lang === l)); return ls.scored ? langShort(l) + " " + (ls.good + ls.flawed) + "/" + ls.scored : null; }).filter(Boolean);
+        const tip = tutor + " · " + c.card + " · " + t("cellTip", { p: s.good + s.flawed, n: s.scored }) + (langs.length > 1 ? "（" + langs.join("，") + "）" : "") + (s.needsReview ? " · " + t("cellReview", { r: s.needsReview }) : "");
+        track.append(el("button", { type: "button", class: "mk" + (s.needsReview ? " pending" : ""), style: `left:${s.passRate * 100}%;--k:${k}`, "data-tip": tip, "aria-label": tip,
+          onclick: () => showRuns({ focus: { tutor, card: c.card } }) }, keys.get(tutor) || "?"));
+      });
+      const unrated = c.cells.filter(x => x.s.passRate == null);
+      chart.append(el("div", { class: "srow", role: "row" },
+        el("span", { class: "card", role: "rowheader" }, c.card, unrated.length ? el("span", { class: "faint small", "data-tip": unrated.map(x => x.tutor).join("、") + " · " + t("cellNone") }, " · " + t("unratedN", { n: unrated.length })) : null),
+        track,
+        el("span", { class: "delta num", role: "cell", text: c.spread >= 0 ? String(Math.round(c.spread * 100)) : "—" })));
     }
-    box.append(el("div", { class: "heat-box" }, grid));
+    box.append(el("div", { class: "spread-box" }, chart));
   }
 
   // What needs a person: two numbers, each opens the matching list.
   function renderAttention(vs) {
     const box = $("attention");
     const pending = vs.filter(v => v.state === "needs_review").length, spot = vs.filter(isSpot).length;
-    box.append(el("header", { class: "sec-head" }, el("h2", { id: "attention-title", text: t("attentionTitle") })));
+    box.append(plateHead("III", "attention-title", t("attentionTitle")));
     if (!pending && !spot) { box.append(el("p", { class: "empty-note", text: t("nothingPending") })); return; }
     const ask = (n, label, go) => el("button", { type: "button", class: "ask", onclick: go, disabled: !n },
       el("span", { class: "n", text: String(n) }), el("span", { class: "l", text: label + " →" }));
@@ -627,7 +693,22 @@
     if (["error", "student_invalid", "superseded"].includes(v.state) || (v.calibration && r.status !== "unscored")) {
       for (const a of r.attempts || []) vb.append(el("div", { class: "small", text: t("attemptN", { n: a.attempt, s: a.status }) + (a.reason ? " · " + a.reason.split(",").map(code).join(", ") : "") + (a.atStudentMessage ? " · " + t("msgN", { n: a.atStudentMessage }) : "") }));
     }
-    box.append(el("div", { class: "section" }, el("h3", { text: t("verdictBox") }), vb));
+    // The conversation's own specimen, large: each leaf is a tutor turn and jumps to it in the transcript.
+    let big = null;
+    if (r.end && r.end.tutorTurns > 0) {
+      // Same scale as Plate I, cropped to the plant so a short conversation does not float in empty space.
+      const d = specimenData(v), maxTurns = maxTurnsOf([v]);
+      const y0 = Math.max(0, SPH - d.n * (SP_ROOM / maxTurns) - 2 * HEAD - 5.5);
+      big = drawSpecimen(svg("svg", { class: "sp big " + kindOf(v), viewBox: `0 ${y0} ${SPW} ${SPH - y0}`, style: `height:${((SPH - y0) / SPW) * 64}px`, role: "img", "aria-label": specimenTip(v) }), d, maxTurns, true);
+      big.addEventListener("click", e => {
+        const g = e.target.closest("[data-turn]");
+        const msg = g && $("turn-" + g.getAttribute("data-turn"));
+        if (!msg) return;
+        msg.scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+        msg.classList.remove("flash"); void msg.offsetWidth; msg.classList.add("flash");
+      });
+    }
+    box.append(el("div", { class: "section" }, el("h3", { text: t("verdictBox") }), el("div", { class: "verdict-row" }, big, vb)));
 
     // Deterministic failure evidence
     const ev = M.failureEvidence(v);
@@ -662,7 +743,7 @@
           el("div", { class: "text", text: line.text })));
       } else {
         const mt = m && m.turns ? m.turns[line.turn - 1] : null;
-        msgs.append(el("div", { class: "msg" + (leakTurns.has(line.turn) ? " leak" : "") },
+        msgs.append(el("div", { class: "msg" + (leakTurns.has(line.turn) ? " leak" : ""), id: "turn-" + line.turn },
           el("div", { class: "who" }, el("strong", { text: t("tutor") + " " + t("turnN", { n: line.turn }) }), mt ? el("span", { text: t("level", { h: mt.helpLevel }) }) : null,
             mt ? el("span", { class: "checks" }, ["correct", "readsState", "helpFit", "noLeak", "responds"].map(k => el("span", { class: "ck" + (mt[k] === false ? " no" : ""), text: (mt[k] === false ? "✕ " : mt[k] === null ? "? " : "✓ ") + code(k) }))) : null),
           el("div", { class: "text", text: line.text })));
