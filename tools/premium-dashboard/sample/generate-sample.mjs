@@ -4,6 +4,7 @@
 // follows the runner's real output format. Cards, tutors, students and judges are all
 // synthetic: no real card, prompt, model output or person appears here.
 //
+// Needs the record schema v2 runner (calibration batches, budget top-ups, reconciliation).
 // Usage (needs a build that contains the premium runner, src/premium/*):
 //   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--bundle <file>] [--out <dir>]
 // --runner  folder with the built premium runner modules (default dist/src/premium)
@@ -21,7 +22,7 @@ const bundlePath = resolve(values.bundle ?? "tools/premium-dashboard/sample/samp
 const outDir = values.out ? resolve(values.out) : null;
 const load = name => import(pathToFileURL(join(runnerDir, name + ".js")).href);
 const { hash, loadCards } = await load("cards");
-const { runBatch, rejudge } = await load("batch");
+const { runBatch, rejudge, reconcile } = await load("batch");
 const { configSchema, panel } = await load("provider");
 const { replayProvider } = await load("replay");
 const { Store } = await load("store");
@@ -113,7 +114,7 @@ function cardJson(id, version, setupNote = "") {
     judgeContext: { problem: c.first, referenceAnswer: c.answer, referenceSolution: c.answer, misconception: c.first,
       leakDefinition: both("Stating the answer.", "直接说出答案。"), transferReference: both("A similar case.", "同类的新情况。") },
     stages: [{ n: 1, label: both("Guesses", "猜") }, { n: 2, label: both("Partial", "想到一半") }, { n: 3, label: both("Solved", "做对") }],
-    solvedStage: 3,
+    solvedStage: 3, leaveNotBefore: 4,
     fixedTest: { studentMessage: 2, kind: c.kind, mustContain: c.literal, skipIfEvent: "thanked_after_answer" },
     scriptedMistakes: [{ id: c.mistake, stage: 2, required: true, hint: { en: [c.hint.en], "zh-CN": [c.hint["zh-CN"]] } }],
     conditionalBehaviours: ["left", "curt_exit"],
@@ -149,7 +150,8 @@ function script(kind, cardId, lang) {
     students: [S(beg, 1, ["pushback", c.kind]), S(q("s3"), 2, [mistake]), S(q("s4"), 3), S(p("okThanks"), 3, ["curt_exit"], true)],
     delivered: true, solved: true };
   switch (kind) {
-    case "good": case "flawed": case "tie": case "incomplete": case "notDispatched": case "rejudgeFlip": return good;
+    case "good": case "flawed": case "tie": case "incomplete": case "notDispatched": case "rejudgeFlip":
+    case "verdictSplit": case "crosscheck": case "solvedClaim": case "repair": case "fenced": case "usageMissing": return good;
     case "transfer": return { ...good, tutors: [q("t1"), q("t2"), q("t3"), p("transfer"), p("transferHint"), p("sum")],
       students: [good.students[0], good.students[1], good.students[2], S(p("transferTry"), 3), S(p("transferFix"), 3), S(p("okThanks"), 3, ["curt_exit"], true)] };
     case "leakAfter": return { tutors: [q("t1"), q("answer")], students: [S(beg, 1, ["pushback", c.kind]), S(p("thanks"), 1, ["thanked_after_answer"], true)], delivered: true, solved: false };
@@ -166,6 +168,8 @@ function script(kind, cardId, lang) {
     case "eventMissing": return { ...good, students: [S(beg, 1, ["pushback"]), ...good.students.slice(1)] };
     case "skipsMistake": return { ...good, students: [good.students[0], S(q("t2").slice(0, 8) + "?", 2), good.students[2], good.students[3]] };
     case "rewrite": return { ...good, rewriteAt: 2 };
+    // The student tries to leave at message 3, before the card's leaveNotBefore (4): the runner sends it back.
+    case "rewriteLeft": return { ...good, rewriteAt: 3, rewriteWith: S(p("leave"), 1, ["left"], true) };
     case "discarded": return { ...good, discardFirst: true };
     case "error": return { tutors: [q("t1"), q("t2")], students: [good.students[0], good.students[1]], delivered: true, solved: false, exhausts: true };
     case "invalid": return { tutors: [q("t1")], students: [], delivered: false, solved: false, invalid: true };
@@ -207,14 +211,18 @@ function ballot(sc, cardLang, judgeIndex, kind, version) {
   if (kind === "left") reasons.push("student_left");
   if (kind === "capFault" || (kind === "capUnclear" && judgeIndex === 0)) reasons.push("unsolved_tutor_fault");
   if (kind === "flawed" && judgeIndex !== 2) reasons.push("help_level");
-  const verdict = reasons.some(r => ["leak", "student_left", "unsolved_tutor_fault"].includes(r)) ? "fail" : !sc.solved ? "fail" :
+  let verdict = reasons.some(r => ["leak", "student_left", "unsolved_tutor_fault"].includes(r)) ? "fail" : !sc.solved ? "fail" :
     reasons.length || (kind === "rejudgeFlip" && version === 1 && judgeIndex !== 0) ? "flawed" : "good";
+  // Judges' own verdicts are descriptive in v2: a three-way split or a majority against the rule verdict is a review flag.
+  if (kind === "verdictSplit") verdict = ["good", "flawed", "fail"][judgeIndex];
+  if (kind === "crosscheck" && judgeIndex !== 0) verdict = "flawed";
+  const solvedByStudent = kind === "solvedClaim" && judgeIndex !== 2 ? false : sc.solved;
   const transfer = kind === "transfer" ? (judgeIndex === 2 ? "solved" : "solved_after_hint") : "not_offered";
   return JSON.stringify({
     turns,
     transitions: { consistent: true, repeatedDeadHint: { value: dead.length > 0, turns: dead }, helpFollowsStudent: !dead.length, note: "" },
     fixedTest: { outcome: delivered ? outcome : "not_reached", evidence: delivered ? ev(tutors[fixed - 1]) : "" },
-    overall: { solvedByStudent: sc.solved, verdict, reasons, leakTurns: leaks, leakAfterFixedTest: delivered && leaks.some(x => x >= fixed),
+    overall: { solvedByStudent, verdict, reasons, leakTurns: leaks, leakAfterFixedTest: delivered && leaks.some(x => x >= fixed),
       transfer, summary: "Synthetic ballot for " + cardLang + "." },
   });
 }
@@ -230,13 +238,14 @@ function tracksFor(kind, cardId, lang, tutor, config, version = 1) {
   const tutorFrame = (x, i) => frame(x, "tutor", i);
   const stu = (x, i) => frame(x, "student", i, config.student.pinnedVersion);
   const bad = i => stu(S("this is way too long ".repeat(13), 1), i);
+  const rejectedReply = i => (sc.rewriteWith ? stu(sc.rewriteWith, i) : bad(i));
   if (sc.invalid) {
     for (let a = 0; a < 3; a++) { tracks[t].push(tutorFrame(sc.tutors[0], 1)); for (let r = 0; r < 3; r++) tracks[st].push(bad(r)); }
   } else {
     if (sc.discardFirst) { tracks[t].push(tutorFrame(sc.tutors[0], 1)); for (let r = 0; r < 3; r++) tracks[st].push(bad(r)); }
-    sc.tutors.forEach((x, i) => tracks[t].push(tutorFrame(x, i + 1)));
+    sc.tutors.forEach((x, i) => tracks[t].push(kind === "usageMissing" && i === 1 ? { ...tutorFrame(x, i + 1), usage: null } : tutorFrame(x, i + 1)));
     sc.students.forEach((x, i) => {
-      if (sc.rewriteAt === i + 2) tracks[st].push(bad(i));
+      if (sc.rewriteAt === i + 2) tracks[st].push(rejectedReply(i));
       tracks[st].push(stu(x, i + 2));
     });
     if (sc.exhausts) tracks[t] = tracks[t].slice(0, 2);
@@ -246,7 +255,14 @@ function tracksFor(kind, cardId, lang, tutor, config, version = 1) {
   judges.forEach((j, k) => {
     let raw = ballot(sc, cardId + "/" + lang, k, kind, version);
     if (kind === "incomplete" && k === 1) raw = "{\"turns\": \"not a list\"}";
+    if (kind === "fenced" && k === 0) raw = "\u0060\u0060\u0060json\n" + raw + "\n\u0060\u0060\u0060";
     tracks[j.id] = [kind === "notDispatched" && k === 2 ? "mock_not_dispatched" : frame(raw, "judge", k, j.pinnedVersion)];
+    if (kind === "repair" && k === 2) {
+      // First ballot names a leak turn that no turn marks; the runner sends it back once and keeps the rejected reply.
+      const broken = JSON.parse(raw);
+      broken.overall.leakTurns = [1];
+      tracks[j.id].unshift(frame(JSON.stringify(broken), "judge", k, j.pinnedVersion));
+    }
   });
   return tracks;
 }
@@ -269,12 +285,16 @@ function config(batchId, purpose, tutors, judgeConfigVersion, extra = {}) {
     judgeConfigVersion, ...extra,
   }, "config");
 }
+// v2 per-model price table (used by the newer batches; the older batches keep the legacy flat rates).
+const priced = (model, input, output) => ({ model, inputUsdPerMillion: input, outputUsdPerMillion: output, date: "2026-11-25", source: "https://example.com/synthetic-prices" });
+const modelPrices = { version: "synthetic-prices-v2", models: [priced("atlas", 0.5, 2), priced("birch", 0.5, 2), priced("cedar", 0.5, 2), priced("dune", 0.5, 2),
+  priced("learner", 0.3, 1.2), priced("j1", 0.5, 2), priced("j2", 0.5, 2), priced("j3", 0.5, 2), priced("alt1", 0.5, 2), priced("alt2", 0.5, 2)] };
 // Scenario per (tutor, card, lang, repeat). Chosen so that every status, end reason and flag appears.
 const PLAN = {
-  atlas: ["good", "good", "flawed", "transfer", "good", "rejudgeFlip", "good", "premature", "good", "tie", "good", "flawed", "eventMissing", "good", "good", "rejudgeFlip"],
+  atlas: ["good", "good", "flawed", "transfer", "verdictSplit", "rejudgeFlip", "good", "premature", "crosscheck", "tie", "good", "flawed", "eventMissing", "good", "good", "rejudgeFlip"],
   birch: ["leakAfter", "good", "leakSkip", "leakAfter", "flawed", "leakAfter", "claimUnconfirmed", "leakAfter", "leakAfter", "good", "leakSkip", "leakAfter", "leakAfter", "flawed", "leakAfter", "good"],
-  cedar: ["left", "capFault", "left", "good", "capUnclear", "left", "left", "skipsMistake", "capFault", "left", "good", "left", "left", "capUnclear", "left", "flawed"],
-  dune: ["incomplete", "good", "good", "rewrite", "invalid", "discarded", "good", "notDispatched", "flawed", "good", "incomplete", "good", "rewrite", "good", "tie", "good"],
+  cedar: ["left", "capFault", "left", "good", "capUnclear", "left", "left", "skipsMistake", "capFault", "left", "solvedClaim", "left", "left", "capUnclear", "left", "flawed"],
+  dune: ["incomplete", "good", "repair", "rewrite", "invalid", "discarded", "fenced", "notDispatched", "flawed", "good", "incomplete", "usageMissing", "rewrite", "good", "tie", "good"],
 };
 function scenarioFor(tutorId, cardIndex, lang, repeat) {
   return PLAN[tutorId][cardIndex * 4 + (lang === "en" ? 2 : 0) + (repeat - 1)];
@@ -318,7 +338,7 @@ try {
     const c2b = config("synthetic-pilot-02", c2.purpose, Object.values(TUTORS), "synthetic-panel-v2");
     const rows = readFileSync(join(work, "runs", "index.jsonl"), "utf8").trim().split("\n").map(l => JSON.parse(l));
     const kindOf = row => scenarioFor(row.tutorLabel.split(" ")[0].toLowerCase(), cardIds.indexOf(row.cardId), row.lang, row.repeatIndex);
-    const targets = rows.filter(r => r.batchId === "synthetic-pilot-02" && ["rejudgeFlip", "tie"].includes(kindOf(r)));
+    const targets = rows.filter(r => r.batchId === "synthetic-pilot-02" && kindOf(r) === "rejudgeFlip");
     const now = clock("2026-11-25T08:00:00Z", 1);
     for (const row of targets) {
       const kind = kindOf(row);
@@ -340,9 +360,40 @@ try {
     const tape4 = {};
     for (const lang of c4.languages) tape4[["synthetic-fractions", lang, "dune"].join("/")] = tracksFor("error", "synthetic-fractions", lang, TUTORS.dune, c4);
     run(store, c4, assets.filter(a => a.card.id === "synthetic-fractions"), tape4, clock("2026-11-25T09:30:00Z"));
+
+    // Batch 5: a calibration batch. It checks the simulated student only: no judges, status "unscored", never counted.
+    const c5 = config("synthetic-calibration-05", "synthetic calibration of the simulated student", [TUTORS.atlas, TUTORS.cedar], "synthetic-panel-v1",
+      { kind: "calibration", budgetUsd: 1, prices: modelPrices });
+    const calibrationPlan = { atlas: ["good", "rewriteLeft", "discarded", "good"], cedar: ["left", "good", "rewrite", "left"] };
+    const tapes5 = { 1: {}, 2: {} };
+    for (const tutor of c5.tutors) c5.languages.forEach((lang, li) => {
+      for (const r of [1, 2]) tapes5[r][["synthetic-tiles", lang, tutor.id].join("/")] = tracksFor(calibrationPlan[tutor.id][li * 2 + r - 1], "synthetic-tiles", lang, tutor, c5);
+    });
+    runBatch(store, { ...execution(c5, assets.filter(a => a.card.id === "synthetic-tiles"), tapes5, clock("2026-11-25T10:00:00Z", 2)),
+      provider: job => replayProvider(tapes5[job.repeatIndex], job) });
+
+    // Batch 6: the budget runs out in the middle of a conversation. That run ends in error; after an explicit top-up the
+    // runner restarts it (restartOf) and the interrupted record stays on file as superseded. Then the provider's invoice
+    // is reconciled against the price-table estimate.
+    const shadows = assets.filter(a => a.card.id === "synthetic-shadows");
+    const c6 = config("synthetic-restart-06", "synthetic run interrupted by its budget, topped up and restarted", [TUTORS.atlas], "synthetic-panel-v1",
+      { languages: ["en"], budgetUsd: 0.006, reserveUsd: 0, prices: modelPrices });
+    const tape6 = { [["synthetic-shadows", "en", "atlas"].join("/")]: tracksFor("good", "synthetic-shadows", "en", TUTORS.atlas, c6) };
+    run(store, c6, shadows, tape6, clock("2026-11-25T10:30:00Z"));
+    const c6b = config(c6.batchId, c6.purpose, c6.tutors, "synthetic-panel-v1", { languages: ["en"], budgetUsd: 0.5, reserveUsd: 0, prices: modelPrices });
+    runBatch(store, { ...execution(c6b, shadows, tape6, clock("2026-11-25T10:45:00Z")), topUp: true });
+    const estimate = JSON.parse(readFileSync(join(work, "runs", "batches", c6.batchId + ".json"), "utf8")).spentUsd;
+    reconcile(store, c6.batchId, "synthetic-host", Math.round(estimate * 1.06 * 1e6) / 1e6, "Synthetic invoice: provider counts tokens differently.");
   } finally { store.close(); }
 
   const runs = join(work, "runs");
+  // The runner stamps a reconciliation with the wall clock; pin it so the sample stays deterministic.
+  for (const f of readdirSync(join(runs, "batches"))) {
+    const path = join(runs, "batches", f), b = JSON.parse(readFileSync(path, "utf8"));
+    if (!b.reconciliationHistory) continue;
+    b.reconciliationHistory = b.reconciliationHistory.map(h => ({ ...h, at: "2026-11-25T11:00:00.000Z" }));
+    writeFileSync(path, JSON.stringify(b) + "\n");
+  }
   const readDir = dir => readdirSync(join(runs, dir)).filter(f => f.endsWith(".json")).sort().map(f => JSON.parse(readFileSync(join(runs, dir, f), "utf8")));
   const sample = { source: "synthetic", note: "Synthetic sample produced by the premium runner in offline replay. Not real results.",
     index: readFileSync(join(runs, "index.jsonl"), "utf8"), batches: readDir("batches"), records: readDir("records") };

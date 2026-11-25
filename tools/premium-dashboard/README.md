@@ -1,6 +1,7 @@
 # Premium runs dashboard
 
 A local page for reading the premium runner's output: `index.jsonl`, `batches/<batchId>.json` and `records/<runId>.json`.
+It reads record and batch schema v1 and v2.
 It shows the formal pass rate, what still needs a person, the evidence behind each deterministic failure, the simulated student's checks, and where the three judges disagreed.
 
 ## Open it
@@ -21,8 +22,10 @@ The page has three views. The filters (judge configuration, batch, language, car
   - *Which cards separate the tutors* is a card × tutor grid in one hue, where a stronger colour means a higher pass rate. The cards with the widest spread between tutors come first. A small ring in a cell means some of its conversations still need review.
   - *Needs you* shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, or tied judges).
   - Hovering a mark or a cell gives the detail. Clicking a mark opens that conversation. Clicking a cell, a tutor name or a number opens the matching list.
-- **All conversations** is the full list, with state tabs and the run drawer.
-- **Run checks** shows judge disagreement and batches with their cost.
+- **All conversations** is the full list, with state tabs and the run drawer. Tabs for superseded and calibration runs appear when such runs are loaded.
+- **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate.
+
+The overview compares tutors, so it reads evaluation runs only. Calibration and superseded runs appear in the lists and the drawer.
 
 ## What counts in the pass rate
 
@@ -40,6 +43,10 @@ Pass rate = (good + flawed) / counted runs. These runs are listed but never coun
 | Needs review | No final verdict yet: a pending item, an incomplete panel, or no scoring at all. A rule verdict that was withheld is shown with its evidence. |
 | Not scorable | The run ended in `error` or `student_invalid`. |
 | Other judge configuration | The current scoring was made under a different judge configuration. |
+| Calibration | The run belongs to a calibration batch (`batchKind: "calibration"`, status `unscored`). It checks the simulated student only and is never judged. |
+| Superseded | The budget interrupted the run and the runner restarted it after a top-up. The restarted record names it in `restartOf`. The interrupted record is kept for the audit. |
+
+Review flags (`merged.reviewFlags`) and `fixedTestSkipped` do not block a verdict. A scored run with a review flag is counted and is also offered for a spot check.
 
 Runs on an older card version are hidden by default and labelled when shown.
 
@@ -51,7 +58,8 @@ The page reports instead of trusting:
 - two different records with one `runId`
 - one card version with two content hashes
 - records whose batch file is missing
-- `index.jsonl` rows that disagree with the records, plus records missing from the index and index rows missing from `records/`
+- `index.jsonl` rows that disagree with the records, plus records missing from the index and index rows missing from `records/`. For v2 rows this includes `batchKind`, `reviewFlags` and `fixedTestSkipped`.
+- a `restartOf` that points to no loaded record, or two restarts of one record
 
 ## Files
 
@@ -77,8 +85,11 @@ The sample is produced by the premium runner itself, so it follows the runner's 
 - an older card version
 - student soft flags, rewrites and discarded attempts
 - a budget stop and an unknown-cost stop
+- a calibration batch, including a student reply sent back for leaving before the card's `leaveNotBefore`
+- a run interrupted by its budget, a top-up and the restart that supersedes it, then a reconciled invoice
+- review flags (split votes and a rule verdict that differs from the judges' majority), `fixedTestSkipped`, a judge ballot that was valid after one retry, a fenced ballot, and a call charged at its reservation
 
-Regenerating it needs a build that contains the premium runner (`src/premium/`, added in PR #431):
+Regenerating it needs a build that contains the premium runner with record schema v2 (`src/premium/`, added in PR #431):
 
 ```sh
 npm run build

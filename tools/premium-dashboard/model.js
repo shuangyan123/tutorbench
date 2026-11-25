@@ -1,6 +1,8 @@
 // Data model for the premium runs dashboard. Pure functions only: no DOM, no network.
 // Loaded as a classic script in the page (works from file://) and imported by the Node tests.
 // Input is the premium runner's output: records/<runId>.json, batches/<batchId>.json, index.jsonl.
+// Record and batch schema v1 and v2 are both read. v2 adds calibration batches (status "unscored", never scored),
+// budget restarts (restartOf), review flags, fixedTestSkipped and cost reconciliation.
 (function (root) {
   "use strict";
 
@@ -8,6 +10,10 @@
   const BATCH_SCHEMA = "tutorbench.premium-batch";
   const VERDICTS = ["good", "flawed", "fail"];
   const ITEMS = ["correct", "readsState", "helpFit", "noLeak", "responds", "helpLevel"];
+  const SCHEMA_VERSIONS = [1, 2];
+  // States that are listed but never part of an evaluation: a calibration run checks the simulated student only,
+  // and a superseded run was interrupted by the budget and replaced by a restart.
+  const NOT_EVALUATION = ["calibration", "superseded"];
 
   function parseJsonl(text) {
     const rows = [];
@@ -30,6 +36,8 @@
   }
 
   const currentScoring = record => (Array.isArray(record.scorings) && record.scorings.length ? record.scorings[record.scorings.length - 1] : null);
+  const isCalibration = record => record.batchKind === "calibration" || record.status === "unscored";
+  const sameList = (a, b) => JSON.stringify(a || []) === JSON.stringify(b || []);
 
   // Builds one dataset from whatever the person loaded. Unknown files are reported, never trusted.
   function buildDataset(input) {
@@ -37,7 +45,7 @@
     const runs = new Map();
     const names = input.recordNames || [];
     (input.records || []).forEach((r, i) => {
-      if (!r || r.schema !== RECORD_SCHEMA || r.schemaVersion !== 1 || typeof r.runId !== "string") {
+      if (!r || r.schema !== RECORD_SCHEMA || !SCHEMA_VERSIONS.includes(r.schemaVersion) || typeof r.runId !== "string") {
         warnings.push({ code: "not_a_record", detail: r && r.runId ? r.runId : names[i] || "?" });
         return;
       }
@@ -65,6 +73,15 @@
     }
     for (const r of list) if (!batches.has(r.batchId)) warnings.push({ code: "batch_missing", detail: r.batchId });
 
+    // Budget restarts: the restarted record names the interrupted one, which stays on file but no longer counts.
+    const supersededBy = {};
+    for (const r of list) {
+      if (!r.restartOf) continue;
+      if (!runs.has(r.restartOf)) warnings.push({ code: "restart_target_missing", detail: r.runId });
+      else if (supersededBy[r.restartOf]) warnings.push({ code: "restarted_twice", detail: r.restartOf });
+      else supersededBy[r.restartOf] = r.runId;
+    }
+
     // Judge configurations in order of first use.
     const seen = new Map();
     for (const r of list) for (const s of r.scorings || []) {
@@ -80,40 +97,55 @@
         if (!r) { warnings.push({ code: "index_row_without_record", detail: row.runId }); continue; }
         const s = currentScoring(r);
         const status = s ? (s.merged && s.merged.verdict ? "scored" : "needs_review") : r.status;
-        if (row.status !== status || (row.scoringId ?? null) !== (s ? s.scoringId : null) || (row.verdict ?? null) !== (s && s.merged ? s.merged.verdict ?? null : null)) {
+        const m = s && s.merged;
+        // v2 rows also carry batchKind, reviewFlags and fixedTestSkipped; v1 rows do not, so only present fields are compared.
+        const v2Differs = ("batchKind" in row && row.batchKind !== (r.batchKind ?? "evaluation"))
+          || ("reviewFlags" in row && !sameList(row.reviewFlags, m && m.reviewFlags))
+          || ("fixedTestSkipped" in row && row.fixedTestSkipped !== !!(m && m.fixedTestSkipped));
+        if (v2Differs || row.status !== status || (row.scoringId ?? null) !== (s ? s.scoringId : null) || (row.verdict ?? null) !== (m ? m.verdict ?? null : null)) {
           warnings.push({ code: "index_out_of_date", detail: row.runId });
         }
       }
       const indexed = new Set(input.index.map(row => row.runId));
       for (const id of runs.keys()) if (!indexed.has(id)) warnings.push({ code: "record_not_in_index", detail: id });
     }
-    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, warnings };
+    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, warnings };
   }
 
   // The state a run counts as under the selected judge configuration.
   // Only the CURRENT scoring decides; an older scoring under another configuration never fills in.
-  function runView(record, selectedVersion, latestCard) {
+  // supersededBy is the dataset's map from an interrupted run to the run that replaced it.
+  function runView(record, selectedVersion, latestCard, supersededBy) {
     const s = currentScoring(record);
     const reason = record.end && record.end.reason;
     const view = {
       record, scoring: s, state: "needs_review", verdict: null, reasons: [], pending: [], reviewFlags: [],
-      withheldVerdict: null, scoringIncomplete: false, judgeErrors: [], disagreements: [],
+      withheldVerdict: null, fixedTestSkipped: false, scoringIncomplete: false, judgeErrors: [], judgeRepairs: [], disagreements: [],
       olderCard: latestCard ? record.card.version !== latestCard[record.card.id] : false,
       judgeVersion: s && s.judgeConfig ? s.judgeConfig.version : null,
+      calibration: isCalibration(record), supersededBy: (supersededBy && supersededBy[record.runId]) || null, restartOf: record.restartOf || null,
     };
+    if (view.calibration) { view.state = "calibration"; return view; }
+    if (view.supersededBy) { view.state = "superseded"; return view; }
     if (reason === "error" || record.status === "error") { view.state = "error"; return view; }
     if (reason === "student_invalid" || record.status === "student_invalid") { view.state = "student_invalid"; return view; }
     if (!s) { view.pending = ["no_scoring"]; view.scoringIncomplete = true; return view; }
     view.pending = Array.isArray(s.pending) ? s.pending.slice() : [];
     view.disagreements = Array.isArray(s.disagreements) ? s.disagreements : [];
     view.judgeErrors = (s.perJudge || []).filter(j => j.error || !j.output).map(j => ({ judgeId: j.judgeId, error: j.error || "no_output" }));
+    // v2: an invalid ballot is sent back to the same judge once; the rejected replies are kept.
+    view.judgeRepairs = (s.perJudge || []).filter(j => Array.isArray(j.rejected) && j.rejected.length)
+      .map(j => ({ judgeId: j.judgeId, reasons: j.rejected.map(x => x.reason), recovered: !!j.output }));
+    // v2 keeps a withheld rule verdict on the scoring (incomplete panel, merged is null); v1 kept it inside merged.
+    view.withheldVerdict = s.withheldRuleVerdict || null;
     // Scoring not finished: no merged result, or a judge in the panel gave no valid ballot.
     view.scoringIncomplete = !s.merged || view.pending.includes("incomplete_panel");
     const m = s.merged;
     if (m) {
       view.reasons = Array.isArray(m.reasons) ? m.reasons : [];
       view.reviewFlags = Array.isArray(m.reviewFlags) ? m.reviewFlags : [];
-      view.withheldVerdict = m.withheldRuleVerdict || null;
+      view.fixedTestSkipped = !!m.fixedTestSkipped;
+      view.withheldVerdict = view.withheldVerdict || m.withheldRuleVerdict || null;
     }
     if (selectedVersion && view.judgeVersion !== selectedVersion) { view.state = "other_version"; return view; }
     if (m && m.verdict && VERDICTS.includes(m.verdict) && !view.pending.length) { view.state = "scored"; view.verdict = m.verdict; }
@@ -121,16 +153,19 @@
   }
 
   // Formal pass rate: only runs in state "scored" under the selected configuration count.
-  // needs_review, error, student_invalid and runs scored under another configuration are listed, never counted.
+  // needs_review, error, student_invalid, runs scored under another configuration, calibration runs and superseded runs
+  // are listed, never counted.
   function summarize(views) {
     const t = { total: views.length, scored: 0, good: 0, flawed: 0, fail: 0, needsReview: 0, scoringIncomplete: 0,
-      otherVersion: 0, error: 0, studentInvalid: 0, passRate: null, goodRate: null, failRate: null };
+      otherVersion: 0, error: 0, studentInvalid: 0, calibration: 0, superseded: 0, passRate: null, goodRate: null, failRate: null };
     for (const v of views) {
       if (v.state === "scored") { t.scored++; t[v.verdict]++; }
       else if (v.state === "needs_review") { t.needsReview++; if (v.scoringIncomplete) t.scoringIncomplete++; }
       else if (v.state === "other_version") t.otherVersion++;
       else if (v.state === "error") t.error++;
       else if (v.state === "student_invalid") t.studentInvalid++;
+      else if (v.state === "calibration") t.calibration++;
+      else if (v.state === "superseded") t.superseded++;
     }
     if (t.scored) {
       t.passRate = (t.good + t.flawed) / t.scored;
@@ -145,10 +180,10 @@
   // Evidence for a deterministic failure: what a reviewer needs to confirm it without rereading the whole run.
   function failureEvidence(view) {
     const { record, scoring } = view;
-    if (!scoring || !scoring.merged) return [];
-    const m = scoring.merged;
+    // A v2 withheld verdict has no merged result (incomplete panel), so only record-based evidence exists for it.
+    const m = (scoring && scoring.merged) || { reasons: [] };
     const failing = view.verdict === "fail" || view.withheldVerdict === "fail";
-    if (!failing) return [];
+    if (!scoring || !failing) return [];
     const out = [];
     if ((m.reasons || []).includes("leak")) {
       for (const turn of m.leakTurns || []) {
@@ -213,10 +248,34 @@
     return { runsWith, total, byJudge, byItem };
   }
 
+  // Costs are the runner's price-table estimates. A v2 call with no usage from the provider is charged at its
+  // reservation and marked costEstimated; those calls are counted so the page can say so.
   function costs(record) {
     const run = record.usage ? record.usage.totalUsd : null;
     const rescoring = (record.scorings || []).slice(1).map(s => ({ scoringId: s.scoringId, usd: s.usage ? s.usage.totalUsd : null }));
-    return { run, rescoring };
+    const calls = [...(record.calls || []), ...(record.scorings || []).slice(1).flatMap(s => s.calls || [])];
+    return { run, rescoring, estimatedCalls: calls.filter(c => c && c.costEstimated === true).length };
+  }
+
+  // A batch as the page shows it. v1 batches have no kind, hard cap, top-ups or reconciliation.
+  function batchInfo(b) {
+    const runs = b.runs || {};
+    const history = Array.isArray(b.reconciliationHistory) ? b.reconciliationHistory : [];
+    const reconciled = Object.entries(b.reconciledUsd || {}).map(([provider, actualUsd]) => {
+      const last = history.filter(h => h.provider === provider).slice(-1)[0] || null;
+      const estimatedUsd = last && typeof last.estimated === "number" ? last.estimated : null;
+      return { provider, actualUsd, estimatedUsd, diffUsd: estimatedUsd == null ? null : Math.round((actualUsd - estimatedUsd) * 1e9) / 1e9,
+        reason: last ? last.reason || "" : "", at: last ? last.at || null : null };
+    }).sort((a, c) => a.provider.localeCompare(c.provider));
+    return {
+      batchId: b.batchId, kind: b.kind || "evaluation", status: b.status || null, createdAt: b.createdAt || null,
+      planned: b.planned ?? runs.planned ?? null,
+      done: (runs.scored || 0) + (runs.error || 0) + (runs.studentInvalid || 0) + (runs.needsReview || 0) + (runs.unscored || 0),
+      superseded: runs.superseded || 0,
+      spentUsd: b.spentUsd ?? null, budgetUsd: b.budgetUsd ?? null, hardCapUsd: b.hardCapUsd ?? null, hardCapReached: b.hardCapReached === true,
+      topUps: Array.isArray(b.budgetHistory) ? b.budgetHistory.map(h => ({ at: h.at || null, from: h.from ?? null, to: h.to ?? null })) : [],
+      reconciled,
+    };
   }
 
   function groupBy(views, key) {
@@ -230,6 +289,6 @@
   }
 
   const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, failureEvidence,
-    studentChecks, disagreementSummary, costs, groupBy, itemOf, VERDICTS, ITEMS };
+    studentChecks, disagreementSummary, costs, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION };
   root.PremiumDashboardModel = api;
 })(globalThis);

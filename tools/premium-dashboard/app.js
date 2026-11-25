@@ -11,8 +11,8 @@
       kicker: "TutorBench · 精品集", chartTutors: "谁教得好", chartCards: "哪张卡拉开了差距", rampLow: "通过率 低", rampHigh: "高", legendPending: "待审（不计入）",
       rateTip: "已计分 {n} 段：好 {g} · 有问题 {f} · 不合格 {x}", rateTipReview: "；另有 {r} 段待审，不计入", allOfTutor: "看这位导师的全部对话",
       cellTip: "通过 {p}/{n}", cellNone: "还没有已计分的对话", cellReview: "待审 {r}", noRate: "暂无", langZh: "中", langEn: "英",
-      attentionTitle: "需要你看的", askPending: "段待审，还没有结论", askSpot: "段已计分，建议抽查", onlySpot: "建议抽查", judgesTied: "评审打平：{f}",
-      costLine: "共花费 {cost}，其中重新评审 {re}。", opsTitle: "运行检查", opsNote: "看评测本身靠不靠得住：三位评审是否一致，批次是否跑完。", ties: "平票", topItems: "分歧最多的项：{list}",
+      attentionTitle: "需要你看的", askPending: "段待审，还没有结论", askSpot: "段已计分，建议抽查", onlySpot: "建议抽查",
+      costLine: "按价格表估算共花费 {cost}，其中重新评审 {re}。", opsTitle: "运行检查", opsNote: "看评测本身靠不靠得住：三位评审是否一致，批次是否跑完。", ties: "平票", topItems: "分歧最多的项：{list}",
       title: "评测运行", openFolder: "打开 runs 文件夹", loadSample: "载入合成示例", dropHere: "松开鼠标，载入这个 runs 文件夹",
       sourceSample: "合成示例 · {runs} 段对话 · {batches} 个批次", sourceFolder: "「{name}」· {runs} 段对话 · {batches} 个批次",
       sourceNone: "还没有数据。打开 runner 写出的 runs 文件夹（含 index.jsonl、batches/、records/），或者把文件夹拖进这个页面。",
@@ -42,14 +42,21 @@
       studentChecks: "学生检查", softFlags: "软标记", rejected: "被退回重写的回复", notFired: "没出现的条件行为", missingMistakes: "没犯的必犯错误", none: "无",
       attempts: "尝试", attemptN: "第 {n} 次尝试：{s}", costs: "花费", runCost: "运行（导师、学生、首次评审）", rejudgeCost: "重新评审 {id}",
       noData: "没有符合筛选条件的对话。", split: "评审分歧",
+      calibration: "校准", superseded: "已被替代", onlyCalibration: "这些筛选里只有校准对话。校准不打分，到「全部对话」里看。",
+      calibNote: "校准批次只检查模拟学生，不评审、不打分，也不计入通过率。", supersededShort: "预算中断，已重跑",
+      supersededNote: "预算中断了这段对话，追加预算后已经重跑。这份记录留着备查，不计入。", openSuccessor: "看重跑的那段",
+      restartNote: "这是预算中断后的重跑，替代了被打断的那段。", openPredecessor: "看被打断的那段",
+      fixedTestSkipped: "考验之前就拿到答案离开", judgeRepaired: "{j} 第一次输出无效，补调 1 次后有效：{r}", judgeRepairFailed: "{j} 补调后仍然无效：{r}",
+      estimatedCalls: "其中 {n} 次调用没有返回用量，按预留额计", hardCap: "硬上限 {v}", hardCapReached: "已到硬上限",
+      topUp: "追加预算 {from} → {to}", reconciled: "{p} 账单 {a}，估算 {e}，差 {d}", supersededRuns: "被替代 {n}",
     },
     en: {
       viewOverview: "Overview", viewRuns: "All conversations", viewChecks: "Run checks", allBatches: "all batches", allLangs: "both languages", latestShort: "latest cards", changeFilters: "Change", doneFilters: "Done",
       kicker: "TutorBench · Premium set", chartTutors: "Who teaches well", chartCards: "Which cards separate the tutors", rampLow: "Pass rate low", rampHigh: "high", legendPending: "Needs review (not counted)",
       rateTip: "{n} scored: good {g} · flawed {f} · fail {x}", rateTipReview: "; {r} more need review and are not counted", allOfTutor: "All conversations for this tutor",
       cellTip: "pass {p}/{n}", cellNone: "nothing scored yet", cellReview: "{r} need review", noRate: "none yet", langZh: "zh", langEn: "en",
-      attentionTitle: "Needs you", askPending: "need review, no verdict yet", askSpot: "scored, worth a spot check", onlySpot: "Worth a spot check", judgesTied: "judges tied: {f}",
-      costLine: "Spent {cost}, of which rescoring {re}.", opsTitle: "Run checks", opsNote: "Whether the evaluation itself can be trusted: do the three judges agree, did the batches finish.", ties: "Ties", topItems: "Most splits: {list}",
+      attentionTitle: "Needs you", askPending: "need review, no verdict yet", askSpot: "scored, worth a spot check", onlySpot: "Worth a spot check",
+      costLine: "Price-table estimate: {cost}, of which rescoring {re}.", opsTitle: "Run checks", opsNote: "Whether the evaluation itself can be trusted: do the three judges agree, did the batches finish.", ties: "Ties", topItems: "Most splits: {list}",
       title: "Evaluation runs", openFolder: "Open runs folder", loadSample: "Load synthetic sample", dropHere: "Drop to load this runs folder",
       sourceSample: "Synthetic sample · {runs} conversations · {batches} batches", sourceFolder: "“{name}” · {runs} conversations · {batches} batches",
       sourceNone: "No data yet. Open the runs folder the runner wrote (index.jsonl, batches/, records/), or drop the folder on this page.",
@@ -79,6 +86,13 @@
       studentChecks: "Student checks", softFlags: "Soft flags", rejected: "Replies sent back for a rewrite", notFired: "Conditional behaviours that never fired", missingMistakes: "Required mistakes not made", none: "none",
       attempts: "Attempts", attemptN: "Attempt {n}: {s}", costs: "Cost", runCost: "Run (tutor, student, first scoring)", rejudgeCost: "Rescoring {id}",
       noData: "No conversations match these filters.", split: "judges split",
+      calibration: "Calibration", superseded: "Superseded", onlyCalibration: "Only calibration runs match these filters. Calibration is not scored; see All conversations.",
+      calibNote: "A calibration batch checks the simulated student only. It is not judged, not scored and never counted.", supersededShort: "budget stop, restarted",
+      supersededNote: "The budget interrupted this conversation and it was restarted after a top-up. This record is kept for the audit and not counted.", openSuccessor: "Open the restart",
+      restartNote: "This is a restart after a budget interruption. It replaces the interrupted run.", openPredecessor: "Open the interrupted run",
+      fixedTestSkipped: "Left with the answer before the fixed test", judgeRepaired: "{j} gave an invalid ballot, valid after one retry: {r}", judgeRepairFailed: "{j} still invalid after a retry: {r}",
+      estimatedCalls: "{n} calls returned no usage and are charged at their reservation", hardCap: "hard cap {v}", hardCapReached: "hard cap reached",
+      topUp: "budget topped up {from} → {to}", reconciled: "{p} invoice {a}, estimate {e}, difference {d}", supersededRuns: "{n} superseded",
     },
   };
   const CODES = {
@@ -101,6 +115,11 @@
       correct: "内容正确", readsState: "看准状态", helpFit: "帮助力度", noLeak: "不泄露", responds: "回应学生", helpLevel: "力度档位", fixedTest: "固定考验",
       transfer: "迁移题", solvedByStudent: "学生自己做出", judgeVerdictMajority: "评审结论多数", consistent: "前后一致", repeatedDeadHint: "重复无效提示",
       helpFollowsStudent: "帮助跟着学生走", "verdict rule / judge majority": "规则结论 vs 评审多数",
+      left_too_early: "比卡片规定的最早时间更早走掉", curt_exit_unsolved: "没做出来就草草结束", fixed_test_early: "考验原话出现得太早",
+      answer_claim_unconfirmed: "学生拿到答案道谢，但评审没认定泄露", solved_claim_unconfirmed: "学生说做完了，但评审不认为是自己做出",
+      fixed_test_split: "固定考验三票各不相同", transfer_split: "迁移题三票各不相同", verdict_split: "评审结论三票各不相同", verdict_crosscheck: "规则结论和评审多数不一致",
+      unscored: "未打分", calibration: "校准", evaluation: "评测", superseded: "已被替代",
+      timeout: "超时", overloaded: "服务繁忙", not_dispatched: "没有发出", content_filter: "被内容过滤", invalid_judge_json: "评审输出不是有效 JSON",
     },
     en: {
       not_a_record: "not a runner conversation record, skipped", not_a_batch: "not a runner batch file, skipped", duplicate_run_differs: "two different records share one runId; the first was used",
@@ -121,6 +140,11 @@
       correct: "correct", readsState: "reads state", helpFit: "help fit", noLeak: "no leak", responds: "responds", helpLevel: "help level", fixedTest: "fixed test",
       transfer: "transfer", solvedByStudent: "solved by student", judgeVerdictMajority: "judges' verdict", consistent: "consistent", repeatedDeadHint: "repeated dead hint",
       helpFollowsStudent: "help follows student", "verdict rule / judge majority": "rule verdict vs judges",
+      left_too_early: "left before the card's earliest message", curt_exit_unsolved: "curt exit while unsolved", fixed_test_early: "fixed line came too early",
+      answer_claim_unconfirmed: "thanked for an answer, but judges found no leak", solved_claim_unconfirmed: "claimed to be done, but judges do not see it solved",
+      fixed_test_split: "fixed test: three different votes", transfer_split: "transfer: three different votes", verdict_split: "judges' verdicts all differ", verdict_crosscheck: "rule verdict differs from the judges' majority",
+      unscored: "unscored", calibration: "calibration", evaluation: "evaluation", superseded: "superseded",
+      timeout: "timeout", overloaded: "overloaded", not_dispatched: "not sent", content_filter: "content filter", invalid_judge_json: "judge output is not valid JSON",
     },
   };
 
@@ -151,12 +175,15 @@
     if (s.startsWith("no_majority:")) return (st.lang === "zh" ? "评审在「" + code(s.slice(12)) + "」上没有多数" : "no majority on " + code(s.slice(12)));
     if (s.startsWith("missing:")) return (st.lang === "zh" ? "没犯必犯的错 " : "required mistake not made: ") + s.slice(8);
     if (s.startsWith("hint_absent:")) return (st.lang === "zh" ? "报了错误但话里没有 " : "mistake reported without its words: ") + s.slice(12);
+    if (/^http_\d+$/u.test(s)) return "HTTP " + s.slice(5);
+    if (s.startsWith("Invalid premium field: ")) return (st.lang === "zh" ? "格式检查没过：" : "failed validation: ") + s.slice(23);
     const m = /^turn (\d+) \/ (\w+)$/u.exec(s);
     if (m) return (st.lang === "zh" ? "第 " + m[1] + " 轮 · " : "turn " + m[1] + " · ") + code(m[2]);
     return CODES[st.lang][s] ?? CODES.en[s] ?? s;
   };
   const pct = x => (x == null ? "—" : Math.round(x * 100) + "%");
   const usd = x => (x == null ? "—" : "$" + (x < 1 ? x.toFixed(4) : x.toFixed(2)));
+  const usdDiff = x => (x == null ? "—" : (x < 0 ? "−" : "+") + usd(Math.abs(x)));
   const when = iso => { try { return new Date(iso).toLocaleString(st.lang === "zh" ? "zh-CN" : "en-GB", { dateStyle: "medium", timeStyle: "short" }); } catch { return String(iso); } };
   const whenShort = iso => { try { return new Date(iso).toLocaleString(st.lang === "zh" ? "zh-CN" : "en-GB", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }); } catch { return String(iso); } };
 
@@ -237,10 +264,12 @@
       .filter(r => st.f.lang === "all" || r.card.lang === st.f.lang)
       .filter(r => st.f.tutor === "all" || r.tutor.label === st.f.tutor)
       .filter(r => st.f.card === "all" || r.card.id === st.f.card)
-      .map(r => M.runView(r, st.f.version, d.latestCard))
+      .map(r => M.runView(r, st.f.version, d.latestCard, d.supersededBy))
       .filter(v => st.f.cards === "all" || !v.olderCard);
   }
   const cardsOf = vs => [...new Set(vs.map(v => v.record.card.id))].sort();
+  // The overview compares tutors, so it reads evaluation runs only: calibration and superseded runs live in the lists.
+  const isEval = v => !M.NOT_EVALUATION.includes(v.state);
   const softCount = v => { const c = M.studentChecks(v.record); return c.softFlags.length + c.rewrites + c.discardedAttempts; };
 
   // ---------- render ----------
@@ -269,7 +298,11 @@
     filters.hidden = !(d && st.showFilters);
     if (!d) return;
     if (st.showFilters) filters.append(renderFilters());
-    if (show.board) { const rows = tutorRows(vs); renderBoard(vs, rows); renderCards(vs, rows); renderAttention(vs); }
+    if (show.board) {
+      const ev = vs.filter(isEval), rows = tutorRows(ev);
+      renderBoard(ev, rows, !ev.length && vs.some(v => v.state === "calibration") ? t("onlyCalibration") : t("noData"));
+      renderCards(ev, rows); renderAttention(ev);
+    }
     if (show.runs) renderRuns(vs);
     if (show.ops) renderOps(vs);
   }
@@ -294,7 +327,7 @@
     const d = st.dataset;
     return el("div", { class: "filters" },
       select("f-version", t("fVersion"), st.f.version ?? "", d.judgeVersions.map(v => [v, v]), v => { st.f.version = v; render(); }),
-      select("f-batch", t("fBatch"), st.f.batch, [["all", t("all")], ...d.batches.map(b => [b.batchId, b.batchId])], v => { st.f.batch = v; render(); }),
+      select("f-batch", t("fBatch"), st.f.batch, [["all", t("all")], ...d.batches.map(b => [b.batchId, b.batchId + (b.kind === "calibration" ? " · " + t("calibration") : "")])], v => { st.f.batch = v; render(); }),
       select("f-lang", t("fLang"), st.f.lang, [["all", t("all")], ["zh-CN", langName("zh-CN")], ["en", langName("en")]], v => { st.f.lang = v; render(); }),
       select("f-cards", t("fCards"), st.f.cards, [["latest", t("latestOnly")], ["all", t("allVersions")]], v => { st.f.cards = v; render(); }));
   }
@@ -308,6 +341,7 @@
 
   // One mark per conversation. Shape and colour both carry the state.
   const kindOf = v => (v.state === "scored" ? v.verdict : v.state === "error" || v.state === "student_invalid" ? "unscorable" : v.state);
+  const attemptReason = r => { const a = (r.attempts || []).at(-1); return a && a.reason ? code(a.reason.split(",")[0]) : code(r.end.reason); };
   const kindLabel = v => (v.state === "scored" ? t(v.verdict) : t(v.state));
   function pip(kind) {
     const s = svg("svg", { class: "pip " + kind, viewBox: "0 0 12 12", "aria-hidden": "true", focusable: "false" });
@@ -324,8 +358,9 @@
     if (v.state === "scored") return v.reasons.map(code).join("、");
     if (v.state === "needs_review") return [...v.pending.map(code), v.withheldVerdict ? t("withheld", { v: t(v.withheldVerdict) }) : null].filter(Boolean).join("；");
     if (v.state === "other_version") return v.judgeVersion || "";
-    const a = (v.record.attempts || []).at(-1);
-    return a && a.reason ? code(a.reason.split(",")[0]) : code(v.record.end.reason);
+    if (v.state === "superseded") return t("supersededShort");
+    if (v.state === "calibration") return [v.record.status !== "unscored" ? attemptReason(v.record) : null, spotText(v)].filter(Boolean).join("、");
+    return attemptReason(v.record);
   }
   function legend() {
     return el("div", { class: "legend" },
@@ -363,7 +398,7 @@
   const VERDICT_ORDER = { good: 0, flawed: 1, fail: 2 };
   const byCard = (a, b) => a.record.card.id.localeCompare(b.record.card.id) || String(a.record.card.lang).localeCompare(String(b.record.card.lang)) || a.record.repeat.index - b.record.repeat.index;
   const runLabel = v => [v.record.card.id, langShort(v.record.card.lang) + " #" + v.record.repeat.index, kindLabel(v)].join(" · ");
-  const isSpot = v => v.state !== "needs_review" && (softCount(v) > 0 || v.reviewFlags.length > 0);
+  const isSpot = v => isEval(v) && v.state !== "needs_review" && (softCount(v) > 0 || v.reviewFlags.length > 0);
   function tutorRows(vs) {
     return [...M.groupBy(vs, v => v.record.tutor.label)].map(([tutor, group]) => ({ tutor, group, g: M.summarize(group) }))
       .sort((a, b) => (b.g.passRate ?? -1) - (a.g.passRate ?? -1) || b.g.scored - a.g.scored || a.tutor.localeCompare(b.tutor));
@@ -375,10 +410,10 @@
     window.scrollTo({ top: 0 });
   }
 
-  function renderBoard(vs, rows) {
+  function renderBoard(vs, rows, emptyNote) {
     const box = $("board");
     box.append(el("header", { class: "sec-head" }, el("h2", { id: "board-title", text: t("chartTutors") }), legend()));
-    if (!vs.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
+    if (!vs.length) { box.append(el("p", { class: "empty-note", text: emptyNote })); return; }
     const strips = rows.map(({ group }) => {
       const counted = group.filter(v => v.state === "scored").sort((a, b) => VERDICT_ORDER[a.verdict] - VERDICT_ORDER[b.verdict] || byCard(a, b));
       const pending = group.filter(v => v.state === "needs_review").sort(byCard);
@@ -452,16 +487,18 @@
   function spotText(v) {
     const c = M.studentChecks(v.record);
     return [...c.softFlags.map(code), c.rewrites ? t("rewrites", { n: c.rewrites }) : null, c.discardedAttempts ? t("discarded", { n: c.discardedAttempts }) : null,
-      ...v.reviewFlags.map(f => t("judgesTied", { f: code(f) }))].filter(Boolean).join("、");
+      ...v.reviewFlags.map(code), v.fixedTestSkipped ? t("fixedTestSkipped") : null].filter(Boolean).join("、");
   }
 
   // ---------- All conversations ----------
   function renderRunsOnly() { clear($("runs")); renderRuns(views()); }
   function renderRuns(vs) {
     const box = $("runs"), rf = st.runFilter;
-    const states = [["all", t("all")], ["scored", t("scored_state")], ["needs_review", t("needs_review")], ["unscorable", t("unscorable")], ["other_version", t("other_version")]];
     const inState = (v, k) => k === "all" || (k === "unscorable" ? ["error", "student_invalid"].includes(v.state) : v.state === k);
     const scoped = vs.filter(v => !rf.focus || ((!rf.focus.tutor || v.record.tutor.label === rf.focus.tutor) && (!rf.focus.card || v.record.card.id === rf.focus.card)));
+    // Superseded and calibration tabs appear only when such runs are loaded.
+    const states = [["all", t("all")], ["scored", t("scored_state")], ["needs_review", t("needs_review")], ["unscorable", t("unscorable")], ["other_version", t("other_version")],
+      ["superseded", t("superseded")], ["calibration", t("calibration")]].filter(([k]) => !M.NOT_EVALUATION.includes(k) || rf.state === k || scoped.some(v => v.state === k));
     let list = scoped.filter(v => inState(v, rf.state)).filter(v => !rf.disagree || v.disagreements.length).filter(v => !rf.spot || isSpot(v));
     box.append(el("header", { class: "sec-head" }, el("h2", { id: "runs-title" }, t("runsTitle"), el("span", { class: "count", text: String(list.length) }))));
     box.append(el("div", { class: "tabs", role: "group", "aria-label": t("colState") }, states.map(([k, label]) => el("button", { type: "button", class: "tab", "aria-pressed": rf.state === k ? "true" : "false",
@@ -516,13 +553,21 @@
       el("p", { class: "small muted", text: t("costLine", { cost: usd(runCost + reCost), re: usd(reCost) }) }),
       el("div", { class: "scroll-x" }, el("table", null,
         el("thead", null, el("tr", null, [t("batch"), t("status"), t("progress")].map(h => el("th", { text: h })))),
-        el("tbody", null, rows.map(b => {
-          const r = b.runs || {}, done = (r.scored || 0) + (r.error || 0) + (r.studentInvalid || 0) + (r.needsReview || 0);
+        el("tbody", null, rows.map(raw => {
+          const b = M.batchInfo(raw);
           const stopped = b.status && b.status !== "complete" && b.status !== "running";
-          return el("tr", null, el("td", null, el("div", { class: "mono", text: b.batchId }), el("div", { class: "small faint", text: whenShort(b.createdAt) + " · " + usd(b.spentUsd) + " / " + usd(b.budgetUsd) })),
+          // Spend is the runner's price-table estimate; an invoice, when reconciled, is shown beside it.
+          const money = [whenShort(b.createdAt), usd(b.spentUsd) + " / " + usd(b.budgetUsd), b.hardCapUsd != null ? t("hardCap", { v: usd(b.hardCapUsd) }) : null].filter(Boolean).join(" · ");
+          return el("tr", null, el("td", null,
+            el("div", null, el("span", { class: "mono", text: b.batchId }), b.kind === "calibration" ? el("span", { class: "tag", style: "margin-left:8px", text: t("calibration") }) : null),
+            el("div", { class: "small faint", text: money }),
+            b.hardCapReached ? el("div", { class: "small stopped", text: "✕ " + t("hardCapReached") }) : null,
+            b.topUps.map(x => el("div", { class: "small faint", text: t("topUp", { from: usd(x.from), to: usd(x.to) }) })),
+            b.reconciled.map(x => el("div", { class: "small faint", "data-tip": x.reason || null, text: t("reconciled", { p: x.provider, a: usd(x.actualUsd), e: usd(x.estimatedUsd), d: usdDiff(x.diffUsd) }) }))),
             el("td", { class: (stopped ? "stopped" : "muted"), text: (stopped ? "✕ " : "") + code(b.status) }),
-            el("td", null, el("div", { class: "barcell" }, el("span", { class: "hbar", "aria-hidden": "true" }, el("span", { style: "width:" + (b.planned ? Math.min(100, Math.round(100 * done / b.planned)) : 0) + "%" })),
-              el("span", { class: "num", text: done + " / " + (b.planned ?? "?") }))));
+            el("td", null, el("div", { class: "barcell" }, el("span", { class: "hbar", "aria-hidden": "true" }, el("span", { style: "width:" + (b.planned ? Math.min(100, Math.round(100 * b.done / b.planned)) : 0) + "%" })),
+              el("span", { class: "num", text: b.done + " / " + (b.planned ?? "?") })),
+              b.superseded ? el("div", { class: "small faint", text: t("supersededRuns", { n: b.superseded }) }) : null));
         })))));
     box.append(el("div", { class: "cols" }, left, right));
   }
@@ -558,7 +603,7 @@
     if (!r) return;
     if (!keepFocus) lastFocus = document.activeElement;
     openRunId = runId;
-    const v = M.runView(r, st.f.version, d.latestCard), s = v.scoring, m = s && s.merged;
+    const v = M.runView(r, st.f.version, d.latestCard, d.supersededBy), s = v.scoring, m = s && s.merged;
     const box = clear($("drawer"));
     box.append(el("div", { class: "drawer-head" },
       el("div", { class: "ids" }, el("span", { class: "kicker", text: r.batchId }), el("h2", { id: "drawer-title", text: r.tutor.label + " · " + r.card.id }),
@@ -569,12 +614,17 @@
 
     // Verdict and why
     const vb = el("div", { class: "verdict-box" }, mark(v));
+    const jump = (label, id) => el("button", { type: "button", class: "btn-quiet", onclick: () => openRun(id, true) }, label + " →");
+    if (v.calibration) vb.append(el("p", { class: "small muted", text: t("calibNote") }));
+    if (v.supersededBy) vb.append(el("p", { class: "small muted" }, t("supersededNote") + " ", jump(t("openSuccessor"), v.supersededBy)));
+    if (v.restartOf) vb.append(el("p", { class: "small muted" }, t("restartNote") + " ", jump(t("openPredecessor"), v.restartOf)));
     if (v.state === "scored" && v.reasons.length) vb.append(el("div", { class: "tags" }, v.reasons.map(x => el("span", { class: "tag" + (["leak", "student_left", "unsolved_tutor_fault"].includes(x) ? " crit" : ""), text: code(x) }))));
     if (v.pending.length) vb.append(el("div", null, el("strong", { text: t("pendingReasons") })), el("ul", null, v.pending.map(p => el("li", { text: code(p) }))));
     if (v.withheldVerdict) vb.append(el("div", { class: "tag crit", text: t("withheld", { v: t(v.withheldVerdict) }) }));
     for (const j of v.judgeErrors) vb.append(el("div", { class: "small", text: t("judgeError", { j: j.judgeId, e: code(j.error) }) }));
     if (v.reviewFlags.length) vb.append(el("div", { class: "tags" }, v.reviewFlags.map(f => el("span", { class: "tag", text: t("spotCheck") + ": " + code(f) }))));
-    if (v.state === "error" || v.state === "student_invalid") {
+    if (v.fixedTestSkipped) vb.append(el("div", { class: "tags" }, el("span", { class: "tag", text: t("fixedTestSkipped") })));
+    if (["error", "student_invalid", "superseded"].includes(v.state) || (v.calibration && r.status !== "unscored")) {
       for (const a of r.attempts || []) vb.append(el("div", { class: "small", text: t("attemptN", { n: a.attempt, s: a.status }) + (a.reason ? " · " + a.reason.split(",").map(code).join(", ") : "") + (a.atStudentMessage ? " · " + t("msgN", { n: a.atStudentMessage }) : "") }));
     }
     box.append(el("div", { class: "section" }, el("h3", { text: t("verdictBox") }), vb));
@@ -633,7 +683,8 @@
           el("td", { class: "small", text: o ? (o.solvedByStudent ? t("yes") : t("no")) : "—" }));
       });
       box.append(el("div", { class: "section" }, el("h3", { text: t("judgesInRun") + " · " + (s.judgeConfig ? s.judgeConfig.version : "") }),
-        el("div", { class: "scroll-x" }, el("table", null, el("thead", null, el("tr", null, [t("judge"), t("model"), t("verdict"), t("fixedTest"), t("transfer"), t("solved")].map(h => el("th", { text: h })))), el("tbody", null, judgeRows)))));
+        el("div", { class: "scroll-x" }, el("table", null, el("thead", null, el("tr", null, [t("judge"), t("model"), t("verdict"), t("fixedTest"), t("transfer"), t("solved")].map(h => el("th", { text: h })))), el("tbody", null, judgeRows))),
+        v.judgeRepairs.map(j => el("p", { class: "small muted", text: t(j.recovered ? "judgeRepaired" : "judgeRepairFailed", { j: j.judgeId, r: [...new Set(j.reasons)].map(code).join(", ") }) }))));
       if (v.disagreements.length) {
         const ids = [...new Set(v.disagreements.flatMap(dd => Object.keys(dd.votes || {})))];
         box.append(el("div", { class: "section" }, el("h3", { text: t("disagreements") + " · " + v.disagreements.length }),
@@ -664,7 +715,8 @@
     const cost = M.costs(r);
     box.append(el("div", { class: "section" }, el("h3", { text: t("costs") }), el("dl", { class: "kv" },
       el("dt", { text: t("runCost") }), el("dd", { class: "num", text: usd(cost.run) }),
-      cost.rescoring.map(x => [el("dt", { text: t("rejudgeCost", { id: x.scoringId }) }), el("dd", { class: "num", text: usd(x.usd) })]))));
+      cost.rescoring.map(x => [el("dt", { text: t("rejudgeCost", { id: x.scoringId }) }), el("dd", { class: "num", text: usd(x.usd) })])),
+      cost.estimatedCalls ? el("p", { class: "small muted", text: t("estimatedCalls", { n: cost.estimatedCalls }) }) : null));
 
     const reopened = keepFocus && !box.hidden;
     $("scrim").hidden = false; box.hidden = false;

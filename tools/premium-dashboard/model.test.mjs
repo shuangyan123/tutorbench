@@ -206,6 +206,20 @@ test("the bundled sample is synthetic, consistent and covers every state", () =>
   const views = d.runs.map(r => M.runView(r, version, d.latestCard));
   const states = new Set(views.map(v => v.state));
   for (const s of ["scored", "needs_review", "error", "student_invalid", "other_version"]) assert.ok(states.has(s), "sample lacks state " + s);
+  // Calibration and superseded runs need the batch links, so check them with the dataset's map.
+  const linked = d.runs.map(r => M.runView(r, version, d.latestCard, d.supersededBy));
+  for (const s of ["calibration", "superseded"]) assert.ok(linked.some(v => v.state === s), "sample lacks state " + s);
+  assert.ok(linked.some(v => v.restartOf && v.state !== "superseded"), "sample lacks a restarted run");
+  assert.ok(linked.some(v => v.reviewFlags.length && v.state === "scored"), "sample lacks a scored run with review flags");
+  assert.ok(linked.some(v => v.fixedTestSkipped), "sample lacks fixedTestSkipped");
+  assert.ok(linked.some(v => v.judgeRepairs.some(j => j.recovered)), "sample lacks a repaired judge ballot");
+  assert.ok(d.runs.some(r => M.costs(r).estimatedCalls > 0), "sample lacks a call charged at its reservation");
+  const infos = d.batches.map(M.batchInfo);
+  assert.ok(infos.some(b => b.kind === "calibration"), "sample lacks a calibration batch");
+  assert.ok(infos.some(b => b.topUps.length && b.superseded), "sample lacks a topped-up batch with a restart");
+  assert.ok(infos.some(b => b.reconciled.some(x => x.estimatedUsd != null)), "sample lacks a reconciliation");
+  const ls = M.summarize(linked);
+  assert.equal(ls.scored + ls.needsReview + ls.error + ls.studentInvalid + ls.otherVersion + ls.calibration + ls.superseded, ls.total);
   for (const v of views.filter(x => x.state === "needs_review")) assert.ok(v.pending.length > 0, v.record.runId + " needs review without a reason");
   assert.ok(views.some(v => v.olderCard), "sample lacks an older card version");
   assert.ok(views.some(v => v.scoringIncomplete), "sample lacks an incomplete panel");
@@ -217,5 +231,129 @@ test("the bundled sample is synthetic, consistent and covers every state", () =>
   const scored = views.filter(v => v.state === "scored");
   assert.equal(s.scored, scored.length);
   assert.equal(s.passRate, scored.filter(v => v.verdict !== "fail").length / scored.length);
-  assert.equal(s.scored + s.needsReview + s.error + s.studentInvalid + s.otherVersion, s.total);
+  assert.equal(s.scored + s.needsReview + s.error + s.studentInvalid + s.otherVersion + s.calibration + s.superseded, s.total);
+});
+
+// ---------- record schema v2 ----------
+function v2(fields) {
+  return { ...record(fields), schemaVersion: 2, batchKind: fields.batchKind || "evaluation", ...(fields.restartOf ? { restartOf: fields.restartOf } : {}) };
+}
+
+test("v2: calibration runs and superseded runs are listed but never counted", () => {
+  const records = [
+    v2({ runId: "eval" }),
+    v2({ runId: "calib", batchKind: "calibration", status: "unscored", scorings: [] }),
+    // Interrupted by the budget, then restarted after a top-up.
+    v2({ runId: "cut", status: "error", endReason: "error", scorings: [], createdAt: "2026-11-24T09:00:00.000Z" }),
+    v2({ runId: "redo", restartOf: "cut", scorings: [scoring({ verdict: "fail", reasons: ["leak"] })] }),
+  ];
+  const d = M.buildDataset({ records, batches: [batch] });
+  assert.deepEqual(d.supersededBy, { cut: "redo" });
+  assert.deepEqual(d.warnings, []);
+  const views = d.runs.map(r => M.runView(r, V1, d.latestCard, d.supersededBy));
+  const byId = Object.fromEntries(views.map(v => [v.record.runId, v]));
+  assert.equal(byId.calib.state, "calibration");
+  assert.equal(byId.cut.state, "superseded");
+  assert.equal(byId.cut.supersededBy, "redo");
+  assert.equal(byId.redo.restartOf, "cut");
+  assert.equal(byId.redo.state, "scored");
+  const s = M.summarize(views);
+  assert.equal(s.calibration, 1);
+  assert.equal(s.superseded, 1);
+  assert.equal(s.error, 0);
+  assert.equal(s.scored, 2);
+  assert.equal(s.passRate, 1 / 2);
+  // Without the dataset's links the interrupted run is an ordinary error; it is never scored either way.
+  assert.equal(M.runView(records[2], V1, d.latestCard).state, "error");
+});
+
+test("v2: a calibration record is never scored, even if the batch kind is missing", () => {
+  const r = { ...record({ runId: "c", status: "unscored", scorings: [] }), schemaVersion: 2 };
+  assert.equal(M.runView(r, V1, null).state, "calibration");
+});
+
+test("v2: restart links that point nowhere or twice are reported", () => {
+  const d = M.buildDataset({ records: [v2({ runId: "a", restartOf: "gone" }), v2({ runId: "cut", status: "error", endReason: "error", scorings: [] }),
+    v2({ runId: "b", restartOf: "cut" }), v2({ runId: "c", restartOf: "cut" })], batches: [batch] });
+  assert.deepEqual(d.warnings.map(w => w.code + ":" + w.detail).sort(), ["restart_target_missing:a", "restarted_twice:cut"]);
+  assert.equal(d.supersededBy.cut, "b");
+});
+
+test("v2: a withheld verdict on an incomplete panel is read from the scoring and keeps its evidence", () => {
+  const r = v2({
+    runId: "w", status: "needs_review", endReason: "left",
+    transcript: [{ role: "student", text: "hi" }, { role: "tutor", turn: 1, text: "Hello" }, { role: "student", text: "bye" }],
+    scorings: [{ ...scoring({ verdict: undefined, pending: ["incomplete_panel"] }), withheldRuleVerdict: "fail" }],
+  });
+  const v = M.runView(r, V1, null);
+  assert.equal(v.state, "needs_review");
+  assert.equal(v.withheldVerdict, "fail");
+  assert.equal(v.scoringIncomplete, true);
+  const ev = M.failureEvidence(v);
+  assert.equal(ev.length, 1);
+  assert.equal(ev[0].kind, "student_left");
+  assert.equal(ev[0].studentMessage, 2);
+});
+
+test("v2: review flags and fixedTestSkipped do not block a verdict", () => {
+  const r = v2({ runId: "f", endReason: "thanked_after_answer",
+    scorings: [scoring({ verdict: "fail", reasons: ["leak"], extra: { reviewFlags: ["verdict_split", "answer_claim_unconfirmed"], fixedTestSkipped: true } })] });
+  const v = M.runView(r, V1, null);
+  assert.equal(v.state, "scored");
+  assert.equal(v.verdict, "fail");
+  assert.deepEqual(v.reviewFlags, ["verdict_split", "answer_claim_unconfirmed"]);
+  assert.equal(v.fixedTestSkipped, true);
+});
+
+test("v2: a judge ballot sent back once is shown as repaired or still invalid", () => {
+  const ok = { judgeId: "j1", output: { turns: [], overall: { verdict: "good", reasons: [] } }, error: null, rejected: [] };
+  const perJudge = [ok, { ...ok, judgeId: "j2", rejected: [{ raw: "{}", reason: "Invalid premium field: judge.leakTurns" }] },
+    { judgeId: "j3", output: null, error: "invalid_judge_output", rejected: [{ raw: "x", reason: "invalid_judge_json" }, { raw: "y", reason: "invalid_judge_json" }] }];
+  const v = M.runView(v2({ runId: "j", status: "needs_review", scorings: [scoring({ verdict: undefined, pending: ["incomplete_panel"], perJudge })] }), V1, null);
+  assert.deepEqual(v.judgeRepairs, [
+    { judgeId: "j2", reasons: ["Invalid premium field: judge.leakTurns"], recovered: true },
+    { judgeId: "j3", reasons: ["invalid_judge_json", "invalid_judge_json"], recovered: false },
+  ]);
+  assert.deepEqual(v.judgeErrors, [{ judgeId: "j3", error: "invalid_judge_output" }]);
+});
+
+test("v2: index rows are checked on batchKind, reviewFlags and fixedTestSkipped; v1 rows without them still pass", () => {
+  const flagged = v2({ runId: "f", scorings: [scoring({ extra: { reviewFlags: ["fixed_test_split"], fixedTestSkipped: false } })] });
+  const calib = v2({ runId: "c", batchKind: "calibration", status: "unscored", scorings: [] });
+  const old = record({ runId: "o" });
+  const good = [
+    { runId: "f", status: "scored", scoringId: "s1", verdict: "good", batchKind: "evaluation", reviewFlags: ["fixed_test_split"], fixedTestSkipped: false, fixedTest: "split" },
+    { runId: "c", status: "unscored", scoringId: null, verdict: null, batchKind: "calibration", reviewFlags: [], fixedTestSkipped: false },
+    { runId: "o", status: "scored", scoringId: "s1", verdict: "good" },
+  ];
+  assert.deepEqual(M.buildDataset({ records: [flagged, calib, old], batches: [batch], index: good }).warnings, []);
+  const stale = [{ ...good[0], reviewFlags: [] }, { ...good[1], batchKind: "evaluation" }, good[2]];
+  assert.deepEqual(M.buildDataset({ records: [flagged, calib, old], batches: [batch], index: stale }).warnings.map(w => w.detail).sort(), ["c", "f"]);
+});
+
+test("v2: costs count calls charged at their reservation", () => {
+  const r = { ...v2({ runId: "u" }), calls: [{ n: 1, usd: 0.001, costEstimated: false }, { n: 2, usd: 0.004, costEstimated: true }] };
+  r.scorings = [scoring(), { ...scoring({ id: "s2" }), calls: [{ n: 3, usd: 0.02, costEstimated: true }] }];
+  assert.equal(M.costs(r).estimatedCalls, 2);
+  assert.equal(M.costs(record({ runId: "v1" })).estimatedCalls, 0);
+});
+
+test("v2: batch info shows the hard cap, top-ups and the reconciliation against the estimate", () => {
+  const b = M.batchInfo({ schema: "tutorbench.premium-batch", schemaVersion: 2, batchId: "b2", kind: "evaluation", status: "complete", planned: 2,
+    spentUsd: 0.026, budgetUsd: 0.5, hardCapUsd: 0.625, hardCapReached: false,
+    budgetHistory: [{ at: "2026-11-25T10:45:00.000Z", from: 0.006, to: 0.5, previousHardCap: 0.0075, hardCapUsd: 0.625 }],
+    reconciledUsd: { host: 0.03 }, reconciliationHistory: [{ provider: "host", actualUsd: 0.028, estimated: 0.026, reason: "", at: "x" }, { provider: "host", actualUsd: 0.03, estimated: 0.026, reason: "invoice", at: "y" }],
+    runs: { planned: 2, superseded: 1, scored: 2, error: 0, unscored: 0, studentInvalid: 0, needsReview: 0 } });
+  assert.equal(b.done, 2);
+  assert.equal(b.superseded, 1);
+  assert.equal(b.hardCapUsd, 0.625);
+  assert.deepEqual(b.topUps, [{ at: "2026-11-25T10:45:00.000Z", from: 0.006, to: 0.5 }]);
+  assert.deepEqual(b.reconciled, [{ provider: "host", actualUsd: 0.03, estimatedUsd: 0.026, diffUsd: 0.004, reason: "invoice", at: "y" }]);
+  const calib = M.batchInfo({ batchId: "c", kind: "calibration", planned: 8, runs: { unscored: 8 } });
+  assert.equal(calib.done, 8);
+  const v1 = M.batchInfo({ batchId: "old", spentUsd: 0.1, budgetUsd: 5, runs: { scored: 3, needsReview: 1 } });
+  assert.equal(v1.kind, "evaluation");
+  assert.equal(v1.hardCapUsd, null);
+  assert.deepEqual(v1.topUps, []);
+  assert.deepEqual(v1.reconciled, []);
 });
