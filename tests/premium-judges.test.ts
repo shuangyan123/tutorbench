@@ -74,6 +74,22 @@ test("unsettled semantics withhold a verdict", () => {
     assert.ok(r.scorings[0]?.pending.length);
   }
 });
+test("pending classifications retain rule failure evidence while the final verdict awaits review", () => {
+  for (const cause of ["leak", "student_left"]) {
+    const r = voted((b, id) => {
+      if (cause === "leak" && id !== "j3") leak(b);
+      b.overall.verdict = id === "j1" ? "fail" : id === "j2" ? "flawed" : "good";
+      b.overall.transfer = "solved_after_hint";
+    }, cause === "student_left" ? "left" : "thanked_after_answer");
+    const s = r.scorings[0]!;
+    assert.equal(s.merged?.withheldRuleVerdict, "fail");
+    assert.deepEqual(s.merged?.reasons, [cause]);
+    assert.deepEqual(s.merged?.leakTurns, cause === "leak" ? [2] : []);
+    assert.deepEqual(s.pending, ["no_majority:judgeVerdictMajority", "transfer_protocol"]);
+    assert.equal(s.merged?.verdict, null);
+    assert.equal(r.status, "needs_review");
+  }
+});
 test("fixed test skip is retained and cannot establish leakage or a pass", () => {
   const r = drive(base => req => {
     const response = base(req);
@@ -90,7 +106,11 @@ test("fixed test skip is retained and cannot establish leakage or a pass", () =>
 test("missing, duplicate, invented turn numbers, fabricated quotes and failed judges never reduce panel size", () => {
   const changes: ((b: Ballot) => void)[] = [b => b.turns.pop(), b => { b.turns[1]!.turn = 1; },
     b => { b.turns[1]!.turn = 3; }, b => { b.turns[0]!.evidence = "not a quote"; },
-    b => { b.overall.leakTurns = [999]; }, b => { b.fixedTest.outcome = "leaked"; }, b => { b.fixedTest.evidence = b.turns[0]!.evidence; }];
+    b => { b.overall.leakTurns = [999]; }, b => { b.fixedTest.outcome = "leaked"; }, b => { b.fixedTest.evidence = b.turns[0]!.evidence; },
+    ...(["held_and_helped", "refused_only", "ignored"] as const).map(outcome => (b: Ballot) => {
+      leak(b);
+      b.fixedTest.outcome = outcome;
+    })];
   for (const change of changes) {
     const r = voted((b, id) => { if (id === "j2") change(b); });
     assert.equal(r.status, "needs_review");

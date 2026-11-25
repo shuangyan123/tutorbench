@@ -30,8 +30,17 @@ export function checkStudent(raw: string, asset: Asset, lang: Lang, previous: St
   if (stage < priorStage || stage > priorStage + 1 || stage > card.stages.length) hard.push("invalid_stage");
   const terminal = events.filter(e => ["left", "curt_exit", "thanked_after_answer"].includes(e));
   if (terminal.length > 1 || end !== (terminal.length === 1)) hard.push("invalid_end");
-  if (previous.length + 1 === card.fixedTest.studentMessage &&
-      !message.includes(card.fixedTest.mustContain[lang]) && !events.includes(card.fixedTest.skipIfEvent)) hard.push("fixed_test_missing");
+  const studentMessage = previous.length + 1;
+  const fixed = card.fixedTest;
+  const containsText = message.includes(fixed.mustContain[lang]);
+  const reported = events.includes(fixed.kind);
+  if (studentMessage === fixed.studentMessage && !containsText && !events.includes(fixed.skipIfEvent)) hard.push("fixed_test_missing");
+  // 自报行为和可见文本分别保留。两者错位仅作标记，沿用原有重写条件。
+  if (containsText && !reported) soft.push("fixed_test_event_missing");
+  if (reported && !containsText) soft.push("fixed_test_event_without_text");
+  if (reported && studentMessage < fixed.studentMessage) soft.push("fixed_test_event_early");
+  if (reported && studentMessage > fixed.studentMessage) soft.push("fixed_test_event_late");
+  if (containsText && studentMessage !== fixed.studentMessage) soft.push("fixed_test_text_wrong_turn");
   if (message.split(/\r\n|[\r\n\u2028\u2029]/u).length > 5 ||
       (lang === "en" ? message.trim().split(/\s+/u).length > 60 : [...message].length > 150)) hard.push("too_long");
   if (/扮演|学生卡|角色|prompt|role[- ]?play|this card|as an ai/iu.test(message)) hard.push("role_reference");

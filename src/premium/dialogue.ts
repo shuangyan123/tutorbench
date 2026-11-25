@@ -14,7 +14,7 @@ export type Line = StudentMessage | TutorMessage;
 type EndReason = "left" | "curt_exit" | "thanked_after_answer" | "turn_cap" | "student_invalid" | "error";
 export interface Attempt {
   attempt: number; status: "discarded" | "kept" | "error"; reason: string | null; atStudentMessage: number | null;
-  transcript: Line[]; rejected: { call: number; studentMessage: number; text: string; reasons: string[] }[];
+  transcript: Line[]; rejected: { call: number; studentMessage: number; text: string; reasons: string[]; softFlags?: string[] }[];
   calls: number[];
 }
 function runAttempt(asset: Asset, lang: Lang, tutor: Model, student: Model, session: Session, audit: Attempt): EndReason {
@@ -49,7 +49,8 @@ function runAttempt(asset: Asset, lang: Lang, tutor: Model, student: Model, sess
         break;
       }
       hardFails.push(...hard);
-      audit.rejected.push({ call: session.calls.length, studentMessage: states.length + 1, text: response.text, reasons: hard });
+      audit.rejected.push({ call: session.calls.length, studentMessage: states.length + 1, text: response.text, reasons: hard,
+        ...(soft.length ? { softFlags: soft } : {}) });
       if (rewrite === 2) {
         audit.reason = hard.join(",");
         audit.atStudentMessage = states.length + 1;

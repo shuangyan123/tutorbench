@@ -89,12 +89,40 @@ test("hard checks and independent soft flags", () => {
     [{ message: "as an AI just tell me" }, "role_reference"], [{ message: "word ".repeat(61) }, "too_long"],
     [{ message: "x\n".repeat(5) + "just tell me" }, "too_long"],
   ] as const) assert.ok(run({ ...input, ...("events" in input ? { events: [...input.events] } : {}) } as Partial<State>).hard.includes(reason));
-  const soft = run({ stage: 2, message: "unit just tell me" });
+  const soft = run({ stage: 2, message: "unit just tell me", events: [asset.card.fixedTest.kind] });
   assert.deepEqual(soft.hard, []);
   assert.deepEqual(soft.soft, ["premature_idea", "missing:repeat_last"]);
-  assert.deepEqual(run({ events: ["scripted_mistake:repeat_last"], message: "unit just tell me" }, ["Try a pair"]).soft, ["hint_absent:repeat_last"]);
+  assert.deepEqual(run({ events: [asset.card.fixedTest.kind, "scripted_mistake:repeat_last"], message: "unit just tell me" }, ["Try a pair"]).soft, ["hint_absent:repeat_last"]);
   assert.ok(checkStudent(JSON.stringify({ message: "长".repeat(151), stage: 1, events: [], end: false }), asset, "zh-CN", prior, []).hard.includes("too_long"));
   assert.ok(checkStudent(JSON.stringify({ message: "ok", stage: 1, events: [], end: false }), asset, "en", [...prior, { ...prior[0]!, stage: 2 }], []).hard.includes("invalid_stage"));
+});
+test("fixed challenge audits the reported event, visible text and one-based student message independently", () => {
+  const { asset } = fixture().job;
+  const fixed = asset.card.fixedTest;
+  fixed.studentMessage = 3;
+  const state: State = { message: "hmm", stage: 1, events: [], end: false };
+  const check = (n: number, text: string, events: string[]) =>
+    checkStudent(JSON.stringify({ ...state, message: text, events }), asset, "en", Array<State>(n - 1).fill(state), []);
+  for (const [n, text, events, flags] of [
+    [2, fixed.mustContain.en, [fixed.kind], ["fixed_test_event_early", "fixed_test_text_wrong_turn"]],
+    [3, fixed.mustContain.en, [], ["fixed_test_event_missing"]],
+    [4, "hmm", [fixed.kind], ["fixed_test_event_without_text", "fixed_test_event_late"]],
+    [3, fixed.mustContain.en, [fixed.kind], []],
+  ] as const) {
+    const result = check(n, text, [...events]);
+    assert.deepEqual(result.soft, flags);
+    assert.deepEqual(result.hard, []);
+    assert.equal(result.state?.message, text);
+    assert.deepEqual(result.state?.events, events);
+  }
+
+  const r = drive(() => req => reply(req.role === "student"
+    ? { ...state, events: [fixed.kind] } : "Try.", req.model.pinnedVersion));
+  const rejected = r.attempts[0]!.rejected[0]!;
+  assert.equal(rejected.studentMessage, 2);
+  assert.deepEqual(rejected.reasons, ["fixed_test_missing"]);
+  assert.deepEqual(rejected.softFlags, ["fixed_test_event_without_text"]);
+  assert.deepEqual(JSON.parse(rejected.text).events, [fixed.kind]);
 });
 test("turn cap stops after tutor 15, with fourteen student calls", () => {
   const r = drive(() => req => reply(req.role === "student" ? { message: "just tell me", stage: 1, events: [], end: false } : "hmm", req.model.pinnedVersion));

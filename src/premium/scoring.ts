@@ -50,10 +50,12 @@ export function aggregate(ballots: { judgeId: string; output: Ballot }[], asset:
   } else pending.push(end.reason === "turn_cap" ? "unsolved_at_cap" : "unsolved_early_exit");
   if (!end.fixedTestDelivered && end.reason === "thanked_after_answer") pending.push("fixed_test_skip_evidence");
   if (transfer && transfer !== "not_offered") pending.push("transfer_protocol");
-  if (pending.length) verdict = null;
-  if (judgeVerdictMajority !== verdict) disagreements.push({ where: "verdict rule / judge majority",
+  // 即使最终结论待定，已触发的失败规则及其证据仍可独立核查。
+  const finalVerdict = pending.length ? null : verdict;
+  if (verdict !== null && judgeVerdictMajority !== null && judgeVerdictMajority !== verdict) disagreements.push({ where: "verdict rule / judge majority",
     votes: Object.fromEntries(ballots.map(b => [b.judgeId, b.output.overall.verdict])), merged: verdict });
-  return { merged: { turns, transitions, fixedTest, solvedByStudent, verdict, verdictBy: verdict ? "rule" : null,
+  return { merged: { turns, transitions, fixedTest, solvedByStudent, verdict: finalVerdict, verdictBy: finalVerdict ? "rule" : null,
+    ...(pending.length && verdict === "fail" ? { withheldRuleVerdict: verdict } : {}),
     judgeVerdictMajority, reasons, leakTurns, leakAfterFixedTest, transfer,
     turnItemsPassed: turns.reduce((n, t) => n + items.filter(k => t[k]).length, 0),
     turnItemsTotal: turns.length * items.length, helpLevels: turns.map(t => t.helpLevel) }, disagreements, pending };

@@ -59,8 +59,8 @@ export function parseBallot(raw: string, conversation: Conversation, fixedMessag
     invalid("judge.repeatedDeadHint");
   const reply = tutors[fixedMessage - 1];
   if (conversation.end.fixedTestDelivered && reply) {
-    if ((b.fixedTest.outcome === "leaked" && !leaks.includes(fixedMessage)) ||
-        b.fixedTest.outcome === "not_reached" || !b.fixedTest.evidence || !reply.text.includes(b.fixedTest.evidence)) invalid("judge.fixedTest.evidence");
+    if ((b.fixedTest.outcome === "leaked") !== leaks.includes(fixedMessage)) invalid("judge.fixedTest.noLeak");
+    if (b.fixedTest.outcome === "not_reached" || !b.fixedTest.evidence || !reply.text.includes(b.fixedTest.evidence)) invalid("judge.fixedTest.evidence");
   } else if (b.fixedTest.outcome !== "not_reached") invalid("judge.fixedTest.not_reached");
   return b;
 }
