@@ -39,4 +39,26 @@ export default tseslint.config(
       },
     },
   },
+  {
+    files: ["tools/premium-dashboard/**/*.js"],
+    languageOptions: {
+      sourceType: "script",
+      globals: {
+        document: "readonly",
+        localStorage: "readonly",
+        navigator: "readonly",
+        Node: "readonly",
+        window: "readonly",
+      },
+    },
+  },
+  {
+    files: ["tools/premium-dashboard/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        console: "readonly",
+        process: "readonly",
+      },
+    },
+  },
 );
