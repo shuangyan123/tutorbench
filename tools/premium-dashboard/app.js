@@ -7,12 +7,12 @@
   // ---------- words ----------
   const T = {
     zh: {
-      kicker: "TutorBench · 精品集", boardTitle: "导师成绩单",
-      boardNote: "每个导师一行，按正式通过率排序。通过 = 好 + 有问题；待审、不计分和其他评审配置的对话都不算进通过率。",
-      noRate: "暂无", passSub: "已计分 {n} · 好 {g} · 有问题 {f} · 不合格 {x}", notCountedMark: "不计分 / 其他配置", pipHint: "每个标记是一段对话，点它看详情。",
+      viewOverview: "概览", viewRuns: "全部对话", viewChecks: "运行检查", allBatches: "全部批次", allLangs: "中英文", latestShort: "最新版卡片", changeFilters: "更改", doneFilters: "收起", tutorLine: "已计分 {n} 段", tutorLineReview: " · {r} 段待审", cardPass: "通过 {p} · {n} 段", allOfTutor: "看这位导师的全部对话 →", spotPrefix: "建议抽查 · {s} · ", showRest: "再看 {n} 条", showFewer: "收起", costLine: "共花费 {cost}，其中重新评审 {re}。", kicker: "TutorBench · 精品集", boardTitle: "导师成绩单",
+      boardNote: "按正式通过率排序。点一位导师，看它在每张卡上的表现。",
+      noRate: "暂无", passSub: "好 {g} · 有问题 {f} · 不合格 {x}", notCountedMark: "不计分 / 其他配置", pipHint: "每个标记是一段对话，点它看详情。",
       showThese: "在下面列出这些对话", langZh: "中", langEn: "英", open: "看详情 →",
-      totals: "合计已计分 {scored} 段。待审 {review} 段（其中评审未完成 {incomplete}），不计分 {unscorable} 段，其他评审配置 {other} 段，这三类都不算进通过率。花费 {cost}，其中重新评审 {re}。",
-      attentionTitle: "需要你看的", attentionNote: "「待审」的对话还没有结论，不算进通过率。「建议抽查」的已经计分，但学生演得有点偏，或评审打平了，值得抽查。",
+      totals: "待审 {review} 段、不计分 {unscorable} 段、其他评审配置 {other} 段，都不算进通过率。",
+      attentionTitle: "需要你看的", attentionNote: "{p} 段待审，还没有结论；{s} 段已计分，但建议抽查。",
       pendingGroup: "待审", spotGroup: "建议抽查", judgesTied: "评审打平：{f}", colNotes: "备注", splitsN: "评审分歧 {n}", flagsN: "学生标记 {n}",
       opsTitle: "运行检查", opsNote: "看评测本身靠不靠得住：三位评审是否一致，批次是否跑完。", ties: "平票", topItems: "分歧最多的项：{list}",
       title: "评测运行", openFolder: "打开 runs 文件夹", loadSample: "载入合成示例", dropHere: "松开鼠标，载入这个 runs 文件夹",
@@ -53,12 +53,12 @@
       noData: "没有符合筛选条件的对话。", split: "评审分歧", noScoring: "没有评分",
     },
     en: {
-      kicker: "TutorBench · Premium set", boardTitle: "Tutor scorecard",
-      boardNote: "One row per tutor, sorted by formal pass rate. Pass = good + flawed. Conversations that need review, are not scorable or were scored under another judge configuration are not counted.",
-      noRate: "none yet", passSub: "Scored {n} · good {g} · flawed {f} · fail {x}", notCountedMark: "Not counted", pipHint: "Each mark is one conversation; select it for details.",
+      viewOverview: "Overview", viewRuns: "All conversations", viewChecks: "Run checks", allBatches: "all batches", allLangs: "both languages", latestShort: "latest cards", changeFilters: "Change", doneFilters: "Done", tutorLine: "{n} scored", tutorLineReview: " · {r} need review", cardPass: "pass {p} · {n} scored", allOfTutor: "All conversations for this tutor →", spotPrefix: "Spot check · {s} · ", showRest: "Show {n} more", showFewer: "Show fewer", costLine: "Spent {cost}, of which rescoring {re}.", kicker: "TutorBench · Premium set", boardTitle: "Tutor scorecard",
+      boardNote: "Sorted by formal pass rate. Select a tutor to see each card.",
+      noRate: "none yet", passSub: "Good {g} · flawed {f} · fail {x}", notCountedMark: "Not counted", pipHint: "Each mark is one conversation; select it for details.",
       showThese: "List these conversations below", langZh: "zh", langEn: "en", open: "Details →",
-      totals: "In total {scored} conversations are scored. {review} need review ({incomplete} with scoring not finished), {unscorable} are not scorable and {other} were scored under another judge configuration; none of these count. Cost {cost}, of which rescoring {re}.",
-      attentionTitle: "Needs you", attentionNote: "Conversations under Needs review have no verdict yet and are not counted. Those under Spot check are scored, but the simulated student drifted or the judges tied, so they are worth a look.",
+      totals: "{review} needing review, {unscorable} not scorable and {other} scored under another judge configuration are not counted.",
+      attentionTitle: "Needs you", attentionNote: "{p} need review and have no verdict yet; {s} are scored but worth a spot check.",
       pendingGroup: "Needs review", spotGroup: "Spot check", judgesTied: "judges tied: {f}", colNotes: "Notes", splitsN: "{n} judge splits", flagsN: "{n} student flags",
       opsTitle: "Run checks", opsNote: "Whether the evaluation itself can be trusted: do the three judges agree, did the batches finish.", ties: "Ties", topItems: "Most splits: {list}",
       title: "Evaluation runs", openFolder: "Open runs folder", loadSample: "Load synthetic sample", dropHere: "Drop to load this runs folder",
@@ -143,11 +143,17 @@
   };
 
   // ---------- state ----------
+  const VIEWS = ["overview", "runs", "checks"];
   const st = {
     lang: detectLang(), dataset: null, source: null,
     f: { batch: "all", version: null, lang: "all", cards: "latest", tutor: "all", card: "all" },
     runFilter: { state: "all", disagree: false, soft: false, focus: null }, limit: 100,
+    view: initialView(), openTutors: new Set(), showFilters: false, attentionAll: false,
   };
+  function initialView() {
+    try { const h = location.hash.slice(1); if (VIEWS.includes(h)) return h; } catch { /* no hash */ }
+    return "overview";
+  }
   function detectLang() {
     try { const saved = localStorage.getItem("premium-dashboard-lang"); if (saved === "zh" || saved === "en") return saved; } catch { /* storage unavailable */ }
     return /^zh/iu.test(navigator.language || "") ? "zh" : "en";
@@ -198,6 +204,8 @@
     st.f = { batch: "all", version: versions.length ? versions[0] : null, lang: "all", cards: "latest", tutor: "all", card: "all" };
     st.runFilter = { state: "all", disagree: false, soft: false, focus: null };
     st.limit = 100;
+    st.openTutors = new Set();
+    st.attentionAll = false;
     closeDrawer();
     render();
   }
@@ -272,14 +280,15 @@
     banner.hidden = !(d && st.source.kind === "sample");
     banner.textContent = t("sampleBanner");
     renderWarnings();
-    for (const id of ["board", "attention", "runs", "ops"]) clear($(id));
+    const show = { board: st.view === "overview", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks" };
+    for (const id of Object.keys(show)) { clear($(id)); $(id).hidden = !show[id]; }
     document.querySelector(".sheet").hidden = !d;
+    const vs = d ? views() : [];
+    renderViews(vs);
     if (!d) return;
-    const vs = views();
-    renderBoard(vs);
-    renderAttention(vs);
-    renderRuns(vs);
-    renderOps(vs);
+    if (show.board) { renderBoard(vs); renderAttention(vs); }
+    if (show.runs) renderRuns(vs);
+    if (show.ops) renderOps(vs);
   }
 
   function renderWarnings() {
@@ -297,13 +306,21 @@
     return el("label", { for: id }, label, el("select", { id, onchange: e => onchange(e.target.value) },
       options.map(([v, text]) => { const o = el("option", { value: v, text }); if (v === value) o.selected = true; return o; })));
   }
+  const langName = l => (l === "zh-CN" ? "中文" : l === "en" ? "English" : l);
   function renderFilters() {
     const d = st.dataset;
     return el("div", { class: "filters" },
       select("f-version", t("fVersion"), st.f.version ?? "", d.judgeVersions.map(v => [v, v]), v => { st.f.version = v; render(); }),
       select("f-batch", t("fBatch"), st.f.batch, [["all", t("all")], ...d.batches.map(b => [b.batchId, b.batchId])], v => { st.f.batch = v; render(); }),
-      select("f-lang", t("fLang"), st.f.lang, [["all", t("all")], ["zh-CN", "中文"], ["en", "English"]], v => { st.f.lang = v; render(); }),
+      select("f-lang", t("fLang"), st.f.lang, [["all", t("all")], ["zh-CN", langName("zh-CN")], ["en", langName("en")]], v => { st.f.lang = v; render(); }),
       select("f-cards", t("fCards"), st.f.cards, [["latest", t("latestOnly")], ["all", t("allVersions")]], v => { st.f.cards = v; render(); }));
+  }
+  function filterSummary() {
+    const parts = [st.f.version || "—", st.f.batch === "all" ? t("allBatches") : st.f.batch, st.f.lang === "all" ? t("allLangs") : langName(st.f.lang),
+      st.f.cards === "latest" ? t("latestShort") : t("allVersions")];
+    return el("div", { class: "fsum" }, el("span", { text: parts.join(" · ") }),
+      el("button", { type: "button", class: "btn-quiet", "aria-expanded": st.showFilters ? "true" : "false", onclick: () => { st.showFilters = !st.showFilters; render(); } },
+        st.showFilters ? t("doneFilters") : t("changeFilters")));
   }
 
   // One mark per conversation. Shape and colour both carry the state.
@@ -319,7 +336,7 @@
     return s;
   }
   const mark = v => el("span", { class: "state" }, pip(kindOf(v)), kindLabel(v));
-  const langShort = l => t(l === "zh-CN" ? "langZh" : l === "en" ? "langEn" : "") || l;
+  const langShort = l => (l === "zh-CN" ? t("langZh") : l === "en" ? t("langEn") : l);
   const runName = v => [v.record.tutor.label, v.record.card.id, langShort(v.record.card.lang) + " #" + v.record.repeat.index].join(" · ");
   function whyText(v) {
     if (v.state === "scored") return v.reasons.map(code).join("、");
@@ -331,57 +348,77 @@
   function legend() {
     return el("div", { class: "legend" },
       ["good", "flawed", "fail", "needs_review"].map(k => el("span", null, pip(k), t(k))),
-      el("span", null, pip("unscorable"), t("notCountedMark")),
-      el("span", { class: "hint", text: t("pipHint") }));
+      el("span", null, pip("unscorable"), t("notCountedMark")));
   }
-  function setFocus(focus, state) {
-    st.runFilter.focus = focus;
-    if (state) st.runFilter.state = state;
+  function setView(view) {
+    st.view = view;
+    render();
+    try { history.replaceState(null, "", "#" + view); } catch { /* the hash is a convenience only */ }
+  }
+  function showTutorRuns(tutor) {
+    st.runFilter = { state: "all", disagree: false, soft: false, focus: { tutor } };
     st.limit = 100;
-    renderRunsOnly();
+    setView("runs");
+    window.scrollTo({ top: 0 });
   }
-  function goToRuns() { $("runs").scrollIntoView({ behavior: "smooth", block: "start" }); }
+  function renderViews(vs) {
+    const nav = clear($("views"));
+    nav.hidden = !st.dataset;
+    if (!st.dataset) return;
+    const views = [["overview", t("viewOverview"), null], ["runs", t("viewRuns"), vs.length], ["checks", t("viewChecks"), null]];
+    for (const [id, label, n] of views) nav.append(el("button", { type: "button", class: "view-tab", "aria-current": st.view === id ? "page" : null, onclick: () => setView(id) },
+      label, n != null ? el("span", { class: "count", text: String(n) }) : null));
+  }
 
-  // ---------- 1. Tutor scorecard ----------
+  // ---------- Overview: tutor scorecard ----------
   function renderBoard(vs) {
     const box = $("board"), s = M.summarize(vs);
     box.append(el("header", { class: "sec-head" },
       el("div", { class: "title" }, el("h2", { id: "board-title", text: t("boardTitle") }), el("p", { class: "lede", text: t("boardNote") })),
-      renderFilters()));
+      filterSummary()));
+    if (st.showFilters) box.append(renderFilters());
     if (!vs.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
-    box.append(legend());
     const cards = cardsOf(vs);
-    const rows = [...M.groupBy(vs, v => v.record.tutor.label)].map(([tutor, group]) => ({ tutor, group, s: M.summarize(group) }))
-      .sort((a, b) => (b.s.passRate ?? -1) - (a.s.passRate ?? -1) || b.s.scored - a.s.scored || a.tutor.localeCompare(b.tutor));
-    const head = el("tr", null, el("th", { text: t("colTutor") }), el("th", { text: t("passRate") }),
-      cards.map(c => el("th", null, el("div", { class: "cardhead" }, el("span", { text: c }), el("span", { class: "faint mono", text: "v" + st.dataset.latestCard[c] })))),
-      el("th", { class: "num", text: t("needs_review") }), el("th", { class: "num", text: t("unscorable") }));
-    const body = el("tbody");
-    for (const { tutor, group, s: g } of rows) {
+    const rows = [...M.groupBy(vs, v => v.record.tutor.label)].map(([tutor, group]) => ({ tutor, group, g: M.summarize(group) }))
+      .sort((a, b) => (b.g.passRate ?? -1) - (a.g.passRate ?? -1) || b.g.scored - a.g.scored || a.tutor.localeCompare(b.tutor));
+    const list = el("div", { class: "tutors" });
+    for (const { tutor, group, g } of rows) {
+      const open = st.openTutors.has(tutor);
       const models = [...new Set(group.map(v => v.record.tutor.resolvedModel).filter(Boolean))];
-      const unscorable = g.error + g.studentInvalid;
-      body.append(el("tr", null,
-        el("td", null, el("div", { class: "who" }, el("strong", { text: tutor }), models.length ? el("span", { class: "faint mono", text: models.join(", ") }) : null)),
-        el("td", null, el("div", { class: "pass" },
+      const detailId = "detail-" + rows.findIndex(x => x.tutor === tutor);
+      list.append(el("div", { class: "tutor" },
+        el("button", { type: "button", class: "tutor-row", "aria-expanded": open ? "true" : "false", "aria-controls": detailId,
+          onclick: () => { if (open) st.openTutors.delete(tutor); else st.openTutors.add(tutor); render(); } },
+          el("span", { class: "who" }, el("strong", { text: tutor }), models.length ? el("span", { class: "faint mono", text: models.join(", ") }) : null),
           el("span", { class: "rate" + (g.passRate == null ? " none" : ""), text: g.passRate == null ? t("noRate") : pct(g.passRate) }),
-          g.passRate == null ? null : el("div", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + Math.round(g.passRate * 100) + "%" })),
-          el("span", { class: "sub", text: t("passSub", { n: g.scored, g: g.good, f: g.flawed, x: g.fail }) }))),
-        cards.map(card => el("td", null, cardCell(group.filter(v => v.record.card.id === card)))),
-        el("td", { class: "num" }, g.needsReview
-          ? el("button", { type: "button", class: "link", "data-tip": t("showThese"), onclick: () => { setFocus({ tutor }, "needs_review"); goToRuns(); } }, String(g.needsReview))
-          : el("span", { class: "faint", text: "0" })),
-        el("td", { class: "num" }, el("span", { class: unscorable ? "" : "faint", text: String(unscorable) }))));
+          el("span", { class: "meter", "aria-hidden": "true" }, g.passRate == null ? null : el("span", { style: "width:" + Math.round(g.passRate * 100) + "%" })),
+          el("span", { class: "meta", text: t("tutorLine", { n: g.scored }) + (g.needsReview ? t("tutorLineReview", { r: g.needsReview }) : "") }),
+          el("span", { class: "chev", "aria-hidden": "true", text: open ? "−" : "+" })),
+        open ? tutorDetail(detailId, tutor, group, g, cards) : null));
     }
-    box.append(el("div", { class: "scroll-x" }, el("table", { class: "board" }, el("thead", null, head), body)));
-    const runCost = vs.reduce((n, v) => n + (M.costs(v.record).run || 0), 0);
-    const reCost = vs.reduce((n, v) => n + M.costs(v.record).rescoring.reduce((m, x) => m + (x.usd || 0), 0), 0);
-    box.append(el("p", { class: "totals", text: t("totals", { scored: s.scored, review: s.needsReview, incomplete: s.scoringIncomplete,
-      unscorable: s.error + s.studentInvalid, other: s.otherVersion, cost: usd(runCost + reCost), re: usd(reCost) }) }));
+    box.append(list);
+    box.append(el("p", { class: "totals", text: t("totals", { review: s.needsReview, unscorable: s.error + s.studentInvalid, other: s.otherVersion }) }));
+  }
+  function tutorDetail(id, tutor, group, g, cards) {
+    const lines = el("div", { class: "card-lines" });
+    for (const card of cards) {
+      const runs = group.filter(v => v.record.card.id === card);
+      if (!runs.length) continue;
+      const cs = M.summarize(runs);
+      lines.append(el("div", { class: "card-line" },
+        el("span", { class: "card-name" }, el("span", { text: card }), el("span", { class: "faint mono", text: "v" + st.dataset.latestCard[card] })),
+        cardCell(runs),
+        el("span", { class: "card-rate", text: cs.passRate == null ? t("noRate") : t("cardPass", { p: pct(cs.passRate), n: cs.scored }) })));
+    }
+    return el("div", { class: "detail", id },
+      el("p", { class: "sum", text: t("passSub", { g: g.good, f: g.flawed, x: g.fail }) }),
+      legend(), lines,
+      el("button", { type: "button", class: "more", onclick: () => showTutorRuns(tutor) }, t("allOfTutor")));
   }
   function cardCell(group) {
-    if (!group.length) return el("span", { class: "faint", text: "—" });
     const cell = el("div", { class: "cell" });
-    for (const lang of ["zh-CN", "en", ...new Set(group.map(v => v.record.card.lang))].filter((x, i, a) => a.indexOf(x) === i)) {
+    const langs = ["zh-CN", "en", ...group.map(v => v.record.card.lang)].filter((x, i, a) => a.indexOf(x) === i);
+    for (const lang of langs) {
       const runs = group.filter(v => v.record.card.lang === lang).sort((a, b) => a.record.repeat.index - b.record.repeat.index || String(a.record.createdAt).localeCompare(String(b.record.createdAt)));
       if (!runs.length) continue;
       cell.append(el("div", { class: "langrow" }, el("span", { class: "lang", text: langShort(lang) }),
@@ -393,7 +430,7 @@
     return cell;
   }
 
-  // ---------- 2. What needs a person ----------
+  // ---------- Overview: what needs a person ----------
   function attentionRow(v, why) {
     return el("button", { type: "button", class: "row", onclick: () => openRun(v.record.runId) },
       pip(kindOf(v)), el("span", { class: "name", text: runName(v) }), el("span", { class: "go", text: t("open") }),
@@ -403,67 +440,62 @@
     const box = $("attention");
     const pending = vs.filter(v => v.state === "needs_review");
     const spot = vs.filter(v => v.state !== "needs_review" && (softCount(v) > 0 || v.reviewFlags.length));
-    box.append(el("header", { class: "sec-head" }, el("div", { class: "title" }, el("h2", { id: "attention-title", text: t("attentionTitle") }), el("p", { class: "lede", text: t("attentionNote") }))));
-    const left = el("div", { class: "list" }, el("h3", null, t("pendingGroup"), el("span", { class: "count", text: String(pending.length) })));
-    if (!pending.length) left.append(el("p", { class: "empty-note", text: t("nothingPending") }));
-    for (const v of pending) {
-      const extra = v.judgeErrors.map(j => t("judgeError", { j: j.judgeId, e: code(j.error) }));
-      left.append(attentionRow(v, [whyText(v), ...extra].filter(Boolean).join("；")));
-    }
-    const right = el("div", { class: "list" }, el("h3", null, t("spotGroup"), el("span", { class: "count", text: String(spot.length) })));
-    if (!spot.length) right.append(el("p", { class: "empty-note", text: t("nothingSoft") }));
-    for (const v of spot) {
-      const c = M.studentChecks(v.record);
-      const bits = [...c.softFlags.map(code), c.rewrites ? t("rewrites", { n: c.rewrites }) : null, c.discardedAttempts ? t("discarded", { n: c.discardedAttempts }) : null,
-        ...v.reviewFlags.map(f => t("judgesTied", { f: code(f) }))].filter(Boolean);
-      right.append(attentionRow(v, kindLabel(v) + " · " + bits.join("、")));
-    }
-    box.append(el("div", { class: "cols" }, left, right));
+    box.append(el("header", { class: "sec-head" }, el("div", { class: "title" },
+      el("h2", { id: "attention-title", text: t("attentionTitle") }), el("p", { class: "lede", text: t("attentionNote", { p: pending.length, s: spot.length }) }))));
+    const items = [
+      ...pending.map(v => attentionRow(v, [whyText(v), ...v.judgeErrors.map(j => t("judgeError", { j: j.judgeId, e: code(j.error) }))].filter(Boolean).join("；"))),
+      ...spot.map(v => {
+        const c = M.studentChecks(v.record);
+        const bits = [...c.softFlags.map(code), c.rewrites ? t("rewrites", { n: c.rewrites }) : null, c.discardedAttempts ? t("discarded", { n: c.discardedAttempts }) : null,
+          ...v.reviewFlags.map(f => t("judgesTied", { f: code(f) }))].filter(Boolean);
+        return attentionRow(v, t("spotPrefix", { s: kindLabel(v) }) + bits.join("、"));
+      }),
+    ];
+    if (!items.length) { box.append(el("p", { class: "empty-note", text: t("nothingPending") })); return; }
+    const FIRST = 4;
+    box.append(el("div", { class: "list" }, st.attentionAll ? items : items.slice(0, FIRST)));
+    if (items.length > FIRST) box.append(el("button", { type: "button", class: "more", "aria-expanded": st.attentionAll ? "true" : "false",
+      onclick: () => { st.attentionAll = !st.attentionAll; render(); } }, st.attentionAll ? t("showFewer") : t("showRest", { n: items.length - FIRST })));
   }
 
-  // ---------- 3. All conversations ----------
+  // ---------- All conversations ----------
   function renderRunsOnly() { clear($("runs")); renderRuns(views()); }
   function renderRuns(vs) {
     const box = $("runs"), rf = st.runFilter;
     const states = [["all", t("all")], ["scored", t("scored_state")], ["needs_review", t("needs_review")], ["unscorable", t("unscorable")], ["other_version", t("other_version")]];
     const inState = (v, k) => k === "all" || (k === "unscorable" ? ["error", "student_invalid"].includes(v.state) : v.state === k);
-    let list = vs.filter(v => inState(v, rf.state))
-      .filter(v => !rf.disagree || v.disagreements.length).filter(v => !rf.soft || softCount(v) > 0)
-      .filter(v => !rf.focus || ((!rf.focus.tutor || v.record.tutor.label === rf.focus.tutor) && (!rf.focus.card || v.record.card.id === rf.focus.card)));
+    const scoped = vs.filter(v => !rf.focus || ((!rf.focus.tutor || v.record.tutor.label === rf.focus.tutor) && (!rf.focus.card || v.record.card.id === rf.focus.card)));
+    let list = scoped.filter(v => inState(v, rf.state)).filter(v => !rf.disagree || v.disagreements.length).filter(v => !rf.soft || softCount(v) > 0);
     box.append(el("header", { class: "sec-head" }, el("div", { class: "title" },
-      el("h2", { id: "runs-title" }, t("runsTitle"), el("span", { class: "count", text: String(list.length) })), el("p", { class: "lede", text: t("runsNote") }))));
+      el("h2", { id: "runs-title" }, t("runsTitle"), el("span", { class: "count", text: String(list.length) })), el("p", { class: "lede", text: t("runsNote") })), filterSummary()));
+    if (st.showFilters) box.append(renderFilters());
     box.append(el("div", { class: "tabs", role: "group", "aria-label": t("colState") }, states.map(([k, label]) => el("button", { type: "button", class: "tab", "aria-pressed": rf.state === k ? "true" : "false",
-      onclick: () => { rf.state = k; st.limit = 100; renderRunsOnly(); } }, label + " " + vs.filter(v => inState(v, k)).length))));
+      onclick: () => { rf.state = k; st.limit = 100; renderRunsOnly(); } }, label + " " + scoped.filter(v => inState(v, k)).length))));
     box.append(el("div", { class: "toggles" },
+      rf.focus ? el("span", { class: "focus" }, t("focus", { f: rf.focus.tutor || "" }), el("button", { type: "button", class: "btn-quiet", onclick: () => { rf.focus = null; renderRunsOnly(); renderViews(views()); } }, t("clearFocus"))) : null,
       el("label", null, el("input", { type: "checkbox", id: "only-disagree", checked: rf.disagree, onchange: e => { rf.disagree = e.target.checked; renderRunsOnly(); } }), t("onlyDisagree")),
-      el("label", null, el("input", { type: "checkbox", id: "only-soft", checked: rf.soft, onchange: e => { rf.soft = e.target.checked; renderRunsOnly(); } }), t("onlySoft")),
-      rf.focus ? el("span", { class: "focus" }, t("focus", { f: rf.focus.tutor || "" }), el("button", { type: "button", class: "btn-quiet", onclick: () => setFocus(null) }, t("clearFocus"))) : null));
+      el("label", null, el("input", { type: "checkbox", id: "only-soft", checked: rf.soft, onchange: e => { rf.soft = e.target.checked; renderRunsOnly(); } }), t("onlySoft"))));
     list = list.slice().sort((a, b) => String(b.record.createdAt).localeCompare(String(a.record.createdAt)));
     if (!list.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
-    const head = [t("colResult"), t("colTutor"), t("colCard"), t("colLang"), t("colFixed"), t("colEnd"), t("colTurns"), t("colNotes"), t("colTime")];
+    const head = [t("colResult"), t("colTutor"), t("colCard"), t("colLang"), t("colEnd"), t("colTime")];
     const body = el("tbody");
     for (const v of list.slice(0, st.limit)) {
-      const r = v.record, m = v.scoring && v.scoring.merged, c = M.studentChecks(r);
+      const r = v.record;
       const open = () => openRun(r.runId);
-      const notes = [v.disagreements.length ? t("splitsN", { n: v.disagreements.length }) : null,
-        softCount(v) ? t("flagsN", { n: c.softFlags.length + c.rewrites + c.discardedAttempts }) : null].filter(Boolean).join(" · ");
       const why = whyText(v);
       body.append(el("tr", { tabindex: "0", onclick: open, onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } } },
         el("td", { class: "verdict" }, mark(v), why ? el("div", { class: "why", text: why }) : null),
         el("td", { text: r.tutor.label }),
-        el("td", null, el("span", { class: "mono", text: r.card.id }), v.olderCard ? el("span", { class: "older", text: "v" + r.card.version + " · " + t("olderCard") }) : null),
+        el("td", null, el("span", { text: r.card.id }), v.olderCard ? el("span", { class: "older", text: "v" + r.card.version + " · " + t("olderCard") }) : null),
         el("td", { text: langShort(r.card.lang) + " #" + r.repeat.index }),
-        el("td", { class: "small", text: m ? code(m.fixedTest) : "—" }),
-        el("td", { class: "small", text: code(r.end.reason) }),
-        el("td", { class: "num", text: r.end.tutorTurns }),
-        el("td", { class: "small muted", text: notes }),
-        el("td", { class: "small muted", text: whenShort(r.createdAt) })));
+        el("td", { class: "muted", text: code(r.end.reason) }),
+        el("td", { class: "muted", text: whenShort(r.createdAt) })));
     }
-    box.append(el("div", { class: "scroll-x" }, el("table", { class: "runs" }, el("thead", null, el("tr", null, head.map((h, i) => el("th", { class: i === 6 ? "num" : null, text: h })))), body)));
-    if (list.length > st.limit) box.append(el("button", { type: "button", onclick: () => { st.limit += 100; renderRunsOnly(); } }, t("showMore", { n: Math.min(100, list.length - st.limit) })));
+    box.append(el("div", { class: "scroll-x" }, el("table", { class: "runs" }, el("thead", null, el("tr", null, head.map(h => el("th", { text: h })))), body)));
+    if (list.length > st.limit) box.append(el("button", { type: "button", class: "more", onclick: () => { st.limit += 100; renderRunsOnly(); } }, t("showMore", { n: Math.min(100, list.length - st.limit) })));
   }
 
-  // ---------- 4. How the run itself behaved ----------
+  // ---------- Run checks ----------
   function renderOps(vs) {
     const box = $("ops");
     box.append(el("header", { class: "sec-head" }, el("div", { class: "title" }, el("h2", { id: "ops-title", text: t("opsTitle") }), el("p", { class: "lede", text: t("opsNote") }))));
@@ -472,25 +504,27 @@
     for (const v of vs) for (const j of v.judgeErrors) invalid[j.judgeId] = (invalid[j.judgeId] || 0) + 1;
     const judges = [...new Set([...Object.keys(sum.byJudge), ...Object.keys(invalid)])].sort();
     const items = Object.entries(sum.byItem).sort((a, b) => b[1] - a[1]);
-    const left = el("div", { class: "list" }, el("h3", { text: t("judgesTitle") }),
-      el("p", { class: "small muted", style: "padding-top:8px", text: t("judgesSummary", { n: sum.total, runs: sum.runsWith }) }),
+    const left = el("div", { class: "block" }, el("h3", { text: t("judgesTitle") }),
+      el("p", { class: "small muted", text: t("judgesSummary", { n: sum.total, runs: sum.runsWith }) }),
       judges.length ? el("div", { class: "scroll-x" }, el("table", null,
         el("thead", null, el("tr", null, el("th", { text: t("judge") }), el("th", { class: "num", text: t("minority") }), el("th", { class: "num", text: t("ties") }), el("th", { class: "num", text: t("invalidOutputs") }))),
         el("tbody", null, judges.map(j => el("tr", null, el("td", { class: "mono", text: j }),
           el("td", { class: "num", text: (sum.byJudge[j] || {}).minority || 0 }), el("td", { class: "num", text: (sum.byJudge[j] || {}).tie || 0 }),
           el("td", { class: "num" + (invalid[j] ? " stopped" : ""), text: invalid[j] || 0 })))))) : null,
-      items.length ? el("p", { class: "small muted", style: "padding-top:10px", text: t("topItems", { list: items.slice(0, 5).map(([k, n]) => code(k) + " " + n).join(" · ") }) }) : null);
+      items.length ? el("p", { class: "small muted", text: t("topItems", { list: items.slice(0, 4).map(([k, n]) => code(k) + " " + n).join(" · ") }) }) : null);
     const rows = st.dataset.batches.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-    const right = el("div", { class: "list" }, el("h3", { text: t("batchesTitle") }),
+    const runCost = vs.reduce((n, v) => n + (M.costs(v.record).run || 0), 0);
+    const reCost = vs.reduce((n, v) => n + M.costs(v.record).rescoring.reduce((m, x) => m + (x.usd || 0), 0), 0);
+    const right = el("div", { class: "block" }, el("h3", { text: t("batchesTitle") }),
+      el("p", { class: "small muted", text: t("costLine", { cost: usd(runCost + reCost), re: usd(reCost) }) }),
       el("div", { class: "scroll-x" }, el("table", null,
-        el("thead", null, el("tr", null, [t("batch"), t("status"), t("progress"), t("spent")].map((h, i) => el("th", { class: i >= 2 ? "num" : null, text: h })))),
+        el("thead", null, el("tr", null, [t("batch"), t("status"), t("progress")].map((h, i) => el("th", { class: i === 2 ? "num" : null, text: h })))),
         el("tbody", null, rows.map(b => {
           const r = b.runs || {}, done = (r.scored || 0) + (r.error || 0) + (r.studentInvalid || 0) + (r.needsReview || 0);
           const stopped = b.status && b.status !== "complete" && b.status !== "running";
-          return el("tr", null, el("td", null, el("div", { class: "mono", text: b.batchId }), el("div", { class: "small muted", text: (b.purpose || "") + " · " + when(b.createdAt) })),
-            el("td", { class: "small" + (stopped ? " stopped" : ""), text: (stopped ? "✕ " : "") + code(b.status) }),
-            el("td", { class: "num", text: done + " / " + (b.planned ?? "?") }),
-            el("td", { class: "num", text: usd(b.spentUsd) + " / " + usd(b.budgetUsd) }));
+          return el("tr", null, el("td", null, el("div", { class: "mono", text: b.batchId }), el("div", { class: "small faint", text: whenShort(b.createdAt) + " · " + usd(b.spentUsd) + " / " + usd(b.budgetUsd) })),
+            el("td", { class: (stopped ? "stopped" : "muted"), text: (stopped ? "✕ " : "") + code(b.status) }),
+            el("td", { class: "num", text: done + " / " + (b.planned ?? "?") }));
         })))));
     box.append(el("div", { class: "cols" }, left, right));
   }
@@ -671,6 +705,7 @@
     if (reopen) openRun(reopen, true);
   });
   $("scrim").addEventListener("click", closeDrawer);
+  window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (VIEWS.includes(h) && h !== st.view) { st.view = h; render(); } });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("drawer").hidden) closeDrawer(); });
   let dragDepth = 0;
   document.addEventListener("dragenter", e => { if (e.dataTransfer && [...e.dataTransfer.types].includes("Files")) { dragDepth++; $("drop").hidden = false; } });

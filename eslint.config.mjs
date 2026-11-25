@@ -45,7 +45,9 @@ export default tseslint.config(
       sourceType: "script",
       globals: {
         document: "readonly",
+        history: "readonly",
         localStorage: "readonly",
+        location: "readonly",
         navigator: "readonly",
         Node: "readonly",
         window: "readonly",
