@@ -111,7 +111,7 @@ test("fixed challenge audits the reported event, visible text and one-based stud
   ] as const) {
     const result = check(n, text, [...events]);
     assert.deepEqual(result.soft, flags);
-    assert.deepEqual(result.hard, []);
+    assert.deepEqual(result.hard, n === 2 ? ["fixed_test_early"] : []);
     assert.equal(result.state?.message, text);
     assert.deepEqual(result.state?.events, events);
   }
@@ -135,12 +135,13 @@ test("only simulated pre-dispatch failures can consume the bounded retry allowan
   const req: Request = { role: "tutor", model: job.tutor, system: "test", messages: [], params: { temperature: null } };
   const session = new Session(() => { throw new MockNotDispatched(); }, e.config.prices, 1, 0.01, 4);
   assert.throws(() => session.call(req), /mock_not_dispatched/);
-  assert.deepEqual(session.calls.map(c => c.retryDelayMs), [0, 1000, 2000, 4000]);
+  assert.deepEqual(session.calls.map(c => c.retryDelayMs), [0, 2000, 4000, 8000]);
   assert.ok(session.calls.every(c => c.usd === 0));
   const unknown = new Session(() => { throw new Error("ambiguous"); }, e.config.prices, 1, 0.01, 4);
   assert.throws(() => unknown.call(req), /provider_error/);
   assert.equal(unknown.calls.length, 1);
-  assert.equal(unknown.calls[0]?.usd, null);
+  assert.equal(unknown.calls[0]?.usd, unknown.calls[0]?.reservedUsd);
+  assert.equal(unknown.calls[0]?.costEstimated, true);
 });
 test("provider errors retain partial transcripts; credentials and response envelopes stay out of records", () => {
   for (const inject of ["Authorization: Bearer example", "sk-example", "<think>internal material</think>", '{"message":"sk\\u002dexample"}', '{"headers":{"cookie":"example"}}']) {
@@ -151,6 +152,6 @@ test("provider errors retain partial transcripts; credentials and response envel
   }
   const r = drive(() => () => { throw new Error("Authorization: Bearer example"); });
   assert.equal(r.status, "error");
-  assert.equal(r.usage.totalUsd, null);
+  assert.equal(r.usage.totalUsd, r.calls[0]?.reservedUsd);
   assert.doesNotMatch(JSON.stringify(r), /Authorization|Bearer/);
 });

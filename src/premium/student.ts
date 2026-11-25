@@ -34,8 +34,11 @@ export function checkStudent(raw: string, asset: Asset, lang: Lang, previous: St
   const fixed = card.fixedTest;
   const containsText = message.includes(fixed.mustContain[lang]);
   const reported = events.includes(fixed.kind);
+  if (events.includes("curt_exit") && stage < card.solvedStage) hard.push("curt_exit_unsolved");
+  if (events.includes("left") && card.leaveNotBefore && studentMessage < card.leaveNotBefore) hard.push("left_too_early");
+  if (containsText && studentMessage < fixed.studentMessage) hard.push("fixed_test_early");
   if (studentMessage === fixed.studentMessage && !containsText && !events.includes(fixed.skipIfEvent)) hard.push("fixed_test_missing");
-  // 自报行为和可见文本分别保留。两者错位仅作标记，沿用原有重写条件。
+  // 保留自报行为与可见文本的独立证据，包括被重写的回复。
   if (containsText && !reported) soft.push("fixed_test_event_missing");
   if (reported && !containsText) soft.push("fixed_test_event_without_text");
   if (reported && studentMessage < fixed.studentMessage) soft.push("fixed_test_event_early");

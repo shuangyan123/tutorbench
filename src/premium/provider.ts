@@ -1,5 +1,5 @@
 import { hash } from "./cards.js";
-import { amount, id, invalid, nullable, optional, positive, shape, str } from "./schema.js";
+import { amount, choices, id, invalid, list, nullable, optional, positive, shape, str } from "./schema.js";
 
 export const modelSchema = shape({ id, label: optional(str), developer: id, provider: id, requestedModel: id, pinnedVersion: id });
 export type Model = ReturnType<typeof modelSchema>;
@@ -15,17 +15,26 @@ export interface Reply {
   text: string; resolvedModel: string; finishReason: string; latencyMs: number;
   usage: { inputTokens: number; outputTokens: number } | null;
 }
-export type Provider = (request: Request) => Reply;
-export const priceSchema = shape({ version: id, inputUsdPerMillion: nullable(amount), outputUsdPerMillion: nullable(amount) });
+export type Provider = ((request: Request) => Reply) & { requestBytes?: (request: Request) => number };
+const rate = shape({ model: id, inputUsdPerMillion: amount, outputUsdPerMillion: amount,
+  date: (v, f) => /^\d{4}-\d{2}-\d{2}$/u.test(str(v, f)) ? String(v) : invalid(f),
+  source: (v, f) => /^https:\/\//u.test(str(v, f)) ? String(v) : invalid(f) });
+export const priceSchema = shape({ version: id, models: optional(list(rate)),
+  inputUsdPerMillion: optional(nullable(amount)), outputUsdPerMillion: optional(nullable(amount)) });
 export type Prices = ReturnType<typeof priceSchema>;
 export type Role = Request["role"];
-export type Failure = "provider_error" | "mock_not_dispatched" | "sensitive_output" | "invalid_response" | "model_version_drift" | "budget_stop" | "unknown_cost";
+export type Failure = `http_${number}` | "timeout" | "overloaded" | "not_dispatched" | "content_filter" | "provider_error" | "mock_not_dispatched" | "sensitive_output" | "invalid_response" | "model_version_drift" | "budget_stop" | "unknown_cost";
 export interface Call {
   n: number; role: Role; model: string; requestHash: string; resolvedModel: string | null;
   usage: Reply["usage"]; usd: number | null; finishReason: string | null; latencyMs: number | null;
-  error: Failure | null; retryDelayMs: number;
+  error: Failure | null; retryDelayMs: number; reservedUsd: number; costEstimated: boolean;
 }
-export class MockNotDispatched extends Error {}
+export class TransportError extends Error {
+  constructor(readonly code: Failure, readonly retryable = false, readonly retryAfterMs?: number) { super(code); }
+}
+export class MockNotDispatched extends TransportError {
+  constructor() { super("mock_not_dispatched", true); }
+}
 export class CallError extends Error { constructor(readonly code: Failure) { super(code); } }
 
 export function sensitive(text: string) {
@@ -62,46 +71,70 @@ export function usage(calls: Call[], priceTable: Prices) {
     judges: sum(calls.filter(c => c.role === "judge")), totalUsd: sum(calls).usd, priceTable: priceTable.version, rates: priceTable };
 }
 
-// 每次模拟调用先预留额度。异常后的未知花费会阻止下一次调用。
+// 同一批次在串行事务内运行，一次只预留一个调用。
 export class Session {
   readonly calls: Call[] = [];
-  constructor(readonly provider: Provider, readonly prices: Prices, private remaining: number, readonly reserveUsd: number, readonly maxOfflineAttempts = 1) {
+  private budgetStopped = false;
+  constructor(readonly provider: Provider, readonly prices: Prices, private remaining: number, readonly reserveUsd: number, readonly maxOfflineAttempts = 1,
+    private readonly wait = (ms: number) => { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); }) {
     amount(remaining, "available budget");
     if (dollars(remaining) !== remaining || dollars(reserveUsd) !== reserveUsd) invalid("budget.precision");
     amount(reserveUsd, "reserveUsd");
     if (!Number.isInteger(maxOfflineAttempts) || maxOfflineAttempts < 1 || maxOfflineAttempts > 4) invalid("maxOfflineAttempts");
   }
   call(req: Request): Reply {
+    let delay = 0;
     for (let attempt = 1; ; attempt++) {
-      try { return this.invoke(req, attempt === 1 ? 0 : 1000 * 2 ** (attempt - 2)); }
+      try { return this.invoke(req, delay); }
       catch (error) {
-        if (!(error instanceof CallError) || error.code !== "mock_not_dispatched" || attempt >= this.maxOfflineAttempts) throw error;
+        if (!(error instanceof TransportError)) throw error;
+        const mock = error instanceof MockNotDispatched;
+        if (!error.retryable || attempt >= (mock ? this.maxOfflineAttempts : 4) || (error.retryAfterMs ?? 0) > 60_000)
+          throw new CallError(error.code);
+        const interval = 2000 * 2 ** (attempt - 1);
+        delay = error.retryAfterMs ?? (mock ? interval : Math.round(interval * (0.8 + 0.4 * Math.random())));
+        if (!mock) this.wait(delay);
       }
     }
   }
   private invoke(req: Request, retryDelayMs: number): Reply {
-    if (this.prices.inputUsdPerMillion === null || this.prices.outputUsdPerMillion === null ||
-        this.calls.some(c => c.usd === null)) throw new CallError("unknown_cost");
-    if (this.remaining <= 0 || this.remaining < this.reserveUsd) throw new CallError("budget_stop");
+    const rate = this.prices.models ? this.prices.models.find(m => m.model === req.model.id) : this.prices;
+    const input = rate?.inputUsdPerMillion, output = rate?.outputUsdPerMillion;
+    if (input == null || output == null || this.calls.some(c => c.usd === null)) throw new CallError("unknown_cost");
+    const bytes = this.provider.requestBytes?.(req) ?? Buffer.byteLength(JSON.stringify(req));
+    const cap = req.params.maxOutputTokens ?? { tutor: 2048, student: 512, judge: 8192 }[req.role];
+    const reserve = dollars((Math.ceil(bytes / 2) * input + cap * output) / 1_000_000);
+    if (reserve === null) throw new CallError("unknown_cost");
+    if (this.budgetStopped || this.remaining < reserve || this.remaining <= 0) {
+      this.budgetStopped = true;
+      throw new CallError("budget_stop");
+    }
     const call: Call = { n: this.calls.length + 1, role: req.role, model: req.model.id, requestHash: hash(JSON.stringify(req)),
-      resolvedModel: null, usage: null, usd: null, finishReason: null, latencyMs: null, error: null, retryDelayMs };
+      resolvedModel: null, usage: null, usd: null, finishReason: null, latencyMs: null, error: null, reservedUsd: reserve, costEstimated: true, retryDelayMs };
     this.calls.push(call);
+    call.usd = reserve;
+    this.remaining = dollars(this.remaining - reserve)!;
     let reply: Reply;
     try { reply = this.provider(structuredClone(req)); }
     catch (error) {
-      call.error = error instanceof MockNotDispatched ? "mock_not_dispatched" : "provider_error";
-      if (error instanceof MockNotDispatched) { call.usd = 0; call.usage = { inputTokens: 0, outputTokens: 0 }; }
+      call.error = error instanceof TransportError ? error.code : "provider_error";
+      if (call.error === "not_dispatched" || call.error === "mock_not_dispatched") {
+        this.remaining = dollars(this.remaining + reserve)!;
+        call.usd = 0; call.costEstimated = false; call.usage = { inputTokens: 0, outputTokens: 0 };
+      }
+      if (error instanceof TransportError) throw error;
       throw new CallError(call.error);
     }
     const fail = (code: Failure): never => { call.error = code; throw new CallError(code); };
     if (!reply || typeof reply !== "object") return fail("invalid_response");
     if (reply.usage && tokens(reply.usage.inputTokens) && tokens(reply.usage.outputTokens)) {
+      call.costEstimated = false;
       call.usage = { inputTokens: reply.usage.inputTokens, outputTokens: reply.usage.outputTokens };
-      const cost = (call.usage.inputTokens * this.prices.inputUsdPerMillion +
-        call.usage.outputTokens * this.prices.outputUsdPerMillion) / 1_000_000;
+      const cost = (call.usage.inputTokens * input +
+        call.usage.outputTokens * output) / 1_000_000;
       call.usd = dollars(cost);
       if (call.usd !== null) {
-        this.remaining = dollars(this.remaining - call.usd)!;
+        this.remaining = dollars(this.remaining + reserve - call.usd)!;
       }
     }
     if (typeof reply.text !== "string" || !reply.text.trim() || typeof reply.resolvedModel !== "string" || !reply.resolvedModel.trim() ||
@@ -117,10 +150,10 @@ export class Session {
   }
 }
 export const configSchema = shape({
-  batchId: id, purpose: str, languages: (v, f) => {
+  syntheticJudgeRubric: optional(choices("fixture")), kind: optional(choices("evaluation", "calibration")), hardCapUsd: optional(amount), batchId: id, purpose: str, languages: (v, f) => {
     if (!Array.isArray(v) || !v.length || v.some(l => l !== "en" && l !== "zh-CN") || new Set(v).size !== v.length) invalid(f);
     return v as ("en" | "zh-CN")[];
-  }, repeats: positive, maxOfflineAttempts: optional(positive), budgetUsd: amount, reserveUsd: amount, prices: priceSchema,
+  }, repeats: positive, maxOfflineAttempts: optional(positive), budgetUsd: amount, reserveUsd: (v, f) => v === undefined ? 0 : amount(v, f), prices: priceSchema,
   tutors: arrayModels, student: modelSchema, judgeConfigVersion: id, judges: arrayModels, alternates: arrayModels,
 });
 function arrayModels(v: unknown, f: string) {

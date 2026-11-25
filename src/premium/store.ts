@@ -23,7 +23,7 @@ export function rebuildIndex(root: string) {
   const dir = join(root, "records");
   const rows = (existsSync(dir) ? readdirSync(dir) : []).filter(f => f.endsWith(".json")).sort().map(f => {
     const r: RunRecord = JSON.parse(readFileSync(join(dir, f), "utf8"));
-    if (r.schema !== "tutorbench.premium-run-record" || r.schemaVersion !== 1 || id(r.runId, "runId") + ".json" !== f) invalid("record.identity");
+    if (r.schema !== "tutorbench.premium-run-record" || ![1, 2].includes(r.schemaVersion) || id(r.runId, "runId") + ".json" !== f) invalid("record.identity");
     return safeJson(indexRow(r)) + "\n";
   });
   publish(join(root, "index.jsonl"), rows.join(""));
@@ -43,6 +43,16 @@ export class Store {
       CREATE TABLE IF NOT EXISTS originals (id TEXT PRIMARY KEY, batch TEXT NOT NULL, body TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS batch_runs ON originals(batch);
       CREATE TABLE IF NOT EXISTS scores (run TEXT NOT NULL REFERENCES originals(id), n INTEGER NOT NULL, body TEXT NOT NULL, PRIMARY KEY(run,n));`);
+  }
+  // 活跃标记独立于 SQLite 事务。断电后不能自动重放一次可能已扣费的任务。
+  liveGuard(batch: string, newRun?: string) {
+    const path = join(this.root, ".inflight-" + id(batch, "batch"));
+    if (existsSync(path)) {
+      const run = readFileSync(path, "utf8");
+      if (!this.get(run)) invalid("calibration.unreconciled_inflight_job");
+      rmSync(path);
+    }
+    if (newRun) writeFileSync(path, newRun, { flag: "wx", flush: true, mode: 0o600 });
   }
   close() { this.db.close(); }
   transaction<T>(work: () => T): T {

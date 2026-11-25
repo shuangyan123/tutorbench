@@ -5,9 +5,11 @@ import { panel } from "../src/premium/provider.js";
 import { drive, fixture, reply } from "./premium-fixture.js";
 
 function voted(change: (b: Ballot, judge: string) => void, exit?: "left" | "thanked_after_answer" | "curt_exit", solved = false) {
+  const cached = new Map<string, ReturnType<typeof reply>>();
   let students = 0;
   return drive(base => req => {
-    const r = base(req);
+    const r = req.role === "judge" ? cached.get(req.model.id) ?? base(req) : base(req);
+    if (req.role === "judge") cached.set(req.model.id, r);
     if (req.role === "student" && ++students === 2 && exit) {
       return reply({ message: "bye", stage: solved ? 2 : 1, events: [exit], end: true }, req.model.pinnedVersion);
     }
@@ -45,11 +47,13 @@ test("the turn cap needs two tutor-fault votes; unresolved counts never imply go
       b.turns = Array.from({ length: 15 }, (_, i) => ({ ...b.turns[0]!, turn: i + 1, evidence: "Try." }));
       b.fixedTest = { outcome: "refused_only", evidence: "Try." };
       b.overall.solvedByStudent = false;
+      b.overall.verdict = "fail";
       b.overall.reasons = Number(req.model.id.slice(1)) <= faultVotes ? ["unsolved_tutor_fault"] : [];
       return reply(b, req.model.pinnedVersion);
     });
     assert.equal(r.end.reason, "turn_cap");
     assert.equal(r.scorings[0]?.merged?.verdict, faultVotes === 2 ? "fail" : null);
+    assert.deepEqual(r.scorings[0]?.pending, faultVotes === 2 ? [] : ["unsolved_at_cap"]);
   }
 });
 test("majority help-fit and repeated failed hints produce a rule-based flawed verdict", () => {
@@ -62,19 +66,18 @@ test("majority help-fit and repeated failed hints produce a rule-based flawed ve
   assert.deepEqual(r.scorings[0]?.merged?.reasons, ["dead_hints", "help_level"]);
   assert.equal(r.scorings[0]?.merged?.verdict, "flawed");
 });
-test("unsettled semantics withhold a verdict", () => {
+test("independent solve survives categorical splits and descriptive transfer", () => {
   for (const r of [
-    voted(() => {}, "curt_exit"),
     voted((b, id) => { b.overall.verdict = id === "j1" ? "flawed" : id === "j2" ? "fail" : "good"; }),
     voted((b, id) => { b.fixedTest.outcome = id === "j1" ? "refused_only" : id === "j2" ? "ignored" : "held_and_helped"; }),
     voted(b => { b.overall.transfer = "solved"; }),
   ]) {
-    assert.equal(r.status, "needs_review");
-    assert.equal(r.scorings[0]?.merged?.verdict, null);
-    assert.ok(r.scorings[0]?.pending.length);
+    assert.equal(r.status, "scored");
+    assert.equal(r.scorings[0]?.merged?.verdict, "good");
+    assert.deepEqual(r.scorings[0]?.pending, []);
   }
 });
-test("pending classifications retain rule failure evidence while the final verdict awaits review", () => {
+test("definitive failure survives verdict splits and transfer activity", () => {
   for (const cause of ["leak", "student_left"]) {
     const r = voted((b, id) => {
       if (cause === "leak" && id !== "j3") leak(b);
@@ -82,12 +85,12 @@ test("pending classifications retain rule failure evidence while the final verdi
       b.overall.transfer = "solved_after_hint";
     }, cause === "student_left" ? "left" : "thanked_after_answer");
     const s = r.scorings[0]!;
-    assert.equal(s.merged?.withheldRuleVerdict, "fail");
+    assert.deepEqual(s.merged?.reviewFlags, ["verdict_split"]);
     assert.deepEqual(s.merged?.reasons, [cause]);
     assert.deepEqual(s.merged?.leakTurns, cause === "leak" ? [2] : []);
-    assert.deepEqual(s.pending, ["no_majority:judgeVerdictMajority", "transfer_protocol"]);
-    assert.equal(s.merged?.verdict, null);
-    assert.equal(r.status, "needs_review");
+    assert.deepEqual(s.pending, []);
+    assert.equal(s.merged?.verdict, "fail");
+    assert.equal(r.status, "scored");
   }
 });
 test("fixed test skip is retained and cannot establish leakage or a pass", () => {
@@ -100,7 +103,7 @@ test("fixed test skip is retained and cannot establish leakage or a pass", () =>
     return { ...response, text: JSON.stringify(b) };
   });
   assert.equal(r.end.fixedTestDelivered, false);
-  assert.ok(r.scorings[0]?.pending.includes("fixed_test_skip_evidence"));
+  assert.ok(r.scorings[0]?.pending.includes("answer_claim_unconfirmed"));
   assert.equal(r.status, "needs_review");
 });
 test("missing, duplicate, invented turn numbers, fabricated quotes and failed judges never reduce panel size", () => {
@@ -122,7 +125,8 @@ test("missing, duplicate, invented turn numbers, fabricated quotes and failed ju
   const r = drive(base => req => { if (req.model.id === "j3") throw new Error("offline failure"); return base(req); });
   assert.equal(r.scorings[0]?.perJudge.length, 3);
   assert.equal(r.scorings[0]?.merged, null);
-  assert.equal(r.usage.totalUsd, null);
+  assert.ok(r.calls.at(-1)?.costEstimated);
+  assert.ok(r.usage.totalUsd! > 0);
 });
 test("recusal uses developer even behind different hosts and preserves configured alternate order", () => {
   const { e, job } = fixture();

@@ -13,7 +13,7 @@ const context = shape({
 const cardSchema = shape({
   schemaVersion: positive, id, version: id, suite: str, realism: str, subject: str, source: str,
   languages: list(language), studentCard: localized(id), tutorSetup: bilingual, firstMessage: bilingual,
-  judgeContext: context, stages: list(shape({ n: positive, label: bilingual })), solvedStage: positive,
+  judgeContext: context, stages: list(shape({ n: positive, label: bilingual })), solvedStage: positive, leaveNotBefore: optional(positive),
   fixedTest: shape({ studentMessage: positive, kind: id, mustContain: bilingual, skipIfEvent: id }),
   scriptedMistakes: list(shape({ id, stage: optional(positive), required: bool, onlyIfTransferOffered: optional(bool), hint: localized(strings) })),
   conditionalBehaviours: list(id), prematureIdea: shape({ studentKeywords: localized(strings), unlockedByTutorKeywords: localized(strings) }),

@@ -37,7 +37,7 @@ function runAttempt(asset: Asset, lang: Lang, tutor: Model, student: Model, sess
     const correction: Message[] = [], hardFails: string[] = [];
     for (let rewrite = 0; rewrite <= 2; rewrite++) {
       const response = session.call({ role: "student", model: student, system,
-        params: { temperature: 0.7 }, messages: [...studentHistory, ...correction] });
+        params: { temperature: 0.7, maxOutputTokens: 512 }, messages: [...studentHistory, ...correction] });
       const { state, hard, soft } = checkStudent(response.text, asset, lang, states, tutors);
       if (state && !hard.length) {
         const { message, ...internal } = state;

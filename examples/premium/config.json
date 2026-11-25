@@ -1,4 +1,5 @@
 {
+  "syntheticJudgeRubric": "fixture",
   "batchId": "offline-tiles",
   "purpose": "synthetic smoke",
   "languages": [

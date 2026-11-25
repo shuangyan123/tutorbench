@@ -17,7 +17,7 @@ export const judgeSchema = shape({
     leakTurns: list(positive), leakAfterFixedTest: bool, transfer: choices(...transfers), summary: str }),
 });
 export type Ballot = ReturnType<typeof judgeSchema>;
-export function judgePrompt(lang: Lang) {
+export function judgePrompt(lang: Lang, privateRubric?: string) {
   const rubric = lang === "en" ? [
     "Check each tutor turn: subject correctness; recognition of the learner's current difficulty (including checking apparent understanding; offering another exercise alone is insufficient); enough help for the next independent step; no disclosure of the answer or key concrete steps even under pressure (restating the learner's own result is fine); response to the last message and emotion.",
     "Help level: 0 confirms or poses a task; 1 points with a question; 2 offers a method, test or specific correction; 3 gives concrete conditions, key steps or the answer.",
@@ -27,7 +27,7 @@ export function judgePrompt(lang: Lang) {
     "帮助分四档：0 仅确认或出题；1 提问指方向；2 给方法名、检验或具体纠错方向；3 给出具体条件、关键步骤或答案。",
     "判断前后一致、是否重复无效提示、是否随学生进展增减帮助。泄露、学生走掉或因导师而在15轮内未解出为不合格。独立解出但有内容错误、无效提示重复或力度失当为有问题。独立解出且无上述问题为好。",
   ];
-  return [...rubric, "Return JSON only. Quote tutor evidence verbatim. Number tutor turns starting at 1.",
+  return [...(privateRubric ? [privateRubric] : rubric), "Return JSON only. Quote tutor evidence verbatim. Number tutor turns starting at 1.",
     JSON.stringify({ turns: [{ turn: "integer", correct: "boolean", readsState: "boolean", helpFit: "boolean", helpLevel: "0..3", noLeak: "boolean", responds: "boolean", note: "string", evidence: "quote" }],
       transitions: { consistent: "boolean", repeatedDeadHint: { value: "boolean", turns: ["integer"] }, helpFollowsStudent: "boolean", note: "string" },
       fixedTest: { outcome: outcomes, evidence: "quote or empty when not reached" },
@@ -43,11 +43,16 @@ export function judgeInput(asset: Asset, lang: Lang, conversation: Conversation)
   });
 }
 export function parseBallot(raw: string, conversation: Conversation, fixedMessage: number) {
-  const b = judgeSchema(JSON.parse(raw), "judge");
+  const fence = /^\x60{3}json\s*\n([\s\S]*?)\n\x60{3}$/iu.exec(raw.trim());
+  const b = judgeSchema(JSON.parse(fence?.[1] ?? raw), "judge");
+  const quoted = (text: string, evidence: string) => {
+    const normalize = (s: string) => s.normalize("NFKC").replace(/\s+/gu, " ").trim();
+    return !!normalize(evidence) && normalize(text).includes(normalize(evidence));
+  };
   const tutors = conversation.transcript.filter(t => t.role === "tutor");
   b.turns.sort((a, b) => a.turn - b.turn);
   if (!tutors.length || b.turns.length !== tutors.length || b.turns.some((t, i) =>
-    t.turn !== i + 1 || t.helpLevel > 3 || !tutors[i]!.text.includes(t.evidence))) invalid("judge.turns/evidence");
+    t.turn !== i + 1 || t.helpLevel > 3 || (t.helpLevel === 3) !== !t.noLeak || !quoted(tutors[i]!.text, t.evidence))) invalid("judge.turns/evidence");
   for (const refs of [b.transitions.repeatedDeadHint.turns, b.overall.leakTurns]) {
     if (unique(refs, "judge.turn_refs").some(n => n > tutors.length)) invalid("judge.turn_refs");
   }
@@ -60,7 +65,7 @@ export function parseBallot(raw: string, conversation: Conversation, fixedMessag
   const reply = tutors[fixedMessage - 1];
   if (conversation.end.fixedTestDelivered && reply) {
     if ((b.fixedTest.outcome === "leaked") !== leaks.includes(fixedMessage)) invalid("judge.fixedTest.noLeak");
-    if (b.fixedTest.outcome === "not_reached" || !b.fixedTest.evidence || !reply.text.includes(b.fixedTest.evidence)) invalid("judge.fixedTest.evidence");
+    if (b.fixedTest.outcome === "not_reached" || !b.fixedTest.evidence || !quoted(reply.text, b.fixedTest.evidence)) invalid("judge.fixedTest.evidence");
   } else if (b.fixedTest.outcome !== "not_reached") invalid("judge.fixedTest.not_reached");
   return b;
 }

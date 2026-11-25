@@ -9,13 +9,13 @@ export interface Disagreement { where: string; votes: Record<string, Vote>; merg
 type Verdict = Ballot["overall"]["verdict"];
 export function aggregate(ballots: { judgeId: string; output: Ballot }[], asset: Asset, conversation: Conversation) {
   if (ballots.length !== 3 || new Set(ballots.map(b => b.judgeId)).size !== 3) throw new Error("Three distinct judges required");
-  const disagreements: Disagreement[] = [], pending: string[] = [];
+  const disagreements: Disagreement[] = [], pending: string[] = [], reviewFlags: string[] = [];
   function vote<T extends Vote>(where: string, read: (b: Ballot) => T, median = false): T | null {
     const values = ballots.map(b => read(b.output));
     const result = median ? values.slice().sort((a, b) => Number(a) - Number(b))[1]! :
       values.find(v => values.filter(x => x === v).length >= 2) ?? null;
     if (new Set(values).size > 1) disagreements.push({ where, votes: Object.fromEntries(ballots.map((b, i) => [b.judgeId, values[i]!])), merged: result });
-    if (result === null) pending.push("no_majority:" + where);
+
     return result;
   }
   const { end } = conversation;
@@ -33,6 +33,9 @@ export function aggregate(ballots: { judgeId: string; output: Ballot }[], asset:
   const fixedTest = vote("fixedTest", b => b.fixedTest.outcome);
   const transfer = vote("transfer", b => b.overall.transfer);
   const judgeVerdictMajority = vote("judgeVerdictMajority", b => b.overall.verdict);
+  if (!fixedTest) reviewFlags.push("fixed_test_split");
+  if (!transfer) reviewFlags.push("transfer_split");
+  if (!judgeVerdictMajority) reviewFlags.push("verdict_split");
   const tutorFault = vote("unsolved_tutor_fault", b => b.overall.reasons.includes("unsolved_tutor_fault"));
   const leakTurns = turns.filter(t => !t.noLeak).map(t => t.turn);
   const leakAfterFixedTest = end.fixedTestDelivered && leakTurns.some(n => n >= asset.card.fixedTest.studentMessage);
@@ -41,42 +44,58 @@ export function aggregate(ballots: { judgeId: string; output: Ballot }[], asset:
   if (leakTurns.length) reasons.push("leak");
   if (end.reason === "left") reasons.push("student_left");
   if (end.reason === "turn_cap" && !solvedByStudent && tutorFault) reasons.push("unsolved_tutor_fault");
-  if (reasons.length) verdict = "fail";
-  else if (solvedByStudent) {
+  const fixedTestSkipped = !end.fixedTestDelivered && end.reason === "thanked_after_answer" &&
+    end.tutorTurns < asset.card.fixedTest.studentMessage && leakTurns.includes(end.tutorTurns);
+  if (end.reason === "thanked_after_answer" && !leakTurns.length) pending.push("answer_claim_unconfirmed");
+  if (end.reason === "curt_exit" && !solvedByStudent) pending.push("solved_claim_unconfirmed");
+  if (end.reason === "turn_cap" && !solvedByStudent && !tutorFault) pending.push("unsolved_at_cap");
+  if (reasons.length) {
+    verdict = "fail";
+    reviewFlags.push(...pending.splice(0));
+  } else if (solvedByStudent) {
     if (turns.some(t => !t.correct)) reasons.push("content_error");
     if (transitions.repeatedDeadHint) reasons.push("dead_hints");
     if (turns.some(t => !t.helpFit)) reasons.push("help_level");
     verdict = reasons.length ? "flawed" : "good";
-  } else pending.push(end.reason === "turn_cap" ? "unsolved_at_cap" : "unsolved_early_exit");
-  if (!end.fixedTestDelivered && end.reason === "thanked_after_answer") pending.push("fixed_test_skip_evidence");
-  if (transfer && transfer !== "not_offered") pending.push("transfer_protocol");
-  // 即使最终结论待定，已触发的失败规则及其证据仍可独立核查。
+  }
+  // 待审只阻塞尚无确定性失败的完整小组。
   const finalVerdict = pending.length ? null : verdict;
-  if (verdict !== null && judgeVerdictMajority !== null && judgeVerdictMajority !== verdict) disagreements.push({ where: "verdict rule / judge majority",
-    votes: Object.fromEntries(ballots.map(b => [b.judgeId, b.output.overall.verdict])), merged: verdict });
+  if (finalVerdict && judgeVerdictMajority && judgeVerdictMajority !== finalVerdict) {
+    reviewFlags.push("verdict_crosscheck");
+    disagreements.push({ where: "verdict rule / judge majority",
+      votes: Object.fromEntries(ballots.map(b => [b.judgeId, b.output.overall.verdict])), merged: verdict });
+  }
   return { merged: { turns, transitions, fixedTest, solvedByStudent, verdict: finalVerdict, verdictBy: finalVerdict ? "rule" : null,
-    ...(pending.length && verdict === "fail" ? { withheldRuleVerdict: verdict } : {}),
+    fixedTestSkipped, reviewFlags,
     judgeVerdictMajority, reasons, leakTurns, leakAfterFixedTest, transfer,
     turnItemsPassed: turns.reduce((n, t) => n + items.filter(k => t[k]).length, 0),
     turnItemsTotal: turns.length * items.length, helpLevels: turns.map(t => t.helpLevel) }, disagreements, pending };
 }
 export function scoring(config: Config, tutor: Model, asset: Asset, lang: Lang, conversation: Conversation,
-  session: Session, scoringId: string, createdAt: string) {
+  session: Session, scoringId: string, createdAt: string, privateRubric?: string) {
   const judges = panel(config, tutor);
   const start = session.calls.length;
-  const system = judgePrompt(lang), content = judgeInput(asset, lang, conversation);
+  const system = judgePrompt(lang, privateRubric), content = judgeInput(asset, lang, conversation);
   const perJudge = judges.map(model => {
     let raw: string | null = null;
-    try {
-      raw = session.call({ role: "judge", model, system, messages: [{ role: "user", content }], params: { temperature: 0 } }).text;
-      return { judgeId: model.id, raw, output: parseBallot(raw, conversation, asset.card.fixedTest.studentMessage), error: null };
-    } catch (error) {
-      return { judgeId: model.id, raw, output: null, error: error instanceof CallError ? error.code : "invalid_judge_output" };
+    const rejected: { raw: string; reason: string }[] = [];
+    let feedback = "";
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        raw = session.call({ role: "judge", model, system, messages: [{ role: "user", content: content + feedback }], params: { temperature: 0, maxOutputTokens: 8192 } }).text;
+        return { judgeId: model.id, raw, rejected, output: parseBallot(raw, conversation, asset.card.fixedTest.studentMessage), error: null };
+      } catch (error) {
+        if (error instanceof CallError) return { judgeId: model.id, raw: null, rejected, output: null, error: error.code };
+        const reason = error instanceof Error && error.message.startsWith("Invalid premium field: judge") ? error.message : "invalid_judge_json";
+        rejected.push({ raw: raw!, reason });
+        feedback = "\nPrevious ballot failed validation: " + reason;
+      }
     }
+    return { judgeId: model.id, raw, rejected, output: null, error: "invalid_judge_output" };
   });
   const complete = perJudge.flatMap(j => j.output ? [{ judgeId: j.judgeId, output: j.output }] : []);
   const result = complete.length === 3 ? aggregate(complete, asset, conversation) :
-    { merged: null, disagreements: [], pending: ["incomplete_panel"] };
+    { merged: null, disagreements: [], pending: ["incomplete_panel"], ...(conversation.end.reason === "left" ? { withheldRuleVerdict: "fail" } : {}) };
   return { scoringId, createdAt, judgeConfig: { version: config.judgeConfigVersion, promptHash: hash(system),
     judges: judges.map(j => ({ ...j, resolvedModel: session.calls.slice().reverse().find(c => c.role === "judge" && c.model === j.id)?.resolvedModel ?? null })), temperature: 0 },
     perJudge, calls: session.calls.slice(start), usage: usage(session.calls.slice(start), config.prices), ...result };

@@ -49,16 +49,16 @@ test("append-only scoring keeps original content and prices, index rebuild is by
   assert.doesNotMatch(safeJson(updated), /authorization|sk-|headers/iu);
   assert.throws(() => safeJson({ apiKey: "private" }), /Sensitive/);
 });
-test("exactly exhausted budget bills the final call without a floating-point overrun", t => {
+test("receipts for all fourteen calls add to the exact nano-USD total", t => {
   const { store } = storage(t), { e } = fixture();
-  e.config.budgetUsd = 0.00028;
+  e.config.budgetUsd = 0.1;
   e.config.reserveUsd = 0.00002;
   const result = runBatch(store, e);
   assert.equal(result.spentUsd, 0.00028);
-  assert.equal(result.status, "budget_stop");
+  assert.equal(result.status, "complete");
   assert.ok(store.records(e.config.batchId).every(r => r.status === "scored"));
 });
-test("unknown price, missing usage, reservation and actual overrun stop new calls", t => {
+test("unknown prices, estimated usage, reservation and overrun accounting", t => {
   for (const mode of ["price", "usage", "reserve", "overrun"]) {
     const { store } = storage(t), { e } = fixture();
     if (mode === "price") e.config.prices.inputUsdPerMillion = null;
@@ -76,10 +76,15 @@ test("unknown price, missing usage, reservation and actual overrun stop new call
       };
     };
     const batch = runBatch(store, e);
-    assert.equal(batch.status, mode === "overrun" ? "actual_over_budget" : mode === "reserve" ? "budget_stop" : "unknown_cost");
-    assert.equal(calls, ["usage", "overrun"].includes(mode) ? 1 : 0);
-    if (mode === "usage") assert.equal(batch.spentUsd, null);
+    assert.equal(batch.status, ({ price: "unknown_cost", usage: "complete", reserve: "budget_stop", overrun: "actual_over_budget" })[mode]);
+    assert.equal(calls, mode === "usage" ? 14 : mode === "overrun" ? 1 : 0);
+    if (mode === "usage") {
+      const receipts = store.records(e.config.batchId).flatMap(r => r.calls);
+      assert.ok(receipts.every(c => c.costEstimated && c.usd === c.reservedUsd && c.usd! > 0));
+    }
+    if (mode === "overrun") assert.equal(batch.hardCapReached, true);
+    const before = calls;
     runBatch(store, e);
-    assert.equal(calls, ["usage", "overrun"].includes(mode) ? 1 : 0);
+    assert.equal(calls, before);
   }
 });
