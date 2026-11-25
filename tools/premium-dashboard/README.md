@@ -12,6 +12,18 @@ Open `index.html` in a browser. No server and no build step are needed; it also 
 
 The files are read inside the browser tab. Nothing is uploaded, and the page makes no network requests (its Content-Security-Policy allows none).
 
+## What the page shows
+
+The page has three views. The filters (judge configuration, batch, language, card versions) sit at the right end of the view bar.
+
+- **Overview** has two charts and two numbers:
+  - *Who teaches well* has one row per tutor: its formal pass rate, then one mark per conversation. Good, flawed and fail come first; hollow rings at the end still need review and are not counted.
+  - *Which cards separate the tutors* is a card × tutor grid in one hue, where a stronger colour means a higher pass rate. The cards with the widest spread between tutors come first. A small ring in a cell means some of its conversations still need review.
+  - *Needs you* shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, or tied judges).
+  - Hovering a mark or a cell gives the detail. Clicking a mark opens that conversation. Clicking a cell, a tutor name or a number opens the matching list.
+- **All conversations** is the full list, with state tabs and the run drawer.
+- **Run checks** shows judge disagreement and batches with their cost.
+
 ## What counts in the pass rate
 
 Only the run's **current** scoring decides, that is, the last entry of `scorings`. An older scoring under another judge configuration never fills in.
