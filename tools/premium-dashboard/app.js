@@ -7,6 +7,14 @@
   // ---------- words ----------
   const T = {
     zh: {
+      kicker: "TutorBench · 精品集", boardTitle: "导师成绩单",
+      boardNote: "每个导师一行，按正式通过率排序。通过 = 好 + 有问题；待审、不计分和其他评审配置的对话都不算进通过率。",
+      noRate: "暂无", passSub: "已计分 {n} · 好 {g} · 有问题 {f} · 不合格 {x}", notCountedMark: "不计分 / 其他配置", pipHint: "每个标记是一段对话，点它看详情。",
+      showThese: "在下面列出这些对话", langZh: "中", langEn: "英", open: "看详情 →",
+      totals: "合计已计分 {scored} 段。待审 {review} 段（其中评审未完成 {incomplete}），不计分 {unscorable} 段，其他评审配置 {other} 段，这三类都不算进通过率。花费 {cost}，其中重新评审 {re}。",
+      attentionTitle: "需要你看的", attentionNote: "「待审」的对话还没有结论，不算进通过率。「建议抽查」的已经计分，但学生演得有点偏，或评审打平了，值得抽查。",
+      pendingGroup: "待审", spotGroup: "建议抽查", judgesTied: "评审打平：{f}", colNotes: "备注", splitsN: "评审分歧 {n}", flagsN: "学生标记 {n}",
+      opsTitle: "运行检查", opsNote: "看评测本身靠不靠得住：三位评审是否一致，批次是否跑完。", ties: "平票", topItems: "分歧最多的项：{list}",
       title: "评测运行", openFolder: "打开 runs 文件夹", loadSample: "载入合成示例", dropHere: "松开鼠标，载入这个 runs 文件夹",
       sourceSample: "合成示例数据：{runs} 段对话，{batches} 个批次。", sourceFolder: "已载入「{name}」：{runs} 段对话，{batches} 个批次。",
       sourceNone: "还没有数据。打开 runner 写出的 runs 文件夹（含 index.jsonl、batches/、records/），或者把文件夹拖进这个页面。",
@@ -29,9 +37,9 @@
       judgesTitle: "评审分歧", judgesNote: "一处分歧是三个评审在某一项上投票不一致。条长是这位评审成为少数票的次数。",
       judgesSummary: "{runs} 段对话里共有 {n} 处分歧。", minority: "少数票", byItem: "分歧出现在哪一项", item: "项目", count: "次数", invalidOutputs: "无效输出",
       batchesTitle: "批次", batch: "批次", purpose: "用途", status: "状态", progress: "完成", spent: "花费", created: "时间",
-      runsTitle: "全部对话", runsNote: "点一行看整段对话、评审和证据。", focus: "只看：{f}", clearFocus: "取消",
+      runsTitle: "全部对话", runsNote: "点一行看整段对话、评审和证据。", focus: "只看导师：{f}", clearFocus: "取消",
       onlyDisagree: "有分歧", onlySoft: "有学生软标记", showMore: "再显示 {n} 段",
-      colState: "状态", colTutor: "导师", colCard: "卡片", colLang: "语言", colRepeat: "次", colResult: "结论或待审原因", colFixed: "固定考验",
+      colState: "状态", colTutor: "导师", colCard: "卡片", colLang: "语言", colRepeat: "次", colResult: "结论", colFixed: "固定考验",
       colEnd: "结束", colTurns: "轮", colStudent: "学生检查", colDisagree: "分歧", colCost: "美元", colTime: "时间",
       olderCard: "旧版卡", close: "关闭", runId: "运行 ID", repeatOf: "第 {i} / {n} 次",
       verdictBox: "结论", reasons: "原因", pendingReasons: "待审原因", evidence: "确定性失败的证据", leakAt: "第 {t} 轮泄露", leakAfter: "发生在固定考验之后",
@@ -45,6 +53,14 @@
       noData: "没有符合筛选条件的对话。", split: "评审分歧", noScoring: "没有评分",
     },
     en: {
+      kicker: "TutorBench · Premium set", boardTitle: "Tutor scorecard",
+      boardNote: "One row per tutor, sorted by formal pass rate. Pass = good + flawed. Conversations that need review, are not scorable or were scored under another judge configuration are not counted.",
+      noRate: "none yet", passSub: "Scored {n} · good {g} · flawed {f} · fail {x}", notCountedMark: "Not counted", pipHint: "Each mark is one conversation; select it for details.",
+      showThese: "List these conversations below", langZh: "zh", langEn: "en", open: "Details →",
+      totals: "In total {scored} conversations are scored. {review} need review ({incomplete} with scoring not finished), {unscorable} are not scorable and {other} were scored under another judge configuration; none of these count. Cost {cost}, of which rescoring {re}.",
+      attentionTitle: "Needs you", attentionNote: "Conversations under Needs review have no verdict yet and are not counted. Those under Spot check are scored, but the simulated student drifted or the judges tied, so they are worth a look.",
+      pendingGroup: "Needs review", spotGroup: "Spot check", judgesTied: "judges tied: {f}", colNotes: "Notes", splitsN: "{n} judge splits", flagsN: "{n} student flags",
+      opsTitle: "Run checks", opsNote: "Whether the evaluation itself can be trusted: do the three judges agree, did the batches finish.", ties: "Ties", topItems: "Most splits: {list}",
       title: "Evaluation runs", openFolder: "Open runs folder", loadSample: "Load synthetic sample", dropHere: "Drop to load this runs folder",
       sourceSample: "Synthetic sample: {runs} conversations in {batches} batches.", sourceFolder: "Loaded “{name}”: {runs} conversations in {batches} batches.",
       sourceNone: "No data yet. Open the runs folder the runner wrote (index.jsonl, batches/, records/), or drop the folder on this page.",
@@ -67,9 +83,9 @@
       judgesTitle: "Judge disagreement", judgesNote: "A disagreement is one item where the three judges did not all vote the same. Bar length counts how often a judge was outvoted.",
       judgesSummary: "{n} disagreements across {runs} conversations.", minority: "Outvoted", byItem: "Where judges disagree", item: "Item", count: "Count", invalidOutputs: "Invalid outputs",
       batchesTitle: "Batches", batch: "Batch", purpose: "Purpose", status: "Status", progress: "Done", spent: "Spent", created: "Created",
-      runsTitle: "All conversations", runsNote: "Select a row to see the conversation, the judges and the evidence.", focus: "Showing: {f}", clearFocus: "Clear",
+      runsTitle: "All conversations", runsNote: "Select a row to see the conversation, the judges and the evidence.", focus: "Tutor: {f}", clearFocus: "Clear",
       onlyDisagree: "Has disagreement", onlySoft: "Has student flags", showMore: "Show {n} more",
-      colState: "State", colTutor: "Tutor", colCard: "Card", colLang: "Lang", colRepeat: "#", colResult: "Verdict or review reason", colFixed: "Fixed test",
+      colState: "State", colTutor: "Tutor", colCard: "Card", colLang: "Lang", colRepeat: "#", colResult: "Verdict", colFixed: "Fixed test",
       colEnd: "End", colTurns: "Turns", colStudent: "Student checks", colDisagree: "Splits", colCost: "USD", colTime: "Time",
       olderCard: "older card", close: "Close", runId: "Run ID", repeatOf: "Repeat {i} of {n}",
       verdictBox: "Verdict", reasons: "Reasons", pendingReasons: "Why it needs review", evidence: "Evidence for the deterministic failure", leakAt: "Leak at turn {t}", leakAfter: "after the fixed test",
@@ -154,6 +170,7 @@
   const pct = x => (x == null ? "—" : Math.round(x * 100) + "%");
   const usd = x => (x == null ? "—" : "$" + (x < 1 ? x.toFixed(4) : x.toFixed(2)));
   const when = iso => { try { return new Date(iso).toLocaleString(st.lang === "zh" ? "zh-CN" : "en-GB", { dateStyle: "medium", timeStyle: "short" }); } catch { return String(iso); } };
+  const whenShort = iso => { try { return new Date(iso).toLocaleString(st.lang === "zh" ? "zh-CN" : "en-GB", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }); } catch { return String(iso); } };
 
   // ---------- DOM helpers ----------
   function el(tag, attrs, ...kids) {
@@ -171,8 +188,7 @@
   const $ = id => document.getElementById(id);
   const clear = n => { while (n.firstChild) n.removeChild(n.firstChild); return n; };
   const svg = (tag, attrs) => { const n = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const [k, v] of Object.entries(attrs || {})) n.setAttribute(k, String(v)); return n; };
-  const stateMark = s => el("span", { class: "state" }, el("span", { class: "dot " + s, "aria-hidden": "true" }), s === "scored" ? t("scored_state") : t(s));
-  const verdictMark = v => el("span", { class: "state" }, el("span", { class: "dot " + v, "aria-hidden": "true" }), t(v));
+  const verdictMark = v => el("span", { class: "state" }, pip(v), t(v));
 
   // ---------- loading ----------
   function load(input, source) {
@@ -236,7 +252,6 @@
       .map(r => M.runView(r, st.f.version, d.latestCard))
       .filter(v => st.f.cards === "all" || !v.olderCard);
   }
-  const tutorsOf = vs => [...new Set(vs.map(v => v.record.tutor.label))].sort();
   const cardsOf = vs => [...new Set(vs.map(v => v.record.card.id))].sort();
   const softCount = v => { const c = M.studentChecks(v.record); return c.softFlags.length + c.rewrites + c.discardedAttempts; };
 
@@ -255,19 +270,16 @@
     }
     const banner = $("banner");
     banner.hidden = !(d && st.source.kind === "sample");
-    clear(banner).append(el("strong", { text: t("sampleBanner") }));
+    banner.textContent = t("sampleBanner");
     renderWarnings();
-    for (const id of ["filters", "tiles", "tutors", "matrix", "review", "judges", "batches", "runs"]) clear($(id));
+    for (const id of ["board", "attention", "runs", "ops"]) clear($(id));
+    document.querySelector(".sheet").hidden = !d;
     if (!d) return;
     const vs = views();
-    renderFilters();
-    renderTiles(vs);
-    renderTutors(vs);
-    renderMatrix(vs);
-    renderReview(vs);
-    renderJudges(vs);
-    renderBatches();
+    renderBoard(vs);
+    renderAttention(vs);
     renderRuns(vs);
+    renderOps(vs);
   }
 
   function renderWarnings() {
@@ -286,210 +298,201 @@
       options.map(([v, text]) => { const o = el("option", { value: v, text }); if (v === value) o.selected = true; return o; })));
   }
   function renderFilters() {
-    const d = st.dataset, box = $("filters");
-    const all = d.runs.map(r => M.runView(r, null, d.latestCard));
-    box.append(
-      select("f-batch", t("fBatch"), st.f.batch, [["all", t("all")], ...d.batches.map(b => [b.batchId, b.batchId])], v => { st.f.batch = v; render(); }),
+    const d = st.dataset;
+    return el("div", { class: "filters" },
       select("f-version", t("fVersion"), st.f.version ?? "", d.judgeVersions.map(v => [v, v]), v => { st.f.version = v; render(); }),
-      select("f-lang", t("fLang"), st.f.lang, [["all", t("all")], ["zh-CN", "中文 zh-CN"], ["en", "English"]], v => { st.f.lang = v; render(); }),
-      select("f-cards", t("fCards"), st.f.cards, [["latest", t("latestOnly")], ["all", t("allVersions")]], v => { st.f.cards = v; render(); }),
-      select("f-tutor", t("fTutor"), st.f.tutor, [["all", t("all")], ...tutorsOf(all).map(x => [x, x])], v => { st.f.tutor = v; render(); }),
-      select("f-card", t("fCard"), st.f.card, [["all", t("all")], ...cardsOf(all).map(x => [x, x])], v => { st.f.card = v; render(); }),
-    );
+      select("f-batch", t("fBatch"), st.f.batch, [["all", t("all")], ...d.batches.map(b => [b.batchId, b.batchId])], v => { st.f.batch = v; render(); }),
+      select("f-lang", t("fLang"), st.f.lang, [["all", t("all")], ["zh-CN", "中文"], ["en", "English"]], v => { st.f.lang = v; render(); }),
+      select("f-cards", t("fCards"), st.f.cards, [["latest", t("latestOnly")], ["all", t("allVersions")]], v => { st.f.cards = v; render(); }));
   }
 
-  function splitBar(s) {
-    const bar = el("div", { class: "split", role: "img", "aria-label": t("scoredFoot", { g: s.good, f: s.flawed, x: s.fail }) });
-    for (const k of M.VERDICTS) if (s[k]) bar.append(el("span", { class: "dot-fill", style: "flex:" + s[k] + ";background:var(--" + (k === "good" ? "good" : k === "flawed" ? "warn" : "crit") + ")", "data-tip": t(k) + " " + s[k] }));
-    return bar;
+  // One mark per conversation. Shape and colour both carry the state.
+  const kindOf = v => (v.state === "scored" ? v.verdict : v.state === "error" || v.state === "student_invalid" ? "unscorable" : v.state);
+  const kindLabel = v => (v.state === "scored" ? t(v.verdict) : t(v.state));
+  function pip(kind) {
+    const s = svg("svg", { class: "pip " + kind, viewBox: "0 0 12 12", "aria-hidden": "true", focusable: "false" });
+    if (kind === "good") s.append(svg("circle", { cx: 6, cy: 6, r: 5 }));
+    else if (kind === "flawed") { s.append(svg("circle", { class: "ring", cx: 6, cy: 6, r: 4.6 })); s.append(svg("path", { d: "M6 1.4 A4.6 4.6 0 0 0 6 10.6 Z" })); }
+    else if (kind === "fail") s.append(svg("path", { d: "M2.4 2.4 L9.6 9.6 M9.6 2.4 L2.4 9.6" }));
+    else if (kind === "needs_review") s.append(svg("circle", { cx: 6, cy: 6, r: 4.4 }));
+    else s.append(svg("path", { d: "M2.5 6 H9.5" }));
+    return s;
   }
-  function renderTiles(vs) {
-    const s = M.summarize(vs), box = $("tiles");
+  const mark = v => el("span", { class: "state" }, pip(kindOf(v)), kindLabel(v));
+  const langShort = l => t(l === "zh-CN" ? "langZh" : l === "en" ? "langEn" : "") || l;
+  const runName = v => [v.record.tutor.label, v.record.card.id, langShort(v.record.card.lang) + " #" + v.record.repeat.index].join(" · ");
+  function whyText(v) {
+    if (v.state === "scored") return v.reasons.map(code).join("、");
+    if (v.state === "needs_review") return [...v.pending.map(code), v.withheldVerdict ? t("withheld", { v: t(v.withheldVerdict) }) : null].filter(Boolean).join("；");
+    if (v.state === "other_version") return v.judgeVersion || "";
+    const a = (v.record.attempts || []).at(-1);
+    return a && a.reason ? code(a.reason.split(",")[0]) : code(v.record.end.reason);
+  }
+  function legend() {
+    return el("div", { class: "legend" },
+      ["good", "flawed", "fail", "needs_review"].map(k => el("span", null, pip(k), t(k))),
+      el("span", null, pip("unscorable"), t("notCountedMark")),
+      el("span", { class: "hint", text: t("pipHint") }));
+  }
+  function setFocus(focus, state) {
+    st.runFilter.focus = focus;
+    if (state) st.runFilter.state = state;
+    st.limit = 100;
+    renderRunsOnly();
+  }
+  function goToRuns() { $("runs").scrollIntoView({ behavior: "smooth", block: "start" }); }
+
+  // ---------- 1. Tutor scorecard ----------
+  function renderBoard(vs) {
+    const box = $("board"), s = M.summarize(vs);
+    box.append(el("header", { class: "sec-head" },
+      el("div", { class: "title" }, el("h2", { id: "board-title", text: t("boardTitle") }), el("p", { class: "lede", text: t("boardNote") })),
+      renderFilters()));
+    if (!vs.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
+    box.append(legend());
+    const cards = cardsOf(vs);
+    const rows = [...M.groupBy(vs, v => v.record.tutor.label)].map(([tutor, group]) => ({ tutor, group, s: M.summarize(group) }))
+      .sort((a, b) => (b.s.passRate ?? -1) - (a.s.passRate ?? -1) || b.s.scored - a.s.scored || a.tutor.localeCompare(b.tutor));
+    const head = el("tr", null, el("th", { text: t("colTutor") }), el("th", { text: t("passRate") }),
+      cards.map(c => el("th", null, el("div", { class: "cardhead" }, el("span", { text: c }), el("span", { class: "faint mono", text: "v" + st.dataset.latestCard[c] })))),
+      el("th", { class: "num", text: t("needs_review") }), el("th", { class: "num", text: t("unscorable") }));
+    const body = el("tbody");
+    for (const { tutor, group, s: g } of rows) {
+      const models = [...new Set(group.map(v => v.record.tutor.resolvedModel).filter(Boolean))];
+      const unscorable = g.error + g.studentInvalid;
+      body.append(el("tr", null,
+        el("td", null, el("div", { class: "who" }, el("strong", { text: tutor }), models.length ? el("span", { class: "faint mono", text: models.join(", ") }) : null)),
+        el("td", null, el("div", { class: "pass" },
+          el("span", { class: "rate" + (g.passRate == null ? " none" : ""), text: g.passRate == null ? t("noRate") : pct(g.passRate) }),
+          g.passRate == null ? null : el("div", { class: "meter", "aria-hidden": "true" }, el("span", { style: "width:" + Math.round(g.passRate * 100) + "%" })),
+          el("span", { class: "sub", text: t("passSub", { n: g.scored, g: g.good, f: g.flawed, x: g.fail }) }))),
+        cards.map(card => el("td", null, cardCell(group.filter(v => v.record.card.id === card)))),
+        el("td", { class: "num" }, g.needsReview
+          ? el("button", { type: "button", class: "link", "data-tip": t("showThese"), onclick: () => { setFocus({ tutor }, "needs_review"); goToRuns(); } }, String(g.needsReview))
+          : el("span", { class: "faint", text: "0" })),
+        el("td", { class: "num" }, el("span", { class: unscorable ? "" : "faint", text: String(unscorable) }))));
+    }
+    box.append(el("div", { class: "scroll-x" }, el("table", { class: "board" }, el("thead", null, head), body)));
     const runCost = vs.reduce((n, v) => n + (M.costs(v.record).run || 0), 0);
     const reCost = vs.reduce((n, v) => n + M.costs(v.record).rescoring.reduce((m, x) => m + (x.usd || 0), 0), 0);
-    const o = s.otherVersion ? t("otherVersionNote", { o: s.otherVersion }) : "";
-    box.append(
-      el("div", { class: "tile hero" }, el("span", { class: "label", text: t("passRate") + (st.f.version ? " · " + st.f.version : "") }),
-        el("span", { class: "value num", text: pct(s.passRate) }),
-        el("span", { class: "foot", text: s.scored ? t("passFoot", { n: s.scored }) : t("passNone") }),
-        s.scored ? splitBar(s) : null,
-        el("span", { class: "foot", text: t("notCounted", { r: s.needsReview, e: s.error + s.studentInvalid, o }) })),
-      el("div", { class: "tile" }, el("span", { class: "label", text: t("scored") }), el("span", { class: "value", text: s.scored }),
-        el("span", { class: "foot", text: t("scoredFoot", { g: s.good, f: s.flawed, x: s.fail }) })),
-      el("div", { class: "tile" }, el("span", { class: "label", text: t("review") }), el("span", { class: "value", text: s.needsReview }),
-        el("button", { type: "button", class: "link small", onclick: () => { st.runFilter.state = "needs_review"; renderRunsOnly(); $("runs").scrollIntoView({ behavior: "smooth" }); } },
-          t("reviewFoot", { k: s.scoringIncomplete }))),
-      el("div", { class: "tile" }, el("span", { class: "label", text: t("unscorable") }), el("span", { class: "value", text: s.error + s.studentInvalid }),
-        el("span", { class: "foot", text: t("unscorableFoot", { e: s.error, s: s.studentInvalid }) })),
-      el("div", { class: "tile" }, el("span", { class: "label", text: t("cost") }), el("span", { class: "value num", text: usd(runCost + reCost) }),
-        el("span", { class: "foot", text: t("costFoot", { r: usd(runCost), j: usd(reCost) }) })),
-    );
+    box.append(el("p", { class: "totals", text: t("totals", { scored: s.scored, review: s.needsReview, incomplete: s.scoringIncomplete,
+      unscorable: s.error + s.studentInvalid, other: s.otherVersion, cost: usd(runCost + reCost), re: usd(reCost) }) }));
+  }
+  function cardCell(group) {
+    if (!group.length) return el("span", { class: "faint", text: "—" });
+    const cell = el("div", { class: "cell" });
+    for (const lang of ["zh-CN", "en", ...new Set(group.map(v => v.record.card.lang))].filter((x, i, a) => a.indexOf(x) === i)) {
+      const runs = group.filter(v => v.record.card.lang === lang).sort((a, b) => a.record.repeat.index - b.record.repeat.index || String(a.record.createdAt).localeCompare(String(b.record.createdAt)));
+      if (!runs.length) continue;
+      cell.append(el("div", { class: "langrow" }, el("span", { class: "lang", text: langShort(lang) }),
+        runs.map(v => {
+          const label = langShort(lang) + " #" + v.record.repeat.index + " · " + kindLabel(v) + (whyText(v) ? " · " + whyText(v) : "");
+          return el("button", { type: "button", class: "pip-btn", "data-tip": label, "aria-label": label, onclick: () => openRun(v.record.runId) }, pip(kindOf(v)));
+        })));
+    }
+    return cell;
   }
 
-  function legend() {
-    return el("div", { class: "legend" }, M.VERDICTS.map(v => el("span", null, el("span", { class: "dot " + v, "aria-hidden": "true" }), t(v))),
-      el("span", null, el("span", { class: "dot needs_review", "aria-hidden": "true" }), t("needs_review")));
+  // ---------- 2. What needs a person ----------
+  function attentionRow(v, why) {
+    return el("button", { type: "button", class: "row", onclick: () => openRun(v.record.runId) },
+      pip(kindOf(v)), el("span", { class: "name", text: runName(v) }), el("span", { class: "go", text: t("open") }),
+      why ? el("span", { class: "why", text: why }) : null);
   }
-  function track(s, height) {
-    const tr = el("div", { class: "track", style: height ? "height:" + height + "px" : null, role: "img", "aria-label": t("scoredFoot", { g: s.good, f: s.flawed, x: s.fail }) });
-    if (!s.scored) tr.append(el("span", { class: "empty" }));
-    for (const k of M.VERDICTS) if (s[k]) tr.append(el("span", { class: k, style: "flex:" + s[k], "data-tip": t(k) + ": " + s[k] + " / " + s.scored }));
-    return tr;
-  }
-  function setFocus(focus) { st.runFilter.focus = focus; st.limit = 100; renderRunsOnly(); }
-  function renderTutors(vs) {
-    const box = $("tutors");
-    box.append(el("header", null, el("h2", { text: t("byTutor") }), el("p", { text: t("byTutorNote") })), legend());
-    const bars = el("div", { class: "bars" });
-    for (const [tutor, group] of M.groupBy(vs, v => v.record.tutor.label)) {
-      const s = M.summarize(group);
-      const active = st.runFilter.focus && st.runFilter.focus.tutor === tutor && !st.runFilter.focus.card;
-      bars.append(el("button", { type: "button", class: "bar-row" + (active ? " active" : ""), "aria-pressed": active ? "true" : "false", onclick: () => setFocus(active ? null : { tutor }) },
-        el("span", { class: "name", text: tutor }), track(s), el("span", { class: "rate num", text: pct(s.passRate) }),
-        el("span", { class: "meta", text: t("tutorMeta", { n: s.scored, r: s.needsReview, e: s.error + s.studentInvalid }) + (s.otherVersion ? " · " + t("other_version") + " " + s.otherVersion : "") })));
-    }
-    if (!vs.length) bars.append(el("p", { class: "empty-note", text: t("noData") }));
-    box.append(bars);
-  }
-  function renderMatrix(vs) {
-    const box = $("matrix"), cards = cardsOf(vs), tutors = tutorsOf(vs);
-    box.append(el("header", null, el("h2", { text: t("matrix") }), el("p", { text: t("matrixNote") })));
-    if (!vs.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
-    const table = el("table", { class: "matrix" }, el("thead", null, el("tr", null, el("th", { text: t("fTutor") }), cards.map(c => el("th", null, c, el("div", { class: "small muted mono", text: "v" + st.dataset.latestCard[c] }))))));
-    const body = el("tbody");
-    for (const tutor of tutors) {
-      body.append(el("tr", null, el("th", { scope: "row", text: tutor }), cards.map(card => {
-        const group = vs.filter(v => v.record.tutor.label === tutor && v.record.card.id === card);
-        const s = M.summarize(group);
-        return el("td", null, group.length ? el("button", { type: "button", class: "cell-btn", onclick: () => { setFocus({ tutor, card }); $("runs").scrollIntoView({ behavior: "smooth" }); } },
-          track(s, 6), el("span", { class: "small", text: t("cellText", { n: s.scored, p: pct(s.passRate) }) }),
-          s.needsReview ? el("span", { class: "tag accent", text: t("cellReview", { r: s.needsReview }) }) : null) : el("span", { class: "muted", text: "—" }));
-      })));
-    }
-    table.append(body);
-    box.append(el("div", { class: "scroll-x" }, table));
-  }
-
-  const runName = v => [v.record.tutor.label, v.record.card.id, v.record.card.lang, "#" + v.record.repeat.index].join(" · ");
-  function renderReview(vs) {
-    const box = $("review");
-    box.append(el("header", null, el("h2", { text: t("reviewTitle") }), el("p", { text: t("reviewNote") })));
-    const pending = vs.filter(v => v.state === "needs_review" || (v.state === "scored" && v.reviewFlags.length));
-    const soft = vs.filter(v => softCount(v) > 0);
-    const left = el("div", { class: "queue" }, el("h3", { text: t("pendingList") + " · " + vs.filter(v => v.state === "needs_review").length }));
+  function renderAttention(vs) {
+    const box = $("attention");
+    const pending = vs.filter(v => v.state === "needs_review");
+    const spot = vs.filter(v => v.state !== "needs_review" && (softCount(v) > 0 || v.reviewFlags.length));
+    box.append(el("header", { class: "sec-head" }, el("div", { class: "title" }, el("h2", { id: "attention-title", text: t("attentionTitle") }), el("p", { class: "lede", text: t("attentionNote") }))));
+    const left = el("div", { class: "list" }, el("h3", null, t("pendingGroup"), el("span", { class: "count", text: String(pending.length) })));
     if (!pending.length) left.append(el("p", { class: "empty-note", text: t("nothingPending") }));
     for (const v of pending) {
-      const why = [];
-      if (v.withheldVerdict) why.push(t("withheld", { v: t(v.withheldVerdict) }));
-      for (const j of v.judgeErrors) why.push(t("judgeError", { j: j.judgeId, e: code(j.error) }));
-      left.append(el("button", { type: "button", class: "q-item", onclick: () => openRun(v.record.runId) },
-        el("span", null, el("strong", { text: runName(v) })), stateMark(v.state === "scored" ? "scored" : "needs_review"),
-        el("span", { class: "tags", style: "grid-column:1/3" }, v.pending.map(p => el("span", { class: "tag accent", text: code(p) })),
-          v.reviewFlags.map(p => el("span", { class: "tag", text: t("spotCheck") + ": " + code(p) }))),
-        why.length ? el("span", { class: "why", text: why.join(" · ") }) : null));
+      const extra = v.judgeErrors.map(j => t("judgeError", { j: j.judgeId, e: code(j.error) }));
+      left.append(attentionRow(v, [whyText(v), ...extra].filter(Boolean).join("；")));
     }
-    const right = el("div", { class: "queue" }, el("h3", { text: t("softList") + " · " + soft.length }));
-    if (!soft.length) right.append(el("p", { class: "empty-note", text: t("nothingSoft") }));
-    for (const v of soft) {
+    const right = el("div", { class: "list" }, el("h3", null, t("spotGroup"), el("span", { class: "count", text: String(spot.length) })));
+    if (!spot.length) right.append(el("p", { class: "empty-note", text: t("nothingSoft") }));
+    for (const v of spot) {
       const c = M.studentChecks(v.record);
-      right.append(el("button", { type: "button", class: "q-item", style: "border-left-color:var(--warn)", onclick: () => openRun(v.record.runId) },
-        el("span", null, el("strong", { text: runName(v) })), stateMark(v.state),
-        el("span", { class: "tags", style: "grid-column:1/3" }, c.softFlags.map(f => el("span", { class: "tag", text: code(f) })),
-          c.rewrites ? el("span", { class: "tag", text: t("rewrites", { n: c.rewrites }) }) : null,
-          c.discardedAttempts ? el("span", { class: "tag", text: t("discarded", { n: c.discardedAttempts }) }) : null)));
+      const bits = [...c.softFlags.map(code), c.rewrites ? t("rewrites", { n: c.rewrites }) : null, c.discardedAttempts ? t("discarded", { n: c.discardedAttempts }) : null,
+        ...v.reviewFlags.map(f => t("judgesTied", { f: code(f) }))].filter(Boolean);
+      right.append(attentionRow(v, kindLabel(v) + " · " + bits.join("、")));
     }
-    box.append(el("div", { class: "grid2", style: "gap:20px" }, left, right));
+    box.append(el("div", { class: "cols" }, left, right));
   }
 
-  function renderJudges(vs) {
-    const box = $("judges"), sum = M.disagreementSummary(vs.filter(v => v.state !== "other_version"));
-    box.append(el("header", null, el("h2", { text: t("judgesTitle") }), el("p", { text: t("judgesNote") })),
-      el("p", { class: "small", text: t("judgesSummary", { n: sum.total, runs: sum.runsWith }) }));
-    const invalid = {};
-    for (const v of vs) for (const j of v.judgeErrors) invalid[j.judgeId] = (invalid[j.judgeId] || 0) + 1;
-    const judges = [...new Set([...Object.keys(sum.byJudge), ...Object.keys(invalid)])].sort();
-    const max = Math.max(1, ...judges.map(j => (sum.byJudge[j] || { minority: 0 }).minority));
-    const bars = el("div", { class: "judge-bars", role: "list" });
-    for (const j of judges) {
-      const n = (sum.byJudge[j] || { minority: 0 }).minority;
-      bars.append(el("div", { class: "jb", role: "listitem" }, el("span", { class: "mono", text: j }),
-        el("div", { class: "base" }, el("div", { class: "fill", style: "width:" + (100 * n / max) + "%", "data-tip": t("minority") + ": " + n })),
-        el("span", { class: "num small", text: n + (invalid[j] ? " · " + invalid[j] + "✕" : "") })));
-    }
-    box.append(bars);
-    const rows = Object.entries(sum.byItem).sort((a, b) => b[1] - a[1]);
-    if (rows.length) box.append(el("div", { class: "scroll-x" }, el("table", null,
-      el("thead", null, el("tr", null, el("th", { text: t("byItem") }), el("th", { class: "num", text: t("count") }))),
-      el("tbody", null, rows.map(([k, n]) => el("tr", null, el("td", { text: code(k) }), el("td", { class: "num", text: n })))))));
-    if (Object.keys(invalid).length) box.append(el("p", { class: "small muted", text: "✕ = " + t("invalidOutputs") }));
-  }
-
-  function renderBatches() {
-    const box = $("batches");
-    box.append(el("header", null, el("h2", { text: t("batchesTitle") })));
-    const rows = st.dataset.batches.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-    box.append(el("div", { class: "scroll-x" }, el("table", null,
-      el("thead", null, el("tr", null, [t("batch"), t("status"), t("progress"), t("spent"), t("created")].map((h, i) => el("th", { class: i === 2 || i === 3 ? "num" : null, text: h })))),
-      el("tbody", null, rows.map(b => {
-        const r = b.runs || {}, done = (r.scored || 0) + (r.error || 0) + (r.studentInvalid || 0) + (r.needsReview || 0);
-        const stopped = b.status && b.status !== "complete" && b.status !== "running";
-        return el("tr", null, el("td", null, el("div", { class: "mono", text: b.batchId }), el("div", { class: "small muted", text: b.purpose || "" })),
-          el("td", null, el("span", { class: "tag" + (stopped ? " crit" : ""), text: code(b.status) })),
-          el("td", { class: "num", text: done + " / " + (b.planned ?? "?") }),
-          el("td", { class: "num", text: usd(b.spentUsd) + " / " + usd(b.budgetUsd) }),
-          el("td", { class: "small", text: when(b.createdAt) }));
-      })))));
-  }
-
-  function resultCell(v) {
-    if (v.state === "scored") return el("div", { class: "tags" }, verdictMark(v.verdict), v.reasons.map(r => el("span", { class: "tag" + (["leak", "student_left", "unsolved_tutor_fault"].includes(r) ? " crit" : ""), text: code(r) })));
-    if (v.state === "needs_review") return el("div", { class: "tags" }, v.pending.map(p => el("span", { class: "tag accent", text: code(p) })),
-      v.withheldVerdict ? el("span", { class: "tag crit", text: t("withheld", { v: t(v.withheldVerdict) }) }) : null);
-    if (v.state === "other_version") return el("span", { class: "muted small", text: v.judgeVersion || "" });
-    const a = (v.record.attempts || []).at(-1);
-    return el("span", { class: "muted small", text: a && a.reason ? code(a.reason.split(",")[0]) : code(v.record.end.reason) });
-  }
-  function renderRunsOnly() { clear($("runs")); renderRuns(views()); renderTutorsActive(); }
-  function renderTutorsActive() { clear($("tutors")); renderTutors(views()); }
+  // ---------- 3. All conversations ----------
+  function renderRunsOnly() { clear($("runs")); renderRuns(views()); }
   function renderRuns(vs) {
     const box = $("runs"), rf = st.runFilter;
-    box.append(el("header", null, el("h2", { text: t("runsTitle") }), el("p", { text: t("runsNote") })));
     const states = [["all", t("all")], ["scored", t("scored_state")], ["needs_review", t("needs_review")], ["unscorable", t("unscorable")], ["other_version", t("other_version")]];
-    const chips = el("div", { class: "chips" }, states.map(([k, label]) => el("button", { type: "button", class: "chip", "aria-pressed": rf.state === k ? "true" : "false",
-      onclick: () => { rf.state = k; st.limit = 100; renderRunsOnly(); } }, label)),
-    el("button", { type: "button", class: "chip", "aria-pressed": rf.disagree ? "true" : "false", onclick: () => { rf.disagree = !rf.disagree; renderRunsOnly(); } }, t("onlyDisagree")),
-    el("button", { type: "button", class: "chip", "aria-pressed": rf.soft ? "true" : "false", onclick: () => { rf.soft = !rf.soft; renderRunsOnly(); } }, t("onlySoft")));
-    box.append(chips);
-    if (rf.focus) box.append(el("p", { class: "small" }, t("focus", { f: [rf.focus.tutor, rf.focus.card].filter(Boolean).join(" × ") }), " ",
-      el("button", { type: "button", class: "chip", onclick: () => setFocus(null) }, t("clearFocus"))));
-    let list = vs.filter(v => rf.state === "all" || (rf.state === "unscorable" ? ["error", "student_invalid"].includes(v.state) : v.state === rf.state))
+    const inState = (v, k) => k === "all" || (k === "unscorable" ? ["error", "student_invalid"].includes(v.state) : v.state === k);
+    let list = vs.filter(v => inState(v, rf.state))
       .filter(v => !rf.disagree || v.disagreements.length).filter(v => !rf.soft || softCount(v) > 0)
       .filter(v => !rf.focus || ((!rf.focus.tutor || v.record.tutor.label === rf.focus.tutor) && (!rf.focus.card || v.record.card.id === rf.focus.card)));
+    box.append(el("header", { class: "sec-head" }, el("div", { class: "title" },
+      el("h2", { id: "runs-title" }, t("runsTitle"), el("span", { class: "count", text: String(list.length) })), el("p", { class: "lede", text: t("runsNote") }))));
+    box.append(el("div", { class: "tabs", role: "group", "aria-label": t("colState") }, states.map(([k, label]) => el("button", { type: "button", class: "tab", "aria-pressed": rf.state === k ? "true" : "false",
+      onclick: () => { rf.state = k; st.limit = 100; renderRunsOnly(); } }, label + " " + vs.filter(v => inState(v, k)).length))));
+    box.append(el("div", { class: "toggles" },
+      el("label", null, el("input", { type: "checkbox", id: "only-disagree", checked: rf.disagree, onchange: e => { rf.disagree = e.target.checked; renderRunsOnly(); } }), t("onlyDisagree")),
+      el("label", null, el("input", { type: "checkbox", id: "only-soft", checked: rf.soft, onchange: e => { rf.soft = e.target.checked; renderRunsOnly(); } }), t("onlySoft")),
+      rf.focus ? el("span", { class: "focus" }, t("focus", { f: rf.focus.tutor || "" }), el("button", { type: "button", class: "btn-quiet", onclick: () => setFocus(null) }, t("clearFocus"))) : null));
     list = list.slice().sort((a, b) => String(b.record.createdAt).localeCompare(String(a.record.createdAt)));
     if (!list.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
-    const head = [t("colState"), t("colTutor"), t("colCard"), t("colLang"), t("colRepeat"), t("colResult"), t("colFixed"), t("colEnd"), t("colTurns"), t("colStudent"), t("colDisagree"), t("colCost"), t("colTime")];
+    const head = [t("colResult"), t("colTutor"), t("colCard"), t("colLang"), t("colFixed"), t("colEnd"), t("colTurns"), t("colNotes"), t("colTime")];
     const body = el("tbody");
     for (const v of list.slice(0, st.limit)) {
       const r = v.record, m = v.scoring && v.scoring.merged, c = M.studentChecks(r);
       const open = () => openRun(r.runId);
+      const notes = [v.disagreements.length ? t("splitsN", { n: v.disagreements.length }) : null,
+        softCount(v) ? t("flagsN", { n: c.softFlags.length + c.rewrites + c.discardedAttempts }) : null].filter(Boolean).join(" · ");
+      const why = whyText(v);
       body.append(el("tr", { tabindex: "0", onclick: open, onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } } },
-        el("td", null, stateMark(v.state)),
+        el("td", { class: "verdict" }, mark(v), why ? el("div", { class: "why", text: why }) : null),
         el("td", { text: r.tutor.label }),
-        el("td", null, el("span", { class: "mono", text: r.card.id + "@" + r.card.version }), v.olderCard ? el("span", { class: "tag", style: "margin-left:6px", text: t("olderCard") }) : null),
-        el("td", { text: r.card.lang }), el("td", { class: "num", text: r.repeat.index }),
-        el("td", { class: "cell-wrap" }, resultCell(v)),
+        el("td", null, el("span", { class: "mono", text: r.card.id }), v.olderCard ? el("span", { class: "older", text: "v" + r.card.version + " · " + t("olderCard") }) : null),
+        el("td", { text: langShort(r.card.lang) + " #" + r.repeat.index }),
         el("td", { class: "small", text: m ? code(m.fixedTest) : "—" }),
         el("td", { class: "small", text: code(r.end.reason) }),
         el("td", { class: "num", text: r.end.tutorTurns }),
-        el("td", { class: "cell-wrap" }, el("div", { class: "tags" }, c.softFlags.map(f => el("span", { class: "tag", text: code(f) })),
-          c.rewrites ? el("span", { class: "tag", text: t("rewrites", { n: c.rewrites }) }) : null,
-          c.discardedAttempts ? el("span", { class: "tag", text: t("discarded", { n: c.discardedAttempts }) }) : null)),
-        el("td", { class: "num", text: v.disagreements.length || "" }),
-        el("td", { class: "num small", text: usd(M.costs(r).run) }),
-        el("td", { class: "small", text: when(r.createdAt) })));
+        el("td", { class: "small muted", text: notes }),
+        el("td", { class: "small muted", text: whenShort(r.createdAt) })));
     }
-    box.append(el("div", { class: "scroll-x" }, el("table", { class: "runs" }, el("thead", null, el("tr", null, head.map((h, i) => el("th", { class: [4, 8, 10, 11].includes(i) ? "num" : null, text: h })))), body)));
+    box.append(el("div", { class: "scroll-x" }, el("table", { class: "runs" }, el("thead", null, el("tr", null, head.map((h, i) => el("th", { class: i === 6 ? "num" : null, text: h })))), body)));
     if (list.length > st.limit) box.append(el("button", { type: "button", onclick: () => { st.limit += 100; renderRunsOnly(); } }, t("showMore", { n: Math.min(100, list.length - st.limit) })));
+  }
+
+  // ---------- 4. How the run itself behaved ----------
+  function renderOps(vs) {
+    const box = $("ops");
+    box.append(el("header", { class: "sec-head" }, el("div", { class: "title" }, el("h2", { id: "ops-title", text: t("opsTitle") }), el("p", { class: "lede", text: t("opsNote") }))));
+    const sum = M.disagreementSummary(vs.filter(v => v.state !== "other_version"));
+    const invalid = {};
+    for (const v of vs) for (const j of v.judgeErrors) invalid[j.judgeId] = (invalid[j.judgeId] || 0) + 1;
+    const judges = [...new Set([...Object.keys(sum.byJudge), ...Object.keys(invalid)])].sort();
+    const items = Object.entries(sum.byItem).sort((a, b) => b[1] - a[1]);
+    const left = el("div", { class: "list" }, el("h3", { text: t("judgesTitle") }),
+      el("p", { class: "small muted", style: "padding-top:8px", text: t("judgesSummary", { n: sum.total, runs: sum.runsWith }) }),
+      judges.length ? el("div", { class: "scroll-x" }, el("table", null,
+        el("thead", null, el("tr", null, el("th", { text: t("judge") }), el("th", { class: "num", text: t("minority") }), el("th", { class: "num", text: t("ties") }), el("th", { class: "num", text: t("invalidOutputs") }))),
+        el("tbody", null, judges.map(j => el("tr", null, el("td", { class: "mono", text: j }),
+          el("td", { class: "num", text: (sum.byJudge[j] || {}).minority || 0 }), el("td", { class: "num", text: (sum.byJudge[j] || {}).tie || 0 }),
+          el("td", { class: "num" + (invalid[j] ? " stopped" : ""), text: invalid[j] || 0 })))))) : null,
+      items.length ? el("p", { class: "small muted", style: "padding-top:10px", text: t("topItems", { list: items.slice(0, 5).map(([k, n]) => code(k) + " " + n).join(" · ") }) }) : null);
+    const rows = st.dataset.batches.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const right = el("div", { class: "list" }, el("h3", { text: t("batchesTitle") }),
+      el("div", { class: "scroll-x" }, el("table", null,
+        el("thead", null, el("tr", null, [t("batch"), t("status"), t("progress"), t("spent")].map((h, i) => el("th", { class: i >= 2 ? "num" : null, text: h })))),
+        el("tbody", null, rows.map(b => {
+          const r = b.runs || {}, done = (r.scored || 0) + (r.error || 0) + (r.studentInvalid || 0) + (r.needsReview || 0);
+          const stopped = b.status && b.status !== "complete" && b.status !== "running";
+          return el("tr", null, el("td", null, el("div", { class: "mono", text: b.batchId }), el("div", { class: "small muted", text: (b.purpose || "") + " · " + when(b.createdAt) })),
+            el("td", { class: "small" + (stopped ? " stopped" : ""), text: (stopped ? "✕ " : "") + code(b.status) }),
+            el("td", { class: "num", text: done + " / " + (b.planned ?? "?") }),
+            el("td", { class: "num", text: usd(b.spentUsd) + " / " + usd(b.budgetUsd) }));
+        })))));
+    box.append(el("div", { class: "cols" }, left, right));
   }
 
   // ---------- drawer ----------
@@ -533,8 +536,8 @@
       el("button", { type: "button", onclick: closeDrawer, id: "drawer-close" }, t("close"))));
 
     // Verdict and why
-    const vb = el("div", { class: "verdict-box" }, stateMark(v.state));
-    if (v.state === "scored") vb.append(el("div", null, el("strong", { text: t("verdictBox") + ": " }), verdictMark(v.verdict)), v.reasons.length ? el("div", { class: "tags" }, v.reasons.map(x => el("span", { class: "tag", text: code(x) }))) : null);
+    const vb = el("div", { class: "verdict-box" }, mark(v));
+    if (v.state === "scored" && v.reasons.length) vb.append(el("div", { class: "tags" }, v.reasons.map(x => el("span", { class: "tag" + (["leak", "student_left", "unsolved_tutor_fault"].includes(x) ? " crit" : ""), text: code(x) }))));
     if (v.pending.length) vb.append(el("div", null, el("strong", { text: t("pendingReasons") })), el("ul", null, v.pending.map(p => el("li", { text: code(p) }))));
     if (v.withheldVerdict) vb.append(el("div", { class: "tag crit", text: t("withheld", { v: t(v.withheldVerdict) }) }));
     for (const j of v.judgeErrors) vb.append(el("div", { class: "small", text: t("judgeError", { j: j.judgeId, e: code(j.error) }) }));
