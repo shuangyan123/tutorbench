@@ -155,9 +155,19 @@
   // Formal pass rate: only runs in state "scored" under the selected configuration count.
   // needs_review, error, student_invalid, runs scored under another configuration, calibration runs and superseded runs
   // are listed, never counted.
+  // Wilson score interval for k passes out of n scored runs (95% by default). Unlike p ± z·se it stays inside 0..1
+  // and does not collapse to a point at 0% or 100%, which matters with the 5–15 runs a tutor usually has per view.
+  function wilson(k, n, z = 1.96) {
+    if (!n) return null;
+    const p = k / n, z2 = z * z, d = 1 + z2 / n;
+    const centre = (p + z2 / (2 * n)) / d;
+    const half = (z * Math.sqrt(p * (1 - p) / n + z2 / (4 * n * n))) / d;
+    return { lo: Math.max(0, centre - half), hi: Math.min(1, centre + half) };
+  }
+
   function summarize(views) {
     const t = { total: views.length, scored: 0, good: 0, flawed: 0, fail: 0, needsReview: 0, scoringIncomplete: 0,
-      otherVersion: 0, error: 0, studentInvalid: 0, calibration: 0, superseded: 0, passRate: null, goodRate: null, failRate: null };
+      otherVersion: 0, error: 0, studentInvalid: 0, calibration: 0, superseded: 0, passRate: null, passRange: null, goodRate: null, failRate: null };
     for (const v of views) {
       if (v.state === "scored") { t.scored++; t[v.verdict]++; }
       else if (v.state === "needs_review") { t.needsReview++; if (v.scoringIncomplete) t.scoringIncomplete++; }
@@ -169,10 +179,70 @@
     }
     if (t.scored) {
       t.passRate = (t.good + t.flawed) / t.scored;
+      t.passRange = wilson(t.good + t.flawed, t.scored);
       t.goodRate = t.good / t.scored;
       t.failRate = t.fail / t.scored;
     }
     return t;
+  }
+
+  // A tutor's version is the model the provider reported, else the pinned or requested one. The system prompt is not
+  // part of it: the runner takes the tutor's system prompt from the card, so it changes with the card and language.
+  function versionKey(record) {
+    const t = (record && record.tutor) || {};
+    return t.resolvedModel || t.pinnedVersion || t.requestedModel || "unknown";
+  }
+
+  // Every tutor's versions, oldest first by when each first appears in the given records. Pass all loaded records, so
+  // the order never depends on a filter, and running an old version again later does not make it the newest.
+  function tutorVersions(records) {
+    const out = new Map();
+    for (const r of records) {
+      const tutor = r && r.tutor && r.tutor.label;
+      if (!tutor) continue;
+      const key = versionKey(r), at = String(r.createdAt || "");
+      if (!out.has(tutor)) out.set(tutor, []);
+      const list = out.get(tutor), hit = list.find(x => x.key === key);
+      if (hit) { if (at < hit.firstAt) hit.firstAt = at; }
+      else list.push({ key, label: key, firstAt: at });
+    }
+    for (const list of out.values()) list.sort((a, b) => a.firstAt.localeCompare(b.firstAt) || a.key.localeCompare(b.key));
+    return out;
+  }
+
+  // The newest version of each tutor among the given views, by the order from tutorVersions.
+  function latestVersions(views, versions) {
+    const out = new Map();
+    for (const [tutor, group] of groupBy(views, v => v.record.tutor.label)) {
+      const keys = new Set(group.map(v => versionKey(v.record)));
+      const order = (versions.get(tutor) || []).filter(o => keys.has(o.key));
+      if (order.length) out.set(tutor, order[order.length - 1]);
+    }
+    return out;
+  }
+
+  // How each tutor's pass rate moved across its versions. Versions are compared only on the card versions and
+  // languages that every one of them has scored runs on, so a version is never judged on easier cards. The change is
+  // the newest version against the one before it, and it is called clear only when their 95% ranges do not overlap.
+  function versionTrend(views, versions) {
+    const cell = v => v.record.card.id + "@" + v.record.card.version + "/" + v.record.card.lang;
+    const out = [];
+    for (const [tutor, group] of groupBy(views, v => v.record.tutor.label)) {
+      const present = (versions.get(tutor) || []).filter(o => group.some(v => versionKey(v.record) === o.key));
+      if (present.length < 2) continue;
+      const byVersion = present.map(o => group.filter(v => versionKey(v.record) === o.key));
+      const sets = byVersion.map(list => new Set(list.filter(v => v.state === "scored").map(cell)));
+      const common = new Set([...sets[0]].filter(k => sets.every(s => s.has(k))));
+      const points = present.map((o, i) => {
+        const runs = byVersion[i].filter(v => common.has(cell(v)));
+        return { key: o.key, label: o.label, firstAt: o.firstAt, runs, total: byVersion[i].length, s: summarize(runs) };
+      });
+      const [prev, last] = points.slice(-2);
+      const delta = prev.s.passRate != null && last.s.passRate != null ? last.s.passRate - prev.s.passRate : null;
+      const clear = delta != null && (last.s.passRange.lo > prev.s.passRange.hi || last.s.passRange.hi < prev.s.passRange.lo);
+      out.push({ tutor, points, cells: common.size, delta, clear });
+    }
+    return out;
   }
 
   const tutorTurn = (record, turn) => (record.transcript || []).find(m => m.role === "tutor" && m.turn === turn) || null;
@@ -288,7 +358,7 @@
     return out;
   }
 
-  const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, failureEvidence,
+  const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, wilson, versionKey, tutorVersions, latestVersions, versionTrend, failureEvidence,
     studentChecks, disagreementSummary, costs, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION };
   root.PremiumDashboardModel = api;
 })(globalThis);

@@ -23,7 +23,7 @@ function scoring({ id = "s1", version = V1, verdict = "good", pending = [], reas
   };
 }
 
-function record({ runId, status = "scored", endReason = "curt_exit", card = {}, scorings = [scoring()], transcript = [], createdAt = "2026-11-24T10:00:00.000Z" }) {
+function record({ runId, status = "scored", endReason = "curt_exit", card = {}, scorings = [scoring()], transcript = [], createdAt = "2026-11-24T10:00:00.000Z", tutor = {} }) {
   return {
     schema: "tutorbench.premium-run-record",
     schemaVersion: 1,
@@ -32,7 +32,7 @@ function record({ runId, status = "scored", endReason = "curt_exit", card = {}, 
     createdAt,
     status,
     card: { id: "card-a", version: "1.0.0", lang: "en", contentHash: "sha256:a", ...card },
-    tutor: { id: "t", label: "Tutor T" },
+    tutor: { id: "t", label: "Tutor T", ...tutor },
     repeat: { index: 1, of: 1 },
     transcript,
     end: { reason: endReason, tutorTurns: 2, finalStage: 1, softFlags: [] },
@@ -76,7 +76,22 @@ test("pass rate counts only scored runs under the selected judge configuration",
   assert.equal(s.studentInvalid, 1);
   assert.equal(s.otherVersion, 1);
   assert.equal(s.passRate, 2 / 3);
+  assert.deepEqual(s.passRange, M.wilson(2, 3));
   assert.equal(s.failRate, 1 / 3);
+});
+
+test("the pass rate carries a Wilson 95% range that stays inside 0..1", () => {
+  const near = (a, b) => assert.ok(Math.abs(a - b) < 5e-4, a + " vs " + b);
+  const third = M.wilson(5, 15);
+  near(third.lo, 0.1518); near(third.hi, 0.5829);
+  const all = M.wilson(15, 15);
+  near(all.lo, 0.7961); assert.equal(all.hi, 1);
+  const none = M.wilson(0, 4);
+  assert.equal(none.lo, 0); near(none.hi, 0.4899);
+  assert.equal(M.wilson(0, 0), null);
+  // More runs, narrower range, same rate.
+  const small = M.wilson(2, 4), big = M.wilson(20, 40);
+  assert.ok(big.hi - big.lo < small.hi - small.lo);
 });
 
 test("no scored runs gives no pass rate rather than zero", () => {
@@ -84,6 +99,7 @@ test("no scored runs gives no pass rate rather than zero", () => {
   const s = M.summarize(d.runs.map(r => M.runView(r, V1, d.latestCard)));
   assert.equal(s.scored, 0);
   assert.equal(s.passRate, null);
+  assert.equal(s.passRange, null);
 });
 
 test("only the current scoring decides; an older scoring never fills in", () => {
@@ -356,4 +372,62 @@ test("v2: batch info shows the hard cap, top-ups and the reconciliation against 
   assert.equal(v1.hardCapUsd, null);
   assert.deepEqual(v1.topUps, []);
   assert.deepEqual(v1.reconciled, []);
+});
+
+test("versions: ordered by first appearance; the card's system prompt is not part of a version", () => {
+  const recs = [
+    record({ runId: "b1", createdAt: "2026-11-20T00:00:00.000Z", tutor: { resolvedModel: "m-2", promptHash: "sha256:aaaa" } }),
+    record({ runId: "a1", createdAt: "2026-11-10T00:00:00.000Z", tutor: { resolvedModel: "m-1", promptHash: "sha256:aaaa" } }),
+    // An old version run again later stays old.
+    record({ runId: "a0", createdAt: "2026-11-25T00:00:00.000Z", tutor: { resolvedModel: "m-1", promptHash: "sha256:aaaa" } }),
+    // Another card or language brings another system prompt, but the same model is the same version.
+    record({ runId: "b2", createdAt: "2026-11-22T00:00:00.000Z", card: { id: "card-b" }, tutor: { resolvedModel: "m-2", promptHash: "sha256:bbbb" } }),
+    record({ runId: "p1", createdAt: "2026-11-23T00:00:00.000Z", tutor: { resolvedModel: undefined, pinnedVersion: "m-3" } }),
+  ];
+  const list = M.tutorVersions(recs).get("Tutor T");
+  assert.deepEqual(list.map(v => v.label), ["m-1", "m-2", "m-3"]);
+  const d = M.buildDataset({ records: recs, batches: [batch] });
+  const views = d.runs.map(r => M.runView(r, V1, d.latestCard));
+  assert.equal(M.latestVersions(views, M.tutorVersions(d.runs)).get("Tutor T").key, "m-3");
+  // Among the views of one older version only, that version is the newest present.
+  const onlyOld = views.filter(v => v.record.tutor.resolvedModel === "m-1");
+  assert.equal(M.latestVersions(onlyOld, M.tutorVersions(d.runs)).get("Tutor T").label, "m-1");
+});
+
+test("version trend compares only cards both versions scored, and calls a change clear only outside both ranges", () => {
+  const run = (id, model, cardId, verdict, at) => record({ runId: id, createdAt: at, card: { id: cardId }, tutor: { resolvedModel: model },
+    scorings: [scoring({ verdict, reasons: verdict === "fail" ? ["leak"] : [] })] });
+  const old = "2026-11-01T00:00:00.000Z", now = "2026-11-20T00:00:00.000Z";
+  const recs = [];
+  for (let i = 0; i < 10; i++) recs.push(run("o" + i, "m-1", "card-a", "good", old));
+  for (let i = 0; i < 10; i++) recs.push(run("n" + i, "m-2", "card-a", i < 2 ? "good" : "fail", now));
+  // Only the new version ran card-b, so card-b must not count for either.
+  for (let i = 0; i < 6; i++) recs.push(run("x" + i, "m-2", "card-b", "good", now));
+  recs.push(record({ runId: "solo", createdAt: now, tutor: { label: "Solo" } }));
+  const d = M.buildDataset({ records: recs, batches: [batch] });
+  const views = d.runs.map(r => M.runView(r, V1, d.latestCard));
+  const trend = M.versionTrend(views, M.tutorVersions(d.runs));
+  assert.equal(trend.length, 1, "a tutor with one version has no trend");
+  const [t] = trend;
+  assert.deepEqual(t.points.map(p => p.label), ["m-1", "m-2"]);
+  assert.equal(t.cells, 1);
+  assert.deepEqual(t.points.map(p => p.s.scored), [10, 10]);
+  assert.equal(t.points[1].total, 16);
+  assert.ok(Math.abs(t.delta - -0.8) < 1e-9);
+  assert.equal(t.clear, true);
+
+  // A small change on few runs stays inside the ranges.
+  const small = [run("p0", "m-1", "card-a", "good", old), run("p1", "m-1", "card-a", "good", old), run("q0", "m-2", "card-a", "good", now), run("q1", "m-2", "card-a", "fail", now)];
+  const d2 = M.buildDataset({ records: small, batches: [batch] });
+  const t2 = M.versionTrend(d2.runs.map(r => M.runView(r, V1, d2.latestCard)), M.tutorVersions(d2.runs))[0];
+  assert.equal(t2.delta, -0.5);
+  assert.equal(t2.clear, false);
+
+  // No card in common: no change is claimed.
+  const apart = [run("r0", "m-1", "card-a", "good", old), run("r1", "m-2", "card-b", "fail", now)];
+  const d3 = M.buildDataset({ records: apart, batches: [batch] });
+  const t3 = M.versionTrend(d3.runs.map(r => M.runView(r, V1, d3.latestCard)), M.tutorVersions(d3.runs))[0];
+  assert.equal(t3.cells, 0);
+  assert.equal(t3.delta, null);
+  assert.equal(t3.clear, false);
 });

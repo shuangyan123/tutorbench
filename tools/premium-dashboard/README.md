@@ -20,11 +20,12 @@ The files are read inside the browser tab. Nothing is uploaded, and the page mak
 
 The page has three views. The filters (judge configuration, batch, language, card versions) sit at the right end of the view bar.
 
-- **Overview** has three plates:
-  - *Plate I, Who teaches well*, has one row per tutor: a letter, the name, the formal pass rate, then one specimen per conversation. Counted specimens come first (good, flawed, fail). After a small gap come the ones that still need review; they stand on a dashed ground and are not counted.
+- **Overview** has four plates:
+  - *Plate I, Who teaches well*, has one row per tutor: a letter, the name, the formal pass rate, then one specimen per conversation. Counted specimens come first (good, flawed, fail). After a small gap come the ones that still need review; they stand on a dashed ground and are not counted. The hairline under each rate is its 95% range (Wilson score interval): when two tutors' lines overlap a lot, the gap between them may be luck.
   - *Plate II, Which cards separate the tutors*, is a dot plot. Each card is a row, each tutor is its letter, placed at its pass rate on that card, and a hairline joins the lowest to the highest. Tutors at the same rate stack upward. The cards with the widest spread come first, and the spread is printed at the right. A small dashed ring on a letter means some of that tutor's runs on that card still need review.
-  - *Plate III, Needs you*, shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, review flags or tied judges).
-  - Hovering a specimen or a letter gives the detail. Clicking a specimen opens that conversation. Clicking a letter, a tutor name or a number opens the matching list.
+  - *Plate III, Did the new version get better*, has one small panel for each tutor with more than one version in view. Each version is a dot at its pass rate with its 95% range as a vertical line. The big number is the newest version against the one before, in percentage points. It is called outside the error range only when the two ranges do not overlap. Versions are compared only on the card versions and languages that every one of them has scored runs on, so no version is judged on easier cards.
+  - *Plate IV, Needs you*, shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, review flags or tied judges).
+  - Hovering a specimen, a letter or a version dot gives the detail. Clicking a specimen opens that conversation. Clicking a letter, a tutor name, a version dot or a number opens the matching list.
 - **All conversations** is the full list, with state tabs and the run drawer. The drawer shows the conversation's own specimen, large; clicking a leaf scrolls to that tutor turn. Tabs for superseded and calibration runs appear when such runs are loaded.
 - **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate.
 
@@ -40,6 +41,12 @@ Each conversation is drawn as one small plant, standing on the plate's ground li
 | Head | The outcome: a filled dot is good, a half dot is flawed, a cross is fail, a dashed ring still needs review. A head lifted off the stem means the student left. |
 
 Letters follow the tutor, never its rank: they are given in name order over all loaded evaluation runs, so a filter never reletters anyone.
+
+### Tutor versions
+
+A tutor is its label. Its version is the model the provider reported (`resolvedModel`), else the pinned or requested model. The system prompt is not part of the version, because the runner takes the tutor's system prompt from the card. Versions are ordered by when each first appears among all loaded records, so running an old version again later does not make it the newest.
+
+Plates I and II show each tutor's newest version in view. Older versions appear on Plate III and in the list.
 
 The overview compares tutors, so it reads evaluation runs only. Calibration and superseded runs appear in the lists and the drawer.
 
@@ -104,6 +111,7 @@ The sample is produced by the premium runner itself, so it follows the runner's 
 - a calibration batch, including a student reply sent back for leaving before the card's `leaveNotBefore`
 - a run interrupted by its budget, a top-up and the restart that supersedes it, then a reconciled invoice
 - review flags (split votes and a rule verdict that differs from the judges' majority), `fixedTestSkipped`, a judge ballot that was valid after one retry, a fenced ballot, and a call charged at its reservation
+- older tutor versions on the three cards that did not change: Birch improves at `birch-2026-09` and then clearly regresses at `birch-2026-10`; Atlas improves at `atlas-2026-11`, but within its error range
 
 Regenerating it needs a build that contains the premium runner with record schema v2 (`src/premium/`, added in PR #431):
 

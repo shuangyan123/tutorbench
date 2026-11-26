@@ -12,8 +12,8 @@
       plate: "图版 {n}", keyHead: "头", keyHeadIs: "结局", keyStem: "茎", keyStemIs: "一节是导师的一轮", keyLeaf: "叶", keyLeafIs: "这一轮的帮助力度 0–3",
       keyRed: "红叶", keyRedIs: "这一轮泄露了答案", turnsN: "{n} 轮", spreadNote: "字母是导师，横向位置是它在这张卡上的通过率。右上角带小虚圈的，这张卡还有待审对话。", spreadCol: "差距", unratedN: "{n} 位未计分",
       rateTip: "已计分 {n} 段：好 {g} · 有问题 {f} · 不合格 {x}", rateTipReview: "；另有 {r} 段待审，不计入", allOfTutor: "看这位导师的全部对话",
-      cellTip: "通过 {p}/{n}", cellNone: "还没有已计分的对话", cellReview: "待审 {r}", noRate: "暂无", langZh: "中", langEn: "英",
-      attentionTitle: "需要你看的", askPending: "段待审，还没有结论", askSpot: "段已计分，建议抽查", onlySpot: "建议抽查",
+      cellTip: "通过 {p}/{n}", ciTip: "95% 区间 {lo}%–{hi}%", ciNote: "数字下的细线是 95% 区间：按已计分的对话数，真实通过率大概落在这一段。两位导师的细线重叠得多，差距可能只是运气。", cellNone: "还没有已计分的对话", cellReview: "待审 {r}", noRate: "暂无", langZh: "中", langEn: "英",
+      attentionTitle: "需要你看的", chartVersions: "换了版本，变好还是变差", versionsNote: "每一格是一位导师的几个版本。点是通过率，竖线是 95% 区间，大数字是最新版比上一版的变化。", versionsNone: "目前每位导师只有一个版本。同一位导师换了新版本再跑以后，这里会画出它变好还是变差。", versionsBasis: "只比每个版本都跑过的 {n} 组卡片和语言", versionsNoBasis: "这些版本没有跑过同样的卡，没法比", vsPrev: "比上一版", sigClear: "超出误差范围", sigNoise: "在误差范围内，可能是运气", firstRun: "首次运行 {d}", olderNote: "这里只算每位导师的最新版本，旧版本见图版 III。", pts: "个百分点", askPending: "段待审，还没有结论", askSpot: "段已计分，建议抽查", onlySpot: "建议抽查",
       costLine: "按价格表估算共花费 {cost}，其中重新评审 {re}。", opsTitle: "运行检查", opsNote: "看评测本身靠不靠得住：三位评审是否一致，批次是否跑完。", ties: "平票", topItems: "分歧最多的项：{list}",
       title: "观测台", openFolder: "打开 runs 文件夹", loadSample: "载入合成示例", dropHere: "松开鼠标，载入这个 runs 文件夹",
       sourceSample: "合成示例 · {runs} 段对话 · {batches} 个批次", sourceFolder: "「{name}」· {runs} 段对话 · {batches} 个批次",
@@ -58,8 +58,8 @@
       plate: "Plate {n}", keyHead: "Head", keyHeadIs: "outcome", keyStem: "Stem", keyStemIs: "one node per tutor turn", keyLeaf: "Leaf", keyLeafIs: "help level that turn, 0–3",
       keyRed: "Red leaf", keyRedIs: "that turn leaked the answer", turnsN: "{n} turns", spreadNote: "Letters are tutors, placed at their pass rate on this card. A small dashed ring means some of its runs on this card still need review.", spreadCol: "Spread", unratedN: "{n} not scored",
       rateTip: "{n} scored: good {g} · flawed {f} · fail {x}", rateTipReview: "; {r} more need review and are not counted", allOfTutor: "All conversations for this tutor",
-      cellTip: "pass {p}/{n}", cellNone: "nothing scored yet", cellReview: "{r} need review", noRate: "none yet", langZh: "zh", langEn: "en",
-      attentionTitle: "Needs you", askPending: "need review, no verdict yet", askSpot: "scored, worth a spot check", onlySpot: "Worth a spot check",
+      cellTip: "pass {p}/{n}", ciTip: "95% range {lo}%–{hi}%", ciNote: "The hairline under each rate is its 95% range: where the true pass rate probably sits, given how many runs were scored. When two tutors' lines overlap a lot, the gap may be luck.", cellNone: "nothing scored yet", cellReview: "{r} need review", noRate: "none yet", langZh: "zh", langEn: "en",
+      attentionTitle: "Needs you", chartVersions: "Did the new version get better", versionsNote: "Each panel is one tutor's versions. Dots are pass rates, vertical lines their 95% ranges; the big number is the newest version against the one before.", versionsNone: "Every tutor has one version so far. When a tutor runs again on a new version, this plate shows whether it got better or worse.", versionsBasis: "Compared only on the {n} card–language pairs every version ran", versionsNoBasis: "These versions never ran the same cards, so they cannot be compared", vsPrev: "vs the version before", sigClear: "outside the error range", sigNoise: "within the error range, may be luck", firstRun: "first run {d}", olderNote: "Only each tutor's newest version counts here; older versions are on Plate III.", pts: "points", askPending: "need review, no verdict yet", askSpot: "scored, worth a spot check", onlySpot: "Worth a spot check",
       costLine: "Price-table estimate: {cost}, of which rescoring {re}.", opsTitle: "Run checks", opsNote: "Whether the evaluation itself can be trusted: do the three judges agree, did the batches finish.", ties: "Ties", topItems: "Most splits: {list}",
       title: "Observatory", openFolder: "Open runs folder", loadSample: "Load synthetic sample", dropHere: "Drop to load this runs folder",
       sourceSample: "Synthetic sample · {runs} conversations · {batches} batches", sourceFolder: "“{name}” · {runs} conversations · {batches} batches",
@@ -292,7 +292,7 @@
     banner.hidden = !(d && st.source.kind === "sample");
     banner.textContent = t("sampleBanner");
     renderWarnings();
-    const show = { board: st.view === "overview", cards: st.view === "overview", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks" };
+    const show = { board: st.view === "overview", cards: st.view === "overview", trends: st.view === "overview", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks" };
     for (const id of Object.keys(show)) { clear($(id)); $(id).hidden = !show[id]; }
     document.querySelector(".sheet").hidden = !d;
     const vs = d ? views() : [];
@@ -302,9 +302,14 @@
     if (!d) return;
     if (st.showFilters) filters.append(renderFilters());
     if (show.board) {
-      const ev = vs.filter(isEval), rows = tutorRows(ev), keys = tutorKeys();
-      renderBoard(ev, rows, !ev.length && vs.some(v => v.state === "calibration") ? t("onlyCalibration") : t("noData"), keys);
-      renderSpread(ev, rows, keys); renderAttention(ev);
+      // Plates I and II compare each tutor's newest version in view; Plate III shows how the versions moved.
+      const ev = vs.filter(isEval), keys = tutorKeys();
+      const versions = M.tutorVersions(d.runs.filter(r => r.batchKind !== "calibration"));
+      const latest = M.latestVersions(ev, versions);
+      const now = ev.filter(v => { const l = latest.get(v.record.tutor.label); return !l || M.versionKey(v.record) === l.key; });
+      const rows = tutorRows(now);
+      renderBoard(now, rows, !ev.length && vs.some(v => v.state === "calibration") ? t("onlyCalibration") : t("noData"), keys, latest, now.length < ev.length);
+      renderSpread(now, rows, keys, latest); renderTrend(ev, versions, keys); renderAttention(ev);
     }
     if (show.runs) renderRuns(vs);
     if (show.ops) renderOps(vs);
@@ -431,6 +436,19 @@
     return [r.card.id, langShort(r.card.lang) + " #" + r.repeat.index, kindLabel(v), code(r.end.reason), t("turnsN", { n: r.end.tutorTurns }),
       leaks.length ? t("leakAt", { t: leaks.join(", ") }) : null, v.state === "needs_review" ? whyText(v) : null].filter(Boolean).join(" · ");
   }
+  const pct = x => Math.round(x * 100);
+  const ciText = s => s.passRange ? t("ciTip", { lo: pct(s.passRange.lo), hi: pct(s.passRange.hi) }) : "";
+  // The 95% range of a pass rate as a hairline on a 0–100 track, with a tick at the rate itself.
+  function ciBar(s) {
+    if (!s.passRange) return null;
+    const ns = { "vector-effect": "non-scaling-stroke" };
+    const g = svg("svg", { class: "ci", viewBox: "0 0 100 10", preserveAspectRatio: "none", "aria-hidden": "true" });
+    g.append(svg("line", Object.assign({ class: "ci-track", x1: 0, x2: 100, y1: 5, y2: 5 }, ns)));
+    for (const x of [0, 50, 100]) g.append(svg("line", Object.assign({ class: "ci-tick", x1: x, x2: x, y1: 3, y2: 7 }, ns)));
+    g.append(svg("line", Object.assign({ class: "ci-range", x1: s.passRange.lo * 100, x2: s.passRange.hi * 100, y1: 5, y2: 5 }, ns)));
+    g.append(svg("line", Object.assign({ class: "ci-point", x1: s.passRate * 100, x2: s.passRate * 100, y1: 1, y2: 9 }, ns)));
+    return g;
+  }
   const maxTurnsOf = vs => Math.max(15, ...vs.map(v => (v.record.end && v.record.end.tutorTurns) || 0));
 
   const VERDICT_ORDER = { good: 0, flawed: 1, fail: 2 };
@@ -470,7 +488,7 @@
         el("div", { class: "crit" }, el("dt", { text: t("keyRed") }), el("dd", { text: t("keyRedIs") }))),
       el("div", { class: "heads" }, ["good", "flawed", "fail", "needs_review"].map(k => el("span", null, pip(k), k === "needs_review" ? t("legendPending") : t(k)))));
   }
-  function renderBoard(vs, rows, emptyNote, keys) {
+  function renderBoard(vs, rows, emptyNote, keys, latest, olderHidden) {
     const box = $("board");
     box.append(plateHead("I", "board-title", t("chartTutors"), specimenKey()));
     if (!vs.length) { box.append(el("p", { class: "empty-note", text: emptyNote })); return; }
@@ -487,19 +505,22 @@
       pending.forEach(v => field.append(specimen(v, maxTurns)));
       field.addEventListener("click", e => { const n = e.target.closest("[data-run]"); if (n) openRun(n.getAttribute("data-run")); });
       list.append(el("div", { class: "tutor" },
-        el("button", { type: "button", class: "who", onclick: () => showRuns({ focus: { tutor } }), "data-tip": t("allOfTutor") },
+        el("button", { type: "button", class: "who", onclick: () => showRuns({ focus: { tutor, version: latest.has(tutor) ? latest.get(tutor).key : null } }), "data-tip": t("allOfTutor") },
           el("span", { class: "tkey", text: keys.get(tutor) || "?" }),
           el("span", { class: "name" }, el("strong", { text: tutor }), models.length ? el("span", { class: "faint mono", text: models.join(", ") }) : null)),
-        el("span", { class: "rate" + (g.passRate == null ? " none" : ""), "data-tip": summary },
-          g.passRate == null ? t("noRate") : String(Math.round(g.passRate * 100)), g.passRate == null ? null : el("small", { text: "%" })),
+        el("div", { class: "rate" + (g.passRate == null ? " none" : ""), "data-tip": summary + (g.passRange ? " · " + ciText(g) : "") },
+          el("span", { class: "num" }, g.passRate == null ? t("noRate") : String(pct(g.passRate)), g.passRate == null ? null : el("small", { text: "%" })),
+          ciBar(g)),
         field));
     }
     box.append(list);
+    const foot = [rows.some(r => r.g.passRange) ? t("ciNote") : null, olderHidden ? t("olderNote") : null].filter(Boolean);
+    if (foot.length) box.append(el("p", { class: "plate-foot", text: foot.join(st.lang === "zh" ? "" : " ") }));
   }
 
   // Plate II: which cards separate the tutors. One row per card on a 0–100% pass-rate scale. Each tutor is its
   // lettered key; a hairline spans the lowest to the highest tutor. Cards with the widest spread come first.
-  function renderSpread(vs, rows, keys) {
+  function renderSpread(vs, rows, keys, latest) {
     const box = $("cards");
     box.append(plateHead("II", "cards-title", t("chartCards"), el("p", { class: "plate-note", text: t("spreadNote") })));
     const tutors = rows.map(r => r.tutor);
@@ -525,9 +546,9 @@
       for (const list of buckets.values()) list.forEach((cell, k) => {
         const { tutor, runs, s } = cell;
         const langs = ["zh-CN", "en"].map(l => { const ls = M.summarize(runs.filter(v => v.record.card.lang === l)); return ls.scored ? langShort(l) + " " + (ls.good + ls.flawed) + "/" + ls.scored : null; }).filter(Boolean);
-        const tip = tutor + " · " + c.card + " · " + t("cellTip", { p: s.good + s.flawed, n: s.scored }) + (langs.length > 1 ? "（" + langs.join("，") + "）" : "") + (s.needsReview ? " · " + t("cellReview", { r: s.needsReview }) : "");
+        const tip = tutor + " · " + c.card + " · " + t("cellTip", { p: s.good + s.flawed, n: s.scored }) + " · " + ciText(s) + (langs.length > 1 ? "（" + langs.join("，") + "）" : "") + (s.needsReview ? " · " + t("cellReview", { r: s.needsReview }) : "");
         track.append(el("button", { type: "button", class: "mk" + (s.needsReview ? " pending" : ""), style: `left:${s.passRate * 100}%;--k:${k}`, "data-tip": tip, "aria-label": tip,
-          onclick: () => showRuns({ focus: { tutor, card: c.card } }) }, keys.get(tutor) || "?"));
+          onclick: () => showRuns({ focus: { tutor, card: c.card, version: latest.has(tutor) ? latest.get(tutor).key : null } }) }, keys.get(tutor) || "?"));
       });
       const unrated = c.cells.filter(x => x.s.passRate == null);
       chart.append(el("div", { class: "srow", role: "row" },
@@ -538,11 +559,49 @@
     box.append(el("div", { class: "spread-box" }, chart));
   }
 
+  // Plate III: did the new version get better. One small panel per tutor with more than one version in view: the pass
+  // rate of each version with its 95% range, compared only on the cards every version scored (see M.versionTrend).
+  function renderTrend(vs, versions, keys) {
+    const box = $("trends");
+    box.append(plateHead("III", "trends-title", t("chartVersions"), el("p", { class: "plate-note", text: t("versionsNote") })));
+    const trend = M.versionTrend(vs, versions).sort((a, b) => (keys.get(a.tutor) || a.tutor).localeCompare(keys.get(b.tutor) || b.tutor));
+    if (!trend.length) { box.append(el("p", { class: "empty-note", text: t("versionsNone") })); return; }
+    const grid = el("div", { class: "trends" });
+    for (const tr of trend) {
+      const n = tr.points.length, x = i => 8 + i * 84 / (n - 1);
+      const plot = el("div", { class: "tplot" });
+      for (const y of [0, 50, 100]) plot.append(el("span", { class: "tgrid", style: `bottom:${y}%`, "aria-hidden": "true" }, el("b", { text: y + (y === 100 ? "%" : "") })));
+      const line = svg("svg", { class: "tline", viewBox: "0 0 100 100", preserveAspectRatio: "none", "aria-hidden": "true" });
+      const ys = tr.points.map(p => (p.s.passRate == null ? null : 100 - p.s.passRate * 100));
+      for (let i = 1; i < n; i++) if (ys[i - 1] != null && ys[i] != null) {
+        line.append(svg("line", { class: "seg" + (i === n - 1 ? " last" : ""), x1: x(i - 1), y1: ys[i - 1], x2: x(i), y2: ys[i], "vector-effect": "non-scaling-stroke" }));
+      }
+      plot.append(line);
+      tr.points.forEach((p, i) => {
+        if (p.s.passRate == null) return;
+        const tip = [p.label, t("cellTip", { p: p.s.good + p.s.flawed, n: p.s.scored }), ciText(p.s), p.firstAt ? t("firstRun", { d: whenShort(p.firstAt) }) : null].filter(Boolean).join(" · ");
+        plot.append(el("i", { class: "whisker", style: `left:${x(i)}%;bottom:${p.s.passRange.lo * 100}%;height:${(p.s.passRange.hi - p.s.passRange.lo) * 100}%`, "aria-hidden": "true" }));
+        plot.append(el("button", { type: "button", class: "pt" + (i === n - 1 ? " last" : ""), style: `left:${x(i)}%;bottom:${p.s.passRate * 100}%`,
+          "data-tip": tip, "aria-label": tr.tutor + " · " + tip, onclick: () => showRuns({ focus: { tutor: tr.tutor, version: p.key } }) }));
+      });
+      const ticks = el("div", { class: "tx", "aria-hidden": "true" }, tr.points.map((p, i) => el("span", { class: i === 0 ? "first" : i === n - 1 ? "last" : "", style: `left:${x(i)}%;max-width:calc(${84 / (n - 1)}% - 10px)`, title: p.label, text: p.label })));
+      const d = tr.delta, sign = d == null ? "" : d > 0 ? "+" : d < 0 ? "−" : "±";
+      const deltaBox = el("div", { class: "tdelta" + (tr.clear ? (d < 0 ? " down" : " up") : "") },
+        el("span", { class: "d", text: d == null ? "—" : sign + Math.abs(Math.round(d * 100)) }),
+        el("span", { class: "u" }, d == null ? t("versionsNoBasis") : t("pts") + " · " + t("vsPrev"), d == null ? null : el("br"), d == null ? null : (tr.clear ? t("sigClear") : t("sigNoise"))));
+      grid.append(el("figure", { class: "trend" },
+        el("figcaption", null, el("span", { class: "tkey", text: keys.get(tr.tutor) || "?" }), el("strong", { text: tr.tutor })),
+        deltaBox, plot, ticks,
+        el("p", { class: "tbasis", text: tr.cells ? t("versionsBasis", { n: tr.cells }) : "" })));
+    }
+    box.append(grid);
+  }
+
   // What needs a person: two numbers, each opens the matching list.
   function renderAttention(vs) {
     const box = $("attention");
     const pending = vs.filter(v => v.state === "needs_review").length, spot = vs.filter(isSpot).length;
-    box.append(plateHead("III", "attention-title", t("attentionTitle")));
+    box.append(plateHead("IV", "attention-title", t("attentionTitle")));
     if (!pending && !spot) { box.append(el("p", { class: "empty-note", text: t("nothingPending") })); return; }
     const ask = (n, label, go) => el("button", { type: "button", class: "ask", onclick: go, disabled: !n },
       el("span", { class: "n", text: String(n) }), el("span", { class: "l", text: label + " →" }));
@@ -561,7 +620,8 @@
   function renderRuns(vs) {
     const box = $("runs"), rf = st.runFilter;
     const inState = (v, k) => k === "all" || (k === "unscorable" ? ["error", "student_invalid"].includes(v.state) : v.state === k);
-    const scoped = vs.filter(v => !rf.focus || ((!rf.focus.tutor || v.record.tutor.label === rf.focus.tutor) && (!rf.focus.card || v.record.card.id === rf.focus.card)));
+    const scoped = vs.filter(v => !rf.focus || ((!rf.focus.tutor || v.record.tutor.label === rf.focus.tutor) && (!rf.focus.card || v.record.card.id === rf.focus.card)
+      && (!rf.focus.version || M.versionKey(v.record) === rf.focus.version)));
     // Superseded and calibration tabs appear only when such runs are loaded.
     const states = [["all", t("all")], ["scored", t("scored_state")], ["needs_review", t("needs_review")], ["unscorable", t("unscorable")], ["other_version", t("other_version")],
       ["superseded", t("superseded")], ["calibration", t("calibration")]].filter(([k]) => !M.NOT_EVALUATION.includes(k) || rf.state === k || scoped.some(v => v.state === k));
@@ -570,7 +630,7 @@
     box.append(el("div", { class: "tabs", role: "group", "aria-label": t("colState") }, states.map(([k, label]) => el("button", { type: "button", class: "tab", "aria-pressed": rf.state === k ? "true" : "false",
       onclick: () => { rf.state = k; st.limit = 100; renderRunsOnly(); } }, label + " " + scoped.filter(v => inState(v, k)).length))));
     box.append(el("div", { class: "toggles" },
-      rf.focus ? el("span", { class: "focus" }, t("focus", { f: [rf.focus.tutor, rf.focus.card].filter(Boolean).join(" · ") }), el("button", { type: "button", class: "btn-quiet", onclick: () => { rf.focus = null; renderRunsOnly(); renderViews(views()); } }, t("clearFocus"))) : null,
+      rf.focus ? el("span", { class: "focus" }, t("focus", { f: [rf.focus.tutor, rf.focus.version, rf.focus.card].filter(Boolean).join(" · ") }), el("button", { type: "button", class: "btn-quiet", onclick: () => { rf.focus = null; renderRunsOnly(); renderViews(views()); } }, t("clearFocus"))) : null,
       el("label", null, el("input", { type: "checkbox", id: "only-disagree", checked: rf.disagree, onchange: e => { rf.disagree = e.target.checked; renderRunsOnly(); } }), t("onlyDisagree")),
       el("label", null, el("input", { type: "checkbox", id: "only-spot", checked: rf.spot, onchange: e => { rf.spot = e.target.checked; renderRunsOnly(); } }), t("onlySpot"))));
     list = list.slice().sort((a, b) => String(b.record.createdAt).localeCompare(String(a.record.createdAt)));

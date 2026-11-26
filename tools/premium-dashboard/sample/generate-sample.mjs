@@ -310,6 +310,29 @@ try {
   const store = new Store(join(work, "runs"));
   try {
     const cardIds = Object.keys(CARDS);
+    writeCards(join(work, "cards"), cardIds.map(id => [id, "1.0.0", ""]));
+    const assets = loadCards(join(work, "cards"));
+
+    // Batches 0a–0c: older versions of Birch and Atlas, run before the pilot on the three cards that have not changed
+    // since. They give the version plate something to compare: Birch improves at birch-2026-09 and then clearly
+    // regresses at birch-2026-10; Atlas improves at atlas-2026-11, but within its error range.
+    const stableIds = cardIds.filter(id => id !== "synthetic-tiles");
+    const stable = assets.filter(a => stableIds.includes(a.card.id));
+    const olderBatch = (batchId, at, tutor, repeats, plan) => {
+      const c = config(batchId, "synthetic run of an older tutor version", [tutor], "synthetic-panel-v1", { repeats });
+      const byRepeat = Object.fromEntries(Array.from({ length: repeats }, (_, i) => [i + 1, {}]));
+      stableIds.forEach((cardId, ci) => c.languages.forEach((lang, li) => {
+        for (let r = 1; r <= repeats; r++) byRepeat[r][[cardId, lang, tutor.id].join("/")] = tracksFor(plan[(ci * 2 + li) * repeats + r - 1], cardId, lang, tutor, c);
+      }));
+      runBatch(store, { ...execution(c, stable, byRepeat, clock(at, 2)), provider: job => replayProvider(byRepeat[job.repeatIndex], job) });
+    };
+    olderBatch("synthetic-older-00a", "2026-11-08T09:00:00Z", { ...TUTORS.birch, pinnedVersion: "birch-2026-08" }, 1,
+      ["good", "leakAfter", "flawed", "good", "leakAfter", "good"]);
+    olderBatch("synthetic-older-00b", "2026-11-12T09:00:00Z", { ...TUTORS.birch, pinnedVersion: "birch-2026-09" }, 2,
+      ["good", "good", "flawed", "good", "good", "good", "good", "flawed", "good", "good", "good", "good"]);
+    olderBatch("synthetic-older-00c", "2026-11-13T09:00:00Z", { ...TUTORS.atlas, pinnedVersion: "atlas-2026-10" }, 1,
+      ["good", "leakAfter", "flawed", "left", "good", "good"]);
+
     // Batch 1: an older card version (synthetic-tiles 0.9.0), two tutors, one repeat.
     writeCards(join(work, "cards-old"), [["synthetic-tiles", "0.9.0", " (older wording)"]]);
     const oldAssets = loadCards(join(work, "cards-old"));
@@ -321,8 +344,6 @@ try {
     run(store, c1, oldAssets, tape1, clock("2026-11-18T09:00:00Z"));
 
     // Batch 2: the main synthetic pilot, 4 cards x 2 languages x 4 tutors x 2 repeats.
-    writeCards(join(work, "cards"), cardIds.map(id => [id, "1.0.0", ""]));
-    const assets = loadCards(join(work, "cards"));
     const c2 = config("synthetic-pilot-02", "synthetic pilot: every status and flag the dashboard must show", Object.values(TUTORS), "synthetic-panel-v1");
     // The runner keys a tape by card/language/tutor, so each repeat gets its own tape and the provider picks by repeat.
     const tapes = { 1: {}, 2: {} };
