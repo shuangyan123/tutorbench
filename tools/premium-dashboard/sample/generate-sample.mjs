@@ -4,10 +4,13 @@
 // follows the runner's real output format. Cards, tutors, students and judges are all
 // synthetic: no real card, prompt, model output or person appears here.
 //
-// Needs the record schema v2 runner (calibration batches, budget top-ups, reconciliation).
+// Needs the record schema v3 runner (tutor prompts and parameters). The bundled sample also keeps history: with
+// --legacy-runner, the batches before 2026-11-25 are written by a record schema v2 runner into the same runs folder,
+// and the newer runner then adds to it, the way a real folder grows across runner versions.
 // Usage (needs a build that contains the premium runner, src/premium/*):
-//   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--bundle <file>] [--out <dir>]
-// --runner  folder with the built premium runner modules (default dist/src/premium)
+//   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--legacy-runner <dir>] [--bundle <file>] [--out <dir>]
+// --runner         folder with the built premium runner modules, record schema v3 (default dist/src/premium)
+// --legacy-runner  optional: an older build, record schema v2, for the history batches (default: --runner for all)
 // --bundle  the sample the dashboard loads (default tools/premium-dashboard/sample/sample-data.js)
 // --out     optional: also write the runner's folder layout (index.jsonl, batches/, records/) there; must be new or empty
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
@@ -16,16 +19,20 @@ import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { pathToFileURL } from "node:url";
 
-const { values } = parseArgs({ options: { runner: { type: "string" }, out: { type: "string" }, bundle: { type: "string" } } });
-const runnerDir = resolve(values.runner ?? "dist/src/premium");
+const { values } = parseArgs({ options: { runner: { type: "string" }, "legacy-runner": { type: "string" }, out: { type: "string" }, bundle: { type: "string" } } });
 const bundlePath = resolve(values.bundle ?? "tools/premium-dashboard/sample/sample-data.js");
 const outDir = values.out ? resolve(values.out) : null;
-const load = name => import(pathToFileURL(join(runnerDir, name + ".js")).href);
-const { hash, loadCards } = await load("cards");
-const { runBatch, rejudge, reconcile } = await load("batch");
-const { configSchema, panel } = await load("provider");
-const { replayProvider } = await load("replay");
-const { Store } = await load("store");
+async function runnerAt(dir) {
+  const load = name => import(pathToFileURL(join(dir, name + ".js")).href);
+  const [{ hash, loadCards }, { runBatch, rejudge, reconcile }, { configSchema, panel }, { replayProvider }, { Store }] =
+    await Promise.all(["cards", "batch", "provider", "replay", "store"].map(load));
+  return { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store };
+}
+const current = await runnerAt(resolve(values.runner ?? "dist/src/premium"));
+const legacy = values["legacy-runner"] ? await runnerAt(resolve(values["legacy-runner"])) : current;
+// The functions below use whichever runner is active; history batches switch to the legacy one.
+let { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store } = current;
+const use = R => ({ hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store } = R);
 
 // ---------- synthetic cards ----------
 const RULES = {
@@ -231,12 +238,14 @@ function ballot(sc, cardLang, judgeIndex, kind, version) {
 const usage = (role, i) => ({ tutor: { inputTokens: 400 + 60 * i, outputTokens: 90 }, student: { inputTokens: 900 + 80 * i, outputTokens: 40 },
   judge: { inputTokens: 2600, outputTokens: 750 } })[role];
 const frame = (text, role, i, resolvedModel) => ({ text, finishReason: "stop", latencyMs: 400 + 37 * i, usage: usage(role, i), ...(resolvedModel ? { resolvedModel } : {}) });
+// A tutor with a prompt of its own reads that prompt on every call, so its input is a little longer.
+const withPrompt = (f, tutor) => (tutor.prompt && f.usage ? { ...f, usage: { ...f.usage, inputTokens: f.usage.inputTokens + 120 } } : f);
 function tracksFor(kind, cardId, lang, tutor, config, version = 1) {
   const sc = script(kind, cardId, lang);
   const t = tutor.id, st = config.student.id;
   const tracks = { [t]: [], [st]: [] };
   // Each synthetic tutor answers at its own typical speed, so the value plate has something to show.
-  const tutorFrame = (x, i) => ({ ...frame(x, "tutor", i), latencyMs: (TUTOR_SPEED_MS[t] || 400) + 53 * i });
+  const tutorFrame = (x, i) => withPrompt({ ...frame(x, "tutor", i), latencyMs: (TUTOR_SPEED_MS[t] || 400) + 53 * i }, tutor);
   const stu = (x, i) => frame(x, "student", i, config.student.pinnedVersion);
   const bad = i => stu(S("this is way too long ".repeat(13), 1), i);
   const rejectedReply = i => (sc.rewriteWith ? stu(sc.rewriteWith, i) : bad(i));
@@ -289,9 +298,23 @@ function config(batchId, purpose, tutors, judgeConfigVersion, extra = {}) {
 // v2 per-model price table (used by the newer batches; the older batches keep the legacy flat rates).
 const priced = (model, input, output) => ({ model, inputUsdPerMillion: input, outputUsdPerMillion: output, date: "2026-11-25", source: "https://example.com/synthetic-prices" });
 // Tutors differ in price and speed on purpose: Atlas is mid-priced and slow, Dune cheap and fast, Cedar expensive.
-const TUTOR_SPEED_MS = { atlas: 2300, birch: 900, cedar: 3400, dune: 650 };
+// Atlas · coach is the same Atlas model with a teaching prompt of its own, so it has Atlas's price and speed.
+const TUTOR_SPEED_MS = { atlas: 2300, "atlas-coach": 2300, birch: 900, cedar: 3400, dune: 650 };
 const modelPrices = { version: "synthetic-prices-v2", models: [priced("atlas", 0.5, 2), priced("birch", 0.4, 1.6), priced("cedar", 2.5, 10), priced("dune", 0.15, 0.6),
   priced("learner", 0.3, 1.2), priced("j1", 0.5, 2), priced("j2", 0.5, 2), priced("j3", 0.5, 2), priced("alt1", 0.5, 2), priced("alt2", 0.5, 2)] };
+// The prompt batches add an entry for Atlas · coach, so they have a table of their own.
+const coachPrices = { version: "synthetic-prices-v3", models: [...modelPrices.models, priced("atlas-coach", 0.5, 2)] };
+// Synthetic teaching prompts of the tutor's own (record schema v3). Both languages are one prompt with one
+// language-independent hash; 1.1.0 adds one sentence, so its hash differs.
+const COACH = {
+  "1.0.0": { id: "synthetic-coach", version: "1.0.0", text: {
+    en: "You are a patient tutor. Ask one short question at a time and let the learner do the thinking.",
+    "zh-CN": "你是一位耐心的导师。每次只问一个简短的问题，让学生自己思考。" } },
+  "1.1.0": { id: "synthetic-coach", version: "1.1.0", text: {
+    en: "You are a patient tutor. Ask one short question at a time and let the learner do the thinking. When the learner asks for the answer, first ask what they have tried.",
+    "zh-CN": "你是一位耐心的导师。每次只问一个简短的问题，让学生自己思考。学生要答案时，先问他已经试过什么。" } },
+};
+const coach = version => ({ ...TUTORS.atlas, id: "atlas-coach", label: "Atlas · coach (synthetic)", prompt: COACH[version] });
 // Scenario per (tutor, card, lang, repeat). Chosen so that every status, end reason and flag appears.
 const PLAN = {
   atlas: ["good", "good", "flawed", "transfer", "verdictSplit", "rejudgeFlip", "good", "premature", "crosscheck", "tie", "good", "flawed", "eventMissing", "good", "good", "rejudgeFlip"],
@@ -310,16 +333,18 @@ function clock(startIso, stepMinutes = 3) {
 // ---------- run ----------
 const work = mkdtempSync(join(tmpdir(), "premium-dashboard-sample-"));
 try {
-  const store = new Store(join(work, "runs"));
+  const cardIds = Object.keys(CARDS);
+  const stableIds = cardIds.filter(id => id !== "synthetic-tiles");
+  // History: everything before 2026-11-25 is written by the legacy runner (record schema v2 when given).
+  use(legacy);
+  let store = new Store(join(work, "runs"));
   try {
-    const cardIds = Object.keys(CARDS);
     writeCards(join(work, "cards"), cardIds.map(id => [id, "1.0.0", ""]));
     const assets = loadCards(join(work, "cards"));
 
     // Batches 0a–0c: older versions of Birch and Atlas, run before the pilot on the three cards that have not changed
     // since. They give the version plate something to compare: Birch improves at birch-2026-09 and then clearly
     // regresses at birch-2026-10; Atlas improves at atlas-2026-11, but within its error range.
-    const stableIds = cardIds.filter(id => id !== "synthetic-tiles");
     const stable = assets.filter(a => stableIds.includes(a.card.id));
     const olderBatch = (batchId, at, tutor, repeats, plan) => {
       const c = config(batchId, "synthetic run of an older tutor version", [tutor], "synthetic-panel-v1", { repeats, prices: modelPrices });
@@ -357,6 +382,15 @@ try {
     });
     runBatch(store, { ...execution(c2, assets, tapes, clock("2026-11-24T10:00:00Z", 2)),
       provider: job => replayProvider(tapes[job.repeatIndex], job) });
+  } finally { store.close(); }
+
+  // From here on the current runner (record schema v3) adds to the same runs folder and ledger.
+  use(current);
+  store = new Store(join(work, "runs"));
+  try {
+    const assets = loadCards(join(work, "cards"));
+    const stable = assets.filter(a => stableIds.includes(a.card.id));
+    const c2 = config("synthetic-pilot-02", "synthetic pilot: every status and flag the dashboard must show", Object.values(TUTORS), "synthetic-panel-v1", { prices: modelPrices });
 
     // Re-score four runs with a revised (synthetic) judge configuration: scorings are appended, never replaced.
     const c2b = config("synthetic-pilot-02", c2.purpose, Object.values(TUTORS), "synthetic-panel-v2", { prices: modelPrices });
@@ -419,6 +453,46 @@ try {
     runBatch(store, { ...execution(c6b, shadows, tape6, clock("2026-11-25T10:45:00Z")), topUp: true });
     const estimate = JSON.parse(readFileSync(join(work, "runs", "batches", c6.batchId + ".json"), "utf8")).spentUsd;
     reconcile(store, c6.batchId, "synthetic-host", Math.round(estimate * 1.06 * 1e6) / 1e6, "Synthetic invoice: provider counts tokens differently.");
+
+    // Batches 8 and 9: the tutor's own prompt (record schema v3). Batch 8 runs Atlas with no prompt beside the same
+    // Atlas model with synthetic-coach 1.0.0, in both languages: the coach's Chinese and English runs share one prompt
+    // hash, so they are one setup, and the compare view must read the pair as one change (the prompt; the name alone
+    // is not a change). Batch 9 changes one sentence of the prompt (1.1.0): again one change. Atlas without a prompt in
+    // batch 8 is the same setup as Atlas in the v2 history.
+    const promptBatch = (batchId, at, tutors, plans) => {
+      const c = config(batchId, "synthetic run of a tutor with a teaching prompt of its own", tutors, "synthetic-panel-v1", { prices: coachPrices });
+      const tapes = { 1: {}, 2: {} };
+      stableIds.forEach((cardId, ci) => c.languages.forEach((lang, li) => c.tutors.forEach((tutor, ti) => {
+        for (const r of [1, 2]) tapes[r][[cardId, lang, tutor.id].join("/")] = tracksFor(plans[ti][(ci * 2 + li) * 2 + r - 1], cardId, lang, tutor, c);
+      })));
+      runBatch(store, { ...execution(c, stable, tapes, clock(at, 2)), provider: job => replayProvider(tapes[job.repeatIndex], job) });
+    };
+    promptBatch("synthetic-prompt-08", "2026-11-26T02:00:00Z", [TUTORS.atlas, coach("1.0.0")], [
+      ["good", "flawed", "good", "leakAfter", "flawed", "good", "good", "left", "good", "flawed", "leakAfter", "good"],
+      ["good", "good", "flawed", "good", "good", "leakAfter", "good", "good", "flawed", "good", "good", "flawed"],
+    ]);
+    promptBatch("synthetic-prompt-09", "2026-11-26T04:00:00Z", [coach("1.1.0")], [
+      ["good", "good", "good", "good", "good", "flawed", "good", "good", "good", "good", "good", "good"],
+    ]);
+
+    // Batch 10: a live-style calibration whose student answers from a different model than the one pinned. The runner
+    // stops the batch for model-version drift; the same call also used up the budget, so the batch keeps that financial
+    // stop as budgetStopReason beside the drift status.
+    {
+      const c = config("synthetic-drift-10", "synthetic hybrid calibration stopped by model-version drift", [TUTORS.atlas], "synthetic-panel-v1",
+        { kind: "calibration", languages: ["en"], repeats: 1, budgetUsd: 1, reserveUsd: 0 });
+      const tape = { [["synthetic-tiles", "en", "atlas"].join("/")]: tracksFor("good", "synthetic-tiles", "en", TUTORS.atlas, c) };
+      const e = execution(c, assets.filter(a => a.card.id === "synthetic-tiles"), tape, clock("2026-11-26T05:00:00Z"));
+      runBatch(store, { ...e, mode: "hybrid_calibration", provider: job => {
+        const base = replayProvider(tape, job);
+        // The student call reports another model and is billed exactly the remaining budget (2M input tokens at $0.50/M).
+        return req => {
+          const r = base(req);
+          return req.role === "student" ? { ...r, resolvedModel: "learner-2026-11-r9", usage: { inputTokens: 2_000_000, outputTokens: 0 } }
+            : { ...r, usage: { inputTokens: 0, outputTokens: 0 } };
+        };
+      } });
+    }
   } finally { store.close(); }
 
   const runs = join(work, "runs");

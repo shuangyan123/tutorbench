@@ -490,3 +490,137 @@ test("setup comparison names what differs and reads a result only when one thing
   const mixed = M.compareSetups([...pick("a1"), ...pick("b1")], pick("c1"));
   assert.ok(mixed.mixed.some(m => m.side === "a" && m.part === "studentModel"));
 });
+
+// ---------- record schema v3: the tutor's own prompt ----------
+// These read the bundled sample: its records were written by the runners themselves, the history by a record schema v2
+// runner and the rest by a v3 runner, into one runs folder.
+function sampleViews() {
+  const d = M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, index: M.parseJsonl(SAMPLE.index) });
+  const version = d.judgeVersions[0];
+  const views = d.runs.map(r => M.runView(r, version, d.latestCard, d.supersededBy));
+  return { d, views, evaluated: views.filter(v => !M.NOT_EVALUATION.includes(v.state)) };
+}
+// A run whose current scoring is under the first judge configuration (some pilot runs were re-scored under the second).
+const underV1 = r => (M.currentScoring(r) || { judgeConfig: {} }).judgeConfig.version === "synthetic-panel-v1";
+const setupWith = (evaluated, pred) => {
+  const hits = M.setups(evaluated).filter(g => g.views.some(v => pred(v.record)));
+  assert.equal(hits.length, 1, "expected one setup, found " + hits.length);
+  return hits[0];
+};
+
+test("v3: records of schema v1, v2 and v3 load together, and v2 history joins v3 runs of the same setup", () => {
+  const { d, evaluated } = sampleViews();
+  assert.deepEqual(d.warnings, []);
+  assert.deepEqual([...new Set(d.runs.map(r => r.schemaVersion))].sort(), [2, 3]);
+  // A v1 record from an older folder loads beside them.
+  const old = record({ runId: "v1-run", createdAt: "2026-11-01T00:00:00.000Z" });
+  const mixed = M.buildDataset({ records: [...SAMPLE.records, old], batches: [...SAMPLE.batches, batch] });
+  assert.deepEqual(mixed.warnings, []);
+  assert.deepEqual([...new Set(mixed.runs.map(r => r.schemaVersion))].sort(), [1, 2, 3]);
+  // Atlas with no prompt of its own: the v2 pilot and the v3 runs after it are one setup.
+  const atlas = setupWith(evaluated, r => r.batchId === "synthetic-pilot-02" && r.tutor.id === "atlas" && underV1(r));
+  assert.deepEqual([...new Set(atlas.views.map(v => v.record.schemaVersion))].sort(), [2, 3]);
+  assert.ok(atlas.views.some(v => v.record.batchId === "synthetic-prompt-08"));
+  assert.equal(atlas.setup.tutorPrompt, null);
+});
+
+test("v3: one bilingual tutor prompt is one setup, though each language sends a different system prompt", () => {
+  const { d, evaluated } = sampleViews();
+  assert.deepEqual(d.tutorPrompts.map(p => p.id + "@" + p.version), ["synthetic-coach@1.0.0", "synthetic-coach@1.1.0"]);
+  const coach = d.runs.filter(r => r.tutor.tutorPromptVersion === "1.0.0");
+  const byLang = lang => coach.filter(r => r.card.lang === lang);
+  assert.ok(byLang("zh-CN").length && byLang("en").length);
+  assert.equal(new Set(coach.map(r => r.tutor.tutorPromptHash)).size, 1);
+  // The localized system prompt is the tutor's prompt, a blank line, then the card's setup, so it differs by language.
+  assert.notEqual(byLang("zh-CN")[0].tutor.promptHash, byLang("en")[0].tutor.promptHash);
+  assert.ok(byLang("en")[0].tutor.systemPrompt.endsWith("\n\n" + "Guide the learner; do not give the answer."));
+  const g = setupWith(evaluated, r => r.tutor.tutorPromptVersion === "1.0.0");
+  assert.deepEqual([...new Set(g.views.map(v => v.record.card.lang))].sort(), ["en", "zh-CN"]);
+  assert.equal(g.views.length, coach.length);
+  assert.equal(g.setup.tutorPrompt, coach[0].tutor.tutorPromptHash);
+  // 1.1.0 changed one sentence: a different hash, a different setup.
+  const next = setupWith(evaluated, r => r.tutor.tutorPromptVersion === "1.1.0");
+  assert.notEqual(next.key, g.key);
+});
+
+test("v3: changing only the tutor prompt is read as one change, even under another tutor name", () => {
+  const { evaluated } = sampleViews();
+  const plain = setupWith(evaluated, r => r.batchId === "synthetic-prompt-08" && r.tutor.id === "atlas");
+  const v100 = setupWith(evaluated, r => r.tutor.tutorPromptVersion === "1.0.0");
+  const v110 = setupWith(evaluated, r => r.tutor.tutorPromptVersion === "1.1.0");
+
+  // Same batch, same Atlas model, two names: the name is not a change, the prompt is.
+  const a = M.compareSetups(plain.views, v100.views);
+  assert.deepEqual(a.diff.map(x => x.part), ["tutor", "tutorPrompt"]);
+  assert.equal(a.nameOnly, true);
+  assert.equal(a.changes, 1);
+  assert.deepEqual(a.mixed, []);
+  assert.equal(a.cells, 6);
+
+  // One prompt version against the next: one change, same name.
+  const b = M.compareSetups(v100.views, v110.views);
+  assert.deepEqual(b.diff.map(x => x.part), ["tutorPrompt"]);
+  assert.equal(b.nameOnly, false);
+  assert.equal(b.changes, 1);
+
+  // Another model and another prompt: two changes, never put down to the prompt.
+  const birch = setupWith(evaluated, r => r.batchId === "synthetic-pilot-02" && r.tutor.id === "birch" && underV1(r));
+  const c = M.compareSetups(birch.views, v110.views);
+  assert.equal(c.nameOnly, false);
+  assert.equal(c.changes, 2);
+});
+
+test("v3: index rows are checked on the prompt id and version; v1 and v2 rows without them still pass", () => {
+  const rows = M.parseJsonl(SAMPLE.index);
+  assert.ok(rows.every(r => "tutorPromptId" in r && "tutorPromptVersion" in r));
+  const coachRow = rows.find(r => r.tutorPromptVersion === "1.1.0");
+  const stale = rows.map(r => (r === coachRow ? { ...r, tutorPromptVersion: "1.0.0" } : r));
+  assert.deepEqual(M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, index: stale }).warnings, [{ code: "index_out_of_date", detail: coachRow.runId }]);
+  const older = rows.map(r => { const o = { ...r }; delete o.tutorPromptId; delete o.tutorPromptVersion; return o; });
+  assert.deepEqual(M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, index: older }).warnings, []);
+});
+
+test("v3: a record must carry the prompt its batch lists, and one prompt version must mean one hash", () => {
+  const coach = SAMPLE.records.filter(r => r.tutor.tutorPromptVersion === "1.1.0");
+  const changed = { ...coach[0], tutor: { ...coach[0].tutor, tutorPromptHash: "sha256:" + "0".repeat(64) } };
+  const records = SAMPLE.records.map(r => (r.runId === changed.runId ? changed : r));
+  const codes = M.buildDataset({ records, batches: SAMPLE.batches }).warnings.map(w => w.code + " " + w.detail);
+  assert.deepEqual(codes.sort(), ["prompt_batch_mismatch " + changed.runId, "tutor_prompt_conflict synthetic-coach@1.1.0"].sort());
+});
+
+test("v3: batch info lists each tutor's prompt and keeps a budget stop beside a drift status", () => {
+  const info = id => M.batchInfo(SAMPLE.batches.find(b => b.batchId === id));
+  const drift = info("synthetic-drift-10");
+  assert.equal(drift.status, "model_version_drift");
+  assert.equal(drift.budgetStopReason, "budget_stop");
+  assert.equal(drift.alsoStopped, "budget_stop");
+  // When the budget is the stop itself, it is not repeated.
+  const smoke = info("synthetic-smoke-03");
+  assert.equal(smoke.status, "budget_stop");
+  assert.equal(smoke.alsoStopped, null);
+  const p8 = info("synthetic-prompt-08");
+  assert.equal(p8.tutorSetups.length, 1);
+  assert.equal(p8.tutorSetups[0].tutor, "Atlas · coach (synthetic)");
+  assert.deepEqual([p8.tutorSetups[0].prompt.id, p8.tutorSetups[0].prompt.version], ["synthetic-coach", "1.0.0"]);
+  assert.match(p8.tutorSetups[0].prompt.hash, /^sha256:[0-9a-f]{64}$/u);
+  // A v2 batch has neither.
+  const old = info("synthetic-older-00a");
+  assert.equal(old.budgetStopReason, null);
+  assert.deepEqual(old.tutorSetups, []);
+  // The drift run is a calibration run: listed, never counted.
+  const { views } = sampleViews();
+  assert.ok(views.filter(v => v.record.batchId === "synthetic-drift-10").every(v => v.state === "calibration"));
+});
+
+test("v3: tutor parameters are compared by value, not by the order they were written in", () => {
+  const a = record({ runId: "p1", tutor: { resolvedModel: "m", params: { temperature: 0.3, maxOutputTokens: 900 } } });
+  const b = record({ runId: "p2", tutor: { resolvedModel: "m", params: { maxOutputTokens: 900, temperature: 0.3 } } });
+  const c = record({ runId: "p3", tutor: { resolvedModel: "m", params: { maxOutputTokens: 900, temperature: 0 } } });
+  const d = M.buildDataset({ records: [a, b, c], batches: [batch] });
+  const views = d.runs.map(r => M.runView(r, V1, d.latestCard));
+  const groups = M.setups(views);
+  assert.equal(groups.length, 2);
+  const cmp = M.compareSetups(groups[0].views, groups[1].views);
+  assert.deepEqual(cmp.diff.map(x => x.part), ["tutorParams"]);
+  assert.equal(cmp.changes, 1);
+});

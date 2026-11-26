@@ -1,7 +1,7 @@
 # TutorBench Observatory（观测台）
 
 A local page for reading the premium runner's output: `index.jsonl`, `batches/<batchId>.json` and `records/<runId>.json`.
-It reads record and batch schema v1 and v2.
+It reads run records of schema v1, v2 and v3 together, so a runs folder that grew across runner versions opens as one.
 It is laid out like a printed atlas: numbered plates, one drawn specimen per conversation, and the words kept to titles, hovers and the run drawer.
 It shows the formal pass rate, what still needs a person, the evidence behind each deterministic failure, the simulated student's checks, and where the three judges disagreed.
 
@@ -29,7 +29,7 @@ The page has four views. The filters (judge configuration, batch, language, card
   - Hovering a specimen, a letter or a version dot gives the detail. Clicking a specimen opens that conversation. Clicking a letter, a tutor name, a version dot or a number opens the matching list.
 - **Compare** puts two setups side by side. Pick A and B; the page first lists what differs (tutor, tutor model, tutor prompt, tutor parameters, simulated student model and parameters, judge configuration, rules version), then compares the pass rates overall and per card and language, only on the card versions and languages both sides scored. A result is read as the effect of a change only when exactly one thing differs (another tutor counts as one change, its model included). When more than one thing differs, the page says the difference cannot be put down to any one of them.
 - **All conversations** is the full list, with state tabs and the run drawer. The drawer shows the conversation's own specimen, large; clicking a leaf scrolls to that tutor turn. Tabs for superseded and calibration runs appear when such runs are loaded.
-- **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate.
+- **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate. It lists each tutor's own prompt (name, version, start of its hash) and any parameters other than the defaults. When a model-version drift stops a batch and the same call also used up the budget, the drift is the status and the financial stop (`budgetStopReason`) is shown under it.
 
 ### How to read a specimen
 
@@ -42,15 +42,19 @@ Each conversation is drawn as one small plant, standing on the plate's ground li
 | Red leaf | The judges marked that turn as leaking the answer. |
 | Head | The outcome: a filled dot is good, a half dot is flawed, a cross is fail, a dashed ring still needs review. A head lifted off the stem means the student left. |
 
-Letters follow the tutor, never its rank: they are given in name order over all loaded evaluation runs, so a filter never reletters anyone.
+Letters follow the tutor, never its rank: they are given in order of each tutor's first run over all loaded evaluation runs, so a filter never reletters anyone, and a tutor added later takes the next letter.
 
 ### Setups
 
-A setup is everything a fair comparison holds fixed apart from the cards: tutor, tutor model, tutor prompt, tutor parameters, simulated student model and parameters, judge configuration and rules version. Cards are matched cell by cell instead. Per-language prompt hashes (the card's tutor setup, the judge prompt) are never part of a setup, because they would split one setup by language. The tutor prompt is read from `tutor.tutorPromptHash`, which the runner does not write yet; until it does, the tutor's system prompt comes from the card.
+A setup is everything a fair comparison holds fixed apart from the cards: tutor, tutor model, tutor prompt, tutor parameters, simulated student model and parameters, judge configuration and rules version. Cards are matched cell by cell instead. Parameters are compared by value, whatever order they were written in.
+
+The tutor prompt is the tutor's own teaching prompt (record schema v3). It is read from `tutor.tutorPromptHash`, one hash for the prompt's Chinese and English text together, so a prompt's runs in both languages are one setup. The page shows it by `tutorPromptId` and `tutorPromptVersion`. A record with no prompt of its own (every v1 and v2 record, and a v3 record whose tutor has none) has a null hash: its tutor's system prompt is the card's setup alone. Per-language hashes (`tutor.promptHash` of the text actually sent, the judge prompt) are never part of a setup, because they would split one setup by language.
+
+Another tutor counts as one change, its model included. Two tutor names for the same model, from the same developer and provider, are no change at all. A batch that runs a model with and without its own prompt needs two tutor names, and the prompt is then the only change.
 
 ### Tutor versions
 
-A tutor is its label. Its version is the model the provider reported (`resolvedModel`), else the pinned or requested model. The system prompt is not part of the version, because the runner takes the tutor's system prompt from the card. Versions are ordered by when each first appears among all loaded records, so running an old version again later does not make it the newest.
+A tutor is its label. Its version is the model the provider reported (`resolvedModel`), else the pinned or requested model. A version is the model only. The system prompt is not part of it, because it changes with the card and language, and neither is the tutor's own prompt: a new prompt is a change of setup, which Compare reads. Versions are ordered by when each first appears among all loaded records, so running an old version again later does not make it the newest.
 
 Plates I, II and III show each tutor's newest version in view. If a tutor's row still mixes setups (another simulated student, rules version, tutor prompt or parameters), Plate I says so and points to Compare. Plate III also uses the newest version. Older versions appear on Plate IV and in the list.
 
@@ -87,7 +91,9 @@ The page reports instead of trusting:
 - two different records with one `runId`
 - one card version with two content hashes
 - records whose batch file is missing
-- `index.jsonl` rows that disagree with the records, plus records missing from the index and index rows missing from `records/`. For v2 rows this includes `batchKind`, `reviewFlags` and `fixedTestSkipped`.
+- `index.jsonl` rows that disagree with the records, plus records missing from the index and index rows missing from `records/`. For v2 rows this includes `batchKind`, `reviewFlags` and `fixedTestSkipped`; for v3 rows, `tutorPromptId` and `tutorPromptVersion`. Rows without those fields still pass.
+- one tutor prompt id and version with two hashes
+- a record whose tutor prompt differs from the one its batch lists for that tutor
 - a `restartOf` that points to no loaded record, or two restarts of one record
 
 ## Files
@@ -120,14 +126,17 @@ The sample is produced by the premium runner itself, so it follows the runner's 
 - a rerun of Dune with a newer simulated student, so Compare shows a one-change result and Plate I warns about the mixed row
 - tutors with different prices and reply speeds (Dune cheap and fast, Cedar expensive and slow)
 - older tutor versions on the three cards that did not change: Birch improves at `birch-2026-09` and then clearly regresses at `birch-2026-10`; Atlas improves at `atlas-2026-11`, but within its error range
+- history and new records in one folder: the batches before 2026-11-25 are record schema v2, written by the older runner; the rest are v3, written by the newer runner into the same folder and ledger. Atlas's v2 pilot runs and its later v3 runs without a prompt are one setup.
+- a tutor prompt of its own: `synthetic-prompt-08` runs Atlas without a prompt beside the same model as *Atlas · coach* with `synthetic-coach` 1.0.0, in both languages; `synthetic-prompt-09` runs 1.1.0, which adds one sentence. Compare reads either pair as one change, the prompt.
+- a calibration batch stopped by model-version drift whose same call also used up the budget (`budgetStopReason`)
 
-Regenerating it needs a build that contains the premium runner with record schema v2 (`src/premium/`, added in PR #431):
+Regenerating it needs a build that contains the premium runner with record schema v3 (`src/premium/`, PR #431 at 0f6dfb1 or later). The bundled sample also passes `--legacy-runner`, a build with record schema v2 (PR #431 at 23cb0a5), for the history batches; without it, the newer runner writes every batch.
 
 ```sh
 npm run build
-node tools/premium-dashboard/sample/generate-sample.mjs --runner dist/src/premium
+node tools/premium-dashboard/sample/generate-sample.mjs --runner dist/src/premium --legacy-runner <v2 build>/dist/src/premium
 # optional: also write a runs folder to try "Open runs folder" (must be a new or empty folder)
-node tools/premium-dashboard/sample/generate-sample.mjs --runner dist/src/premium --out /tmp/premium-sample-runs
+node tools/premium-dashboard/sample/generate-sample.mjs --runner dist/src/premium --legacy-runner <v2 build>/dist/src/premium --out /tmp/premium-sample-runs
 ```
 
-The output is deterministic: the same runner gives the same file.
+The output is deterministic: the same runners give the same file.
