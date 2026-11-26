@@ -1,6 +1,8 @@
 // Data model for the premium runs dashboard. Pure functions only: no DOM, no network.
 // Loaded as a classic script in the page (works from file://) and imported by the Node tests.
 // Input is the premium runner's output: records/<runId>.json, batches/<batchId>.json, index.jsonl.
+// Record and batch schema v1 and v2 are both read. v2 adds calibration batches (status "unscored", never scored),
+// budget restarts (restartOf), review flags, fixedTestSkipped and cost reconciliation.
 (function (root) {
   "use strict";
 
@@ -8,6 +10,10 @@
   const BATCH_SCHEMA = "tutorbench.premium-batch";
   const VERDICTS = ["good", "flawed", "fail"];
   const ITEMS = ["correct", "readsState", "helpFit", "noLeak", "responds", "helpLevel"];
+  const SCHEMA_VERSIONS = [1, 2];
+  // States that are listed but never part of an evaluation: a calibration run checks the simulated student only,
+  // and a superseded run was interrupted by the budget and replaced by a restart.
+  const NOT_EVALUATION = ["calibration", "superseded"];
 
   function parseJsonl(text) {
     const rows = [];
@@ -30,6 +36,8 @@
   }
 
   const currentScoring = record => (Array.isArray(record.scorings) && record.scorings.length ? record.scorings[record.scorings.length - 1] : null);
+  const isCalibration = record => record.batchKind === "calibration" || record.status === "unscored";
+  const sameList = (a, b) => JSON.stringify(a || []) === JSON.stringify(b || []);
 
   // Builds one dataset from whatever the person loaded. Unknown files are reported, never trusted.
   function buildDataset(input) {
@@ -37,7 +45,7 @@
     const runs = new Map();
     const names = input.recordNames || [];
     (input.records || []).forEach((r, i) => {
-      if (!r || r.schema !== RECORD_SCHEMA || r.schemaVersion !== 1 || typeof r.runId !== "string") {
+      if (!r || r.schema !== RECORD_SCHEMA || !SCHEMA_VERSIONS.includes(r.schemaVersion) || typeof r.runId !== "string") {
         warnings.push({ code: "not_a_record", detail: r && r.runId ? r.runId : names[i] || "?" });
         return;
       }
@@ -65,6 +73,15 @@
     }
     for (const r of list) if (!batches.has(r.batchId)) warnings.push({ code: "batch_missing", detail: r.batchId });
 
+    // Budget restarts: the restarted record names the interrupted one, which stays on file but no longer counts.
+    const supersededBy = {};
+    for (const r of list) {
+      if (!r.restartOf) continue;
+      if (!runs.has(r.restartOf)) warnings.push({ code: "restart_target_missing", detail: r.runId });
+      else if (supersededBy[r.restartOf]) warnings.push({ code: "restarted_twice", detail: r.restartOf });
+      else supersededBy[r.restartOf] = r.runId;
+    }
+
     // Judge configurations in order of first use.
     const seen = new Map();
     for (const r of list) for (const s of r.scorings || []) {
@@ -80,40 +97,55 @@
         if (!r) { warnings.push({ code: "index_row_without_record", detail: row.runId }); continue; }
         const s = currentScoring(r);
         const status = s ? (s.merged && s.merged.verdict ? "scored" : "needs_review") : r.status;
-        if (row.status !== status || (row.scoringId ?? null) !== (s ? s.scoringId : null) || (row.verdict ?? null) !== (s && s.merged ? s.merged.verdict ?? null : null)) {
+        const m = s && s.merged;
+        // v2 rows also carry batchKind, reviewFlags and fixedTestSkipped; v1 rows do not, so only present fields are compared.
+        const v2Differs = ("batchKind" in row && row.batchKind !== (r.batchKind ?? "evaluation"))
+          || ("reviewFlags" in row && !sameList(row.reviewFlags, m && m.reviewFlags))
+          || ("fixedTestSkipped" in row && row.fixedTestSkipped !== !!(m && m.fixedTestSkipped));
+        if (v2Differs || row.status !== status || (row.scoringId ?? null) !== (s ? s.scoringId : null) || (row.verdict ?? null) !== (m ? m.verdict ?? null : null)) {
           warnings.push({ code: "index_out_of_date", detail: row.runId });
         }
       }
       const indexed = new Set(input.index.map(row => row.runId));
       for (const id of runs.keys()) if (!indexed.has(id)) warnings.push({ code: "record_not_in_index", detail: id });
     }
-    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, warnings };
+    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, warnings };
   }
 
   // The state a run counts as under the selected judge configuration.
   // Only the CURRENT scoring decides; an older scoring under another configuration never fills in.
-  function runView(record, selectedVersion, latestCard) {
+  // supersededBy is the dataset's map from an interrupted run to the run that replaced it.
+  function runView(record, selectedVersion, latestCard, supersededBy) {
     const s = currentScoring(record);
     const reason = record.end && record.end.reason;
     const view = {
       record, scoring: s, state: "needs_review", verdict: null, reasons: [], pending: [], reviewFlags: [],
-      withheldVerdict: null, scoringIncomplete: false, judgeErrors: [], disagreements: [],
+      withheldVerdict: null, fixedTestSkipped: false, scoringIncomplete: false, judgeErrors: [], judgeRepairs: [], disagreements: [],
       olderCard: latestCard ? record.card.version !== latestCard[record.card.id] : false,
       judgeVersion: s && s.judgeConfig ? s.judgeConfig.version : null,
+      calibration: isCalibration(record), supersededBy: (supersededBy && supersededBy[record.runId]) || null, restartOf: record.restartOf || null,
     };
+    if (view.calibration) { view.state = "calibration"; return view; }
+    if (view.supersededBy) { view.state = "superseded"; return view; }
     if (reason === "error" || record.status === "error") { view.state = "error"; return view; }
     if (reason === "student_invalid" || record.status === "student_invalid") { view.state = "student_invalid"; return view; }
     if (!s) { view.pending = ["no_scoring"]; view.scoringIncomplete = true; return view; }
     view.pending = Array.isArray(s.pending) ? s.pending.slice() : [];
     view.disagreements = Array.isArray(s.disagreements) ? s.disagreements : [];
     view.judgeErrors = (s.perJudge || []).filter(j => j.error || !j.output).map(j => ({ judgeId: j.judgeId, error: j.error || "no_output" }));
+    // v2: an invalid ballot is sent back to the same judge once; the rejected replies are kept.
+    view.judgeRepairs = (s.perJudge || []).filter(j => Array.isArray(j.rejected) && j.rejected.length)
+      .map(j => ({ judgeId: j.judgeId, reasons: j.rejected.map(x => x.reason), recovered: !!j.output }));
+    // v2 keeps a withheld rule verdict on the scoring (incomplete panel, merged is null); v1 kept it inside merged.
+    view.withheldVerdict = s.withheldRuleVerdict || null;
     // Scoring not finished: no merged result, or a judge in the panel gave no valid ballot.
     view.scoringIncomplete = !s.merged || view.pending.includes("incomplete_panel");
     const m = s.merged;
     if (m) {
       view.reasons = Array.isArray(m.reasons) ? m.reasons : [];
       view.reviewFlags = Array.isArray(m.reviewFlags) ? m.reviewFlags : [];
-      view.withheldVerdict = m.withheldRuleVerdict || null;
+      view.fixedTestSkipped = !!m.fixedTestSkipped;
+      view.withheldVerdict = view.withheldVerdict || m.withheldRuleVerdict || null;
     }
     if (selectedVersion && view.judgeVersion !== selectedVersion) { view.state = "other_version"; return view; }
     if (m && m.verdict && VERDICTS.includes(m.verdict) && !view.pending.length) { view.state = "scored"; view.verdict = m.verdict; }
@@ -121,23 +153,149 @@
   }
 
   // Formal pass rate: only runs in state "scored" under the selected configuration count.
-  // needs_review, error, student_invalid and runs scored under another configuration are listed, never counted.
+  // needs_review, error, student_invalid, runs scored under another configuration, calibration runs and superseded runs
+  // are listed, never counted.
+  // Wilson score interval for k passes out of n scored runs (95% by default). Unlike p ± z·se it stays inside 0..1
+  // and does not collapse to a point at 0% or 100%, which matters with the 5–15 runs a tutor usually has per view.
+  function wilson(k, n, z = 1.96) {
+    if (!n) return null;
+    const p = k / n, z2 = z * z, d = 1 + z2 / n;
+    const centre = (p + z2 / (2 * n)) / d;
+    const half = (z * Math.sqrt(p * (1 - p) / n + z2 / (4 * n * n))) / d;
+    return { lo: Math.max(0, centre - half), hi: Math.min(1, centre + half) };
+  }
+
   function summarize(views) {
     const t = { total: views.length, scored: 0, good: 0, flawed: 0, fail: 0, needsReview: 0, scoringIncomplete: 0,
-      otherVersion: 0, error: 0, studentInvalid: 0, passRate: null, goodRate: null, failRate: null };
+      otherVersion: 0, error: 0, studentInvalid: 0, calibration: 0, superseded: 0, passRate: null, passRange: null, goodRate: null, failRate: null };
     for (const v of views) {
       if (v.state === "scored") { t.scored++; t[v.verdict]++; }
       else if (v.state === "needs_review") { t.needsReview++; if (v.scoringIncomplete) t.scoringIncomplete++; }
       else if (v.state === "other_version") t.otherVersion++;
       else if (v.state === "error") t.error++;
       else if (v.state === "student_invalid") t.studentInvalid++;
+      else if (v.state === "calibration") t.calibration++;
+      else if (v.state === "superseded") t.superseded++;
     }
     if (t.scored) {
       t.passRate = (t.good + t.flawed) / t.scored;
+      t.passRange = wilson(t.good + t.flawed, t.scored);
       t.goodRate = t.good / t.scored;
       t.failRate = t.fail / t.scored;
     }
     return t;
+  }
+
+  // A tutor's version is the model the provider reported, else the pinned or requested one. The system prompt is not
+  // part of it: the runner takes the tutor's system prompt from the card, so it changes with the card and language.
+  function versionKey(record) {
+    const t = (record && record.tutor) || {};
+    return t.resolvedModel || t.pinnedVersion || t.requestedModel || "unknown";
+  }
+
+  // Every tutor's versions, oldest first by when each first appears in the given records. Pass all loaded records, so
+  // the order never depends on a filter, and running an old version again later does not make it the newest.
+  function tutorVersions(records) {
+    const out = new Map();
+    for (const r of records) {
+      const tutor = r && r.tutor && r.tutor.label;
+      if (!tutor) continue;
+      const key = versionKey(r), at = String(r.createdAt || "");
+      if (!out.has(tutor)) out.set(tutor, []);
+      const list = out.get(tutor), hit = list.find(x => x.key === key);
+      if (hit) { if (at < hit.firstAt) hit.firstAt = at; }
+      else list.push({ key, label: key, firstAt: at });
+    }
+    for (const list of out.values()) list.sort((a, b) => a.firstAt.localeCompare(b.firstAt) || a.key.localeCompare(b.key));
+    return out;
+  }
+
+  // The newest version of each tutor among the given views, by the order from tutorVersions.
+  function latestVersions(views, versions) {
+    const out = new Map();
+    for (const [tutor, group] of groupBy(views, v => v.record.tutor.label)) {
+      const keys = new Set(group.map(v => versionKey(v.record)));
+      const order = (versions.get(tutor) || []).filter(o => keys.has(o.key));
+      if (order.length) out.set(tutor, order[order.length - 1]);
+    }
+    return out;
+  }
+
+  // How each tutor's pass rate moved across its versions. Versions are compared only on the card versions and
+  // languages that every one of them has scored runs on, so a version is never judged on easier cards. The change is
+  // the newest version against the one before it, and it is called clear only when their 95% ranges do not overlap.
+  function versionTrend(views, versions) {
+    const cell = v => v.record.card.id + "@" + v.record.card.version + "/" + v.record.card.lang;
+    const out = [];
+    for (const [tutor, group] of groupBy(views, v => v.record.tutor.label)) {
+      const present = (versions.get(tutor) || []).filter(o => group.some(v => versionKey(v.record) === o.key));
+      if (present.length < 2) continue;
+      const byVersion = present.map(o => group.filter(v => versionKey(v.record) === o.key));
+      const sets = byVersion.map(list => new Set(list.filter(v => v.state === "scored").map(cell)));
+      const common = new Set([...sets[0]].filter(k => sets.every(s => s.has(k))));
+      const points = present.map((o, i) => {
+        const runs = byVersion[i].filter(v => common.has(cell(v)));
+        return { key: o.key, label: o.label, firstAt: o.firstAt, runs, total: byVersion[i].length, s: summarize(runs) };
+      });
+      const [prev, last] = points.slice(-2);
+      const delta = prev.s.passRate != null && last.s.passRate != null ? last.s.passRate - prev.s.passRate : null;
+      const clear = delta != null && (last.s.passRange.lo > prev.s.passRange.hi || last.s.passRange.hi < prev.s.passRange.lo);
+      out.push({ tutor, points, cells: common.size, delta, clear });
+    }
+    return out;
+  }
+
+  // The parts of a run's setup that a fair comparison holds fixed. Cards are not a part: they are matched cell by cell
+  // (card version and language). Today the tutor's system prompt comes from the card; a prompt of the tutor's own is
+  // read from tutor.tutorPromptHash once the runner records one. Per-language or per-card prompt hashes are never parts:
+  // they would split one setup by language.
+  const SETUP_PARTS = ["tutor", "tutorModel", "tutorPrompt", "tutorParams", "studentModel", "studentParams", "judgeConfig", "rules"];
+  function setupOf(v) {
+    const r = v.record, t = r.tutor || {}, s = r.student || {}, jc = v.scoring && v.scoring.judgeConfig;
+    return {
+      tutor: t.label || "unknown",
+      tutorModel: versionKey(r),
+      tutorPrompt: t.tutorPromptHash || null,
+      tutorParams: JSON.stringify(t.params || null),
+      studentModel: s.resolvedModel || s.pinnedVersion || s.requestedModel || null,
+      studentParams: JSON.stringify(s.params || null),
+      // The judge prompt differs by language, so the configuration's version names it, not the prompt hash.
+      judgeConfig: jc ? jc.version || null : null,
+      rules: (r.card && r.card.rulesVersion) || null,
+    };
+  }
+  const setupKey = v => { const s = setupOf(v); return SETUP_PARTS.map(p => String(s[p])).join("\u0001"); };
+
+  // The distinct setups among the views, each with its runs, in tutor order and then by first run.
+  function setups(views) {
+    return [...groupBy(views, setupKey)].map(([key, group]) => {
+      const times = group.map(v => String(v.record.createdAt || "")).sort();
+      return { key, setup: setupOf(group[0]), views: group, firstAt: times[0], lastAt: times[times.length - 1], batches: [...new Set(group.map(v => v.record.batchId))].sort() };
+    }).sort((a, b) => a.setup.tutor.localeCompare(b.setup.tutor) || a.firstAt.localeCompare(b.firstAt));
+  }
+
+  // Compare setup B against setup A. First say what differs; a result can be read as the effect of one change only when
+  // exactly one part differs (another tutor counts as one change, its model included). Runs are matched on the card
+  // versions and languages both sides scored, and a change is clear only when the 95% ranges do not overlap.
+  function compareSetups(a, b) {
+    const valuesOf = (list, part) => [...new Set(list.map(v => String(setupOf(v)[part])))];
+    const diff = [], mixed = [];
+    for (const part of SETUP_PARTS) {
+      const va = valuesOf(a, part), vb = valuesOf(b, part);
+      if (va.length > 1) mixed.push({ side: "a", part, values: va });
+      if (vb.length > 1) mixed.push({ side: "b", part, values: vb });
+      if (va.join("|") !== vb.join("|")) diff.push({ part, a: va.join(", "), b: vb.join(", ") });
+    }
+    const changes = diff.filter(d => !(d.part === "tutorModel" && diff.some(x => x.part === "tutor"))).length;
+    const cell = v => v.record.card.id + "@" + v.record.card.version + "/" + v.record.card.lang;
+    const scoredCells = list => new Set(list.filter(v => v.state === "scored").map(cell));
+    const ca = scoredCells(a), cb = scoredCells(b);
+    const common = new Set([...ca].filter(k => cb.has(k)));
+    const sa = summarize(a.filter(v => common.has(cell(v)))), sb = summarize(b.filter(v => common.has(cell(v))));
+    const delta = sa.passRate != null && sb.passRate != null ? sb.passRate - sa.passRate : null;
+    const clear = delta != null && (sb.passRange.lo > sa.passRange.hi || sb.passRange.hi < sa.passRange.lo);
+    const byCell = [...common].sort().map(k => ({ cell: k, a: summarize(a.filter(v => cell(v) === k)), b: summarize(b.filter(v => cell(v) === k)) }));
+    return { diff, changes, mixed, cells: common.size, a: sa, b: sb, delta, clear, byCell };
   }
 
   const tutorTurn = (record, turn) => (record.transcript || []).find(m => m.role === "tutor" && m.turn === turn) || null;
@@ -145,10 +303,10 @@
   // Evidence for a deterministic failure: what a reviewer needs to confirm it without rereading the whole run.
   function failureEvidence(view) {
     const { record, scoring } = view;
-    if (!scoring || !scoring.merged) return [];
-    const m = scoring.merged;
+    // A v2 withheld verdict has no merged result (incomplete panel), so only record-based evidence exists for it.
+    const m = (scoring && scoring.merged) || { reasons: [] };
     const failing = view.verdict === "fail" || view.withheldVerdict === "fail";
-    if (!failing) return [];
+    if (!scoring || !failing) return [];
     const out = [];
     if ((m.reasons || []).includes("leak")) {
       for (const turn of m.leakTurns || []) {
@@ -213,10 +371,61 @@
     return { runsWith, total, byJudge, byItem };
   }
 
+  // Costs are the runner's price-table estimates. A v2 call with no usage from the provider is charged at its
+  // reservation and marked costEstimated; those calls are counted so the page can say so.
   function costs(record) {
     const run = record.usage ? record.usage.totalUsd : null;
     const rescoring = (record.scorings || []).slice(1).map(s => ({ scoringId: s.scoringId, usd: s.usage ? s.usage.totalUsd : null }));
-    return { run, rescoring };
+    const calls = [...(record.calls || []), ...(record.scorings || []).slice(1).flatMap(s => s.calls || [])];
+    return { run, rescoring, estimatedCalls: calls.filter(c => c && c.costEstimated === true).length };
+  }
+
+  function median(xs) {
+    if (!xs.length) return null;
+    const s = [...xs].sort((a, b) => a - b), m = s.length >> 1;
+    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  }
+  const tutorCalls = record => (record.calls || []).filter(c => c && c.role === "tutor" && !c.error);
+
+  // What the tested tutor itself cost in one run, and how long each of its replies took. Only tutor calls count: the
+  // simulated student and the judges are the benchmark's own cost. Tokens are not compared, because each model's
+  // tokenizer counts the same text differently; dollars and seconds are comparable.
+  function tutorEconomy(record) {
+    const calls = tutorCalls(record);
+    const fromUsage = record.usage && record.usage.tutor && typeof record.usage.tutor.usd === "number" ? record.usage.tutor.usd : null;
+    const summed = calls.length && calls.every(c => typeof c.usd === "number") ? calls.reduce((a, c) => a + c.usd, 0) : null;
+    const latencies = calls.map(c => c.latencyMs).filter(x => typeof x === "number" && x >= 0);
+    return { usd: fromUsage ?? summed, replies: calls.length, latencies, estimated: calls.some(c => c.costEstimated === true) };
+  }
+
+  // A group's typical tutor cost per conversation and wait per reply, as medians so one long run does not dominate.
+  function economyOf(views) {
+    const per = views.map(v => tutorEconomy(v.record));
+    const usd = per.map(p => p.usd).filter(x => x != null);
+    const waits = per.flatMap(p => p.latencies);
+    return { runs: views.length, priced: usd.length, usdPerRun: median(usd), replies: waits.length, latencyMs: median(waits),
+      estimated: per.filter(p => p.estimated).length };
+  }
+
+  // A batch as the page shows it. v1 batches have no kind, hard cap, top-ups or reconciliation.
+  function batchInfo(b) {
+    const runs = b.runs || {};
+    const history = Array.isArray(b.reconciliationHistory) ? b.reconciliationHistory : [];
+    const reconciled = Object.entries(b.reconciledUsd || {}).map(([provider, actualUsd]) => {
+      const last = history.filter(h => h.provider === provider).slice(-1)[0] || null;
+      const estimatedUsd = last && typeof last.estimated === "number" ? last.estimated : null;
+      return { provider, actualUsd, estimatedUsd, diffUsd: estimatedUsd == null ? null : Math.round((actualUsd - estimatedUsd) * 1e9) / 1e9,
+        reason: last ? last.reason || "" : "", at: last ? last.at || null : null };
+    }).sort((a, c) => a.provider.localeCompare(c.provider));
+    return {
+      batchId: b.batchId, kind: b.kind || "evaluation", status: b.status || null, createdAt: b.createdAt || null,
+      planned: b.planned ?? runs.planned ?? null,
+      done: (runs.scored || 0) + (runs.error || 0) + (runs.studentInvalid || 0) + (runs.needsReview || 0) + (runs.unscored || 0),
+      superseded: runs.superseded || 0,
+      spentUsd: b.spentUsd ?? null, budgetUsd: b.budgetUsd ?? null, hardCapUsd: b.hardCapUsd ?? null, hardCapReached: b.hardCapReached === true,
+      topUps: Array.isArray(b.budgetHistory) ? b.budgetHistory.map(h => ({ at: h.at || null, from: h.from ?? null, to: h.to ?? null })) : [],
+      reconciled,
+    };
   }
 
   function groupBy(views, key) {
@@ -229,7 +438,7 @@
     return out;
   }
 
-  const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, failureEvidence,
-    studentChecks, disagreementSummary, costs, groupBy, itemOf, VERDICTS, ITEMS };
+  const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, wilson, versionKey, tutorVersions, latestVersions, versionTrend, SETUP_PARTS, setupOf, setups, compareSetups, failureEvidence,
+    studentChecks, disagreementSummary, costs, tutorEconomy, economyOf, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION };
   root.PremiumDashboardModel = api;
 })(globalThis);
