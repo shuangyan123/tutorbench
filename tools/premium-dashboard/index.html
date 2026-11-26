@@ -179,13 +179,14 @@ select { border: 1px solid var(--rule-strong); background: var(--sheet); border-
 
 /* Plate I: who teaches well */
 .tutors { display: grid; gap: 34px; }
-.tutor { display: grid; grid-template-columns: minmax(0, 13em) 4.4em minmax(0, 1fr); gap: 32px; align-items: end; }
-.tutor .who { display: flex; gap: 12px; align-items: center; text-align: left; border: 0; background: none; padding: 0 0 4px; border-radius: 0; min-width: 0; }
+/* The name and the rate stand on the ground of the first line of specimens, also when a long row wraps. */
+.tutor { display: grid; grid-template-columns: minmax(0, 13em) 4.4em minmax(0, 1fr); gap: 32px; align-items: start; }
+.tutor .who { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: center; align-content: end; min-height: var(--sph); text-align: left; border: 0; background: none; padding: 0 0 4px; border-radius: 0; min-width: 0; }
 .tkey { flex: none; width: 24px; height: 24px; border: 1px solid var(--ink-2); border-radius: 50%; display: inline-grid; place-items: center; font-family: var(--display); font-size: 13px; line-height: 1; color: var(--ink); }
 .tutor .name { display: grid; gap: 1px; min-width: 0; }
 .tutor .name strong { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
 .tutor .who:hover strong { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
-.tutor .rate { display: grid; justify-items: end; gap: 9px; padding-bottom: 2px; }
+.tutor .rate { display: grid; justify-items: end; align-content: end; min-height: var(--sph); gap: 9px; padding-bottom: 2px; }
 .tutor .rate .num { font-family: var(--display); font-size: 46px; font-weight: 400; line-height: .9; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
 .ci { display: block; width: 64px; height: 10px; overflow: visible; }
 .ci line { vector-effect: non-scaling-stroke; }
@@ -234,9 +235,14 @@ select { border: 1px solid var(--rule-strong); background: var(--sheet); border-
 .drow.differs { color: var(--ink); }
 .drow.differs .dpart { font-weight: 600; }
 .drow.differs .dpart::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: middle; }
+.drow.differs.name-only { color: var(--ink-3); }
+.drow.differs.name-only .dpart { font-weight: 400; }
+/* Differs, but not counted as a change: a hollow dot. */
+.drow.differs.name-only .dpart::before { background: transparent; box-shadow: inset 0 0 0 1px var(--accent); }
 .dval { overflow-wrap: anywhere; min-width: 0; }
 .cmp-verdict { display: flex; flex-wrap: wrap; gap: 14px 40px; align-items: center; padding: 18px 0; border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); }
-.cmp-verdict .tdelta { justify-items: start; text-align: left; }
+/* The delta's grid-area belongs to the trend panels; here it must not open an implicit track on phones. */
+.cmp-verdict .tdelta { grid-area: auto; justify-items: start; text-align: left; }
 .cmp-notes { display: grid; gap: 4px; min-width: 0; flex: 1; }
 .cmp-notes p { margin: 0; font-size: 14px; max-width: 62ch; }
 .cmp-verdict.unsure .tdelta .d { color: var(--ink-3); }
@@ -370,7 +376,7 @@ svg text { fill: var(--ink-2); font-family: var(--font); font-size: 11px; }
 
 @media (max-width: 860px) {
   .tutor { grid-template-columns: 4em minmax(0, 1fr); gap: 10px 20px; }
-  .tutor .who { grid-column: 1 / -1; }
+  .tutor .who { grid-column: 1 / -1; min-height: 0; }
 }
 @media (max-width: 560px) {
   .page { padding-block: 28px 64px; gap: 24px; }
@@ -380,7 +386,7 @@ svg text { fill: var(--ink-2); font-family: var(--font); font-size: 11px; }
   .sec { padding: 34px 22px 40px; gap: 26px; }
   .tutor { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "who rate" "field field"; gap: 12px 16px; align-items: center; }
   .tutor .who { grid-area: who; grid-column: auto; }
-  .tutor .rate { grid-area: rate; }
+  .tutor .rate { grid-area: rate; min-height: 0; }
   .tutor .field { grid-area: field; }
   .tutor .rate .num, .ask .n { font-size: 34px; }
   .tutor .rate small { font-size: 14px; }

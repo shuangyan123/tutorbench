@@ -49,11 +49,12 @@
       supersededNote: "预算中断了这段对话，追加预算后已经重跑。这份记录留着备查，不计入。", openSuccessor: "看重跑的那段",
       restartNote: "这是预算中断后的重跑，替代了被打断的那段。", openPredecessor: "看被打断的那段",
       fixedTestSkipped: "考验之前就拿到答案离开", judgeRepaired: "{j} 第一次输出无效，补调 1 次后有效：{r}", judgeRepairFailed: "{j} 补调后仍然无效：{r}",
-      estimatedCalls: "其中 {n} 次调用没有返回用量，按预留额计", hardCap: "硬上限 {v}", hardCapReached: "已到硬上限",
+      estimatedCalls: "其中 {n} 次调用没有返回用量，按预留额计", hardCap: "硬上限 {v}", hardCapReached: "已到硬上限", alsoStopped: "同一次调用也停在：{r}",
+      cmpNameOnly: "两边导师名字不同，但开发方、服务方和模型都一样，名字不算一项改动。", cmpSameNamed: "除了导师名字，两边是同一套配置。", noPrompt: "无导师 prompt",
       topUp: "追加预算 {from} → {to}", reconciled: "{p} 账单 {a}，估算 {e}，差 {d}", supersededRuns: "被替代 {n}",
     },
     en: {
-      viewOverview: "Overview", viewCompare: "Compare", viewRuns: "All conversations", compareTitle: "Two setups: what differs, which is better", compareNote: "Pick two setups. The page first lists what differs, then compares only on the cards both ran.", sideA: "A (baseline)", sideB: "B (compared)", swap: "Swap A and B", diffTitle: "What differs", partSame: "same", part_tutor: "Tutor", part_tutorModel: "Tutor model", part_tutorPrompt: "Tutor prompt", part_tutorParams: "Tutor parameters", part_studentModel: "Simulated student model", part_studentParams: "Simulated student parameters", part_judgeConfig: "Judge configuration", part_rules: "Rules version", promptFromCard: "comes from the card", cmpSame: "Both sides are the same setup. Pick two different ones.", cmpOne: "Only one thing changed: {p}", cmpMany: "{n} things changed: {p}. The difference cannot be put down to any one of them; read it as a guide.", cmpMixed: "{s} mixes more than one {p}; use the filters at the top to separate them.", cmpNoCells: "The two sides never ran the same cards, so they cannot be compared.", cmpBvsA: "points · B against A", cmpCells: "Compared on the {n} card–language pairs both sides ran", cmpOverall: "All", setupOption: "{t} · {m} · student {s} · {n} runs · {d}", cmpNone: "Comparing needs at least two setups with scored runs.", mixedRow: "{t} mixes runs with different {p}; Compare can separate them.", viewChecks: "Run checks", allBatches: "all batches", allLangs: "both languages", latestShort: "latest cards", changeFilters: "Change", doneFilters: "Done",
+      viewOverview: "Overview", viewCompare: "Compare", viewRuns: "All conversations", compareTitle: "Two setups: what differs, which is better", compareNote: "Pick two setups. The page first lists what differs, then compares only on the cards both ran.", sideA: "A (baseline)", sideB: "B (compared)", swap: "Swap A and B", diffTitle: "What differs", partSame: "same", part_tutor: "Tutor", part_tutorModel: "Tutor model", part_tutorPrompt: "Tutor prompt", part_tutorParams: "Tutor parameters", part_studentModel: "Simulated student model", part_studentParams: "Simulated student parameters", part_judgeConfig: "Judge configuration", part_rules: "Rules version", promptFromCard: "comes from the card", cmpSame: "Both sides are the same setup. Pick two different ones.", cmpOne: "Only one thing changed: {p}", cmpMany: "{n} things changed: {p}. The difference cannot be put down to any one of them; read it as a guide.", cmpMixed: "{s} mixes more than one {p}; use the filters at the top to separate them.", cmpNoCells: "The two sides never ran the same cards, so they cannot be compared.", cmpBvsA: "points · B against A", cmpCells: "Compared on the {n} card–language pairs both sides ran", cmpOverall: "All", setupOption: "{t} · {m} · student {s} · {n} runs · {d}", cmpNone: "Comparing needs at least two setups with scored runs.", mixedRow: "{t} mixes runs from more than one {p}; Compare can separate them.", viewChecks: "Run checks", allBatches: "all batches", allLangs: "both languages", latestShort: "latest cards", changeFilters: "Change", doneFilters: "Done",
       kicker: "Teachometry · TutorBench premium set", chartTutors: "Who teaches well", chartCards: "Which cards separate the tutors", legendPending: "Needs review (not counted)",
       plate: "Plate {n}", keyHead: "Head", keyHeadIs: "outcome", keyStem: "Stem", keyStemIs: "one node per tutor turn", keyLeaf: "Leaf", keyLeafIs: "help level that turn, 0–3",
       keyRed: "Red leaf", keyRedIs: "that turn leaked the answer", turnsN: "{n} turns", spreadNote: "Letters are tutors, placed at their pass rate on this card. A small dashed ring means some of its runs on this card still need review.", spreadCol: "Spread", unratedN: "{n} not scored",
@@ -95,14 +96,15 @@
       supersededNote: "The budget interrupted this conversation and it was restarted after a top-up. This record is kept for the audit and not counted.", openSuccessor: "Open the restart",
       restartNote: "This is a restart after a budget interruption. It replaces the interrupted run.", openPredecessor: "Open the interrupted run",
       fixedTestSkipped: "Left with the answer before the fixed test", judgeRepaired: "{j} gave an invalid ballot, valid after one retry: {r}", judgeRepairFailed: "{j} still invalid after a retry: {r}",
-      estimatedCalls: "{n} calls returned no usage and are charged at their reservation", hardCap: "hard cap {v}", hardCapReached: "hard cap reached",
+      estimatedCalls: "{n} calls returned no usage and are charged at their reservation", hardCap: "hard cap {v}", hardCapReached: "hard cap reached", alsoStopped: "the same call also stopped it: {r}",
+      cmpNameOnly: "The tutor names differ, but the developer, provider and model are the same; a name is not a change.", cmpSameNamed: "Apart from the tutor's name, both sides are the same setup.", noPrompt: "no tutor prompt",
       topUp: "budget topped up {from} → {to}", reconciled: "{p} invoice {a}, estimate {e}, difference {d}", supersededRuns: "{n} superseded",
     },
   };
   const CODES = {
     zh: {
       not_a_record: "不是 runner 的对话记录，已跳过", not_a_batch: "不是 runner 的批次文件，已跳过", duplicate_run_differs: "同一 runId 有两份不同的记录，只用了第一份",
-      card_hash_conflict: "同一卡片版本出现了两个内容哈希", batch_missing: "记录指向的批次文件不在文件夹里", index_out_of_date: "index.jsonl 和记录对不上（重新生成 index）",
+      card_hash_conflict: "同一卡片版本出现了两个内容哈希", tutor_prompt_conflict: "同一导师 prompt 版本出现了两个哈希", prompt_batch_mismatch: "记录里的导师 prompt 和批次登记的不一样", batch_missing: "记录指向的批次文件不在文件夹里", index_out_of_date: "index.jsonl 和记录对不上（重新生成 index）",
       index_row_without_record: "index.jsonl 里有、records/ 里没有", record_not_in_index: "records/ 里有、index.jsonl 里没有", unreadable_file: "文件读不了，已跳过",
       incomplete_panel: "评审小组不完整", unsolved_early_exit: "没做出来就结束，原因待定", unsolved_at_cap: "15 轮没做出来，多数评审不认为是导师的责任",
       fixed_test_skip_evidence: "考验前拿到答案离开，要核对泄露证据", transfer_protocol: "导师出了迁移题（协议决定 §4 已取消这条待审）", no_scoring: "没有评分",
@@ -127,7 +129,7 @@
     },
     en: {
       not_a_record: "not a runner conversation record, skipped", not_a_batch: "not a runner batch file, skipped", duplicate_run_differs: "two different records share one runId; the first was used",
-      card_hash_conflict: "one card version has two content hashes", batch_missing: "a record points to a batch file that is not in the folder", index_out_of_date: "index.jsonl does not match the records (rebuild the index)",
+      card_hash_conflict: "one card version has two content hashes", tutor_prompt_conflict: "one tutor prompt version has two hashes", prompt_batch_mismatch: "the record's tutor prompt differs from the one its batch lists", batch_missing: "a record points to a batch file that is not in the folder", index_out_of_date: "index.jsonl does not match the records (rebuild the index)",
       index_row_without_record: "in index.jsonl but not in records/", record_not_in_index: "in records/ but not in index.jsonl", unreadable_file: "file could not be read, skipped",
       incomplete_panel: "incomplete judge panel", unsolved_early_exit: "ended unsolved, cause undecided", unsolved_at_cap: "unsolved after 15 turns, most judges do not blame the tutor",
       fixed_test_skip_evidence: "left with the answer before the fixed test; check the leak evidence", transfer_protocol: "tutor gave a transfer problem (dropped by protocol decision §4)", no_scoring: "no scoring",
@@ -459,9 +461,11 @@
     return [...M.groupBy(vs, v => v.record.tutor.label)].map(([tutor, group]) => ({ tutor, group, g: M.summarize(group) }))
       .sort((a, b) => (b.g.passRate ?? -1) - (a.g.passRate ?? -1) || b.g.scored - a.g.scored || a.tutor.localeCompare(b.tutor));
   }
-  // A letter per tutor, shared by both plates. It follows the tutor, never its rank, so filters never reletter anyone.
+  // A letter per tutor, shared by all plates. It follows the tutor, never its rank, so filters never reletter anyone. Tutors
+  // are lettered in order of their first run, so a tutor added later (say, the same model with a prompt of its own) takes
+  // the next letter instead of relettering the others.
   function tutorKeys() {
-    const names = [...new Set(st.dataset.runs.filter(r => !r.batchKind || r.batchKind !== "calibration").map(r => r.tutor.label))].sort();
+    const names = [...new Set(st.dataset.runs.filter(r => !r.batchKind || r.batchKind !== "calibration").map(r => r.tutor.label))];
     const letter = i => (i < 26 ? "" : String.fromCharCode(65 + Math.floor(i / 26) - 1)) + String.fromCharCode(65 + (i % 26));
     return new Map(names.map((n, i) => [n, letter(i)]));
   }
@@ -519,7 +523,7 @@
     const mixed = rows.map(r => {
       const counted = r.group.filter(v => v.state === "scored");
       const parts = ["tutorPrompt", "tutorParams", "studentModel", "studentParams", "rules"].filter(p => new Set(counted.map(v => String(M.setupOf(v)[p]))).size > 1);
-      return parts.length ? t("mixedRow", { t: r.tutor, p: parts.map(p => t("part_" + p)).join(st.lang === "zh" ? "、" : ", ") }) : null;
+      return parts.length ? t("mixedRow", { t: r.tutor, p: parts.map(partInText).join(st.lang === "zh" ? "、" : ", ") }) : null;
     }).filter(Boolean);
     const foot = [rows.some(r => r.g.passRange) ? t("ciNote") : null, olderHidden ? t("olderNote") : null, ...mixed].filter(Boolean);
     if (foot.length) box.append(el("p", { class: "plate-foot", text: foot.join(st.lang === "zh" ? "" : " ") }));
@@ -645,9 +649,18 @@
 
   // Compare: two setups side by side. What differs comes first, because a result only means something when exactly one
   // thing changed. Runs are matched on the card versions and languages both sides scored (see M.compareSetups).
+  // A setup part's name inside a sentence: lower case in English ("mixes more than one tutor prompt").
+  const partInText = part => (st.lang === "zh" ? t("part_" + part) : t("part_" + part).toLowerCase());
   const shortHash = x => String(x).replace(/sha256:([0-9a-f]{8})[0-9a-f]+/g, "$1");
+  // A tutor prompt by its name and version, with the start of its hash (the hash is what the comparison uses).
+  function promptName(hash) {
+    if (!hash || hash === "null") return null;
+    const p = ((st.dataset && st.dataset.tutorPrompts) || []).find(x => x.hash === hash);
+    return (p && p.id ? p.id + " " + (p.version || "") + " · " : "") + shortHash(hash);
+  }
   function partValue(part, value) {
     if (part === "tutorPrompt" && (value === "null" || value == null)) return t("promptFromCard");
+    if (part === "tutorPrompt") return promptName(value);
     if (/Params$/.test(part)) { try { const o = JSON.parse(value); return o ? Object.entries(o).map(([k, v]) => k + "=" + v).join(", ") : "—"; } catch { return value; } }
     return value === "null" || value == null ? "—" : shortHash(value);
   }
@@ -663,7 +676,7 @@
       const most = [...byTutor.values()].sort((a, b) => b.length - a.length)[0];
       [st.cmpA, st.cmpB] = most.length > 1 ? [most[most.length - 2].key, most[most.length - 1].key] : [keys[0], keys[1]];
     }
-    const option = g => [g.key, t("setupOption", { t: g.setup.tutor, m: g.setup.tutorModel, s: g.setup.studentModel || "—", n: g.views.filter(v => v.state === "scored").length,
+    const option = g => [g.key, t("setupOption", { t: g.setup.tutor, m: g.setup.tutorModel + (g.setup.tutorPrompt ? " · " + promptName(g.setup.tutorPrompt) : ""), s: g.setup.studentModel || "—", n: g.views.filter(v => v.state === "scored").length,
       d: whenShort(g.firstAt).split(/[ ,]/)[0] + (g.firstAt.slice(0, 10) !== g.lastAt.slice(0, 10) ? "–" + whenShort(g.lastAt).split(/[ ,]/)[0] : "") })];
     const rerender = () => { clear(box); renderCompare(vs); };
     box.append(el("div", { class: "pickers" },
@@ -677,7 +690,8 @@
     const differs = new Set(c.diff.map(d => d.part));
     const rows = [...M.SETUP_PARTS].sort((x, y) => (differs.has(y) ? 1 : 0) - (differs.has(x) ? 1 : 0)).map(part => {
       const a = partValue(part, String(M.setupOf(A.views[0])[part])), b = partValue(part, String(M.setupOf(B.views[0])[part]));
-      return el("div", { class: "drow" + (differs.has(part) ? " differs" : ""), role: "row" },
+      const nameOnly = c.diff.some(x => x.part === part && x.nameOnly);
+      return el("div", { class: "drow" + (differs.has(part) ? " differs" : "") + (nameOnly ? " name-only" : ""), role: "row" },
         el("span", { class: "dpart", role: "rowheader", text: t("part_" + part) }),
         el("span", { class: "dval mono", role: "cell", text: a }),
         el("span", { class: "dval mono", role: "cell", text: differs.has(part) ? b : t("partSame") }));
@@ -686,21 +700,23 @@
       el("div", { class: "dtable", role: "table" }, el("div", { class: "drow head", role: "row" }, el("span", { role: "columnheader" }), el("span", { role: "columnheader", text: "A" }), el("span", { role: "columnheader", text: "B" })), rows)));
 
     // The verdict.
-    const names = c.diff.filter(d => !(d.part === "tutorModel" && differs.has("tutor"))).map(d => t("part_" + d.part)).join("、");
+    const names = c.diff.filter(d => !d.nameOnly && !(d.part === "tutorModel" && differs.has("tutor"))).map(d => t("part_" + d.part)).join(st.lang === "zh" ? "、" : ", ");
     const notes = [];
     if (!c.diff.length) notes.push(t("cmpSame"));
+    else if (!c.changes) notes.push(t("cmpSameNamed"));
     else if (c.changes === 1) notes.push(t("cmpOne", { p: names }));
     else notes.push(t("cmpMany", { n: c.changes, p: names }));
-    for (const m of c.mixed) notes.push(t("cmpMixed", { s: m.side.toUpperCase(), p: t("part_" + m.part) }));
+    if (c.nameOnly && c.changes) notes.push(t("cmpNameOnly"));
+    for (const m of c.mixed) notes.push(t("cmpMixed", { s: m.side.toUpperCase(), p: partInText(m.part) }));
     if (c.diff.length && !c.cells) notes.push(t("cmpNoCells"));
     const d = c.delta, sign = d == null ? "" : d > 0 ? "+" : d < 0 ? "−" : "±";
     const verdict = el("div", { class: "cmp-verdict" + (c.changes > 1 || c.mixed.length ? " unsure" : "") },
-      c.diff.length && c.cells ? el("div", { class: "tdelta" + (c.clear && c.changes === 1 && !c.mixed.length ? (d < 0 ? " down" : " up") : "") },
+      c.changes && c.cells ? el("div", { class: "tdelta" + (c.clear && c.changes === 1 && !c.mixed.length ? (d < 0 ? " down" : " up") : "") },
         el("span", { class: "d", text: d == null ? "—" : sign + Math.abs(Math.round(d * 100)) }),
         el("span", { class: "u" }, t("cmpBvsA"), el("br"), c.clear ? t("sigClear") : t("sigNoise"))) : null,
       el("div", { class: "cmp-notes" }, notes.map(n => el("p", { text: n }))));
     box.append(verdict);
-    if (!c.diff.length || !c.cells) return;
+    if (!c.changes || !c.cells) return;
 
     // Overall and per card–language: A and B as letters on a 0–100% track, joined by a hairline.
     const chart = el("div", { class: "spread cmp", role: "table", "aria-label": t("cmpCells", { n: c.cells }) });
@@ -815,7 +831,11 @@
           return el("tr", null, el("td", null,
             el("div", null, el("span", { class: "mono", text: b.batchId }), b.kind === "calibration" ? el("span", { class: "tag", style: "margin-left:8px", text: t("calibration") }) : null),
             el("div", { class: "small faint", text: money }),
+            b.tutorSetups.map(x => el("div", { class: "small faint", "data-tip": x.prompt && x.prompt.hash ? x.prompt.hash : null,
+              text: x.tutor + ": " + [x.prompt ? (x.prompt.id + " " + x.prompt.version + (x.prompt.hash ? " · " + shortHash(x.prompt.hash) : "")) : null,
+                x.params ? Object.entries(x.params).map(([k, v]) => k + "=" + v).join(", ") : null].filter(Boolean).join(" · ") })),
             b.hardCapReached ? el("div", { class: "small stopped", text: "✕ " + t("hardCapReached") }) : null,
+            b.alsoStopped ? el("div", { class: "small stopped", text: "✕ " + t("alsoStopped", { r: code(b.alsoStopped) }) }) : null,
             b.topUps.map(x => el("div", { class: "small faint", text: t("topUp", { from: usd(x.from), to: usd(x.to) }) })),
             b.reconciled.map(x => el("div", { class: "small faint", "data-tip": x.reason || null, text: t("reconciled", { p: x.provider, a: usd(x.actualUsd), e: usd(x.estimatedUsd), d: usdDiff(x.diffUsd) }) }))),
             el("td", { class: (stopped ? "stopped" : "muted"), text: (stopped ? "✕ " : "") + code(b.status) }),
@@ -863,6 +883,7 @@
       el("div", { class: "ids" }, el("span", { class: "kicker", text: r.batchId }), el("h2", { id: "drawer-title", text: r.tutor.label + " · " + r.card.id }),
         el("span", { class: "small muted" }, r.card.lang + " · " + t("repeatOf", { i: r.repeat.index, n: r.repeat.of }) + " · " + when(r.createdAt)),
         el("span", { class: "mono muted" }, r.card.id + "@" + r.card.version + (v.olderCard ? " (" + t("olderCard") + ")" : "") + " · " + String(r.card.contentHash).slice(0, 19) + "…"),
+        el("span", { class: "mono muted" }, [M.versionKey(r), r.tutor.tutorPromptHash ? promptName(r.tutor.tutorPromptHash) : t("noPrompt")].join(" · ")),
         el("span", { class: "mono muted" }, t("runId") + " " + r.runId)),
       el("button", { type: "button", onclick: closeDrawer, id: "drawer-close" }, t("close"))));
 

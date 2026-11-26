@@ -1,8 +1,10 @@
 // Data model for the premium runs dashboard. Pure functions only: no DOM, no network.
 // Loaded as a classic script in the page (works from file://) and imported by the Node tests.
 // Input is the premium runner's output: records/<runId>.json, batches/<batchId>.json, index.jsonl.
-// Record and batch schema v1 and v2 are both read. v2 adds calibration batches (status "unscored", never scored),
-// budget restarts (restartOf), review flags, fixedTestSkipped and cost reconciliation.
+// Record schema v1, v2 and v3 are all read, together. v2 adds calibration batches (status "unscored", never scored),
+// budget restarts (restartOf), review flags, fixedTestSkipped and cost reconciliation. v3 adds the tutor's own prompt
+// (tutorPromptId, tutorPromptVersion and a language-independent tutorPromptHash) and the effective tutor parameters;
+// its batch lists each tutor's prompt identity and keeps a financial stop (budgetStopReason) beside a drift status.
 (function (root) {
   "use strict";
 
@@ -10,7 +12,7 @@
   const BATCH_SCHEMA = "tutorbench.premium-batch";
   const VERDICTS = ["good", "flawed", "fail"];
   const ITEMS = ["correct", "readsState", "helpFit", "noLeak", "responds", "helpLevel"];
-  const SCHEMA_VERSIONS = [1, 2];
+  const SCHEMA_VERSIONS = [1, 2, 3];
   // States that are listed but never part of an evaluation: a calibration run checks the simulated student only,
   // and a superseded run was interrupted by the budget and replaced by a restart.
   const NOT_EVALUATION = ["calibration", "superseded"];
@@ -73,6 +75,21 @@
     }
     for (const r of list) if (!batches.has(r.batchId)) warnings.push({ code: "batch_missing", detail: r.batchId });
 
+    // Tutor prompts (v3): one id and version must always mean one prompt hash, as the runner's ledger enforces, and a
+    // record must carry the prompt its batch lists for that tutor. Records before v3 have no prompt of the tutor's own.
+    const prompts = new Map(), promptKeys = {};
+    for (const r of list) {
+      const t = r.tutor || {}, h = t.tutorPromptHash || null;
+      if (h) {
+        const key = t.tutorPromptId + "@" + t.tutorPromptVersion;
+        if (promptKeys[key] && promptKeys[key] !== h) warnings.push({ code: "tutor_prompt_conflict", detail: key });
+        promptKeys[key] = promptKeys[key] || h;
+        if (!prompts.has(h)) prompts.set(h, { hash: h, id: t.tutorPromptId ?? null, version: t.tutorPromptVersion ?? null, firstAt: String(r.createdAt || "") });
+      }
+      const bt = ((batches.get(r.batchId) || {}).tutors || []).find(x => x && x.id === t.id);
+      if (bt && ((bt.prompt && bt.prompt.hash) || null) !== h) warnings.push({ code: "prompt_batch_mismatch", detail: r.runId });
+    }
+
     // Budget restarts: the restarted record names the interrupted one, which stays on file but no longer counts.
     const supersededBy = {};
     for (const r of list) {
@@ -99,9 +116,12 @@
         const status = s ? (s.merged && s.merged.verdict ? "scored" : "needs_review") : r.status;
         const m = s && s.merged;
         // v2 rows also carry batchKind, reviewFlags and fixedTestSkipped; v1 rows do not, so only present fields are compared.
+        // v3 rows add the tutor's prompt id and version (null when it has none).
         const v2Differs = ("batchKind" in row && row.batchKind !== (r.batchKind ?? "evaluation"))
           || ("reviewFlags" in row && !sameList(row.reviewFlags, m && m.reviewFlags))
-          || ("fixedTestSkipped" in row && row.fixedTestSkipped !== !!(m && m.fixedTestSkipped));
+          || ("fixedTestSkipped" in row && row.fixedTestSkipped !== !!(m && m.fixedTestSkipped))
+          || ("tutorPromptId" in row && row.tutorPromptId !== (r.tutor.tutorPromptId ?? null))
+          || ("tutorPromptVersion" in row && row.tutorPromptVersion !== (r.tutor.tutorPromptVersion ?? null));
         if (v2Differs || row.status !== status || (row.scoringId ?? null) !== (s ? s.scoringId : null) || (row.verdict ?? null) !== (m ? m.verdict ?? null : null)) {
           warnings.push({ code: "index_out_of_date", detail: row.runId });
         }
@@ -109,7 +129,8 @@
       const indexed = new Set(input.index.map(row => row.runId));
       for (const id of runs.keys()) if (!indexed.has(id)) warnings.push({ code: "record_not_in_index", detail: id });
     }
-    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, warnings };
+    const tutorPrompts = [...prompts.values()].sort((a, b) => a.firstAt.localeCompare(b.firstAt) || a.hash.localeCompare(b.hash));
+    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, tutorPrompts, warnings };
   }
 
   // The state a run counts as under the selected judge configuration.
@@ -187,7 +208,8 @@
   }
 
   // A tutor's version is the model the provider reported, else the pinned or requested one. The system prompt is not
-  // part of it: the runner takes the tutor's system prompt from the card, so it changes with the card and language.
+  // part of it, because it changes with the card and language, and neither is the tutor's own prompt (v3): a new prompt
+  // is a change of setup, which compareSetups reads.
   function versionKey(record) {
     const t = (record && record.tutor) || {};
     return t.resolvedModel || t.pinnedVersion || t.requestedModel || "unknown";
@@ -246,9 +268,9 @@
   }
 
   // The parts of a run's setup that a fair comparison holds fixed. Cards are not a part: they are matched cell by cell
-  // (card version and language). Today the tutor's system prompt comes from the card; a prompt of the tutor's own is
-  // read from tutor.tutorPromptHash once the runner records one. Per-language or per-card prompt hashes are never parts:
-  // they would split one setup by language.
+  // (card version and language). A prompt of the tutor's own (v3) is read from tutor.tutorPromptHash, which is the same
+  // for its Chinese and English text; without one, the tutor's system prompt is the card's setup alone. Per-language or
+  // per-card prompt hashes (tutor.promptHash, the judge prompt) are never parts: they would split one setup by language.
   const SETUP_PARTS = ["tutor", "tutorModel", "tutorPrompt", "tutorParams", "studentModel", "studentParams", "judgeConfig", "rules"];
   function setupOf(v) {
     const r = v.record, t = r.tutor || {}, s = r.student || {}, jc = v.scoring && v.scoring.judgeConfig;
@@ -256,13 +278,18 @@
       tutor: t.label || "unknown",
       tutorModel: versionKey(r),
       tutorPrompt: t.tutorPromptHash || null,
-      tutorParams: JSON.stringify(t.params || null),
+      tutorParams: canonical(t.params),
       studentModel: s.resolvedModel || s.pinnedVersion || s.requestedModel || null,
-      studentParams: JSON.stringify(s.params || null),
+      studentParams: canonical(s.params),
       // The judge prompt differs by language, so the configuration's version names it, not the prompt hash.
       judgeConfig: jc ? jc.version || null : null,
       rules: (r.card && r.card.rulesVersion) || null,
     };
+  }
+  // Parameters as JSON with sorted keys, so the order they were written in never splits a setup.
+  function canonical(o) {
+    if (!o || typeof o !== "object") return JSON.stringify(o ?? null);
+    return JSON.stringify(Object.fromEntries(Object.keys(o).sort().map(k => [k, o[k]])));
   }
   const setupKey = v => { const s = setupOf(v); return SETUP_PARTS.map(p => String(s[p])).join("\u0001"); };
 
@@ -275,8 +302,11 @@
   }
 
   // Compare setup B against setup A. First say what differs; a result can be read as the effect of one change only when
-  // exactly one part differs (another tutor counts as one change, its model included). Runs are matched on the card
-  // versions and languages both sides scored, and a change is clear only when the 95% ranges do not overlap.
+  // exactly one part differs. Another tutor counts as one change, its model included. Two tutor names for the same model
+  // from the same developer and provider are no change at all: in one batch, a tutor with a prompt of its own and the
+  // same model without it need two names, and the prompt is then the only change. Runs are matched on the card versions
+  // and languages both sides scored, and a change is clear only when the 95% ranges do not overlap.
+  const routeOf = v => { const t = v.record.tutor || {}; return [t.developer, t.provider, versionKey(v.record)].map(x => String(x ?? "")).join("/"); };
   function compareSetups(a, b) {
     const valuesOf = (list, part) => [...new Set(list.map(v => String(setupOf(v)[part])))];
     const diff = [], mixed = [];
@@ -286,7 +316,10 @@
       if (vb.length > 1) mixed.push({ side: "b", part, values: vb });
       if (va.join("|") !== vb.join("|")) diff.push({ part, a: va.join(", "), b: vb.join(", ") });
     }
-    const changes = diff.filter(d => !(d.part === "tutorModel" && diff.some(x => x.part === "tutor"))).length;
+    const ra = [...new Set(a.map(routeOf))], rb = [...new Set(b.map(routeOf))];
+    const nameOnly = diff.some(d => d.part === "tutor") && ra.length === 1 && rb.length === 1 && ra[0] === rb[0];
+    for (const d of diff) if (d.part === "tutor" && nameOnly) d.nameOnly = true;
+    const changes = diff.filter(d => !d.nameOnly && !(d.part === "tutorModel" && diff.some(x => x.part === "tutor"))).length;
     const cell = v => v.record.card.id + "@" + v.record.card.version + "/" + v.record.card.lang;
     const scoredCells = list => new Set(list.filter(v => v.state === "scored").map(cell));
     const ca = scoredCells(a), cb = scoredCells(b);
@@ -295,7 +328,7 @@
     const delta = sa.passRate != null && sb.passRate != null ? sb.passRate - sa.passRate : null;
     const clear = delta != null && (sb.passRange.lo > sa.passRange.hi || sb.passRange.hi < sa.passRange.lo);
     const byCell = [...common].sort().map(k => ({ cell: k, a: summarize(a.filter(v => cell(v) === k)), b: summarize(b.filter(v => cell(v) === k)) }));
-    return { diff, changes, mixed, cells: common.size, a: sa, b: sb, delta, clear, byCell };
+    return { diff, changes, nameOnly, mixed, cells: common.size, a: sa, b: sb, delta, clear, byCell };
   }
 
   const tutorTurn = (record, turn) => (record.transcript || []).find(m => m.role === "tutor" && m.turn === turn) || null;
@@ -407,7 +440,9 @@
       estimated: per.filter(p => p.estimated).length };
   }
 
-  // A batch as the page shows it. v1 batches have no kind, hard cap, top-ups or reconciliation.
+  // A batch as the page shows it. v1 batches have no kind, hard cap, top-ups or reconciliation. v3-era batches list each
+  // tutor's prompt identity ({id, version, hash}) and any parameters other than the defaults, and keep a financial stop
+  // (budgetStopReason) beside the status, which a model-version drift takes over.
   function batchInfo(b) {
     const runs = b.runs || {};
     const history = Array.isArray(b.reconciliationHistory) ? b.reconciliationHistory : [];
@@ -425,6 +460,11 @@
       spentUsd: b.spentUsd ?? null, budgetUsd: b.budgetUsd ?? null, hardCapUsd: b.hardCapUsd ?? null, hardCapReached: b.hardCapReached === true,
       topUps: Array.isArray(b.budgetHistory) ? b.budgetHistory.map(h => ({ at: h.at || null, from: h.from ?? null, to: h.to ?? null })) : [],
       reconciled,
+      budgetStopReason: b.budgetStopReason || null,
+      // Shown only when it adds something: a drift status hides a budget stop that happened in the same call.
+      alsoStopped: b.budgetStopReason && b.budgetStopReason !== b.status ? b.budgetStopReason : null,
+      tutorSetups: (Array.isArray(b.tutors) ? b.tutors : []).filter(t => t && (t.prompt || t.params))
+        .map(t => ({ tutor: t.label || t.id, prompt: t.prompt ? { id: t.prompt.id ?? null, version: t.prompt.version ?? null, hash: t.prompt.hash ?? null } : null, params: t.params || null })),
     };
   }
 
