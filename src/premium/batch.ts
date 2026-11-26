@@ -5,6 +5,7 @@ import { indexRow, runJob, type Job, type RunRecord } from "./runner.js";
 import { invalid, unique } from "./schema.js";
 import { scoring } from "./scoring.js";
 import { safeJson, Store } from "./store.js";
+import { tutorManifest } from "./tutor.js";
 import { studentPrompt } from "./student.js";
 
 export interface Execution {
@@ -13,7 +14,7 @@ export interface Execution {
   judgePrompts?: Record<"en" | "zh-CN", string>; mode?: "hybrid_calibration";
   provider: (job: Job) => Provider; now?: () => string;
 }
-function bindVersions(store: Store, e: Execution) {
+function bindVersions(store: Store, e: Execution, tutors: ReturnType<typeof tutorManifest>[]) {
   const c = e.config;
   safeJson(c);
   if ([c.budgetUsd, c.reserveUsd].some(n => dollars(n) !== n)) invalid("budget.precision");
@@ -30,6 +31,9 @@ function bindVersions(store: Store, e: Execution) {
     if (/^(auto|latest|default|recommended)$/iu.test(m.pinnedVersion)) invalid("pinnedVersion");
     store.bind("developer/" + m.requestedModel.toLowerCase() + "/" + m.pinnedVersion.toLowerCase(), m.developer.toLowerCase());
   }
+  for (const { prompt } of tutors) {
+    if (prompt) store.bind("tutor-prompt/" + prompt.id + "/" + prompt.version, prompt.hash);
+  }
   if (c.kind !== "calibration") for (const t of c.tutors) panel(c, t);
   for (const a of e.assets) {
     store.bind("card/" + a.card.id + "/" + a.card.version, a.contentHash);
@@ -42,7 +46,7 @@ function manifest(e: Execution) {
   const { config: c, assets } = e;
   const cards = assets.map(a => ({ id: a.card.id, version: a.card.version, contentHash: a.contentHash, rulesVersion: a.rulesVersion,
     studentPrompts: c.languages.map(l => hash(studentPrompt(a, l))) }));
-  return { schema: "tutorbench.premium-batch", schemaVersion: 2, mode: e.mode ?? "offline_replay", ...c, kind: c.kind ?? "evaluation", hardCapUsd: c.hardCapUsd ?? c.budgetUsd * 1.25, cards,
+  return { schema: "tutorbench.premium-batch", schemaVersion: 2, mode: e.mode ?? "offline_replay", ...c, tutors: c.tutors.map(tutorManifest), kind: c.kind ?? "evaluation", hardCapUsd: c.hardCapUsd ?? c.budgetUsd * 1.25, cards,
     gitCommit: e.gitCommit, tapeHash: e.tapeHash, planned: cards.length * c.languages.length * c.tutors.length * c.repeats };
 }
 function totals(records: RunRecord[]) {
@@ -61,9 +65,12 @@ function refresh(store: Store, batchId: string, explicitStop: string | null = nu
   const b = store.getBatch(batchId)!;
   const records = store.records(batchId);
   const { spentUsd, ...counts } = totals(records);
-  const stop = budgetStop(b as Config, spentUsd) ?? explicitStop;
+  const budgetStopReason = budgetStop(b as Config, spentUsd) ?? (explicitStop === "budget_stop" ? explicitStop : null);
+  // 已保存的版本漂移是永久停止条件，即使同一次扣费也耗尽了预算。
+  const drift = b.mode === "hybrid_calibration" && records.some(r => r.attempts.some(a => a.reason === "model_version_drift"));
+  const stop = drift ? "model_version_drift" : budgetStopReason ?? explicitStop;
   const status = stop ?? (new Set(records.map(r => JSON.stringify([r.card.id, r.card.lang, r.tutor.id, r.repeat.index]))).size === b.planned ? "complete" : "running");
-  store.batch(batchId, { ...b, spentUsd, hardCapReached: spentUsd !== null && spentUsd >= Number(b.hardCapUsd), status, runs: { planned: b.planned, ...counts } });
+  store.batch(batchId, { ...b, spentUsd, budgetStopReason, hardCapReached: spentUsd !== null && spentUsd >= Number(b.hardCapUsd), status, runs: { planned: b.planned, ...counts } });
   return status;
 }
 function updateBudget(store: Store, previous: Record<string, unknown>, e: Execution) {
@@ -80,13 +87,18 @@ export function runBatch(store: Store, e: Execution) {
   const c = e.config, spec = manifest(e);
   const now = e.now ?? (() => new Date().toISOString());
   store.transaction(() => {
-    bindVersions(store, e);
+    bindVersions(store, e, spec.tutors);
     if (e.mode) store.liveGuard(c.batchId);
     const identity = { ...spec, budgetUsd: undefined, hardCapUsd: undefined };
     store.bind("batch/" + c.batchId, hash(safeJson(identity)));
     const previous = store.getBatch(c.batchId);
     if (!previous) store.batch(c.batchId, { ...spec, createdAt: now(), budgetHistory: [], reconciledUsd: {} });
-    else updateBudget(store, previous, e);
+    else {
+      // v2 账本可能只在原记录中保留漂移，恢复前先重建被费用遮蔽的状态。
+      if (previous.mode === "hybrid_calibration" && ["actual_over_budget", "budget_stop", "unknown_cost"].includes(String(previous.status)))
+        refresh(store, c.batchId, String(previous.status));
+      updateBudget(store, store.getBatch(c.batchId)!, e);
+    }
   });
   outer: for (const asset of e.assets) for (const lang of c.languages) for (const tutor of c.tutors)
     for (let repeatIndex = 1; repeatIndex <= c.repeats; repeatIndex++) {
@@ -112,9 +124,8 @@ export function runBatch(store: Store, e: Execution) {
         const r = runJob(c, job, session, e.gitCommit, now(), e.judgePrompts?.[lang]);
         store.insert(r);
         const stopped = r.attempts.at(-1)?.reason === "budget_stop" || r.scorings.some(s => s.perJudge.some(j => j.error === "budget_stop"));
-        const drift = e.mode && r.attempts.at(-1)?.reason === "model_version_drift";
-        refresh(store, c.batchId, stopped ? "budget_stop" : drift ? "model_version_drift" : null);
-        return stopped || drift;
+        const status = refresh(store, c.batchId, stopped ? "budget_stop" : null);
+        return stopped || status === "model_version_drift";
       });
       if (stop) break outer;
     }
@@ -145,7 +156,8 @@ export function reconcile(store: Store, batchId: string, provider: string, actua
 export function rejudge(store: Store, e: Execution, runId: string) {
   const c = e.config;
   const result = store.transaction(() => {
-    bindVersions(store, e);
+    const tutors = c.tutors.map(tutorManifest);
+    bindVersions(store, e, tutors);
     const r = store.get(runId);
     if (!r || c.kind === "calibration" || r.batchKind === "calibration" || r.batchId !== c.batchId || ["error", "student_invalid"].includes(r.end.reason)) invalid("rejudge.run");
     const asset = e.assets.find(a => a.card.id === r.card.id && a.contentHash === r.card.contentHash &&
@@ -154,7 +166,7 @@ export function rejudge(store: Store, e: Execution, runId: string) {
     updateBudget(store, store.getBatch(c.batchId)!, e);
     const batch = store.getBatch(c.batchId)!;
     const tutor = c.tutors.find(t => t.id === r.tutor.id);
-    if (!tutor || safeJson(c.tutors) !== safeJson(batch.tutors) || tutor.developer !== r.tutor.developer || safeJson(c.student) !== safeJson(batch.student) ||
+    if (!tutor || safeJson(tutors) !== safeJson(batch.tutors) || tutor.developer !== r.tutor.developer || safeJson(c.student) !== safeJson(batch.student) ||
         c.budgetUsd !== batch.budgetUsd || (c.hardCapUsd ?? c.budgetUsd * 1.25) !== (batch.hardCapUsd ?? Number(batch.budgetUsd) * 1.25) || c.reserveUsd !== batch.reserveUsd || safeJson(c.prices) !== safeJson(batch.prices)) invalid("rejudge.identity/budget");
     const spent = totals(store.records(c.batchId)).spentUsd;
     const stop = budgetStop(c, spent);

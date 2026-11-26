@@ -1,7 +1,13 @@
 import { hash } from "./cards.js";
-import { amount, choices, id, invalid, list, nullable, optional, positive, shape, str } from "./schema.js";
+import { amount, choices, id, invalid, list, localized, nullable, optional, positive, shape, str } from "./schema.js";
 
-export const modelSchema = shape({ id, label: optional(str), developer: id, provider: id, requestedModel: id, pinnedVersion: id });
+const modelFields = { id, label: optional(str), developer: id, provider: id, requestedModel: id, pinnedVersion: id };
+export const modelSchema = shape(modelFields);
+const tutorSchema = shape({ ...modelFields,
+  prompt: optional(shape({ id, version: id, text: localized(str) })),
+  params: optional(shape({ temperature: optional(nullable(amount)), maxOutputTokens: optional(positive) })),
+});
+export type Tutor = ReturnType<typeof tutorSchema>;
 export type Model = ReturnType<typeof modelSchema>;
 export interface Message { role: "assistant" | "user"; content: string }
 export interface Request {
@@ -154,7 +160,7 @@ export const configSchema = shape({
     if (!Array.isArray(v) || !v.length || v.some(l => l !== "en" && l !== "zh-CN") || new Set(v).size !== v.length) invalid(f);
     return v as ("en" | "zh-CN")[];
   }, repeats: positive, maxOfflineAttempts: optional(positive), budgetUsd: amount, reserveUsd: (v, f) => v === undefined ? 0 : amount(v, f), prices: priceSchema,
-  tutors: arrayModels, student: modelSchema, judgeConfigVersion: id, judges: arrayModels, alternates: arrayModels,
+  tutors: list(tutorSchema), student: modelSchema, judgeConfigVersion: id, judges: arrayModels, alternates: arrayModels,
 });
 function arrayModels(v: unknown, f: string) {
   if (!Array.isArray(v)) invalid(f);

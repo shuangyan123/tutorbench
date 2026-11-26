@@ -29,6 +29,25 @@ The handoff names DeepSeek V4.1-Flash for the student, Qwen4-Max (Alibaba), Mist
 
 A tape is a JSON object keyed by `cardId/lang/tutorId`. Each entry maps a model ID to an ordered array of replies. Each reply has visible `text`, `finishReason`, `latencyMs` and token `usage` or null. Optional `resolvedModel` defaults to the configured synthetic pinned version. A missing frame or null simulates a provider error. Every job starts at frame zero. Retries and discarded dialogue attempts consume frames. Rejudging starts fresh Judge tracks. Raw private tapes and source cards belong outside tracked directories.
 
+### Per-tutor configuration
+
+Each `tutors[]` entry accepts a private bilingual teaching prompt and generation parameters. This synthetic fragment shows the optional fields.
+
+```json
+{
+  "prompt": {
+    "id": "tiles-coach",
+    "version": "1.0.0",
+    "text": { "en": "Ask about the tiles.", "zh-CN": "问问瓷砖的规律。" }
+  },
+  "params": { "temperature": 0.3, "maxOutputTokens": 1024 }
+}
+```
+
+Both language strings, ID and version are required when a prompt is present. The tutor receives its localized text, two LF characters and the card’s localized `tutorSetup`. With no prompt it receives the original card setup verbatim. Each omitted parameter takes its own default, `temperature: null` and `maxOutputTokens: 2048`. Output caps must be positive integers. A supplied temperature can be null or a finite nonnegative number. The Judge continues to receive the card setup and visible conversation.
+
+The private record saves the exact sent `systemPrompt`, its `promptHash` and the effective parameters in temperature/output-cap order. Its `tutorPromptId`, `tutorPromptVersion` and `tutorPromptHash` describe the independent bilingual prompt and are null when absent. Hash the UTF-8 compact JSON object `{id,version,text}` with keys sorted recursively in ordinal order, preserving the strings exactly and adding no trailing newline. Prefix the lowercase SHA-256 digest with `sha256:`. The ledger binds an ID/version to this digest across tutors, batches and languages. The batch tutor entry includes `prompt: {id,version,hash}` when configured and includes effective `params` for nondefault settings. Changing these identities requires a new batch. The index adds nullable `tutorPromptId` and `tutorPromptVersion`.
+
 ### Serving revision and executable identity
 
 For students and Judges, the session compares the returned `resolvedModel` string with `pinnedVersion` on each call. For a tutor, the first returned revision establishes the reference for that model in that job, including discarded attempts. A stable tutor revision can differ from the configured pin. A new job starts a new session. The replay adapter can fill an omitted revision from the tape configuration. These comparisons establish consistency of supplied strings. A formal run requires a separately verified immutable serving revision and a provider-returned identity on every call, with any alias-to-revision mapping recorded and verified. A mock default supplies no such evidence.
@@ -53,7 +72,7 @@ The fixed challenge is delivered when its literal text appears on the prescribed
 | `batches/<batchId>.json` | Configuration, card identities, code/tape identity, budget, `spentUsd`, `status` and `runs` counts. `unknown_cost`, `budget_stop` and `actual_over_budget` stop further calls. |
 | `records/<runId>.json` | Follow `recordPath` for chronological messages, first-run status, immutable attempt evidence and call ledger. Each scoring retains its config, prompt hash, isolated outputs, validation failures, aggregate and disagreement votes. Use the last scoring to render the current detail view. |
 
-Schema version 2 extends the original record and batch. Version 1 records can still be indexed. Index rows include identities, repeat, latest scoring ID, verdict/reasons, fixed test, end reason, turn totals, help levels, leak turns, transfer, unfired behaviours, discarded attempts, disagreements and USD. The sample record and sample index use different placeholders for the same student version; reconstruction uses the record's value. The runner preserves the manifest’s full suite ID in `suiteId` and splits a trailing `-v<number>` for the example’s `suite` and `suiteVersion` fields. Aggregates and verdicts may be null. A missing panel cannot contribute a tally. Show `pending`, per-Judge errors and the raw accepted/rejected evidence on drill-down. Keep soft flags visible even on a scored run.
+The runner emits v3 records and v2 batches. It can rebuild the index from v1, v2 and v3 records. Index rows include identities, repeat, latest scoring ID, verdict/reasons, fixed test, end reason, turn totals, help levels, leak turns, transfer, unfired behaviours, discarded attempts, disagreements and USD. The sample record and sample index use different placeholders for the same student version; reconstruction uses the record's value. The runner preserves the manifest’s full suite ID in `suiteId` and splits a trailing `-v<number>` for the example’s `suite` and `suiteVersion` fields. Aggregates and verdicts may be null. A missing panel cannot contribute a tally. Show `pending`, per-Judge errors and the raw accepted/rejected evidence on drill-down. Keep soft flags visible even on a scored run.
 
 Phase 1 extensions for review include `attempts[].transcript/rejected/calls`, `calls[]` (model, request fingerprint, returned metadata, usage, retry delay and stable error code), `perJudge[].raw/error`, `scorings[].pending/calls/usage`, and `usage.rates`. The raw Judge field contains only the visible model text. Secret-shaped responses are withheld and recorded by failure code. Transcripts, private tutor setup and audit evidence require private storage; use synthetic or reviewed deidentified inputs. Credential filtering supplements this input boundary.
 
@@ -85,9 +104,11 @@ The formal config selects three tutors, both languages, five repeats, a student 
 
 ## Reservations, top-up and reconciliation
 
-Use `prices.models[]` with `model` (configured model ID), `inputUsdPerMillion`, `outputUsdPerMillion`, ISO `date` and HTTPS `source`. Provide one row per active model, including zero-priced scripted tutors. Legacy global fixture rates remain readable. One SQLite writer serializes the batch. Each dispatch reserves half the serialized UTF-8 bytes rounded up, billed at input rate, plus the output cap at output rate. The caps for student, tutor and Judge are 512, 2048 and 8192 tokens. The live student measures the serialized HTTP body. An admitted call records `reservedUsd`, reported usage and `usd`. Missing usage and ambiguous dispatched failures use the reservation and set `costEstimated`. A confirmed pre-dispatch failure costs zero.
+Use `prices.models[]` with `model` (configured model ID), `inputUsdPerMillion`, `outputUsdPerMillion`, ISO `date` and HTTPS `source`. Provide one row per active model, including zero-priced scripted tutors. Legacy global fixture rates remain readable. One SQLite writer serializes the batch. Each dispatch reserves half the serialized UTF-8 bytes rounded up, billed at input rate, plus the output cap at output rate. The student and Judge caps are 512 and 8192 tokens. Tutor reservations use the effective configured cap. The live student measures the serialized HTTP body. An admitted call records `reservedUsd`, reported usage and `usd`. Missing usage and ambiguous dispatched failures use the reservation and set `costEstimated`. A confirmed pre-dispatch failure costs zero.
 
 Transient transport errors allow up to three retries after 2/4/8 seconds with 20% jitter or the provider's Retry-After. An interval above 60 seconds ends the job. Each retry needs its own reservation. Permanent HTTP errors carry a status code. Actual usage above the reservation is charged in full. Budget exhaustion stops new calls. The default hard cap is 1.25 times budget. `hardCapReached` identifies a crossed or reached cap. A local stop cannot reverse a charge already incurred.
+
+A hybrid batch with recorded model-version drift stays stopped across resume and top-up. If the same receipt also consumes or exceeds the budget, `budgetStopReason`, `spentUsd` and `hardCapReached` retain the financial evidence.
 
 An explicit `--top-up` with increased budget and a nondecreasing hard cap records `budgetHistory`. Rerun the same command and immutable inputs. A budget-interrupted dialogue restarts under a new run ID. The new record links to its predecessor in `restartOf`. Batch `runs.superseded` counts replaced attempts and `spentUsd` includes their charges. If only judging stopped, use rejudge to append the panel. A live job leaves a durable in-flight marker before dispatch. On a crash before commit the batch refuses further live work pending operator review of provider charges. Preserve the ledger and marker for incident reconciliation. Use separate output roots for new cohorts. Archived v1 batches retain the original executable for resumption.
 

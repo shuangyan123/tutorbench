@@ -1,5 +1,6 @@
 import type { Asset } from "./cards.js";
 import { CallError, type Config, type Message, type Model, type Reply, type Session } from "./provider.js";
+import type { TutorRequest } from "./tutor.js";
 import type { Lang } from "./schema.js";
 import { checkStudent, studentPrompt, type State } from "./student.js";
 
@@ -17,7 +18,7 @@ export interface Attempt {
   transcript: Line[]; rejected: { call: number; studentMessage: number; text: string; reasons: string[]; softFlags?: string[] }[];
   calls: number[];
 }
-function runAttempt(asset: Asset, lang: Lang, tutor: Model, student: Model, session: Session, audit: Attempt): EndReason {
+function runAttempt(asset: Asset, lang: Lang, tutor: TutorRequest, student: Model, session: Session, audit: Attempt): EndReason {
   const card = asset.card;
   const first: State = { message: card.firstMessage[lang], stage: 1, events: [], end: false };
   const states = [first], tutors: string[] = [];
@@ -26,8 +27,7 @@ function runAttempt(asset: Asset, lang: Lang, tutor: Model, student: Model, sess
   const studentHistory: Message[] = [{ role: "assistant", content: JSON.stringify(first) }];
   const system = studentPrompt(asset, lang);
   for (let turn = 1; turn <= card.maxTutorTurns; turn++) {
-    const reply = session.call({ role: "tutor", model: tutor, system: card.tutorSetup[lang],
-      params: { temperature: null, maxOutputTokens: 2048 },
+    const reply = session.call({ ...tutor,
       messages: lines.map(m => ({ role: m.role === "student" ? "user" : "assistant", content: m.text })) });
     tutors.push(reply.text);
     lines.push({ i: lines.length + 1, role: "tutor", text: reply.text, turn,
@@ -61,7 +61,7 @@ function runAttempt(asset: Asset, lang: Lang, tutor: Model, student: Model, sess
   }
   throw new Error("Unreachable dialogue state");
 }
-export function dialogue(asset: Asset, lang: Lang, tutor: Model, config: Config, session: Session) {
+export function dialogue(asset: Asset, lang: Lang, tutor: TutorRequest, config: Config, session: Session) {
   const attempts: Attempt[] = [];
   let reason: EndReason = "student_invalid";
   for (let n = 1; n <= 3; n++) {
