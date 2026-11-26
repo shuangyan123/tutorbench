@@ -50,7 +50,7 @@ test("one bilingual prompt fingerprint, exact localized tutor requests and isola
     const setup = fixture().job.asset.card.tutorSetup[lang];
     const system = prompt.text[lang] + "\n\n" + setup;
     const { record, requests } = capture(lang, { prompt, params: { maxOutputTokens: 333, temperature: 0 } });
-    assert.equal(record.schemaVersion, 4);
+    assert.equal(record.schemaVersion, 5);
     assert.equal(record.tutor.systemPrompt, system);
     assert.equal(record.tutor.promptHash, hash(system));
     assert.equal(record.tutor.tutorPromptHash, hash(canonical));
@@ -114,24 +114,24 @@ test("batch persists only prompt metadata, binds versions across batches and che
   assert.equal(runBatch(store, e).status, "complete");
 });
 
-test("legacy v1, v2 and v3 records rebuild a stable index, retaining v3 prompt identity", t => {
+test("legacy v1 through v4 records rebuild a stable index, retaining v3 prompt identity", t => {
   const { root } = storage(t);
-  for (const version of [1, 2, 3]) {
-    const { record } = capture("en", version === 3 ? { prompt } : {});
+  for (const version of [1, 2, 3, 4]) {
+    const { record } = capture("en", version >= 3 ? { prompt } : {});
     const old = JSON.parse(JSON.stringify(record, (key, value) =>
-      ["calledAt", "returnedModel", "system_fingerprint", "fenceStripped", "unwrapped"].includes(key) ? undefined : value));
+      (key === "cache" || (version < 4 && ["calledAt", "returnedModel", "system_fingerprint", "fenceStripped", "unwrapped"].includes(key))) ? undefined : value));
     old.runId = "legacy-" + version; old.schemaVersion = version;
     if (version < 3) for (const key of ["tutorPromptId", "tutorPromptVersion", "tutorPromptHash"]) delete old.tutor[key];
     if (version === 1) { delete old.batchKind; delete old.card.hash; }
     writeFileSync(join(root, "records", old.runId + ".json"), JSON.stringify(old));
   }
   const rows = () => readFileSync(join(root, "index.jsonl"), "utf8");
-  assert.equal(rebuildIndex(root), 3);
+  assert.equal(rebuildIndex(root), 4);
   const original = rows();
   for (const line of original.trim().split("\n")) {
     const row = JSON.parse(line);
-    assert.equal(row.tutorPromptId, row.runId === "legacy-3" ? prompt.id : null);
-    assert.equal(row.tutorPromptVersion, row.runId === "legacy-3" ? prompt.version : null);
+    assert.equal(row.tutorPromptId, ["legacy-3", "legacy-4"].includes(row.runId) ? prompt.id : null);
+    assert.equal(row.tutorPromptVersion, ["legacy-3", "legacy-4"].includes(row.runId) ? prompt.version : null);
     assert.equal(row.verdict, "good");
   }
   rebuildIndex(root); assert.equal(rows(), original);

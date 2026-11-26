@@ -1,5 +1,5 @@
 import { hash } from "./cards.js";
-import { amount, choices, id, invalid, list, localized, nullable, optional, positive, shape, str } from "./schema.js";
+import { amount, choices, id, invalid, list, localized, nullable, optional, positive, shape, str, type Reader } from "./schema.js";
 
 const modelFields = { id, label: optional(str), developer: id, provider: id, requestedModel: id, pinnedVersion: id };
 export const modelSchema = shape(modelFields);
@@ -20,18 +20,21 @@ export interface Request {
 export interface Reply {
   returnedModel?: string | null; system_fingerprint?: string | null;
   text: string; resolvedModel: string; finishReason: string; latencyMs: number;
-  usage: { inputTokens: number; outputTokens: number } | null;
+  usage: { inputTokens: number; outputTokens: number; cacheHitTokens?: number | undefined; cacheMissTokens?: number | undefined } | null;
 }
 export type Provider = ((request: Request) => Reply) & { requestBytes?: (request: Request) => number };
-const rate = shape({ model: id, inputUsdPerMillion: amount, outputUsdPerMillion: amount,
+export interface ModelPrice { model: string; cacheHitInputUsdPerMillion?: number | undefined; inputUsdPerMillion: number;
+  outputUsdPerMillion: number; date: string; source: string }
+const rate: Reader<ModelPrice> = shape({ model: id, cacheHitInputUsdPerMillion: optional(amount), inputUsdPerMillion: amount, outputUsdPerMillion: amount,
   date: (v, f) => /^\d{4}-\d{2}-\d{2}$/u.test(str(v, f)) ? String(v) : invalid(f),
   source: (v, f) => /^https:\/\//u.test(str(v, f)) ? String(v) : invalid(f) });
-export const priceSchema = shape({ version: id, models: optional(list(rate)),
+export const priceSchema = shape({ version: id, models: optional(list(rate)), cacheHitInputUsdPerMillion: optional(amount),
   inputUsdPerMillion: optional(nullable(amount)), outputUsdPerMillion: optional(nullable(amount)) });
 export type Prices = ReturnType<typeof priceSchema>;
 export type Role = Request["role"];
 export type Failure = `http_${number}` | "timeout" | "overloaded" | "not_dispatched" | "content_filter" | "provider_error" | "mock_not_dispatched" | "sensitive_output" | "invalid_response" | "model_version_drift" | "budget_stop" | "unknown_cost";
 export interface Call {
+  cache?: ReturnType<typeof cacheReceipt>;
   requestedModel: string; returnedModel: string | null; system_fingerprint: string | null; calledAt: string;
   n: number; role: Role; model: string; requestHash: string; resolvedModel: string | null;
   usage: Reply["usage"]; usd: number | null; finishReason: string | null; latencyMs: number | null;
@@ -51,6 +54,16 @@ export function sensitive(text: string) {
   const visible = text.replace(/\\u([0-9a-f]{4})/giu, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
     .replace(/\\(["'])/gu, "$1");
   return /<\/?(?:think|thinking|reasoning)>|\bsk-[a-z0-9_-]+|\bgh[pousr]_[a-z0-9]+|github_pat_|authorization|\bbearer\s+\S+|\b(?:set-cookie|cookie|password|api[_-]?key|access[_-]?token|request[_-]?headers|headers|reasoning(?:_content)?|thinking|chain_of_thought|private[_-]?key|client[_-]?secret|refresh[_-]?token)\b\s*["']?\s*[:=]|-----BEGIN [A-Z ]*PRIVATE KEY-----|[\w.+-]+@[\w.-]+\.[a-z]{2,}/iu.test(visible);
+}
+// 老价格表的 inputUsdPerMillion 也是保守预留所用的未命中价。
+function cacheReceipt(hitRate: number | null, missRate: number, usage?: Reply["usage"]) {
+  const hit = usage?.cacheHitTokens, miss = usage?.cacheMissTokens;
+  const complete = hit !== undefined && miss !== undefined && tokens(hit) && tokens(miss) && hit + miss === usage?.inputTokens;
+  return { hitTokens: complete ? hit : null, missTokens: complete ? miss : null,
+    hitRate: complete && hit + miss > 0 ? hit / (hit + miss) : null,
+    hitUsdPerMillion: hitRate, missUsdPerMillion: missRate,
+    hitUsd: complete && (hitRate !== null || hit === 0) ? dollars(hit * (hitRate ?? 0) / 1e6) : null,
+    missUsd: complete ? dollars(miss * missRate / 1e6) : null };
 }
 function tokens(v: number) { return Number.isSafeInteger(v) && v >= 0; }
 export function sumKnown(values: (number | null)[]) {
@@ -110,6 +123,8 @@ export class Session {
     const rate = this.prices.models ? this.prices.models.find(m => m.model === req.model.id) : this.prices;
     const input = rate?.inputUsdPerMillion, output = rate?.outputUsdPerMillion;
     if (input == null || output == null || this.calls.some(c => c.usd === null)) throw new CallError("unknown_cost");
+    const hitRate = rate?.cacheHitInputUsdPerMillion ?? null;
+    if (hitRate !== null && hitRate > input) invalid("prices.cacheHitInputUsdPerMillion");
     const bytes = this.provider.requestBytes?.(req) ?? Buffer.byteLength(JSON.stringify(req));
     const cap = req.params.maxOutputTokens ?? { tutor: 2048, student: 512, judge: 8192 }[req.role];
     const reserve = dollars((Math.ceil(bytes / 2) * input + cap * output) / 1_000_000);
@@ -118,7 +133,7 @@ export class Session {
       this.budgetStopped = true;
       throw new CallError("budget_stop");
     }
-    const call: Call = { n: this.calls.length + 1, role: req.role, model: req.model.id, requestHash: hash(JSON.stringify(req)),
+    const call: Call = { cache: cacheReceipt(hitRate, input), n: this.calls.length + 1, role: req.role, model: req.model.id, requestHash: hash(JSON.stringify(req)),
       calledAt: new Date().toISOString(), requestedModel: req.model.requestedModel, returnedModel: null, system_fingerprint: null,
       resolvedModel: null, usage: null, usd: null, finishReason: null, latencyMs: null, error: null, reservedUsd: reserve, costEstimated: true, retryDelayMs };
     this.calls.push(call);
@@ -153,7 +168,18 @@ export class Session {
     if (reply.usage && tokens(reply.usage.inputTokens) && tokens(reply.usage.outputTokens)) {
       call.costEstimated = false;
       call.usage = { inputTokens: reply.usage.inputTokens, outputTokens: reply.usage.outputTokens };
-      const cost = (call.usage.inputTokens * input +
+      const cache = cacheReceipt(hitRate, input, reply.usage);
+      call.cache = cache;
+      if (cache.hitTokens !== null && cache.missTokens !== null) {
+        Object.assign(call.usage, { cacheHitTokens: cache.hitTokens, cacheMissTokens: cache.missTokens });
+      }
+      const expectsCache = req.model.provider === "deepseek" || hitRate !== null ||
+        reply.usage.cacheHitTokens !== undefined || reply.usage.cacheMissTokens !== undefined;
+      call.costEstimated = expectsCache && call.usage.inputTokens > 0 &&
+        (cache.hitTokens === null || (cache.hitTokens > 0 && hitRate === null));
+      const inputCost = cache.hitTokens !== null && cache.missTokens !== null && hitRate !== null
+        ? cache.hitTokens * hitRate + cache.missTokens * input : call.usage.inputTokens * input;
+      const cost = (inputCost +
         call.usage.outputTokens * output) / 1_000_000;
       call.usd = dollars(cost);
       if (call.usd !== null) {

@@ -1,4 +1,5 @@
 import { hash, type Asset } from "./cards.js";
+import { batchCache } from "./cache-summary.js";
 import { judgePrompt } from "./judge.js";
 import { dollars, panel, Session, sumUsd, type Config, type Provider } from "./provider.js";
 import { indexRow, runJob, type Job, type RunRecord } from "./runner.js";
@@ -23,6 +24,10 @@ function bindVersions(store: Store, e: Execution, tutors: ReturnType<typeof tuto
   if ([c.budgetUsd, c.reserveUsd].some(n => dollars(n) !== n)) invalid("budget.precision");
   if ((c.maxOfflineAttempts ?? 1) > 4) invalid("maxOfflineAttempts");
   if (c.hardCapUsd !== undefined && (c.hardCapUsd < c.budgetUsd || dollars(c.hardCapUsd) !== c.hardCapUsd)) invalid("hardCapUsd");
+  for (const rate of c.prices.models ?? [c.prices]) {
+    if (rate.cacheHitInputUsdPerMillion != null && (rate.inputUsdPerMillion == null || rate.cacheHitInputUsdPerMillion > rate.inputUsdPerMillion))
+      invalid("prices.cacheHitInputUsdPerMillion");
+  }
   if (c.prices.models) {
     unique(c.prices.models.map(p => p.model), "prices.models");
     const required = [...c.tutors, c.student, ...(c.kind === "calibration" ? [] : c.tutors.flatMap(t => panel(c, t)))];
@@ -80,7 +85,7 @@ function refresh(store: Store, batchId: string, explicitStop: string | null = nu
   if (!measured.some(({ call }) => call.returnedModel) ||
       (servingIdentity === "revision" && measured.some(({ call, pin }) => call.returnedModel !== pin)))
     servingIdentity = "unknown";
-  store.batch(batchId, { ...b, servingIdentity, spentUsd, budgetStopReason, hardCapReached: spentUsd !== null && spentUsd >= Number(b.hardCapUsd), status, runs: { planned: b.planned, ...counts } });
+  store.batch(batchId, { ...b, cache: batchCache(records), servingIdentity, spentUsd, budgetStopReason, hardCapReached: spentUsd !== null && spentUsd >= Number(b.hardCapUsd), status, runs: { planned: b.planned, ...counts } });
   return status;
 }
 function updateBudget(store: Store, previous: Record<string, unknown>, e: Execution) {

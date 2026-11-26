@@ -23,7 +23,7 @@ export function rebuildIndex(root: string) {
   const dir = join(root, "records");
   const rows = (existsSync(dir) ? readdirSync(dir) : []).filter(f => f.endsWith(".json")).sort().map(f => {
     const r: RunRecord = JSON.parse(readFileSync(join(dir, f), "utf8"));
-    if (r.schema !== "tutorbench.premium-run-record" || ![1, 2, 3, 4].includes(r.schemaVersion) || id(r.runId, "runId") + ".json" !== f) invalid("record.identity");
+    if (r.schema !== "tutorbench.premium-run-record" || ![1, 2, 3, 4, 5].includes(r.schemaVersion) || id(r.runId, "runId") + ".json" !== f) invalid("record.identity");
     return safeJson(indexRow(r)) + "\n";
   });
   publish(join(root, "index.jsonl"), rows.join(""));

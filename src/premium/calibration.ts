@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { childEnvironment } from "./child-environment.js";
 import { studentPayload } from "./student-http.js";
 import { replayProvider } from "./replay.js";
 import { TransportError, type Provider } from "./provider.js";
@@ -22,7 +23,7 @@ export function hybridProvider(tape: unknown, job: Job, student: Provider): Prov
 export const liveStudent: Provider = req => {
   if (req.role !== "student" || req.model.provider !== "deepseek") return invalid("calibration.student");
   const child = spawnSync(process.execPath, [fileURLToPath(new URL("./student-http.js", import.meta.url))], {
-    input: JSON.stringify(req), encoding: "utf8", timeout: 40_000, maxBuffer: 1_000_000, windowsHide: true,
+    env: childEnvironment("deepseek"), input: JSON.stringify(req), encoding: "utf8", timeout: 40_000, maxBuffer: 1_000_000, windowsHide: true,
   });
   if (child.error && "code" in child.error && child.error.code === "ETIMEDOUT") throw new TransportError("timeout", true);
   if (child.error || child.status !== 0) throw new TransportError("provider_error");

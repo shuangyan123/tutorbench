@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { childEnvironment } from "./child-environment.js";
 import { obj, id } from "./schema.js";
 import { publish, safeJson } from "./store.js";
 import type { RunRecord } from "./runner.js";
@@ -61,7 +62,7 @@ export function checkCalibration(out: string, checker: string, expectations: str
   try {
     const path = join(scratch, "reference.json");
     const process = spawnSync("python", ["-I", "-B", "-X", "utf8", checker, out, expectations,
-      "--batch-id", batchId, "--report", path, ...(dry ? ["--dry-run"] : [])], { stdio: "ignore", windowsHide: true });
+      "--batch-id", batchId, "--report", path, ...(dry ? ["--dry-run"] : [])], { env: childEnvironment("local"), stdio: "ignore", windowsHide: true });
     if (process.status !== 0 && process.status !== 1) throw new Error("checker unavailable");
     const report = obj(read(path), "checker.report");
     if (report.checkerVersion !== 2 || report.batchId !== batchId || report.dryRun !== dry ||

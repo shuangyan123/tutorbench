@@ -17,7 +17,7 @@ test("both roles accept one whole fence, retain repair evidence and charge only 
     if (req.role !== "tutor") response.text = wrap(response.text, req.role === "student" ? "" : "JSON");
     return response;
   });
-  assert.equal(result.schemaVersion, 4);
+  assert.equal(result.schemaVersion, 5);
   assert.equal(result.status, "scored");
   assert.equal(result.calls.length, clean.calls.length);
   assert.equal(result.end.fenceStripped, result.calls.filter(c => c.role === "student").length);

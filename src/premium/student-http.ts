@@ -31,7 +31,8 @@ export async function studentHttp(req: Request, key: string | undefined, send = 
     const choice = Array.isArray(data.choices) ? data.choices[0] : undefined;
     const bill = data.usage == null ? null : obj(data.usage, "usage");
     return { reply: { text: choice?.message?.content, resolvedModel: data.model, system_fingerprint: data.system_fingerprint ?? null, finishReason: choice?.finish_reason,
-      usage: bill && typeof bill === "object" ? { inputTokens: bill.prompt_tokens, outputTokens: bill.completion_tokens } : null,
+      usage: bill && typeof bill === "object" ? { inputTokens: bill.prompt_tokens, outputTokens: bill.completion_tokens,
+        cacheHitTokens: bill.prompt_cache_hit_tokens, cacheMissTokens: bill.prompt_cache_miss_tokens } : null,
       latencyMs: Date.now() - start } };
   } catch (error) {
     const cause = error instanceof Error && error.cause && typeof error.cause === "object" && "code" in error.cause ? error.cause.code : null;

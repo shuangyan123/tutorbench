@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
+import { childEnvironment } from "../premium/child-environment.js";
 import { checkCalibration } from "../premium/check-calibration.js";
 import { hash, loadCards, parseCard } from "../premium/cards.js";
 import { hybridProvider, liveStudent } from "../premium/calibration.js";
@@ -63,7 +64,7 @@ function main() {
   const execution: Execution = { config, assets, topUp: values["top-up"] ?? false,
     ...(live ? { mode: "hybrid_calibration" as const } : {}),
     provider: job => live ? hybridProvider(tape, job, liveStudent) : replayProvider(tape, job),
-    tapeHash: hash(bytes.replace(/\r\n/g, "\n")), gitCommit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim() };
+    tapeHash: hash(bytes.replace(/\r\n/g, "\n")), gitCommit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8", env: childEnvironment("local") }).trim() };
   if (values["judge-prompts"]) {
     const text = readFileSync(values["judge-prompts"], "utf8").replace(/\r\n/g, "\n");
     const blocks = [...text.matchAll(/^\x60{3}text\n([\s\S]+?)\n\x60{3}$/gmu)];
