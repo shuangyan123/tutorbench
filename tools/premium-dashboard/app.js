@@ -13,7 +13,7 @@
       keyRed: "红叶", keyRedIs: "这一轮泄露了答案", turnsN: "{n} 轮", spreadNote: "字母是导师，横向位置是它在这张卡上的通过率。右上角带小虚圈的，这张卡还有待审对话。", spreadCol: "差距", unratedN: "{n} 位未计分",
       rateTip: "已计分 {n} 段：好 {g} · 有问题 {f} · 不合格 {x}", rateTipReview: "；另有 {r} 段待审，不计入", allOfTutor: "看这位导师的全部对话",
       cellTip: "通过 {p}/{n}", ciTip: "95% 区间 {lo}%–{hi}%", ciNote: "数字下的细线是 95% 区间：按已计分的对话数，真实通过率大概落在这一段。两位导师的细线重叠得多，差距可能只是运气。", cellNone: "还没有已计分的对话", cellReview: "待审 {r}", noRate: "暂无", langZh: "中", langEn: "英",
-      attentionTitle: "需要你看的", chartVersions: "换了版本，变好还是变差", versionsNote: "每一格是一位导师的几个版本。点是通过率，竖线是 95% 区间，大数字是最新版比上一版的变化。", versionsNone: "目前每位导师只有一个版本。同一位导师换了新版本再跑以后，这里会画出它变好还是变差。", versionsBasis: "只比每个版本都跑过的 {n} 组卡片和语言", versionsNoBasis: "这些版本没有跑过同样的卡，没法比", vsPrev: "比上一版", sigClear: "超出误差范围", sigNoise: "在误差范围内，可能是运气", firstRun: "首次运行 {d}", olderNote: "这里只算每位导师的最新版本，旧版本见图版 III。", pts: "个百分点", askPending: "段待审，还没有结论", askSpot: "段已计分，建议抽查", onlySpot: "建议抽查",
+      attentionTitle: "需要你看的", chartVersions: "换了版本，变好还是变差", versionsNote: "每一格是一位导师的几个版本。点是通过率，竖线是 95% 区间，大数字是最新版比上一版的变化。", versionsNone: "目前每位导师只有一个版本。同一位导师换了新版本再跑以后，这里会画出它变好还是变差。", versionsBasis: "只比每个版本都跑过的 {n} 组卡片和语言", versionsNoBasis: "这些版本没有跑过同样的卡，没法比", vsPrev: "比上一版", sigClear: "超出误差范围", sigNoise: "在误差范围内，可能是运气", firstRun: "首次运行 {d}", olderNote: "这里只算每位导师的最新版本，旧版本见图版 IV。", chartValue: "值不值", axisCost: "每段花费", axisTime: "每次回复等待", valueAxis: "横轴", cornerCost: "↖ 更好，也更省", cornerTime: "↖ 更好，也更快", valueTip: "每段花费 {c}（中位数，{n} 段） · 每次回复 {s}（中位数）", valueEstimated: "，其中 {k} 段有按预留价估算的调用", valueNote: "只算导师自己的调用，模拟学生和评审的花费在「运行检查」里。花费按价格表估算，横轴是对数刻度。等待时间受网络和服务器忙闲影响，只作参考。不比较 token 数，因为各家模型切 token 的方式不同。", valueMissing: "{n} 位导师缺这项数据，没画。", valueNone: "还没有可画的数据。", sec: "{v} 秒", pts: "个百分点", askPending: "段待审，还没有结论", askSpot: "段已计分，建议抽查", onlySpot: "建议抽查",
       costLine: "按价格表估算共花费 {cost}，其中重新评审 {re}。", opsTitle: "运行检查", opsNote: "看评测本身靠不靠得住：三位评审是否一致，批次是否跑完。", ties: "平票", topItems: "分歧最多的项：{list}",
       title: "观测台", openFolder: "打开 runs 文件夹", loadSample: "载入合成示例", dropHere: "松开鼠标，载入这个 runs 文件夹",
       sourceSample: "合成示例 · {runs} 段对话 · {batches} 个批次", sourceFolder: "「{name}」· {runs} 段对话 · {batches} 个批次",
@@ -59,7 +59,7 @@
       keyRed: "Red leaf", keyRedIs: "that turn leaked the answer", turnsN: "{n} turns", spreadNote: "Letters are tutors, placed at their pass rate on this card. A small dashed ring means some of its runs on this card still need review.", spreadCol: "Spread", unratedN: "{n} not scored",
       rateTip: "{n} scored: good {g} · flawed {f} · fail {x}", rateTipReview: "; {r} more need review and are not counted", allOfTutor: "All conversations for this tutor",
       cellTip: "pass {p}/{n}", ciTip: "95% range {lo}%–{hi}%", ciNote: "The hairline under each rate is its 95% range: where the true pass rate probably sits, given how many runs were scored. When two tutors' lines overlap a lot, the gap may be luck.", cellNone: "nothing scored yet", cellReview: "{r} need review", noRate: "none yet", langZh: "zh", langEn: "en",
-      attentionTitle: "Needs you", chartVersions: "Did the new version get better", versionsNote: "Each panel is one tutor's versions. Dots are pass rates, vertical lines their 95% ranges; the big number is the newest version against the one before.", versionsNone: "Every tutor has one version so far. When a tutor runs again on a new version, this plate shows whether it got better or worse.", versionsBasis: "Compared only on the {n} card–language pairs every version ran", versionsNoBasis: "These versions never ran the same cards, so they cannot be compared", vsPrev: "vs the version before", sigClear: "outside the error range", sigNoise: "within the error range, may be luck", firstRun: "first run {d}", olderNote: "Only each tutor's newest version counts here; older versions are on Plate III.", pts: "points", askPending: "need review, no verdict yet", askSpot: "scored, worth a spot check", onlySpot: "Worth a spot check",
+      attentionTitle: "Needs you", chartVersions: "Did the new version get better", versionsNote: "Each panel is one tutor's versions. Dots are pass rates, vertical lines their 95% ranges; the big number is the newest version against the one before.", versionsNone: "Every tutor has one version so far. When a tutor runs again on a new version, this plate shows whether it got better or worse.", versionsBasis: "Compared only on the {n} card–language pairs every version ran", versionsNoBasis: "These versions never ran the same cards, so they cannot be compared", vsPrev: "vs the version before", sigClear: "outside the error range", sigNoise: "within the error range, may be luck", firstRun: "first run {d}", olderNote: "Only each tutor's newest version counts here; older versions are on Plate IV.", chartValue: "Is it worth it", axisCost: "Cost per conversation", axisTime: "Wait per reply", valueAxis: "Horizontal axis", cornerCost: "↖ better and cheaper", cornerTime: "↖ better and faster", valueTip: "{c} per conversation (median of {n}) · {s} per reply (median)", valueEstimated: "; {k} with calls charged at their reservation", valueNote: "Only the tutor's own calls count; the simulated student and judges are under Run checks. Costs are price-table estimates on a log scale. Waits depend on the network and provider load, so read them as a guide. Tokens are not compared, because each model counts them differently.", valueMissing: "{n} tutors lack this data and are not drawn.", valueNone: "Nothing to draw yet.", sec: "{v} s", pts: "points", askPending: "need review, no verdict yet", askSpot: "scored, worth a spot check", onlySpot: "Worth a spot check",
       costLine: "Price-table estimate: {cost}, of which rescoring {re}.", opsTitle: "Run checks", opsNote: "Whether the evaluation itself can be trusted: do the three judges agree, did the batches finish.", ties: "Ties", topItems: "Most splits: {list}",
       title: "Observatory", openFolder: "Open runs folder", loadSample: "Load synthetic sample", dropHere: "Drop to load this runs folder",
       sourceSample: "Synthetic sample · {runs} conversations · {batches} batches", sourceFolder: "“{name}” · {runs} conversations · {batches} batches",
@@ -292,7 +292,7 @@
     banner.hidden = !(d && st.source.kind === "sample");
     banner.textContent = t("sampleBanner");
     renderWarnings();
-    const show = { board: st.view === "overview", cards: st.view === "overview", trends: st.view === "overview", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks" };
+    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks" };
     for (const id of Object.keys(show)) { clear($(id)); $(id).hidden = !show[id]; }
     document.querySelector(".sheet").hidden = !d;
     const vs = d ? views() : [];
@@ -309,7 +309,7 @@
       const now = ev.filter(v => { const l = latest.get(v.record.tutor.label); return !l || M.versionKey(v.record) === l.key; });
       const rows = tutorRows(now);
       renderBoard(now, rows, !ev.length && vs.some(v => v.state === "calibration") ? t("onlyCalibration") : t("noData"), keys, latest, now.length < ev.length);
-      renderSpread(now, rows, keys, latest); renderTrend(ev, versions, keys); renderAttention(ev);
+      renderSpread(now, rows, keys, latest); renderValue(now, rows, keys, latest); renderTrend(ev, versions, keys); renderAttention(ev);
     }
     if (show.runs) renderRuns(vs);
     if (show.ops) renderOps(vs);
@@ -559,11 +559,50 @@
     box.append(el("div", { class: "spread-box" }, chart));
   }
 
-  // Plate III: did the new version get better. One small panel per tutor with more than one version in view: the pass
+  // Plate III: is it worth it. Pass rate (with its 95% range) against what the tutor itself costs per conversation, or
+  // how long each reply takes, on a log scale, so up and to the left is better. Only the tutor's own calls count.
+  const secs = ms => t("sec", { v: (ms / 1000).toFixed(ms < 10000 ? 1 : 0) });
+  const tickText = (mode, v) => (mode === "cost" ? "$" + String(Number(v.toPrecision(1))) : secs(v));
+  function renderValue(vs, rows, keys, latest) {
+    const box = $("value");
+    const mode = st.valueAxis === "time" ? "time" : "cost";
+    const toggle = el("div", { class: "seg", role: "group", "aria-label": t("valueAxis") }, ["cost", "time"].map(k => el("button", { type: "button", class: "tab",
+      "aria-pressed": mode === k ? "true" : "false", onclick: () => { st.valueAxis = k; clear(box); renderValue(vs, rows, keys, latest); } }, t(k === "cost" ? "axisCost" : "axisTime"))));
+    box.append(plateHead("III", "value-title", t("chartValue"), toggle));
+    const pts = rows.filter(r => r.g.passRate != null).map(r => {
+      const e = M.economyOf(r.group.filter(v => v.state === "scored"));
+      return { tutor: r.tutor, g: r.g, e, x: mode === "cost" ? e.usdPerRun : e.latencyMs };
+    });
+    const shown = pts.filter(p => p.x != null && p.x > 0);
+    if (!shown.length) { box.append(el("p", { class: "empty-note", text: t("valueNone") })); return; }
+    const L = Math.log10, lo = Math.min(...shown.map(p => p.x)) / 1.8, hi = Math.max(...shown.map(p => p.x)) * 1.8;
+    const xpos = x => ((L(x) - L(lo)) / (L(hi) - L(lo))) * 100;
+    let ticks = [];
+    for (let k = Math.floor(L(lo)); k <= Math.ceil(L(hi)); k++) for (const m of [1, 2, 5]) { const v = m * 10 ** k; if (v >= lo && v <= hi) ticks.push(v); }
+    if (ticks.length > 7) ticks = ticks.filter(v => Math.abs(L(v) - Math.round(L(v))) < 1e-9);
+    const plot = el("div", { class: "vplot" });
+    for (const y of [0, 25, 50, 75, 100]) plot.append(el("span", { class: "vgy", style: `bottom:${y}%`, "aria-hidden": "true" }, el("b", { text: y + (y === 100 ? "%" : "") })));
+    for (const v of ticks) plot.append(el("span", { class: "vgx" + (xpos(v) > 92 ? " edge" : ""), style: `left:${xpos(v)}%`, "aria-hidden": "true" }, el("b", { text: tickText(mode, v) })));
+    plot.append(el("span", { class: "vcorner", text: t(mode === "cost" ? "cornerCost" : "cornerTime"), "aria-hidden": "true" }));
+    for (const p of shown) {
+      const tip = [p.tutor, t("cellTip", { p: p.g.good + p.g.flawed, n: p.g.scored }), ciText(p.g),
+        t("valueTip", { c: usd(p.e.usdPerRun), n: p.e.priced, s: p.e.latencyMs == null ? "—" : secs(p.e.latencyMs) }) + (p.e.estimated ? t("valueEstimated", { k: p.e.estimated }) : "")].join(" · ");
+      if (p.g.passRange) plot.append(el("i", { class: "whisker", style: `left:${xpos(p.x)}%;bottom:${p.g.passRange.lo * 100}%;height:${(p.g.passRange.hi - p.g.passRange.lo) * 100}%`, "aria-hidden": "true" }));
+      plot.append(el("button", { type: "button", class: "vmk", style: `left:${xpos(p.x)}%;bottom:${p.g.passRate * 100}%`, "data-tip": tip, "aria-label": tip,
+        onclick: () => showRuns({ focus: { tutor: p.tutor, version: latest.has(p.tutor) ? latest.get(p.tutor).key : null } }) }, keys.get(p.tutor) || "?"));
+      // Direct label beside the mark, on the left near the right edge.
+      plot.append(el("span", { class: "vname" + (xpos(p.x) > 72 ? " left" : ""), style: `left:${xpos(p.x)}%;bottom:${p.g.passRate * 100}%`, "aria-hidden": "true", text: p.tutor }));
+    }
+    box.append(el("div", { class: "vbox", role: "img", "aria-labelledby": "value-title" }, plot));
+    const missing = pts.length - shown.length;
+    box.append(el("p", { class: "plate-foot", text: t("valueNote") + (missing ? (st.lang === "zh" ? "" : " ") + t("valueMissing", { n: missing }) : "") }));
+  }
+
+  // Plate IV: did the new version get better. One small panel per tutor with more than one version in view: the pass
   // rate of each version with its 95% range, compared only on the cards every version scored (see M.versionTrend).
   function renderTrend(vs, versions, keys) {
     const box = $("trends");
-    box.append(plateHead("III", "trends-title", t("chartVersions"), el("p", { class: "plate-note", text: t("versionsNote") })));
+    box.append(plateHead("IV", "trends-title", t("chartVersions"), el("p", { class: "plate-note", text: t("versionsNote") })));
     const trend = M.versionTrend(vs, versions).sort((a, b) => (keys.get(a.tutor) || a.tutor).localeCompare(keys.get(b.tutor) || b.tutor));
     if (!trend.length) { box.append(el("p", { class: "empty-note", text: t("versionsNone") })); return; }
     const grid = el("div", { class: "trends" });
@@ -601,7 +640,7 @@
   function renderAttention(vs) {
     const box = $("attention");
     const pending = vs.filter(v => v.state === "needs_review").length, spot = vs.filter(isSpot).length;
-    box.append(plateHead("IV", "attention-title", t("attentionTitle")));
+    box.append(plateHead("V", "attention-title", t("attentionTitle")));
     if (!pending && !spot) { box.append(el("p", { class: "empty-note", text: t("nothingPending") })); return; }
     const ask = (n, label, go) => el("button", { type: "button", class: "ask", onclick: go, disabled: !n },
       el("span", { class: "n", text: String(n) }), el("span", { class: "l", text: label + " →" }));

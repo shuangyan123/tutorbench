@@ -431,3 +431,23 @@ test("version trend compares only cards both versions scored, and calls a change
   assert.equal(t3.delta, null);
   assert.equal(t3.clear, false);
 });
+
+test("tutor economy counts only the tutor's own calls, as medians", () => {
+  const call = (role, usd, latencyMs, extra = {}) => ({ role, usd, latencyMs, error: null, costEstimated: false, ...extra });
+  const a = { ...record({ runId: "a" }), calls: [call("tutor", 0.001, 400), call("student", 0.5, 9000), call("tutor", 0.002, 800), call("judge", 0.9, 9000),
+    call("tutor", null, 30000, { error: "timeout" })], usage: { tutor: { usd: 0.003 }, totalUsd: 1.403 } };
+  const e = M.tutorEconomy(a);
+  assert.equal(e.usd, 0.003);
+  assert.equal(e.replies, 2, "a failed call is not a reply");
+  assert.deepEqual(e.latencies, [400, 800]);
+  // Without a usage block the tutor calls are summed; one unpriced call leaves the cost unknown rather than low.
+  const b = { ...record({ runId: "b" }), calls: [call("tutor", 0.004, 600), call("tutor", 0.004, 1000, { costEstimated: true })], usage: null };
+  assert.ok(Math.abs(M.tutorEconomy(b).usd - 0.008) < 1e-12);
+  assert.equal(M.tutorEconomy(b).estimated, true);
+  const c = { ...record({ runId: "c" }), calls: [call("tutor", 0.004, 600), call("tutor", null, 700)], usage: null };
+  assert.equal(M.tutorEconomy(c).usd, null);
+  const g = M.economyOf([a, b, c].map(r => ({ record: r })));
+  assert.equal(g.priced, 2);
+  assert.equal(g.usdPerRun, (0.003 + 0.008) / 2);
+  assert.equal(g.latencyMs, 650, "median over every reply: 400 600 600 700 800 1000");
+});

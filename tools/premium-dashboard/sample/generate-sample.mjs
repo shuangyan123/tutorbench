@@ -235,7 +235,8 @@ function tracksFor(kind, cardId, lang, tutor, config, version = 1) {
   const sc = script(kind, cardId, lang);
   const t = tutor.id, st = config.student.id;
   const tracks = { [t]: [], [st]: [] };
-  const tutorFrame = (x, i) => frame(x, "tutor", i);
+  // Each synthetic tutor answers at its own typical speed, so the value plate has something to show.
+  const tutorFrame = (x, i) => ({ ...frame(x, "tutor", i), latencyMs: (TUTOR_SPEED_MS[t] || 400) + 53 * i });
   const stu = (x, i) => frame(x, "student", i, config.student.pinnedVersion);
   const bad = i => stu(S("this is way too long ".repeat(13), 1), i);
   const rejectedReply = i => (sc.rewriteWith ? stu(sc.rewriteWith, i) : bad(i));
@@ -287,7 +288,9 @@ function config(batchId, purpose, tutors, judgeConfigVersion, extra = {}) {
 }
 // v2 per-model price table (used by the newer batches; the older batches keep the legacy flat rates).
 const priced = (model, input, output) => ({ model, inputUsdPerMillion: input, outputUsdPerMillion: output, date: "2026-11-25", source: "https://example.com/synthetic-prices" });
-const modelPrices = { version: "synthetic-prices-v2", models: [priced("atlas", 0.5, 2), priced("birch", 0.5, 2), priced("cedar", 0.5, 2), priced("dune", 0.5, 2),
+// Tutors differ in price and speed on purpose: Atlas is mid-priced and slow, Dune cheap and fast, Cedar expensive.
+const TUTOR_SPEED_MS = { atlas: 2300, birch: 900, cedar: 3400, dune: 650 };
+const modelPrices = { version: "synthetic-prices-v2", models: [priced("atlas", 0.5, 2), priced("birch", 0.4, 1.6), priced("cedar", 2.5, 10), priced("dune", 0.15, 0.6),
   priced("learner", 0.3, 1.2), priced("j1", 0.5, 2), priced("j2", 0.5, 2), priced("j3", 0.5, 2), priced("alt1", 0.5, 2), priced("alt2", 0.5, 2)] };
 // Scenario per (tutor, card, lang, repeat). Chosen so that every status, end reason and flag appears.
 const PLAN = {
@@ -319,7 +322,7 @@ try {
     const stableIds = cardIds.filter(id => id !== "synthetic-tiles");
     const stable = assets.filter(a => stableIds.includes(a.card.id));
     const olderBatch = (batchId, at, tutor, repeats, plan) => {
-      const c = config(batchId, "synthetic run of an older tutor version", [tutor], "synthetic-panel-v1", { repeats });
+      const c = config(batchId, "synthetic run of an older tutor version", [tutor], "synthetic-panel-v1", { repeats, prices: modelPrices });
       const byRepeat = Object.fromEntries(Array.from({ length: repeats }, (_, i) => [i + 1, {}]));
       stableIds.forEach((cardId, ci) => c.languages.forEach((lang, li) => {
         for (let r = 1; r <= repeats; r++) byRepeat[r][[cardId, lang, tutor.id].join("/")] = tracksFor(plan[(ci * 2 + li) * repeats + r - 1], cardId, lang, tutor, c);
@@ -344,7 +347,7 @@ try {
     run(store, c1, oldAssets, tape1, clock("2026-11-18T09:00:00Z"));
 
     // Batch 2: the main synthetic pilot, 4 cards x 2 languages x 4 tutors x 2 repeats.
-    const c2 = config("synthetic-pilot-02", "synthetic pilot: every status and flag the dashboard must show", Object.values(TUTORS), "synthetic-panel-v1");
+    const c2 = config("synthetic-pilot-02", "synthetic pilot: every status and flag the dashboard must show", Object.values(TUTORS), "synthetic-panel-v1", { prices: modelPrices });
     // The runner keys a tape by card/language/tutor, so each repeat gets its own tape and the provider picks by repeat.
     const tapes = { 1: {}, 2: {} };
     cardIds.forEach((cardId, ci) => {
@@ -356,7 +359,7 @@ try {
       provider: job => replayProvider(tapes[job.repeatIndex], job) });
 
     // Re-score four runs with a revised (synthetic) judge configuration: scorings are appended, never replaced.
-    const c2b = config("synthetic-pilot-02", c2.purpose, Object.values(TUTORS), "synthetic-panel-v2");
+    const c2b = config("synthetic-pilot-02", c2.purpose, Object.values(TUTORS), "synthetic-panel-v2", { prices: modelPrices });
     const rows = readFileSync(join(work, "runs", "index.jsonl"), "utf8").trim().split("\n").map(l => JSON.parse(l));
     const kindOf = row => scenarioFor(row.tutorLabel.split(" ")[0].toLowerCase(), cardIds.indexOf(row.cardId), row.lang, row.repeatIndex);
     const targets = rows.filter(r => r.batchId === "synthetic-pilot-02" && kindOf(r) === "rejudgeFlip");

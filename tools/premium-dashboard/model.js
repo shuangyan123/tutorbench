@@ -327,6 +327,33 @@
     return { run, rescoring, estimatedCalls: calls.filter(c => c && c.costEstimated === true).length };
   }
 
+  function median(xs) {
+    if (!xs.length) return null;
+    const s = [...xs].sort((a, b) => a - b), m = s.length >> 1;
+    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  }
+  const tutorCalls = record => (record.calls || []).filter(c => c && c.role === "tutor" && !c.error);
+
+  // What the tested tutor itself cost in one run, and how long each of its replies took. Only tutor calls count: the
+  // simulated student and the judges are the benchmark's own cost. Tokens are not compared, because each model's
+  // tokenizer counts the same text differently; dollars and seconds are comparable.
+  function tutorEconomy(record) {
+    const calls = tutorCalls(record);
+    const fromUsage = record.usage && record.usage.tutor && typeof record.usage.tutor.usd === "number" ? record.usage.tutor.usd : null;
+    const summed = calls.length && calls.every(c => typeof c.usd === "number") ? calls.reduce((a, c) => a + c.usd, 0) : null;
+    const latencies = calls.map(c => c.latencyMs).filter(x => typeof x === "number" && x >= 0);
+    return { usd: fromUsage ?? summed, replies: calls.length, latencies, estimated: calls.some(c => c.costEstimated === true) };
+  }
+
+  // A group's typical tutor cost per conversation and wait per reply, as medians so one long run does not dominate.
+  function economyOf(views) {
+    const per = views.map(v => tutorEconomy(v.record));
+    const usd = per.map(p => p.usd).filter(x => x != null);
+    const waits = per.flatMap(p => p.latencies);
+    return { runs: views.length, priced: usd.length, usdPerRun: median(usd), replies: waits.length, latencyMs: median(waits),
+      estimated: per.filter(p => p.estimated).length };
+  }
+
   // A batch as the page shows it. v1 batches have no kind, hard cap, top-ups or reconciliation.
   function batchInfo(b) {
     const runs = b.runs || {};
@@ -359,6 +386,6 @@
   }
 
   const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, wilson, versionKey, tutorVersions, latestVersions, versionTrend, failureEvidence,
-    studentChecks, disagreementSummary, costs, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION };
+    studentChecks, disagreementSummary, costs, tutorEconomy, economyOf, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION };
   root.PremiumDashboardModel = api;
 })(globalThis);
