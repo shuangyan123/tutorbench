@@ -39,6 +39,13 @@ export function optional<T>(read: Reader<T>): Reader<T | undefined> {
 export function nullable<T>(read: Reader<T>): Reader<T | null> {
   return (v, f) => v === null ? null : read(v, f);
 }
+// 只剥整条回复的一层围栏。多个块、嵌套围栏及额外文字仍交由 JSON.parse 拒绝。
+export function unwrapJson(raw: string) {
+  const text = raw.trim();
+  const match = /^\x60{3}(?:json)?\r?\n([\s\S]*?)\r?\n\x60{3}$/iu.exec(text);
+  if (!match || /^\s*\x60{3}/mu.test(match[1]!)) return { text, unwrapped: false };
+  return { text: match[1]!, unwrapped: true };
+}
 export const language = choices("zh-CN", "en");
 export type Lang = ReturnType<typeof language>;
 export const localized = <T>(read: Reader<T>) => shape({ "zh-CN": read, en: read });

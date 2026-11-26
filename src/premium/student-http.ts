@@ -26,11 +26,11 @@ export async function studentHttp(req: Request, key: string | undefined, send = 
     }
     const data = obj(await readBoundedJson(response, signal), "response");
     if (data.error && typeof data.error === "object" && "code" in data.error &&
-        ["server_overloaded", "overloaded_error"].includes(String(data.error.code))) return { error: "overloaded", retryable: true };
+        ["server_overloaded", "overloaded_error"].includes(String(data.error.code))) return { error: "overloaded", retryable: true,
+          identity: { returnedModel: data.model ?? null, system_fingerprint: data.system_fingerprint ?? null } };
     const choice = Array.isArray(data.choices) ? data.choices[0] : undefined;
-    if (choice?.finish_reason === "content_filter") return { error: "content_filter" };
     const bill = data.usage == null ? null : obj(data.usage, "usage");
-    return { reply: { text: choice?.message?.content, resolvedModel: data.model, finishReason: choice?.finish_reason,
+    return { reply: { text: choice?.message?.content, resolvedModel: data.model, system_fingerprint: data.system_fingerprint ?? null, finishReason: choice?.finish_reason,
       usage: bill && typeof bill === "object" ? { inputTokens: bill.prompt_tokens, outputTokens: bill.completion_tokens } : null,
       latencyMs: Date.now() - start } };
   } catch (error) {

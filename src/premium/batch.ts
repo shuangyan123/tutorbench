@@ -17,6 +17,9 @@ export interface Execution {
 function bindVersions(store: Store, e: Execution, tutors: ReturnType<typeof tutorManifest>[]) {
   const c = e.config;
   safeJson(c);
+  if (c.servingIdentity === "revision" && !c.identityEvidence) invalid("servingIdentity.revision_evidence");
+  if (e.mode === "hybrid_calibration" && c.student.provider === "deepseek" &&
+      c.servingIdentity !== undefined && c.servingIdentity !== "alias") invalid("calibration.servingIdentity");
   if ([c.budgetUsd, c.reserveUsd].some(n => dollars(n) !== n)) invalid("budget.precision");
   if ((c.maxOfflineAttempts ?? 1) > 4) invalid("maxOfflineAttempts");
   if (c.hardCapUsd !== undefined && (c.hardCapUsd < c.budgetUsd || dollars(c.hardCapUsd) !== c.hardCapUsd)) invalid("hardCapUsd");
@@ -47,6 +50,7 @@ function manifest(e: Execution) {
   const cards = assets.map(a => ({ id: a.card.id, version: a.card.version, contentHash: a.contentHash, rulesVersion: a.rulesVersion,
     studentPrompts: c.languages.map(l => hash(studentPrompt(a, l))) }));
   return { schema: "tutorbench.premium-batch", schemaVersion: 2, mode: e.mode ?? "offline_replay", ...c, tutors: c.tutors.map(tutorManifest), kind: c.kind ?? "evaluation", hardCapUsd: c.hardCapUsd ?? c.budgetUsd * 1.25, cards,
+    configuredServingIdentity: c.servingIdentity ?? (e.mode === "hybrid_calibration" && c.student.provider === "deepseek" ? "alias" : "unknown"),
     gitCommit: e.gitCommit, tapeHash: e.tapeHash, planned: cards.length * c.languages.length * c.tutors.length * c.repeats };
 }
 function totals(records: RunRecord[]) {
@@ -70,7 +74,13 @@ function refresh(store: Store, batchId: string, explicitStop: string | null = nu
   const drift = b.mode === "hybrid_calibration" && records.some(r => r.attempts.some(a => a.reason === "model_version_drift"));
   const stop = drift ? "model_version_drift" : budgetStopReason ?? explicitStop;
   const status = stop ?? (new Set(records.map(r => JSON.stringify([r.card.id, r.card.lang, r.tutor.id, r.repeat.index]))).size === b.planned ? "complete" : "running");
-  store.batch(batchId, { ...b, spentUsd, budgetStopReason, hardCapReached: spentUsd !== null && spentUsd >= Number(b.hardCapUsd), status, runs: { planned: b.planned, ...counts } });
+  const role = b.kind === "calibration" ? "student" : "tutor";
+  const measured = records.flatMap(r => r.calls.filter(c => c.role === role).map(c => ({ call: c, pin: r[role].pinnedVersion })));
+  let servingIdentity = b.configuredServingIdentity ?? "unknown";
+  if (!measured.some(({ call }) => call.returnedModel) ||
+      (servingIdentity === "revision" && measured.some(({ call, pin }) => call.returnedModel !== pin)))
+    servingIdentity = "unknown";
+  store.batch(batchId, { ...b, servingIdentity, spentUsd, budgetStopReason, hardCapReached: spentUsd !== null && spentUsd >= Number(b.hardCapUsd), status, runs: { planned: b.planned, ...counts } });
   return status;
 }
 function updateBudget(store: Store, previous: Record<string, unknown>, e: Execution) {
@@ -92,7 +102,7 @@ export function runBatch(store: Store, e: Execution) {
     const identity = { ...spec, budgetUsd: undefined, hardCapUsd: undefined };
     store.bind("batch/" + c.batchId, hash(safeJson(identity)));
     const previous = store.getBatch(c.batchId);
-    if (!previous) store.batch(c.batchId, { ...spec, createdAt: now(), budgetHistory: [], reconciledUsd: {} });
+    if (!previous) store.batch(c.batchId, { ...spec, servingIdentity: "unknown", createdAt: now(), budgetHistory: [], reconciledUsd: {} });
     else {
       // v2 账本可能只在原记录中保留漂移，恢复前先重建被费用遮蔽的状态。
       if (previous.mode === "hybrid_calibration" && ["actual_over_budget", "budget_stop", "unknown_cost"].includes(String(previous.status)))

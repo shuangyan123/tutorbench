@@ -18,6 +18,7 @@ export interface Request {
   params: { temperature: number | null; maxOutputTokens?: number };
 }
 export interface Reply {
+  returnedModel?: string | null; system_fingerprint?: string | null;
   text: string; resolvedModel: string; finishReason: string; latencyMs: number;
   usage: { inputTokens: number; outputTokens: number } | null;
 }
@@ -31,12 +32,14 @@ export type Prices = ReturnType<typeof priceSchema>;
 export type Role = Request["role"];
 export type Failure = `http_${number}` | "timeout" | "overloaded" | "not_dispatched" | "content_filter" | "provider_error" | "mock_not_dispatched" | "sensitive_output" | "invalid_response" | "model_version_drift" | "budget_stop" | "unknown_cost";
 export interface Call {
+  requestedModel: string; returnedModel: string | null; system_fingerprint: string | null; calledAt: string;
   n: number; role: Role; model: string; requestHash: string; resolvedModel: string | null;
   usage: Reply["usage"]; usd: number | null; finishReason: string | null; latencyMs: number | null;
   error: Failure | null; retryDelayMs: number; reservedUsd: number; costEstimated: boolean;
 }
 export class TransportError extends Error {
-  constructor(readonly code: Failure, readonly retryable = false, readonly retryAfterMs?: number) { super(code); }
+  constructor(readonly code: Failure, readonly retryable = false, readonly retryAfterMs?: number,
+    readonly identity?: { returnedModel: unknown; system_fingerprint: unknown }) { super(code); }
 }
 export class MockNotDispatched extends TransportError {
   constructor() { super("mock_not_dispatched", true); }
@@ -116,10 +119,21 @@ export class Session {
       throw new CallError("budget_stop");
     }
     const call: Call = { n: this.calls.length + 1, role: req.role, model: req.model.id, requestHash: hash(JSON.stringify(req)),
+      calledAt: new Date().toISOString(), requestedModel: req.model.requestedModel, returnedModel: null, system_fingerprint: null,
       resolvedModel: null, usage: null, usd: null, finishReason: null, latencyMs: null, error: null, reservedUsd: reserve, costEstimated: true, retryDelayMs };
     this.calls.push(call);
     call.usd = reserve;
     this.remaining = dollars(this.remaining - reserve)!;
+    const fail = (code: Failure): never => { call.error = code; throw new CallError(code); };
+    const recordIdentity = (model: unknown, fingerprint: unknown) => {
+      for (const value of [model, fingerprint]) {
+        if (value != null && typeof value !== "string") fail("invalid_response");
+        if (typeof value === "string" && sensitive(value)) fail("sensitive_output");
+      }
+      call.returnedModel = typeof model === "string" && model.trim() ? model : null;
+      call.system_fingerprint = typeof fingerprint === "string" ? fingerprint : null;
+    };
+    const returnedDrift = () => req.role !== "tutor" && call.returnedModel !== null && call.returnedModel !== req.model.pinnedVersion;
     let reply: Reply;
     try { reply = this.provider(structuredClone(req)); }
     catch (error) {
@@ -128,10 +142,13 @@ export class Session {
         this.remaining = dollars(this.remaining + reserve)!;
         call.usd = 0; call.costEstimated = false; call.usage = { inputTokens: 0, outputTokens: 0 };
       }
-      if (error instanceof TransportError) throw error;
+      if (error instanceof TransportError) {
+        if (error.identity) recordIdentity(error.identity.returnedModel, error.identity.system_fingerprint);
+        if (returnedDrift()) fail("model_version_drift");
+        throw error;
+      }
       throw new CallError(call.error);
     }
-    const fail = (code: Failure): never => { call.error = code; throw new CallError(code); };
     if (!reply || typeof reply !== "object") return fail("invalid_response");
     if (reply.usage && tokens(reply.usage.inputTokens) && tokens(reply.usage.outputTokens)) {
       call.costEstimated = false;
@@ -143,19 +160,28 @@ export class Session {
         this.remaining = dollars(this.remaining + reserve - call.usd)!;
       }
     }
+    const returned = reply.returnedModel === undefined ? reply.resolvedModel : reply.returnedModel;
+    recordIdentity(returned, reply.system_fingerprint);
+    if (reply.finishReason === "content_filter") return fail(returnedDrift() ? "model_version_drift" : "content_filter");
     if (typeof reply.text !== "string" || !reply.text.trim() || typeof reply.resolvedModel !== "string" || !reply.resolvedModel.trim() ||
-        typeof reply.finishReason !== "string" || !reply.finishReason.trim() || !tokens(reply.latencyMs)) return fail("invalid_response");
+        typeof reply.finishReason !== "string" || !reply.finishReason.trim() || !tokens(reply.latencyMs)) return fail(returnedDrift() ? "model_version_drift" : "invalid_response");
     if ([reply.text, reply.resolvedModel, reply.finishReason].some(sensitive)) return fail("sensitive_output");
     call.resolvedModel = reply.resolvedModel;
     call.finishReason = reply.finishReason;
     call.latencyMs = reply.latencyMs;
     const previous = this.calls.find(c => c.role === req.role && c.model === req.model.id && c.resolvedModel);
-    if ((req.role !== "tutor" && reply.resolvedModel !== req.model.pinnedVersion) ||
+    if (returnedDrift() || (req.role !== "tutor" && reply.resolvedModel !== req.model.pinnedVersion) ||
         previous?.resolvedModel !== reply.resolvedModel) return fail("model_version_drift");
-    return { text: reply.text, resolvedModel: reply.resolvedModel, finishReason: reply.finishReason, latencyMs: reply.latencyMs, usage: call.usage };
+    return { text: reply.text, returnedModel: call.returnedModel, system_fingerprint: call.system_fingerprint, resolvedModel: reply.resolvedModel, finishReason: reply.finishReason, latencyMs: reply.latencyMs, usage: call.usage };
   }
 }
 export const configSchema = shape({
+  servingIdentity: optional(choices("revision", "alias", "unknown")),
+  identityEvidence: optional(shape({
+    url: (v, f) => URL.canParse(str(v, f)) && new URL(String(v)).protocol === "https:" ? String(v) : invalid(f),
+    retrievedAt: (v, f) => /^\d{4}-\d{2}-\d{2}(?:T.*)?$/u.test(str(v, f)) && Number.isFinite(Date.parse(String(v))) ? String(v) : invalid(f),
+    quote: str,
+  })),
   syntheticJudgeRubric: optional(choices("fixture")), kind: optional(choices("evaluation", "calibration")), hardCapUsd: optional(amount), batchId: id, purpose: str, languages: (v, f) => {
     if (!Array.isArray(v) || !v.length || v.some(l => l !== "en" && l !== "zh-CN") || new Set(v).size !== v.length) invalid(f);
     return v as ("en" | "zh-CN")[];

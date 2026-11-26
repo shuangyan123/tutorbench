@@ -1,8 +1,8 @@
 import { hash, type Asset } from "./cards.js";
 import type { Conversation } from "./dialogue.js";
-import { items, judgeInput, judgePrompt, parseBallot, type Ballot } from "./judge.js";
+import { items, judgeInput, judgePrompt, validateBallot, type Ballot } from "./judge.js";
 import { CallError, panel, usage, type Config, type Model, type Session } from "./provider.js";
-import type { Lang } from "./schema.js";
+import { unwrapJson, type Lang } from "./schema.js";
 
 type Vote = string | number | boolean;
 export interface Disagreement { where: string; votes: Record<string, Vote>; merged: Vote | null }
@@ -78,20 +78,22 @@ export function scoring(config: Config, tutor: Model, asset: Asset, lang: Lang, 
   const system = judgePrompt(lang, privateRubric), content = judgeInput(asset, lang, conversation);
   const perJudge = judges.map(model => {
     let raw: string | null = null;
-    const rejected: { raw: string; reason: string }[] = [];
-    let feedback = "";
+    const rejected: { raw: string; reason: string; unwrapped: boolean }[] = [];
+    let feedback = "", unwrapped = false;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         raw = session.call({ role: "judge", model, system, messages: [{ role: "user", content: content + feedback }], params: { temperature: 0, maxOutputTokens: 8192 } }).text;
-        return { judgeId: model.id, raw, rejected, output: parseBallot(raw, conversation, asset.card.fixedTest.studentMessage), error: null };
+        const parsed = unwrapJson(raw);
+        unwrapped = parsed.unwrapped;
+        return { judgeId: model.id, raw, rejected, unwrapped, output: validateBallot(parsed.text, conversation, asset.card.fixedTest.studentMessage), error: null };
       } catch (error) {
-        if (error instanceof CallError) return { judgeId: model.id, raw: null, rejected, output: null, error: error.code };
+        if (error instanceof CallError) return { judgeId: model.id, raw: null, rejected, unwrapped: false, output: null, error: error.code };
         const reason = error instanceof Error && error.message.startsWith("Invalid premium field: judge") ? error.message : "invalid_judge_json";
-        rejected.push({ raw: raw!, reason });
+        rejected.push({ raw: raw!, reason, unwrapped });
         feedback = "\nPrevious ballot failed validation: " + reason;
       }
     }
-    return { judgeId: model.id, raw, rejected, output: null, error: "invalid_judge_output" };
+    return { judgeId: model.id, raw, rejected, unwrapped, output: null, error: "invalid_judge_output" };
   });
   const complete = perJudge.flatMap(j => j.output ? [{ judgeId: j.judgeId, output: j.output }] : []);
   const result = complete.length === 3 ? aggregate(complete, asset, conversation) :

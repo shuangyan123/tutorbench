@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
+import { checkCalibration } from "../premium/check-calibration.js";
 import { hash, loadCards, parseCard } from "../premium/cards.js";
 import { hybridProvider, liveStudent } from "../premium/calibration.js";
 import { reconcile, rejudge, runBatch, type Execution } from "../premium/batch.js";
@@ -22,8 +23,8 @@ function main() {
   } });
   if (command === "check-calibration") {
     if (!values.checker || !values.expectations || !values["batch-id"]) invalid("checker.arguments");
-    execFileSync("python", ["-X", "utf8", "-B", resolve(values.checker), resolve(values.out!), resolve(values.expectations),
-      "--batch-id", id(values["batch-id"], "batch"), ...(values["dry-run"] ? ["--dry-run"] : [])], { stdio: "inherit" });
+    process.exitCode = checkCalibration(resolve(values.out!), resolve(values.checker), resolve(values.expectations),
+      values["batch-id"], !!values["dry-run"]);
     return;
   }
   if (command === "reconcile") {
@@ -85,5 +86,5 @@ catch (e) {
   const message = e instanceof Error && /^(Invalid premium field:|Premium configuration\/version drift:|--cards|Expected run|Existing record|Sensitive premium|unknown_cost|budget_stop|actual_over_budget)/u.test(e.message)
     ? e.message : "Premium input or storage unavailable; verify paths, UTF-8 JSON and required rules/lock.";
   console.error(message);
-  process.exitCode = 1;
+  process.exitCode = process.argv[2] === "check-calibration" ? 2 : 1;
 }

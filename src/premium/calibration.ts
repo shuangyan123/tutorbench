@@ -27,6 +27,6 @@ export const liveStudent: Provider = req => {
   if (child.error && "code" in child.error && child.error.code === "ETIMEDOUT") throw new TransportError("timeout", true);
   if (child.error || child.status !== 0) throw new TransportError("provider_error");
   const response = JSON.parse(child.stdout);
-  if (response.error) throw new TransportError(response.error, response.retryable, response.retryAfterMs);
+  if (response.error) throw new TransportError(response.error, response.retryable, response.retryAfterMs, response.identity);
   return response.reply;
 };

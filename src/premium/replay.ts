@@ -3,7 +3,7 @@ import { id, integer, invalid, nullable, obj, optional, shape, str } from "./sch
 import type { Job } from "./runner.js";
 
 // Golden replay consumes frames in call order, including rejected replies.
-const frame = shape({ text: str, resolvedModel: optional(id), finishReason: id, latencyMs: integer,
+const frame = shape({ text: str, resolvedModel: optional(str), system_fingerprint: optional(nullable(str)), finishReason: id, latencyMs: integer,
   usage: nullable(shape({ inputTokens: integer, outputTokens: integer })) });
 export function replayProvider(tape: unknown, job: Job, tutorByTurn = false): Provider {
   const tracks = obj(obj(tape, "tape")[[job.asset.card.id, job.lang, job.tutor.id].join("/")], "tape.job");
@@ -18,6 +18,6 @@ export function replayProvider(tape: unknown, job: Job, tutorByTurn = false): Pr
     if (value === "mock_not_dispatched") throw new MockNotDispatched();
     if (value == null) return invalid("tape.exhausted/provider_error");
     const reply = frame(value, "tape.frame");
-    return { ...reply, resolvedModel: reply.resolvedModel ?? request.model.pinnedVersion } satisfies Reply;
+    return { ...reply, system_fingerprint: reply.system_fingerprint ?? null, returnedModel: reply.resolvedModel ?? null, resolvedModel: reply.resolvedModel ?? request.model.pinnedVersion } satisfies Reply;
   };
 }

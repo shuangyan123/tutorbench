@@ -6,7 +6,7 @@ import { checkStudent, studentPrompt, type State } from "./student.js";
 
 interface StudentMessage {
   i: number; role: "student"; text: string; state: Omit<State, "message">; fixed?: boolean;
-  checks?: { regenerated: number; hardFails: string[]; softFlags: string[] };
+  checks?: { fenceStripped?: true; regenerated: number; hardFails: string[]; softFlags: string[] };
 }
 interface TutorMessage {
   i: number; role: "tutor"; turn: number; text: string; finishReason: string; latencyMs: number; usage: Reply["usage"];
@@ -15,7 +15,7 @@ export type Line = StudentMessage | TutorMessage;
 type EndReason = "left" | "curt_exit" | "thanked_after_answer" | "turn_cap" | "student_invalid" | "error";
 export interface Attempt {
   attempt: number; status: "discarded" | "kept" | "error"; reason: string | null; atStudentMessage: number | null;
-  transcript: Line[]; rejected: { call: number; studentMessage: number; text: string; reasons: string[]; softFlags?: string[] }[];
+  transcript: Line[]; rejected: { call: number; studentMessage: number; text: string; fenceStripped?: true; reasons: string[]; softFlags?: string[] }[];
   calls: number[];
 }
 function runAttempt(asset: Asset, lang: Lang, tutor: TutorRequest, student: Model, session: Session, audit: Attempt): EndReason {
@@ -38,11 +38,11 @@ function runAttempt(asset: Asset, lang: Lang, tutor: TutorRequest, student: Mode
     for (let rewrite = 0; rewrite <= 2; rewrite++) {
       const response = session.call({ role: "student", model: student, system,
         params: { temperature: 0.7, maxOutputTokens: 512 }, messages: [...studentHistory, ...correction] });
-      const { state, hard, soft } = checkStudent(response.text, asset, lang, states, tutors);
+      const { state, hard, soft, fenceStripped } = checkStudent(response.text, asset, lang, states, tutors);
       if (state && !hard.length) {
         const { message, ...internal } = state;
         lines.push({ i: lines.length + 1, role: "student", text: message, state: internal,
-          checks: { regenerated: rewrite, hardFails, softFlags: soft } });
+          checks: { ...(fenceStripped ? { fenceStripped } : {}), regenerated: rewrite, hardFails, softFlags: soft } });
         states.push(state);
         studentHistory.push({ role: "assistant", content: response.text });
         if (state.end) return state.events.find(e => ["left", "curt_exit", "thanked_after_answer"].includes(e)) as EndReason;
@@ -50,6 +50,7 @@ function runAttempt(asset: Asset, lang: Lang, tutor: TutorRequest, student: Mode
       }
       hardFails.push(...hard);
       audit.rejected.push({ call: session.calls.length, studentMessage: states.length + 1, text: response.text, reasons: hard,
+        ...(fenceStripped ? { fenceStripped } : {}),
         ...(soft.length ? { softFlags: soft } : {}) });
       if (rewrite === 2) {
         audit.reason = hard.join(",");
@@ -85,7 +86,9 @@ export function dialogue(asset: Asset, lang: Lang, tutor: TutorRequest, config: 
   const fired = students.flatMap(m => m.state.events);
   const { card } = asset;
   const fixedTestDelivered = students[card.fixedTest.studentMessage - 1]?.text.includes(card.fixedTest.mustContain[lang]) ?? false;
-  const end = { reason, tutorTurns: transcript.length - students.length, messages: transcript.length,
+  const fenceStripped = attempts.reduce((count, a) => count + a.rejected.filter(r => r.fenceStripped).length +
+    a.transcript.filter(m => m.role === "student" && m.checks?.fenceStripped).length, 0);
+  const end = { reason, fenceStripped, tutorTurns: transcript.length - students.length, messages: transcript.length,
     finalStage: students.at(-1)!.state.stage, fixedTestDelivered,
     behavioursFired: [card.fixedTest.kind, ...card.conditionalBehaviours].filter(e => fired.includes(e)),
     behavioursNotFired: card.conditionalBehaviours.filter(e => !fired.includes(e)),

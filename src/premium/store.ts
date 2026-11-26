@@ -11,7 +11,7 @@ export function safeJson(value: unknown) {
   if (sensitive(text)) throw new Error("Sensitive premium data blocked");
   return text;
 }
-function publish(path: string, bytes: string) {
+export function publish(path: string, bytes: string) {
   if (existsSync(path) && readFileSync(path, "utf8") === bytes) return;
   const temp = path + "." + randomUUID() + ".tmp";
   try {
@@ -23,7 +23,7 @@ export function rebuildIndex(root: string) {
   const dir = join(root, "records");
   const rows = (existsSync(dir) ? readdirSync(dir) : []).filter(f => f.endsWith(".json")).sort().map(f => {
     const r: RunRecord = JSON.parse(readFileSync(join(dir, f), "utf8"));
-    if (r.schema !== "tutorbench.premium-run-record" || ![1, 2, 3].includes(r.schemaVersion) || id(r.runId, "runId") + ".json" !== f) invalid("record.identity");
+    if (r.schema !== "tutorbench.premium-run-record" || ![1, 2, 3, 4].includes(r.schemaVersion) || id(r.runId, "runId") + ".json" !== f) invalid("record.identity");
     return safeJson(indexRow(r)) + "\n";
   });
   publish(join(root, "index.jsonl"), rows.join(""));

@@ -1,6 +1,6 @@
 import type { Asset } from "./cards.js";
 import type { Lang } from "./schema.js";
-import { bool, list, positive, shape, str } from "./schema.js";
+import { bool, list, positive, shape, str, unwrapJson } from "./schema.js";
 
 const stateSchema = shape({ message: str, stage: positive, events: list(str), end: bool });
 export type State = ReturnType<typeof stateSchema>;
@@ -16,8 +16,9 @@ export function studentPrompt(asset: Asset, lang: Lang) {
 export function checkStudent(raw: string, asset: Asset, lang: Lang, previous: State[], tutors: string[]) {
   const hard: string[] = [], soft: string[] = [];
   let state: State;
-  try { state = stateSchema(JSON.parse(raw), "student"); }
-  catch { return { state: null, hard: ["invalid_json_or_fields"], soft }; }
+  const { text, unwrapped: fenceStripped } = unwrapJson(raw);
+  try { state = stateSchema(JSON.parse(text), "student"); }
+  catch { return { state: null, fenceStripped, hard: ["invalid_json_or_fields"], soft }; }
   const { card } = asset;
   const { message, stage, events, end } = state;
   const allowed = [card.fixedTest.kind, "pushback", "thanked_after_answer", ...card.conditionalBehaviours,
@@ -55,5 +56,5 @@ export function checkStudent(raw: string, asset: Asset, lang: Lang, previous: St
     if (stage === card.solvedStage && ![...priorEvents, ...events].includes(key)) soft.push("missing:" + mistake.id);
     if (events.includes(key) && !has(message, mistake.hint[lang])) soft.push("hint_absent:" + mistake.id);
   }
-  return { state, hard, soft };
+  return { state, fenceStripped, hard, soft };
 }

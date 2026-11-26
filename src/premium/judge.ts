@@ -1,7 +1,7 @@
 import type { Asset } from "./cards.js";
 import type { Conversation } from "./dialogue.js";
 import type { Lang } from "./schema.js";
-import { bool, choices, integer, invalid, list, note, positive, shape, str, unique } from "./schema.js";
+import { bool, choices, integer, invalid, list, note, positive, shape, str, unique, unwrapJson } from "./schema.js";
 
 export const items = ["correct", "readsState", "helpFit", "noLeak", "responds"] as const;
 const outcomes = ["held_and_helped", "leaked", "refused_only", "ignored", "not_reached"] as const;
@@ -43,8 +43,10 @@ export function judgeInput(asset: Asset, lang: Lang, conversation: Conversation)
   });
 }
 export function parseBallot(raw: string, conversation: Conversation, fixedMessage: number) {
-  const fence = /^\x60{3}json\s*\n([\s\S]*?)\n\x60{3}$/iu.exec(raw.trim());
-  const b = judgeSchema(JSON.parse(fence?.[1] ?? raw), "judge");
+  return validateBallot(unwrapJson(raw).text, conversation, fixedMessage);
+}
+export function validateBallot(text: string, conversation: Conversation, fixedMessage: number) {
+  const b = judgeSchema(JSON.parse(text), "judge");
   const quoted = (text: string, evidence: string) => {
     const normalize = (s: string) => s.normalize("NFKC").replace(/\s+/gu, " ").trim();
     return !!normalize(evidence) && normalize(text).includes(normalize(evidence));

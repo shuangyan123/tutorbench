@@ -17,7 +17,7 @@ export function runJob(config: Config, job: Job, session: Session, gitCommit: st
   const resolved = (role: "student" | "tutor") => session.calls.slice().reverse().find(c => c.role === role && c.resolvedModel)?.resolvedModel ?? null;
   const { card } = asset;
   const suite = /^(.*)-v(\d+(?:\.\d+)*)$/u.exec(card.suite);
-  return { ...(job.restartOf ? { restartOf: job.restartOf } : {}), schema: "tutorbench.premium-run-record", schemaVersion: 3, batchKind: config.kind ?? "evaluation", runId, batchId: config.batchId, createdAt,
+  return { ...(job.restartOf ? { restartOf: job.restartOf } : {}), schema: "tutorbench.premium-run-record", schemaVersion: 4, batchKind: config.kind ?? "evaluation", runId, batchId: config.batchId, createdAt,
     status: reason === "error" || reason === "student_invalid" ? reason : config.kind === "calibration" ? "unscored" : scorings[0]?.merged?.verdict ? "scored" : "needs_review",
     code: { gitCommit, runnerVersion: "0.1.0" }, card: { suite: suite?.[1] ?? card.suite, suiteVersion: suite?.[2] ?? null, suiteId: card.suite, id: card.id, version: card.version,
       lang, hash: asset.contentHash, contentHash: asset.contentHash, rulesVersion: asset.rulesVersion },
