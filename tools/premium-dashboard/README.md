@@ -18,7 +18,7 @@ The files are read inside the browser tab. Nothing is uploaded, and the page mak
 
 ## What the page shows
 
-The page has three views. The filters (judge configuration, batch, language, card versions) sit at the right end of the view bar.
+The page has four views. The filters (judge configuration, batch, language, card versions) sit at the right end of the view bar.
 
 - **Overview** has five plates:
   - *Plate I, Who teaches well*, has one row per tutor: a letter, the name, the formal pass rate, then one specimen per conversation. Counted specimens come first (good, flawed, fail). After a small gap come the ones that still need review; they stand on a dashed ground and are not counted. The hairline under each rate is its 95% range (Wilson score interval): when two tutors' lines overlap a lot, the gap between them may be luck.
@@ -27,6 +27,7 @@ The page has three views. The filters (judge configuration, batch, language, car
   - *Plate IV, Did the new version get better*, has one small panel for each tutor with more than one version in view. Each version is a dot at its pass rate with its 95% range as a vertical line. The big number is the newest version against the one before, in percentage points. It is called outside the error range only when the two ranges do not overlap. Versions are compared only on the card versions and languages that every one of them has scored runs on, so no version is judged on easier cards.
   - *Plate V, Needs you*, shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, review flags or tied judges).
   - Hovering a specimen, a letter or a version dot gives the detail. Clicking a specimen opens that conversation. Clicking a letter, a tutor name, a version dot or a number opens the matching list.
+- **Compare** puts two setups side by side. Pick A and B; the page first lists what differs (tutor, tutor model, tutor prompt, tutor parameters, simulated student model and parameters, judge configuration, rules version), then compares the pass rates overall and per card and language, only on the card versions and languages both sides scored. A result is read as the effect of a change only when exactly one thing differs (another tutor counts as one change, its model included). When more than one thing differs, the page says the difference cannot be put down to any one of them.
 - **All conversations** is the full list, with state tabs and the run drawer. The drawer shows the conversation's own specimen, large; clicking a leaf scrolls to that tutor turn. Tabs for superseded and calibration runs appear when such runs are loaded.
 - **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate.
 
@@ -43,11 +44,15 @@ Each conversation is drawn as one small plant, standing on the plate's ground li
 
 Letters follow the tutor, never its rank: they are given in name order over all loaded evaluation runs, so a filter never reletters anyone.
 
+### Setups
+
+A setup is everything a fair comparison holds fixed apart from the cards: tutor, tutor model, tutor prompt, tutor parameters, simulated student model and parameters, judge configuration and rules version. Cards are matched cell by cell instead. Per-language prompt hashes (the card's tutor setup, the judge prompt) are never part of a setup, because they would split one setup by language. The tutor prompt is read from `tutor.tutorPromptHash`, which the runner does not write yet; until it does, the tutor's system prompt comes from the card.
+
 ### Tutor versions
 
 A tutor is its label. Its version is the model the provider reported (`resolvedModel`), else the pinned or requested model. The system prompt is not part of the version, because the runner takes the tutor's system prompt from the card. Versions are ordered by when each first appears among all loaded records, so running an old version again later does not make it the newest.
 
-Plates I, II and III show each tutor's newest version in view. Plate III also uses the newest version. Older versions appear on Plate IV and in the list.
+Plates I, II and III show each tutor's newest version in view. If a tutor's row still mixes setups (another simulated student, rules version, tutor prompt or parameters), Plate I says so and points to Compare. Plate III also uses the newest version. Older versions appear on Plate IV and in the list.
 
 The overview compares tutors, so it reads evaluation runs only. Calibration and superseded runs appear in the lists and the drawer.
 
@@ -112,6 +117,7 @@ The sample is produced by the premium runner itself, so it follows the runner's 
 - a calibration batch, including a student reply sent back for leaving before the card's `leaveNotBefore`
 - a run interrupted by its budget, a top-up and the restart that supersedes it, then a reconciled invoice
 - review flags (split votes and a rule verdict that differs from the judges' majority), `fixedTestSkipped`, a judge ballot that was valid after one retry, a fenced ballot, and a call charged at its reservation
+- a rerun of Dune with a newer simulated student, so Compare shows a one-change result and Plate I warns about the mixed row
 - tutors with different prices and reply speeds (Dune cheap and fast, Cedar expensive and slow)
 - older tutor versions on the three cards that did not change: Birch improves at `birch-2026-09` and then clearly regresses at `birch-2026-10`; Atlas improves at `atlas-2026-11`, but within its error range
 

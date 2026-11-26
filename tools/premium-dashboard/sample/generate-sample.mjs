@@ -372,6 +372,17 @@ try {
       rejudge(store, execution(c2b, assets, tape, now), row.runId);
     }
 
+    // Batch 2b: Dune again, same model, but with a newer simulated student. The compare view must say that only the
+    // student changed, and the overview must warn that Dune's row now mixes two students.
+    {
+      const c = config("synthetic-student-07", "synthetic rerun with a newer simulated student", [TUTORS.dune], "synthetic-panel-v1",
+        { repeats: 1, prices: modelPrices, student: model("learner", "synthetic-lab-s", "Learner", "learner-2026-11-r2") });
+      const tape = {};
+      const plan = ["good", "flawed", "good", "leakAfter", "good", "flawed"];
+      stableIds.forEach((cardId, ci) => c.languages.forEach((lang, li) => { tape[[cardId, lang, "dune"].join("/")] = tracksFor(plan[ci * 2 + li], cardId, lang, TUTORS.dune, c); }));
+      run(store, c, stable, tape, clock("2026-11-25T12:00:00Z"));
+    }
+
     // Batch 3: a smoke run that hits its budget and stops early.
     const c3 = config("synthetic-smoke-03", "synthetic smoke run that stops at its budget", [TUTORS.atlas], "synthetic-panel-v1",
       { budgetUsd: 0.02, reserveUsd: 0.008, repeats: 3 });

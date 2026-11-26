@@ -223,6 +223,26 @@ select { border: 1px solid var(--rule-strong); background: var(--sheet); border-
 .axis-row .delta { font-family: var(--font); font-size: 11.5px; color: var(--ink-3); }
 
 /* Plate III: what needs a person */
+/* Compare view */
+.pickers { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px 18px; align-items: end; }
+.picker label { display: grid; gap: 6px; font-size: 12.5px; color: var(--ink-2); min-width: 0; }
+.picker select { width: 100%; }
+.swap { font-size: 18px; padding: 4px 10px; }
+.dtable { display: grid; }
+.drow { display: grid; grid-template-columns: minmax(8em, 12em) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 7px 0; border-bottom: 1px solid var(--rule); color: var(--ink-3); font-size: 13.5px; align-items: baseline; }
+.drow.head { color: var(--ink-3); font-size: 12px; padding-top: 0; border-bottom-color: var(--rule-strong); }
+.drow.differs { color: var(--ink); }
+.drow.differs .dpart { font-weight: 600; }
+.drow.differs .dpart::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: middle; }
+.dval { overflow-wrap: anywhere; min-width: 0; }
+.cmp-verdict { display: flex; flex-wrap: wrap; gap: 14px 40px; align-items: center; padding: 18px 0; border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); }
+.cmp-verdict .tdelta { justify-items: start; text-align: left; }
+.cmp-notes { display: grid; gap: 4px; min-width: 0; flex: 1; }
+.cmp-notes p { margin: 0; font-size: 14px; max-width: 62ch; }
+.cmp-verdict.unsure .tdelta .d { color: var(--ink-3); }
+.spread.cmp .srow.overall .card { font-weight: 600; }
+.spread.cmp .mk.b { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+
 /* Plate III: pass rate against the tutor's own cost or wait, log scale. */
 .seg { display: flex; gap: 18px; }
 .vbox { padding: 6px 0 34px 44px; }
@@ -369,6 +389,12 @@ svg text { fill: var(--ink-2); font-family: var(--font); font-size: 11px; }
   .srow .card { grid-column: 1 / -1; padding-top: 6px; }
   .axis-row > span:first-child { display: none; }
   .asks { gap: 14px; }
+  .pickers { grid-template-columns: minmax(0, 1fr); }
+  .swap { justify-self: start; }
+  .drow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .drow .dpart { grid-column: 1 / -1; }
+  .drow.head > :first-child { display: none; }
+  .cmp-verdict { display: grid; gap: 10px; }
   .vbox { padding: 26px 0 34px 36px; }
   .vplot { height: 240px; }
   .vname { display: none; }
@@ -409,6 +435,7 @@ svg text { fill: var(--ink-2); font-family: var(--font); font-size: 11px; }
     <section class="sec" id="trends" aria-labelledby="trends-title"></section>
     <section class="sec" id="attention" aria-labelledby="attention-title"></section>
     <section class="sec" id="runs" aria-labelledby="runs-title"></section>
+    <section class="sec" id="compare" aria-labelledby="compare-title"></section>
     <section class="sec" id="ops" aria-labelledby="ops-title"></section>
   </main>
 </div>

@@ -245,6 +245,59 @@
     return out;
   }
 
+  // The parts of a run's setup that a fair comparison holds fixed. Cards are not a part: they are matched cell by cell
+  // (card version and language). Today the tutor's system prompt comes from the card; a prompt of the tutor's own is
+  // read from tutor.tutorPromptHash once the runner records one. Per-language or per-card prompt hashes are never parts:
+  // they would split one setup by language.
+  const SETUP_PARTS = ["tutor", "tutorModel", "tutorPrompt", "tutorParams", "studentModel", "studentParams", "judgeConfig", "rules"];
+  function setupOf(v) {
+    const r = v.record, t = r.tutor || {}, s = r.student || {}, jc = v.scoring && v.scoring.judgeConfig;
+    return {
+      tutor: t.label || "unknown",
+      tutorModel: versionKey(r),
+      tutorPrompt: t.tutorPromptHash || null,
+      tutorParams: JSON.stringify(t.params || null),
+      studentModel: s.resolvedModel || s.pinnedVersion || s.requestedModel || null,
+      studentParams: JSON.stringify(s.params || null),
+      // The judge prompt differs by language, so the configuration's version names it, not the prompt hash.
+      judgeConfig: jc ? jc.version || null : null,
+      rules: (r.card && r.card.rulesVersion) || null,
+    };
+  }
+  const setupKey = v => { const s = setupOf(v); return SETUP_PARTS.map(p => String(s[p])).join("\u0001"); };
+
+  // The distinct setups among the views, each with its runs, in tutor order and then by first run.
+  function setups(views) {
+    return [...groupBy(views, setupKey)].map(([key, group]) => {
+      const times = group.map(v => String(v.record.createdAt || "")).sort();
+      return { key, setup: setupOf(group[0]), views: group, firstAt: times[0], lastAt: times[times.length - 1], batches: [...new Set(group.map(v => v.record.batchId))].sort() };
+    }).sort((a, b) => a.setup.tutor.localeCompare(b.setup.tutor) || a.firstAt.localeCompare(b.firstAt));
+  }
+
+  // Compare setup B against setup A. First say what differs; a result can be read as the effect of one change only when
+  // exactly one part differs (another tutor counts as one change, its model included). Runs are matched on the card
+  // versions and languages both sides scored, and a change is clear only when the 95% ranges do not overlap.
+  function compareSetups(a, b) {
+    const valuesOf = (list, part) => [...new Set(list.map(v => String(setupOf(v)[part])))];
+    const diff = [], mixed = [];
+    for (const part of SETUP_PARTS) {
+      const va = valuesOf(a, part), vb = valuesOf(b, part);
+      if (va.length > 1) mixed.push({ side: "a", part, values: va });
+      if (vb.length > 1) mixed.push({ side: "b", part, values: vb });
+      if (va.join("|") !== vb.join("|")) diff.push({ part, a: va.join(", "), b: vb.join(", ") });
+    }
+    const changes = diff.filter(d => !(d.part === "tutorModel" && diff.some(x => x.part === "tutor"))).length;
+    const cell = v => v.record.card.id + "@" + v.record.card.version + "/" + v.record.card.lang;
+    const scoredCells = list => new Set(list.filter(v => v.state === "scored").map(cell));
+    const ca = scoredCells(a), cb = scoredCells(b);
+    const common = new Set([...ca].filter(k => cb.has(k)));
+    const sa = summarize(a.filter(v => common.has(cell(v)))), sb = summarize(b.filter(v => common.has(cell(v))));
+    const delta = sa.passRate != null && sb.passRate != null ? sb.passRate - sa.passRate : null;
+    const clear = delta != null && (sb.passRange.lo > sa.passRange.hi || sb.passRange.hi < sa.passRange.lo);
+    const byCell = [...common].sort().map(k => ({ cell: k, a: summarize(a.filter(v => cell(v) === k)), b: summarize(b.filter(v => cell(v) === k)) }));
+    return { diff, changes, mixed, cells: common.size, a: sa, b: sb, delta, clear, byCell };
+  }
+
   const tutorTurn = (record, turn) => (record.transcript || []).find(m => m.role === "tutor" && m.turn === turn) || null;
 
   // Evidence for a deterministic failure: what a reviewer needs to confirm it without rereading the whole run.
@@ -385,7 +438,7 @@
     return out;
   }
 
-  const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, wilson, versionKey, tutorVersions, latestVersions, versionTrend, failureEvidence,
+  const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, wilson, versionKey, tutorVersions, latestVersions, versionTrend, SETUP_PARTS, setupOf, setups, compareSetups, failureEvidence,
     studentChecks, disagreementSummary, costs, tutorEconomy, economyOf, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION };
   root.PremiumDashboardModel = api;
 })(globalThis);

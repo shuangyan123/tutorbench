@@ -7,7 +7,7 @@
   // ---------- words ----------
   const T = {
     zh: {
-      viewOverview: "概览", viewRuns: "全部对话", viewChecks: "运行检查", allBatches: "全部批次", allLangs: "中英文", latestShort: "最新版卡片", changeFilters: "更改", doneFilters: "收起",
+      viewOverview: "概览", viewCompare: "对照", viewRuns: "全部对话", compareTitle: "两套配置，哪里不一样，谁更好", compareNote: "选两套配置。页面先列出它们哪里不一样，只在两边都跑过的卡上比较。", sideA: "A（基准）", sideB: "B（对照）", swap: "交换 A 和 B", diffTitle: "哪里不一样", partSame: "相同", part_tutor: "导师", part_tutorModel: "导师模型", part_tutorPrompt: "导师 prompt", part_tutorParams: "导师参数", part_studentModel: "模拟学生模型", part_studentParams: "模拟学生参数", part_judgeConfig: "评审配置", part_rules: "规则版本", promptFromCard: "跟着卡片走", cmpSame: "两边是同一套配置。选两套不同的再比。", cmpOne: "只变了一样：{p}", cmpMany: "变了 {n} 样：{p}。这个差别说不清是哪一样造成的，只作参考。", cmpMixed: "{s} 里混了不同的{p}，先用顶部筛选把它们分开。", cmpNoCells: "两边没有跑过同样的卡，没法比。", cmpBvsA: "个百分点 · B 比 A", cmpCells: "按两边都跑过的 {n} 组卡片和语言比较", cmpOverall: "全部", setupOption: "{t} · {m} · 学生 {s} · {n} 段 · {d}", cmpNone: "至少要有两套已计分的配置才能对照。", mixedRow: "{t} 的对话混了不同的{p}，可以去「对照」里分开看。", viewChecks: "运行检查", allBatches: "全部批次", allLangs: "中英文", latestShort: "最新版卡片", changeFilters: "更改", doneFilters: "收起",
       kicker: "Teachometry · TutorBench 精品集", chartTutors: "谁教得好", chartCards: "哪张卡拉开了差距", legendPending: "待审（不计入）",
       plate: "图版 {n}", keyHead: "头", keyHeadIs: "结局", keyStem: "茎", keyStemIs: "一节是导师的一轮", keyLeaf: "叶", keyLeafIs: "这一轮的帮助力度 0–3",
       keyRed: "红叶", keyRedIs: "这一轮泄露了答案", turnsN: "{n} 轮", spreadNote: "字母是导师，横向位置是它在这张卡上的通过率。右上角带小虚圈的，这张卡还有待审对话。", spreadCol: "差距", unratedN: "{n} 位未计分",
@@ -53,7 +53,7 @@
       topUp: "追加预算 {from} → {to}", reconciled: "{p} 账单 {a}，估算 {e}，差 {d}", supersededRuns: "被替代 {n}",
     },
     en: {
-      viewOverview: "Overview", viewRuns: "All conversations", viewChecks: "Run checks", allBatches: "all batches", allLangs: "both languages", latestShort: "latest cards", changeFilters: "Change", doneFilters: "Done",
+      viewOverview: "Overview", viewCompare: "Compare", viewRuns: "All conversations", compareTitle: "Two setups: what differs, which is better", compareNote: "Pick two setups. The page first lists what differs, then compares only on the cards both ran.", sideA: "A (baseline)", sideB: "B (compared)", swap: "Swap A and B", diffTitle: "What differs", partSame: "same", part_tutor: "Tutor", part_tutorModel: "Tutor model", part_tutorPrompt: "Tutor prompt", part_tutorParams: "Tutor parameters", part_studentModel: "Simulated student model", part_studentParams: "Simulated student parameters", part_judgeConfig: "Judge configuration", part_rules: "Rules version", promptFromCard: "comes from the card", cmpSame: "Both sides are the same setup. Pick two different ones.", cmpOne: "Only one thing changed: {p}", cmpMany: "{n} things changed: {p}. The difference cannot be put down to any one of them; read it as a guide.", cmpMixed: "{s} mixes more than one {p}; use the filters at the top to separate them.", cmpNoCells: "The two sides never ran the same cards, so they cannot be compared.", cmpBvsA: "points · B against A", cmpCells: "Compared on the {n} card–language pairs both sides ran", cmpOverall: "All", setupOption: "{t} · {m} · student {s} · {n} runs · {d}", cmpNone: "Comparing needs at least two setups with scored runs.", mixedRow: "{t} mixes runs with different {p}; Compare can separate them.", viewChecks: "Run checks", allBatches: "all batches", allLangs: "both languages", latestShort: "latest cards", changeFilters: "Change", doneFilters: "Done",
       kicker: "Teachometry · TutorBench premium set", chartTutors: "Who teaches well", chartCards: "Which cards separate the tutors", legendPending: "Needs review (not counted)",
       plate: "Plate {n}", keyHead: "Head", keyHeadIs: "outcome", keyStem: "Stem", keyStemIs: "one node per tutor turn", keyLeaf: "Leaf", keyLeafIs: "help level that turn, 0–3",
       keyRed: "Red leaf", keyRedIs: "that turn leaked the answer", turnsN: "{n} turns", spreadNote: "Letters are tutors, placed at their pass rate on this card. A small dashed ring means some of its runs on this card still need review.", spreadCol: "Spread", unratedN: "{n} not scored",
@@ -153,7 +153,7 @@
   };
 
   // ---------- state ----------
-  const VIEWS = ["overview", "runs", "checks"];
+  const VIEWS = ["overview", "compare", "runs", "checks"];
   const st = {
     lang: detectLang(), dataset: null, source: null,
     f: { batch: "all", version: null, lang: "all", cards: "latest", tutor: "all", card: "all" },
@@ -292,7 +292,7 @@
     banner.hidden = !(d && st.source.kind === "sample");
     banner.textContent = t("sampleBanner");
     renderWarnings();
-    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks" };
+    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview", compare: st.view === "compare", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks" };
     for (const id of Object.keys(show)) { clear($(id)); $(id).hidden = !show[id]; }
     document.querySelector(".sheet").hidden = !d;
     const vs = d ? views() : [];
@@ -311,6 +311,7 @@
       renderBoard(now, rows, !ev.length && vs.some(v => v.state === "calibration") ? t("onlyCalibration") : t("noData"), keys, latest, now.length < ev.length);
       renderSpread(now, rows, keys, latest); renderValue(now, rows, keys, latest); renderTrend(ev, versions, keys); renderAttention(ev);
     }
+    if (show.compare) renderCompare(vs.filter(isEval));
     if (show.runs) renderRuns(vs);
     if (show.ops) renderOps(vs);
   }
@@ -379,7 +380,7 @@
     const nav = clear($("views"));
     nav.hidden = !st.dataset;
     if (!st.dataset) return;
-    const views = [["overview", t("viewOverview"), null], ["runs", t("viewRuns"), vs.length], ["checks", t("viewChecks"), null]];
+    const views = [["overview", t("viewOverview"), null], ["compare", t("viewCompare"), null], ["runs", t("viewRuns"), vs.length], ["checks", t("viewChecks"), null]];
     for (const [id, label, n] of views) nav.append(el("button", { type: "button", class: "view-tab", "aria-current": st.view === id ? "page" : null, onclick: () => setView(id) },
       label, n != null ? el("span", { class: "count", text: String(n) }) : null));
     nav.append(filterSummary());
@@ -471,7 +472,7 @@
     window.scrollTo({ top: 0 });
   }
   function plateHead(no, id, title, extra) {
-    return el("header", { class: "plate-head" }, el("div", { class: "title" }, el("span", { class: "plate-no", text: t("plate", { n: no }) }), el("h2", { id, text: title })), extra || null);
+    return el("header", { class: "plate-head" }, el("div", { class: "title" }, no ? el("span", { class: "plate-no", text: t("plate", { n: no }) }) : null, el("h2", { id, text: title })), extra || null);
   }
 
   // Plate I: who teaches well. One row per tutor; counted specimens first (good, flawed, fail), then a break
@@ -514,7 +515,13 @@
         field));
     }
     box.append(list);
-    const foot = [rows.some(r => r.g.passRange) ? t("ciNote") : null, olderHidden ? t("olderNote") : null].filter(Boolean);
+    // A row should hold one setup. If the student, rules or tutor settings changed between batches, say so.
+    const mixed = rows.map(r => {
+      const counted = r.group.filter(v => v.state === "scored");
+      const parts = ["tutorPrompt", "tutorParams", "studentModel", "studentParams", "rules"].filter(p => new Set(counted.map(v => String(M.setupOf(v)[p]))).size > 1);
+      return parts.length ? t("mixedRow", { t: r.tutor, p: parts.map(p => t("part_" + p)).join(st.lang === "zh" ? "、" : ", ") }) : null;
+    }).filter(Boolean);
+    const foot = [rows.some(r => r.g.passRange) ? t("ciNote") : null, olderHidden ? t("olderNote") : null, ...mixed].filter(Boolean);
     if (foot.length) box.append(el("p", { class: "plate-foot", text: foot.join(st.lang === "zh" ? "" : " ") }));
   }
 
@@ -634,6 +641,88 @@
         el("p", { class: "tbasis", text: tr.cells ? t("versionsBasis", { n: tr.cells }) : "" })));
     }
     box.append(grid);
+  }
+
+  // Compare: two setups side by side. What differs comes first, because a result only means something when exactly one
+  // thing changed. Runs are matched on the card versions and languages both sides scored (see M.compareSetups).
+  const shortHash = x => String(x).replace(/sha256:([0-9a-f]{8})[0-9a-f]+/g, "$1");
+  function partValue(part, value) {
+    if (part === "tutorPrompt" && (value === "null" || value == null)) return t("promptFromCard");
+    if (/Params$/.test(part)) { try { const o = JSON.parse(value); return o ? Object.entries(o).map(([k, v]) => k + "=" + v).join(", ") : "—"; } catch { return value; } }
+    return value === "null" || value == null ? "—" : shortHash(value);
+  }
+  function renderCompare(vs) {
+    const box = $("compare");
+    box.append(plateHead("", "compare-title", t("compareTitle"), el("p", { class: "plate-note", text: t("compareNote") })));
+    const list = M.setups(vs).filter(g => g.views.some(v => v.state === "scored"));
+    if (list.length < 2) { box.append(el("p", { class: "empty-note", text: t("cmpNone") })); return; }
+    const keys = list.map(g => g.key);
+    if (!keys.includes(st.cmpA) || !keys.includes(st.cmpB)) {
+      // Default: the tutor with the most setups, its previous setup against its newest; else the first two.
+      const byTutor = M.groupBy(list, g => g.setup.tutor);
+      const most = [...byTutor.values()].sort((a, b) => b.length - a.length)[0];
+      [st.cmpA, st.cmpB] = most.length > 1 ? [most[most.length - 2].key, most[most.length - 1].key] : [keys[0], keys[1]];
+    }
+    const option = g => [g.key, t("setupOption", { t: g.setup.tutor, m: g.setup.tutorModel, s: g.setup.studentModel || "—", n: g.views.filter(v => v.state === "scored").length,
+      d: whenShort(g.firstAt).split(/[ ,]/)[0] + (g.firstAt.slice(0, 10) !== g.lastAt.slice(0, 10) ? "–" + whenShort(g.lastAt).split(/[ ,]/)[0] : "") })];
+    const rerender = () => { clear(box); renderCompare(vs); };
+    box.append(el("div", { class: "pickers" },
+      el("div", { class: "picker a" }, select("cmp-a", t("sideA"), st.cmpA, list.map(option), v => { st.cmpA = v; rerender(); })),
+      el("button", { type: "button", class: "btn-quiet swap", "aria-label": t("swap"), "data-tip": t("swap"), onclick: () => { [st.cmpA, st.cmpB] = [st.cmpB, st.cmpA]; rerender(); } }, "⇄"),
+      el("div", { class: "picker b" }, select("cmp-b", t("sideB"), st.cmpB, list.map(option), v => { st.cmpB = v; rerender(); }))));
+    const A = list.find(g => g.key === st.cmpA), B = list.find(g => g.key === st.cmpB);
+    const c = M.compareSetups(A.views, B.views);
+
+    // What differs: every part, the differing ones first and in ink, the same ones quiet.
+    const differs = new Set(c.diff.map(d => d.part));
+    const rows = [...M.SETUP_PARTS].sort((x, y) => (differs.has(y) ? 1 : 0) - (differs.has(x) ? 1 : 0)).map(part => {
+      const a = partValue(part, String(M.setupOf(A.views[0])[part])), b = partValue(part, String(M.setupOf(B.views[0])[part]));
+      return el("div", { class: "drow" + (differs.has(part) ? " differs" : ""), role: "row" },
+        el("span", { class: "dpart", role: "rowheader", text: t("part_" + part) }),
+        el("span", { class: "dval mono", role: "cell", text: a }),
+        el("span", { class: "dval mono", role: "cell", text: differs.has(part) ? b : t("partSame") }));
+    });
+    box.append(el("div", { class: "block" }, el("h3", { text: t("diffTitle") }),
+      el("div", { class: "dtable", role: "table" }, el("div", { class: "drow head", role: "row" }, el("span", { role: "columnheader" }), el("span", { role: "columnheader", text: "A" }), el("span", { role: "columnheader", text: "B" })), rows)));
+
+    // The verdict.
+    const names = c.diff.filter(d => !(d.part === "tutorModel" && differs.has("tutor"))).map(d => t("part_" + d.part)).join("、");
+    const notes = [];
+    if (!c.diff.length) notes.push(t("cmpSame"));
+    else if (c.changes === 1) notes.push(t("cmpOne", { p: names }));
+    else notes.push(t("cmpMany", { n: c.changes, p: names }));
+    for (const m of c.mixed) notes.push(t("cmpMixed", { s: m.side.toUpperCase(), p: t("part_" + m.part) }));
+    if (c.diff.length && !c.cells) notes.push(t("cmpNoCells"));
+    const d = c.delta, sign = d == null ? "" : d > 0 ? "+" : d < 0 ? "−" : "±";
+    const verdict = el("div", { class: "cmp-verdict" + (c.changes > 1 || c.mixed.length ? " unsure" : "") },
+      c.diff.length && c.cells ? el("div", { class: "tdelta" + (c.clear && c.changes === 1 && !c.mixed.length ? (d < 0 ? " down" : " up") : "") },
+        el("span", { class: "d", text: d == null ? "—" : sign + Math.abs(Math.round(d * 100)) }),
+        el("span", { class: "u" }, t("cmpBvsA"), el("br"), c.clear ? t("sigClear") : t("sigNoise"))) : null,
+      el("div", { class: "cmp-notes" }, notes.map(n => el("p", { text: n }))));
+    box.append(verdict);
+    if (!c.diff.length || !c.cells) return;
+
+    // Overall and per card–language: A and B as letters on a 0–100% track, joined by a hairline.
+    const chart = el("div", { class: "spread cmp", role: "table", "aria-label": t("cmpCells", { n: c.cells }) });
+    chart.append(el("div", { class: "srow axis-row", role: "row" }, el("span", { role: "columnheader" }),
+      el("div", { class: "track axis", role: "columnheader" }, [0, 25, 50, 75, 100].map(x => el("span", { style: "left:" + x + "%", text: x + (x === 100 ? "%" : "") }))),
+      el("span", { class: "delta", role: "columnheader", text: "B − A" })));
+    const row = (label, sa, sb, strong) => {
+      const track = el("div", { class: "track", role: "cell", style: "--stack:" + (sa.passRate != null && sb.passRate != null && Math.round(sa.passRate * 50) === Math.round(sb.passRate * 50) ? 2 : 1) });
+      if (sa.passRate != null && sb.passRate != null) track.append(el("i", { class: "range", style: `left:${Math.min(sa.passRate, sb.passRate) * 100}%;width:${Math.abs(sb.passRate - sa.passRate) * 100}%` }));
+      const same = sa.passRate != null && sb.passRate != null && Math.round(sa.passRate * 50) === Math.round(sb.passRate * 50);
+      [["A", sa, 0], ["B", sb, same ? 1 : 0]].forEach(([k, s, stack]) => {
+        if (s.passRate == null) return;
+        const tip = k + " · " + label + " · " + t("cellTip", { p: s.good + s.flawed, n: s.scored }) + " · " + ciText(s);
+        track.append(el("span", { class: "mk " + k.toLowerCase(), style: `left:${s.passRate * 100}%;--k:${stack}`, "data-tip": tip, "aria-label": tip, tabindex: "0" }, k));
+      });
+      const dd = sa.passRate != null && sb.passRate != null ? Math.round((sb.passRate - sa.passRate) * 100) : null;
+      return el("div", { class: "srow" + (strong ? " overall" : ""), role: "row" }, el("span", { class: "card", role: "rowheader", text: label }), track,
+        el("span", { class: "delta num", role: "cell", text: dd == null ? "—" : (dd > 0 ? "+" : dd < 0 ? "−" : "±") + Math.abs(dd) }));
+    };
+    chart.append(row(t("cmpOverall"), c.a, c.b, true));
+    for (const x of c.byCell) { const [id, lang] = x.cell.split("/"); chart.append(row(id.replace(/@.*/, "") + " · " + langShort(lang), x.a, x.b, false)); }
+    box.append(el("div", { class: "spread-box" }, chart), el("p", { class: "plate-foot", text: t("cmpCells", { n: c.cells }) }));
   }
 
   // What needs a person: two numbers, each opens the matching list.

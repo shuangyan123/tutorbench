@@ -23,7 +23,7 @@ function scoring({ id = "s1", version = V1, verdict = "good", pending = [], reas
   };
 }
 
-function record({ runId, status = "scored", endReason = "curt_exit", card = {}, scorings = [scoring()], transcript = [], createdAt = "2026-11-24T10:00:00.000Z", tutor = {} }) {
+function record({ runId, status = "scored", endReason = "curt_exit", card = {}, scorings = [scoring()], transcript = [], createdAt = "2026-11-24T10:00:00.000Z", tutor = {}, student }) {
   return {
     schema: "tutorbench.premium-run-record",
     schemaVersion: 1,
@@ -34,6 +34,7 @@ function record({ runId, status = "scored", endReason = "curt_exit", card = {}, 
     card: { id: "card-a", version: "1.0.0", lang: "en", contentHash: "sha256:a", ...card },
     tutor: { id: "t", label: "Tutor T", ...tutor },
     repeat: { index: 1, of: 1 },
+    ...(student ? { student } : {}),
     transcript,
     end: { reason: endReason, tutorTurns: 2, finalStage: 1, softFlags: [] },
     usage: { totalUsd: 0.02 },
@@ -450,4 +451,42 @@ test("tutor economy counts only the tutor's own calls, as medians", () => {
   assert.equal(g.priced, 2);
   assert.equal(g.usdPerRun, (0.003 + 0.008) / 2);
   assert.equal(g.latencyMs, 650, "median over every reply: 400 600 600 700 800 1000");
+});
+
+test("setup comparison names what differs and reads a result only when one thing changed", () => {
+  const run = (id, { model = "m-1", label, studentModel = "s-1", cardId = "card-a", verdict = "good" } = {}) => record({ runId: id, card: { id: cardId },
+    tutor: { resolvedModel: model, ...(label ? { label } : {}) }, student: { resolvedModel: studentModel, params: { temperature: 0.7 } },
+    scorings: [scoring({ verdict, reasons: verdict === "fail" ? ["leak"] : [] })] });
+  const viewsOf = recs => { const d = M.buildDataset({ records: recs, batches: [batch] }); return d.runs.map(r => M.runView(r, V1, d.latestCard)); };
+  const all = viewsOf([
+    run("a1"), run("a2"), run("a3", { cardId: "card-b" }),
+    run("b1", { studentModel: "s-2", verdict: "fail" }), run("b2", { studentModel: "s-2" }),
+    run("c1", { model: "m-2", studentModel: "s-2" }),
+    run("d1", { label: "Tutor U", model: "u-1" }),
+  ]);
+  const groups = M.setups(all);
+  assert.equal(groups.length, 4);
+  const pick = id => groups.find(g => g.views.some(v => v.record.runId === id)).views;
+
+  // Only the student changed: one change, read on card-a only (card-b ran on one side).
+  const ab = M.compareSetups(pick("a1"), pick("b1"));
+  assert.deepEqual(ab.diff.map(d => d.part), ["studentModel"]);
+  assert.equal(ab.changes, 1);
+  assert.equal(ab.cells, 1);
+  assert.equal(ab.a.scored, 2);
+  assert.equal(ab.delta, -0.5);
+  assert.equal(ab.clear, false);
+
+  // Another tutor is one change even though its model differs too.
+  const ad = M.compareSetups(pick("a1"), pick("d1"));
+  assert.deepEqual(ad.diff.map(d => d.part), ["tutor", "tutorModel"]);
+  assert.equal(ad.changes, 1);
+
+  // Model and student both changed: two changes, so no single cause.
+  const ac = M.compareSetups(pick("a1"), pick("c1"));
+  assert.equal(ac.changes, 2);
+
+  // A hand-made group that mixes two students is reported as mixed.
+  const mixed = M.compareSetups([...pick("a1"), ...pick("b1")], pick("c1"));
+  assert.ok(mixed.mixed.some(m => m.side === "a" && m.part === "studentModel"));
 });
