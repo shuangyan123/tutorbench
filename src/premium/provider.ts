@@ -11,18 +11,30 @@ const tutorSchema = shape({ ...modelFields,
 export type Tutor = ReturnType<typeof tutorSchema>;
 export type Model = ReturnType<typeof modelSchema>;
 export interface Message { role: "assistant" | "user"; content: string }
+const inferenceSchema = shape({ thinking: choices("disabled", "enabled"), reasoningEffort: choices("none", "low", "high", "max"),
+  maxOutputTokens: positive, temperature: optional(amount) });
+export type StudentInference = Omit<ReturnType<typeof inferenceSchema>, "temperature"> & { temperature?: number };
+export function readStudentInference(v: unknown, field: string): StudentInference {
+  const inference = inferenceSchema(v, field);
+  if ((inference.thinking === "disabled") !== (inference.reasoningEffort === "none") || inference.maxOutputTokens > 384_000 ||
+      (inference.temperature !== undefined && (inference.thinking === "enabled" || inference.temperature > 2))) invalid(field);
+  const { temperature, ...required } = inference;
+  return temperature === undefined ? required : { ...required, temperature };
+}
 export interface Request {
   role: "student" | "tutor" | "judge";
   model: Model;
   system: string;
   messages: Message[];
   responseFormat?: { type: "json_object" }; historyHash?: string;
-  params: { temperature: number | null; maxOutputTokens?: number };
+  studentInference?: StudentInference;
+  params: { temperature?: number | null; maxOutputTokens?: number };
 }
 export interface Reply {
   returnedModel?: string | null; system_fingerprint?: string | null;
   text: string | null; resolvedModel: string; finishReason: string; latencyMs: number;
-  usage: { inputTokens: number; outputTokens: number; cacheHitTokens?: number | undefined; cacheMissTokens?: number | undefined } | null;
+  usage: { inputTokens: number; outputTokens: number; cacheHitTokens?: number | undefined; cacheMissTokens?: number | undefined;
+    reasoningTokens?: number | undefined; visibleOutputTokens?: number | undefined } | null;
 }
 export type Provider = ((request: Request) => Reply) & { requestBytes?: (request: Request) => number };
 export interface ModelPrice { model: string; cacheHitInputUsdPerMillion?: number | undefined; inputUsdPerMillion: number;
@@ -37,6 +49,7 @@ export type Role = Request["role"];
 export type Failure = `http_${number}` | "timeout" | "overloaded" | "not_dispatched" | "content_filter" | "provider_error" | "mock_not_dispatched" | "sensitive_output" | "invalid_response" | "model_version_drift" | "budget_stop" | "unknown_cost";
 export interface Call {
   historyHash?: string; responseFormat?: { requested: "json_object"; observed: ObservedFormat | null };
+  studentInference?: StudentInference; truncated?: boolean | null;
   transportDiagnostic?: TransportDiagnostic;
   cache?: ReturnType<typeof cacheReceipt>;
   requestedModel: string; returnedModel: string | null; system_fingerprint: string | null; calledAt: string;
@@ -58,7 +71,7 @@ export function sensitive(text: string) {
   // 先展开 JSON 转义，防止凭据在解析学生消息后才显现。
   const visible = text.replace(/\\u([0-9a-f]{4})/giu, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
     .replace(/\\(["'])/gu, "$1");
-  return /<\/?(?:think|thinking|reasoning)>|\bsk-[a-z0-9_-]+|\bgh[pousr]_[a-z0-9]+|github_pat_|authorization|\bbearer\s+\S+|\b(?:set-cookie|cookie|password|api[_-]?key|access[_-]?token|request[_-]?headers|headers|reasoning(?:_content)?|chain_of_thought|private[_-]?key|client[_-]?secret|refresh[_-]?token)\b\s*["']?\s*[:=]|\bthinking\b\s*["']?\s*[:=](?!\s*"disabled")|-----BEGIN [A-Z ]*PRIVATE KEY-----|[\w.+-]+@[\w.-]+\.[a-z]{2,}/iu.test(visible);
+  return /<\/?(?:think|thinking|reasoning)>|\bsk-[a-z0-9_-]+|\bgh[pousr]_[a-z0-9]+|github_pat_|authorization|\bbearer\s+\S+|\b(?:set-cookie|cookie|password|api[_-]?key|access[_-]?token|request[_-]?headers|headers|reasoning(?:_content)?|chain_of_thought|private[_-]?key|client[_-]?secret|refresh[_-]?token)\b\s*["']?\s*[:=]|\bthinking\b\s*["']?\s*[:=](?!\s*"(?:disabled|enabled)")|-----BEGIN [A-Z ]*PRIVATE KEY-----|[\w.+-]+@[\w.-]+\.[a-z]{2,}/iu.test(visible);
 }
 // 老价格表的 inputUsdPerMillion 也是保守预留所用的未命中价。
 function cacheReceipt(hitRate: number | null, missRate: number, usage?: Reply["usage"]) {
@@ -98,6 +111,26 @@ export function usage(calls: Call[], priceTable: Prices) {
     judges: sum(calls.filter(c => c.role === "judge")), totalUsd: sum(calls).usd, priceTable: priceTable.version, rates: priceTable };
 }
 
+export function callReservation(req: Request, bytes: number, input: number, output: number) {
+  // 推理实验按完整 UTF-8 请求字节加消息封装余量保守估算输入，不依赖缓存折扣。
+  const inputTokens = req.studentInference ? bytes + 32 * (req.messages.length + 1) : Math.ceil(bytes / 2);
+  const outputTokens = req.studentInference?.maxOutputTokens ?? req.params.maxOutputTokens ?? { tutor: 2048, student: 512, judge: 8192 }[req.role];
+  return dollars((inputTokens * input + outputTokens * output) / 1_000_000);
+}
+export function inferenceUsage(calls: Call[]) {
+  return {
+    calls: calls.length,
+    outputTokens: calls.length ? sumKnown(calls.map(c => c.usage?.outputTokens ?? null)) : null,
+    reasoningTokens: calls.length ? sumKnown(calls.map(c => c.usage?.reasoningTokens ?? null)) : null,
+    visibleOutputTokens: calls.length ? sumKnown(calls.map(c => c.usage?.visibleOutputTokens ?? null)) : null,
+    knownReasoningCalls: calls.filter(c => c.usage?.reasoningTokens !== undefined).length,
+    knownVisibleOutputCalls: calls.filter(c => c.usage?.visibleOutputTokens !== undefined).length,
+    truncatedCalls: calls.filter(c => c.truncated === true).length,
+    knownTruncationCalls: calls.filter(c => typeof c.truncated === "boolean").length,
+    usd: sumUsd(calls.map(c => c.usd)),
+  };
+}
+
 // 同一批次在串行事务内运行，一次只预留一个调用。
 export class Session {
   readonly calls: Call[] = [];
@@ -131,8 +164,7 @@ export class Session {
     const hitRate = rate?.cacheHitInputUsdPerMillion ?? null;
     if (hitRate !== null && hitRate > input) invalid("prices.cacheHitInputUsdPerMillion");
     const bytes = this.provider.requestBytes?.(req) ?? Buffer.byteLength(JSON.stringify(req));
-    const cap = req.params.maxOutputTokens ?? { tutor: 2048, student: 512, judge: 8192 }[req.role];
-    const reserve = dollars((Math.ceil(bytes / 2) * input + cap * output) / 1_000_000);
+    const reserve = callReservation(req, bytes, input, output);
     if (reserve === null) throw new CallError("unknown_cost");
     if (this.budgetStopped || this.remaining < reserve || this.remaining <= 0) {
       this.budgetStopped = true;
@@ -145,6 +177,7 @@ export class Session {
       call.responseFormat = { requested: req.responseFormat.type, observed: null };
       if (req.historyHash) call.historyHash = req.historyHash;
     }
+    if (req.studentInference) Object.assign(call, { studentInference: req.studentInference, truncated: null });
     this.calls.push(call);
     call.usd = reserve;
     this.remaining = dollars(this.remaining - reserve)!;
@@ -158,9 +191,11 @@ export class Session {
       call.system_fingerprint = typeof fingerprint === "string" ? fingerprint : null;
     };
     const returnedDrift = () => req.role !== "tutor" && call.returnedModel !== null && call.returnedModel !== req.model.pinnedVersion;
+    const started = Date.now();
     let reply: Reply;
     try { reply = this.provider(structuredClone(req)); }
     catch (error) {
+      if (req.studentInference) call.latencyMs = Date.now() - started;
       call.error = error instanceof TransportError ? error.code : "provider_error";
       if (call.error === "not_dispatched" || call.error === "mock_not_dispatched") {
         this.remaining = dollars(this.remaining + reserve)!;
@@ -178,6 +213,10 @@ export class Session {
     if (reply.usage && tokens(reply.usage.inputTokens) && tokens(reply.usage.outputTokens)) {
       call.costEstimated = false;
       call.usage = { inputTokens: reply.usage.inputTokens, outputTokens: reply.usage.outputTokens };
+      const { reasoningTokens, visibleOutputTokens, outputTokens } = reply.usage;
+      if (reasoningTokens !== undefined && tokens(reasoningTokens) && reasoningTokens <= outputTokens) call.usage.reasoningTokens = reasoningTokens;
+      if (visibleOutputTokens !== undefined && tokens(visibleOutputTokens) &&
+          visibleOutputTokens + (call.usage.reasoningTokens ?? 0) <= outputTokens) call.usage.visibleOutputTokens = visibleOutputTokens;
       const cache = cacheReceipt(hitRate, input, reply.usage);
       call.cache = cache;
       if (cache.hitTokens !== null && cache.missTokens !== null) {
@@ -198,6 +237,13 @@ export class Session {
     }
     const returned = reply.returnedModel === undefined ? reply.resolvedModel : reply.returnedModel;
     recordIdentity(returned, reply.system_fingerprint);
+    if (req.studentInference) {
+      call.latencyMs = tokens(reply.latencyMs) ? reply.latencyMs : Date.now() - started;
+      if (typeof reply.finishReason === "string" && !sensitive(reply.finishReason)) {
+        call.finishReason = reply.finishReason;
+        call.truncated = reply.finishReason === "length";
+      }
+    }
     if (reply.finishReason === "content_filter") return fail(returnedDrift() ? "model_version_drift" : "content_filter");
     const v6Student = req.role === "student" && !!req.responseFormat;
     const validText = typeof reply.text === "string" ? v6Student || !!reply.text.trim() : v6Student && reply.text === null;
@@ -225,7 +271,7 @@ export const configSchema = shape({
     if (!Array.isArray(v) || !v.length || v.some(l => l !== "en" && l !== "zh-CN") || new Set(v).size !== v.length) invalid(f);
     return v as ("en" | "zh-CN")[];
   }, repeats: positive, maxOfflineAttempts: optional(positive), budgetUsd: amount, reserveUsd: (v, f) => v === undefined ? 0 : amount(v, f), prices: priceSchema,
-  tutors: list(tutorSchema), student: modelSchema, judgeConfigVersion: id, judges: arrayModels, alternates: arrayModels,
+  tutors: list(tutorSchema), student: modelSchema, studentInference: optional(readStudentInference), judgeConfigVersion: id, judges: arrayModels, alternates: arrayModels,
 });
 function arrayModels(v: unknown, f: string) {
   if (!Array.isArray(v)) invalid(f);

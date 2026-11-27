@@ -8,6 +8,8 @@ import { childEnvironment } from "./child-environment.js";
 import { obj, id, invalid } from "./schema.js";
 import { publish, safeJson } from "./store.js";
 import type { RunRecord } from "./runner.js";
+import { inferenceUsage, type StudentInference } from "./provider.js";
+import { studentRequestOptions } from "./student.js";
 
 const read = (path: string) => JSON.parse(readFileSync(path, "utf8"));
 
@@ -112,17 +114,28 @@ export function checkCalibration(out: string, checker: string, expectations: str
 
 // v3 的机器报告必须保留待复核状态。最终关卡还要独立核验报告身份及计划覆盖。
 const formats = ["json", "fenced_json", "text", "empty", "truncated"];
-function checkRequests(records: RunRecord[], errors: string[]) {
+function checkRequests(records: RunRecord[], errors: string[], inference?: StudentInference) {
+  const { params } = studentRequestOptions(inference, undefined);
   for (const r of records) {
-    if (r.schemaVersion !== 6 || r.student.thinking !== "disabled" || (r.batchKind === "calibration-probe") !== !!r.probe ||
+    if (r.schemaVersion !== 6 || r.student.thinking !== (inference?.thinking ?? "disabled") || (r.batchKind === "calibration-probe") !== !!r.probe ||
         !isDeepStrictEqual(r.student.responseFormat, { type: "json_object" }) ||
-        !isDeepStrictEqual(r.student.params, { temperature: 0.7, maxOutputTokens: 512 }) ||
+        !isDeepStrictEqual(r.student.params, params) || !isDeepStrictEqual(r.student.studentInference, inference) ||
         !Array.isArray(r.calls) || r.calls.some(c => c.role === "judge" ||
-          (c.role === "student" && (c.responseFormat?.requested !== "json_object" ||
+          (c.role === "student" && (!isDeepStrictEqual(c.studentInference, inference) ||
+            (inference && (!/^sha256:[a-f0-9]{64}$/u.test(c.requestHash) ||
+              c.truncated !== (c.finishReason === null ? null : c.finishReason === "length") || !validOutputBreakdown(c.usage))) ||
+            c.responseFormat?.requested !== "json_object" ||
             !/^sha256:[a-f0-9]{64}$/u.test(c.historyHash ?? "") ||
             (c.responseFormat.observed === null ? !c.error : !formats.includes(c.responseFormat.observed))))))
       errors.push(r.runId + ": invalid v6 student request parameters or call evidence");
   }
+}
+function validOutputBreakdown(usage: RunRecord["calls"][number]["usage"]) {
+  if (usage === null) return true;
+  const { reasoningTokens, visibleOutputTokens, outputTokens } = usage;
+  return [outputTokens, reasoningTokens === undefined ? 0 : reasoningTokens, visibleOutputTokens === undefined ? 0 : visibleOutputTokens]
+    .every(n => Number.isSafeInteger(n) && n >= 0) &&
+    (reasoningTokens ?? 0) + (visibleOutputTokens ?? 0) <= outputTokens;
 }
 function pythonReport(checker: string, args: string[], reportOption: string, accepted: number[]) {
   const scratch = mkdtempSync(join(tmpdir(), "premium-check-"));
@@ -143,7 +156,7 @@ export function validateCalibration(checker: string, expectations: string, cards
   if (!v3Revision(report) || report.ok !== (status === 0) || !Array.isArray(report.errors) || (status === 0 && report.errors.length)) invalid("checker.validate");
   return { status, report };
 }
-export function checkCalibrationV3(out: string, checker: string, expectations: string, batchId: string, cards: string, calibration: string) {
+export function checkCalibrationV3(out: string, checker: string, expectations: string, batchId: string, cards: string, calibration: string, expectedInference?: StudentInference) {
   id(batchId, "batch");
   const destination = join(out, "calibration-report-" + batchId + ".json");
   try {
@@ -182,7 +195,14 @@ export function checkCalibrationV3(out: string, checker: string, expectations: s
       records.push(r);
     }
     checkRecords(records, errors);
-    checkRequests(records, errors);
+    if (!isDeepStrictEqual(batch.studentInference, expectedInference) || (expectedInference && !diagnostic))
+      errors.push("student inference settings differ from the authorized diagnostic configuration");
+    checkRequests(records, errors, expectedInference);
+    if (expectedInference) {
+      report.studentInference = expectedInference;
+      report.inferenceUsage = inferenceUsage(records.flatMap(r => r.calls.filter(c => c.role === "student")));
+      if (!isDeepStrictEqual(batch.inferenceUsage, report.inferenceUsage)) errors.push("student inference totals differ from the call ledger");
+    }
     if (errors.length && !diagnostic) report.verdict = "FAIL";
     report.checkerExitCode = status;
     report.servingIdentity = batch.servingIdentity ?? "unknown";

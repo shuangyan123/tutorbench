@@ -3,7 +3,7 @@ import { batchCache } from "./cache-summary.js";
 import type { Phase, Probe, ProbeGate } from "./plan.js";
 import type { Lang } from "./schema.js";
 import { judgePrompt } from "./judge.js";
-import { dollars, panel, Session, sumUsd, type Config, type Provider } from "./provider.js";
+import { dollars, inferenceUsage, panel, readStudentInference, Session, sumUsd, type Config, type Provider } from "./provider.js";
 import { indexRow, runJob, type Job, type RunRecord } from "./runner.js";
 import { invalid, unique } from "./schema.js";
 import { scoring } from "./scoring.js";
@@ -103,7 +103,8 @@ function refresh(store: Store, batchId: string, explicitStop: string | null = nu
   if (!measured.some(({ call }) => call.returnedModel) ||
       (servingIdentity === "revision" && measured.some(({ call, pin }) => call.returnedModel !== pin)))
     servingIdentity = "unknown";
-  store.batch(batchId, { ...b, cache: batchCache(records), servingIdentity, spentUsd, ...(b.calibrationSeries ? { seriesSpentUsd: totalSpentUsd } : {}), budgetStopReason,
+  store.batch(batchId, { ...b, cache: batchCache(records), servingIdentity, spentUsd,
+    ...(b.studentInference ? { inferenceUsage: inferenceUsage(measured.map(a => a.call)) } : {}), ...(b.calibrationSeries ? { seriesSpentUsd: totalSpentUsd } : {}), budgetStopReason,
     hardCapReached: totalSpentUsd !== null && totalSpentUsd >= Number(b.hardCapUsd), status, runs: { planned: b.planned, ...counts } });
   return status;
 }
@@ -139,6 +140,10 @@ export function runBatch(store: Store, e: Execution) {
   if (!!e.probePlan !== (c.kind === "calibration-probe") || (e.probePlan && (e.assets.length !== 1 || !e.assets[0]?.protocol ||
       c.tutors.length || !e.probePlan.probes.length))) invalid("calibration.probe_plan");
   const diagnostic = e.probePlan?.gate === "diagnostic";
+  if (c.studentInference) {
+    if (!diagnostic) invalid("calibration.studentInference_scope");
+    readStudentInference(c.studentInference, "calibration.studentInference");
+  }
   if (diagnostic && (e.series || e.topUp || c.budgetUsd <= 0 || c.hardCapUsd !== c.budgetUsd))
     invalid("calibration.diagnostic_budget_or_series");
   if (e.mode && e.assets.some(a => a.protocol) && !e.series && !diagnostic) invalid("calibration.series_required");

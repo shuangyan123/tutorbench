@@ -1,11 +1,11 @@
 import { hash, type Asset } from "./cards.js";
 import type { Probe } from "./plan.js";
 import { dialogue } from "./dialogue.js";
-import { type Config, type Tutor, type Session, sumUsd, usage } from "./provider.js";
+import { type Config, type Tutor, type Session, inferenceUsage, sumUsd, usage } from "./provider.js";
 import { scoring } from "./scoring.js";
 import type { Lang } from "./schema.js";
 import { prepareTutor } from "./tutor.js";
-import { studentPrompt } from "./student.js";
+import { studentPrompt, studentRequestOptions } from "./student.js";
 
 export interface Job { probe?: Probe; restartOf?: string; runId: string; lang: Lang; repeatIndex: number; tutor: Tutor; asset: Asset }
 export function runJob(config: Config, job: Job, session: Session, gitCommit: string, createdAt: string, privateRubric?: string) {
@@ -28,9 +28,9 @@ export function runJob(config: Config, job: Job, session: Session, gitCommit: st
     tutor: job.probe ? { id: job.probe.tutorSource, provider: "replay" as const } as ProbeTutor : { ...request.model, label: tutor.label ?? tutor.id, resolvedModel: resolved("tutor"), systemPrompt: request.system,
       promptHash: hash(request.system), tutorPromptId: prompt?.id ?? null, tutorPromptVersion: prompt?.version ?? null,
       tutorPromptHash: prompt?.hash ?? null, params: request.params },
-    student: { ...config.student, resolvedModel: resolved("student"), params: { temperature: studentRequest?.temperature ?? 0.7, maxOutputTokens: studentRequest?.maxOutputTokens ?? 512 },
-      ...(studentRequest ? { responseFormat: studentRequest.responseFormat, thinking: studentRequest.thinking.type } : {}), promptHash: hash(studentPrompt(asset, lang)) },
-    repeat: { index: repeatIndex, of: config.repeats }, ...conversation, calls: session.calls, usage: usage(session.calls, config.prices), scorings };
+    student: { ...config.student, resolvedModel: resolved("student"), ...studentRequestOptions(config.studentInference, asset.protocol),
+      ...(studentRequest ? { responseFormat: studentRequest.responseFormat, thinking: config.studentInference?.thinking ?? studentRequest.thinking.type } : {}), promptHash: hash(studentPrompt(asset, lang)) },
+    repeat: { index: repeatIndex, of: config.repeats }, ...conversation, calls: session.calls, usage: usage(session.calls, config.prices), ...(config.studentInference ? { inferenceUsage: inferenceUsage(session.calls.filter(c => c.role === "student")) } : {}), scorings };
 }
 // 探针只有重放来源；索引保留原导师列的可选值。
 type ProbeTutor = { id: string; provider: "replay"; label?: undefined; resolvedModel?: undefined; pinnedVersion?: undefined;

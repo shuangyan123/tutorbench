@@ -1,10 +1,18 @@
 import type { Asset } from "./cards.js";
+import type { Request, StudentInference } from "./provider.js";
 import type { Lang } from "./schema.js";
 import { fill } from "./protocol.js";
 import { bool, list, positive, shape, str, unwrapJson } from "./schema.js";
 
 const stateSchema = shape({ message: str, stage: positive, events: list(str), end: bool });
 export type State = ReturnType<typeof stateSchema>;
+export function studentRequestOptions(inference: StudentInference | undefined, protocol: Asset["protocol"]) {
+  const params: Request["params"] = inference ? {
+    ...(inference.temperature === undefined ? {} : { temperature: inference.temperature }),
+    maxOutputTokens: inference.maxOutputTokens,
+  } : { temperature: protocol?.studentRequest.temperature ?? 0.7, maxOutputTokens: protocol?.studentRequest.maxOutputTokens ?? 512 };
+  return { params, ...(inference ? { studentInference: inference } : {}) };
+}
 export function studentPrompt(asset: Asset, lang: Lang) {
   const card = asset.card;
   const events = [...(card.fixedTest.delivery === "injected" ? [] : [card.fixedTest.kind]), "pushback", "thanked_after_answer", ...card.conditionalBehaviours,

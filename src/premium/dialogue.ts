@@ -1,9 +1,9 @@
 import { hash, type Asset } from "./cards.js";
-import { CallError, type Config, type Message, type Model, type Reply, type Session } from "./provider.js";
+import { CallError, type Config, type Message, type Reply, type Session } from "./provider.js";
 import { turnNote } from "./protocol.js";
 import type { TutorRequest } from "./tutor.js";
 import type { Lang } from "./schema.js";
-import { checkStudent, finalStudentText, observedFormat, rewriteFeedback, studentPrompt, type ObservedFormat, type State } from "./student.js";
+import { checkStudent, finalStudentText, observedFormat, rewriteFeedback, studentPrompt, studentRequestOptions, type ObservedFormat, type State } from "./student.js";
 
 interface StudentMessage {
   i: number; role: "student"; text: string; state: Omit<State, "message">; fixed?: boolean; prefix?: true;
@@ -29,7 +29,7 @@ function studentState(line: StudentMessage): State {
   const { stage, events, end } = line.state;
   return { message: line.text, stage, events, end };
 }
-function runAttempt(asset: Asset, lang: Lang, tutor: TutorRequest, student: Model, session: Session, audit: Attempt, prefix?: PrefixLine[]): EndReason {
+function runAttempt(asset: Asset, lang: Lang, tutor: TutorRequest, config: Config, session: Session, audit: Attempt, prefix?: PrefixLine[]): EndReason {
   const { card, protocol } = asset;
   const fixed = card.fixedTest, injectedCard = fixed.delivery === "injected";
   const atInjection = (k: number) => injectedCard && k === fixed.studentMessage;
@@ -53,6 +53,7 @@ function runAttempt(asset: Asset, lang: Lang, tutor: TutorRequest, student: Mode
     }
   }
   const system = studentPrompt(asset, lang), request = protocol?.studentRequest;
+  const options = studentRequestOptions(config.studentInference, protocol);
   for (let turn = prefix ? tutors.length : 1; turn <= card.maxTutorTurns; turn++) {
     if (!prefix) {
       const reply = session.call({ ...tutor,
@@ -68,8 +69,8 @@ function runAttempt(asset: Asset, lang: Lang, tutor: TutorRequest, student: Mode
     const studentAudit = request ? { historyHash: hash(JSON.stringify(studentHistory)), responseFormat: request.responseFormat } : {};
     // 每个位置首次生成加两次重写；传输重试由 Session 独立处理。
     for (let rewrite = 0; rewrite <= 2; rewrite++) {
-      const response = session.call({ role: "student", model: student, system,
-        params: { temperature: request?.temperature ?? 0.7, maxOutputTokens: request?.maxOutputTokens ?? 512 },
+      const response = session.call({ role: "student", model: config.student, system,
+        ...options,
         ...studentAudit, messages: [...studentHistory, ...correction] });
       const format = request ? observedFormat(response.text, response.finishReason) : undefined;
       const { state, hard, soft, fenceStripped } = checkStudent(response.text, asset, lang, states, tutors);
@@ -115,7 +116,7 @@ export function dialogue(asset: Asset, lang: Lang, tutor: TutorRequest, config: 
     const start = session.calls.length;
     attempts.push(attempt);
     try {
-      reason = runAttempt(asset, lang, tutor, config.student, session, attempt, prefix);
+      reason = runAttempt(asset, lang, tutor, config, session, attempt, prefix);
       if (reason === "student_invalid") attempt.status = "discarded";
     } catch (error) {
       if (!(error instanceof CallError)) throw error;

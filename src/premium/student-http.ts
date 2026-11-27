@@ -5,8 +5,26 @@ import type { Request, TransportDiagnostic } from "./provider.js";
 import { obj } from "./schema.js";
 
 export function studentPayload(req: Request) {
+  const inference = req.studentInference;
   return JSON.stringify({ model: req.model.requestedModel, messages: [{ role: "system", content: req.system }, ...req.messages],
-    temperature: req.params.temperature, max_tokens: req.params.maxOutputTokens, thinking: { type: "disabled" }, ...(req.responseFormat ? { response_format: req.responseFormat } : {}) });
+    temperature: inference ? inference.temperature : req.params.temperature,
+    max_tokens: inference?.maxOutputTokens ?? req.params.maxOutputTokens, thinking: { type: inference?.thinking ?? "disabled" },
+    ...(inference ? { reasoning_effort: inference.reasoningEffort } : {}), ...(req.responseFormat ? { response_format: req.responseFormat } : {}) });
+}
+function outputBreakdown(bill: Record<string, unknown>, req: Request) {
+  const details = bill.completion_tokens_details;
+  const total = bill.completion_tokens;
+  const reasoning = details && typeof details === "object" && "reasoning_tokens" in details ? details.reasoning_tokens : undefined;
+  const safety = details && typeof details === "object" && "safety_tokens" in details ? details.safety_tokens : 0;
+  const count = (v: unknown): v is number => typeof v === "number" && Number.isSafeInteger(v) && v >= 0;
+  if (!count(total)) return {};
+  if (count(reasoning) && reasoning <= total) return {
+    reasoningTokens: reasoning,
+    ...(count(safety) && safety <= total - reasoning ? { visibleOutputTokens: total - reasoning - safety } : {}),
+  };
+  if (reasoning === undefined && req.studentInference?.thinking === "disabled" && count(safety) && safety <= total)
+    return { visibleOutputTokens: total - safety };
+  return {};
 }
 export async function studentHttp(req: Request, key: string | undefined, send = fetch) {
   if (!key || req.role !== "student" || req.model.provider !== "deepseek") return { error: "not_dispatched" };
@@ -32,7 +50,7 @@ export async function studentHttp(req: Request, key: string | undefined, send = 
     const bill = data.usage == null ? null : obj(data.usage, "usage");
     return { reply: { text: choice?.message?.content ?? null, resolvedModel: data.model, system_fingerprint: data.system_fingerprint ?? null, finishReason: choice?.finish_reason,
       usage: bill && typeof bill === "object" ? { inputTokens: bill.prompt_tokens, outputTokens: bill.completion_tokens,
-        cacheHitTokens: bill.prompt_cache_hit_tokens, cacheMissTokens: bill.prompt_cache_miss_tokens } : null,
+        cacheHitTokens: bill.prompt_cache_hit_tokens, cacheMissTokens: bill.prompt_cache_miss_tokens, ...outputBreakdown(bill, req) } : null,
       latencyMs: Date.now() - start } };
   } catch (error) {
     const cause = error instanceof Error && error.cause && typeof error.cause === "object" && "code" in error.cause ? error.cause.code : null;

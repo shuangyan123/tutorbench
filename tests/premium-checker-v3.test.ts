@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test, type TestContext } from "node:test";
 import { checkCalibrationV3, finalCalibration } from "../src/premium/check-calibration.js";
+import { inferenceUsage, readStudentInference, type Call, type StudentInference } from "../src/premium/provider.js";
 import { temp } from "./premium-fixture.js";
 
 const languages = ["en", "zh-CN"], repeats = 5;
@@ -29,7 +30,8 @@ function setup(t: TestContext, diagnostic = false) {
   put(join(root, "unused.json"), {});
   mkdirSync(join(root, "batches"));
   mkdirSync(join(root, "records"));
-  put(join(root, "batches", batchId + ".json"), { batchId, kind: "calibration-probe", gate: current.gate });
+  const putBatch = (fields: object) => put(join(root, "batches", batchId + ".json"), { batchId, kind: "calibration-probe", gate: current.gate, ...fields });
+  putBatch({});
   // 子进程故意模拟可错误放行的上游，而不是在测试里复制包装器。
   writeFileSync(checker, `import json, pathlib, sys
 if sys.argv[1] == "check":
@@ -46,7 +48,7 @@ pathlib.Path(sys.argv[sys.argv.index(target)+1]).write_text(json.dumps(r), encod
 sys.exit(code)
 `);
   const final = () => finalCalibration(checker, exp, "G2", [raw], [review]);
-  const check = () => checkCalibrationV3(root, checker, exp, batchId, root, root);
+  const check = (inference?: StudentInference) => checkCalibrationV3(root, checker, exp, batchId, root, root, inference);
   const record = { schemaVersion: 6, batchId, batchKind: report.batchKind, runId: "r1", status: "unscored", scorings: [],
     card: { ...card, lang: "en", rulesVersion: pins.rulesVersion, protocolVersion: "2", protocolHash: pins.protocolHash },
     probe: { probeId: "probe-key", prefixHash: "fixture" }, tutor: { id: "replay" }, repeat: { index: 1 },
@@ -54,7 +56,7 @@ sys.exit(code)
     calls: [], };
   const putRecord = (r: { runId: string }) => put(join(root, "records", r.runId + ".json"), r);
   putRecord(record);
-  return { checker, exp, raw, put, current, record, putRecord, check, final };
+  return { checker, exp, raw, put, current, record, putRecord, putBatch, check, final };
 }
 test("v3 final fails verdict FAIL even with machine PASS", t => {
   const f = setup(t);
@@ -136,6 +138,25 @@ test("diagnostic verdict alone cannot pass: machine, cohort and checker exit mus
   verify({ fixtureExit: 2 }, 2);
   f.putRecord({ ...f.record, scorings: [{}] } as { runId: string });
   verify({}, 1);
+});
+test("diagnostic checker binds the authorized inference profile to the batch, records, and individual calls", t => {
+  const f = setup(t, true);
+  const profile = readStudentInference({ thinking: "enabled", reasoningEffort: "high", maxOutputTokens: 8192 }, "test");
+  const call = { studentInference: profile, role: "student", truncated: true, finishReason: "length",
+    requestHash: "sha256:" + "a".repeat(64), historyHash: "sha256:" + "b".repeat(64),
+    responseFormat: { requested: "json_object", observed: "truncated" }, usd: 0,
+    usage: { inputTokens: 3, outputTokens: 100, reasoningTokens: 90, visibleOutputTokens: 10 } } as Call;
+  const record = { ...f.record, student: { ...f.record.student, thinking: "enabled",
+    studentInference: profile, params: { maxOutputTokens: 8192 } }, calls: [call] };
+  f.putRecord(record);
+  f.putBatch({ studentInference: profile, inferenceUsage: inferenceUsage([call]) });
+  assert.equal(f.check(profile).status, 0);
+  assert.equal(f.check().status, 1);
+  for (const replacement of [{ studentInference: { ...profile, reasoningEffort: "max" } }, { truncated: false },
+    { usage: { ...call.usage, visibleOutputTokens: 100 } }]) {
+    f.putRecord({ ...record, calls: [{ ...call, ...replacement }] } as { runId: string });
+    assert.equal(f.check(profile).status, 1);
+  }
 });
 test("diagnostic reports are excluded by label, gate and diagnostic flag", t => {
   const f = setup(t, true);

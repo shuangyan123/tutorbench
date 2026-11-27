@@ -40,8 +40,10 @@ function main() {
     if (!values.checker || !values.expectations || !values["batch-id"]) invalid("checker.arguments");
     if (JSON.parse(readFileSync(values.expectations, "utf8")).schemaVersion === 3) {
       if (!values.cards || !values.calibration || values["dry-run"]) invalid("checker.v3_arguments");
+      const audit = values.config ? configSchema(JSON.parse(readFileSync(values.config, "utf8")), "config") : undefined;
+      if (audit && (audit.batchId !== values["batch-id"] || !audit.studentInference)) invalid("checker.studentInference_config");
       const result = checkCalibrationV3(resolve(values.out!), resolve(values.checker), resolve(values.expectations),
-        values["batch-id"], resolve(values.cards), resolve(values.calibration));
+        values["batch-id"], resolve(values.cards), resolve(values.calibration), audit?.studentInference);
       process.exitCode = result.status;
       return result.report;
     }
