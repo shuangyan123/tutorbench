@@ -82,7 +82,7 @@ export function scoring(config: Config, tutor: Model, asset: Asset, lang: Lang, 
     let feedback = "", unwrapped = false;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        raw = session.call({ role: "judge", model, system, messages: [{ role: "user", content: content + feedback }], params: { temperature: 0, maxOutputTokens: 8192 } }).text;
+        raw = session.call({ role: "judge", model, system, messages: [{ role: "user", content: content + feedback }], params: { temperature: 0, maxOutputTokens: 8192 } }).text!;
         const parsed = unwrapJson(raw);
         unwrapped = parsed.unwrapped;
         return { judgeId: model.id, raw, rejected, unwrapped, output: validateBallot(parsed.text, conversation, asset.card.fixedTest.studentMessage), error: null };

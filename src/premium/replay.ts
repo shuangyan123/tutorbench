@@ -6,7 +6,7 @@ import type { Job } from "./runner.js";
 const frame = shape({ text: str, resolvedModel: optional(str), system_fingerprint: optional(nullable(str)), finishReason: id, latencyMs: integer,
   usage: nullable(shape({ inputTokens: integer, outputTokens: integer, cacheHitTokens: optional(integer), cacheMissTokens: optional(integer) })) });
 export function replayProvider(tape: unknown, job: Job, tutorByTurn = false): Provider {
-  const tracks = obj(obj(tape, "tape")[[job.asset.card.id, job.lang, job.tutor.id].join("/")], "tape.job");
+  const tracks = obj(obj(tape, "tape")[[job.asset.card.id, job.lang, job.probe?.probeId ?? job.tutor.id].join("/")], "tape.job");
   const cursors = new Map<string, number>();
   return request => {
     const key = request.model.id;

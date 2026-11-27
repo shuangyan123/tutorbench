@@ -23,7 +23,7 @@ export function rebuildIndex(root: string) {
   const dir = join(root, "records");
   const rows = (existsSync(dir) ? readdirSync(dir) : []).filter(f => f.endsWith(".json")).sort().map(f => {
     const r: RunRecord = JSON.parse(readFileSync(join(dir, f), "utf8"));
-    if (r.schema !== "tutorbench.premium-run-record" || ![1, 2, 3, 4, 5].includes(r.schemaVersion) || id(r.runId, "runId") + ".json" !== f) invalid("record.identity");
+    if (r.schema !== "tutorbench.premium-run-record" || ![1, 2, 3, 4, 5, 6].includes(r.schemaVersion) || id(r.runId, "runId") + ".json" !== f) invalid("record.identity");
     return safeJson(indexRow(r)) + "\n";
   });
   publish(join(root, "index.jsonl"), rows.join(""));
@@ -72,6 +72,9 @@ export class Store {
     if (!this.db.prepare("SELECT 1 FROM batches WHERE id=?").get(id) && existsSync(join(this.root, "batches", id + ".json")))
       throw new Error("Batch ID already exists outside this ledger");
     this.db.prepare("INSERT INTO batches VALUES (?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body").run(id, safeJson(value));
+  }
+  batches() {
+    return this.db.prepare("SELECT body FROM batches ORDER BY id").all().map(row => JSON.parse(String(row.body)) as Record<string, unknown>);
   }
   getBatch(id: string): Record<string, unknown> | null {
     const row = this.db.prepare("SELECT body FROM batches WHERE id=?").get(id);

@@ -60,6 +60,8 @@
     "benchmark": "npm run build && node dist/src/cli/benchmark.js",
     "premium:check-cards": "node dist/src/cli/premium.js check-cards",
     "premium:calibrate": "node dist/src/cli/premium.js calibrate",
+    "premium:validate-calibration": "node dist/src/cli/premium.js validate-calibration",
+    "premium:final-calibration": "node dist/src/cli/premium.js final-calibration",
     "premium:check-calibration": "node dist/src/cli/premium.js check-calibration",
     "premium:reconcile": "node dist/src/cli/premium.js reconcile",
     "premium:run": "node dist/src/cli/premium.js run",

@@ -14,7 +14,7 @@ function voted(change: (b: Ballot, judge: string) => void, exit?: "left" | "than
       return reply({ message: "bye", stage: solved ? 2 : 1, events: [exit], end: true }, req.model.pinnedVersion);
     }
     if (req.role !== "judge") return r;
-    const b: Ballot = JSON.parse(r.text);
+    const b: Ballot = JSON.parse(r.text!);
     change(b, req.model.id);
     return { ...r, text: JSON.stringify(b) };
   });
@@ -43,7 +43,7 @@ test("the turn cap needs two tutor-fault votes; unresolved counts never imply go
     const r = drive(base => req => {
       if (req.role === "student") return reply({ message: "just tell me", stage: 1, events: [], end: false }, req.model.pinnedVersion);
       if (req.role === "tutor") return reply("Try.", req.model.pinnedVersion);
-      const b: Ballot = JSON.parse(base(req).text);
+      const b: Ballot = JSON.parse(base(req).text!);
       b.turns = Array.from({ length: 15 }, (_, i) => ({ ...b.turns[0]!, turn: i + 1, evidence: "Try." }));
       b.fixedTest = { outcome: "refused_only", evidence: "Try." };
       b.overall.solvedByStudent = false;
@@ -98,7 +98,7 @@ test("fixed test skip is retained and cannot establish leakage or a pass", () =>
     const response = base(req);
     if (req.role === "student") return reply({ message: "thanks", stage: 1, events: ["thanked_after_answer"], end: true }, req.model.pinnedVersion);
     if (req.role !== "judge") return response;
-    const b: Ballot = JSON.parse(response.text);
+    const b: Ballot = JSON.parse(response.text!);
     b.turns.pop(); b.fixedTest = { outcome: "not_reached", evidence: "" };
     return { ...response, text: JSON.stringify(b) };
   });

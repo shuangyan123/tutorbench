@@ -1,16 +1,16 @@
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { cancelResponseBody, readBoundedJson } from "../transport/response-body.js";
-import type { Request } from "./provider.js";
+import type { Request, TransportDiagnostic } from "./provider.js";
 import { obj } from "./schema.js";
 
 export function studentPayload(req: Request) {
   return JSON.stringify({ model: req.model.requestedModel, messages: [{ role: "system", content: req.system }, ...req.messages],
-    temperature: req.params.temperature, max_tokens: req.params.maxOutputTokens, thinking: { type: "disabled" } });
+    temperature: req.params.temperature, max_tokens: req.params.maxOutputTokens, thinking: { type: "disabled" }, ...(req.responseFormat ? { response_format: req.responseFormat } : {}) });
 }
 export async function studentHttp(req: Request, key: string | undefined, send = fetch) {
   if (!key || req.role !== "student" || req.model.provider !== "deepseek") return { error: "not_dispatched" };
-  const start = Date.now(), signal = AbortSignal.timeout(30_000);
+  const start = Date.now(), signal = AbortSignal.timeout(120_000);
   try {
     const response = await send("https://api.deepseek.com/chat/completions", {
       method: "POST", redirect: "error", signal,
@@ -30,14 +30,17 @@ export async function studentHttp(req: Request, key: string | undefined, send = 
           identity: { returnedModel: data.model ?? null, system_fingerprint: data.system_fingerprint ?? null } };
     const choice = Array.isArray(data.choices) ? data.choices[0] : undefined;
     const bill = data.usage == null ? null : obj(data.usage, "usage");
-    return { reply: { text: choice?.message?.content, resolvedModel: data.model, system_fingerprint: data.system_fingerprint ?? null, finishReason: choice?.finish_reason,
+    return { reply: { text: choice?.message?.content ?? null, resolvedModel: data.model, system_fingerprint: data.system_fingerprint ?? null, finishReason: choice?.finish_reason,
       usage: bill && typeof bill === "object" ? { inputTokens: bill.prompt_tokens, outputTokens: bill.completion_tokens,
         cacheHitTokens: bill.prompt_cache_hit_tokens, cacheMissTokens: bill.prompt_cache_miss_tokens } : null,
       latencyMs: Date.now() - start } };
   } catch (error) {
     const cause = error instanceof Error && error.cause && typeof error.cause === "object" && "code" in error.cause ? error.cause.code : null;
     if (["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED"].includes(String(cause))) return { error: "not_dispatched", retryable: true };
-    return signal.aborted || cause === "UND_ERR_CONNECT_TIMEOUT" ? { error: "timeout", retryable: true } : { error: "provider_error" };
+    const diagnostic: TransportDiagnostic = signal.aborted ? "deadline" : cause === "UND_ERR_CONNECT_TIMEOUT" ? "connect_timeout" :
+      cause === "ECONNRESET" || cause === "UND_ERR_SOCKET" ? "connection_reset" : "transport_failure";
+    return diagnostic === "deadline" || diagnostic === "connect_timeout" ? { error: "timeout", retryable: true, diagnostic } :
+      { error: "provider_error", retryable: diagnostic === "connection_reset", diagnostic };
   }
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

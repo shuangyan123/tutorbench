@@ -122,7 +122,7 @@ test("fixed challenge audits the reported event, visible text and one-based stud
   assert.equal(rejected.studentMessage, 2);
   assert.deepEqual(rejected.reasons, ["fixed_test_missing"]);
   assert.deepEqual(rejected.softFlags, ["fixed_test_event_without_text"]);
-  assert.deepEqual(JSON.parse(rejected.text).events, [fixed.kind]);
+  assert.deepEqual(JSON.parse(rejected.text!).events, [fixed.kind]);
 });
 test("turn cap stops after tutor 15, with fourteen student calls", () => {
   const r = drive(() => req => reply(req.role === "student" ? { message: "just tell me", stage: 1, events: [], end: false } : "hmm", req.model.pinnedVersion));

@@ -1,3 +1,4 @@
+import { observedFormat, type ObservedFormat } from "./student.js";
 import { hash } from "./cards.js";
 import { amount, choices, id, invalid, list, localized, nullable, optional, positive, shape, str, type Reader } from "./schema.js";
 
@@ -15,11 +16,12 @@ export interface Request {
   model: Model;
   system: string;
   messages: Message[];
+  responseFormat?: { type: "json_object" }; historyHash?: string;
   params: { temperature: number | null; maxOutputTokens?: number };
 }
 export interface Reply {
   returnedModel?: string | null; system_fingerprint?: string | null;
-  text: string; resolvedModel: string; finishReason: string; latencyMs: number;
+  text: string | null; resolvedModel: string; finishReason: string; latencyMs: number;
   usage: { inputTokens: number; outputTokens: number; cacheHitTokens?: number | undefined; cacheMissTokens?: number | undefined } | null;
 }
 export type Provider = ((request: Request) => Reply) & { requestBytes?: (request: Request) => number };
@@ -34,15 +36,18 @@ export type Prices = ReturnType<typeof priceSchema>;
 export type Role = Request["role"];
 export type Failure = `http_${number}` | "timeout" | "overloaded" | "not_dispatched" | "content_filter" | "provider_error" | "mock_not_dispatched" | "sensitive_output" | "invalid_response" | "model_version_drift" | "budget_stop" | "unknown_cost";
 export interface Call {
+  historyHash?: string; responseFormat?: { requested: "json_object"; observed: ObservedFormat | null };
+  transportDiagnostic?: TransportDiagnostic;
   cache?: ReturnType<typeof cacheReceipt>;
   requestedModel: string; returnedModel: string | null; system_fingerprint: string | null; calledAt: string;
   n: number; role: Role; model: string; requestHash: string; resolvedModel: string | null;
   usage: Reply["usage"]; usd: number | null; finishReason: string | null; latencyMs: number | null;
   error: Failure | null; retryDelayMs: number; reservedUsd: number; costEstimated: boolean;
 }
+export type TransportDiagnostic = "connect_timeout" | "deadline" | "worker_deadline" | "worker_failure" | "connection_reset" | "transport_failure";
 export class TransportError extends Error {
   constructor(readonly code: Failure, readonly retryable = false, readonly retryAfterMs?: number,
-    readonly identity?: { returnedModel: unknown; system_fingerprint: unknown }) { super(code); }
+    readonly identity?: { returnedModel: unknown; system_fingerprint: unknown }, readonly diagnostic?: TransportDiagnostic) { super(code); }
 }
 export class MockNotDispatched extends TransportError {
   constructor() { super("mock_not_dispatched", true); }
@@ -53,7 +58,7 @@ export function sensitive(text: string) {
   // 先展开 JSON 转义，防止凭据在解析学生消息后才显现。
   const visible = text.replace(/\\u([0-9a-f]{4})/giu, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
     .replace(/\\(["'])/gu, "$1");
-  return /<\/?(?:think|thinking|reasoning)>|\bsk-[a-z0-9_-]+|\bgh[pousr]_[a-z0-9]+|github_pat_|authorization|\bbearer\s+\S+|\b(?:set-cookie|cookie|password|api[_-]?key|access[_-]?token|request[_-]?headers|headers|reasoning(?:_content)?|thinking|chain_of_thought|private[_-]?key|client[_-]?secret|refresh[_-]?token)\b\s*["']?\s*[:=]|-----BEGIN [A-Z ]*PRIVATE KEY-----|[\w.+-]+@[\w.-]+\.[a-z]{2,}/iu.test(visible);
+  return /<\/?(?:think|thinking|reasoning)>|\bsk-[a-z0-9_-]+|\bgh[pousr]_[a-z0-9]+|github_pat_|authorization|\bbearer\s+\S+|\b(?:set-cookie|cookie|password|api[_-]?key|access[_-]?token|request[_-]?headers|headers|reasoning(?:_content)?|chain_of_thought|private[_-]?key|client[_-]?secret|refresh[_-]?token)\b\s*["']?\s*[:=]|\bthinking\b\s*["']?\s*[:=](?!\s*"disabled")|-----BEGIN [A-Z ]*PRIVATE KEY-----|[\w.+-]+@[\w.-]+\.[a-z]{2,}/iu.test(visible);
 }
 // 老价格表的 inputUsdPerMillion 也是保守预留所用的未命中价。
 function cacheReceipt(hitRate: number | null, missRate: number, usage?: Reply["usage"]) {
@@ -136,6 +141,10 @@ export class Session {
     const call: Call = { cache: cacheReceipt(hitRate, input), n: this.calls.length + 1, role: req.role, model: req.model.id, requestHash: hash(JSON.stringify(req)),
       calledAt: new Date().toISOString(), requestedModel: req.model.requestedModel, returnedModel: null, system_fingerprint: null,
       resolvedModel: null, usage: null, usd: null, finishReason: null, latencyMs: null, error: null, reservedUsd: reserve, costEstimated: true, retryDelayMs };
+    if (req.role === "student" && req.responseFormat) {
+      call.responseFormat = { requested: req.responseFormat.type, observed: null };
+      if (req.historyHash) call.historyHash = req.historyHash;
+    }
     this.calls.push(call);
     call.usd = reserve;
     this.remaining = dollars(this.remaining - reserve)!;
@@ -158,6 +167,7 @@ export class Session {
         call.usd = 0; call.costEstimated = false; call.usage = { inputTokens: 0, outputTokens: 0 };
       }
       if (error instanceof TransportError) {
+        if (error.diagnostic) call.transportDiagnostic = error.diagnostic;
         if (error.identity) recordIdentity(error.identity.returnedModel, error.identity.system_fingerprint);
         if (returnedDrift()) fail("model_version_drift");
         throw error;
@@ -189,9 +199,12 @@ export class Session {
     const returned = reply.returnedModel === undefined ? reply.resolvedModel : reply.returnedModel;
     recordIdentity(returned, reply.system_fingerprint);
     if (reply.finishReason === "content_filter") return fail(returnedDrift() ? "model_version_drift" : "content_filter");
-    if (typeof reply.text !== "string" || !reply.text.trim() || typeof reply.resolvedModel !== "string" || !reply.resolvedModel.trim() ||
+    const v6Student = req.role === "student" && !!req.responseFormat;
+    const validText = typeof reply.text === "string" ? v6Student || !!reply.text.trim() : v6Student && reply.text === null;
+    if (!validText || typeof reply.resolvedModel !== "string" || !reply.resolvedModel.trim() ||
         typeof reply.finishReason !== "string" || !reply.finishReason.trim() || !tokens(reply.latencyMs)) return fail(returnedDrift() ? "model_version_drift" : "invalid_response");
-    if ([reply.text, reply.resolvedModel, reply.finishReason].some(sensitive)) return fail("sensitive_output");
+    if ([reply.text ?? "", reply.resolvedModel, reply.finishReason].some(sensitive)) return fail("sensitive_output");
+    if (call.responseFormat) call.responseFormat.observed = observedFormat(reply.text, reply.finishReason);
     call.resolvedModel = reply.resolvedModel;
     call.finishReason = reply.finishReason;
     call.latencyMs = reply.latencyMs;
@@ -208,7 +221,7 @@ export const configSchema = shape({
     retrievedAt: (v, f) => /^\d{4}-\d{2}-\d{2}(?:T.*)?$/u.test(str(v, f)) && Number.isFinite(Date.parse(String(v))) ? String(v) : invalid(f),
     quote: str,
   })),
-  syntheticJudgeRubric: optional(choices("fixture")), kind: optional(choices("evaluation", "calibration")), hardCapUsd: optional(amount), batchId: id, purpose: str, languages: (v, f) => {
+  syntheticJudgeRubric: optional(choices("fixture")), kind: optional(choices("evaluation", "calibration", "calibration-probe")), hardCapUsd: optional(amount), batchId: id, purpose: str, languages: (v, f) => {
     if (!Array.isArray(v) || !v.length || v.some(l => l !== "en" && l !== "zh-CN") || new Set(v).size !== v.length) invalid(f);
     return v as ("en" | "zh-CN")[];
   }, repeats: positive, maxOfflineAttempts: optional(positive), budgetUsd: amount, reserveUsd: (v, f) => v === undefined ? 0 : amount(v, f), prices: priceSchema,

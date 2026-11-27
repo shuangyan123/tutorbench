@@ -14,7 +14,7 @@ const wrap = (s: string, tag = "json") => ticks + tag + "\r\n" + s + "\r\n" + ti
 test("both roles accept one whole fence, retain repair evidence and charge only actual rewrites", () => {
   const clean = drive(), result = drive(base => req => {
     const response = base(req);
-    if (req.role !== "tutor") response.text = wrap(response.text, req.role === "student" ? "" : "JSON");
+    if (req.role !== "tutor") response.text = wrap(response.text!, req.role === "student" ? "" : "JSON");
     return response;
   });
   assert.equal(result.schemaVersion, 5);
