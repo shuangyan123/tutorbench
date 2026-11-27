@@ -44,12 +44,16 @@ export default tseslint.config(
     languageOptions: {
       sourceType: "script",
       globals: {
+        Blob: "readonly",
         document: "readonly",
         history: "readonly",
         localStorage: "readonly",
         location: "readonly",
         navigator: "readonly",
         Node: "readonly",
+        setTimeout: "readonly",
+        TextEncoder: "readonly",
+        URL: "readonly",
         window: "readonly",
       },
     },
@@ -60,6 +64,7 @@ export default tseslint.config(
       globals: {
         console: "readonly",
         process: "readonly",
+        TextDecoder: "readonly",
       },
     },
   },
