@@ -216,7 +216,9 @@ test("the bundled sample is synthetic, consistent and covers every state", () =>
   const d = M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, index: M.parseJsonl(SAMPLE.index) });
   assert.deepEqual(d.warnings, []);
   for (const r of d.runs) {
-    assert.match(r.tutor.label, /\(synthetic\)/u);
+    // A probe's tutor is the replayed tape, which the runner names without a label.
+    if (r.probe) assert.match(r.tutor.id, /^tape-/u);
+    else assert.match(r.tutor.label, /\(synthetic\)/u);
     assert.match(r.card.id, /^synthetic-/u);
   }
   const version = d.judgeVersions[0];
@@ -511,12 +513,12 @@ const setupWith = (evaluated, pred) => {
 test("v3: records of schema v1, v2, v3 and v5 load together, and v2 history joins v3 runs of the same setup", () => {
   const { d, evaluated } = sampleViews();
   assert.deepEqual(d.warnings, []);
-  assert.deepEqual([...new Set(d.runs.map(r => r.schemaVersion))].sort(), [2, 3, 5]);
+  assert.deepEqual([...new Set(d.runs.map(r => r.schemaVersion))].sort(), [2, 3, 5, 6]);
   // A v1 record from an older folder loads beside them.
   const old = record({ runId: "v1-run", createdAt: "2026-11-01T00:00:00.000Z" });
   const mixed = M.buildDataset({ records: [...SAMPLE.records, old], batches: [...SAMPLE.batches, batch] });
   assert.deepEqual(mixed.warnings, []);
-  assert.deepEqual([...new Set(mixed.runs.map(r => r.schemaVersion))].sort(), [1, 2, 3, 5]);
+  assert.deepEqual([...new Set(mixed.runs.map(r => r.schemaVersion))].sort(), [1, 2, 3, 5, 6]);
   // Atlas with no prompt of its own: the v2 pilot and the v3 runs after it are one setup.
   const atlas = setupWith(evaluated, r => r.batchId === "synthetic-pilot-02" && r.tutor.id === "atlas" && underV1(r));
   assert.deepEqual([...new Set(atlas.views.map(v => v.record.schemaVersion))].sort(), [2, 3]);
@@ -634,8 +636,10 @@ const CAL = "synthetic-calibration-13";
 test("v5: the sample's calibration reports load, and the page shows them as written", () => {
   const d = full();
   assert.deepEqual(d.warnings, []);
-  assert.equal(d.reports.size, 3);
-  assert.deepEqual(M.calibrationBatches(d).map(b => b.batchId).slice(0, 3), [CAL, "synthetic-dryrun-12", "synthetic-cannot-check-11"]);
+  assert.equal(d.reports.size, 6);
+  // Formal batches with a report first, newest first; the diagnostic batch last.
+  assert.deepEqual(M.calibrationBatches(d).map(b => b.batchId),
+    ["synthetic-calibration-16", "synthetic-probes-g2-14", CAL, "synthetic-dryrun-12", "synthetic-cannot-check-11", "synthetic-drift-10", "synthetic-calibration-05", "synthetic-probes-diag-15"]);
   const rep = d.reports.get(CAL), c = M.calibrationOf(d, CAL);
   assert.equal(c.machine.verdict, rep.verdict);
   assert.equal(c.machine.runsPassing, rep.runs.filter(x => x.pass).length);
@@ -644,7 +648,7 @@ test("v5: the sample's calibration reports load, and the page shows them as writ
   assert.deepEqual(c.machine.discard, rep.discard);
   assert.equal(c.contentReview, "pending");
   // Thresholds come from the expectations, never from the page.
-  assert.deepEqual({ ...c.criteria, rulesVersion: undefined }, { maxHard: 0, maxSoft: 1, minPassingRuns: 2, repeats: 3, rewriteRateMax: 0.2, rulesVersion: undefined });
+  assert.deepEqual({ ...c.criteria, rulesVersion: undefined }, { maxHard: 0, maxSoft: 1, minPassingRuns: 2, repeats: 3, groupRuns: 3, rewriteRateMax: 0.2, rulesVersion: undefined, probes: false });
   // Groups hold the adopted runs only; the interrupted record is kept apart.
   assert.equal(c.records.length, 19);
   assert.equal(c.adopted.length, 18);
@@ -660,7 +664,7 @@ test("v5: the sample's calibration reports load, and the page shows them as writ
   const d2 = M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, reports: [said] });
   assert.equal(M.calibrationOf(d2, CAL).machine.verdict, "PASS");
   // Without expectations only the report's rewrite limit is known.
-  assert.deepEqual(M.calibrationOf(d2, CAL).criteria, { rewriteRateMax: 0.2 });
+  assert.deepEqual(M.calibrationOf(d2, CAL).criteria, { rewriteRateMax: 0.2, probes: false });
   // Expectations written for another rules version do not apply.
   const other = M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, reports: SAMPLE.reports, expectations: [{ ...SAMPLE.expectations[0], rulesVersion: "9.9.9" }] });
   assert.equal(M.calibrationOf(other, CAL).expectations, null);
@@ -862,4 +866,203 @@ test("review pack: SHA-256, CRC-32, a stored zip with UTF-8 names, and CSV that 
   // The review index of the sample goes through it whole.
   const rows = M.reviewIndex(full(), CAL);
   assert.equal(P.csv(M.REVIEW_COLUMNS, rows).split("\r\n").length, rows.length + 2);
+});
+
+// ---------- record schema v6, checker v3 and v3.1, probes, content review and gate outputs ----------
+const G2 = "synthetic-probes-g2-14", DIAG = "synthetic-probes-diag-15", C16 = "synthetic-calibration-16";
+const all = (over = {}) => M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, index: M.parseJsonl(SAMPLE.index), reports: SAMPLE.reports,
+  expectations: SAMPLE.expectations, reviews: SAMPLE.reviews, gates: SAMPLE.gates, probeSets: SAMPLE.probes, ...over });
+const clone = v => JSON.parse(JSON.stringify(v));
+const sha = async () => { const { createHash } = await import("node:crypto"); return t => createHash("sha256").update(t, "utf8").digest("hex"); };
+
+test("v6: reviews, gate outputs and probe files are told apart from reports and load without warnings", () => {
+  const d = all();
+  assert.deepEqual(d.warnings, []);
+  assert.equal(d.reviews.size, 2);
+  assert.equal(d.gates.length, 1);
+  assert.equal(d.probeSets.length, 1);
+  for (const r of SAMPLE.reviews) { assert.ok(M.isContentReview(r)); assert.ok(!M.isReport(r)); assert.ok(!M.isGateResult(r)); assert.ok(!M.isProbeSet(r)); }
+  for (const g of SAMPLE.gates) { assert.ok(M.isGateResult(g)); assert.ok(!M.isReport(g)); assert.ok(!M.isContentReview(g)); }
+  for (const p of SAMPLE.probes) { assert.ok(M.isProbeSet(p)); assert.ok(!M.isExpectations(p)); }
+  for (const r of SAMPLE.reports) { assert.ok(!M.isContentReview(r)); assert.ok(!M.isGateResult(r)); }
+  assert.ok(M.CALIBRATION_KINDS.every(M.isCalibrationKind));
+  // A probe run is a calibration run: never scored, never in a tutor's pass rate.
+  const probe = d.runs.find(r => r.batchId === G2);
+  assert.equal(M.runView(probe, d.judgeVersions[0], d.latestCard, d.supersededBy).state, "calibration");
+  assert.deepEqual(M.probeBatches(d).map(b => b.batchId), [G2, DIAG], "formal probe batches before diagnostic ones");
+});
+
+test("v6: checker v2 and v3 reports read in one shape, and nothing is recomputed", () => {
+  const d = all();
+  const v2r = M.normReport(d.reports.get(CAL)), v3r = M.normReport(d.reports.get(G2)), raw = d.reports.get(G2);
+  assert.equal(v2r.v3, false);
+  assert.equal(v2r.machineVerdict, d.reports.get(CAL).verdict);
+  assert.equal(v3r.v3, true);
+  assert.equal(v3r.machineVerdict, raw.machineVerdict);
+  assert.equal(v3r.reportVerdict, "PENDING_REVIEW");
+  assert.deepEqual(v3r.groups.map(g => [g.key, g.lang, g.passing, g.pass]), raw.groups.map(g => [g.probeId, g.lang, g.machinePassing, g.machinePass]));
+  assert.deepEqual(v3r.runs.map(x => x.pass), raw.runs.map(x => x.machinePass));
+  assert.deepEqual(v3r.rewrite, raw.l0.rewrite);
+  assert.deepEqual(v3r.observedFormats, raw.l0.observedFormats);
+  // A report that says something else is shown as it says.
+  const said = M.normReport({ ...raw, machineVerdict: "FAIL", runs: raw.runs.map(x => ({ ...x, machinePass: true })) });
+  assert.equal(said.machineVerdict, "FAIL");
+  assert.ok(said.runs.every(x => x.pass));
+  assert.equal(M.normReport({ batchId: "x", verdict: "CANNOT_CHECK" }), null);
+  const c = M.calibrationOf(d, G2);
+  assert.equal(c.probes, true);
+  assert.deepEqual(c.groups.map(g => g.key), ["P-beg", "P-mistake", "P-leave"]);
+  assert.deepEqual(c.criteria, { maxHard: 0, maxSoft: 1, minPassingRuns: 4, repeats: 5, groupRuns: 5, rewriteRateMax: 0.2, rulesVersion: "2.0.0", probes: true });
+  assert.equal(c.machine.checkerVersion, 3);
+  assert.equal(M.calibrationOf(d, DIAG).machine.checkerRevision, "3.1.0");
+});
+
+test("v6: what a batch is for: diagnostic, formal calibration or tutor evaluation", () => {
+  const d = all(), b = id => d.batches.find(x => x.batchId === id);
+  assert.equal(M.batchClass(b(DIAG), d.reports.get(DIAG)), "diagnostic");
+  assert.equal(M.batchClass(b(G2), d.reports.get(G2)), "calibration");
+  assert.equal(M.batchClass(b(C16), d.reports.get(C16)), "calibration");
+  assert.equal(M.batchClass(b(CAL), d.reports.get(CAL)), "calibration");
+  const ev = d.batches.find(x => !M.isCalibrationKind(x.kind));
+  assert.equal(M.batchClass(ev, null), "evaluation");
+  // Either side can say it: a batch file written with gate "diagnostic", or a checker 3.1 report that says DIAGNOSTIC.
+  assert.equal(M.batchClass({ ...b(G2), gate: "key" }, { ...d.reports.get(DIAG) }), "diagnostic");
+  assert.equal(M.batchClass({ ...b(DIAG), gate: "key" }, { diagnostic: false, verdict: "FAIL" }), "calibration");
+});
+
+test("v6: the content review follows its rules: undecided needs_review is fail once complete, auto_fail passes only by override", () => {
+  const d = all(), g2 = M.reviewOf(d, G2);
+  assert.equal(g2.complete, true);
+  assert.equal(g2.counts.items, M.normReport(d.reports.get(G2)).runs.reduce((n, x) => n + x.reviewItems.length, 0));
+  assert.equal(g2.counts.decided, g2.counts.items);
+  assert.equal(g2.counts.pending, 0);
+  assert.equal(g2.counts.overrides, 1);
+  const over = g2.items.find(x => x.overridesMachine);
+  assert.equal(over.machine, "auto_fail");
+  assert.equal(over.effective, "pass");
+  assert.ok(g2.items.some(x => x.decision === "fail" && x.effective === "fail"));
+  // Take one needs_review decision out of a complete review: it counts as fail. Take it out of an open one: pending.
+  const file = clone(SAMPLE.reviews.find(r => r.batchId === G2));
+  const nr = g2.items.find(x => x.machine === "needs_review");
+  file.items = file.items.filter(i => !(i.recordId === nr.runId && i.itemId === nr.itemId));
+  const gone = M.reviewOf(all({ reviews: [file, ...SAMPLE.reviews.filter(r => r.batchId !== G2)] }), G2).items.find(x => x.runId === nr.runId && x.itemId === nr.itemId);
+  assert.equal(gone.decision, null);
+  assert.equal(gone.undecidedFail, true);
+  assert.equal(gone.effective, "fail");
+  const open = M.reviewOf(all({ reviews: [{ ...file, status: "open" }, ...SAMPLE.reviews.filter(r => r.batchId !== G2)] }), G2).items.find(x => x.runId === nr.runId && x.itemId === nr.itemId);
+  assert.equal(open.effective, "pending");
+  // An undecided auto_fail stays fail; an undecided auto_pass stays pass.
+  const af = clone(file); af.items = af.items.filter(i => !(i.recordId === over.runId && i.itemId === over.itemId));
+  assert.equal(M.reviewOf(all({ reviews: [af] }), G2).items.find(x => x.runId === over.runId && x.itemId === over.itemId).effective, "fail");
+  const c16 = M.reviewOf(d, C16);
+  assert.equal(c16.status, "open");
+  assert.ok(c16.counts.pending > 0);
+  assert.ok(c16.items.filter(x => x.machine === "auto_pass" && !x.decision).every(x => x.effective === "pass"));
+  // No review file: nothing is decided, and the page says so rather than guessing.
+  const none = M.reviewOf(all({ reviews: [] }), G2);
+  assert.equal(none.file, null);
+  assert.equal(none.counts.decided, 0);
+});
+
+test("v6: the final verdict comes only from gate or final files, and a diagnostic batch is refused", () => {
+  const d = all();
+  const f = M.finalOf(d, G2);
+  assert.equal(f.diagnostic, false);
+  assert.deepEqual(f.outputs.map(o => [o.kind, o.scope, o.verdict, o.machineVerdict]), [["gate", "G2", "FAIL", "PASS"]]);
+  assert.equal(f.outputs[0].overrides.length, 1);
+  assert.equal(f.outputs[0].groups.length, 6);
+  assert.deepEqual(M.finalOf(d, DIAG), { batchId: DIAG, diagnostic: true, outputs: [] });
+  assert.deepEqual(M.finalOf(all({ gates: [] }), G2).outputs, []);
+  const L = M.packLayers(d, DIAG);
+  assert.equal(L.class, "diagnostic");
+  assert.equal(L.review.required, false);
+  assert.equal(L.final.refused, true);
+  const L2 = M.packLayers(d, G2);
+  assert.equal(L2.review.required, true);
+  assert.deepEqual(L2.final.outputs.map(o => o.verdict), ["FAIL"]);
+  assert.equal(L2.phase, "G2");
+  assert.equal(L2.series, "synthetic-series-1");
+});
+
+test("v6: loading warns about reviews and gates that do not fit the folder", () => {
+  const g = SAMPLE.gates[0], rv = SAMPLE.reviews.find(r => r.batchId === G2);
+  const codes = over => all(over).warnings.map(w => w.code);
+  assert.deepEqual(codes({ gates: [{ ...g, machineVerdicts: { ...g.machineVerdicts, [DIAG]: "FAIL" } }] }), ["gate_has_diagnostic"]);
+  assert.deepEqual(codes({ gates: [{ ...g, machineVerdicts: { [G2]: "FAIL" } }] }), ["gate_report_differs"]);
+  assert.deepEqual(codes({ gates: [{ ...g, machineVerdicts: { "no-such-batch": "PASS" } }] }), ["gate_batch_missing"]);
+  assert.deepEqual(codes({ reviews: [...SAMPLE.reviews, { ...rv, reviewer: "someone else" }] }), ["review_conflict"]);
+  assert.deepEqual(codes({ reviews: [{ ...rv, items: [...rv.items, { recordId: "run-none", itemId: "L2-H1", decision: "pass" }] }] }), ["review_run_unknown"]);
+  assert.deepEqual(codes({ reviews: [{ ...rv, items: [...rv.items, { ...rv.items[0], itemId: "L9" }] }] }), ["review_item_unknown"]);
+  assert.deepEqual(codes({ reviews: [{ ...rv, batchId: "no-such-batch", items: [] }] }), ["review_without_batch"]);
+  assert.deepEqual(codes({ gates: [{ kind: "gate" }], reviews: [{ schemaVersion: 1, batchId: G2 }], probeSets: [{ schemaVersion: 1 }] }), ["not_a_review", "not_a_gate", "not_a_probe_set"]);
+});
+
+test("v6: a probe in both languages: the same prefix every run, its hash, the probe file, and the target message as parts", async () => {
+  const d = all(), h = await sha();
+  const pv = M.probeView(d, G2, h);
+  assert.deepEqual(pv.probes.map(p => p.probeId), ["P-beg", "P-mistake", "P-leave"]);
+  assert.deepEqual(pv.others.map(p => p.probeId), ["P-solve"], "a probe of the file this batch did not run is listed apart");
+  for (const p of pv.probes) for (const lang of pv.langs) {
+    const x = p.langs[lang];
+    assert.equal(x.runs.length, 5);
+    assert.equal(x.sameAcrossRuns, true);
+    assert.equal(x.hashMatches, true, p.probeId + " " + lang);
+    assert.equal(x.matchesFile, true);
+    assert.equal(x.prefix.length, 2 * (p.target - 1));
+    for (const r of x.runs) { assert.equal(r.n, p.target); assert.ok(r.parts.v6); }
+  }
+  const beg = pv.probes[0].langs.en.runs[0].parts;
+  assert.equal(beg.injected.kind, "fixed_test");
+  assert.equal(beg.final, beg.modelMessage + beg.injected.separator + beg.injected.text);
+  assert.ok(beg.runnerEvents.includes("begs_for_answer"));
+  assert.equal(pv.probes[0].expectation.n, 2);
+  // Without the probe file only the hash can be checked; without a hash function, nothing is claimed.
+  const bare = M.probeView(all({ probeSets: [] }), G2, null);
+  assert.equal(bare.set, null);
+  assert.ok(bare.probes.every(p => Object.values(p.langs).every(x => x.matchesFile === null && x.hashMatches === null)));
+  // A record whose prefix was changed no longer matches its hash, the others or the file.
+  const recs = clone(SAMPLE.records), one = recs.find(r => r.batchId === G2 && r.probe.probeId === "P-beg" && r.card.lang === "en" && r.repeat.index === 1);
+  one.transcript[0].text += " (edited)";
+  const bad = M.probeView(all({ records: recs }), G2, h).probes[0].langs.en;
+  assert.equal(bad.sameAcrossRuns, false);
+  assert.equal(bad.hashMatches, false);
+  assert.equal(bad.matchesFile, false);
+  // A line before v6 has only its final text.
+  assert.deepEqual(M.messageParts({ role: "student", text: "hi", state: { stage: 1, events: [], end: false } }),
+    { raw: null, modelMessage: null, modelEvents: null, injected: null, runnerEvents: [], droppedEvents: [], final: "hi", state: { stage: 1, events: [], end: false },
+      format: null, call: null, regenerated: 0, hardFails: [], softFlags: [], fenceStripped: false, v6: false });
+  // The fixed prefix was written by nobody in this run; the target names its call.
+  const att = M.attemptsOf(SAMPLE.records.find(r => r.batchId === G2)).at(-1);
+  for (const l of att.lines.filter(x => x.role === "student")) {
+    if (l.prefix) assert.equal(l.callInfo, null);
+    else assert.equal(l.callInfo.n, l.checks.call);
+  }
+  assert.equal(M.ruleFamily(["fixed_test_echo"]), "protocol");
+  assert.equal(M.ruleFamily(["empty_response"]), "format");
+});
+
+test("v6: the pack tables: one row per record, per review item and per student message", () => {
+  const d = all();
+  const idx = M.reviewIndex(d, G2);
+  assert.equal(idx.length, 30);
+  for (const row of idx) assert.deepEqual(Object.keys(row), M.REVIEW_COLUMNS);
+  assert.ok(idx.every(r => r.batch_class === "calibration" && r.probe && r.prefix_hash.startsWith("sha256:")));
+  assert.equal(idx.reduce((n, r) => n + r.review_items, 0), M.reviewOf(d, G2).counts.items);
+  assert.equal(idx.reduce((n, r) => n + r.review_overrides, 0), 1);
+  assert.ok(M.reviewIndex(d, DIAG).every(r => r.batch_class === "diagnostic"));
+  const items = M.reviewItemRows(d, G2);
+  assert.equal(items.length, M.reviewOf(d, G2).counts.items);
+  for (const row of items) assert.deepEqual(Object.keys(row), M.REVIEW_ITEM_COLUMNS);
+  assert.equal(items.filter(r => r.overrides_machine).length, 1);
+  assert.deepEqual(M.reviewItemRows(d, CAL), [], "checker v2 writes no review items");
+  const msgs = M.messageRows(d, G2), recs = d.runs.filter(r => r.batchId === G2);
+  for (const row of msgs) assert.deepEqual(Object.keys(row), M.MESSAGE_COLUMNS);
+  const expected = recs.reduce((n, r) => n + M.attemptsOf(r).reduce((k, a) => k + a.lines.filter(l => l.role === "student").length + a.rejected.length, 0), 0);
+  assert.equal(msgs.length, expected);
+  assert.equal(msgs.filter(r => r.target && r.row === "kept").length, 30, "one kept target message per run");
+  assert.ok(msgs.filter(r => r.row === "rejected").every(r => r.rejection_reasons && r.raw !== undefined));
+  assert.ok(msgs.filter(r => r.row === "prefix").every(r => r.call === "" && r.raw === ""));
+  assert.ok(msgs.some(r => r.injected_kind === "fixed_test" && r.injected_text));
+  // Older batches still export: a v2 report and v5 records.
+  assert.ok(M.messageRows(d, CAL).length > 0);
 });

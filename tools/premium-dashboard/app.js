@@ -167,7 +167,7 @@
     scriptedNoInput: "{m} 是离线回放的脚本导师，没有输入 token，不算缓存。", cacheNote: "命中率只按拆分已知的调用算，分母见「已知 / 调用」。拆分未知的调用不当 0，也不猜。",
     transportTitle: "传输错误和重试", conversation: "对话", call: "调用", retryWait: "重试等待", charged: "计费", then: "后来", retryOk: "重试后成功", atReservation: "{v}（按预留额）",
     replacedBy: "已由这段重跑替代", noTransport: "没有传输错误，也没有重试。",
-    exportPack: "导出复核包", exportNote: "用已经打开的文件，在这个标签页里打成 .zip：原始记录、批次、报告和索引，加一份复核索引表和 SHA-256。不上传，不重跑。",
+    exportPack: "导出复核包", exportNote: "用已经打开的文件，在这个标签页里打成 .zip：原始记录、批次、报告、复核、关口、探针文件和索引，加三张表（每段、每个复核项、每条消息）、manifest.json 和 SHA-256。不上传，不重跑。",
     exportSynthetic: "合成示例没有原始文件，包里是重新序列化的 JSON。",
     calibTitle: "模拟学生靠不靠得住", calibLede: "校准只看模拟学生有没有照卡片演：脚本导师，不评审，不打分。结论、分组和比率都照抄校准报告，页面不重新判。", calibBatch: "校准批次",
     layerMachine: "机器校准", layerScoring: "正式导师评分", layerReview: "独立内容复核",
@@ -217,7 +217,7 @@
     scriptedNoInput: "{m}: scripted replay with no input tokens, so no cache.", cacheNote: "The hit rate counts only calls whose split is known; that denominator is under “Known / calls”. A call with an unknown split is neither zero nor guessed.",
     transportTitle: "Transport errors and retries", conversation: "Conversation", call: "Call", retryWait: "Retry wait", charged: "Charged", then: "Then", retryOk: "succeeded on retry", atReservation: "{v} (reservation)",
     replacedBy: "replaced by the restart", noTransport: "No transport errors and no retries.",
-    exportPack: "Export review pack", exportNote: "Packs the files already open into a .zip in this tab: the original records, batch, report and index, plus a review index and SHA-256 sums. Nothing is uploaded or re-run.",
+    exportPack: "Export review pack", exportNote: "Packs the files already open into a .zip in this tab: the original records, batch, report, review, gate outputs, probe file and index, plus three tables (per run, per review item, per message), manifest.json and SHA-256 sums. Nothing is uploaded or re-run.",
     exportSynthetic: "The synthetic sample has no original files, so the pack holds re-serialised JSON.",
     calibTitle: "Can the simulated student be trusted", calibLede: "Calibration checks only whether the simulated student plays the card: scripted tutors, no judges, no scores. The verdict, the groups and the rates are copied from the calibration report; the page never re-judges.", calibBatch: "Calibration batch",
     layerMachine: "Machine calibration", layerScoring: "Formal tutor scoring", layerReview: "Independent content review",
@@ -269,13 +269,119 @@
     format: "format", protocol: "protocol", state: "state", other: "other", kept: "kept", discarded: "discarded",
   });
 
+  // Record schema v6, checker v3 and v3.1, single-step probes, content reviews and gate or final outputs.
+  Object.assign(T.zh, {
+    viewProbes: "探针",
+    cls_diagnostic: "诊断", cls_calibration: "正式校准", cls_evaluation: "导师评测", clsHere: "这个批次",
+    clsNote_diagnostic: "只用于开发：不需要内容复核，最终结论不收，数字不计入任何关口。",
+    clsNote_calibration: "检查模拟学生。机器判定要经过内容复核，才能写进关口或最终结论。",
+    clsNote_evaluation: "给导师打分，在「概览」和「对照」里看。",
+    clsRule: "三类分开走：页面不会把一类的数字算进另一类。",
+    layerMachine: "机器判定", layerReview: "内容复核", layerFinal: "最终结论",
+    v_PENDING_REVIEW: "待复核", v_DIAGNOSTIC: "诊断", v_pending: "待定",
+    reportSays: "报告总结论：{v}", checkerRev: "checker {r}",
+    reviewNotNeeded: "不需要", reviewDiagNote: "诊断批次不做内容复核。机器标的复核项照样列在图版 IV，只作参考。",
+    reviewNoFile: "还没有复核文件", reviewNoFileNote: "文件夹里没有这个批次的内容复核（content-review-<批次>.json）。报告里有 {n} 项要人来决定。",
+    reviewOpen: "复核进行中", reviewComplete: "复核已完成",
+    reviewLine: "{d}/{n} 项已决定 · 判不通过 {f} · 改判机器 {o}", reviewPendingLine: "还有 {p} 项待定", reviewUndecidedLine: "{u} 项没人决定，按规则记不通过",
+    reviewBy: "复核人 {r} · {b}", blindYes: "盲审", blindNo: "非盲审", reviewNoItems: "报告里没有复核项（checker v2 不写）。",
+    finalRefused: "不适用", finalRefusedNote: "最终结论不收诊断批次。",
+    finalNone: "还没有", finalNoneNote: "文件夹里没有写到这个批次的关口或最终结论文件（gate-<范围>.json）。页面不自己算最终结论。",
+    finalKind_gate: "关口 {s}", finalKind_final: "最终 {s}", finalReview: "复核：{s}", finalMerged: "合并 {n} 个批次", finalOverrides: "改判 {n} 项", finalErrors: "错误 {n} 个",
+    reviewStatus_complete: "已完成", reviewStatus_open: "进行中", reviewStatus_pending: "待复核",
+    critProbe: "每个探针每种语言：{r} 次里至少 {m} 次通过", critProbeAll: "每个计划的探针组都通过",
+    firstTry: "第一次就被采用", firstTrySub: "按目标消息：采用 / 位置", formats: "观察到的输出格式",
+    plateReview: "内容复核：机器标记 × 复核决定", reviewPlateNote: "一行一种机器标记，一列一种复核决定。点一格看是哪几项。",
+    reviewRules: "规则：自动通过的不复核也算通过；自动不通过的只有改判才算通过；需要复核的在复核完成后若没人决定，记为不通过。",
+    m_auto_pass: "自动通过", m_needs_review: "需要复核", m_auto_fail: "自动不通过",
+    dec_pass: "判通过", dec_fail: "判不通过", dec_undecided: "未决定",
+    eff_pass: "结果通过", eff_fail: "结果不通过", eff_pending: "待定",
+    overridesTag: "改判机器", undecidedFailTag: "未决定，记不通过", itemsN: "{n} 项", reviewUnknown: "复核文件里有 {n} 项在报告里找不到：",
+    itemQuestion: "问题", itemQuote: "复核摘的原话", itemNote: "复核备注", machineQuote: "机器摘的原话", itemAt: "第 {n} 条",
+    intGate: "关口与阶段", intSeries: "校准系列", intPrior: "之前的批次", intPins: "报告固定的版本", intResponse: "要求的输出格式",
+    gate_key: "关键探针", gate_rest: "其余探针", gate_diagnostic: "诊断",
+    afterReview: "复核后 {p}/{n}", afterReviewTip: "关口文件里写的复核后通过次数",
+    probesTitle: "同一个探针，中英对照", probesLede: "单步探针：固定的历史前缀之后，模拟学生只写一条目标消息。中英文并排，模型原话和 runner 注入后的消息分开看。结论照抄报告和关口文件，页面不重新判。",
+    probeBatch: "探针批次", plateProbes: "探针 × 语言", probesNote: "大数字是机器判定通过的次数；有关口文件时，下面一行是复核后的次数。点一行看细节。",
+    colProbe: "探针", colPrefix: "前缀", notInBatch: "这个批次没跑", targetN: "第 {n} 条学生消息",
+    prefixSame: "{n} 次前缀相同", prefixDiffers: "各次前缀不一样", hashOk: "哈希对得上", hashBad: "哈希对不上", hashNone: "没有哈希",
+    fileOk: "和探针文件一致", fileBad: "和探针文件不一致", fileNone: "没载入探针文件",
+    plateProbe: "{p}：前缀和每一次的目标消息", probeMeta: "用途", probeTarget: "目标", probeTape: "导师回放", probeProtocol: "协议版本", probeSet: "探针集",
+    probeExpect: "目标消息应该", prefixTitle: "固定历史前缀 · {n} 行", prefixLineN: "第 {n} 行",
+    part_raw: "原始输出", part_model: "模型写的话", part_injected: "runner 注入", part_final: "最终消息",
+    noInjection: "没有注入", droppedTag: "丢掉 {e}", runnerTag: "runner 加 {e}", formatTag: "格式 {f}", sentBackN: "之前退回 {n} 次", fenceTag: "去掉了外壳",
+    noV6: "这条记录早于 v6，只有最终文字。", repeatN: "第 {n} 次", openRecord: "打开整段",
+    probeInfo: "探针", prefixHash: "前缀哈希", milestones: "里程碑", selfReport: "阶段自报", selfReportLine: "{a}/{n} 条和检查器一致", eventReport: "事件自报",
+    reviewInRun: "这段的复核项", machineLabelCol: "机器标记", pc_same: "相同", pc_hash: "哈希", pc_file: "文件", filesLine2: "复核 {v} · 关口 {g} · 探针文件 {s}", prefixTag: "前缀", injectedTag: "注入", partsSummary: "原始输出 → 注入 → 最终", ms_met: "达到", ms_missed: "没达到", ms_not_reached: "没到",
+  });
+  Object.assign(T.en, {
+    viewProbes: "Probes",
+    cls_diagnostic: "Diagnostic", cls_calibration: "Formal calibration", cls_evaluation: "Tutor evaluation", clsHere: "this batch",
+    clsNote_diagnostic: "For development only: needs no content review, a final verdict refuses it, and it counts toward no gate.",
+    clsNote_calibration: "Checks the simulated student. Its machine verdict goes through content review before any gate or final verdict.",
+    clsNote_evaluation: "Scores tutors; see Overview and Compare.",
+    clsRule: "The three never mix: the page never counts one class's numbers toward another.",
+    layerMachine: "Machine verdict", layerReview: "Content review", layerFinal: "Final verdict",
+    v_PENDING_REVIEW: "Pending review", v_DIAGNOSTIC: "Diagnostic", v_pending: "Pending",
+    reportSays: "Report verdict: {v}", checkerRev: "checker {r}",
+    reviewNotNeeded: "Not needed", reviewDiagNote: "A diagnostic batch has no content review. The checker's review items are still listed on Plate IV, for reference only.",
+    reviewNoFile: "No review file yet", reviewNoFileNote: "The folder holds no content review for this batch (content-review-<batch>.json). The report has {n} items that need a person.",
+    reviewOpen: "Review open", reviewComplete: "Review complete",
+    reviewLine: "{d} of {n} items decided · {f} failed · {o} override the machine", reviewPendingLine: "{p} items still pending", reviewUndecidedLine: "{u} undecided, counted as fail by the rules",
+    reviewBy: "Reviewer {r} · {b}", blindYes: "blind", blindNo: "not blind", reviewNoItems: "The report has no review items (checker v2 writes none).",
+    finalRefused: "Not applicable", finalRefusedNote: "A final verdict refuses a diagnostic batch.",
+    finalNone: "None yet", finalNoneNote: "The folder holds no gate or final output that names this batch (gate-<scope>.json). The page never works out a final verdict itself.",
+    finalKind_gate: "Gate {s}", finalKind_final: "Final {s}", finalReview: "review: {s}", finalMerged: "{n} batches merged", finalOverrides: "{n} overrides", finalErrors: "{n} errors",
+    reviewStatus_complete: "complete", reviewStatus_open: "open", reviewStatus_pending: "pending",
+    critProbe: "Each probe in each language: at least {m} of {r} runs pass", critProbeAll: "Every planned probe group passes",
+    firstTry: "Accepted at first try", firstTrySub: "by target message: accepted / positions", formats: "Observed output formats",
+    plateReview: "Content review: machine label × decision", reviewPlateNote: "One row per machine label, one column per decision. Click a cell to see the items.",
+    reviewRules: "Rules: auto-pass counts as pass without a decision; auto-fail passes only when overridden; a needs-review item nobody decided counts as fail once the review is complete.",
+    m_auto_pass: "auto pass", m_needs_review: "needs review", m_auto_fail: "auto fail",
+    dec_pass: "decided pass", dec_fail: "decided fail", dec_undecided: "undecided",
+    eff_pass: "result: pass", eff_fail: "result: fail", eff_pending: "pending",
+    overridesTag: "overrides the machine", undecidedFailTag: "undecided, counted as fail", itemsN: "{n} items", reviewUnknown: "{n} decisions in the review file match no item in the report:",
+    itemQuestion: "Question", itemQuote: "Quoted by the reviewer", itemNote: "Reviewer's note", machineQuote: "Quoted by the checker", itemAt: "message {n}",
+    intGate: "Gate and phase", intSeries: "Calibration series", intPrior: "Earlier batches", intPins: "Versions pinned by the report", intResponse: "Requested output format",
+    gate_key: "key probes", gate_rest: "remaining probes", gate_diagnostic: "diagnostic",
+    afterReview: "after review {p}/{n}", afterReviewTip: "Passing runs after review, as the gate file writes them",
+    probesTitle: "One probe, both languages side by side", probesLede: "A single-step probe: after a fixed history prefix the simulated student writes one target message. Chinese and English sit side by side, and the model's own words stay apart from what the runner injected. Verdicts are copied from the report and the gate file; the page never re-judges.",
+    probeBatch: "Probe batch", plateProbes: "Probes × languages", probesNote: "The large figure counts runs the machine passed; when a gate file is loaded, the line below gives the count after review. Click a row for detail.",
+    colProbe: "Probe", colPrefix: "Prefix", notInBatch: "not run in this batch", targetN: "student message {n}",
+    prefixSame: "same prefix in {n} runs", prefixDiffers: "prefixes differ between runs", hashOk: "hash matches", hashBad: "hash does not match", hashNone: "no hash",
+    fileOk: "matches the probe file", fileBad: "differs from the probe file", fileNone: "probe file not loaded",
+    plateProbe: "{p}: the prefix and every target message", probeMeta: "Purpose", probeTarget: "Target", probeTape: "Tutor replay", probeProtocol: "Protocol", probeSet: "Probe set",
+    probeExpect: "The target message should", prefixTitle: "Fixed history prefix · {n} lines", prefixLineN: "line {n}",
+    part_raw: "Raw output", part_model: "Model's words", part_injected: "Runner injected", part_final: "Final message",
+    noInjection: "nothing injected", droppedTag: "dropped {e}", runnerTag: "runner added {e}", formatTag: "format {f}", sentBackN: "sent back {n}× before", fenceTag: "fence removed",
+    noV6: "This record predates v6 and keeps only the final text.", repeatN: "run {n}", openRecord: "Open the record",
+    probeInfo: "Probe", prefixHash: "Prefix hash", milestones: "Milestones", selfReport: "Self-reported stage", selfReportLine: "{a} of {n} agree with the checker", eventReport: "Self-reported events",
+    reviewInRun: "Review items in this run", machineLabelCol: "Machine label", pc_same: "same", pc_hash: "hash", pc_file: "file", filesLine2: "reviews {v} · gates {g} · probe files {s}", prefixTag: "prefix", injectedTag: "injected", partsSummary: "raw → injected → final", ms_met: "met", ms_missed: "missed", ms_not_reached: "not reached",
+  });
+  Object.assign(CODES.zh, {
+    not_a_review: "像复核文件但缺字段，已跳过", review_conflict: "同一批次有两份不同的复核文件，只用了第一份", review_without_batch: "复核文件的批次不在文件夹里",
+    review_run_unknown: "复核文件里的对话不在这个批次", review_item_unknown: "复核文件里的复核项报告里没有", not_a_gate: "像关口文件但缺字段，已跳过",
+    gate_batch_missing: "关口文件提到的批次不在文件夹里", gate_report_differs: "关口文件里的机器结论和报告不一致", gate_has_diagnostic: "关口文件收了诊断批次",
+    not_a_probe_set: "像探针文件但缺字段，已跳过", "calibration-probe": "探针校准", probe_complete: "探针完成", fixed_test: "固定考验原话",
+    key: "关键探针", rest: "其余探针", diagnostic: "诊断", pending: "待复核", open: "进行中",
+    empty_response: "空回复", fixed_test_self_written: "自己写了考验原话（应由 runner 加）", fixed_test_echo: "又重复了一遍考验原话",
+  });
+  Object.assign(CODES.en, {
+    not_a_review: "looks like a review file but lacks fields, skipped", review_conflict: "two different review files for one batch; the first was used", review_without_batch: "the review's batch is not in the folder",
+    review_run_unknown: "a run in the review file is not in this batch", review_item_unknown: "a review decision names an item the report does not have", not_a_gate: "looks like a gate file but lacks fields, skipped",
+    gate_batch_missing: "a batch named in a gate file is not in the folder", gate_report_differs: "a gate file's machine verdict differs from the report", gate_has_diagnostic: "a gate file includes a diagnostic batch",
+    not_a_probe_set: "looks like a probe file but lacks fields, skipped", "calibration-probe": "probe calibration", probe_complete: "probe complete", fixed_test: "fixed test sentence",
+    key: "key probes", rest: "remaining probes", diagnostic: "diagnostic", pending: "pending", open: "open",
+    empty_response: "empty reply", fixed_test_self_written: "wrote the fixed sentence itself (the runner adds it)", fixed_test_echo: "echoed the fixed sentence",
+  });
+
   // ---------- state ----------
-  const VIEWS = ["overview", "calibration", "compare", "runs", "checks"];
+  const VIEWS = ["overview", "calibration", "probes", "compare", "runs", "checks"];
   const st = {
     lang: detectLang(), dataset: null, source: null,
     f: { batch: "all", version: null, lang: "all", cards: "latest", tutor: "all", card: "all" },
     runFilter: { state: "all", disagree: false, spot: false, focus: null, transport: false }, limit: 100,
-    view: initialView(), showFilters: false, calib: null, calibSel: null, callsOpen: null, drawerAttempt: null, files: null,
+    view: initialView(), showFilters: false, calib: null, calibSel: null, callsOpen: null, drawerAttempt: null, files: null, probe: null, probeSel: null,
   };
   function initialView() {
     try { const h = location.hash.slice(1); if (VIEWS.includes(h)) return h; } catch { /* no hash */ }
@@ -336,8 +442,10 @@
     const cal = M.calibrationBatches(st.dataset);
     st.calib = cal.length ? cal[0].batchId : null;
     st.calibSel = null; st.callsOpen = null;
+    const pb = M.probeBatches(st.dataset);
+    st.probe = pb.length ? pb[0].batchId : null; st.probeSel = null;
     // A folder that holds only calibration batches opens on the calibration view.
-    if (!st.dataset.runs.some(r => r.batchKind !== "calibration") && cal.length && st.view === "overview") st.view = "calibration";
+    if (!st.dataset.runs.some(r => !M.isCalibrationKind(r.batchKind)) && cal.length && st.view === "overview") st.view = "calibration";
     closeDrawer();
     render();
   }
@@ -345,7 +453,8 @@
     const s = globalThis.PREMIUM_SAMPLE;
     if (!s) return;
     st.files = null;
-    load({ records: s.records, batches: s.batches, index: M.parseJsonl(s.index), reports: s.reports || [], expectations: s.expectations || [] }, { kind: "sample" });
+    load({ records: s.records, batches: s.batches, index: M.parseJsonl(s.index), reports: s.reports || [], expectations: s.expectations || [],
+      reviews: s.reviews || [], gates: s.gates || [], probeSets: s.probes || [] }, { kind: "sample" });
   }
   // The runs folder is the shallowest folder that holds records/ (or batches/, or index.jsonl), whatever folder the person
   // picked or dropped. Only its index.jsonl, records/*.json, batches/*.json and top-level .json files are read; every other
@@ -361,9 +470,9 @@
     return roots.sort((a, b) => a.split("/").length - b.split("/").length || a.length - b.length)[0];
   }
   async function loadFiles(files, name) {
-    const input = { records: [], recordNames: [], batches: [], index: null, reports: [], expectations: [] };
+    const input = { records: [], recordNames: [], batches: [], index: null, reports: [], expectations: [], reviews: [], gates: [], probeSets: [] };
     const extra = [];
-    const src = { root: "", index: null, records: new Map(), batches: new Map(), reports: new Map(), expectations: [], ignored: [] };
+    const src = { root: "", index: null, records: new Map(), batches: new Map(), reports: new Map(), expectations: [], reviews: new Map(), gates: [], probeSets: [], ignored: [] };
     const withPath = files.map(f => ({ f, path: (f.webkitRelativePath || f.fullPath || f.name).replace(/\\/gu, "/") }));
     const root = src.root = runsRoot(withPath.map(x => x.path));
     for (const { f, path } of withPath) {
@@ -387,6 +496,9 @@
           else if (v && v.schema === "tutorbench.premium-run-record") { input.records.push(v); input.recordNames.push(path); if (typeof v.runId === "string") src.records.set(v.runId, { path: rel, file: f }); }
           else if (M.isReport(v)) { input.reports.push(v); src.reports.set(v.batchId, { path: rel, file: f }); }
           else if (M.isExpectations(v)) { input.expectations.push(v); src.expectations.push({ path: rel, file: f, value: v }); }
+          else if (M.isContentReview(v)) { input.reviews.push(v); if (!src.reviews.has(v.batchId)) src.reviews.set(v.batchId, { path: rel, file: f }); }
+          else if (M.isGateResult(v)) { input.gates.push(v); src.gates.push({ path: rel, file: f, value: v }); }
+          else if (M.isProbeSet(v)) { input.probeSets.push(v); src.probeSets.push({ path: rel, file: f, value: v }); }
           else skip();
         } else skip();
       } catch (e) { extra.push({ code: "unreadable_file", detail: path + ": " + (e && e.message ? e.message : "?") }); }
@@ -444,10 +556,12 @@
     banner.hidden = !(d && st.source.kind === "sample");
     banner.textContent = t("sampleBanner");
     renderWarnings();
-    const hasCalib = !!d && M.calibrationBatches(d).length > 0;
+    const hasCalib = !!d && M.calibrationBatches(d).length > 0, hasProbes = !!d && M.probeBatches(d).length > 0;
     if (st.view === "calibration" && d && !hasCalib) st.view = "overview";
-    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview", compare: st.view === "compare", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks", calib: st.view === "calibration",
-      "calib-groups": st.view === "calibration", "calib-rewrites": st.view === "calibration", "calib-dev": st.view === "calibration", "calib-int": st.view === "calibration" };
+    if (st.view === "probes" && d && !hasProbes) st.view = "overview";
+    const cv = st.view === "calibration", pv = st.view === "probes";
+    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview", compare: st.view === "compare", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks", calib: cv,
+      "calib-groups": cv, "calib-rewrites": cv, "calib-dev": cv, "calib-review": cv, "calib-int": cv, probe: pv, "probe-detail": pv };
     for (const id of Object.keys(show)) { clear($(id)); $(id).hidden = !show[id]; }
     document.querySelector(".sheet").hidden = !d;
     const vs = d ? views() : [];
@@ -459,7 +573,7 @@
     if (show.board) {
       // Plates I and II compare each tutor's newest version in view; Plate III shows how the versions moved.
       const ev = vs.filter(isEval), keys = tutorKeys();
-      const versions = M.tutorVersions(d.runs.filter(r => r.batchKind !== "calibration"));
+      const versions = M.tutorVersions(d.runs.filter(r => !M.isCalibrationKind(r.batchKind)));
       const latest = M.latestVersions(ev, versions);
       const now = ev.filter(v => { const l = latest.get(v.record.tutor.label); return !l || M.versionKey(v.record) === l.key; });
       const rows = tutorRows(now);
@@ -470,6 +584,7 @@
     if (show.runs) renderRuns(vs);
     if (show.ops) renderOps(vs);
     if (show.calib) renderCalibration();
+    if (show.probe) renderProbes();
   }
 
   function renderWarnings() {
@@ -492,7 +607,7 @@
     const d = st.dataset;
     return el("div", { class: "filters" },
       select("f-version", t("fVersion"), st.f.version ?? "", d.judgeVersions.map(v => [v, v]), v => { st.f.version = v; render(); }),
-      select("f-batch", t("fBatch"), st.f.batch, [["all", t("all")], ...d.batches.map(b => [b.batchId, b.batchId + (b.kind === "calibration" ? " · " + t("calibration") : "")])], v => { st.f.batch = v; render(); }),
+      select("f-batch", t("fBatch"), st.f.batch, [["all", t("all")], ...d.batches.map(b => [b.batchId, b.batchId + (M.isCalibrationKind(b.kind) ? " · " + t("cls_" + clsOf(b)) : "")])], v => { st.f.batch = v; render(); }),
       select("f-lang", t("fLang"), st.f.lang, [["all", t("all")], ["zh-CN", langName("zh-CN")], ["en", langName("en")]], v => { st.f.lang = v; render(); }),
       select("f-cards", t("fCards"), st.f.cards, [["latest", t("latestOnly")], ["all", t("allVersions")]], v => { st.f.cards = v; render(); }));
   }
@@ -519,6 +634,11 @@
   }
   const mark = v => el("span", { class: "state" }, pip(kindOf(v)), kindLabel(v));
   const langShort = l => (l === "zh-CN" ? t("langZh") : l === "en" ? t("langEn") : l);
+  // Who a run is: a probe run by its probe (its tutor is a replayed tape with no label), any other by its tutor.
+  const colon = () => (st.lang === "zh" ? "：" : ": ");
+  const whoOf = r => (r.probe ? r.probe.probeId : r.tutor.label || r.tutor.id);
+  // What a batch is for: diagnostic, formal calibration or tutor evaluation, from the batch and its report.
+  const clsOf = b => M.batchClass(b, st.dataset ? st.dataset.reports.get(b.batchId) : null);
   function whyText(v) {
     if (v.state === "scored") return v.reasons.map(code).join("、");
     if (v.state === "needs_review") return [...v.pending.map(code), v.withheldVerdict ? t("withheld", { v: t(v.withheldVerdict) }) : null].filter(Boolean).join("；");
@@ -536,8 +656,9 @@
     const nav = clear($("views"));
     nav.hidden = !st.dataset;
     if (!st.dataset) return;
-    const calib = M.calibrationBatches(st.dataset).length;
-    const views = [["overview", t("viewOverview"), null], calib ? ["calibration", t("viewCalibration"), null] : null, ["compare", t("viewCompare"), null], ["runs", t("viewRuns"), vs.length], ["checks", t("viewChecks"), null]].filter(Boolean);
+    const calib = M.calibrationBatches(st.dataset).length, probes = M.probeBatches(st.dataset).length;
+    const views = [["overview", t("viewOverview"), null], calib ? ["calibration", t("viewCalibration"), null] : null, probes ? ["probes", t("viewProbes"), null] : null,
+      ["compare", t("viewCompare"), null], ["runs", t("viewRuns"), vs.length], ["checks", t("viewChecks"), null]].filter(Boolean);
     for (const [id, label, n] of views) nav.append(el("button", { type: "button", class: "view-tab", "aria-current": st.view === id ? "page" : null, onclick: () => setView(id) },
       label, n != null ? el("span", { class: "count", text: String(n) }) : null));
     nav.append(filterSummary());
@@ -620,7 +741,7 @@
   // are lettered in order of their first run, so a tutor added later (say, the same model with a prompt of its own) takes
   // the next letter instead of relettering the others.
   function tutorKeys() {
-    const names = [...new Set(st.dataset.runs.filter(r => !r.batchKind || r.batchKind !== "calibration").map(r => r.tutor.label))];
+    const names = [...new Set(st.dataset.runs.filter(r => !M.isCalibrationKind(r.batchKind)).map(r => r.tutor.label))];
     const letter = i => (i < 26 ? "" : String.fromCharCode(65 + Math.floor(i / 26) - 1)) + String.fromCharCode(65 + (i % 26));
     return new Map(names.map((n, i) => [n, letter(i)]));
   }
@@ -944,7 +1065,7 @@
       const why = rf.spot && isSpot(v) ? spotText(v) : whyText(v);
       body.append(el("tr", { tabindex: "0", onclick: open, onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } } },
         el("td", { class: "verdict" }, mark(v), why ? el("div", { class: "why", text: why }) : null),
-        el("td", { text: r.tutor.label }),
+        el("td", { text: whoOf(r) }),
         el("td", null, el("span", { text: r.card.id }), v.olderCard ? el("span", { class: "older", text: "v" + r.card.version + " · " + t("olderCard") }) : null),
         el("td", { text: langShort(r.card.lang) + " #" + r.repeat.index }),
         el("td", { class: "muted", text: code(r.end.reason) }),
@@ -986,7 +1107,7 @@
           // Spend is the runner's price-table estimate; an invoice, when reconciled, is shown beside it.
           const money = [whenShort(b.createdAt), usd(b.spentUsd) + " / " + usd(b.budgetUsd), b.hardCapUsd != null ? t("hardCap", { v: usd(b.hardCapUsd) }) : null].filter(Boolean).join(" · ");
           return el("tr", null, el("td", null,
-            el("div", null, el("span", { class: "mono", text: b.batchId }), b.kind === "calibration" ? el("span", { class: "tag", style: "margin-left:8px", text: t("calibration") }) : null),
+            el("div", null, el("span", { class: "mono", text: b.batchId }), M.isCalibrationKind(b.kind) ? el("span", { class: "tag cls-" + clsOf(raw), style: "margin-left:8px", text: t("cls_" + clsOf(raw)) }) : null),
             el("div", { class: "small faint", text: money }),
             b.tutorSetups.map(x => el("div", { class: "small faint", "data-tip": x.prompt && x.prompt.hash ? x.prompt.hash : null,
               text: x.tutor + ": " + [x.prompt ? (x.prompt.id + " " + x.prompt.version + (x.prompt.hash ? " · " + shortHash(x.prompt.hash) : "")) : null,
@@ -1022,7 +1143,7 @@
     const status = [t("nowStatus", { s: code(h.status) }), h.earlierStop ? t("earlierStop", { s: code(h.earlierStop), n: restarts }) : null,
       ...h.topUps.map(x => t("topUp", { from: usd(x.from), to: usd(x.to) }))].filter(Boolean).join(" · ");
     const box = el("details", { class: "bcalls", id: "calls-" + raw.batchId, open: open || null },
-      el("summary", null, el("span", { class: "mono", text: raw.batchId }), raw.kind === "calibration" ? el("span", { class: "tag", text: t("calibration") }) : null,
+      el("summary", null, el("span", { class: "mono", text: raw.batchId }), M.isCalibrationKind(raw.kind) ? el("span", { class: "tag cls-" + clsOf(raw), text: t("cls_" + clsOf(raw)) }) : null,
         el("span", { class: "small muted", text: status })));
 
     // Who answered.
@@ -1080,8 +1201,9 @@
 
   // ---------- review pack ----------
   // Builds a .zip in this tab from the files already opened: the batch's records (superseded ones too), its batch file,
-  // report, expectations and index lines, byte for byte, plus a derived review index, a README and SHA-256 sums.
-  // Nothing is uploaded and nothing is re-run.
+  // report, expectations, content review, gate or final outputs, probe file and index lines, byte for byte, plus derived
+  // tables (one row per record, per review item and per student message), a manifest an agent can read first, a README
+  // and SHA-256 sums. Nothing is uploaded and nothing is re-run.
   async function exportPack(batchId) {
     const d = st.dataset, P = globalThis.PremiumReviewPack;
     if (!d || !P) return;
@@ -1089,60 +1211,108 @@
     const folder = "review-pack-" + batchId + "/";
     const files = [], notes = [];
     const raw = async (s, value) => (s ? new Uint8Array(await s.file.arrayBuffer()) : JSON.stringify(value) + "\n");
+    const add = (path, data, role, extra) => files.push({ path, data, role, ...(extra || {}) });
+    const base = p => p.split("/").pop();
     const recs = d.runs.filter(r => r.batchId === batchId);
-    for (const r of recs) files.push({ path: "records/" + r.runId + ".json", data: await raw(src && src.records.get(r.runId), r) });
+    const sup = d.supersededBy || {};
+    for (const r of recs) add("records/" + r.runId + ".json", await raw(src && src.records.get(r.runId), r), "record", { runId: r.runId, adopted: !sup[r.runId] });
     const batch = d.batches.find(b => b.batchId === batchId);
-    if (batch) files.push({ path: "batches/" + batchId + ".json", data: await raw(src && src.batches.get(batchId), batch) });
+    if (batch) add("batches/" + batchId + ".json", await raw(src && src.batches.get(batchId), batch), "batch");
     const report = d.reports.get(batchId);
-    if (report) files.push({ path: "calibration-report-" + batchId + ".json", data: await raw(src && src.reports.get(batchId), report) });
-    const c = M.calibrationOf(d, batchId);
+    if (report) add("calibration-report-" + batchId + ".json", await raw(src && src.reports.get(batchId), report), "checker-report");
+    const c = M.calibrationOf(d, batchId), L = M.packLayers(d, batchId);
     if (c.expectations) {
       const s = src && src.expectations.find(x => x.value === c.expectations);
-      files.push({ path: s ? s.path.split("/").pop() : "expectations.json", data: await raw(s, c.expectations) });
+      add(s ? base(s.path) : "expectations.json", await raw(s, c.expectations), "expectations");
+    }
+    // The content review and every gate or final output that names this batch, as the reviewer and the checker wrote them.
+    const review = d.reviews.get(batchId);
+    if (review) add("content-review-" + batchId + ".json", await raw(src && src.reviews.get(batchId), review), "content-review");
+    for (const o of c.final.outputs) {
+      const s = src && src.gates.find(x => x.value === o.gate);
+      add(s ? base(s.path) : "gate-" + o.scope + ".json", await raw(s, o.gate), o.kind === "final" ? "final-output" : "gate-output");
+    }
+    if (c.probeSet) {
+      const s = src && src.probeSets.find(x => x.value === c.probeSet);
+      add(s ? base(s.path) : "probes.json", await raw(s, c.probeSet), "probe-set");
     }
     // index.jsonl: only this batch's lines, each line exactly as it was.
     const indexText = src ? (src.index ? await src.index.file.text() : null) : (globalThis.PREMIUM_SAMPLE && globalThis.PREMIUM_SAMPLE.index);
     if (indexText != null) {
       // Each line keeps its own line end. (No look-behind here: older Safari lacks it.)
       const lines = (indexText.match(/[^\n]*\n|[^\n]+$/gu) || []).filter(line => { try { return JSON.parse(line).batchId === batchId; } catch { return false; } });
-      files.push({ path: "index.jsonl", data: lines.join("") });
+      add("index.jsonl", lines.join(""), "index");
     }
     const exportedAt = new Date().toISOString();
-    files.push({ path: "review-index.csv", data: P.csv(M.REVIEW_COLUMNS, M.reviewIndex(d, batchId)) });
-    const sup = recs.filter(r => d.supersededBy[r.runId]).length;
+    const reviewRows = M.reviewItemRows(d, batchId), messageRows = M.messageRows(d, batchId);
+    add("review-index.csv", P.csv(M.REVIEW_COLUMNS, M.reviewIndex(d, batchId)), "derived-table", { rows: recs.length, columns: M.REVIEW_COLUMNS });
+    if (reviewRows.length) add("review-items.csv", P.csv(M.REVIEW_ITEM_COLUMNS, reviewRows), "derived-table", { rows: reviewRows.length, columns: M.REVIEW_ITEM_COLUMNS });
+    add("messages.csv", P.csv(M.MESSAGE_COLUMNS, messageRows), "derived-table", { rows: messageRows.length, columns: M.MESSAGE_COLUMNS });
+    const hasRole = role => files.some(f => f.role === role);
+    const yesNo = (ok, what) => (ok ? "included / 已附" : "not loaded / 未载入") + (what ? " (" + what + ")" : "");
+    const m = L.machine, rv = L.review;
     const lines = [
       "TutorBench Observatory · review pack / 复核包",
-      "Batch / 批次: " + batchId + (batch && batch.kind ? " (" + batch.kind + ")" : ""),
+      "Batch / 批次: " + batchId + (batch && batch.kind ? " (" + batch.kind + (L.gate ? ", gate " + L.gate : "") + (L.phase ? ", " + L.phase : "") + ")" : ""),
+      "Class / 类别: " + L.class + " / " + { diagnostic: "诊断", calibration: "正式校准", evaluation: "导师评测" }[L.class],
       "Exported / 导出: " + exportedAt,
       "Source / 来源: " + (synthetic ? "synthetic sample bundled with the page; JSON re-serialised, NOT original bytes / 合成示例，重新序列化，不是原始字节"
         : "folder \"" + (st.source.name || "") + "\", original bytes / 打开的文件夹，原始字节"),
       "",
+      "Read first / 先读: manifest.json (what is here, the three layers, every file with its role and SHA-256 / 包里有什么、三层结论、每个文件的用途和哈希)",
+      "",
       "Inside / 包里有",
-      "- records/: " + recs.length + " records of this batch, " + sup + " superseded / 本批全部记录，含被替代的",
+      "- records/: " + recs.length + " records of this batch, " + recs.filter(r => sup[r.runId]).length + " superseded / 本批全部记录，含被替代的",
       "- " + [batch ? "batches/" + batchId + ".json" : null, report ? "calibration-report-" + batchId + ".json" : null, indexText != null ? "index.jsonl (this batch's lines, unchanged / 本批的行，原样)" : null].filter(Boolean).join(", "),
-      "- expectations: " + (c.expectations ? "included / 已附" : "not loaded / 未载入"),
-      "- review-index.csv: one row per record, made by the page. Checker results are copied from the report; counts come from the records. / 页面派生：检查器结论照抄报告，计数来自记录。",
+      "- expectations: " + yesNo(hasRole("expectations")),
+      "- content review / 内容复核: " + yesNo(hasRole("content-review"), review ? review.status : null),
+      "- gate or final outputs / 关口或最终结论: " + (c.final.outputs.length ? c.final.outputs.map(o => o.kind + " " + o.scope + " " + o.verdict).join(", ") : "none / 没有"),
+      "- probe file / 探针文件: " + (c.probes ? yesNo(hasRole("probe-set"), (batch && batch.probeSetVersion) || null) : "not a probe batch / 不是探针批次"),
+      "- review-index.csv: one row per record. Checker results are copied from the report; counts come from the records. / 每段一行：检查器结论照抄报告，计数来自记录。",
+      "- review-items.csv: " + (reviewRows.length ? "one row per checker review item, machine label beside the reviewer's decision and the result by the rules / 每个复核项一行：机器标记、复核决定、按规则的结果" : "not written, the report has no review items / 报告没有复核项，没有这张表"),
+      "- messages.csv: one row per student message of every attempt, kept or sent back: raw output, model text and events, injected text, runner and dropped events, final text / 每条学生消息一行（含退回的）：原始输出、模型原话和事件、注入、runner 加的和丢掉的事件、最终消息",
       "- SHA256SUMS.txt: SHA-256 of every other file here / 包内其余文件的 SHA-256",
       "",
       "Three layers, kept apart / 三层分开",
-      "- Machine calibration / 机器校准: " + (report ? report.verdict + (report.checkerVersion ? " (checker v" + report.checkerVersion + ")" : "") : "no report loaded / 未载入报告"),
-      "- Formal tutor scoring / 正式导师评分: " + (batch && batch.kind === "calibration" ? "not applicable, calibration batches are never scored / 不适用，校准批次不评分" : "see scorings in the records / 见记录里的 scorings"),
-      "- Independent content review / 独立内容复核: " + (report && report.humanReviewPending === true ? "pending (report: humanReviewPending) / 待复核" : "not recorded here / 本包不含") + ". This pack holds no review result. / 本包不含复核结论。",
+      "- Machine verdict / 机器判定: " + (m ? m.verdict + (m.reportVerdict !== m.verdict ? " (report verdict / 报告总结论 " + m.reportVerdict + ")" : "") + " · checker " + (m.checkerRevision || "v" + m.checkerVersion)
+        + " · " + m.runsPassing + "/" + m.runs + " runs, " + m.groupsPassing + "/" + m.groups + " groups" : c.cannotCheck ? "CANNOT_CHECK" : "no report loaded / 未载入报告"),
+      "- Content review / 内容复核: " + (L.class === "diagnostic" ? "not required for a diagnostic batch / 诊断批次不需要" : !rv.required && !review ? (report && report.humanReviewPending === true ? "pending (report: humanReviewPending) / 待复核" : "no review items / 没有复核项")
+        : !review ? "no review file loaded / 未载入复核文件" : rv.status + " · " + rv.counts.decided + "/" + rv.counts.items + " decided, " + rv.counts.fails + " failed, " + rv.counts.overrides + " overrides, " + rv.counts.pending + " pending"),
+      "- Final verdict / 最终结论: " + (L.final.refused ? "refused, a final verdict never takes a diagnostic batch / 不适用，最终结论不收诊断批次"
+        : L.final.outputs.length ? L.final.outputs.map(o => o.kind + " " + o.scope + ": " + o.verdict + (o.reviewStatus ? " (review " + o.reviewStatus + ")" : "")).join("; ") : "none loaded; the page never works one out / 未载入，页面不自己算"),
       "",
       "Not included / 没有放进来",
     ];
+    if (L.class === "diagnostic") notes.push("- DIAGNOSTIC: for development only. Do not count these runs toward any gate or final verdict. / 诊断批次只用于开发，不计入任何关口或最终结论。");
     const ignored = src ? src.ignored : [];
     if (ignored.length) for (const x of ignored) lines.push("- " + x.path + " (" + x.size + " bytes): in the opened folder, not read by the page / 文件夹里有，页面不读取");
     else lines.push("- (no other files in the opened folder / 打开的文件夹里没有其他文件)");
-    if (!report && batch && batch.kind === "calibration") notes.push("- No calibration report was loaded for this batch / 这个批次没有载入校准报告");
-    lines.push(...notes,
+    if (!report && batch && M.isCalibrationKind(batch.kind)) lines.push("- No calibration report was loaded for this batch / 这个批次没有载入校准报告");
+    lines.push(
       "- Cards, student prompts, the checker, build outputs and launch evidence are not part of a runs folder; attach them separately if the reviewer needs them. / 卡片、学生提示、检查器、编译产物和启动证据不在 runs 文件夹里，需要时另附。",
       "",
       "Limits / 限制",
+      ...notes,
       "- The page does not read the ledger database (.premium.sqlite), re-run the checker or check provider invoices. / 页面不读账本数据库，不重跑检查器，不核对厂商账单。",
       "- Costs are the runner's price-table estimates unless an invoice was reconciled. / 费用是价格表估算，除非已对账。",
       "- A SHA-256 sum shows a file has not changed since this export. It is not a signature. / 哈希只说明导出后没变，不是签名。", "");
-    files.push({ path: "README.txt", data: lines.join("\n") });
+    add("README.txt", lines.join("\n"), "readme");
+    // The manifest lists every file above with its role and hash, then the layers as the page read them.
+    const manifest = {
+      schema: "tutorbench.observatory-review-pack", schemaVersion: 1, exportedAt,
+      source: synthetic ? { kind: "synthetic-sample", originalBytes: false } : { kind: "folder", name: st.source.name || null, originalBytes: true },
+      ...L,
+      counts: { records: recs.length, adopted: recs.filter(r => !sup[r.runId]).length, superseded: recs.filter(r => sup[r.runId]).length, reviewItems: reviewRows.length, studentMessages: messageRows.length },
+      files: files.map(f => ({ path: f.path, role: f.role, bytes: P.bytesOf(f.data).length, sha256: P.sha256(P.bytesOf(f.data)),
+        ...(f.runId ? { runId: f.runId, adopted: f.adopted } : {}), ...(f.columns ? { rows: f.rows, columns: f.columns } : {}) })),
+      notRead: ignored.map(x => ({ path: x.path, bytes: x.size })),
+      rules: [
+        "Machine verdict, content review and final verdict are separate layers; the page copies each from its own file and never derives one from another.",
+        "A diagnostic batch needs no content review, and no gate or final verdict may count it.",
+        "An undecided needs_review item counts as fail once the review is complete; auto_fail passes only with an override.",
+      ],
+    };
+    add("manifest.json", JSON.stringify(manifest, null, 2) + "\n", "manifest");
     files.push({ path: "SHA256SUMS.txt", data: files.map(f => P.sha256(P.bytesOf(f.data)) + "  " + f.path).join("\n") + "\n" });
     const bytes = P.zip(files.map(f => ({ path: folder + f.path, data: f.data })), exportedAt);
     const url = URL.createObjectURL(new Blob([bytes], { type: "application/zip" }));
@@ -1158,7 +1328,7 @@
   const pctText = x => (x == null ? "—" : String(Math.round(x * 1000) / 10) + "%");
   const tOr = (key, fallback) => (T[st.lang][key] != null || T.en[key] != null ? t(key) : fallback);
   const expPath = e => { const s = st.files && st.files.expectations.find(x => x.value === e); return s ? s.path : "expectations.json"; };
-  const runLabel = r => r.tutor.label + " · " + langShort(r.card.lang) + " #" + r.repeat.index;
+  const runLabel = r => whoOf(r) + " · " + langShort(r.card.lang) + " #" + r.repeat.index;
   function renderCalibration() {
     const d = st.dataset, list = M.calibrationBatches(d);
     if (!list.some(b => b.batchId === st.calib)) st.calib = list.length ? list[0].batchId : null;
@@ -1166,32 +1336,69 @@
     const c = M.calibrationOf(d, st.calib);
     const box = $("calib");
     box.append(el("header", { class: "sec-head" }, el("div", { class: "title" }, el("h2", { id: "calib-title", text: t("calibTitle") }), el("p", { class: "lede", text: t("calibLede") })),
-      list.length > 1 ? el("div", { class: "filters" }, select("calib-batch", t("calibBatch"), st.calib, list.map(b => [b.batchId, b.batchId + (d.reports.has(b.batchId) ? "" : " · " + t("v_none"))]),
+      list.length > 1 ? el("div", { class: "filters" }, select("calib-batch", t("calibBatch"), st.calib, list.map(b => [b.batchId, batchOption(b)]),
         v => { st.calib = v; st.calibSel = null; render(); })) : el("span", { class: "mono muted", text: st.calib })));
-    box.append(calibLayers(c), el("div", { class: "calib-facts" }, calibCriteria(c), calibRates(c)));
-    renderCalibGroups(c); renderCalibRewrites(c); renderCalibDeviations(c); renderCalibIntegrity(c);
+    box.append(classStrip(c.cls), calibLayers(c), el("div", { class: "calib-facts" }, calibCriteria(c), calibRates(c)));
+    renderCalibGroups(c); renderCalibRewrites(c); renderCalibDeviations(c); renderCalibReview(c); renderCalibIntegrity(c);
   }
+  // A batch in a picker: its id, what it is for and, when it has no report, that.
+  const batchOption = b => [b.batchId, t("cls_" + clsOf(b)), b.kind === "calibration-probe" && b.gate !== "diagnostic" ? (b.phase || (b.gate ? tOr("gate_" + b.gate, b.gate) : null)) : null,
+    st.dataset.reports.has(b.batchId) ? null : t("v_none")].filter(Boolean).join(" · ");
+  // What this batch is for, among the three, with the rule that keeps them apart.
+  function classStrip(cls) {
+    return el("div", { class: "cls-strip" },
+      el("ol", { class: "cls-list" }, ["diagnostic", "calibration", "evaluation"].map(k => el("li", { class: "cls cls-" + k + (k === cls ? " on" : ""), "aria-current": k === cls ? "true" : null },
+        el("span", { class: "cls-name" }, t("cls_" + k), k === cls ? el("span", { class: "cls-here", text: t("clsHere") }) : null),
+        el("span", { class: "cls-note", text: t("clsNote_" + k) })))),
+      el("p", { class: "cls-rule", text: t("clsRule") }));
+  }
+  // Three layers, never mixed: what the checker decided, what the reviewer decided, and the gate or final verdict written
+  // from both. Each is copied from its own file; the page never turns one into another.
   function calibLayers(c) {
-    const m = c.machine, verdict = c.cannotCheck ? "CANNOT_CHECK" : m ? m.verdict : "none";
+    const m = c.machine, rv = c.review, fin = c.final, verdict = c.cannotCheck ? "CANNOT_CHECK" : m ? m.verdict : "none";
     const layer = (no, title, kind, value, notes, cls) => el("div", { class: "layer " + cls, role: "listitem" },
       el("span", { class: "layer-no", text: no }), el("h3", { text: title }),
       el("p", { class: "layer-value" }, pip(kind), el("span", { text: value })),
-      notes.filter(Boolean).map(n => el("p", { class: "small muted", text: n })));
-    return el("div", { class: "layers", role: "list" },
-      layer("1", t("layerMachine"), verdict === "PASS" ? "good" : verdict === "FAIL" ? "fail" : "calibration", tOr("v_" + verdict, verdict),
-        [m ? t("machineLine", { v: m.checkerVersion, r: m.runsPassing, n: m.runs, g: m.groupsPassing, m: m.groups }) + (m.dryRun ? " · " + t("dryRunTag") : "") : null,
-          c.cannotCheck ? t("cannotCheckNote") : !c.report ? t("noReportNote") : null], "machine v-" + verdict.toLowerCase()),
-      layer("2", t("layerScoring"), "calibration", t("scoringNA"), [t("scoringNote")], "scoring"),
-      layer("3", t("layerReview"), c.contentReview === "pending" ? "needs_review" : "calibration",
+      notes.filter(Boolean).map(n => (n instanceof Node ? n : el("p", { class: "small muted", text: n }))));
+    const vKind = v => (v === "PASS" ? "good" : v === "FAIL" ? "fail" : v === "PENDING_REVIEW" ? "needs_review" : "calibration");
+    const machine = layer("1", t("layerMachine"), vKind(verdict), tOr("v_" + verdict, verdict),
+      [m ? t("machineLine", { v: m.checkerRevision || m.checkerVersion, r: m.runsPassing, n: m.runs, g: m.groupsPassing, m: m.groups }) + (m.dryRun ? " · " + t("dryRunTag") : "") : null,
+        m && m.reportVerdict && m.reportVerdict !== m.verdict ? t("reportSays", { v: tOr("v_" + m.reportVerdict, m.reportVerdict) }) : null,
+        c.cannotCheck ? t("cannotCheckNote") : !c.report ? t("noReportNote") : null], "machine v-" + verdict.toLowerCase());
+    let review;
+    if (c.cls === "diagnostic") review = layer("2", t("layerReview"), "calibration", t("reviewNotNeeded"), [t("reviewDiagNote")], "review");
+    else if (!rv.counts.items && !rv.file) {
+      // Checker v2 writes no review items; the report's pending flag is all there is.
+      review = layer("2", t("layerReview"), c.contentReview === "pending" ? "needs_review" : "calibration",
         t(c.contentReview === "pending" ? "reviewPending" : c.contentReview === "not_pending" ? "reviewNotPending" : "reviewUnstated"),
-        [c.contentReview === "pending" ? t("reviewPendingNote") : c.contentReview === "unstated" ? t("reviewUnstatedNote") : null], "review"));
+        [c.contentReview === "pending" ? t("reviewPendingNote") : c.contentReview === "unstated" ? t("reviewUnstatedNote") : null, c.checked && m.checkerVersion >= 3 ? t("reviewNoItems") : null], "review");
+    } else if (!rv.file) review = layer("2", t("layerReview"), "needs_review", t("reviewNoFile"), [t("reviewNoFileNote", { n: rv.counts.needsReview + rv.counts.autoFail })], "review");
+    else {
+      const k = rv.counts;
+      review = layer("2", t("layerReview"), rv.complete ? (k.fails || k.undecidedFail ? "fail" : "good") : "needs_review", t(rv.complete ? "reviewComplete" : "reviewOpen"),
+        [t("reviewLine", { d: k.decided, n: k.items, f: k.fails, o: k.overrides }), k.pending ? t("reviewPendingLine", { p: k.pending }) : null,
+          k.undecidedFail ? t("reviewUndecidedLine", { u: k.undecidedFail }) : null,
+          t("reviewBy", { r: rv.reviewer || "—", b: rv.blind == null ? "—" : t(rv.blind ? "blindYes" : "blindNo") }), rv.scope ? el("p", { class: "small faint", text: rv.scope }) : null], "review");
+    }
+    let final;
+    if (fin.diagnostic) final = layer("3", t("layerFinal"), "calibration", t("finalRefused"), [t("finalRefusedNote")], "final");
+    else if (!fin.outputs.length) final = layer("3", t("layerFinal"), "calibration", t("finalNone"), [t("finalNoneNote")], "final");
+    else {
+      const o = fin.outputs[fin.outputs.length - 1];
+      final = layer("3", t("layerFinal"), vKind(o.verdict), tOr("v_" + o.verdict, o.verdict),
+        fin.outputs.map(x => [t("finalKind_" + x.kind, { s: x.scope }), x.reviewStatus ? t("finalReview", { s: tOr("reviewStatus_" + x.reviewStatus, x.reviewStatus) }) : null,
+          x.batches.length > 1 ? t("finalMerged", { n: x.batches.length }) : null, x.overrides.length ? t("finalOverrides", { n: x.overrides.length }) : null,
+          x.errors.length ? t("finalErrors", { n: x.errors.length }) : null].filter(Boolean).join(" · ")), "final v-" + String(o.verdict).toLowerCase());
+    }
+    return el("div", { class: "layers", role: "list" }, machine, review, final);
   }
   function calibCriteria(c) {
     const cr = c.criteria, e = c.expectations, items = [];
     if (e) {
       items.push(t("critRun", { h: cr.maxHard, s: cr.maxSoft }));
-      items.push(c.machine && c.machine.dryRun ? t("critDryGroup") : t("critGroup", { r: (e.pass.group && e.pass.group.runs) ?? e.repeats, m: cr.minPassingRuns }));
-      items.push(t("critAll"));
+      if (c.machine && c.machine.dryRun) items.push(t("critDryGroup"));
+      else items.push(t(cr.probes ? "critProbe" : "critGroup", { r: cr.groupRuns, m: cr.minPassingRuns }));
+      items.push(t(cr.probes ? "critProbeAll" : "critAll"));
     }
     if (cr && cr.rewriteRateMax != null) items.push(t("critRewrite", { x: pctText(cr.rewriteRateMax) }));
     return el("div", { class: "criteria" }, el("h3", { text: t("criteriaTitle") }), items.length ? el("ul", null, items.map(x => el("li", { text: x }))) : null,
@@ -1202,12 +1409,19 @@
     if (!m) return null;
     const fig = (label, value, sub, flag, cls) => el("div", { class: "rate-fig" + (cls ? " " + cls : "") }, el("span", { class: "rf-label", text: label }),
       el("span", { class: "rf-num", text: value }), flag ? el("span", { class: "rf-flag", text: flag }) : null, el("span", { class: "rf-sub", text: sub }));
-    const w = m.rewrite, dc = m.discard;
-    return el("div", { class: "rates" },
+    const w = m.rewrite, dc = m.discard, ft = m.firstTryByMessage, fm = m.observedFormats;
+    // Checker v3 also counts, per student message, how often the first reply was accepted, and the formats it saw.
+    const extra = ft || fm ? el("div", { class: "rates-more" },
+      ft ? el("div", null, el("span", { class: "rf-label", text: t("firstTry") }), el("span", { class: "rf-sub", text: t("firstTrySub") }),
+        el("div", { class: "ft" }, Object.entries(ft).sort((a, b) => Number(a[0]) - Number(b[0])).map(([n, x]) => el("span", { class: "ft-cell" },
+          el("span", { class: "small faint", text: t("msgCol", { n }) }), el("span", { class: "ft-num", text: x.accepted + "/" + x.positions }))))) : null,
+      fm ? el("div", null, el("span", { class: "rf-label", text: t("formats") }),
+        el("div", { class: "tags" }, Object.entries(fm).sort((a, b) => b[1] - a[1]).map(([k, n]) => el("span", { class: "tag" + (k === "json" ? "" : " soft"), text: k + " " + n })))) : null) : null;
+    return el("div", { class: "rates-wrap" }, el("div", { class: "rates" },
       w ? fig(t("rateRewrite"), pctText(w.rate), t("rateRewriteSub", { x: w.extraRewrites, p: w.positions, m: pctText(w.max) }),
         w.pass === false ? "✕ " + t("overLimit") : w.pass === true ? "✓ " + t("withinLimit") : null, w.pass === false ? "over" : null) : null,
       dc ? fig(t("rateDiscard"), pctText(dc.rate), t("rateDiscardSub", { d: dc.discarded, a: dc.attempts }), null) : null,
-      fig(t("rateSpend"), usd(m.spentUsd), t("rateSpendSub") + (m.batchStatus ? " · " + code(m.batchStatus) : ""), null));
+      fig(t("rateSpend"), usd(m.spentUsd), t("rateSpendSub") + (m.batchStatus ? " · " + code(m.batchStatus) : ""), null)), extra);
   }
 
   // A student specimen: the stem grows one node per student message; each message the model wrote puts out a leaf that
@@ -1221,7 +1435,7 @@
       for (const line of check.hard || []) { const p = M.parseCheckerLine(line); if (p.n != null) dev.set(p.n, "hard"); }
       for (const line of check.soft || []) { const p = M.parseCheckerLine(line); if (p.n != null && !dev.has(p.n)) dev.set(p.n, "soft"); }
     }
-    return { n: students.length, fixed: students.map(s => !!s.fixed), rewrites: students.map(s => (s.checks && s.checks.regenerated) || 0), dev,
+    return { n: students.length, fixed: students.map(s => !!s.fixed || !!s.prefix), rewrites: students.map(s => (s.checks && s.checks.regenerated) || 0), dev,
       seeds: atts.filter(a => a.status === "discarded").length, left: !!(rec.end && rec.end.reason === "left"), kind: check ? (check.pass ? "good" : "fail") : "calibration" };
   }
   function drawStudent(target, d, maxN, big) {
@@ -1270,24 +1484,31 @@
     grid.append(el("div", { class: "crow head", role: "row" }, el("span", { role: "columnheader" }), c.langs.map(l => el("span", { role: "columnheader", text: langName(l) }))));
     for (const g of c.groups) {
       grid.append(el("div", { class: "crow" + (g.optional ? " optional" : ""), role: "row" },
-        el("div", { class: "cwho", role: "rowheader" }, el("strong", { text: g.label }), g.optional ? el("span", { class: "small faint", text: t("optionalGroup") }) : null),
+        el("div", { class: "cwho", role: "rowheader" }, el("strong", { text: g.label }), g.purpose ? el("span", { class: "small muted cpurpose", text: g.purpose }) : null,
+          g.optional ? el("span", { class: "small faint", text: t("optionalGroup") }) : null),
         g.cells.map(cell => {
           const field = el("div", { class: "field cfield" });
           for (const x of cell.runs) field.append(studentSpecimen(x.record, x.check, maxN));
           field.addEventListener("click", e => { const n = e.target.closest("[data-run]"); if (n) openRun(n.getAttribute("data-run")); });
-          const replaced = c.records.filter(r => sup[r.runId] && r.tutor.id === g.tutor && r.card.lang === cell.lang).length;
-          const gr = cell.group;
+          const replaced = c.records.filter(r => sup[r.runId] && M.runKey(r) === g.key && r.card.lang === cell.lang).length;
+          const gr = cell.group, after = afterReview(c, g.key, cell.lang);
           return el("div", { class: "ccell", role: "cell" },
             el("span", { class: "clang", text: langName(cell.lang) }),
             el("div", { class: "cnum" + (gr ? (gr.optional ? "" : gr.pass ? " pass" : " fail") : " none") },
               gr ? [el("span", { class: "n", text: String(gr.passing) }), el("span", { class: "of", text: t("groupOf", { n: gr.runs }) })] : el("span", { class: "of", text: t("groupNoReport", { n: cell.runs.length }) }),
-              gr && !gr.optional ? el("span", { class: "gmark" }, pip(gr.pass ? "good" : "fail"), t(gr.pass ? "groupPass" : "groupFail")) : null),
+              gr && !gr.optional ? el("span", { class: "gmark" }, pip(gr.pass ? "good" : "fail"), t(gr.pass ? "groupPass" : "groupFail")) : null,
+              after ? el("span", { class: "gmark after" + (after.pass ? "" : " fail"), "data-tip": t("afterReviewTip") }, t("afterReview", { p: after.passing, n: after.runs })) : null),
             el("div", { class: "cbody" }, field, replaced ? el("span", { class: "small faint", text: t("groupSuperseded", { n: replaced }) }) : null));
         })));
     }
     box.append(el("div", { class: "cgrid-box" }, grid), el("p", { class: "plate-foot", text: t("groupsNote") }));
   }
 
+  // The group as the newest gate or final output that names this batch writes it, after the content review.
+  const afterReview = (c, key, lang) => {
+    const o = c.final.outputs[c.final.outputs.length - 1];
+    return o ? o.groups.find(x => x.key === key && x.lang === lang) || null : null;
+  };
   // A heat cell: the count in a single-hue wash, darker for more. Empty cells stay blank.
   const heatLevel = (k, max) => (k ? Math.max(1, Math.ceil((4 * k) / Math.max(1, max))) : 0);
   function selectionList(title, entries, onClear) {
@@ -1372,12 +1593,57 @@
     }
   }
 
-  // Plate IV: whether the batch itself is whole, from the report where it says so and from the records otherwise.
+  // Plate IV: the content review. Rows are the checker's labels, columns the reviewer's decisions; each cell lists its
+  // items. Decisions are copied from the review file, and the result of an undecided item follows the stated rules.
+  function renderCalibReview(c) {
+    const box = $("calib-review"), rv = c.review;
+    box.append(plateHead("IV", "calib-review-title", t("plateReview"), el("p", { class: "plate-note", text: t("reviewPlateNote") })));
+    if (!c.checked) { box.append(el("p", { class: "empty-note", text: t("devNeedReport") })); return; }
+    if (!rv.items.length) { box.append(el("p", { class: "empty-note", text: t("reviewNoItems") })); return; }
+    if (c.cls === "diagnostic") box.append(el("p", { class: "small muted", text: t("reviewDiagNote") }));
+    const rows = ["auto_pass", "needs_review", "auto_fail", ...Object.keys(rv.byMachine).filter(k => !["auto_pass", "needs_review", "auto_fail"].includes(k))];
+    const cols = ["pass", "fail", "undecided"];
+    const at = (m, dcs) => rv.items.filter(x => x.machine === m && (x.decision || "undecided") === dcs);
+    const max = Math.max(1, ...rows.flatMap(m => cols.map(k => at(m, k).length)));
+    const sel = st.calibSel && st.calibSel.plate === "rv" && st.calibSel.batchId === c.batchId ? st.calibSel : null;
+    const rerender = () => { clear(box); renderCalibReview(c); };
+    const body = el("tbody", null, rows.map(m => el("tr", null, el("th", { scope: "row", class: "rule", text: tOr("m_" + m, m) }), cols.map(k => {
+      const xs = at(m, k), n = xs.length, on = sel && sel.m === m && sel.k === k;
+      if (!n) return el("td", { class: "hc" });
+      // Within a cell, items that override the machine or count as fail by the rules are marked.
+      const flag = xs.some(x => x.overridesMachine) ? " ↺" : xs.some(x => x.undecidedFail) ? " ✕" : "";
+      return el("td", { class: "hc" }, el("button", { type: "button", class: "heat h" + heatLevel(n, max) + (on ? " on" : ""), "aria-pressed": on ? "true" : "false",
+        "data-tip": tOr("m_" + m, m) + " · " + t("dec_" + k) + " · " + t("itemsN", { n }),
+        onclick: () => { st.calibSel = on ? null : { plate: "rv", batchId: c.batchId, m, k }; rerender(); } }, String(n) + flag));
+    }), el("td", { class: "num total", text: String(rv.items.filter(x => x.machine === m).length) }))));
+    box.append(el("div", { class: "scroll-x" }, el("table", { class: "heatmap review" },
+      el("thead", null, el("tr", null, el("th", { text: t("machineLabelCol") }), cols.map(k => el("th", { class: "num", text: t("dec_" + k) })), el("th", { class: "num", text: t("totalCol") }))), body)));
+    if (sel) {
+      const picked = at(sel.m, sel.k);
+      box.append(selectionList(t("selTitle", { what: tOr("m_" + sel.m, sel.m) + " · " + t("dec_" + sel.k), n: new Set(picked.map(x => x.runId)).size }),
+        picked.map(x => el("li", { class: "ritem" },
+          el("div", { class: "ritem-head" }, el("button", { type: "button", class: "btn-quiet run-link", onclick: () => openRun(x.runId, false, x.messages.length ? { n: x.messages[0] } : null) },
+            x.record ? runLabel(x.record) : shortRun(x.runId)),
+          el("span", { class: "mono small", text: x.itemId }), x.messages.length ? el("span", { class: "small faint", text: x.messages.map(n => t("itemAt", { n })).join(" · ") }) : null,
+          el("span", { class: "tag" + (x.effective === "fail" ? " crit" : x.effective === "pending" ? " soft" : ""), text: t("eff_" + x.effective) }),
+          x.overridesMachine ? el("span", { class: "tag accent", text: t("overridesTag") }) : null, x.undecidedFail ? el("span", { class: "tag crit", text: t("undecidedFailTag") }) : null),
+          x.question ? el("div", { class: "small muted", text: t("itemQuestion") + colon() + x.question }) : null,
+          x.machineQuote ? el("div", { class: "small" }, el("span", { class: "faint", text: t("machineQuote") + " " }), el("q", { text: x.machineQuote })) : null,
+          x.quote ? el("div", { class: "small" }, el("span", { class: "faint", text: t("itemQuote") + " " }), el("q", { text: x.quote })) : null,
+          x.note ? el("div", { class: "small muted", text: t("itemNote") + colon() + x.note }) : null)),
+        () => { st.calibSel = null; rerender(); }));
+    }
+    if (rv.unknown.length) box.append(el("p", { class: "small stopped" }, t("reviewUnknown", { n: rv.unknown.length }) + " ",
+      el("span", { class: "mono", text: rv.unknown.slice(0, 6).map(x => shortRun(x.recordId) + "/" + x.itemId).join(", ") })));
+    box.append(el("p", { class: "plate-foot", text: t("reviewRules") }));
+  }
+
+  // Plate V: whether the batch itself is whole, from the report where it says so and from the records otherwise.
   // Why a record stopped: its last attempt's reason when the record has attempts (v4+), else its end.
   const stopReason = r => { const a = Array.isArray(r.attempts) && r.attempts.length ? r.attempts[r.attempts.length - 1] : null; return (a && a.status !== "kept" && a.reason) || (r.end && r.end.reason); };
   function renderCalibIntegrity(c) {
     const box = $("calib-int"), d = st.dataset, sup = d.supersededBy || {}, m = c.machine;
-    box.append(plateHead("IV", "calib-int-title", t("plateIntegrity")));
+    box.append(plateHead("V", "calib-int-title", t("plateIntegrity")));
     const dl = el("dl", { class: "kv integrity" });
     const row = (k, ...v) => dl.append(el("dt", { text: k }), el("dd", null, ...v));
     const none = () => el("span", { class: "muted", text: t("intNone") });
@@ -1404,13 +1670,156 @@
     const h = M.batchHistory(c.batch || {});
     row(t("intBatch"), el("span", { text: [t("nowStatus", { s: code(h.status) }), h.earlierStop ? t("earlierStop", { s: code(h.earlierStop), n: c.records.filter(r => r.restartOf).length }) : null,
       ...h.topUps.map(x => t("topUp", { from: usd(x.from), to: usd(x.to) }))].filter(Boolean).join(" · ") }));
+    const b = c.batch || {};
+    if (b.gate || b.phase) row(t("intGate"), el("span", { text: [b.phase, b.gate ? tOr("gate_" + b.gate, b.gate) : null, b.probeSetVersion ? t("probeSet") + " " + b.probeSetVersion : null].filter(Boolean).join(" · ") }));
+    if (b.calibrationSeries) row(t("intSeries"), el("span", { class: "mono small", text: b.calibrationSeries + (b.seriesSpentUsd != null ? " · " + usd(b.seriesSpentUsd) : "") }));
+    if (b.priorBatchIds && b.priorBatchIds.length) row(t("intPrior"), el("span", { class: "mono small", text: b.priorBatchIds.join(", ") }));
+    if (b.responseFormat) row(t("intResponse"), el("span", { class: "mono small", text: JSON.stringify(b.responseFormat) }));
+    if (m && m.pins) row(t("intPins"), Object.entries(m.pins).map(([k, v]) => el("div", { class: "small mono", "data-tip": typeof v === "string" ? v : null,
+      text: k + ": " + (v && typeof v === "object" ? [v.id, v.version, v.contentHash ? shortHash(v.contentHash) : null].filter(Boolean).join(" ") : shortHash(String(v))) })));
     const f = st.files;
-    row(t("intFiles"), el("span", { class: "small", text: f ? t("filesLine", { r: f.records.size, b: f.batches.size, p: f.reports.size, e: f.expectations.length, i: f.ignored.length }) : t("filesSample") }),
+    row(t("intFiles"), el("span", { class: "small", text: f ? t("filesLine", { r: f.records.size, b: f.batches.size, p: f.reports.size, e: f.expectations.length, i: f.ignored.length }) + " · " + t("filesLine2", { v: f.reviews.size, g: f.gates.length, s: f.probeSets.length }) : t("filesSample") }),
       f && f.ignored.length ? el("details", { class: "ignored" }, el("summary", { class: "small faint", text: t("filesIgnored", { n: f.ignored.length }) }),
         el("ul", null, f.ignored.slice(0, 200).map(x => el("li", { class: "small mono", text: x.path })))) : null);
     box.append(dl, el("div", { class: "bcalls-foot" }, el("button", { type: "button", onclick: () => exportPack(c.batchId) }, t("exportPack") + " ↓"),
       el("span", { class: "small faint", text: t("exportNote") + (f ? "" : " " + t("exportSynthetic")) })));
   }
+
+  // ---------- Probes ----------
+  // One probe batch at a time: each probe in both languages, the fixed history prefix it starts from, and every repeat's
+  // target message as its parts (what the model returned, what it wrote, what the runner injected, what was kept).
+  // Machine counts come from the report and counts after review from the gate file; the page never re-judges.
+  const shaHex = text => { const P = globalThis.PremiumReviewPack; return P ? P.sha256(P.bytesOf(text)) : null; };
+  function renderProbes() {
+    const d = st.dataset, list = M.probeBatches(d);
+    if (!list.some(b => b.batchId === st.probe)) { st.probe = list.length ? list[0].batchId : null; st.probeSel = null; }
+    if (!st.probe) return;
+    const pv = M.probeView(d, st.probe, shaHex), c = pv.calibration;
+    if (!pv.probes.some(p => p.probeId === st.probeSel)) st.probeSel = pv.probes.length ? pv.probes[0].probeId : null;
+    const box = $("probe");
+    box.append(el("header", { class: "sec-head" }, el("div", { class: "title" }, el("h2", { id: "probe-title", text: t("probesTitle") }), el("p", { class: "lede", text: t("probesLede") })),
+      list.length > 1 ? el("div", { class: "filters" }, select("probe-batch", t("probeBatch"), st.probe, list.map(b => [b.batchId, batchOption(b)]),
+        v => { st.probe = v; st.probeSel = null; render(); })) : el("span", { class: "mono muted", text: st.probe })));
+    box.append(classStrip(c.cls), calibLayers(c));
+    renderProbeMatrix(box, pv);
+    renderProbeDetail(pv);
+  }
+  // A check that is true, false or unknown, as a short mark with its full words in a tip.
+  const pcheck = (ok, short, yes, no, unknown) => el("span", { class: "pcheck " + (ok === true ? "ok" : ok === false ? "bad" : "na"), "data-tip": ok === true ? yes : ok === false ? no : unknown },
+    (ok === true ? "✓ " : ok === false ? "✕ " : "– ") + short);
+  const prefixChecks = x => el("span", { class: "pchecks" },
+    pcheck(x.runs.length ? x.sameAcrossRuns : null, t("pc_same"), t("prefixSame", { n: x.runs.length }), t("prefixDiffers"), t("hashNone")),
+    pcheck(x.hashMatches, t("pc_hash"), t("hashOk"), t("hashBad"), t("hashNone")),
+    pcheck(x.matchesFile, t("pc_file"), t("fileOk"), t("fileBad"), t("fileNone")));
+  // Plate I: probes down, languages across. The large figure is the machine count; the gate's count after review sits below.
+  function renderProbeMatrix(box, pv) {
+    const c = pv.calibration;
+    box.append(plateHead("I", "probe-matrix-title", t("plateProbes"), el("p", { class: "plate-note", text: t("probesNote") })));
+    const head = el("tr", null, el("th", { text: t("colProbe") }), pv.langs.map(l => el("th", { text: langName(l) })));
+    const rows = pv.probes.map(p => {
+      const on = p.probeId === st.probeSel;
+      return el("tr", { class: "prow" + (on ? " on" : "") },
+        el("th", { scope: "row" }, el("div", { class: "pwho" }, el("button", { type: "button", class: "pname", "aria-pressed": on ? "true" : "false", onclick: () => { st.probeSel = p.probeId; clear($("probe-detail")); renderProbeDetail(pv); markSel(); $("probe-detail").scrollIntoView({ block: "start" }); } },
+          el("strong", { class: "mono", text: p.probeId }), p.gate ? el("span", { class: "tag", text: tOr("gate_" + p.gate, p.gate) }) : null),
+          p.purpose ? el("span", { class: "small muted ppurpose", text: p.purpose }) : null,
+          p.target ? el("span", { class: "small faint", text: t("probeTarget") + " · " + t("targetN", { n: p.target }) }) : null)),
+        pv.langs.map(l => {
+          const x = p.langs[l], g = x.group, after = afterReview(c, p.probeId, l);
+          return el("td", { class: "pcell" }, el("span", { class: "pc-lang small faint", text: langName(l) }),
+            el("div", { class: "cnum" + (g ? (g.pass ? " pass" : " fail") : " none") },
+              g ? [el("span", { class: "n", text: String(g.passing) }), el("span", { class: "of", text: t("groupOf", { n: g.runs }) })] : el("span", { class: "of", text: t("groupNoReport", { n: x.runs.length }) }),
+              g && !g.optional ? el("span", { class: "gmark" }, pip(g.pass ? "good" : "fail"), t(g.pass ? "groupPass" : "groupFail")) : null,
+              after ? el("span", { class: "gmark after" + (after.pass ? "" : " fail"), "data-tip": t("afterReviewTip") }, t("afterReview", { p: after.passing, n: after.runs })) : null),
+            el("div", { class: "pfield" }, x.runs.map(r => studentSpecimen(r.record, r.check, Math.max(4, p.target || 4)))),
+            prefixChecks(x));
+        }));
+    });
+    const others = pv.others.map(p => el("tr", { class: "prow off" }, el("th", { scope: "row" }, el("div", { class: "pwho" }, el("span", { class: "pname off" }, el("strong", { class: "mono", text: p.probeId }),
+      p.gate ? el("span", { class: "tag", text: tOr("gate_" + p.gate, p.gate) }) : null), p.purpose ? el("span", { class: "small faint ppurpose", text: p.purpose }) : null)),
+    el("td", { class: "small faint", colspan: String(pv.langs.length), text: t("notInBatch") })));
+    const table = el("table", { class: "ptable", "aria-labelledby": "probe-matrix-title" }, el("thead", null, head), el("tbody", null, rows, others));
+    table.addEventListener("click", e => { const n = e.target.closest("[data-run]"); if (n) openRun(n.getAttribute("data-run")); });
+    box.append(el("div", { class: "scroll-x" }, table));
+    function markSel() { table.querySelectorAll(".prow").forEach((tr, i) => { const p = pv.probes[i], on = !!p && p.probeId === st.probeSel; tr.classList.toggle("on", on); const b = tr.querySelector(".pname"); if (b && p) b.setAttribute("aria-pressed", on ? "true" : "false"); }); }
+  }
+  // Plate II: one probe in detail. The prefix lines up across languages; then each repeat's target message, zh beside en.
+  function renderProbeDetail(pv) {
+    const box = $("probe-detail"), p = pv.probes.find(x => x.probeId === st.probeSel);
+    if (!p) return;
+    box.append(plateHead("II", "probe-detail-title", t("plateProbe", { p: p.probeId }),
+      el("dl", { class: "kv pmeta" }, [[t("probeMeta"), p.purpose], [t("probeTarget"), p.target ? t("targetN", { n: p.target }) : null], [t("probeTape"), p.tutorSource],
+        [t("probeProtocol"), p.protocolVersion], [t("probeSet"), pv.set ? pv.set.probeSetVersion : (pv.calibration.batch || {}).probeSetVersion]].filter(x => x[1])
+        .flatMap(([k, v]) => [el("dt", { text: k }), el("dd", { text: v })]))));
+    // What the expectations ask of the target message, in each language.
+    const human = p.expectation && p.expectation.human;
+    if (human) box.append(el("div", { class: "pexpect", style: "--langs:" + pv.langs.length }, pv.langs.map(l => el("div", null,
+      el("span", { class: "small faint", text: t("probeExpect") + " · " + langName(l) }), el("p", { text: human[l] || "—" })))));
+    // The fixed prefix, line by line, the languages side by side.
+    const lens = pv.langs.map(l => p.langs[l].prefix.length), n = Math.max(0, ...lens);
+    const pre = el("details", { class: "prefix" }, el("summary", null, el("span", { text: t("prefixTitle", { n }) }), pv.langs.map(l => el("span", { class: "small faint" }, langName(l) + " ", prefixChecks(p.langs[l])))));
+    const grid = el("div", { class: "pgrid", style: "--langs:" + pv.langs.length });
+    grid.append(...pv.langs.map(l => el("div", { class: "pgh small faint" }, langName(l), " · ", el("span", { class: "mono", "data-tip": p.langs[l].prefixHash || null, text: p.langs[l].prefixHash ? shortHash(p.langs[l].prefixHash) : t("hashNone") }))));
+    for (let i = 0; i < n; i++) for (const l of pv.langs) {
+      const line = p.langs[l].prefix[i];
+      grid.append(line ? el("div", { class: "pline " + line.role },
+        el("div", { class: "who small" }, el("span", { class: "pl-lang faint", text: langName(l) }), el("strong", { text: line.role === "student" ? t("student") : t("tutor") }),
+          line.role === "student" ? (line.fixed ? el("span", { class: "tag", text: t("fixedOpening") }) : null) : el("span", { text: t("turnN", { n: line.turn }) }),
+          line.state ? el("span", { text: t("stage", { s: line.state.stage }) }) : null, line.state ? (line.state.events || []).map(e => el("span", { class: "tag", text: e })) : null,
+          line.source ? el("span", { class: "mono faint", text: line.source }) : null),
+        el("div", { class: "text", text: line.text })) : el("div", { class: "pline empty" }));
+    }
+    pre.append(grid);
+    box.append(pre);
+    // The repeats: run i in one language beside run i in the other.
+    const reps = Math.max(0, ...pv.langs.map(l => p.langs[l].runs.length));
+    const rgrid = el("div", { class: "rgrid", style: "--langs:" + pv.langs.length });
+    rgrid.append(...pv.langs.map(l => el("div", { class: "rgh" }, el("strong", { text: langName(l) }))));
+    for (let i = 0; i < reps; i++) for (const l of pv.langs) {
+      const x = p.langs[l].runs[i];
+      rgrid.append(x ? targetCard(x, l) : el("div", { class: "tcard empty" }));
+    }
+    box.append(rgrid);
+  }
+  // One run's target message as four parts. Dropped events are struck through; the runner's additions are marked.
+  function targetCard(x, lang) {
+    const r = x.record, pt = x.parts, ck = x.check;
+    const head = el("div", { class: "tc-head" },
+      el("span", { class: "tc-lang small faint", text: langName(lang) }),
+      el("strong", { text: t("repeatN", { n: r.repeat.index }) }),
+      ck ? el("span", { class: "state" }, pip(ck.pass ? "good" : "fail"), t(ck.pass ? "v_PASS" : "v_FAIL")) : el("span", { class: "small faint", text: t("sHeadNone") }),
+      pt && pt.format ? el("span", { class: "tag" + (pt.format === "json" ? "" : " soft"), text: t("formatTag", { f: pt.format }) }) : null,
+      x.rejected.length ? el("span", { class: "tag soft", "data-tip": x.rejected.map(rj => (rj.reasons || []).map(code).join(", ")).join(" · "), text: t("sentBackN", { n: x.rejected.length }) }) : null,
+      x.discarded ? el("span", { class: "tag", text: t("discarded", { n: x.discarded }) }) : null,
+      pt && pt.fenceStripped ? el("span", { class: "tag", text: t("fenceTag") }) : null,
+      el("button", { type: "button", class: "btn-quiet run-link", onclick: () => openRun(r.runId, false, x.n ? { n: x.n } : null) }, t("openRecord") + " →"));
+    const card = el("article", { class: "tcard" }, head);
+    if (ck && (ck.hard.length || ck.soft.length)) card.append(el("div", { class: "cklines" }, [...ck.hard.map(h => ckLine({ kind: "hard", ...M.parseCheckerLine(h) })), ...ck.soft.map(h => ckLine({ kind: "soft", ...M.parseCheckerLine(h) }))]));
+    if (!pt) { card.append(el("p", { class: "small faint", text: t("noData") })); return card; }
+    card.append(partsView(pt));
+    if (x.review.length) card.append(reviewBadges(x.review));
+    return card;
+  }
+  // The four parts of a model-written student message. A record before v6 has only the final text.
+  function partsView(pt) {
+    const part = (k, ...body) => el("div", { class: "part part-" + k }, el("span", { class: "part-name", text: t("part_" + k) }), ...body);
+    const evTags = (list, cls) => (list || []).map(e => el("span", { class: "tag" + (cls ? " " + cls : ""), text: e }));
+    const dropped = new Set(pt.droppedEvents || []);
+    if (!pt.v6) return el("div", { class: "parts" }, part("final", el("div", { class: "text", text: pt.final ?? "" }), el("p", { class: "small faint", text: t("noV6") })));
+    return el("div", { class: "parts" },
+      part("raw", el("pre", { class: "raw mono", text: pt.raw ?? "" })),
+      part("model", el("div", { class: "text", text: pt.modelMessage ?? "" }),
+        el("div", { class: "tags" }, (pt.modelEvents || []).map(e => el("span", { class: "tag" + (dropped.has(e) ? " struck" : ""), "data-tip": dropped.has(e) ? t("droppedTag", { e }) : null, text: e })),
+          [...dropped].filter(e => !(pt.modelEvents || []).includes(e)).map(e => el("span", { class: "tag struck", "data-tip": t("droppedTag", { e }), text: e })))),
+      part("injected", pt.injected ? [el("div", { class: "text inj", text: pt.injected.text ?? "" }), el("div", { class: "tags" }, el("span", { class: "tag", text: code(pt.injected.kind) }), evTags(pt.runnerEvents, "accent"))]
+        : (pt.runnerEvents || []).length ? el("div", { class: "tags" }, evTags(pt.runnerEvents, "accent")) : el("span", { class: "small faint", text: t("noInjection") })),
+      part("final", el("div", { class: "text", text: pt.final ?? "" }),
+        pt.state ? el("div", { class: "tags" }, el("span", { class: "small faint", text: t("stage", { s: pt.state.stage }) }), evTags(pt.state.events), pt.state.end ? el("span", { class: "tag", text: t("endMark") }) : null) : null));
+  }
+  // Review items of one run: machine label, then the decision and the result by the rules.
+  const reviewBadges = items => el("div", { class: "rbadges" }, items.map(i => el("span", { class: "rbadge " + i.effective,
+    "data-tip": [i.question, i.quote ? "“" + i.quote + "”" : null, i.note].filter(Boolean).join(" · ") || null },
+  el("span", { class: "mono", text: i.itemId }), " ", tOr("m_" + i.machine, i.machine), " → ", i.decision ? t("dec_" + i.decision) : t("eff_" + i.effective),
+  i.overridesMachine ? " ↺" : i.undecidedFail ? " ✕" : "")));
 
   // ---------- drawer ----------
   let lastFocus = null;
@@ -1449,10 +1858,12 @@
     const v = M.runView(r, st.f.version, d.latestCard, d.supersededBy), s = v.scoring, m = s && s.merged;
     const box = clear($("drawer"));
     box.append(el("div", { class: "drawer-head" },
-      el("div", { class: "ids" }, el("span", { class: "kicker", text: r.batchId }), el("h2", { id: "drawer-title", text: r.tutor.label + " · " + r.card.id }),
+      el("div", { class: "ids" }, el("span", { class: "kicker", text: r.batchId + (M.isCalibrationKind(r.batchKind) ? " · " + t("cls_" + clsOf(d.batches.find(b => b.batchId === r.batchId) || { batchId: r.batchId, kind: r.batchKind })) : "") }),
+        el("h2", { id: "drawer-title", text: whoOf(r) + " · " + r.card.id }),
         el("span", { class: "small muted" }, r.card.lang + " · " + t("repeatOf", { i: r.repeat.index, n: r.repeat.of }) + " · " + when(r.createdAt)),
         el("span", { class: "mono muted" }, r.card.id + "@" + r.card.version + (v.olderCard ? " (" + t("olderCard") + ")" : "") + " · " + String(r.card.contentHash).slice(0, 19) + "…"),
-        el("span", { class: "mono muted" }, [M.versionKey(r), r.tutor.tutorPromptHash ? promptName(r.tutor.tutorPromptHash) : t("noPrompt")].join(" · ")),
+        el("span", { class: "mono muted" }, r.probe ? t("probeTape") + " " + r.tutor.id + (r.tutor.provider ? " · " + r.tutor.provider : "")
+          : [M.versionKey(r), r.tutor.tutorPromptHash ? promptName(r.tutor.tutorPromptHash) : t("noPrompt")].join(" · ")),
         el("span", { class: "mono muted" }, t("runId") + " " + r.runId)),
       el("button", { type: "button", onclick: closeDrawer, id: "drawer-close" }, t("close"))));
 
@@ -1460,11 +1871,11 @@
     const vb = el("div", { class: "verdict-box" }, mark(v));
     const jump = (label, id) => el("button", { type: "button", class: "btn-quiet", onclick: () => openRun(id, true) }, label + " →");
     if (v.calibration) vb.append(el("p", { class: "small muted", text: t("calibNote") }));
-    const rr = r.batchKind === "calibration" ? M.reportRun(d, r.runId) : null, rep = d.reports.get(r.batchId);
+    const cal = M.isCalibrationKind(r.batchKind), rr = cal ? M.reportRun(d, r.runId) : null, rep = d.reports.get(r.batchId);
     if (rr) vb.append(el("div", { class: "machine-line" }, el("span", { class: "small muted", text: t("machineCheck") }),
       el("span", { class: "state" }, pip(rr.run.pass ? "good" : "fail"), t(rr.run.pass ? "v_PASS" : "v_FAIL")),
-      el("span", { class: "small muted", text: t("machineRun", { h: (rr.run.hard || []).length, s: (rr.run.soft || []).length, x: rr.run.extraRewrites ?? "—" }) + " · checker v" + rr.report.checkerVersion })));
-    else if (r.batchKind === "calibration") vb.append(el("p", { class: "small muted", text: !rep ? t("machineNoReport") : rep.verdict === "CANNOT_CHECK" ? t("cannotCheckNote") : t("machineNotInReport") }));
+      el("span", { class: "small muted", text: t("machineRun", { h: rr.run.hard.length, s: rr.run.soft.length, x: rr.run.extraRewrites ?? "—" }) + " · checker v" + (rr.norm.checkerRevision || rr.report.checkerVersion) })));
+    else if (cal) vb.append(el("p", { class: "small muted", text: !rep ? t("machineNoReport") : rep.verdict === "CANNOT_CHECK" ? t("cannotCheckNote") : t("machineNotInReport") }));
     if (v.supersededBy) vb.append(el("p", { class: "small muted" }, t("supersededNote") + " ", jump(t("openSuccessor"), v.supersededBy)));
     if (v.restartOf) vb.append(el("p", { class: "small muted" }, t("restartNote") + " ", jump(t("openPredecessor"), v.restartOf)));
     if (v.state === "scored" && v.reasons.length) vb.append(el("div", { class: "tags" }, v.reasons.map(x => el("span", { class: "tag" + (["leak", "student_left", "unsolved_tutor_fault"].includes(x) ? " crit" : ""), text: code(x) }))));
@@ -1478,7 +1889,7 @@
     }
     // The conversation's own specimen, large: each leaf is a tutor turn and jumps to it in the transcript.
     let big = null;
-    if (r.batchKind === "calibration") {
+    if (cal) {
       const sd = studentData(r, rr ? rr.run : null), maxN = Math.max(8, sd.n);
       const y0 = Math.max(0, SPH - sd.n * (SP_ROOM / maxN) - 2 * HEAD - 5.5);
       big = drawStudent(svg("svg", { class: "sp big student " + sd.kind, viewBox: `0 ${y0} ${SPW} ${SPH - y0}`, style: `height:${((SPH - y0) / SPW) * 64}px`, role: "img", "aria-label": studentTip(r, rr ? rr.run : null, sd) }), sd, maxN, true);
@@ -1502,6 +1913,8 @@
       });
     }
     box.append(el("div", { class: "section" }, el("h3", { text: t("verdictBox") }), el("div", { class: "verdict-row" }, big, vb)));
+    if (r.probe) box.append(probeSection(r));
+    if (rr && rr.norm.v3) { const sec = runV3Section(r, rr); if (sec) box.append(sec); }
 
     // Deterministic failure evidence
     const ev = M.failureEvidence(v);
@@ -1528,7 +1941,7 @@
     if (ai < 0) ai = atts.length - 1;
     const tsec = el("div", { class: "section" }, el("h3", { text: t("transcript") }));
     const tbody = el("div", { class: "tbody" });
-    const drawAttempt = () => { clear(tbody); tbody.append(transcriptView(atts[ai], ai === atts.length - 1, m, ckLines)); };
+    const drawAttempt = () => { clear(tbody); tbody.append(transcriptView(atts[ai], ai === atts.length - 1, m, ckLines, r.probe ? r.probe.targetStudentMessage : null)); };
     if (atts.length > 1) tsec.append(el("div", { class: "tabs attempts", role: "group", "aria-label": t("attempts") }, atts.map((a, i) => el("button", { type: "button", class: "tab", "aria-pressed": i === ai ? "true" : "false",
       onclick: () => { ai = i; st.drawerAttempt = a.attempt; tsec.querySelectorAll(".attempts .tab").forEach((b, k) => b.setAttribute("aria-pressed", k === i ? "true" : "false")); drawAttempt(); } },
       t("attemptTab", { n: a.attempt }) + " · " + tOr("attempt_" + a.status, code(a.status))))));
@@ -1591,23 +2004,66 @@
     const target = focus && focus.n ? $("smsg-" + focus.n) : null;
     if (target) { target.scrollIntoView({ block: "center" }); target.classList.remove("flash"); void target.offsetWidth; target.classList.add("flash"); }
   }
+  // A probe run: which probe, where its fixed prefix came from, and whether the prefix is the one the probe file holds.
+  function probeSection(r) {
+    const pb = r.probe, prefix = M.prefixOf(r), hash = pb.prefixHash || null, h = shaHex(JSON.stringify(prefix));
+    const set = (st.dataset.probeSets || []).find(x => x.probeSetVersion === pb.probeSetVersion) || null;
+    const def = set ? set.probes.find(x => x.probeId === pb.probeId) || null : null;
+    const fileText = def && def.prefix && def.prefix[r.card.lang] ? JSON.stringify(def.prefix[r.card.lang]) : null;
+    return el("div", { class: "section" }, el("h3", { text: t("probeInfo") }), el("dl", { class: "kv" },
+      el("dt", { text: t("colProbe") }), el("dd", null, el("span", { class: "mono", text: pb.probeId }), def && def.gate ? [" ", el("span", { class: "tag", text: tOr("gate_" + def.gate, def.gate) })] : null),
+      def && def.purpose ? [el("dt", { text: t("probeMeta") }), el("dd", { text: def.purpose })] : null,
+      el("dt", { text: t("probeTarget") }), el("dd", { text: t("targetN", { n: pb.targetStudentMessage }) }),
+      el("dt", { text: t("probeSet") }), el("dd", { class: "mono", text: pb.probeSetVersion }),
+      el("dt", { text: t("probeTape") }), el("dd", { class: "mono", text: pb.tutorSource }),
+      el("dt", { text: t("probeProtocol") }), el("dd", { class: "mono", text: pb.protocolVersion }),
+      el("dt", { text: t("prefixHash") }), el("dd", null, el("span", { class: "mono", "data-tip": hash, text: hash ? shortHash(hash) : t("hashNone") }), " ",
+        pcheck(hash && h ? "sha256:" + h === hash : null, t("pc_hash"), t("hashOk"), t("hashBad"), t("hashNone")), " ",
+        pcheck(fileText == null ? null : fileText === JSON.stringify(prefix), t("pc_file"), t("fileOk"), t("fileBad"), t("fileNone")))));
+  }
+  // What checker v3 adds for one run: its review items, the milestones it found and how the self-reports compare.
+  function runV3Section(r, rr) {
+    const x = rr.run, items = M.reviewOf(st.dataset, r.batchId).items.filter(i => i.runId === r.runId);
+    const kv = el("dl", { class: "kv" });
+    if ((x.milestones || []).length) kv.append(el("dt", { text: t("milestones") }), el("dd", null, el("div", { class: "tags" }, x.milestones.map(ms => el("span", { class: "tag" + (ms.status === "met" ? "" : " soft"),
+      text: ms.id + " · " + tOr("ms_" + ms.status, ms.status) + (ms.message != null ? " · " + t("msgN", { n: ms.message }) : "") })))));
+    if (x.selfReportStage) kv.append(el("dt", { text: t("selfReport") }), el("dd", { text: t("selfReportLine", { a: x.selfReportStage.agree, n: x.selfReportStage.total }) }));
+    if (x.eventSelfReport && Object.keys(x.eventSelfReport).length) kv.append(el("dt", { text: t("eventReport") }), el("dd", { class: "mono small", text: Object.entries(x.eventSelfReport).map(([k, v]) => k + " " + v).join(" · ") }));
+    if (!kv.childNodes.length && !items.length) return null;
+    return el("div", { class: "section" }, el("h3", { text: t("reviewInRun") }), items.length ? el("ul", { class: "ritems" }, items.map(i => el("li", { class: "ritem" },
+      el("div", { class: "ritem-head" }, el("span", { class: "mono small", text: i.itemId }), el("span", { class: "small muted", text: tOr("m_" + i.machine, i.machine) + " → " + (i.decision ? t("dec_" + i.decision) : t("dec_undecided")) }),
+        el("span", { class: "tag" + (i.effective === "fail" ? " crit" : i.effective === "pending" ? " soft" : ""), text: t("eff_" + i.effective) }),
+        i.overridesMachine ? el("span", { class: "tag accent", text: t("overridesTag") }) : null, i.undecidedFail ? el("span", { class: "tag crit", text: t("undecidedFailTag") }) : null,
+        i.messages.length ? el("span", { class: "small faint", text: i.messages.map(n => t("itemAt", { n })).join(" · ") }) : null),
+      i.question ? el("div", { class: "small muted", text: t("itemQuestion") + colon() + i.question }) : null,
+      i.quote ? el("div", { class: "small" }, el("span", { class: "faint", text: t("itemQuote") + " " }), el("q", { text: i.quote })) : null,
+      i.note ? el("div", { class: "small muted", text: t("itemNote") + colon() + i.note }) : null))) : null, kv.childNodes.length ? kv : null);
+  }
   const ruleCounts = rejected => {
     const n = new Map();
     for (const x of rejected) for (const k of x.reasons || []) n.set(k, (n.get(k) || 0) + 1);
     return [...n].sort((a, b) => b[1] - a[1]).map(([k, v]) => code(k) + " " + v).join(st.lang === "zh" ? "、" : ", ");
   };
   const ckLine = x => el("div", { class: "ckline " + x.kind }, el("span", { class: "tag" + (x.kind === "hard" ? " crit" : ""), text: t("checkerAt") + " · " + t(x.kind) }), el("span", { class: "mono", text: x.text }));
-  function transcriptView(att, isLast, m, ckLines) {
+  function transcriptView(att, isLast, m, ckLines, target) {
     const wrap = el("div", { class: "attempt" });
     if (!att.legacy && att.status === "error") wrap.append(el("p", { class: "small stopped", text: t("attemptErrored", { r: code(att.reason) }) }));
     else if (!att.legacy && att.status !== "kept") wrap.append(el("p", { class: "small stopped", text: t("attemptStopped", { n: att.atStudentMessage ?? "?", r: String(att.reason || "").split(",").filter(Boolean).map(code).join(st.lang === "zh" ? "、" : ", ") }) }));
     const msgs = el("div", { class: "msgs" });
     const leakTurns = new Set(m && isLast ? m.leakTurns || [] : []);
     const shown = new Set();
+    // A probe's fixed prefix folds into one block: it is the same in every repeat and nobody in this run wrote it.
+    const pre = att.lines.filter(l => l.prefix);
+    let preBox = null;
+    if (pre.length) { preBox = el("div", { class: "msgs" }); msgs.append(el("details", { class: "prefix-lines" }, el("summary", { text: t("prefixTitle", { n: pre.length }) }), preBox)); }
     for (const line of att.lines) {
+      const into = line.prefix ? preBox : msgs;
       if (line.role === "student") {
         shown.add(line.n);
-        msgs.append(studentLine(line, att.byMessage.get(line.n) || [], isLast ? ckLines.filter(x => x.n === line.n) : [], att));
+        into.append(studentLine(line, att.byMessage.get(line.n) || [], isLast ? ckLines.filter(x => x.n === line.n) : [], att, target));
+      } else if (line.prefix) {
+        into.append(el("div", { class: "msg prefix" }, el("div", { class: "who" }, el("strong", { text: t("tutor") + " " + t("turnN", { n: line.turn }) }), el("span", { class: "tag", text: t("prefixTag") }),
+          line.source ? el("span", { class: "mono faint", text: line.source }) : null), el("div", { class: "text", text: line.text })));
       } else {
         const mt = isLast && m && m.turns ? m.turns[line.turn - 1] : null;
         msgs.append(el("div", { class: "msg" + (leakTurns.has(line.turn) ? " leak" : ""), id: isLast ? "turn-" + line.turn : null },
@@ -1621,11 +2077,13 @@
     wrap.append(msgs);
     return wrap;
   }
-  function studentLine(line, drafts, cks, att) {
+  function studentLine(line, drafts, cks, att, target) {
     const s = line.state || {}, ck = line.checks || {};
-    const out = el("div", { class: "msg student", id: "smsg-" + line.n },
+    const out = el("div", { class: "msg student" + (line.prefix ? " prefix" : "") + (target != null && line.n === target ? " target" : ""), id: "smsg-" + line.n },
       el("div", { class: "who" }, el("strong", { text: t("student") + " " + t("msgN", { n: line.n }) }),
-        line.fixed ? el("span", { class: "tag", text: t("fixedOpening") }) : null,
+        line.fixed ? el("span", { class: "tag", text: t("fixedOpening") }) : null, line.prefix ? el("span", { class: "tag", text: t("prefixTag") }) : null,
+        target != null && line.n === target ? el("span", { class: "tag accent", text: t("probeTarget") }) : null,
+        line.injected ? el("span", { class: "tag accent", text: t("injectedTag") }) : null,
         line.state ? el("span", { text: t("stage", { s: s.stage }) }) : null,
         (s.events || []).map(e => el("span", { class: "tag", text: e })),
         s.end ? el("span", { class: "tag", text: t("endMark") }) : null,
@@ -1644,6 +2102,12 @@
       line.text != null ? el("div", { class: "accepted-label", text: "↓ " + t("accepted") + (line.callInfo ? " · " + t("callN", { c: line.callInfo.n }) : "") }) : null));
     if (line.text != null) out.append(el("div", { class: "text", text: line.text }));
     else if (att.status === "discarded") out.append(el("p", { class: "small stopped", text: t("neverAccepted") }));
+    // Record schema v6 keeps what the model returned and what the runner changed. Shown open where they differ.
+    if (line.model) {
+      const pt = M.messageParts(line);
+      const differs = !!pt.injected || pt.droppedEvents.length > 0 || pt.runnerEvents.length > 0 || pt.fenceStripped || (target != null && line.n === target);
+      out.append(el("details", { class: "parts-box", open: differs || null }, el("summary", { text: t("partsSummary") + (pt.format ? " · " + t("formatTag", { f: pt.format }) : "") }), partsView(pt)));
+    }
     if (cks.length) out.append(el("div", { class: "cklines" }, cks.map(ckLine)));
     return out;
   }
