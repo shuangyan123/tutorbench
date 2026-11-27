@@ -508,15 +508,15 @@ const setupWith = (evaluated, pred) => {
   return hits[0];
 };
 
-test("v3: records of schema v1, v2 and v3 load together, and v2 history joins v3 runs of the same setup", () => {
+test("v3: records of schema v1, v2, v3 and v5 load together, and v2 history joins v3 runs of the same setup", () => {
   const { d, evaluated } = sampleViews();
   assert.deepEqual(d.warnings, []);
-  assert.deepEqual([...new Set(d.runs.map(r => r.schemaVersion))].sort(), [2, 3]);
+  assert.deepEqual([...new Set(d.runs.map(r => r.schemaVersion))].sort(), [2, 3, 5]);
   // A v1 record from an older folder loads beside them.
   const old = record({ runId: "v1-run", createdAt: "2026-11-01T00:00:00.000Z" });
   const mixed = M.buildDataset({ records: [...SAMPLE.records, old], batches: [...SAMPLE.batches, batch] });
   assert.deepEqual(mixed.warnings, []);
-  assert.deepEqual([...new Set(mixed.runs.map(r => r.schemaVersion))].sort(), [1, 2, 3]);
+  assert.deepEqual([...new Set(mixed.runs.map(r => r.schemaVersion))].sort(), [1, 2, 3, 5]);
   // Atlas with no prompt of its own: the v2 pilot and the v3 runs after it are one setup.
   const atlas = setupWith(evaluated, r => r.batchId === "synthetic-pilot-02" && r.tutor.id === "atlas" && underV1(r));
   assert.deepEqual([...new Set(atlas.views.map(v => v.record.schemaVersion))].sort(), [2, 3]);
@@ -623,4 +623,243 @@ test("v3: tutor parameters are compared by value, not by the order they were wri
   const cmp = M.compareSetups(groups[0].views, groups[1].views);
   assert.deepEqual(cmp.diff.map(x => x.part), ["tutorParams"]);
   assert.equal(cmp.changes, 1);
+});
+
+// ---------- record schema v4–v5, calibration reports and the review pack ----------
+await import("./pack.js");
+const P = globalThis.PremiumReviewPack;
+const full = () => M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, index: M.parseJsonl(SAMPLE.index), reports: SAMPLE.reports, expectations: SAMPLE.expectations });
+const CAL = "synthetic-calibration-13";
+
+test("v5: the sample's calibration reports load, and the page shows them as written", () => {
+  const d = full();
+  assert.deepEqual(d.warnings, []);
+  assert.equal(d.reports.size, 3);
+  assert.deepEqual(M.calibrationBatches(d).map(b => b.batchId).slice(0, 3), [CAL, "synthetic-dryrun-12", "synthetic-cannot-check-11"]);
+  const rep = d.reports.get(CAL), c = M.calibrationOf(d, CAL);
+  assert.equal(c.machine.verdict, rep.verdict);
+  assert.equal(c.machine.runsPassing, rep.runs.filter(x => x.pass).length);
+  assert.equal(c.machine.groupsPassing, rep.groups.filter(g => !g.optional && g.pass).length);
+  assert.deepEqual(c.machine.rewrite, rep.rewrite);
+  assert.deepEqual(c.machine.discard, rep.discard);
+  assert.equal(c.contentReview, "pending");
+  // Thresholds come from the expectations, never from the page.
+  assert.deepEqual({ ...c.criteria, rulesVersion: undefined }, { maxHard: 0, maxSoft: 1, minPassingRuns: 2, repeats: 3, rewriteRateMax: 0.2, rulesVersion: undefined });
+  // Groups hold the adopted runs only; the interrupted record is kept apart.
+  assert.equal(c.records.length, 19);
+  assert.equal(c.adopted.length, 18);
+  assert.deepEqual(c.groups.map(g => g.cells.map(x => x.runs.length)), [[3, 3], [3, 3], [3, 3]]);
+  for (const g of c.groups) for (const cell of g.cells) for (const x of cell.runs) assert.equal(x.check.runId, x.record.runId);
+  // Every reply sent back in the adopted runs is listed: the report's extra tries, plus one position per discarded
+  // attempt where no reply was ever accepted.
+  assert.equal(c.rejects.filter(x => !x.superseded).length, rep.rewrite.extraRewrites + rep.discard.discarded);
+  assert.equal(c.deviations.length, rep.runs.reduce((n, x) => n + x.hard.length + x.soft.length, 0));
+  assert.ok(c.deviations.some(x => x.n === null), "a whole-run deviation stays off the message grid");
+  // A report is copied, not re-judged: a report that says PASS is shown as PASS.
+  const said = { ...rep, verdict: "PASS" };
+  const d2 = M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, reports: [said] });
+  assert.equal(M.calibrationOf(d2, CAL).machine.verdict, "PASS");
+  // Without expectations only the report's rewrite limit is known.
+  assert.deepEqual(M.calibrationOf(d2, CAL).criteria, { rewriteRateMax: 0.2 });
+  // Expectations written for another rules version do not apply.
+  const other = M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, reports: SAMPLE.reports, expectations: [{ ...SAMPLE.expectations[0], rulesVersion: "9.9.9" }] });
+  assert.equal(M.calibrationOf(other, CAL).expectations, null);
+});
+
+test("v5: a dry run, a report that could not check, and a batch without a report", () => {
+  const d = full();
+  const dry = M.calibrationOf(d, "synthetic-dryrun-12");
+  assert.equal(dry.machine.verdict, "PASS");
+  assert.equal(dry.machine.dryRun, true);
+  assert.equal(dry.criteria.minPassingRuns, 1);
+  const cannot = M.calibrationOf(d, "synthetic-cannot-check-11");
+  assert.equal(cannot.cannotCheck, true);
+  assert.equal(cannot.checked, false);
+  assert.equal(cannot.machine, null);
+  assert.equal(cannot.contentReview, "unstated");
+  const none = M.calibrationOf(d, "synthetic-calibration-05");
+  assert.equal(none.report, null);
+  assert.equal(none.machine, null);
+  assert.ok(none.groups.length > 0 && none.groups.every(g => g.cells.every(x => x.runs.every(y => y.check === null))));
+  assert.deepEqual(none.deviations, []);
+});
+
+test("v5: attempts, drafts sent back and the call that wrote each accepted message", () => {
+  const discard = SAMPLE.records.find(r => r.batchId === CAL && r.tutor.id === "calib-steady" && r.card.lang === "en" && r.repeat.index === 1);
+  const atts = M.attemptsOf(discard);
+  assert.deepEqual(atts.map(a => a.status), ["discarded", "kept"]);
+  assert.deepEqual([...atts[0].byMessage.keys()], [2]);
+  assert.equal(atts[0].byMessage.get(2).length, 3);
+  assert.ok(atts[0].rejected.every(x => x.callInfo && x.callInfo.role === "student" && x.callInfo.n === x.call));
+  assert.equal(atts[0].rejected[0].reply.json, false);
+  for (const a of atts) for (const line of a.lines.filter(l => l.role === "student")) {
+    if (line.fixed) assert.equal(line.callInfo, null);
+    else assert.equal(line.callInfo.role, "student");
+  }
+  // The last attempt is the record's transcript.
+  assert.deepEqual(atts[1].lines.map(l => l.text), discard.transcript.map(l => l.text));
+  // A v1 record reads as one attempt with nothing sent back.
+  const old = M.attemptsOf(record({ runId: "v1", transcript: [{ role: "student", text: "hi" }, { role: "tutor", turn: 1, text: "hello" }] }));
+  assert.equal(old.length, 1);
+  assert.equal(old[0].legacy, true);
+  assert.equal(old[0].lines[0].n, 1);
+  // A reply in one whole ```json fence is read; anything else is shown as written.
+  const fenced = SAMPLE.records.find(r => r.batchId === CAL && r.transcript.some(l => l.checks && l.checks.fenceStripped));
+  assert.ok(fenced, "sample lacks a fenced student reply");
+  assert.ok(fenced.end.fenceStripped >= 1);
+  const ok = M.parseStudentReply("```json\n{\"message\":\"hi\",\"stage\":2,\"events\":[\"pushback\"],\"end\":false}\n```");
+  assert.deepEqual([ok.json, ok.fenced, ok.message, ok.stage, ok.events], [true, true, "hi", 2, ["pushback"]]);
+  assert.equal(M.parseStudentReply("```json\n```json\n{}\n```\n```").json, false);
+  assert.equal(M.parseStudentReply("plain words").message, "plain words");
+  assert.equal(M.ruleFamily(["too_long"]), "format");
+  assert.equal(M.ruleFamily(["fixed_test_missing"]), "protocol");
+  assert.equal(M.ruleFamily(["invalid_stage"]), "state");
+  assert.equal(M.ruleFamily(["something_new"]), "other");
+  assert.deepEqual(M.parseCheckerLine("msg 3: missing event pushback"), { n: 3, text: "missing event pushback", line: "msg 3: missing event pushback" });
+  assert.equal(M.parseCheckerLine("required mistake x not made").n, null);
+});
+
+test("v5: cache totals count only known splits, with their denominator; unknown is never zero", () => {
+  const d = full(), raw = SAMPLE.batches.find(b => b.batchId === CAL), recs = d.runs.filter(r => r.batchId === CAL);
+  const cache = M.cacheOf(raw, recs);
+  assert.equal(cache.recorded, true);
+  const learner = cache.models.find(m => m.model === "learner");
+  assert.ok(learner.observed > 0 && learner.observed < learner.calls, "the sample needs known and unknown splits");
+  assert.equal(learner.unknown, learner.calls - learner.observed);
+  const calls = recs.flatMap(r => r.calls).filter(c => c.model === "learner" && c.cache.hitTokens != null);
+  assert.equal(learner.hitTokens, calls.reduce((n, c) => n + c.cache.hitTokens, 0));
+  assert.ok(learner.hitRate > 0 && learner.hitRate < 1);
+  // The batch's own summary is kept as written: one unknown call makes its total unknown.
+  assert.equal(learner.batch.hitTokens, null);
+  // Scripted tutors send no input, so they have no cache to speak of.
+  assert.ok(cache.models.filter(m => m.role === "tutor").every(m => m.observed === 0 && m.noInput === m.calls));
+  // A v3 record has no cache field at all.
+  const v3 = SAMPLE.records.find(r => r.schemaVersion === 3);
+  assert.equal(M.cacheOf(null, [v3]).recorded, false);
+});
+
+test("v5: fingerprints count once per conversation, adopted and superseded apart, as the checker counts them", () => {
+  const d = full(), raw = SAMPLE.batches.find(b => b.batchId === CAL), recs = d.runs.filter(r => r.batchId === CAL);
+  const id = M.identityOf(raw, recs, d.supersededBy);
+  assert.equal(id.target, "student");
+  assert.equal(id.servingIdentity, "alias");
+  assert.equal(id.multipleFingerprints, true);
+  const student = id.roles.find(g => g.role === "student");
+  const mine = student.fingerprints.map(f => [f.value, f.conversations, f.adopted, f.superseded]);
+  const theirs = d.reports.get(CAL).fingerprintDistribution.map(f => [f.system_fingerprint, f.conversations, f.adopted, f.superseded]);
+  assert.deepEqual(mine.sort(), theirs.sort());
+  assert.deepEqual(student.requested, ["Learner"]);
+  assert.deepEqual(student.returned, ["learner-2026-11"]);
+  // Before v4 nothing about identity was recorded, and the page says so rather than showing null.
+  const v3 = SAMPLE.records.find(r => r.schemaVersion === 3 && r.batchKind === "evaluation");
+  const old = M.identityOf(null, [v3], {}).roles.find(g => g.role === "tutor");
+  assert.equal(old.unrecorded, old.calls);
+  assert.deepEqual(old.fingerprints.map(f => f.value), [undefined]);
+});
+
+test("v5: transport errors and retries, with the record that replaced an interrupted run", () => {
+  const d = full(), recs = d.runs.filter(r => r.batchId === CAL);
+  const tr = M.transportOf(recs, d.supersededBy);
+  const timeout = tr.find(x => x.error === "timeout");
+  assert.ok(timeout && timeout.costEstimated, "a failed call is charged at its reservation");
+  const retry = tr.find(x => x.runId === timeout.runId && x.retry);
+  assert.equal(retry.error, null);
+  assert.equal(retry.retryDelayMs, 1500);
+  assert.equal(retry.n, timeout.n + 1);
+  // A conversation that ended on a provider error and was restarted points to its restart; budget stops are not
+  // transport errors.
+  const call = (n, extra) => ({ n, role: "student", model: "m", usd: 0.001, retryDelayMs: 0, error: null, ...extra });
+  const cut = { ...v2({ runId: "cut", status: "error", endReason: "error", scorings: [] }), calls: [call(1), call(2, { error: "provider_error", costEstimated: true }), call(3, { error: "budget_stop" })] };
+  const redo = { ...v2({ runId: "redo", restartOf: "cut", scorings: [] }), calls: [call(1)] };
+  const rows = M.transportOf([cut, redo], { cut: "redo" });
+  assert.deepEqual(rows.map(x => [x.runId, x.n, x.error, x.replacedBy]), [["cut", 2, "provider_error", "redo"]]);
+});
+
+test("v5: a recovered batch keeps its old stop as history, not as its status", () => {
+  assert.deepEqual(M.batchHistory({ status: "complete", stopReason: "provider_error" }), { status: "complete", earlierStop: "provider_error", topUps: [] });
+  assert.deepEqual(M.batchHistory({ status: "budget_stop", stopReason: "budget_stop" }), { status: "budget_stop", earlierStop: null, topUps: [] });
+  assert.deepEqual(M.batchHistory({ status: "complete" }), { status: "complete", earlierStop: null, topUps: [] });
+  // A top-up is part of the batch's history even when the batch then completed.
+  const cal = SAMPLE.batches.find(b => b.batchId === "synthetic-calibration-13");
+  assert.deepEqual(M.batchHistory(cal).topUps.map(x => [x.from, x.to]), [[0.006, 0.05]]);
+});
+
+test("v5: reports and expectations that do not fit are reported, not trusted", () => {
+  const rep = SAMPLE.reports.find(r => r.batchId === CAL);
+  const evalBatch = SAMPLE.batches.find(b => b.batchId === "synthetic-pilot-02");
+  const d = M.buildDataset({ records: SAMPLE.records, batches: SAMPLE.batches, expectations: [{ card: null }],
+    reports: [rep, { ...rep, verdict: "PASS" }, { batchId: "gone", verdict: "CANNOT_CHECK" }, { batchId: evalBatch.batchId, verdict: "CANNOT_CHECK" },
+      { ...SAMPLE.reports.find(r => r.batchId === "synthetic-dryrun-12"), runs: [{ runId: "run-missing", pass: true, hard: [], soft: [] }] },
+      { batchId: "x", verdict: "FAIL" }] });
+  assert.deepEqual(d.warnings.map(w => w.code + ":" + w.detail).sort(), ["not_a_report:x", "not_expectations:?", "report_conflict:" + CAL,
+    "report_not_calibration:synthetic-pilot-02", "report_run_missing:run-missing", "report_without_batch:gone"].sort());
+  assert.equal(d.reports.get(CAL).verdict, "FAIL", "the first report of a batch is kept");
+  assert.equal(M.isReport({ batchId: "b", verdict: "CANNOT_CHECK" }), true);
+  assert.equal(M.isReport(SAMPLE.batches[0]), false);
+  assert.equal(M.isExpectations(SAMPLE.expectations[0]), true);
+});
+
+test("review index: one row per record; checker results are copied from the report, counts from the record", () => {
+  const d = full(), rep = d.reports.get(CAL), rows = M.reviewIndex(d, CAL);
+  assert.equal(rows.length, 19);
+  for (const row of rows) assert.deepEqual(Object.keys(row), M.REVIEW_COLUMNS);
+  const adopted = rows.filter(r => r.record_role === "adopted"), superseded = rows.filter(r => r.record_role === "superseded");
+  assert.equal(adopted.length, 18);
+  assert.equal(superseded.length, 1);
+  assert.equal(superseded[0].checker_pass, "NOT_EVALUATED");
+  assert.equal(superseded[0].replaced_by, adopted.find(r => r.restart_of === superseded[0].run_id).run_id);
+  for (const row of adopted) {
+    const x = rep.runs.find(y => y.runId === row.run_id);
+    assert.equal(row.checker_pass, x.pass ? "PASS" : "FAIL");
+    assert.deepEqual([row.checker_hard, row.checker_soft, row.report_extra_rewrites], [x.hard, x.soft, x.extraRewrites]);
+    assert.equal(row.record_path, "records/" + row.run_id + ".json");
+  }
+  assert.ok(rows.some(r => r.transport_errors.startsWith("call ")), "the timeout is listed");
+  assert.ok(rows.some(r => r.discarded_attempts === 1 && r.attempt_stops.length === 1));
+  assert.ok(M.reviewIndex(d, "synthetic-cannot-check-11").every(r => r.checker_pass === "CANNOT_CHECK"));
+  assert.ok(M.reviewIndex(d, "synthetic-calibration-05").every(r => r.checker_pass === "NO_REPORT"));
+});
+
+// A minimal reader for the stored zips the pack writes: the end record, the central directory, then each local entry.
+function readZip(bytes) {
+  const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength), dec = new TextDecoder();
+  const end = bytes.length - 22;
+  assert.equal(v.getUint32(end, true), 0x06054b50);
+  const count = v.getUint16(end + 10, true), size = v.getUint32(end + 12, true), start = v.getUint32(end + 16, true);
+  assert.equal(start + size, end);
+  const out = [];
+  for (let i = 0, at = start; i < count; i++) {
+    assert.equal(v.getUint32(at, true), 0x02014b50);
+    assert.equal(v.getUint16(at + 8, true) & 0x0800, 0x0800, "names are flagged as UTF-8");
+    assert.equal(v.getUint16(at + 10, true), 0, "stored, not compressed");
+    const crc = v.getUint32(at + 16, true), len = v.getUint32(at + 20, true), nameLen = v.getUint16(at + 28, true), local = v.getUint32(at + 42, true);
+    const name = dec.decode(bytes.subarray(at + 46, at + 46 + nameLen));
+    assert.equal(v.getUint32(local, true), 0x04034b50);
+    const dataAt = local + 30 + v.getUint16(local + 26, true) + v.getUint16(local + 28, true);
+    const data = bytes.subarray(dataAt, dataAt + len);
+    assert.equal(P.crc32(data), crc);
+    out.push({ name, data });
+    at += 46 + nameLen;
+  }
+  return out;
+}
+
+test("review pack: SHA-256, CRC-32, a stored zip with UTF-8 names, and CSV that spreadsheet programs read", async () => {
+  const { createHash } = await import("node:crypto");
+  for (const s of ["", "abc", "a".repeat(55), "a".repeat(56), "a".repeat(64), "b".repeat(1000), "复核包 · review"]) {
+    assert.equal(P.sha256(s), createHash("sha256").update(s, "utf8").digest("hex"));
+  }
+  assert.equal(P.crc32("123456789"), 0xcbf43926);
+  const files = [{ path: "pack/records/run-a.json", data: "{\"a\":1}\n" }, { path: "pack/说明.txt", data: "中文\n" }, { path: "pack/bin", data: new Uint8Array([0, 255, 10]) }];
+  const zip = P.zip(files, "2026-11-26T08:00:00.000Z");
+  const back = readZip(zip);
+  assert.deepEqual(back.map(f => f.name), files.map(f => f.path));
+  back.forEach((f, i) => assert.deepEqual([...f.data], [...P.bytesOf(files[i].data)]));
+  assert.deepEqual([...P.zip(files, "2026-11-26T08:00:00.000Z")], [...zip], "one export time gives the same bytes");
+  const csv = P.csv(["a", "b", "c"], [{ a: "x,y", b: "say \"hi\"", c: { k: [1] } }, { a: "two\nlines", b: null, c: 3 }]);
+  assert.ok(csv.startsWith("﻿a,b,c\r\n"));
+  assert.equal(csv, "﻿a,b,c\r\n\"x,y\",\"say \"\"hi\"\"\",\"{\"\"k\"\":[1]}\"\r\n\"two\nlines\",,3\r\n");
+  // The review index of the sample goes through it whole.
+  const rows = M.reviewIndex(full(), CAL);
+  assert.equal(P.csv(M.REVIEW_COLUMNS, rows).split("\r\n").length, rows.length + 2);
 });

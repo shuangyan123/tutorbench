@@ -1,10 +1,16 @@
 // Data model for the premium runs dashboard. Pure functions only: no DOM, no network.
 // Loaded as a classic script in the page (works from file://) and imported by the Node tests.
 // Input is the premium runner's output: records/<runId>.json, batches/<batchId>.json, index.jsonl.
-// Record schema v1, v2 and v3 are all read, together. v2 adds calibration batches (status "unscored", never scored),
+// Record schema v1 to v5 are all read, together. v2 adds calibration batches (status "unscored", never scored),
 // budget restarts (restartOf), review flags, fixedTestSkipped and cost reconciliation. v3 adds the tutor's own prompt
 // (tutorPromptId, tutorPromptVersion and a language-independent tutorPromptHash) and the effective tutor parameters;
 // its batch lists each tutor's prompt identity and keeps a financial stop (budgetStopReason) beside a drift status.
+// v4 adds fence evidence (end.fenceStripped, checks.fenceStripped, rejected[].fenceStripped, perJudge[].unwrapped) and,
+// on every call, requestedModel, returnedModel, system_fingerprint and calledAt; its batch says how the served model
+// is known (servingIdentity: revision, alias or unknown). v5 adds the cache split of each call (calls[].cache) and a
+// cache summary on the batch. A field a record does not carry is "not recorded", never zero.
+// A calibration report (calibration-report-<batchId>.json, checker v2) is read as the machine verdict of its batch;
+// the page never recomputes that verdict.
 (function (root) {
   "use strict";
 
@@ -12,7 +18,7 @@
   const BATCH_SCHEMA = "tutorbench.premium-batch";
   const VERDICTS = ["good", "flawed", "fail"];
   const ITEMS = ["correct", "readsState", "helpFit", "noLeak", "responds", "helpLevel"];
-  const SCHEMA_VERSIONS = [1, 2, 3];
+  const SCHEMA_VERSIONS = [1, 2, 3, 4, 5];
   // States that are listed but never part of an evaluation: a calibration run checks the simulated student only,
   // and a superseded run was interrupted by the budget and replaced by a restart.
   const NOT_EVALUATION = ["calibration", "superseded"];
@@ -36,6 +42,12 @@
     }
     return 0;
   }
+
+  // A calibration report as the runner's check writes it (checker v2 plus the runner's own fields), or the short form it
+  // publishes when the input could not be checked.
+  const isReport = r => !!r && typeof r === "object" && typeof r.batchId === "string" && typeof r.verdict === "string"
+    && (r.verdict === "CANNOT_CHECK" || (Number.isInteger(r.checkerVersion) && Array.isArray(r.groups) && Array.isArray(r.runs)));
+  const isExpectations = v => !!v && typeof v === "object" && !!v.card && !!v.pass && Array.isArray(v.plannedGroups);
 
   const currentScoring = record => (Array.isArray(record.scorings) && record.scorings.length ? record.scorings[record.scorings.length - 1] : null);
   const isCalibration = record => record.batchKind === "calibration" || record.status === "unscored";
@@ -130,7 +142,33 @@
       for (const id of runs.keys()) if (!indexed.has(id)) warnings.push({ code: "record_not_in_index", detail: id });
     }
     const tutorPrompts = [...prompts.values()].sort((a, b) => a.firstAt.localeCompare(b.firstAt) || a.hash.localeCompare(b.hash));
-    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, tutorPrompts, warnings };
+
+    // Calibration reports: one per batch. A report is the checker's verdict and is shown as written; it must name a
+    // loaded calibration batch, and every run it judged must be loaded.
+    const reports = new Map();
+    for (const rep of input.reports || []) {
+      if (!isReport(rep)) { warnings.push({ code: "not_a_report", detail: rep && rep.batchId ? rep.batchId : "?" }); continue; }
+      if (reports.has(rep.batchId)) {
+        if (JSON.stringify(reports.get(rep.batchId)) !== JSON.stringify(rep)) warnings.push({ code: "report_conflict", detail: rep.batchId });
+        continue;
+      }
+      reports.set(rep.batchId, rep);
+      const b = batches.get(rep.batchId);
+      if (!b) warnings.push({ code: "report_without_batch", detail: rep.batchId });
+      else if (b.kind !== "calibration") warnings.push({ code: "report_not_calibration", detail: rep.batchId });
+      for (const x of rep.runs || []) {
+        const r = runs.get(x.runId);
+        if (!r || r.batchId !== rep.batchId) warnings.push({ code: "report_run_missing", detail: x.runId });
+      }
+    }
+    // Expectations (the checker's private thresholds and per-message expectations) are optional. They only add the exact
+    // pass thresholds, which the report itself does not carry.
+    const expectations = (input.expectations || []).filter(e => {
+      const ok = e && typeof e === "object" && e.card && e.pass && Array.isArray(e.plannedGroups);
+      if (!ok) warnings.push({ code: "not_expectations", detail: "?" });
+      return ok;
+    });
+    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, tutorPrompts, reports, expectations, warnings };
   }
 
   // The state a run counts as under the selected judge configuration.
@@ -468,6 +506,250 @@
     };
   }
 
+  // ---------- attempts, rejected replies and calls (v2 and later) ----------
+  // Strips exactly one whole-reply ```json fence, as the runner's parser does, so a rejected reply that was valid JSON
+  // shows its message, stage and events. Anything else is shown as the raw text it was.
+  function unwrapJson(raw) {
+    const text = String(raw ?? "").trim();
+    const m = /^`{3}(?:json)?\r?\n([\s\S]*?)\r?\n`{3}$/iu.exec(text);
+    if (!m || /^\s*`{3}/mu.test(m[1])) return { text, unwrapped: false };
+    return { text: m[1], unwrapped: true };
+  }
+  function parseStudentReply(raw) {
+    const u = unwrapJson(raw);
+    try {
+      const v = JSON.parse(u.text);
+      if (v && typeof v === "object" && !Array.isArray(v) && typeof v.message === "string") {
+        return { json: true, message: v.message, stage: v.stage ?? null, events: Array.isArray(v.events) ? v.events : [], end: v.end ?? null, fenced: u.unwrapped };
+      }
+    } catch { /* not JSON: shown as written */ }
+    return { json: false, message: String(raw ?? ""), stage: null, events: [], end: null, fenced: false };
+  }
+
+  // Every attempt of one conversation. Student messages are numbered in each attempt (the opening is message 1), and
+  // the replies the runner sent back are grouped by the message they were meant to be, in the order they were written.
+  // A v1 record keeps only its final transcript, so it reads as one attempt with rewrite counts and no rejected text.
+  function attemptsOf(record) {
+    const list = Array.isArray(record.attempts) && record.attempts.length ? record.attempts
+      : [{ attempt: 1, status: "kept", reason: null, atStudentMessage: null, transcript: record.transcript || [], rejected: [], legacy: true }];
+    const calls = new Map((record.calls || []).map(c => [c.n, c]));
+    return list.map(a => {
+      // The call that wrote each accepted student message: the attempt's student calls that neither failed in transport nor
+      // were sent back, in order. The record does not name it, so it is left out whenever the counts do not match.
+      const sentBack = new Set((a.rejected || []).map(x => x.call));
+      const writers = (Array.isArray(a.calls) ? a.calls : []).map(k => calls.get(k)).filter(c => c && c.role === "student" && !c.error && !sentBack.has(c.n));
+      const written = (a.transcript || []).filter(m => m.role === "student" && !m.fixed).length;
+      let n = 0, w = 0;
+      const lines = (a.transcript || []).map(m => (m.role !== "student" ? m
+        : { ...m, n: ++n, callInfo: !m.fixed && writers.length === written ? writers[w++] : null }));
+      const rejected = (a.rejected || []).map(x => ({ ...x, studentMessage: Number(x.studentMessage), reply: parseStudentReply(x.text), callInfo: calls.get(x.call) || null }));
+      const byMessage = new Map();
+      for (const x of rejected) {
+        if (!byMessage.has(x.studentMessage)) byMessage.set(x.studentMessage, []);
+        byMessage.get(x.studentMessage).push(x);
+      }
+      return { attempt: a.attempt, status: a.status, reason: a.reason || null, atStudentMessage: a.atStudentMessage ?? null, lines, rejected, byMessage,
+        studentMessages: n, calls: Array.isArray(a.calls) ? a.calls : [], legacy: !!a.legacy };
+    });
+  }
+
+  // Rule families for replies sent back to the simulated student: the reply's form, the card's protocol, its state.
+  const RULE_FAMILY = {
+    invalid_json_or_fields: "format", internal_state_in_message: "format", too_long: "format", role_reference: "format", sensitive_output: "format",
+    fixed_test_missing: "protocol", fixed_test_early: "protocol", left_too_early: "protocol", invalid_end: "protocol", curt_exit_unsolved: "protocol",
+    invalid_stage: "state", unknown_event: "state", duplicate_event: "state",
+  };
+  const ruleFamily = reasons => { for (const r of reasons || []) if (RULE_FAMILY[r]) return RULE_FAMILY[r]; return "other"; };
+
+  const has = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
+  const allCalls = record => [...(record.calls || []), ...(record.scorings || []).slice(1).flatMap(s => s.calls || [])];
+  // Errors that stop a batch are not transport errors; they are shown with the batch.
+  const STOPS = ["budget_stop", "unknown_cost", "model_version_drift", "actual_over_budget"];
+
+  // Calls that failed in transport (timeouts, provider errors, calls never sent) and calls that were a retry, with the
+  // conversation they belong to and, when that conversation was replaced, the record that replaced it.
+  function transportOf(records, supersededBy) {
+    const out = [];
+    for (const r of records) for (const c of allCalls(r)) {
+      const failed = c.error && !STOPS.includes(c.error);
+      if (!failed && !(c.retryDelayMs > 0)) continue;
+      out.push({ runId: r.runId, n: c.n, role: c.role, model: c.model, error: failed ? c.error : null, retry: c.retryDelayMs > 0, retryDelayMs: c.retryDelayMs || 0,
+        costEstimated: c.costEstimated === true, usd: c.usd ?? null, calledAt: c.calledAt || null, status: r.status, endReason: (r.end && r.end.reason) || null,
+        replacedBy: (supersededBy && supersededBy[r.runId]) || null });
+    }
+    return out;
+  }
+
+  // Cache per model. The batch's own summary (v5) is kept as written; beside it, the totals over the calls whose split is
+  // known, with that denominator, so an unknown call never turns the whole into zero or into a guess.
+  function cacheOf(batch, records) {
+    const per = new Map();
+    for (const r of records) for (const c of allCalls(r)) {
+      if (c.error === "not_dispatched" || c.error === "mock_not_dispatched") continue;
+      const p = per.get(c.model) || { model: c.model, role: c.role, calls: 0, observed: 0, noInput: 0, unrecorded: 0, hitTokens: 0, missTokens: 0, hitUsd: 0, missUsd: 0 };
+      p.calls++;
+      if (!has(c, "cache")) p.unrecorded++;
+      if (c.cache && c.cache.hitTokens != null && c.cache.missTokens != null) {
+        p.observed++; p.hitTokens += c.cache.hitTokens; p.missTokens += c.cache.missTokens;
+        p.hitUsd += c.cache.hitUsd || 0; p.missUsd += c.cache.missUsd || 0;
+      } else if (c.usage && c.usage.inputTokens === 0) p.noInput++;
+      per.set(c.model, p);
+    }
+    const models = [...per.values()].map(p => ({ ...p, unknown: p.calls - p.observed - p.noInput,
+      hitRate: p.hitTokens + p.missTokens > 0 ? p.hitTokens / (p.hitTokens + p.missTokens) : null,
+      batch: ((batch && batch.cache && batch.cache.byModel) || []).find(m => m.model === p.model) || null }))
+      .sort((a, b) => a.role.localeCompare(b.role) || a.model.localeCompare(b.model));
+    return { recorded: models.some(m => m.calls > m.unrecorded), batch: (batch && batch.cache) || null, models };
+  }
+
+  // Who answered, per role: the model names asked for and returned, when, and the fingerprints seen. Each distinct
+  // fingerprint counts once per conversation, adopted and superseded apart, as the calibration check counts them.
+  function identityOf(batch, records, supersededBy) {
+    const roles = new Map();
+    for (const r of records) {
+      const replaced = !!(supersededBy && supersededBy[r.runId]);
+      const seen = new Map();
+      for (const c of allCalls(r)) {
+        const g = roles.get(c.role) || { role: c.role, calls: 0, requested: new Set(), returned: new Set(), returnedNull: 0, unrecorded: 0, first: null, last: null, fingerprints: new Map() };
+        g.calls++;
+        if (c.requestedModel) g.requested.add(c.requestedModel);
+        if (!has(c, "returnedModel")) g.unrecorded++;
+        else if (c.returnedModel == null) g.returnedNull++;
+        else g.returned.add(c.returnedModel);
+        if (c.calledAt) { if (!g.first || c.calledAt < g.first) g.first = c.calledAt; if (!g.last || c.calledAt > g.last) g.last = c.calledAt; }
+        if (!c.error || !STOPS.includes(c.error)) {
+          const fp = has(c, "system_fingerprint") ? (c.system_fingerprint ?? null) : undefined;
+          if (!seen.has(c.role)) seen.set(c.role, new Set());
+          seen.get(c.role).add(fp === undefined ? "\u0000unrecorded" : fp === null ? "\u0000null" : fp);
+        }
+        roles.set(c.role, g);
+      }
+      for (const [role, set] of seen) for (const fp of set) {
+        const g = roles.get(role), row = g.fingerprints.get(fp) || { conversations: 0, adopted: 0, superseded: 0 };
+        row.conversations++; row[replaced ? "superseded" : "adopted"]++;
+        g.fingerprints.set(fp, row);
+      }
+    }
+    const order = ["tutor", "student", "judge"];
+    const list = [...roles.values()].sort((a, b) => order.indexOf(a.role) - order.indexOf(b.role)).map(g => ({
+      role: g.role, calls: g.calls, requested: [...g.requested].sort(), returned: [...g.returned].sort(), returnedNull: g.returnedNull, unrecorded: g.unrecorded,
+      first: g.first, last: g.last,
+      fingerprints: [...g.fingerprints].map(([k, v]) => ({ value: k === "\u0000null" ? null : k === "\u0000unrecorded" ? undefined : k, ...v }))
+        .sort((a, b) => (a.value === undefined) - (b.value === undefined) || (a.value === null) - (b.value === null) || String(a.value).localeCompare(String(b.value))),
+    }));
+    const target = batch && batch.kind === "calibration" ? "student" : "tutor";
+    const t = list.find(g => g.role === target);
+    return { target, roles: list, servingIdentity: (batch && batch.servingIdentity) || null, configured: (batch && batch.configuredServingIdentity) || null,
+      evidence: (batch && batch.identityEvidence) || null,
+      multipleFingerprints: !!t && t.fingerprints.filter(f => typeof f.value === "string").length > 1 };
+  }
+
+  // ---------- calibration ----------
+  // A checker line such as "msg 2: missing event pushback" belongs to student message 2; others belong to the whole run.
+  function parseCheckerLine(line) {
+    const m = /^msg (\d+): ([\s\S]*)$/u.exec(String(line));
+    return m ? { n: Number(m[1]), text: m[2], line: String(line) } : { n: null, text: String(line), line: String(line) };
+  }
+  const reportRun = (dataset, runId) => {
+    for (const rep of dataset.reports.values()) { const x = (rep.runs || []).find(y => y.runId === runId); if (x) return { report: rep, run: x }; }
+    return null;
+  };
+
+  // Everything the calibration view shows for one batch. The verdict, the group passes and the rewrite and discard rates
+  // come from the report only; without a report the page lists what the records say and calls the batch unchecked.
+  function calibrationOf(dataset, batchId) {
+    const batch = dataset.batches.find(b => b.batchId === batchId) || null;
+    const report = dataset.reports.get(batchId) || null;
+    const checked = !!report && report.verdict !== "CANNOT_CHECK";
+    const records = dataset.runs.filter(r => r.batchId === batchId);
+    const sup = dataset.supersededBy || {};
+    const adopted = records.filter(r => !sup[r.runId]);
+    const byRun = new Map(((checked && report.runs) || []).map(x => [x.runId, x]));
+    const card = (checked && report.card) || (records[0] && { id: records[0].card.id, version: records[0].card.version, contentHash: records[0].card.contentHash }) || null;
+    // Expectations apply to one card version under one rules version, as the runner's check-calibration requires.
+    const rules = records[0] ? records[0].card.rulesVersion : null;
+    const exp = card ? dataset.expectations.find(e => e.card.id === card.id && e.card.version === card.version && (!card.contentHash || e.card.contentHash === card.contentHash)
+      && (!rules || !e.rulesVersion || e.rulesVersion === rules)) || null : null;
+    const tutorOrder = ((batch && batch.tutors) || []).map(x => x.id);
+    for (const r of records) if (!tutorOrder.includes(r.tutor.id)) tutorOrder.push(r.tutor.id);
+    const langs = (batch && batch.languages) || [...new Set(records.map(r => r.card.lang))];
+    const label = id => { const bt = ((batch && batch.tutors) || []).find(x => x.id === id); const r = records.find(x => x.tutor.id === id); return (bt && bt.label) || (r && r.tutor.label) || id; };
+    const optional = new Set(((checked && report.groups) || []).filter(g => g.optional).map(g => g.tutor));
+    const groups = tutorOrder.map(tutor => ({ tutor, label: label(tutor), optional: optional.has(tutor), cells: langs.map(lang => {
+      const runs = adopted.filter(r => r.tutor.id === tutor && r.card.lang === lang).sort((a, b) => a.repeat.index - b.repeat.index)
+        .map(r => ({ record: r, check: byRun.get(r.runId) || null }));
+      const g = ((checked && report.groups) || []).find(x => x.tutor === tutor && x.lang === lang) || null;
+      return { lang, runs, group: g };
+    }) })).filter(g => g.cells.some(c => c.runs.length || c.group));
+    const rejects = records.flatMap(r => attemptsOf(r).flatMap(a => a.rejected.map(x => ({ runId: r.runId, tutor: r.tutor.id, lang: r.card.lang, repeat: r.repeat.index,
+      attempt: a.attempt, attemptStatus: a.status, superseded: !!sup[r.runId], n: x.studentMessage, reasons: x.reasons || [], family: ruleFamily(x.reasons) }))));
+    const deviations = [];
+    for (const [runId, x] of byRun) {
+      const r = records.find(y => y.runId === runId);
+      for (const kind of ["hard", "soft"]) for (const line of x[kind] || []) deviations.push({ runId, tutor: x.tutor, lang: x.lang, repeat: x.repeat, kind, record: r || null, ...parseCheckerLine(line) });
+    }
+    const need = exp ? (report && report.dryRun ? 1 : exp.pass.group.minPassingRuns) : null;
+    const machine = checked ? {
+      verdict: report.verdict, checkerVersion: report.checkerVersion, dryRun: report.dryRun === true,
+      runsPassing: report.runs.filter(x => x.pass).length, runs: report.runs.length,
+      groupsPassing: report.groups.filter(g => !g.optional && g.pass).length, groups: report.groups.filter(g => !g.optional).length,
+      rewrite: report.rewrite || null, discard: report.discard || null, cohortErrors: report.cohortErrors || [], superseded: report.superseded || [],
+      fingerprints: report.fingerprintDistribution || null, multipleFingerprints: report.multipleFingerprints ?? null,
+      servingIdentity: report.servingIdentity ?? null, spentUsd: report.batchSpentUsd ?? null, batchStatus: report.batchStatus ?? null,
+    } : null;
+    const criteria = exp ? { maxHard: exp.pass.run.maxHard, maxSoft: exp.pass.run.maxSoft, minPassingRuns: need, repeats: exp.repeats,
+      rewriteRateMax: exp.pass.rewriteRateMax, rulesVersion: exp.rulesVersion || null } : (machine && machine.rewrite ? { rewriteRateMax: machine.rewrite.max } : null);
+    return { batchId, batch, report, checked, cannotCheck: !!report && report.verdict === "CANNOT_CHECK", card, records, adopted, groups, langs, rejects, deviations,
+      machine, criteria, expectations: exp, contentReview: report ? (report.humanReviewPending === true ? "pending" : report.humanReviewPending === false ? "not_pending" : "unstated") : "unstated" };
+  }
+
+  // The calibration batches in view, newest first; a batch with a report before one without.
+  function calibrationBatches(dataset) {
+    return dataset.batches.filter(b => b.kind === "calibration")
+      .sort((a, b) => (dataset.reports.has(b.batchId) - dataset.reports.has(a.batchId)) || String(b.createdAt).localeCompare(String(a.createdAt)));
+  }
+
+  // A batch's status now, and any earlier stop it recovered from. A recovered batch can keep the stopReason of its first
+  // run beside status "complete"; that is history, not the current state.
+  function batchHistory(b) {
+    const stop = b && b.stopReason ? String(b.stopReason) : null;
+    const topUps = (b && Array.isArray(b.budgetHistory) ? b.budgetHistory : []).filter(x => x && typeof x.from === "number" && typeof x.to === "number").map(x => ({ at: x.at || null, from: x.from, to: x.to }));
+    return { status: (b && b.status) || null, earlierStop: stop && stop !== b.status ? stop : null, topUps };
+  }
+
+  // ---------- review pack ----------
+  // One row per record of a batch, for the review index in the pack. Checker results are copied from the report;
+  // everything else is counted from the record as written. Nothing here re-scores or re-checks a run.
+  const REVIEW_COLUMNS = ["job", "record_role", "tutor", "language", "repeat", "checker_pass", "record_status", "end_reason", "checker_hard", "checker_soft",
+    "report_extra_rewrites", "rejected_outputs", "rejection_rule_counts", "attempts", "discarded_attempts", "attempt_stops", "student_calls", "transport_errors",
+    "fingerprints", "run_id", "restart_of", "replaced_by", "record_path"];
+  function reviewIndex(dataset, batchId) {
+    const rep = dataset.reports.get(batchId);
+    const checked = rep && rep.verdict !== "CANNOT_CHECK";
+    const byRun = new Map(((checked && rep.runs) || []).map(x => [x.runId, x]));
+    const sup = dataset.supersededBy || {};
+    const records = dataset.runs.filter(r => r.batchId === batchId)
+      .sort((a, b) => a.tutor.id.localeCompare(b.tutor.id) || String(a.card.lang).localeCompare(String(b.card.lang)) || a.repeat.index - b.repeat.index
+        || (sup[a.runId] ? -1 : 0) - (sup[b.runId] ? -1 : 0));
+    return records.map(r => {
+      const x = byRun.get(r.runId), attempts = attemptsOf(r);
+      const counts = {};
+      for (const a of attempts) for (const rj of a.rejected) for (const k of rj.reasons || []) counts[k] = (counts[k] || 0) + 1;
+      const transport = transportOf([r], sup).filter(t => t.error);
+      const fps = [...new Set(allCalls(r).filter(c => has(c, "system_fingerprint") && c.system_fingerprint).map(c => c.system_fingerprint))].sort();
+      return {
+        job: [r.tutor.id, r.card.lang, r.repeat.index].join("/"), record_role: sup[r.runId] ? "superseded" : "adopted", tutor: r.tutor.id, language: r.card.lang, repeat: r.repeat.index,
+        checker_pass: x ? (x.pass ? "PASS" : "FAIL") : !rep ? "NO_REPORT" : !checked ? "CANNOT_CHECK" : "NOT_EVALUATED",
+        record_status: r.status, end_reason: r.end && r.end.reason, checker_hard: x ? x.hard : "", checker_soft: x ? x.soft : "", report_extra_rewrites: x ? x.extraRewrites : "",
+        rejected_outputs: attempts.reduce((n, a) => n + a.rejected.length, 0), rejection_rule_counts: counts, attempts: attempts.filter(a => !a.legacy).length,
+        discarded_attempts: attempts.filter(a => a.status === "discarded").length,
+        attempt_stops: attempts.filter(a => !a.legacy && a.status !== "kept").map(a => ({ attempt: a.attempt, status: a.status, reason: a.reason, atStudentMessage: a.atStudentMessage })),
+        student_calls: allCalls(r).filter(c => c.role === "student").length, transport_errors: transport.map(t => "call " + t.n + " " + t.error).join("; "),
+        fingerprints: fps.join(" "), run_id: r.runId, restart_of: r.restartOf || "", replaced_by: sup[r.runId] || "", record_path: "records/" + r.runId + ".json",
+      };
+    });
+  }
+
   function groupBy(views, key) {
     const out = new Map();
     for (const v of views) {
@@ -479,6 +761,8 @@
   }
 
   const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, wilson, versionKey, tutorVersions, latestVersions, versionTrend, SETUP_PARTS, setupOf, setups, compareSetups, failureEvidence,
-    studentChecks, disagreementSummary, costs, tutorEconomy, economyOf, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION };
+    studentChecks, disagreementSummary, costs, tutorEconomy, economyOf, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION,
+    SCHEMA_VERSIONS, isReport, isExpectations, unwrapJson, parseStudentReply, attemptsOf, ruleFamily, RULE_FAMILY, transportOf, cacheOf, identityOf,
+    parseCheckerLine, reportRun, calibrationOf, calibrationBatches, batchHistory, REVIEW_COLUMNS, reviewIndex };
   root.PremiumDashboardModel = api;
 })(globalThis);

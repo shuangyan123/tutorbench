@@ -1,7 +1,7 @@
 # TutorBench Observatory（观测台）
 
-A local page for reading the premium runner's output: `index.jsonl`, `batches/<batchId>.json` and `records/<runId>.json`.
-It reads run records of schema v1, v2 and v3 together, so a runs folder that grew across runner versions opens as one.
+A local page for reading the premium runner's output: `index.jsonl`, `batches/<batchId>.json`, `records/<runId>.json` and, for a calibration batch, `calibration-report-<batchId>.json`.
+It reads run records of schema v1, v2, v3, v4 and v5 together, so a runs folder that grew across runner versions opens as one.
 It is laid out like a printed atlas: numbered plates, one drawn specimen per conversation, and the words kept to titles, hovers and the run drawer.
 It shows the formal pass rate, what still needs a person, the evidence behind each deterministic failure, the simulated student's checks, and where the three judges disagreed.
 
@@ -18,7 +18,7 @@ The files are read inside the browser tab. Nothing is uploaded, and the page mak
 
 ## What the page shows
 
-The page has four views. The filters (judge configuration, batch, language, card versions) sit at the right end of the view bar.
+The page has five views. The filters (judge configuration, batch, language, card versions) sit at the right end of the view bar.
 
 - **Overview** has five plates:
   - *Plate I, Who teaches well*, has one row per tutor: a letter, the name, the formal pass rate, then one specimen per conversation. Counted specimens come first (good, flawed, fail). After a small gap come the ones that still need review; they stand on a dashed ground and are not counted. The hairline under each rate is its 95% range (Wilson score interval): when two tutors' lines overlap a lot, the gap between them may be luck.
@@ -28,8 +28,9 @@ The page has four views. The filters (judge configuration, batch, language, card
   - *Plate V, Needs you*, shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, review flags or tied judges).
   - Hovering a specimen, a letter or a version dot gives the detail. Clicking a specimen opens that conversation. Clicking a letter, a tutor name, a version dot or a number opens the matching list.
 - **Compare** puts two setups side by side. Pick A and B; the page first lists what differs (tutor, tutor model, tutor prompt, tutor parameters, simulated student model and parameters, judge configuration, rules version), then compares the pass rates overall and per card and language, only on the card versions and languages both sides scored. A result is read as the effect of a change only when exactly one thing differs (another tutor counts as one change, its model included). When more than one thing differs, the page says the difference cannot be put down to any one of them.
-- **All conversations** is the full list, with state tabs and the run drawer. The drawer shows the conversation's own specimen, large; clicking a leaf scrolls to that tutor turn. Tabs for superseded and calibration runs appear when such runs are loaded.
-- **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate. It lists each tutor's own prompt (name, version, start of its hash) and any parameters other than the defaults. When a model-version drift stops a batch and the same call also used up the budget, the drift is the status and the financial stop (`budgetStopReason`) is shown under it.
+- **Calibration** appears when a calibration batch is loaded. It is described below.
+- **All conversations** is the full list, with state tabs and the run drawer. The drawer shows the conversation's own specimen, large; clicking a leaf scrolls to that tutor turn. Tabs for superseded and calibration runs appear when such runs are loaded. A toggle keeps only the runs with a transport error.
+- **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate. It lists each tutor's own prompt (name, version, start of its hash) and any parameters other than the defaults. When a model-version drift stops a batch and the same call also used up the budget, the drift is the status and the financial stop (`budgetStopReason`) is shown under it. Each batch also has a **calls** block (record schema v4 and later), described below.
 
 ### How to read a specimen
 
@@ -59,6 +60,93 @@ A tutor is its label. Its version is the model the provider reported (`resolvedM
 Plates I, II and III show each tutor's newest version in view. If a tutor's row still mixes setups (another simulated student, rules version, tutor prompt or parameters), Plate I says so and points to Compare. Plate III also uses the newest version. Older versions appear on Plate IV and in the list.
 
 The overview compares tutors, so it reads evaluation runs only. Calibration and superseded runs appear in the lists and the drawer.
+
+## Calibration
+
+A calibration batch checks the simulated student, not a tutor. Its verdict comes from the private checker (v2), which the runner's `check-calibration` command runs and writes to `calibration-report-<batchId>.json`. The page shows that report as written. It never re-checks a run, recomputes a verdict or applies a threshold of its own.
+
+The view keeps three layers apart:
+
+| Layer | Where it comes from | What the page shows |
+| --- | --- | --- |
+| 1 · Machine calibration | The checker report | `PASS`, `FAIL` or `CANNOT_CHECK`, the checker version, passing runs and groups, and whether it was a dry run. With no report the layer says so and gives no verdict. |
+| 2 · Formal tutor scoring | — | Not applicable. Calibration runs are never scored (`unscored`, no `scorings`). |
+| 3 · Independent content review | `humanReviewPending` in the report | *Pending* when the report says so. The page records no review outcome, and nothing on it can mark a review done. |
+
+Beside the layers are the pass criteria and the rates:
+
+- **Pass criteria** come from the private expectations file (`expectations.json`, schema v2). The report does not carry them. Put the file in the opened folder (top level) to list the per-run limits on hard and soft deviations, the passing runs a group needs and the rewrite limit. Without it, only the rewrite limit from the report is shown.
+- **Rewrite rate** is the report's extra rewrites over student positions, with its limit and whether it passed.
+- **Discard rate** is the report's discarded attempts over all attempts.
+- **Spend** is the batch's estimated spend and status as the report states them.
+
+Four plates follow:
+
+- *Plate I, Groups* has one row per scripted tutor and one column per language. Each cell holds the report's passing runs out of the group's runs, its pass mark, and one student specimen per adopted run (see below). Optional groups are labelled and never fail the batch. Superseded runs are counted under the cell, not drawn.
+- *Plate II, Sent back* is a heatmap of the student replies the runner sent back: one row per rule, grouped by family (format, protocol, state), one column per student message. A darker cell means more. Clicking a cell lists the runs and attempts behind it, and each one opens the drawer at that message. Replies from superseded runs are left out and counted under the plate.
+- *Plate III, Deviations* is the checker's hard and soft findings, one row per group (tutor × language), one column per student message plus *whole run* for findings tied to no message. The number is the runs with a hard finding; soft findings are listed beside it. Clicking a cell lists the checker's own lines.
+- *Plate IV, Integrity* lists the report's cohort errors, adopted runs the report does not mention, superseded runs and what replaced them, transport errors (with a link to the calls block under Run checks), the serving identity and fingerprints, how much of the learner's cache split is known, the batch's status history and the files the page read and did not read. The review-pack export is here too.
+
+With more than one calibration batch loaded, a select picks the batch.
+
+### How to read a student specimen
+
+| Part | Means |
+| --- | --- |
+| Stem | One node per student message. Every specimen on the plate uses the same scale. |
+| Leaf | A message the model wrote. It grows with each time the runner sent that message back. A small bud is a message accepted first time. The card's fixed opening line has no leaf. |
+| Red leaf | The checker found a hard deviation at that message. |
+| Dashed leaf | A soft deviation at that message. |
+| Dots by the root | Attempts the runner discarded before the kept one. |
+| Head | The checker's result for the run: a filled dot passed, a cross failed, a ring means no report. A head lifted off the stem means the student left. |
+
+## The run drawer
+
+For record schema v4 and later the drawer also shows:
+
+- **attempt tabs**, one per attempt (kept, discarded, error), each with its own transcript, the reason it ended and the student message it stopped at
+- on every student line: the student's stage and events, the end it declared, a stripped fence, soft flags, the number of rewrites, the call that wrote it and any retry wait
+- under a line that was sent back, **each rejected draft** with its call, the rules that rejected it and its text (parsed when it is JSON, raw when it is not), then the accepted reply marked with its call. In a discarded attempt the last draft is marked as never accepted.
+- the checker's lines for that message, copied from the report, and the checker's whole-run lines above the transcript
+- the rejected replies counted by rule in the student checks
+- a **calls** table with each call's role, model asked for and returned, fingerprint, tokens, cache split, cost (estimated or charged at its reservation), retry wait and error
+
+For a calibration run the drawer opens with the checker's result for that run and a large student specimen; clicking a leaf scrolls to that message.
+
+## The calls block under Run checks
+
+Each batch has a folded block (it says so when its records are older than v4) with four small tables:
+
+- **Model identity**: per role, the model asked for, the model returned and when the calls were made, then the batch's serving identity (`pinned`, `alias` or not recorded) and its evidence when the batch has some.
+- **Fingerprints** of the role under test (the student in a calibration batch, the tutor otherwise), each with how many conversations it was in, adopted and superseded. A second fingerprint is flagged. A missing fingerprint is shown as *none returned*, not hidden.
+- **Cache**: per model, how many calls have a known hit and miss split out of all its calls, the hit and miss tokens and the hit rate over those calls only, and the batch's own summary as written. A partial split is never read as the whole. Scripted models with no input are named under the table instead of shown as zero.
+- **Transport**: each call that ended in a transport error and each retry that then succeeded: its run and call number, role, error, the wait before the retry, what it was charged (at its reservation when the call failed), and what became of the run. A run that was restarted links to the run that replaced it.
+
+## Review pack
+
+**Export review pack** (in the calls block and on Plate IV) builds a `.zip` inside the tab from the files already open. It reuses the evidence; it runs nothing and generates no evaluation data. The zip holds one folder, `review-pack-<batchId>/`:
+
+| File | Contents |
+| --- | --- |
+| `records/` | Every record of the batch, superseded ones included, as the original bytes |
+| `batches/<batchId>.json` | The batch file, original bytes |
+| `calibration-report-<batchId>.json` | The checker report, when loaded |
+| `expectations.json` (its own name) | The private expectations, when loaded |
+| `index.jsonl` | Only this batch's lines, each exactly as it was |
+| `review-index.csv` | One row per record, made by the page: whether it is adopted or superseded, tutor, language, repeat, the checker's result, findings and extra rewrites copied from the report, status, end, rejected replies by rule, attempts and how they stopped, student calls, transport errors, fingerprints, the restart links and the record's path |
+| `README.txt` | What is inside, the three layers, what is not included and the limits, in English and Chinese |
+| `SHA256SUMS.txt` | SHA-256 of every other file in the pack |
+
+What a browser page cannot do, so the pack does not do it:
+
+- It cannot read the ledger database (`.premium.sqlite`), so the pack has no ledger rows. Spend comes from the batch and the records.
+- It cannot run Python, so it never re-runs the checker. The report is copied, not checked again.
+- It cannot reach providers, so invoices are not checked. Costs are price-table estimates unless the batch records a reconciled invoice.
+- It cannot see files outside the opened folder. Cards, student prompts, the checker, build outputs and launch evidence are not in a runs folder; the README lists them as not included, and lists any file in the folder the page did not read.
+- A SHA-256 sum shows that a file has not changed since the export. It is not a signature and proves nothing about who made it.
+- From the synthetic sample, files are re-serialised JSON, not original bytes, and the README says so.
+
+The pack is private review material. Keep it where the runs folder is kept.
 
 ## What counts in the pass rate
 
@@ -95,6 +183,7 @@ The page reports instead of trusting:
 - one tutor prompt id and version with two hashes
 - a record whose tutor prompt differs from the one its batch lists for that tutor
 - a `restartOf` that points to no loaded record, or two restarts of one record
+- a file that looks like a calibration report or expectations file but is not one, two different reports for one batch, a report whose batch is missing or is not a calibration batch, and a run named in a report that is not in `records/`
 
 ## Files
 
@@ -102,6 +191,7 @@ The page reports instead of trusting:
 | --- | --- |
 | `index.html` | Page and styles |
 | `model.js` | Pure data model (no DOM). The page loads it as a script and the tests import it. |
+| `pack.js` | SHA-256, CRC-32, a stored zip writer and CSV for the review pack. Pure, no DOM; also imported by the tests. |
 | `app.js` | Rendering, filters, the run drawer, folder loading. Text goes in through `textContent` only. |
 | `model.test.mjs` | Node tests for the model, run by `npm test` |
 | `sample/generate-sample.mjs` | Builds the synthetic sample with the premium runner in offline replay |
@@ -129,14 +219,26 @@ The sample is produced by the premium runner itself, so it follows the runner's 
 - history and new records in one folder: the batches before 2026-11-25 are record schema v2, written by the older runner; the rest are v3, written by the newer runner into the same folder and ledger. Atlas's v2 pilot runs and its later v3 runs without a prompt are one setup.
 - a tutor prompt of its own: `synthetic-prompt-08` runs Atlas without a prompt beside the same model as *Atlas · coach* with `synthetic-coach` 1.0.0, in both languages; `synthetic-prompt-09` runs 1.1.0, which adds one sentence. Compare reads either pair as one change, the prompt.
 - a calibration batch stopped by model-version drift whose same call also used up the budget (`budgetStopReason`)
+- record schema v5 calibration, written by the v5 runner and checked by the checker, with three scripted tutors (*Steady*, *Leaks at turn 2*, *Vague hints*) whose simulated student follows a scripted tape:
+  - `synthetic-cannot-check-11`: the checker cannot run, so the report says `CANNOT_CHECK`
+  - `synthetic-dryrun-12`: a dry run over every group, one repeat each, that passes
+  - `synthetic-calibration-13`: three repeats in two languages that fail on one group, with replies sent back for format, protocol and state rules, a discarded attempt, a timeout retried after 1.5 s, a budget stop, a top-up and the restart that supersedes the stopped run, and two student fingerprints
 
-Regenerating it needs a build that contains the premium runner with record schema v3 (`src/premium/`, PR #431 at 0f6dfb1 or later). The bundled sample also passes `--legacy-runner`, a build with record schema v2 (PR #431 at 23cb0a5), for the history batches; without it, the newer runner writes every batch.
+Regenerating it needs three builds of the premium runner (`src/premium/` from PR #431) and the private calibration checker (v2), which is not in this repository:
+
+- `--runner`: record schema v5 with `check-calibration` (PR #431 at db9ba4b or later). It writes the v5 calibration batches.
+- `--v3-runner`: record schema v3 (PR #431 at 0f6dfb1). It writes the later evaluation batches.
+- `--legacy-runner`: record schema v2 (PR #431 at 23cb0a5). It writes the history batches.
+- `--checker`: the private `check_calibration.py`. It needs `python` on the path.
+
+Without `--v3-runner` or `--legacy-runner`, the next newer runner writes those batches, so the file changes.
 
 ```sh
-npm run build
-node tools/premium-dashboard/sample/generate-sample.mjs --runner dist/src/premium --legacy-runner <v2 build>/dist/src/premium
-# optional: also write a runs folder to try "Open runs folder" (must be a new or empty folder)
-node tools/premium-dashboard/sample/generate-sample.mjs --runner dist/src/premium --legacy-runner <v2 build>/dist/src/premium --out /tmp/premium-sample-runs
+node tools/premium-dashboard/sample/generate-sample.mjs --runner <v5 build>/dist/src/premium --v3-runner <v3 build>/dist/src/premium \
+  --legacy-runner <v2 build>/dist/src/premium --checker <path to check_calibration.py>
+# optional: also write a runs folder to try "Open runs folder" (must be a new or empty folder).
+# It holds the reports and a synthetic calibration-expectations.json, so the calibration view shows its criteria.
+node tools/premium-dashboard/sample/generate-sample.mjs <same flags> --out /tmp/premium-sample-runs
 ```
 
 The output is deterministic: the same runners give the same file.

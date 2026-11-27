@@ -153,14 +153,129 @@
       timeout: "timeout", overloaded: "overloaded", not_dispatched: "not sent", content_filter: "content filter", invalid_judge_json: "judge output is not valid JSON",
     },
   };
+  // Record schema v4–v5, calibration reports, the calibration view, call details and the review pack.
+  Object.assign(T.zh, {
+    viewCalibration: "校准", callsTitle: "调用：谁在回答、缓存、传输错误", callsNote: "按批次列出 runner 记下的调用。模型身份和 fingerprint 从记录 v4 起才有，缓存从 v5 起才有；更早的记录显示「没记录」，不是 0。",
+    notRecorded: "没记录", notRecordedV4: "没记录（v4 之前）", fpNull: "空（服务方没返回）", nowStatus: "现在：{s}", earlierStop: "之前停过：{s}，重跑了 {n} 段",
+    role_tutor: "导师", role_student: "模拟学生", role_judge: "评审", role: "角色", requestedModel: "请求的模型", returnedModel: "返回的模型", calledAt: "调用时间", returnedNull: "{n} 次没返回",
+    identityTitle: "模型身份", servingIdentity: "{r}的服务身份：", configured: "配置写的是 {v}", identityEvidence: "依据：",
+    aliasNote: "alias 表示请求的是一个别名，服务方随时可以把它指向别的模型版本。fingerprint 只说明后端配置变没变，证明不了是哪个模型在回答。",
+    fingerprintTitle: "{r}的 fingerprint", fingerprint: "fingerprint", conversations: "对话", adopted: "采用", supersededCol: "被替代",
+    multipleFingerprints: "出现了不止一个 fingerprint：这个批次里服务方的后端变过。", fpNote: "一个 fingerprint 在一段对话里只算一次，采用的和被替代的分开数，和校准检查的算法一样。",
+    cacheTitle: "缓存", cacheNotRecorded: "这些记录没有缓存数据（记录 v5 之前）。", observed: "已知 / 调用", hitTokens: "命中 token", missTokens: "未命中 token", hitRateObserved: "命中率（已知部分）", batchSummary: "批次汇总",
+    batchCacheTip: "批次文件自己写的汇总。只要有一次调用的拆分未知，整体就记为未知。", unknownWhole: "未知",
+    scriptedNoInput: "{m} 是离线回放的脚本导师，没有输入 token，不算缓存。", cacheNote: "命中率只按拆分已知的调用算，分母见「已知 / 调用」。拆分未知的调用不当 0，也不猜。",
+    transportTitle: "传输错误和重试", conversation: "对话", call: "调用", retryWait: "重试等待", charged: "计费", then: "后来", retryOk: "重试后成功", atReservation: "{v}（按预留额）",
+    replacedBy: "已由这段重跑替代", noTransport: "没有传输错误，也没有重试。",
+    exportPack: "导出复核包", exportNote: "用已经打开的文件，在这个标签页里打成 .zip：原始记录、批次、报告和索引，加一份复核索引表和 SHA-256。不上传，不重跑。",
+    exportSynthetic: "合成示例没有原始文件，包里是重新序列化的 JSON。",
+    calibTitle: "模拟学生靠不靠得住", calibLede: "校准只看模拟学生有没有照卡片演：脚本导师，不评审，不打分。结论、分组和比率都照抄校准报告，页面不重新判。", calibBatch: "校准批次",
+    layerMachine: "机器校准", layerScoring: "正式导师评分", layerReview: "独立内容复核",
+    v_PASS: "通过", v_FAIL: "未通过", v_CANNOT_CHECK: "无法检查", v_none: "没有报告",
+    machineLine: "检查器 v{v} · {r}/{n} 段通过 · {g}/{m} 组通过", dryRunTag: "试跑",
+    cannotCheckNote: "检查器没能运行（私有检查器、期望文件或输入不对），报告只写了「无法检查」，所以这个批次没有结论。",
+    noReportNote: "文件夹里没有这个批次的校准报告（calibration-report-<批次>.json）。下面只列记录里写的东西，不给结论。",
+    scoringNA: "不适用", scoringNote: "校准批次不评审、不打分，也不进任何导师的通过率。",
+    reviewPending: "待复核", reviewPendingNote: "报告标了 humanReviewPending：机器结论要等人读过对话才能用。复核结论不记在这个页面里。",
+    reviewNotPending: "报告说不需要", reviewUnstated: "报告没写", reviewUnstatedNote: "报告没有说要不要人来复核。",
+    criteriaTitle: "通过标准", criteriaFrom: "来自 {f} · 规则版本 {v}", critRun: "每段：硬性偏差 ≤ {h}，软性 ≤ {s}", critGroup: "每组 {r} 段里至少 {m} 段通过", critDryGroup: "试跑：每组 1 段，要通过",
+    critAll: "每个计划组都通过", critRewrite: "重写率 ≤ {x}", criteriaMissing: "阈值在私有的 expectations.json 里，报告不带。把它放进打开的文件夹，这里才能列全。",
+    rateRewrite: "重写率", rateRewriteSub: "{x} 次额外重写 / {p} 个消息位置 · 上限 {m}", rateDiscard: "作废率", rateDiscardSub: "{d} 次作废 / {a} 次尝试 · 只报告，不是通过条件",
+    rateSpend: "花费", rateSpendSub: "价格表估算，含被替代的尝试", overLimit: "超过上限", withinLimit: "在上限内",
+    plateGroups: "每一组学生演得怎样", groupsNote: "一行一个脚本导师，一列一种语言，一株是一段对话。数字是这一组通过的段数。", optionalGroup: "可选组，不计入",
+    groupOf: "/ {n}", groupNoReport: "{n} 段", groupSuperseded: "另有 {n} 段被替代", groupPass: "这一组通过", groupFail: "这一组未通过",
+    sKeyHeadIs: "检查器对这段的结论", sKeyStemIs: "一节是学生的一条消息", sKeyLeafIs: "越长，这条被退回重写越多", sKeyRed: "红叶", sKeyRedIs: "检查器在这条记了硬性偏差",
+    sKeyDash: "虚线叶", sKeyDashIs: "软性偏差", sKeySeed: "根旁的点", sKeySeedIs: "作废的尝试", sHeadPass: "通过", sHeadFail: "未通过", sHeadNone: "未检查",
+    plateRewrites: "被退回的回复：哪一条消息，哪条规则", rewritesNote: "数采用的对话里每一次退回，作废的尝试也算。一稿违反几条规则，就在几行各记一次。点一格看是哪几段。",
+    family_format: "格式", family_protocol: "协议", family_state: "状态", family_other: "其他", msgCol: "第 {n} 条", totalCol: "合计", ruleCol: "规则",
+    noRejects: "没有被退回的回复。", rejectsSuperseded: "被替代的记录里另有 {n} 次退回，没算进来。",
+    plateDeviations: "检查器记的偏差：哪一组，哪一条消息", deviationsNote: "数字是有偏差的对话段数，深的是硬性，「软」是软性。「整段」是不落在某一条消息上的偏差。照抄报告，页面不重新检查。",
+    wholeRun: "整段", noDeviations: "检查器没有记任何偏差。", devNeedReport: "要有校准报告才有这张图版。", hardShort: "硬", softShort: "软", groupCol: "组",
+    selTitle: "{what} · {n} 段", selClear: "收起", hard: "硬性", soft: "软性",
+    plateIntegrity: "数据完整性", intCohort: "批次完整性", intCohortOk: "检查器没发现问题：每个计划任务都正好有一份当前记录。", intSuperseded: "被替代的记录", intNone: "没有",
+    intSupLine: "{s} · {usd}", intTransport: "传输错误", intTransportLine: "{n} 次调用出错，详情在「运行检查」", intIdentity: "服务身份和 fingerprint", intCache: "缓存记录",
+    intCacheLine: "{m}：{o}/{c} 次调用拆分已知", intBatch: "批次状态", intMissing: "报告里没有的采用记录", intFiles: "这次读到的文件", openChecks: "去「运行检查」",
+    filesLine: "记录 {r} · 批次 {b} · 报告 {p} · 期望 {e} · 没读 {i}", filesSample: "合成示例，随页面带来", fpLine: "{v} · 对话 {c} · 采用 {a} · 被替代 {s}",
+    machineCheck: "机器检查", machineRun: "硬性 {h} · 软性 {s} · 额外重写 {x}", machineNoReport: "没有载入这个批次的校准报告。", machineNotInReport: "这段不在校准报告里（被替代的记录不参加检查）。",
+    attemptTab: "第 {n} 次", attempt_kept: "保留", attempt_discarded: "作废", attempt_error: "出错", attemptStopped: "这次尝试停在第 {n} 条消息：{r}", attemptErrored: "这次尝试因传输错误中断：{r}",
+    fixedOpening: "固定开场", endMark: "结束", fenceStripped: "去掉了 ```json 外壳", drafts: "重写前后 · 退回 {n} 次", draftN: "第 {k} 稿", callN: "调用 #{c}",
+    draftRaw: "不是有效 JSON，按原文显示", accepted: "采用", neverAccepted: "三稿都被退回，这次尝试作废。", checkerLines: "检查器（整段）",
+    callsDetail: "调用明细 · {n} 次", colN: "#", colModel: "模型", colTokens: "输入 / 输出", colCacheHM: "缓存 命中 / 未命中", colLatency: "耗时", colErr: "错误 / 重试",
+    onlyTransport: "有传输错误", rejectedByRule: "{n}（{list}）",
+    filesIgnored: "没读的文件 {n} 个", checkerAt: "检查器", retryWaited: "等了 {v} 秒重试",
+  });
+  Object.assign(T.en, {
+    viewCalibration: "Calibration", callsTitle: "Calls: who answered, cache, transport errors", callsNote: "The calls the runner recorded, batch by batch. Model identity and fingerprints are recorded from record schema v4, cache from v5; older records show “not recorded”, never zero.",
+    notRecorded: "not recorded", notRecordedV4: "not recorded (before v4)", fpNull: "null (not returned)", nowStatus: "now: {s}", earlierStop: "stopped earlier: {s}; {n} restarted",
+    role_tutor: "Tutor", role_student: "Simulated student", role_judge: "Judge", role: "Role", requestedModel: "Requested", returnedModel: "Returned", calledAt: "Called", returnedNull: "{n} returned none",
+    identityTitle: "Model identity", servingIdentity: "Serving identity ({r}):", configured: "configured as {v}", identityEvidence: "Evidence:",
+    aliasNote: "“alias” means the request named an alias that the provider can point at another model version at any time. A fingerprint shows whether the backend configuration changed; it cannot prove which model answered.",
+    fingerprintTitle: "Fingerprints ({r})", fingerprint: "Fingerprint", conversations: "Conversations", adopted: "Adopted", supersededCol: "Superseded",
+    multipleFingerprints: "More than one fingerprint: the provider's backend changed during this batch.", fpNote: "A fingerprint counts once per conversation, adopted and superseded apart, as the calibration check counts them.",
+    cacheTitle: "Cache", cacheNotRecorded: "These records hold no cache data (record schema before v5).", observed: "Known / calls", hitTokens: "Hit tokens", missTokens: "Miss tokens", hitRateObserved: "Hit rate (known)", batchSummary: "Batch summary",
+    batchCacheTip: "The batch file's own summary. One call with an unknown split makes the whole unknown.", unknownWhole: "unknown",
+    scriptedNoInput: "{m}: scripted replay with no input tokens, so no cache.", cacheNote: "The hit rate counts only calls whose split is known; that denominator is under “Known / calls”. A call with an unknown split is neither zero nor guessed.",
+    transportTitle: "Transport errors and retries", conversation: "Conversation", call: "Call", retryWait: "Retry wait", charged: "Charged", then: "Then", retryOk: "succeeded on retry", atReservation: "{v} (reservation)",
+    replacedBy: "replaced by the restart", noTransport: "No transport errors and no retries.",
+    exportPack: "Export review pack", exportNote: "Packs the files already open into a .zip in this tab: the original records, batch, report and index, plus a review index and SHA-256 sums. Nothing is uploaded or re-run.",
+    exportSynthetic: "The synthetic sample has no original files, so the pack holds re-serialised JSON.",
+    calibTitle: "Can the simulated student be trusted", calibLede: "Calibration checks only whether the simulated student plays the card: scripted tutors, no judges, no scores. The verdict, the groups and the rates are copied from the calibration report; the page never re-judges.", calibBatch: "Calibration batch",
+    layerMachine: "Machine calibration", layerScoring: "Formal tutor scoring", layerReview: "Independent content review",
+    v_PASS: "Pass", v_FAIL: "Fail", v_CANNOT_CHECK: "Cannot check", v_none: "No report",
+    machineLine: "checker v{v} · {r} of {n} runs pass · {g} of {m} groups pass", dryRunTag: "dry run",
+    cannotCheckNote: "The checker could not run (private checker, expectations or inputs). The report says only “cannot check”, so this batch has no verdict.",
+    noReportNote: "The folder holds no calibration report for this batch (calibration-report-<batch>.json). Below is only what the records say; there is no verdict.",
+    scoringNA: "Not applicable", scoringNote: "Calibration batches are never judged or scored and never count toward any tutor's pass rate.",
+    reviewPending: "Pending", reviewPendingNote: "The report sets humanReviewPending: the machine verdict waits until a person has read the conversations. Review outcomes are not recorded on this page.",
+    reviewNotPending: "Not required by the report", reviewUnstated: "Not stated", reviewUnstatedNote: "The report does not say whether a person must review it.",
+    criteriaTitle: "Pass criteria", criteriaFrom: "from {f} · rules version {v}", critRun: "Each run: at most {h} hard and {s} soft deviations", critGroup: "Each group: at least {m} of its {r} runs pass", critDryGroup: "Dry run: one run per group, which must pass",
+    critAll: "Every planned group passes", critRewrite: "Rewrite rate at most {x}", criteriaMissing: "The thresholds live in the private expectations.json, not in the report. Put it in the opened folder to list them all here.",
+    rateRewrite: "Rewrite rate", rateRewriteSub: "{x} extra tries / {p} message positions · max {m}", rateDiscard: "Discard rate", rateDiscardSub: "{d} discarded / {a} attempts · reported, not a pass rule",
+    rateSpend: "Spend", rateSpendSub: "price-table estimate, superseded attempts included", overLimit: "over the limit", withinLimit: "within the limit",
+    plateGroups: "How the student played, group by group", groupsNote: "One row per scripted tutor, one column per language, one plant per run. The number is how many runs in the group passed.", optionalGroup: "optional, not counted",
+    groupOf: "/ {n}", groupNoReport: "{n} runs", groupSuperseded: "{n} more superseded", groupPass: "group passes", groupFail: "group fails",
+    sKeyHeadIs: "the checker's result for the run", sKeyStemIs: "one node per student message", sKeyLeafIs: "longer when that message was sent back more", sKeyRed: "Red leaf", sKeyRedIs: "a hard deviation at that message",
+    sKeyDash: "Dashed leaf", sKeyDashIs: "a soft deviation", sKeySeed: "Root dots", sKeySeedIs: "discarded attempts", sHeadPass: "pass", sHeadFail: "fail", sHeadNone: "not checked",
+    plateRewrites: "Replies sent back: which message, which rule", rewritesNote: "Counts every reply sent back in the adopted runs, discarded attempts included. A draft that broke several rules counts once in each row. Click a cell to see the runs.",
+    family_format: "Format", family_protocol: "Protocol", family_state: "State", family_other: "Other", msgCol: "msg {n}", totalCol: "Total", ruleCol: "Rule",
+    noRejects: "No reply was sent back.", rejectsSuperseded: "Superseded records hold {n} more, not counted here.",
+    plateDeviations: "What the checker found: which group, which message", deviationsNote: "Numbers count runs with a deviation: the dark figure is hard, “soft” is soft. “Whole run” holds deviations not tied to one message. Copied from the report; the page does not re-check.",
+    wholeRun: "Whole run", noDeviations: "The checker found no deviation.", devNeedReport: "This plate needs the calibration report.", hardShort: "hard", softShort: "soft", groupCol: "Group",
+    selTitle: "{what} · {n} runs", selClear: "Close", hard: "hard", soft: "soft",
+    plateIntegrity: "Data integrity", intCohort: "Cohort", intCohortOk: "The checker found no problem: every planned job has exactly one current record.", intSuperseded: "Superseded records", intNone: "none",
+    intSupLine: "{s} · {usd}", intTransport: "Transport errors", intTransportLine: "failed calls: {n}; details under Run checks", intIdentity: "Serving identity and fingerprints", intCache: "Cache records",
+    intCacheLine: "{m}: split known for {o} of {c} calls", intBatch: "Batch status", intMissing: "Adopted records missing from the report", intFiles: "Files read", openChecks: "Open Run checks",
+    filesLine: "records {r} · batches {b} · reports {p} · expectations {e} · not read {i}", filesSample: "synthetic sample bundled with the page", fpLine: "{v} · conversations {c} · adopted {a} · superseded {s}",
+    machineCheck: "Machine check", machineRun: "hard {h} · soft {s} · extra tries {x}", machineNoReport: "No calibration report is loaded for this batch.", machineNotInReport: "This run is not in the calibration report (superseded records are not checked).",
+    attemptTab: "Attempt {n}", attempt_kept: "kept", attempt_discarded: "discarded", attempt_error: "error", attemptStopped: "This attempt stopped at message {n}: {r}", attemptErrored: "This attempt ended on a transport error: {r}",
+    fixedOpening: "fixed opening", endMark: "ends", fenceStripped: "```json fence removed", drafts: "Before and after · sent back {n}×", draftN: "Draft {k}", callN: "call #{c}",
+    draftRaw: "not valid JSON, shown as written", accepted: "Accepted", neverAccepted: "All three drafts were sent back; the attempt was discarded.", checkerLines: "Checker (whole run)",
+    callsDetail: "Calls · {n}", colN: "#", colModel: "Model", colTokens: "In / out", colCacheHM: "Cache hit / miss", colLatency: "Time", colErr: "Error / retry",
+    onlyTransport: "Has transport errors", rejectedByRule: "{n} ({list})",
+    filesIgnored: "{n} files not read", checkerAt: "Checker", retryWaited: "retried after {v} s",
+  });
+  Object.assign(CODES.zh, {
+    not_a_report: "顶层 JSON 像校准报告但缺字段，已跳过", report_conflict: "同一批次有两份不同的校准报告，只用了第一份", report_without_batch: "校准报告的批次不在文件夹里",
+    report_not_calibration: "校准报告指向的不是校准批次", report_run_missing: "校准报告里的对话在 records/ 里找不到", not_expectations: "像期望文件但缺字段，已跳过",
+    restart_target_missing: "重跑记录指向的原记录不在文件夹里", restarted_twice: "同一段对话被重跑了两次",
+    alias: "alias（别名）", revision: "revision（固定版本）", unknown: "未知", stopped: "已停止", error_stop: "出错停止",
+    format: "格式", protocol: "协议", state: "状态", other: "其他", kept: "保留", discarded: "作废",
+  });
+  Object.assign(CODES.en, {
+    not_a_report: "top-level JSON looks like a calibration report but lacks fields, skipped", report_conflict: "two different calibration reports for one batch; the first was used", report_without_batch: "the report's batch is not in the folder",
+    report_not_calibration: "the report points to a batch that is not a calibration", report_run_missing: "a run in the report is not in records/", not_expectations: "looks like an expectations file but lacks fields, skipped",
+    restart_target_missing: "a restart points to a record that is not in the folder", restarted_twice: "one conversation was restarted twice",
+    alias: "alias", revision: "revision (pinned)", unknown: "unknown", stopped: "stopped", error_stop: "stopped on error",
+    format: "format", protocol: "protocol", state: "state", other: "other", kept: "kept", discarded: "discarded",
+  });
 
   // ---------- state ----------
-  const VIEWS = ["overview", "compare", "runs", "checks"];
+  const VIEWS = ["overview", "calibration", "compare", "runs", "checks"];
   const st = {
     lang: detectLang(), dataset: null, source: null,
     f: { batch: "all", version: null, lang: "all", cards: "latest", tutor: "all", card: "all" },
-    runFilter: { state: "all", disagree: false, spot: false, focus: null }, limit: 100,
-    view: initialView(), showFilters: false,
+    runFilter: { state: "all", disagree: false, spot: false, focus: null, transport: false }, limit: 100,
+    view: initialView(), showFilters: false, calib: null, calibSel: null, callsOpen: null, drawerAttempt: null, files: null,
   };
   function initialView() {
     try { const h = location.hash.slice(1); if (VIEWS.includes(h)) return h; } catch { /* no hash */ }
@@ -216,32 +331,67 @@
     st.source = source;
     const versions = st.dataset.judgeVersions;
     st.f = { batch: "all", version: versions.length ? versions[0] : null, lang: "all", cards: "latest", tutor: "all", card: "all" };
-    st.runFilter = { state: "all", disagree: false, spot: false, focus: null };
+    st.runFilter = { state: "all", disagree: false, spot: false, focus: null, transport: false };
     st.limit = 100;
+    const cal = M.calibrationBatches(st.dataset);
+    st.calib = cal.length ? cal[0].batchId : null;
+    st.calibSel = null; st.callsOpen = null;
+    // A folder that holds only calibration batches opens on the calibration view.
+    if (!st.dataset.runs.some(r => r.batchKind !== "calibration") && cal.length && st.view === "overview") st.view = "calibration";
     closeDrawer();
     render();
   }
   function loadSample() {
     const s = globalThis.PREMIUM_SAMPLE;
     if (!s) return;
-    load({ records: s.records, batches: s.batches, index: M.parseJsonl(s.index) }, { kind: "sample" });
+    st.files = null;
+    load({ records: s.records, batches: s.batches, index: M.parseJsonl(s.index), reports: s.reports || [], expectations: s.expectations || [] }, { kind: "sample" });
+  }
+  // The runs folder is the shallowest folder that holds records/ (or batches/, or index.jsonl), whatever folder the person
+  // picked or dropped. Only its index.jsonl, records/*.json, batches/*.json and top-level .json files are read; every other
+  // file (a ledger database, an earlier snapshot in a subfolder) is listed as not read, so a copy of index.jsonl in a
+  // subfolder can never stand in for the real one.
+  function runsRoot(paths) {
+    const roots = [];
+    for (const p of paths) {
+      const m = /^((?:[^/]+\/)*)(?:records|batches)\/[^/]+\.json$/u.exec(p) || /^((?:[^/]+\/)*)index\.jsonl$/u.exec(p);
+      if (m) roots.push(m[1]);
+    }
+    if (!roots.length) return "";
+    return roots.sort((a, b) => a.split("/").length - b.split("/").length || a.length - b.length)[0];
   }
   async function loadFiles(files, name) {
-    const input = { records: [], recordNames: [], batches: [], index: null };
+    const input = { records: [], recordNames: [], batches: [], index: null, reports: [], expectations: [] };
     const extra = [];
-    for (const f of files) {
-      const path = (f.webkitRelativePath || f.fullPath || f.name).replace(/\\/gu, "/");
+    const src = { root: "", index: null, records: new Map(), batches: new Map(), reports: new Map(), expectations: [], ignored: [] };
+    const withPath = files.map(f => ({ f, path: (f.webkitRelativePath || f.fullPath || f.name).replace(/\\/gu, "/") }));
+    const root = src.root = runsRoot(withPath.map(x => x.path));
+    for (const { f, path } of withPath) {
+      const rel = path.startsWith(root) ? path.slice(root.length) : null;
+      const skip = () => src.ignored.push({ path, size: f.size });
       try {
-        if (path.endsWith("index.jsonl")) input.index = M.parseJsonl(await f.text());
-        else if (/(^|\/)batches\/[^/]+\.json$/u.test(path)) input.batches.push(JSON.parse(await f.text()));
-        else if (/(^|\/)records\/[^/]+\.json$/u.test(path)) { input.records.push(JSON.parse(await f.text())); input.recordNames.push(path); }
-        else if (path.endsWith(".json") && !path.includes("/")) {
+        if (rel === null) skip();
+        else if (rel === "index.jsonl") { input.index = M.parseJsonl(await f.text()); src.index = { path: rel, file: f }; }
+        else if (/^records\/[^/]+\.json$/u.test(rel)) {
           const v = JSON.parse(await f.text());
-          if (v && v.schema === "tutorbench.premium-batch") input.batches.push(v);
-          else { input.records.push(v); input.recordNames.push(path); }
-        }
+          input.records.push(v); input.recordNames.push(path);
+          if (v && typeof v.runId === "string") src.records.set(v.runId, { path: rel, file: f });
+        } else if (/^batches\/[^/]+\.json$/u.test(rel)) {
+          const v = JSON.parse(await f.text());
+          input.batches.push(v);
+          if (v && typeof v.batchId === "string") src.batches.set(v.batchId, { path: rel, file: f });
+        } else if (/^[^/]+\.json$/u.test(rel)) {
+          // A top-level file is read by what it is, not by its name.
+          const v = JSON.parse(await f.text());
+          if (v && v.schema === "tutorbench.premium-batch") { input.batches.push(v); src.batches.set(v.batchId, { path: rel, file: f }); }
+          else if (v && v.schema === "tutorbench.premium-run-record") { input.records.push(v); input.recordNames.push(path); if (typeof v.runId === "string") src.records.set(v.runId, { path: rel, file: f }); }
+          else if (M.isReport(v)) { input.reports.push(v); src.reports.set(v.batchId, { path: rel, file: f }); }
+          else if (M.isExpectations(v)) { input.expectations.push(v); src.expectations.push({ path: rel, file: f, value: v }); }
+          else skip();
+        } else skip();
       } catch (e) { extra.push({ code: "unreadable_file", detail: path + ": " + (e && e.message ? e.message : "?") }); }
     }
+    st.files = src;
     load(input, { kind: "folder", name });
     st.dataset.warnings.unshift(...extra);
     render();
@@ -294,7 +444,10 @@
     banner.hidden = !(d && st.source.kind === "sample");
     banner.textContent = t("sampleBanner");
     renderWarnings();
-    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview", compare: st.view === "compare", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks" };
+    const hasCalib = !!d && M.calibrationBatches(d).length > 0;
+    if (st.view === "calibration" && d && !hasCalib) st.view = "overview";
+    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview", compare: st.view === "compare", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks", calib: st.view === "calibration",
+      "calib-groups": st.view === "calibration", "calib-rewrites": st.view === "calibration", "calib-dev": st.view === "calibration", "calib-int": st.view === "calibration" };
     for (const id of Object.keys(show)) { clear($(id)); $(id).hidden = !show[id]; }
     document.querySelector(".sheet").hidden = !d;
     const vs = d ? views() : [];
@@ -316,6 +469,7 @@
     if (show.compare) renderCompare(vs.filter(isEval));
     if (show.runs) renderRuns(vs);
     if (show.ops) renderOps(vs);
+    if (show.calib) renderCalibration();
   }
 
   function renderWarnings() {
@@ -382,7 +536,8 @@
     const nav = clear($("views"));
     nav.hidden = !st.dataset;
     if (!st.dataset) return;
-    const views = [["overview", t("viewOverview"), null], ["compare", t("viewCompare"), null], ["runs", t("viewRuns"), vs.length], ["checks", t("viewChecks"), null]];
+    const calib = M.calibrationBatches(st.dataset).length;
+    const views = [["overview", t("viewOverview"), null], calib ? ["calibration", t("viewCalibration"), null] : null, ["compare", t("viewCompare"), null], ["runs", t("viewRuns"), vs.length], ["checks", t("viewChecks"), null]].filter(Boolean);
     for (const [id, label, n] of views) nav.append(el("button", { type: "button", class: "view-tab", "aria-current": st.view === id ? "page" : null, onclick: () => setView(id) },
       label, n != null ? el("span", { class: "count", text: String(n) }) : null));
     nav.append(filterSummary());
@@ -470,7 +625,7 @@
     return new Map(names.map((n, i) => [n, letter(i)]));
   }
   function showRuns(filter) {
-    st.runFilter = Object.assign({ state: "all", disagree: false, spot: false, focus: null }, filter);
+    st.runFilter = Object.assign({ state: "all", disagree: false, spot: false, focus: null, transport: false }, filter);
     st.limit = 100;
     setView("runs");
     window.scrollTo({ top: 0 });
@@ -760,6 +915,7 @@
   }
 
   // ---------- All conversations ----------
+  const hasTransport = v => M.transportOf([v.record], null).some(x => x.error);
   function renderRunsOnly() { clear($("runs")); renderRuns(views()); }
   function renderRuns(vs) {
     const box = $("runs"), rf = st.runFilter;
@@ -769,14 +925,15 @@
     // Superseded and calibration tabs appear only when such runs are loaded.
     const states = [["all", t("all")], ["scored", t("scored_state")], ["needs_review", t("needs_review")], ["unscorable", t("unscorable")], ["other_version", t("other_version")],
       ["superseded", t("superseded")], ["calibration", t("calibration")]].filter(([k]) => !M.NOT_EVALUATION.includes(k) || rf.state === k || scoped.some(v => v.state === k));
-    let list = scoped.filter(v => inState(v, rf.state)).filter(v => !rf.disagree || v.disagreements.length).filter(v => !rf.spot || isSpot(v));
+    let list = scoped.filter(v => inState(v, rf.state)).filter(v => !rf.disagree || v.disagreements.length).filter(v => !rf.spot || isSpot(v)).filter(v => !rf.transport || hasTransport(v));
     box.append(el("header", { class: "sec-head" }, el("h2", { id: "runs-title" }, t("runsTitle"), el("span", { class: "count", text: String(list.length) }))));
     box.append(el("div", { class: "tabs", role: "group", "aria-label": t("colState") }, states.map(([k, label]) => el("button", { type: "button", class: "tab", "aria-pressed": rf.state === k ? "true" : "false",
       onclick: () => { rf.state = k; st.limit = 100; renderRunsOnly(); } }, label + " " + scoped.filter(v => inState(v, k)).length))));
     box.append(el("div", { class: "toggles" },
       rf.focus ? el("span", { class: "focus" }, t("focus", { f: [rf.focus.tutor, rf.focus.version, rf.focus.card].filter(Boolean).join(" · ") }), el("button", { type: "button", class: "btn-quiet", onclick: () => { rf.focus = null; renderRunsOnly(); renderViews(views()); } }, t("clearFocus"))) : null,
       el("label", null, el("input", { type: "checkbox", id: "only-disagree", checked: rf.disagree, onchange: e => { rf.disagree = e.target.checked; renderRunsOnly(); } }), t("onlyDisagree")),
-      el("label", null, el("input", { type: "checkbox", id: "only-spot", checked: rf.spot, onchange: e => { rf.spot = e.target.checked; renderRunsOnly(); } }), t("onlySpot"))));
+      el("label", null, el("input", { type: "checkbox", id: "only-spot", checked: rf.spot, onchange: e => { rf.spot = e.target.checked; renderRunsOnly(); } }), t("onlySpot")),
+      rf.transport || scoped.some(hasTransport) ? el("label", null, el("input", { type: "checkbox", id: "only-transport", checked: rf.transport, onchange: e => { rf.transport = e.target.checked; renderRunsOnly(); } }), t("onlyTransport")) : null));
     list = list.slice().sort((a, b) => String(b.record.createdAt).localeCompare(String(a.record.createdAt)));
     if (!list.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
     const head = [t("colResult"), t("colTutor"), t("colCard"), t("colLang"), t("colEnd"), t("colTime")];
@@ -844,6 +1001,415 @@
               b.superseded ? el("div", { class: "small faint", text: t("supersededRuns", { n: b.superseded }) }) : null));
         })))));
     box.append(el("div", { class: "cols" }, left, right));
+    // The calls of each batch in view: who answered, fingerprints, cache, transport errors and recoveries.
+    const inView = rows.filter(b => st.f.batch === "all" || b.batchId === st.f.batch);
+    if (inView.length) box.append(el("div", { class: "block calls-block" }, el("h3", { text: t("callsTitle") }), el("p", { class: "small muted", text: t("callsNote") }),
+      inView.map((b, i) => batchCalls(b, st.callsOpen ? b.batchId === st.callsOpen : i === 0))));
+  }
+
+  // ---------- Run checks: calls of each batch (record schema v4 and v5) ----------
+  const fmtInt = n => (n == null ? "—" : Number(n).toLocaleString(st.lang === "zh" ? "zh-CN" : "en-GB"));
+  const pct1 = x => (x == null ? "—" : (x * 100).toFixed(1) + "%");
+  const shortRun = id => String(id).replace(/^run-/u, "").slice(0, 8);
+  const fpText = v => (v === undefined ? t("notRecorded") : v === null ? t("fpNull") : v);
+  const runButton = id => el("button", { type: "button", class: "btn-quiet mono run-link", onclick: () => openRun(id), "data-tip": id }, shortRun(id));
+  const smallTable = (head, rows, cls) => el("div", { class: "scroll-x" }, el("table", { class: "mini" + (cls ? " " + cls : "") },
+    el("thead", null, el("tr", null, head.map(h => el("th", { class: h.num ? "num" : null, text: h.text || h })))), el("tbody", null, rows)));
+  function batchCalls(raw, open) {
+    const d = st.dataset, recs = d.runs.filter(r => r.batchId === raw.batchId);
+    const h = M.batchHistory(raw), id = M.identityOf(raw, recs, d.supersededBy), cache = M.cacheOf(raw, recs), tr = M.transportOf(recs, d.supersededBy);
+    const restarts = recs.filter(r => r.restartOf).length;
+    const status = [t("nowStatus", { s: code(h.status) }), h.earlierStop ? t("earlierStop", { s: code(h.earlierStop), n: restarts }) : null,
+      ...h.topUps.map(x => t("topUp", { from: usd(x.from), to: usd(x.to) }))].filter(Boolean).join(" · ");
+    const box = el("details", { class: "bcalls", id: "calls-" + raw.batchId, open: open || null },
+      el("summary", null, el("span", { class: "mono", text: raw.batchId }), raw.kind === "calibration" ? el("span", { class: "tag", text: t("calibration") }) : null,
+        el("span", { class: "small muted", text: status })));
+
+    // Who answered.
+    const idRows = id.roles.map(g => el("tr", null, el("td", { text: t("role_" + g.role) }),
+      el("td", { class: "mono small", text: g.requested.join(", ") || "—" }),
+      el("td", { class: "mono small", text: g.unrecorded === g.calls ? t("notRecordedV4") : [g.returned.join(", "), g.returnedNull ? t("returnedNull", { n: g.returnedNull }) : null].filter(Boolean).join(" · ") || "—" }),
+      el("td", { class: "small muted", text: g.first ? whenShort(g.first) + (g.last && g.last !== g.first ? " – " + whenShort(g.last) : "") : "—" })));
+    const si = id.servingIdentity;
+    const ev = id.evidence;
+    const idBlock = el("div", { class: "block" }, el("h4", { text: t("identityTitle") }),
+      el("p", { class: "small" }, t("servingIdentity", { r: t("role_" + id.target) }) + " ", el("strong", { text: si ? code(si) : t("notRecorded") }),
+        id.configured && id.configured !== si ? el("span", { class: "muted", text: " · " + t("configured", { v: code(id.configured) }) }) : null),
+      si === "alias" ? el("p", { class: "small muted", text: t("aliasNote") }) : null,
+      ev ? el("p", { class: "small muted" }, t("identityEvidence") + " ", ev.url ? el("span", { class: "mono", text: ev.url }) : null, ev.retrievedAt ? " · " + ev.retrievedAt : null, ev.quote ? el("q", { text: ev.quote }) : null) : null,
+      idRows.length ? smallTable([t("role"), t("requestedModel"), t("returnedModel"), t("calledAt")], idRows) : null);
+
+    // Fingerprints of the observed role (the student in calibration, the tutor in evaluation).
+    const target = id.roles.find(g => g.role === id.target);
+    const fpBlock = el("div", { class: "block" }, el("h4", { text: t("fingerprintTitle", { r: t("role_" + id.target) }) }),
+      !target ? el("p", { class: "small muted", text: t("none") }) :
+        smallTable([t("fingerprint"), { text: t("conversations"), num: true }, { text: t("adopted"), num: true }, { text: t("supersededCol"), num: true }],
+          target.fingerprints.map(f => el("tr", null, el("td", { class: "mono small", text: fpText(f.value) }), el("td", { class: "num", text: f.conversations }),
+            el("td", { class: "num", text: f.adopted }), el("td", { class: "num", text: f.superseded })))),
+      id.multipleFingerprints ? el("p", { class: "small stopped", text: t("multipleFingerprints") }) : null,
+      el("p", { class: "small faint", text: t("fpNote") }));
+
+    // Cache: the observed calls with their denominator, and the batch's own summary as written.
+    const scripted = cache.models.filter(m => m.observed === 0 && m.unknown === 0 && m.noInput > 0);
+    const cRows = cache.models.filter(m => !scripted.includes(m)).map(m => el("tr", null, el("td", { class: "mono small", text: m.model }),
+      el("td", { class: "num", text: m.calls === m.unrecorded ? t("notRecorded") : m.observed + " / " + m.calls }),
+      el("td", { class: "num", text: m.observed ? fmtInt(m.hitTokens) : "—" }), el("td", { class: "num", text: m.observed ? fmtInt(m.missTokens) : "—" }),
+      el("td", { class: "num", text: pct1(m.hitRate) }),
+      el("td", { class: "num small", "data-tip": t("batchCacheTip"), text: !m.batch ? "—" : m.batch.hitRate != null ? pct1(m.batch.hitRate) : t("unknownWhole") })));
+    const cacheBlock = el("div", { class: "block" }, el("h4", { text: t("cacheTitle") }),
+      !cache.recorded ? el("p", { class: "small muted", text: t("cacheNotRecorded") }) :
+        smallTable([t("model"), { text: t("observed"), num: true }, { text: t("hitTokens"), num: true }, { text: t("missTokens"), num: true }, { text: t("hitRateObserved"), num: true }, { text: t("batchSummary"), num: true }], cRows),
+      scripted.length ? el("p", { class: "small faint", text: t("scriptedNoInput", { m: scripted.map(m => m.model).join(", ") }) }) : null,
+      cache.recorded ? el("p", { class: "small faint", text: t("cacheNote") }) : null);
+
+    // Transport errors and retries, with what became of the conversation.
+    const tRows = tr.map(x => el("tr", null, el("td", null, runButton(x.runId)), el("td", { class: "num", text: "#" + x.n }), el("td", { text: t("role_" + x.role) }),
+      el("td", { class: x.error ? "stopped" : "muted", text: x.error ? code(x.error) : t("retryOk") }),
+      el("td", { class: "num small", text: x.retry ? (x.retryDelayMs / 1000).toFixed(1) + " s" : "—" }),
+      el("td", { class: "num small", text: x.costEstimated ? t("atReservation", { v: usd(x.usd) }) : usd(x.usd) }),
+      el("td", { class: "small" }, x.replacedBy ? [t("replacedBy") + " ", runButton(x.replacedBy)] : code(x.status === "unscored" ? x.endReason : x.status))));
+    const trBlock = el("div", { class: "block" }, el("h4", { text: t("transportTitle") }),
+      tr.length ? smallTable([t("conversation"), { text: t("call"), num: true }, t("role"), t("error"), { text: t("retryWait"), num: true }, { text: t("charged"), num: true }, t("then")], tRows)
+        : el("p", { class: "small muted", text: t("noTransport") }));
+
+    box.append(el("div", { class: "bcalls-body" }, idBlock, fpBlock, cacheBlock, trBlock,
+      el("div", { class: "bcalls-foot" }, el("button", { type: "button", class: "btn-quiet", onclick: () => exportPack(raw.batchId) }, t("exportPack") + " ↓"),
+        el("span", { class: "small faint", text: t("exportNote") }))));
+    return box;
+  }
+
+  // ---------- review pack ----------
+  // Builds a .zip in this tab from the files already opened: the batch's records (superseded ones too), its batch file,
+  // report, expectations and index lines, byte for byte, plus a derived review index, a README and SHA-256 sums.
+  // Nothing is uploaded and nothing is re-run.
+  async function exportPack(batchId) {
+    const d = st.dataset, P = globalThis.PremiumReviewPack;
+    if (!d || !P) return;
+    const src = st.files, synthetic = !src;
+    const folder = "review-pack-" + batchId + "/";
+    const files = [], notes = [];
+    const raw = async (s, value) => (s ? new Uint8Array(await s.file.arrayBuffer()) : JSON.stringify(value) + "\n");
+    const recs = d.runs.filter(r => r.batchId === batchId);
+    for (const r of recs) files.push({ path: "records/" + r.runId + ".json", data: await raw(src && src.records.get(r.runId), r) });
+    const batch = d.batches.find(b => b.batchId === batchId);
+    if (batch) files.push({ path: "batches/" + batchId + ".json", data: await raw(src && src.batches.get(batchId), batch) });
+    const report = d.reports.get(batchId);
+    if (report) files.push({ path: "calibration-report-" + batchId + ".json", data: await raw(src && src.reports.get(batchId), report) });
+    const c = M.calibrationOf(d, batchId);
+    if (c.expectations) {
+      const s = src && src.expectations.find(x => x.value === c.expectations);
+      files.push({ path: s ? s.path.split("/").pop() : "expectations.json", data: await raw(s, c.expectations) });
+    }
+    // index.jsonl: only this batch's lines, each line exactly as it was.
+    const indexText = src ? (src.index ? await src.index.file.text() : null) : (globalThis.PREMIUM_SAMPLE && globalThis.PREMIUM_SAMPLE.index);
+    if (indexText != null) {
+      // Each line keeps its own line end. (No look-behind here: older Safari lacks it.)
+      const lines = (indexText.match(/[^\n]*\n|[^\n]+$/gu) || []).filter(line => { try { return JSON.parse(line).batchId === batchId; } catch { return false; } });
+      files.push({ path: "index.jsonl", data: lines.join("") });
+    }
+    const exportedAt = new Date().toISOString();
+    files.push({ path: "review-index.csv", data: P.csv(M.REVIEW_COLUMNS, M.reviewIndex(d, batchId)) });
+    const sup = recs.filter(r => d.supersededBy[r.runId]).length;
+    const lines = [
+      "TutorBench Observatory · review pack / 复核包",
+      "Batch / 批次: " + batchId + (batch && batch.kind ? " (" + batch.kind + ")" : ""),
+      "Exported / 导出: " + exportedAt,
+      "Source / 来源: " + (synthetic ? "synthetic sample bundled with the page; JSON re-serialised, NOT original bytes / 合成示例，重新序列化，不是原始字节"
+        : "folder \"" + (st.source.name || "") + "\", original bytes / 打开的文件夹，原始字节"),
+      "",
+      "Inside / 包里有",
+      "- records/: " + recs.length + " records of this batch, " + sup + " superseded / 本批全部记录，含被替代的",
+      "- " + [batch ? "batches/" + batchId + ".json" : null, report ? "calibration-report-" + batchId + ".json" : null, indexText != null ? "index.jsonl (this batch's lines, unchanged / 本批的行，原样)" : null].filter(Boolean).join(", "),
+      "- expectations: " + (c.expectations ? "included / 已附" : "not loaded / 未载入"),
+      "- review-index.csv: one row per record, made by the page. Checker results are copied from the report; counts come from the records. / 页面派生：检查器结论照抄报告，计数来自记录。",
+      "- SHA256SUMS.txt: SHA-256 of every other file here / 包内其余文件的 SHA-256",
+      "",
+      "Three layers, kept apart / 三层分开",
+      "- Machine calibration / 机器校准: " + (report ? report.verdict + (report.checkerVersion ? " (checker v" + report.checkerVersion + ")" : "") : "no report loaded / 未载入报告"),
+      "- Formal tutor scoring / 正式导师评分: " + (batch && batch.kind === "calibration" ? "not applicable, calibration batches are never scored / 不适用，校准批次不评分" : "see scorings in the records / 见记录里的 scorings"),
+      "- Independent content review / 独立内容复核: " + (report && report.humanReviewPending === true ? "pending (report: humanReviewPending) / 待复核" : "not recorded here / 本包不含") + ". This pack holds no review result. / 本包不含复核结论。",
+      "",
+      "Not included / 没有放进来",
+    ];
+    const ignored = src ? src.ignored : [];
+    if (ignored.length) for (const x of ignored) lines.push("- " + x.path + " (" + x.size + " bytes): in the opened folder, not read by the page / 文件夹里有，页面不读取");
+    else lines.push("- (no other files in the opened folder / 打开的文件夹里没有其他文件)");
+    if (!report && batch && batch.kind === "calibration") notes.push("- No calibration report was loaded for this batch / 这个批次没有载入校准报告");
+    lines.push(...notes,
+      "- Cards, student prompts, the checker, build outputs and launch evidence are not part of a runs folder; attach them separately if the reviewer needs them. / 卡片、学生提示、检查器、编译产物和启动证据不在 runs 文件夹里，需要时另附。",
+      "",
+      "Limits / 限制",
+      "- The page does not read the ledger database (.premium.sqlite), re-run the checker or check provider invoices. / 页面不读账本数据库，不重跑检查器，不核对厂商账单。",
+      "- Costs are the runner's price-table estimates unless an invoice was reconciled. / 费用是价格表估算，除非已对账。",
+      "- A SHA-256 sum shows a file has not changed since this export. It is not a signature. / 哈希只说明导出后没变，不是签名。", "");
+    files.push({ path: "README.txt", data: lines.join("\n") });
+    files.push({ path: "SHA256SUMS.txt", data: files.map(f => P.sha256(P.bytesOf(f.data)) + "  " + f.path).join("\n") + "\n" });
+    const bytes = P.zip(files.map(f => ({ path: folder + f.path, data: f.data })), exportedAt);
+    const url = URL.createObjectURL(new Blob([bytes], { type: "application/zip" }));
+    const a = el("a", { href: url, download: "review-pack-" + batchId + ".zip", hidden: true });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+
+  // ---------- Calibration ----------
+  // One calibration batch at a time. Three layers stay apart: the machine check (copied from the report), formal tutor
+  // scoring (never, for a calibration batch) and the independent content review (only the report's pending flag; this page
+  // records no review outcome). Nothing here re-checks a run: verdicts, groups and rates come from the report.
+  const pctText = x => (x == null ? "—" : String(Math.round(x * 1000) / 10) + "%");
+  const tOr = (key, fallback) => (T[st.lang][key] != null || T.en[key] != null ? t(key) : fallback);
+  const expPath = e => { const s = st.files && st.files.expectations.find(x => x.value === e); return s ? s.path : "expectations.json"; };
+  const runLabel = r => r.tutor.label + " · " + langShort(r.card.lang) + " #" + r.repeat.index;
+  function renderCalibration() {
+    const d = st.dataset, list = M.calibrationBatches(d);
+    if (!list.some(b => b.batchId === st.calib)) st.calib = list.length ? list[0].batchId : null;
+    if (!st.calib) return;
+    const c = M.calibrationOf(d, st.calib);
+    const box = $("calib");
+    box.append(el("header", { class: "sec-head" }, el("div", { class: "title" }, el("h2", { id: "calib-title", text: t("calibTitle") }), el("p", { class: "lede", text: t("calibLede") })),
+      list.length > 1 ? el("div", { class: "filters" }, select("calib-batch", t("calibBatch"), st.calib, list.map(b => [b.batchId, b.batchId + (d.reports.has(b.batchId) ? "" : " · " + t("v_none"))]),
+        v => { st.calib = v; st.calibSel = null; render(); })) : el("span", { class: "mono muted", text: st.calib })));
+    box.append(calibLayers(c), el("div", { class: "calib-facts" }, calibCriteria(c), calibRates(c)));
+    renderCalibGroups(c); renderCalibRewrites(c); renderCalibDeviations(c); renderCalibIntegrity(c);
+  }
+  function calibLayers(c) {
+    const m = c.machine, verdict = c.cannotCheck ? "CANNOT_CHECK" : m ? m.verdict : "none";
+    const layer = (no, title, kind, value, notes, cls) => el("div", { class: "layer " + cls, role: "listitem" },
+      el("span", { class: "layer-no", text: no }), el("h3", { text: title }),
+      el("p", { class: "layer-value" }, pip(kind), el("span", { text: value })),
+      notes.filter(Boolean).map(n => el("p", { class: "small muted", text: n })));
+    return el("div", { class: "layers", role: "list" },
+      layer("1", t("layerMachine"), verdict === "PASS" ? "good" : verdict === "FAIL" ? "fail" : "calibration", tOr("v_" + verdict, verdict),
+        [m ? t("machineLine", { v: m.checkerVersion, r: m.runsPassing, n: m.runs, g: m.groupsPassing, m: m.groups }) + (m.dryRun ? " · " + t("dryRunTag") : "") : null,
+          c.cannotCheck ? t("cannotCheckNote") : !c.report ? t("noReportNote") : null], "machine v-" + verdict.toLowerCase()),
+      layer("2", t("layerScoring"), "calibration", t("scoringNA"), [t("scoringNote")], "scoring"),
+      layer("3", t("layerReview"), c.contentReview === "pending" ? "needs_review" : "calibration",
+        t(c.contentReview === "pending" ? "reviewPending" : c.contentReview === "not_pending" ? "reviewNotPending" : "reviewUnstated"),
+        [c.contentReview === "pending" ? t("reviewPendingNote") : c.contentReview === "unstated" ? t("reviewUnstatedNote") : null], "review"));
+  }
+  function calibCriteria(c) {
+    const cr = c.criteria, e = c.expectations, items = [];
+    if (e) {
+      items.push(t("critRun", { h: cr.maxHard, s: cr.maxSoft }));
+      items.push(c.machine && c.machine.dryRun ? t("critDryGroup") : t("critGroup", { r: (e.pass.group && e.pass.group.runs) ?? e.repeats, m: cr.minPassingRuns }));
+      items.push(t("critAll"));
+    }
+    if (cr && cr.rewriteRateMax != null) items.push(t("critRewrite", { x: pctText(cr.rewriteRateMax) }));
+    return el("div", { class: "criteria" }, el("h3", { text: t("criteriaTitle") }), items.length ? el("ul", null, items.map(x => el("li", { text: x }))) : null,
+      el("p", { class: "small faint", text: e ? t("criteriaFrom", { f: expPath(e), v: cr.rulesVersion || "—" }) : t("criteriaMissing") }));
+  }
+  function calibRates(c) {
+    const m = c.machine;
+    if (!m) return null;
+    const fig = (label, value, sub, flag, cls) => el("div", { class: "rate-fig" + (cls ? " " + cls : "") }, el("span", { class: "rf-label", text: label }),
+      el("span", { class: "rf-num", text: value }), flag ? el("span", { class: "rf-flag", text: flag }) : null, el("span", { class: "rf-sub", text: sub }));
+    const w = m.rewrite, dc = m.discard;
+    return el("div", { class: "rates" },
+      w ? fig(t("rateRewrite"), pctText(w.rate), t("rateRewriteSub", { x: w.extraRewrites, p: w.positions, m: pctText(w.max) }),
+        w.pass === false ? "✕ " + t("overLimit") : w.pass === true ? "✓ " + t("withinLimit") : null, w.pass === false ? "over" : null) : null,
+      dc ? fig(t("rateDiscard"), pctText(dc.rate), t("rateDiscardSub", { d: dc.discarded, a: dc.attempts }), null) : null,
+      fig(t("rateSpend"), usd(m.spentUsd), t("rateSpendSub") + (m.batchStatus ? " · " + code(m.batchStatus) : ""), null));
+  }
+
+  // A student specimen: the stem grows one node per student message; each message the model wrote puts out a leaf that
+  // grows with the times it was sent back. A red leaf is a hard deviation the checker found at that message, a dashed
+  // one a soft deviation. The head is the checker's result. Dots by the root are discarded attempts.
+  function studentData(rec, check) {
+    const atts = M.attemptsOf(rec), last = atts[atts.length - 1];
+    const students = last.lines.filter(l => l.role === "student");
+    const dev = new Map();
+    if (check) {
+      for (const line of check.hard || []) { const p = M.parseCheckerLine(line); if (p.n != null) dev.set(p.n, "hard"); }
+      for (const line of check.soft || []) { const p = M.parseCheckerLine(line); if (p.n != null && !dev.has(p.n)) dev.set(p.n, "soft"); }
+    }
+    return { n: students.length, fixed: students.map(s => !!s.fixed), rewrites: students.map(s => (s.checks && s.checks.regenerated) || 0), dev,
+      seeds: atts.filter(a => a.status === "discarded").length, left: !!(rec.end && rec.end.reason === "left"), kind: check ? (check.pass ? "good" : "fail") : "calibration" };
+  }
+  function drawStudent(target, d, maxN, big) {
+    const step = SP_ROOM / Math.max(1, maxN), cx = SPW / 2, top = SPH - d.n * step;
+    target.append(svg("line", { class: "stem", x1: cx, x2: cx, y1: SPH, y2: top }));
+    for (let i = 1; i <= d.n; i++) {
+      const dev = d.dev.get(i), k = d.rewrites[i - 1] || 0;
+      if (d.fixed[i - 1] && !dev) continue;
+      const y = SPH - (i - .5) * step, side = i % 2 ? 1 : -1, len = 1.6 + k * 2.6 + (dev ? 1.2 : 0);
+      const leaf = svg("line", { class: "leaf" + (dev ? " " + dev : "") + (k || dev ? "" : " bud"), x1: cx, y1: y, x2: cx + side * len, y2: y - len * .45 });
+      if (!big) { target.append(leaf); continue; }
+      // In the drawer each leaf is a target that jumps to its message.
+      const g = svg("g", { class: "turn", "data-msg": i, "data-tip": t("msgN", { n: i }) + (k ? " · " + t("rewrites", { n: k }) : "") + (dev ? " · " + t("checkerAt") + " " + t(dev) : "") });
+      g.append(svg("rect", { class: "hit", x: 0, y: y - step / 2, width: SPW, height: step }), leaf);
+      target.append(g);
+    }
+    for (let s = 0; s < d.seeds; s++) target.append(svg("circle", { class: "seed", cx: cx - 3.4 - s * 2.6, cy: SPH - 1.2, r: 1 }));
+    target.append(head(d.kind, cx, top - HEAD - .6 - (d.left ? 3.4 : 0)));
+    return target;
+  }
+  function studentTip(rec, check, d) {
+    return [runLabel(rec), check ? t(check.pass ? "sHeadPass" : "sHeadFail") + " · " + t("machineRun", { h: check.hard.length, s: check.soft.length, x: check.extraRewrites }) : t("sHeadNone"),
+      code(rec.end && rec.end.reason), d.seeds ? t("discarded", { n: d.seeds }) : null].filter(Boolean).join(" · ");
+  }
+  function studentSpecimen(rec, check, maxN) {
+    const d = studentData(rec, check);
+    return drawStudent(svg("svg", { class: "sp student " + d.kind, viewBox: `0 0 ${SPW} ${SPH}`, preserveAspectRatio: "xMidYMax meet", "data-run": rec.runId, "data-tip": studentTip(rec, check, d) }), d, maxN);
+  }
+  function studentKey() {
+    const ex = { n: 7, fixed: [true], rewrites: [0, 2, 0, 1, 0, 0, 0], dev: new Map([[4, "hard"], [6, "soft"]]), seeds: 1, left: false, kind: "fail" };
+    const fig = drawStudent(svg("svg", { class: "sp key-sp", viewBox: `0 0 ${SPW} ${SPH}`, "aria-hidden": "true" }), ex, 9);
+    const row = (k, v, cls) => el("div", { class: cls || null }, el("dt", { text: k }), el("dd", { text: v }));
+    return el("figure", { class: "key" }, fig,
+      el("dl", null, row(t("keyHead"), t("sKeyHeadIs")), row(t("keyStem"), t("sKeyStemIs")), row(t("keyLeaf"), t("sKeyLeafIs")), row(t("sKeyRed"), t("sKeyRedIs"), "crit"),
+        row(t("sKeyDash"), t("sKeyDashIs")), row(t("sKeySeed"), t("sKeySeedIs"))),
+      el("div", { class: "heads" }, [["good", "sHeadPass"], ["fail", "sHeadFail"], ["calibration", "sHeadNone"]].map(([k, l]) => el("span", null, pip(k), t(l)))));
+  }
+
+  // Plate I: one row per scripted tutor, one column per language, one student specimen per adopted run.
+  function renderCalibGroups(c) {
+    const box = $("calib-groups"), sup = st.dataset.supersededBy || {};
+    box.append(plateHead("I", "calib-groups-title", t("plateGroups"), studentKey()));
+    if (!c.groups.length) { box.append(el("p", { class: "empty-note", text: t("noData") })); return; }
+    const maxN = Math.max(8, ...c.adopted.map(r => (r.transcript || []).filter(l => l.role === "student").length));
+    const grid = el("div", { class: "cgrid", style: "--langs:" + c.langs.length, role: "table", "aria-labelledby": "calib-groups-title" });
+    grid.append(el("div", { class: "crow head", role: "row" }, el("span", { role: "columnheader" }), c.langs.map(l => el("span", { role: "columnheader", text: langName(l) }))));
+    for (const g of c.groups) {
+      grid.append(el("div", { class: "crow" + (g.optional ? " optional" : ""), role: "row" },
+        el("div", { class: "cwho", role: "rowheader" }, el("strong", { text: g.label }), g.optional ? el("span", { class: "small faint", text: t("optionalGroup") }) : null),
+        g.cells.map(cell => {
+          const field = el("div", { class: "field cfield" });
+          for (const x of cell.runs) field.append(studentSpecimen(x.record, x.check, maxN));
+          field.addEventListener("click", e => { const n = e.target.closest("[data-run]"); if (n) openRun(n.getAttribute("data-run")); });
+          const replaced = c.records.filter(r => sup[r.runId] && r.tutor.id === g.tutor && r.card.lang === cell.lang).length;
+          const gr = cell.group;
+          return el("div", { class: "ccell", role: "cell" },
+            el("span", { class: "clang", text: langName(cell.lang) }),
+            el("div", { class: "cnum" + (gr ? (gr.optional ? "" : gr.pass ? " pass" : " fail") : " none") },
+              gr ? [el("span", { class: "n", text: String(gr.passing) }), el("span", { class: "of", text: t("groupOf", { n: gr.runs }) })] : el("span", { class: "of", text: t("groupNoReport", { n: cell.runs.length }) }),
+              gr && !gr.optional ? el("span", { class: "gmark" }, pip(gr.pass ? "good" : "fail"), t(gr.pass ? "groupPass" : "groupFail")) : null),
+            el("div", { class: "cbody" }, field, replaced ? el("span", { class: "small faint", text: t("groupSuperseded", { n: replaced }) }) : null));
+        })));
+    }
+    box.append(el("div", { class: "cgrid-box" }, grid), el("p", { class: "plate-foot", text: t("groupsNote") }));
+  }
+
+  // A heat cell: the count in a single-hue wash, darker for more. Empty cells stay blank.
+  const heatLevel = (k, max) => (k ? Math.max(1, Math.ceil((4 * k) / Math.max(1, max))) : 0);
+  function selectionList(title, entries, onClear) {
+    return el("div", { class: "sel" }, el("div", { class: "sel-head" }, el("strong", { text: title }), el("button", { type: "button", class: "btn-quiet", onclick: onClear }, t("selClear"))),
+      el("ul", null, entries));
+  }
+
+  // Plate II: replies sent back, by rule (grouped by family) and by student message.
+  function renderCalibRewrites(c) {
+    const box = $("calib-rewrites");
+    box.append(plateHead("II", "calib-rw-title", t("plateRewrites"), el("p", { class: "plate-note", text: t("rewritesNote") })));
+    const rows = c.rejects.filter(x => !x.superseded), supN = c.rejects.length - rows.length;
+    const foot = supN ? el("p", { class: "plate-foot", text: t("rejectsSuperseded", { n: supN }) }) : null;
+    if (!rows.length) { box.append(el("p", { class: "empty-note", text: t("noRejects") }), foot); return; }
+    const ns = [...new Set(rows.map(x => x.n))].sort((a, b) => a - b);
+    const fam = ["format", "protocol", "state", "other"];
+    const rules = [...new Set(rows.flatMap(x => x.reasons))].map(r => [r, M.ruleFamily([r])]).sort((a, b) => fam.indexOf(a[1]) - fam.indexOf(b[1]) || a[0].localeCompare(b[0]));
+    const hits = (rule, n) => rows.filter(x => x.reasons.includes(rule) && (n == null || x.n === n));
+    const max = Math.max(1, ...rules.flatMap(([r]) => ns.map(n => hits(r, n).length)));
+    const sel = st.calibSel && st.calibSel.plate === "rw" && st.calibSel.batchId === c.batchId ? st.calibSel : null;
+    const rerender = () => { clear(box); renderCalibRewrites(c); };
+    const cell = (rule, n) => {
+      const k = hits(rule, n).length, on = sel && sel.rule === rule && sel.n === n;
+      return el("td", { class: "hc" }, k ? el("button", { type: "button", class: "heat h" + heatLevel(k, max) + (on ? " on" : ""), "aria-pressed": on ? "true" : "false",
+        "data-tip": code(rule) + " · " + t("msgN", { n }) + " · " + k, onclick: () => { st.calibSel = on ? null : { plate: "rw", batchId: c.batchId, rule, n }; rerender(); } }, String(k)) : null);
+    };
+    const body = el("tbody");
+    for (const f of fam) {
+      const inFam = rules.filter(x => x[1] === f);
+      if (!inFam.length) continue;
+      body.append(el("tr", { class: "fam" }, el("th", { scope: "rowgroup", colspan: String(ns.length + 2), text: t("family_" + f) })));
+      for (const [rule] of inFam) body.append(el("tr", null, el("th", { scope: "row", class: "rule", text: code(rule) }), ns.map(n => cell(rule, n)), el("td", { class: "num total", text: String(hits(rule).length) })));
+    }
+    box.append(el("div", { class: "scroll-x" }, el("table", { class: "heatmap" },
+      el("thead", null, el("tr", null, el("th", { text: t("ruleCol") }), ns.map(n => el("th", { class: "num", text: t("msgCol", { n }) })), el("th", { class: "num", text: t("totalCol") }))), body)));
+    if (sel) {
+      const picked = hits(sel.rule, sel.n), byRun = M.groupBy(picked, x => x.runId);
+      box.append(selectionList(t("selTitle", { what: code(sel.rule) + " · " + t("msgN", { n: sel.n }), n: byRun.size }),
+        [...byRun].map(([runId, xs]) => {
+          const r = st.dataset.runs.find(y => y.runId === runId);
+          return el("li", null, el("button", { type: "button", class: "btn-quiet run-link", onclick: () => openRun(runId, false, { attempt: xs[0].attempt, n: sel.n }) }, r ? runLabel(r) : shortRun(runId)),
+            el("span", { class: "small muted", text: " " + xs.map(x => t("attemptTab", { n: x.attempt }) + (x.attemptStatus !== "kept" ? "（" + tOr("attempt_" + x.attemptStatus, code(x.attemptStatus)) + "）" : "")).join(" · ") }));
+        }), () => { st.calibSel = null; rerender(); }));
+    }
+    if (foot) box.append(foot);
+  }
+
+  // Plate III: the checker's deviations, by group (tutor × language) and by student message. Copied from the report.
+  function renderCalibDeviations(c) {
+    const box = $("calib-dev");
+    box.append(plateHead("III", "calib-dev-title", t("plateDeviations"), el("p", { class: "plate-note", text: t("deviationsNote") })));
+    if (!c.checked) { box.append(el("p", { class: "empty-note", text: t("devNeedReport") })); return; }
+    if (!c.deviations.length) { box.append(el("p", { class: "empty-note", text: t("noDeviations") })); return; }
+    const ns = [...new Set(c.deviations.filter(x => x.n != null).map(x => x.n))].sort((a, b) => a - b);
+    const cols = c.deviations.some(x => x.n == null) ? [...ns, null] : ns;
+    const groups = c.groups.flatMap(g => g.cells.map(cell => ({ tutor: g.tutor, lang: cell.lang, label: g.label + " · " + langShort(cell.lang), runs: cell.runs.length })));
+    const at = (g, n, kind) => c.deviations.filter(x => x.tutor === g.tutor && x.lang === g.lang && x.n === n && (!kind || x.kind === kind));
+    const runsOf = xs => new Set(xs.map(x => x.runId)).size;
+    const max = Math.max(1, ...groups.flatMap(g => cols.map(n => runsOf(at(g, n, "hard")))));
+    const sel = st.calibSel && st.calibSel.plate === "dev" && st.calibSel.batchId === c.batchId ? st.calibSel : null;
+    const rerender = () => { clear(box); renderCalibDeviations(c); };
+    const body = el("tbody", null, groups.map(g => el("tr", null, el("th", { scope: "row", class: "rule", text: g.label }), cols.map(n => {
+      const h = runsOf(at(g, n, "hard")), s = runsOf(at(g, n, "soft")), on = sel && sel.tutor === g.tutor && sel.lang === g.lang && sel.n === n;
+      if (!h && !s) return el("td", { class: "hc" });
+      return el("td", { class: "hc" }, el("button", { type: "button", class: "heat h" + heatLevel(h, max) + (on ? " on" : ""), "aria-pressed": on ? "true" : "false",
+        "data-tip": g.label + " · " + (n == null ? t("wholeRun") : t("msgN", { n })) + " · " + t("hard") + " " + h + " · " + t("soft") + " " + s,
+        onclick: () => { st.calibSel = on ? null : { plate: "dev", batchId: c.batchId, tutor: g.tutor, lang: g.lang, n }; rerender(); } },
+        h ? el("span", { class: "hn", text: String(h) }) : null, s ? el("span", { class: "sn", text: t("softShort") + " " + s }) : null));
+    }))));
+    box.append(el("div", { class: "scroll-x" }, el("table", { class: "heatmap dev" },
+      el("thead", null, el("tr", null, el("th", { text: t("groupCol") }), cols.map(n => el("th", { class: "num", text: n == null ? t("wholeRun") : t("msgCol", { n }) })))), body)));
+    if (sel) {
+      const g = groups.find(x => x.tutor === sel.tutor && x.lang === sel.lang);
+      const picked = g ? at(g, sel.n) : [];
+      const byRun = M.groupBy(picked, x => x.runId);
+      box.append(selectionList(t("selTitle", { what: (g ? g.label : "") + " · " + (sel.n == null ? t("wholeRun") : t("msgN", { n: sel.n })), n: byRun.size }),
+        [...byRun].map(([runId, xs]) => {
+          const r = st.dataset.runs.find(y => y.runId === runId);
+          return el("li", null, el("button", { type: "button", class: "btn-quiet run-link", onclick: () => openRun(runId, false, sel.n == null ? null : { n: sel.n }) }, r ? runLabel(r) : shortRun(runId)),
+            xs.map(x => el("div", { class: "small" }, el("span", { class: "tag" + (x.kind === "hard" ? " crit" : ""), text: t(x.kind) }), " ", el("span", { class: "mono", text: x.text }))));
+        }), () => { st.calibSel = null; rerender(); }));
+    }
+  }
+
+  // Plate IV: whether the batch itself is whole, from the report where it says so and from the records otherwise.
+  // Why a record stopped: its last attempt's reason when the record has attempts (v4+), else its end.
+  const stopReason = r => { const a = Array.isArray(r.attempts) && r.attempts.length ? r.attempts[r.attempts.length - 1] : null; return (a && a.status !== "kept" && a.reason) || (r.end && r.end.reason); };
+  function renderCalibIntegrity(c) {
+    const box = $("calib-int"), d = st.dataset, sup = d.supersededBy || {}, m = c.machine;
+    box.append(plateHead("IV", "calib-int-title", t("plateIntegrity")));
+    const dl = el("dl", { class: "kv integrity" });
+    const row = (k, ...v) => dl.append(el("dt", { text: k }), el("dd", null, ...v));
+    const none = () => el("span", { class: "muted", text: t("intNone") });
+    if (c.checked) {
+      row(t("intCohort"), m.cohortErrors.length ? el("ul", null, m.cohortErrors.map(x => el("li", { class: "small stopped mono", text: x }))) : el("span", { class: "muted", text: t("intCohortOk") }));
+      const inReport = new Set(c.report.runs.map(x => x.runId)), missing = c.adopted.filter(r => !inReport.has(r.runId));
+      if (missing.length) row(t("intMissing"), el("div", { class: "tags" }, missing.map(r => runButton(r.runId))));
+    }
+    const replaced = c.records.filter(r => sup[r.runId]);
+    row(t("intSuperseded"), replaced.length ? el("div", { class: "sup-list" }, replaced.map(r => el("div", { class: "small" }, runButton(r.runId),
+      " " + t("intSupLine", { s: code(r.status) + " · " + code(stopReason(r)), usd: usd(r.usage ? r.usage.totalUsd : null) }) + " → ", runButton(sup[r.runId])))) : none());
+    const tr = M.transportOf(c.records, sup).filter(x => x.error);
+    row(t("intTransport"), tr.length ? [el("span", { text: t("intTransportLine", { n: tr.length }) + " " }),
+      el("button", { type: "button", class: "btn-quiet", onclick: () => { st.callsOpen = c.batchId; setView("checks"); const n = $("calls-" + c.batchId); if (n) n.scrollIntoView({ block: "start" }); } }, t("openChecks") + " →")] : none());
+    const id = M.identityOf(c.batch, c.records, sup);
+    const fps = m && m.fingerprints ? m.fingerprints.map(f => ({ value: f.system_fingerprint, conversations: f.conversations, adopted: f.adopted, superseded: f.superseded }))
+      : ((id.roles.find(g => g.role === "student") || {}).fingerprints || []);
+    const si = (m && m.servingIdentity) || id.servingIdentity;
+    row(t("intIdentity"), el("div", { class: "small" }, t("servingIdentity", { r: t("role_student") }) + " ", el("strong", { text: si ? code(si) : t("notRecorded") })),
+      fps.map(f => el("div", { class: "small mono", text: t("fpLine", { v: fpText(f.value), c: f.conversations, a: f.adopted, s: f.superseded }) })),
+      (m ? m.multipleFingerprints : id.multipleFingerprints) ? el("div", { class: "small stopped", text: t("multipleFingerprints") }) : null);
+    const cache = M.cacheOf(c.batch, c.records), learner = cache.models.filter(x => x.role === "student");
+    row(t("intCache"), !cache.recorded ? el("span", { class: "muted", text: t("cacheNotRecorded") }) : learner.map(x => el("div", { class: "small", text: t("intCacheLine", { m: x.model, o: x.observed, c: x.calls }) })));
+    const h = M.batchHistory(c.batch || {});
+    row(t("intBatch"), el("span", { text: [t("nowStatus", { s: code(h.status) }), h.earlierStop ? t("earlierStop", { s: code(h.earlierStop), n: c.records.filter(r => r.restartOf).length }) : null,
+      ...h.topUps.map(x => t("topUp", { from: usd(x.from), to: usd(x.to) }))].filter(Boolean).join(" · ") }));
+    const f = st.files;
+    row(t("intFiles"), el("span", { class: "small", text: f ? t("filesLine", { r: f.records.size, b: f.batches.size, p: f.reports.size, e: f.expectations.length, i: f.ignored.length }) : t("filesSample") }),
+      f && f.ignored.length ? el("details", { class: "ignored" }, el("summary", { class: "small faint", text: t("filesIgnored", { n: f.ignored.length }) }),
+        el("ul", null, f.ignored.slice(0, 200).map(x => el("li", { class: "small mono", text: x.path })))) : null);
+    box.append(dl, el("div", { class: "bcalls-foot" }, el("button", { type: "button", onclick: () => exportPack(c.batchId) }, t("exportPack") + " ↓"),
+      el("span", { class: "small faint", text: t("exportNote") + (f ? "" : " " + t("exportSynthetic")) })));
   }
 
   // ---------- drawer ----------
@@ -872,10 +1438,13 @@
     return el("div", null, s, el("p", { class: "small muted", text: t("helpLevels") }));
   }
   let openRunId = null;
-  function openRun(runId, keepFocus) {
+  // focus, when given, is { attempt, n }: open that attempt and scroll to student message n.
+  function openRun(runId, keepFocus, focus) {
     const d = st.dataset, r = d.runs.find(x => x.runId === runId);
     if (!r) return;
     if (!keepFocus) lastFocus = document.activeElement;
+    if (openRunId !== runId) st.drawerAttempt = null;
+    if (focus && focus.attempt != null) st.drawerAttempt = focus.attempt;
     openRunId = runId;
     const v = M.runView(r, st.f.version, d.latestCard, d.supersededBy), s = v.scoring, m = s && s.merged;
     const box = clear($("drawer"));
@@ -891,6 +1460,11 @@
     const vb = el("div", { class: "verdict-box" }, mark(v));
     const jump = (label, id) => el("button", { type: "button", class: "btn-quiet", onclick: () => openRun(id, true) }, label + " →");
     if (v.calibration) vb.append(el("p", { class: "small muted", text: t("calibNote") }));
+    const rr = r.batchKind === "calibration" ? M.reportRun(d, r.runId) : null, rep = d.reports.get(r.batchId);
+    if (rr) vb.append(el("div", { class: "machine-line" }, el("span", { class: "small muted", text: t("machineCheck") }),
+      el("span", { class: "state" }, pip(rr.run.pass ? "good" : "fail"), t(rr.run.pass ? "v_PASS" : "v_FAIL")),
+      el("span", { class: "small muted", text: t("machineRun", { h: (rr.run.hard || []).length, s: (rr.run.soft || []).length, x: rr.run.extraRewrites ?? "—" }) + " · checker v" + rr.report.checkerVersion })));
+    else if (r.batchKind === "calibration") vb.append(el("p", { class: "small muted", text: !rep ? t("machineNoReport") : rep.verdict === "CANNOT_CHECK" ? t("cannotCheckNote") : t("machineNotInReport") }));
     if (v.supersededBy) vb.append(el("p", { class: "small muted" }, t("supersededNote") + " ", jump(t("openSuccessor"), v.supersededBy)));
     if (v.restartOf) vb.append(el("p", { class: "small muted" }, t("restartNote") + " ", jump(t("openPredecessor"), v.restartOf)));
     if (v.state === "scored" && v.reasons.length) vb.append(el("div", { class: "tags" }, v.reasons.map(x => el("span", { class: "tag" + (["leak", "student_left", "unsolved_tutor_fault"].includes(x) ? " crit" : ""), text: code(x) }))));
@@ -900,11 +1474,21 @@
     if (v.reviewFlags.length) vb.append(el("div", { class: "tags" }, v.reviewFlags.map(f => el("span", { class: "tag", text: t("spotCheck") + ": " + code(f) }))));
     if (v.fixedTestSkipped) vb.append(el("div", { class: "tags" }, el("span", { class: "tag", text: t("fixedTestSkipped") })));
     if (["error", "student_invalid", "superseded"].includes(v.state) || (v.calibration && r.status !== "unscored")) {
-      for (const a of r.attempts || []) vb.append(el("div", { class: "small", text: t("attemptN", { n: a.attempt, s: a.status }) + (a.reason ? " · " + a.reason.split(",").map(code).join(", ") : "") + (a.atStudentMessage ? " · " + t("msgN", { n: a.atStudentMessage }) : "") }));
+      for (const a of r.attempts || []) vb.append(el("div", { class: "small", text: t("attemptN", { n: a.attempt, s: code(a.status) }) + (a.reason ? " · " + a.reason.split(",").map(code).join(", ") : "") + (a.atStudentMessage ? " · " + t("msgN", { n: a.atStudentMessage }) : "") }));
     }
     // The conversation's own specimen, large: each leaf is a tutor turn and jumps to it in the transcript.
     let big = null;
-    if (r.end && r.end.tutorTurns > 0) {
+    if (r.batchKind === "calibration") {
+      const sd = studentData(r, rr ? rr.run : null), maxN = Math.max(8, sd.n);
+      const y0 = Math.max(0, SPH - sd.n * (SP_ROOM / maxN) - 2 * HEAD - 5.5);
+      big = drawStudent(svg("svg", { class: "sp big student " + sd.kind, viewBox: `0 ${y0} ${SPW} ${SPH - y0}`, style: `height:${((SPH - y0) / SPW) * 64}px`, role: "img", "aria-label": studentTip(r, rr ? rr.run : null, sd) }), sd, maxN, true);
+      big.addEventListener("click", e => {
+        const g = e.target.closest("[data-msg]"), msg = g && $("smsg-" + g.getAttribute("data-msg"));
+        if (!msg) return;
+        msg.scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+        msg.classList.remove("flash"); void msg.offsetWidth; msg.classList.add("flash");
+      });
+    } else if (r.end && r.end.tutorTurns > 0) {
       // Same scale as Plate I, cropped to the plant so a short conversation does not float in empty space.
       const d = specimenData(v), maxTurns = maxTurnsOf([v]);
       const y0 = Math.max(0, SPH - d.n * (SP_ROOM / maxTurns) - 2 * HEAD - 5.5);
@@ -936,29 +1520,23 @@
 
     if (m && m.helpLevels && m.helpLevels.length) box.append(el("div", { class: "section" }, el("h3", { text: t("helpCurve") }), helpChart(m)));
 
-    // Conversation
-    const msgs = el("div", { class: "msgs" });
-    let sn = 0;
-    const leakTurns = new Set(m ? m.leakTurns || [] : []);
-    for (const line of r.transcript || []) {
-      if (line.role === "student") {
-        sn++;
-        const ck = line.checks || {};
-        msgs.append(el("div", { class: "msg student" },
-          el("div", { class: "who" }, el("strong", { text: t("student") + " " + t("msgN", { n: sn }) }), line.state ? el("span", { text: t("stage", { s: line.state.stage }) }) : null,
-            (line.state && line.state.events || []).map(e => el("span", { class: "tag", text: e })),
-            (ck.softFlags || []).map(f => el("span", { class: "tag", style: "border-color:var(--warn)", text: code(f) })),
-            ck.regenerated ? el("span", { class: "tag", text: t("rewrites", { n: ck.regenerated }) }) : null),
-          el("div", { class: "text", text: line.text })));
-      } else {
-        const mt = m && m.turns ? m.turns[line.turn - 1] : null;
-        msgs.append(el("div", { class: "msg" + (leakTurns.has(line.turn) ? " leak" : ""), id: "turn-" + line.turn },
-          el("div", { class: "who" }, el("strong", { text: t("tutor") + " " + t("turnN", { n: line.turn }) }), mt ? el("span", { text: t("level", { h: mt.helpLevel }) }) : null,
-            mt ? el("span", { class: "checks" }, ["correct", "readsState", "helpFit", "noLeak", "responds"].map(k => el("span", { class: "ck" + (mt[k] === false ? " no" : ""), text: (mt[k] === false ? "✕ " : mt[k] === null ? "? " : "✓ ") + code(k) }))) : null),
-          el("div", { class: "text", text: line.text })));
-      }
-    }
-    box.append(el("div", { class: "section" }, el("h3", { text: t("transcript") }), msgs));
+    // Conversation: every attempt the runner kept, each student message with its self-reported state and events, the
+    // replies sent back before it (before and after, with the rules they broke) and the checker's lines for it.
+    const atts = M.attemptsOf(r);
+    const ckLines = rr ? [...(rr.run.hard || []).map(x => ({ kind: "hard", ...M.parseCheckerLine(x) })), ...(rr.run.soft || []).map(x => ({ kind: "soft", ...M.parseCheckerLine(x) }))] : [];
+    let ai = atts.findIndex(a => a.attempt === st.drawerAttempt);
+    if (ai < 0) ai = atts.length - 1;
+    const tsec = el("div", { class: "section" }, el("h3", { text: t("transcript") }));
+    const tbody = el("div", { class: "tbody" });
+    const drawAttempt = () => { clear(tbody); tbody.append(transcriptView(atts[ai], ai === atts.length - 1, m, ckLines)); };
+    if (atts.length > 1) tsec.append(el("div", { class: "tabs attempts", role: "group", "aria-label": t("attempts") }, atts.map((a, i) => el("button", { type: "button", class: "tab", "aria-pressed": i === ai ? "true" : "false",
+      onclick: () => { ai = i; st.drawerAttempt = a.attempt; tsec.querySelectorAll(".attempts .tab").forEach((b, k) => b.setAttribute("aria-pressed", k === i ? "true" : "false")); drawAttempt(); } },
+      t("attemptTab", { n: a.attempt }) + " · " + tOr("attempt_" + a.status, code(a.status))))));
+    const whole = ckLines.filter(x => x.n == null);
+    if (whole.length) tsec.append(el("div", { class: "cklines whole" }, el("span", { class: "small muted", text: t("checkerLines") }), whole.map(ckLine)));
+    tsec.append(tbody);
+    drawAttempt();
+    box.append(tsec);
 
     // Judges
     if (s) {
@@ -993,14 +1571,11 @@
     const c = M.studentChecks(r);
     const kv = el("dl", { class: "kv" },
       el("dt", { text: t("softFlags") }), el("dd", { text: c.softFlags.length ? c.softFlags.map(code).join(", ") : t("none") }),
-      el("dt", { text: t("rejected") }), el("dd", { text: c.rejected.length ? String(c.rejected.length) : t("none") }),
-      el("dt", { text: t("attempts") }), el("dd", { text: (r.attempts || []).map(a => t("attemptN", { n: a.attempt, s: a.status })).join(" · ") }),
+      el("dt", { text: t("rejected") }), el("dd", { text: c.rejected.length ? t("rejectedByRule", { n: c.rejected.length, list: ruleCounts(c.rejected) }) : t("none") }),
+      el("dt", { text: t("attempts") }), el("dd", { text: (r.attempts || []).map(a => t("attemptN", { n: a.attempt, s: code(a.status) })).join(" · ") }),
       el("dt", { text: t("notFired") }), el("dd", { text: c.behavioursNotFired.length ? c.behavioursNotFired.join(", ") : t("none") }),
       el("dt", { text: t("missingMistakes") }), el("dd", { text: c.scriptedMistakesMissing.length ? c.scriptedMistakesMissing.join(", ") : t("none") }));
-    const sec = el("div", { class: "section" }, el("h3", { text: t("studentChecks") }), kv);
-    if (c.rejected.length) sec.append(el("details", null, el("summary", { text: t("rejected") + " · " + c.rejected.length }),
-      el("ul", null, c.rejected.map(x => el("li", { class: "small" }, t("attemptN", { n: x.attempt, s: t("msgN", { n: x.studentMessage }) }) + " · " + (x.reasons || []).map(code).join(", "))))));
-    box.append(sec);
+    box.append(el("div", { class: "section" }, el("h3", { text: t("studentChecks") }), kv));
 
     const cost = M.costs(r);
     box.append(el("div", { class: "section" }, el("h3", { text: t("costs") }), el("dl", { class: "kv" },
@@ -1008,10 +1583,84 @@
       cost.rescoring.map(x => [el("dt", { text: t("rejudgeCost", { id: x.scoringId }) }), el("dd", { class: "num", text: usd(x.usd) })])),
       cost.estimatedCalls ? el("p", { class: "small muted", text: t("estimatedCalls", { n: cost.estimatedCalls }) }) : null));
 
+    if ((r.calls || []).length) box.append(el("div", { class: "section" }, el("details", { class: "calls" }, el("summary", { text: t("callsDetail", { n: r.calls.length }) }), callsTable(r.calls))));
+
     const reopened = keepFocus && !box.hidden;
     $("scrim").hidden = false; box.hidden = false;
     if (!reopened) { box.scrollTop = 0; $("drawer-close").focus(); }
+    const target = focus && focus.n ? $("smsg-" + focus.n) : null;
+    if (target) { target.scrollIntoView({ block: "center" }); target.classList.remove("flash"); void target.offsetWidth; target.classList.add("flash"); }
   }
+  const ruleCounts = rejected => {
+    const n = new Map();
+    for (const x of rejected) for (const k of x.reasons || []) n.set(k, (n.get(k) || 0) + 1);
+    return [...n].sort((a, b) => b[1] - a[1]).map(([k, v]) => code(k) + " " + v).join(st.lang === "zh" ? "、" : ", ");
+  };
+  const ckLine = x => el("div", { class: "ckline " + x.kind }, el("span", { class: "tag" + (x.kind === "hard" ? " crit" : ""), text: t("checkerAt") + " · " + t(x.kind) }), el("span", { class: "mono", text: x.text }));
+  function transcriptView(att, isLast, m, ckLines) {
+    const wrap = el("div", { class: "attempt" });
+    if (!att.legacy && att.status === "error") wrap.append(el("p", { class: "small stopped", text: t("attemptErrored", { r: code(att.reason) }) }));
+    else if (!att.legacy && att.status !== "kept") wrap.append(el("p", { class: "small stopped", text: t("attemptStopped", { n: att.atStudentMessage ?? "?", r: String(att.reason || "").split(",").filter(Boolean).map(code).join(st.lang === "zh" ? "、" : ", ") }) }));
+    const msgs = el("div", { class: "msgs" });
+    const leakTurns = new Set(m && isLast ? m.leakTurns || [] : []);
+    const shown = new Set();
+    for (const line of att.lines) {
+      if (line.role === "student") {
+        shown.add(line.n);
+        msgs.append(studentLine(line, att.byMessage.get(line.n) || [], isLast ? ckLines.filter(x => x.n === line.n) : [], att));
+      } else {
+        const mt = isLast && m && m.turns ? m.turns[line.turn - 1] : null;
+        msgs.append(el("div", { class: "msg" + (leakTurns.has(line.turn) ? " leak" : ""), id: isLast ? "turn-" + line.turn : null },
+          el("div", { class: "who" }, el("strong", { text: t("tutor") + " " + t("turnN", { n: line.turn }) }), mt ? el("span", { text: t("level", { h: mt.helpLevel }) }) : null,
+            mt ? el("span", { class: "checks" }, ["correct", "readsState", "helpFit", "noLeak", "responds"].map(k => el("span", { class: "ck" + (mt[k] === false ? " no" : ""), text: (mt[k] === false ? "✕ " : mt[k] === null ? "? " : "✓ ") + code(k) }))) : null),
+          el("div", { class: "text", text: line.text })));
+      }
+    }
+    // Replies sent back for a message that was never accepted: the attempt stopped there.
+    for (const [n, list] of att.byMessage) if (!shown.has(n)) msgs.append(studentLine({ role: "student", n, text: null }, list, [], att));
+    wrap.append(msgs);
+    return wrap;
+  }
+  function studentLine(line, drafts, cks, att) {
+    const s = line.state || {}, ck = line.checks || {};
+    const out = el("div", { class: "msg student", id: "smsg-" + line.n },
+      el("div", { class: "who" }, el("strong", { text: t("student") + " " + t("msgN", { n: line.n }) }),
+        line.fixed ? el("span", { class: "tag", text: t("fixedOpening") }) : null,
+        line.state ? el("span", { text: t("stage", { s: s.stage }) }) : null,
+        (s.events || []).map(e => el("span", { class: "tag", text: e })),
+        s.end ? el("span", { class: "tag", text: t("endMark") }) : null,
+        ck.fenceStripped ? el("span", { class: "tag", text: t("fenceStripped") }) : null,
+        (ck.softFlags || []).map(f => el("span", { class: "tag soft", text: code(f) })),
+        ck.regenerated ? el("span", { class: "tag", text: t("rewrites", { n: ck.regenerated }) }) : null,
+        !drafts.length && line.callInfo ? el("span", { class: "faint mono", text: t("callN", { c: line.callInfo.n }) }) : null,
+        line.callInfo && line.callInfo.retryDelayMs > 0 ? el("span", { class: "faint small", text: t("retryWaited", { v: (line.callInfo.retryDelayMs / 1000).toFixed(1) }) }) : null));
+    if (drafts.length) out.append(el("details", { class: "drafts", open: true }, el("summary", { text: t("drafts", { n: drafts.length }) }),
+      el("ol", null, drafts.map((x, k) => el("li", { class: "draft" },
+        el("div", { class: "dh" }, el("span", { text: t("draftN", { k: k + 1 }) }), x.call ? el("span", { class: "faint mono", text: t("callN", { c: x.call }) }) : null,
+          (x.reasons || []).map(rs => el("span", { class: "tag crit", "data-tip": t("family_" + M.ruleFamily([rs])), text: "✕ " + code(rs) })),
+          x.fenceStripped ? el("span", { class: "tag", text: t("fenceStripped") }) : null),
+        el("div", { class: "small faint", text: x.reply.json ? [t("stage", { s: x.reply.stage ?? "?" }), ...x.reply.events, x.reply.end ? t("endMark") : null].filter(Boolean).join(" · ") : t("draftRaw") }),
+        el("div", { class: "text", text: x.reply.message })))),
+      line.text != null ? el("div", { class: "accepted-label", text: "↓ " + t("accepted") + (line.callInfo ? " · " + t("callN", { c: line.callInfo.n }) : "") }) : null));
+    if (line.text != null) out.append(el("div", { class: "text", text: line.text }));
+    else if (att.status === "discarded") out.append(el("p", { class: "small stopped", text: t("neverAccepted") }));
+    if (cks.length) out.append(el("div", { class: "cklines" }, cks.map(ckLine)));
+    return out;
+  }
+  function callsTable(calls) {
+    const tok = u => (u ? fmtInt(u.inputTokens) + " / " + fmtInt(u.outputTokens) : "—");
+    const cacheText = c => (!has(c, "cache") ? t("notRecorded") : c.cache && c.cache.hitTokens != null && c.cache.missTokens != null ? fmtInt(c.cache.hitTokens) + " / " + fmtInt(c.cache.missTokens) : t("unknownWhole"));
+    const model = c => [c.model, c.requestedModel && c.requestedModel !== c.model ? "(" + c.requestedModel + ")" : null, has(c, "returnedModel") ? "→ " + (c.returnedModel ?? "—") : null].filter(Boolean).join(" ");
+    return smallTable([t("colN"), t("role"), t("colModel"), t("fingerprint"), { text: t("colTokens"), num: true }, { text: t("colCacheHM"), num: true }, { text: t("colCost"), num: true },
+      { text: t("colLatency"), num: true }, t("colErr"), t("calledAt")],
+    calls.map(c => el("tr", { class: c.error ? "err" : null }, el("td", { class: "num", text: String(c.n) }), el("td", { class: "small", text: t("role_" + c.role) }),
+      el("td", { class: "mono", text: model(c) }), el("td", { class: "mono", text: has(c, "system_fingerprint") ? fpText(c.system_fingerprint) : t("notRecorded") }),
+      el("td", { class: "num small", text: tok(c.usage) }), el("td", { class: "num small", text: cacheText(c) }),
+      el("td", { class: "num small", text: (c.costEstimated ? "≈ " : "") + usd(c.usd) }), el("td", { class: "num small", text: c.latencyMs == null ? "—" : secs(c.latencyMs) }),
+      el("td", { class: "small" + (c.error ? " stopped" : "") }, c.error ? code(c.error) : null, c.retryDelayMs > 0 ? (c.error ? " · " : "") + t("retryWaited", { v: (c.retryDelayMs / 1000).toFixed(1) }) : null),
+      el("td", { class: "small muted", text: c.calledAt ? whenShort(c.calledAt) : "—" }))), "calls-table");
+  }
+  const has = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
   function fmtVote(x) { return typeof x === "boolean" ? (x ? t("yes") : t("no")) : x == null ? "—" : code(x); }
 
   // ---------- tooltip ----------

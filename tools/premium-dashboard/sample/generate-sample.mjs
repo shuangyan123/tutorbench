@@ -4,31 +4,42 @@
 // follows the runner's real output format. Cards, tutors, students and judges are all
 // synthetic: no real card, prompt, model output or person appears here.
 //
-// Needs the record schema v3 runner (tutor prompts and parameters). The bundled sample also keeps history: with
-// --legacy-runner, the batches before 2026-11-25 are written by a record schema v2 runner into the same runs folder,
-// and the newer runner then adds to it, the way a real folder grows across runner versions.
+// Needs the record schema v5 runner (model identity, fingerprints, cache, checkCalibration). The bundled sample also keeps
+// history, the way a real folder grows across runner versions: with --legacy-runner the batches before 2026-11-25 are
+// written by a record schema v2 runner, with --v3-runner the batches of 2026-11-25 and 2026-11-26 up to 05:00 by a record
+// schema v3 runner, and the newest runner then adds the v5 calibration batches.
 // Usage (needs a build that contains the premium runner, src/premium/*):
-//   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--legacy-runner <dir>] [--bundle <file>] [--out <dir>]
-// --runner         folder with the built premium runner modules, record schema v3 (default dist/src/premium)
-// --legacy-runner  optional: an older build, record schema v2, for the history batches (default: --runner for all)
+//   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--v3-runner <dir>] [--legacy-runner <dir>] [--checker <file>]
+//     [--bundle <file>] [--out <dir>]
+// --runner         folder with the built premium runner modules, record schema v5 (default dist/src/premium)
+// --v3-runner      optional: a record schema v3 build for the batches of that era (default: --runner)
+// --legacy-runner  optional: a record schema v2 build for the history batches (default: the v3 runner)
+// --checker        the private calibration checker (check_calibration.py, v2). It is not in this repository. The runner's
+//                  checkCalibration runs it on the synthetic calibration batches against the synthetic expectations below;
+//                  without it every calibration report comes out as CANNOT_CHECK.
 // --bundle  the sample the dashboard loads (default tools/premium-dashboard/sample/sample-data.js)
-// --out     optional: also write the runner's folder layout (index.jsonl, batches/, records/) there; must be new or empty
+// --out     optional: also write the runner's folder layout (index.jsonl, batches/, records/, reports, expectations) there;
+//           must be new or empty
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { pathToFileURL } from "node:url";
 
-const { values } = parseArgs({ options: { runner: { type: "string" }, "legacy-runner": { type: "string" }, out: { type: "string" }, bundle: { type: "string" } } });
+const { values } = parseArgs({ options: { runner: { type: "string" }, "v3-runner": { type: "string" }, "legacy-runner": { type: "string" }, checker: { type: "string" },
+  out: { type: "string" }, bundle: { type: "string" } } });
 const bundlePath = resolve(values.bundle ?? "tools/premium-dashboard/sample/sample-data.js");
 const outDir = values.out ? resolve(values.out) : null;
 async function runnerAt(dir) {
   const load = name => import(pathToFileURL(join(dir, name + ".js")).href);
-  const [{ hash, loadCards }, { runBatch, rejudge, reconcile }, { configSchema, panel }, { replayProvider }, { Store }] =
+  const [{ hash, loadCards }, { runBatch, rejudge, reconcile }, { configSchema, panel, TransportError }, { replayProvider }, { Store }] =
     await Promise.all(["cards", "batch", "provider", "replay", "store"].map(load));
-  return { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store };
+  const checkCalibration = existsSync(join(dir, "check-calibration.js")) ? (await load("check-calibration")).checkCalibration : null;
+  return { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store, TransportError, checkCalibration };
 }
-const current = await runnerAt(resolve(values.runner ?? "dist/src/premium"));
+const newest = await runnerAt(resolve(values.runner ?? "dist/src/premium"));
+if (!newest.checkCalibration) throw new Error("--runner must be a build with record schema v5 (src/premium/check-calibration)");
+const current = values["v3-runner"] ? await runnerAt(resolve(values["v3-runner"])) : newest;
 const legacy = values["legacy-runner"] ? await runnerAt(resolve(values["legacy-runner"])) : current;
 // The functions below use whichever runner is active; history batches switch to the legacy one.
 let { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store } = current;
@@ -330,6 +341,156 @@ function clock(startIso, stepMinutes = 3) {
   return () => { const s = new Date(t).toISOString(); t += stepMinutes * 60_000; return s; };
 }
 
+// ---------- record schema v5: calibration batches with a checker report ----------
+// The scripted calibration tutors answer from the tape and use no tokens, as in a real calibration. The simulated
+// student's frames carry the provider's model name, a system fingerprint and the cache split of the input, so the
+// records hold what record schema v5 adds: requested and returned model, fingerprint, call time and cache receipt.
+function scripted(id, label) { return { id, developer: "synthetic-scripted", provider: "synthetic-tape", requestedModel: id, pinnedVersion: id + "-v1", label }; }
+const CALIB = [scripted("calib-steady", "Steady · scripted (synthetic)"), scripted("calib-leaky", "Leaks at turn 2 · scripted (synthetic)"), scripted("calib-vague", "Vague hints · scripted (synthetic)")];
+const CALIB_SCRIPT = { "calib-steady": "good", "calib-leaky": "leakAfter", "calib-vague": "left" };
+// The first budget of batch 13: it runs out in the middle of calib-leaky zh-CN #2, which the top-up then restarts.
+const CALIB_BUDGET_STOP = 0.006;
+const LEARNER = model("learner", "synthetic-lab-s", "Learner", "learner-2026-11");
+const calibPrices = { version: "synthetic-prices-v5", models: [...CALIB.map(t => priced(t.id, 0, 0)),
+  { ...priced("learner", 0.3, 1.2), cacheHitInputUsdPerMillion: 0.03 }] };
+// Twists per run: replies the runner sends back (by message), a discarded attempt, a reply in a ```json fence, deviations
+// the checker finds, a call whose cache split the provider did not report, and a timeout retried after the provider's wait.
+function calibTape(tutor, lang, twists, fp) {
+  const card = "synthetic-tiles", c = CARDS[card], p = k => PHRASES[k][lang], q = k => c[k][lang];
+  const sc = script(CALIB_SCRIPT[tutor.id], card, lang);
+  const on = k => twists.includes(k);
+  const beg = p("pushback") + " " + q("first").split(/[ ，]/u)[0] + "..\n" + q("literal");
+  const students = sc.students.slice();
+  if (on("noKind")) students[0] = S(beg, 1, ["pushback"]);
+  if (on("noMistake")) students[1] = S(q("s3"), 2);
+  if (on("paraphraseLeave")) students[students.length - 1] = S(lang === "en" ? "ok bye" : "算了 拜拜", 1, ["left"], true);
+  if (on("fence")) students[students.length - 1] = "```json\n" + students[students.length - 1] + "\n```";
+  const before = {
+    plain2: [2, [beg]],
+    stage2: [2, [S(beg, 3, ["pushback", c.kind])]],
+    stage2x2: [2, [S(beg, 3, ["pushback", c.kind]), S("this is way too long ".repeat(13), 1, ["pushback", c.kind])]],
+    missing2: [2, [S(p("pushback") + " " + q("first").split(/[ ，]/u)[0] + "..", 1, ["pushback", c.kind])]],
+    unknownEvt3: [3, [(() => { const x = JSON.parse(students[1]); return S(x.message, x.stage, [...x.events, "confused"], x.end); })()]],
+    leaveEarly3: [3, [S(p("leave"), 1, ["left"], true)]],
+  };
+  let k = 0;
+  const stu = text => {
+    k++;
+    const input = 1500 + 160 * k, split = !on("noSplit"), hit = Math.min(input - 64, 1280 + 128 * (k - 1));
+    return { text, resolvedModel: LEARNER.pinnedVersion, system_fingerprint: fp, finishReason: "stop", latencyMs: 700 + 41 * k,
+      usage: { inputTokens: input, outputTokens: 38 + (k % 5) * 6, ...(split ? { cacheHitTokens: hit, cacheMissTokens: input - hit } : {}) } };
+  };
+  const tut = text => ({ text, finishReason: "stop", latencyMs: 0, usage: { inputTokens: 0, outputTokens: 0 } });
+  const tutors = sc.tutors.slice(0, students.length + 1).map(tut), learner = [];
+  let timeoutAt = null;
+  if (on("discard")) { tutors.unshift(tut(sc.tutors[0])); learner.push(stu(beg), stu("this is way too long ".repeat(13)), stu(beg)); }
+  students.forEach((text, i) => {
+    const n = i + 2;
+    if (on("timeout3") && n === 3) timeoutAt = learner.length + 1;
+    for (const [name, [at, list]] of Object.entries(before)) if (on(name) && at === n) for (const x of list) learner.push(stu(x));
+    learner.push(stu(text));
+  });
+  return { tracks: { [tutor.id]: tutors, [LEARNER.id]: learner }, timeoutAt };
+}
+// The provider for one job: the tape, plus one timeout (retryable, with the provider's own wait) where the tape asks.
+function calibProvider(R, tapes, timeouts) {
+  return job => {
+    const base = R.replayProvider(tapes[job.repeatIndex], job), at = timeouts[[job.lang, job.tutor.id, job.repeatIndex].join("/")];
+    let n = 0, failed = false;
+    return req => {
+      if (req.role === "student" && ++n === at && !failed) { failed = true; n--; throw new R.TransportError("timeout", true, 1500); }
+      return base(req);
+    };
+  };
+}
+// Synthetic expectations in the checker's v2 format. The real ones are private; these describe the synthetic card only.
+function calibExpectations(asset) {
+  const c = CARDS["synthetic-tiles"], terminal = ["left", "curt_exit", "thanked_after_answer"];
+  const msg = (n, stage, mustEvents, end, extra = {}) => ({ n, stage: [stage], stageSoft: [], mustEvents, expectEvents: [], forbidEvents: end ? [] : terminal,
+    end, endAlsoOk: false, mustContain: [], expectContain: [], mustNotContain: [], human: "synthetic", softNotes: null, ...extra });
+  const groups = {};
+  for (const lang of ["zh-CN", "en"]) {
+    const opening = msg(2, 1, ["pushback", c.kind], false, { mustContain: [c.literal[lang]] });
+    groups["calib-steady"] = { ...groups["calib-steady"], [lang]: { messages: [opening, msg(3, 2, ["scripted_mistake:" + c.mistake], false), msg(4, 3, [], false), msg(5, 3, ["curt_exit"], true)],
+      end: { reason: ["curt_exit"], fixedTestDelivered: true, scriptedMistakesMade: [c.mistake] } } };
+    groups["calib-leaky"] = { ...groups["calib-leaky"], [lang]: { messages: [opening, msg(3, 1, ["thanked_after_answer"], true)],
+      end: { reason: ["thanked_after_answer"], fixedTestDelivered: true, scriptedMistakesMade: [] } } };
+    groups["calib-vague"] = { ...groups["calib-vague"], [lang]: { messages: [opening, msg(3, 1, [], false), msg(4, 1, ["left"], true, { expectContain: [PHRASES.leave[lang]] })],
+      end: { reason: ["left"], fixedTestDelivered: true, scriptedMistakesMade: [] } } };
+  }
+  return { schemaVersion: 2, purpose: "Synthetic: calibrate the simulated student on the synthetic tiles card with scripted tutors. Dashboard fixture only.",
+    card: { id: asset.card.id, version: asset.card.version, contentHash: asset.contentHash, leaveNotBefore: asset.card.leaveNotBefore }, rulesVersion: asset.rulesVersion,
+    tape: "synthetic", repeats: 3, languages: ["zh-CN", "en"], plannedGroups: CALIB.map(t => t.id), optionalGroups: [],
+    pass: { run: { maxHard: 0, maxSoft: 1 }, group: { runs: 3, minPassingRuns: 2 }, calibration: "every planned group passes", rewriteRateMax: 0.2 },
+    globalHard: ["student_invalid (3 attempts failed)"], groups };
+}
+// The runner stamps each call with the wall clock (calledAt); a fixed clock keeps the sample deterministic.
+function withClock(startIso, fn) {
+  const Real = Date;
+  let t = Real.parse(startIso);
+  class Fixed extends Real {
+    constructor(...a) { if (a.length) super(...a); else { super(t); t += 1000; } }
+    static now() { const v = t; t += 1000; return v; }
+  }
+  globalThis.Date = Fixed;
+  try { return fn(); } finally { globalThis.Date = Real; }
+}
+function calibrationV5(work, runs) {
+  const R = newest;
+  const asset = R.loadCards(join(work, "cards")).find(a => a.card.id === "synthetic-tiles");
+  const expectations = calibExpectations(asset);
+  const expPath = join(work, "calibration-expectations.json");
+  writeFileSync(expPath, JSON.stringify(expectations, null, 2) + "\n");
+  const checker = values.checker ? resolve(values.checker) : join(work, "no-checker.py");
+  const cfg = (batchId, purpose, tutors, languages, repeats, budgetUsd) => R.configSchema({
+    batchId, purpose, kind: "calibration", languages, repeats, budgetUsd, reserveUsd: 0, prices: calibPrices, servingIdentity: "alias",
+    tutors, student: LEARNER, judges: [model("j1", "alibaba", "Judge-One", "judge-one-v1"), model("j2", "mistral-ai", "Judge-Two", "judge-two-v1"), model("j3", "minimax", "Judge-Three", "judge-three-v1")],
+    alternates: [], judgeConfigVersion: "synthetic-panel-v1" }, "config");
+  // Each batch runs in a runs folder of its own, because the checker reads a folder that holds one batch; its files are
+  // then added to the sample's folder, and its index lines appended.
+  const batch = (c, at, plan, fps, dry, phases, checkerPath = checker) => {
+    const dir = join(work, "calib-" + c.batchId), tapes = {}, timeouts = {};
+    for (let r = 1; r <= c.repeats; r++) tapes[r] = {};
+    for (const tutor of c.tutors) for (const lang of c.languages) for (let r = 1; r <= c.repeats; r++) {
+      const x = calibTape(tutor, lang, plan[[tutor.id, lang, r].join("/")] || [], fps[r - 1] ?? fps[0]);
+      tapes[r][["synthetic-tiles", lang, tutor.id].join("/")] = x.tracks;
+      if (x.timeoutAt) timeouts[[lang, tutor.id, r].join("/")] = x.timeoutAt;
+    }
+    const store = new R.Store(dir);
+    try {
+      const now = clock(at, 2);
+      withClock(at, () => {
+        for (const [i, budgetUsd] of (phases || [c.budgetUsd]).entries()) {
+          const e = execution({ ...c, budgetUsd }, [asset], tapes, now);
+          R.runBatch(store, { ...e, provider: calibProvider(R, tapes, timeouts), ...(i ? { topUp: true } : {}) });
+        }
+      });
+    } finally { store.close(); }
+    R.checkCalibration(dir, checkerPath, expPath, c.batchId, dry);
+    for (const part of ["records", "batches"]) cpSync(join(dir, part), join(runs, part), { recursive: true });
+    for (const f of readdirSync(dir).filter(f => f.startsWith("calibration-report-"))) cpSync(join(dir, f), join(runs, f));
+    writeFileSync(join(runs, "index.jsonl"), readFileSync(join(runs, "index.jsonl"), "utf8") + readFileSync(join(dir, "index.jsonl"), "utf8"));
+  };
+  const langs = ["zh-CN", "en"];
+  // Batch 11: the checker could not run (it is given no checker), so the runner writes a CANNOT_CHECK report.
+  batch(cfg("synthetic-cannot-check-11", "synthetic calibration whose checker could not run", [CALIB[0]], ["en"], 1, 0.05),
+    "2026-11-26T06:00:00Z", {}, ["fp_synth_7c1e"], false, null, join(work, "no-checker.py"));
+  // Batch 12: a dry run, one run per group, every group passes.
+  batch(cfg("synthetic-dryrun-12", "synthetic calibration dry run", CALIB, langs, 1, 0.05), "2026-11-26T07:00:00Z",
+    { ["calib-steady/en/1"]: ["fence"], ["calib-vague/zh-CN/1"]: ["plain2"] }, ["fp_synth_7c1e"], true);
+  // Batch 13: the full calibration. It fails: one group falls short and the rewrite rate is over the limit. The budget
+  // runs out in the middle of a conversation; after a top-up the runner restarts it and the interrupted record is
+  // superseded. The provider's backend changes before the third repeats, so two fingerprints appear.
+  batch(cfg("synthetic-calibration-13", "synthetic calibration of the simulated student, three scripted tutors", CALIB, langs, 3, 0.05), "2026-11-26T08:00:00Z", {
+    "calib-steady/zh-CN/1": ["plain2", "fence"], "calib-steady/zh-CN/2": ["stage2x2", "timeout3"], "calib-steady/zh-CN/3": ["leaveEarly3", "plain2"],
+    "calib-steady/en/1": ["discard"], "calib-steady/en/2": ["noMistake"], "calib-steady/en/3": ["missing2", "noSplit"],
+    "calib-leaky/zh-CN/3": ["unknownEvt3"], "calib-leaky/en/1": ["plain2"], "calib-leaky/en/2": ["stage2"],
+    "calib-vague/zh-CN/1": ["noKind"], "calib-vague/zh-CN/2": ["noKind", "plain2"], "calib-vague/zh-CN/3": ["paraphraseLeave"],
+    "calib-vague/en/1": ["missing2"], "calib-vague/en/2": ["noKind"],
+  }, ["fp_synth_7c1e", "fp_synth_7c1e", "fp_synth_9a40"], false, [CALIB_BUDGET_STOP, 0.05]);
+  return { expectations };
+}
+
 // ---------- run ----------
 const work = mkdtempSync(join(tmpdir(), "premium-dashboard-sample-"));
 try {
@@ -384,7 +545,7 @@ try {
       provider: job => replayProvider(tapes[job.repeatIndex], job) });
   } finally { store.close(); }
 
-  // From here on the current runner (record schema v3) adds to the same runs folder and ledger.
+  // From here on the v3 runner adds to the same runs folder and ledger.
   use(current);
   store = new Store(join(work, "runs"));
   try {
@@ -496,6 +657,8 @@ try {
   } finally { store.close(); }
 
   const runs = join(work, "runs");
+  // Last, the newest runner (record schema v5) writes the calibration batches, each checked by its own checkCalibration.
+  const calibration = calibrationV5(work, runs);
   // The runner stamps a reconciliation with the wall clock; pin it so the sample stays deterministic.
   for (const f of readdirSync(join(runs, "batches"))) {
     const path = join(runs, "batches", f), b = JSON.parse(readFileSync(path, "utf8"));
@@ -504,8 +667,9 @@ try {
     writeFileSync(path, JSON.stringify(b) + "\n");
   }
   const readDir = dir => readdirSync(join(runs, dir)).filter(f => f.endsWith(".json")).sort().map(f => JSON.parse(readFileSync(join(runs, dir, f), "utf8")));
+  const reports = readdirSync(runs).filter(f => /^calibration-report-.+\.json$/u.test(f)).sort().map(f => JSON.parse(readFileSync(join(runs, f), "utf8")));
   const sample = { source: "synthetic", note: "Synthetic sample produced by the premium runner in offline replay. Not real results.",
-    index: readFileSync(join(runs, "index.jsonl"), "utf8"), batches: readDir("batches"), records: readDir("records") };
+    index: readFileSync(join(runs, "index.jsonl"), "utf8"), batches: readDir("batches"), records: readDir("records"), reports, expectations: [calibration.expectations] };
   writeFileSync(bundlePath, "// Generated by generate-sample.mjs. Synthetic data only; do not edit by hand.\nglobalThis.PREMIUM_SAMPLE = "
     + JSON.stringify(sample) + ";\n");
   if (outDir) {
@@ -513,8 +677,12 @@ try {
     if (existsSync(outDir) && readdirSync(outDir).length) throw new Error("--out must be a new or empty folder: " + outDir);
     mkdirSync(outDir, { recursive: true });
     for (const part of ["index.jsonl", "batches", "records"]) cpSync(join(runs, part), join(outDir, part), { recursive: true });
+    for (const f of readdirSync(runs).filter(f => /^calibration-report-.+\.json$/u.test(f))) cpSync(join(runs, f), join(outDir, f));
+    // In a real folder the expectations are private and kept elsewhere; the synthetic ones are written beside the runs.
+    writeFileSync(join(outDir, "calibration-expectations.json"), JSON.stringify(calibration.expectations, null, 2) + "\n");
   }
-  console.log(JSON.stringify({ bundle: bundlePath, out: outDir, records: sample.records.length, batches: sample.batches.map(b => b.batchId) }, null, 2));
+  console.log(JSON.stringify({ bundle: bundlePath, out: outDir, records: sample.records.length, batches: sample.batches.map(b => b.batchId),
+    reports: reports.map(r => r.batchId + " " + r.verdict) }, null, 2));
 } finally { rmSync(work, { recursive: true, force: true }); }
 
 function execution(config, assets, tape, now) {
