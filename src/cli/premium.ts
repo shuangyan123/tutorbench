@@ -16,7 +16,7 @@ import { choices, id, invalid } from "../premium/schema.js";
 function main() {
   const [command, ...args] = process.argv.slice(2);
   const { values } = parseArgs({ args, options: {
-    "student-tape": { type: "string" }, calibration: { type: "string" }, phase: { type: "string" }, probes: { type: "string" }, recover: { type: "string" },
+    "student-tape": { type: "string" }, calibration: { type: "string" }, phase: { type: "string" }, "probe-id": { type: "string", multiple: true }, probes: { type: "string" }, recover: { type: "string" },
     report: { type: "string", multiple: true }, review: { type: "string", multiple: true }, output: { type: "string" },
     checker: { type: "string" }, expectations: { type: "string" }, "batch-id": { type: "string" },
     "dry-run": { type: "boolean" }, "live-student": { type: "boolean" }, "card-id": { type: "string" },
@@ -73,7 +73,7 @@ function main() {
   const config = configSchema(JSON.parse(readFileSync(values.config, "utf8")), "config");
   if (command === "calibrate") {
     if (config.kind === "evaluation") invalid("calibration.kind");
-    const probe = values.phase === "G2" || values.phase === "G3";
+    const probe = values.phase === "G2" || values.phase === "G3" || values.phase === "DIAGNOSTIC";
     if (!!values.probes !== probe || (config.kind === "calibration-probe" && !probe)) invalid("calibration.probe_arguments");
     config.kind = probe ? "calibration-probe" : "calibration";
   }
@@ -88,7 +88,9 @@ function main() {
   const studentBytes = values["student-tape"] ? readFileSync(values["student-tape"], "utf8").replace(/\r\n/g, "\n") : undefined;
   const studentTape: unknown = studentBytes ? JSON.parse(studentBytes) : undefined;
   const tapeHash = hash(bytes.replace(/\r\n/g, "\n"));
-  const phase: Phase | undefined = values.phase ? choices("G2", "G3", "G4")(values.phase, "calibration.phase") : undefined;
+  const phase: Phase | "DIAGNOSTIC" | undefined = values.phase ? choices("G2", "G3", "G4", "DIAGNOSTIC")(values.phase, "calibration.phase") : undefined;
+  if ((phase === "DIAGNOSTIC") !== !!values["probe-id"]?.length ||
+      (phase === "DIAGNOSTIC" && (values.report?.length || values.review?.length))) invalid("calibration.diagnostic_arguments");
   const exp = values.expectations ? readExpectations(values.expectations) : undefined;
   if (phase && (command !== "calibrate" || !exp)) invalid("calibration.phase_arguments");
   const asset = assets[0]!;
@@ -97,13 +99,13 @@ function main() {
       asset.protocol.version !== exp.protocol.version || config.repeats !== exp.repeats ||
       [...config.languages].sort().join() !== [...exp.languages].sort().join())) invalid("calibration.expectations");
   let probePlan: Execution["probePlan"];
-  if ((phase === "G2" || phase === "G3") && exp && values.probes) {
-    const gate = phase === "G2" ? "key" : "rest";
+  if ((phase === "G2" || phase === "G3" || phase === "DIAGNOSTIC") && exp && values.probes) {
+    const gate = phase === "DIAGNOSTIC" ? "diagnostic" : phase === "G2" ? "key" : "rest";
     if (basename(values.probes) !== exp.probes.file) invalid("calibration.probe_filename");
-    probePlan = { gate, probes: loadProbes(values.probes, exp, asset, gate) };
+    probePlan = { gate, probes: loadProbes(values.probes, exp, asset, gate, values["probe-id"]) };
   }
-  if (exp && !probePlan && (exp.tape.hash !== tapeHash || exp.tape.file !== basename(values.tape) ||
-      !exp.required.every(t => config.tutors.some(m => m.id === t)) ||
+  if (exp && (exp.tape.hash !== tapeHash || exp.tape.file !== basename(values.tape))) invalid("calibration.tape_pin");
+  if (exp && !probePlan && (!exp.required.every(t => config.tutors.some(m => m.id === t)) ||
       config.tutors.some(m => ![...exp.required, ...exp.optional].includes(m.id)))) invalid("calibration.tape_or_tutors");
   if (exp && (config.judges.length || config.alternates.length)) invalid("calibration.no_judges");
   let series: Execution["series"];
@@ -112,10 +114,10 @@ function main() {
     const validated = validateCalibration(resolve(values.checker), resolve(values.expectations!), resolve(values.cards),
       resolve(values.calibration ?? dirname(values.expectations!)));
     if (validated.status !== 0) invalid("calibration.validate_assets");
-    const prior = phase === "G2" ? undefined : finalCalibration(resolve(values.checker), resolve(values.expectations!),
+    const prior = phase === "G2" || phase === "DIAGNOSTIC" ? undefined : finalCalibration(resolve(values.checker), resolve(values.expectations!),
       phase === "G3" ? "G2" : "G3", (values.report ?? []).map(p => resolve(p)), (values.review ?? []).map(p => resolve(p)));
     if (prior && prior.status !== 0) invalid("calibration.prior_gate_not_passed");
-    series = { phase, id: hash(JSON.stringify(exp.pins)), priorBatchIds: prior?.batchIds ?? [] };
+    if (phase !== "DIAGNOSTIC") series = { phase, id: hash(JSON.stringify(exp.pins)), priorBatchIds: prior?.batchIds ?? [] };
   }
   const execution: Execution = { ...(studentBytes ? { mockTapeHash: hash(studentBytes) } : {}), ...(series ? { series } : {}), ...(probePlan ? { probePlan } : {}),
     ...(values.recover ? { recoverTransportRunId: id(values.recover, "recover") } : {}), config, assets, topUp: values["top-up"] ?? false,

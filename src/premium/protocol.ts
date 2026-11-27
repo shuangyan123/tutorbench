@@ -1,4 +1,4 @@
-import { amount, choices, invalid, localized, obj, positive, shape, str } from "./schema.js";
+import { amount, choices, invalid, localized, obj, optional, positive, shape, str } from "./schema.js";
 import type { Lang } from "./schema.js";
 
 const bilingual = localized(str);
@@ -11,7 +11,7 @@ const protocolSchema = shape({
   rewrite: shape({ joiner: strWithWhitespace, codes: (v, f) => Object.fromEntries(
     Object.entries(obj(v, f)).map(([k, item]) => [k, bilingual(item, f)])) }),
   injection: shape({ appliesWhen: str, separator: strWithWhitespace, position: choices("append"), runnerEvent: str,
-    dropModelReportedRunnerEvent: choicesTrue, lengthCheck: str }),
+    dropModelReportedRunnerEvent: choicesTrue, lengthCheck: str, echoCheckScope: optional(str) }),
   history: shape({ assistantContent: str, userContent: str, opening: str }),
 });
 function strWithWhitespace(v: unknown, f: string) { return typeof v === "string" && v.length ? v : invalid(f); }

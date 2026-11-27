@@ -134,10 +134,13 @@ function pythonReport(checker: string, args: string[], reportOption: string, acc
     return { status: process.status, report: obj(read(path), "checker.report") };
   } finally { rmSync(scratch, { recursive: true, force: true }); }
 }
+function v3Revision(r: Record<string, unknown>) {
+  return r.checkerVersion === 3 && (r.checkerRevision === undefined || r.checkerRevision === "3.1.0");
+}
 export function validateCalibration(checker: string, expectations: string, cards: string, calibration: string) {
   readExpectations(expectations);
   const { status, report } = pythonReport(checker, ["validate", cards, calibration, expectations], "--report", [0, 1]);
-  if (report.ok !== (status === 0) || !Array.isArray(report.errors) || (status === 0 && report.errors.length)) invalid("checker.validate");
+  if (!v3Revision(report) || report.ok !== (status === 0) || !Array.isArray(report.errors) || (status === 0 && report.errors.length)) invalid("checker.validate");
   return { status, report };
 }
 export function checkCalibrationV3(out: string, checker: string, expectations: string, batchId: string, cards: string, calibration: string) {
@@ -149,14 +152,16 @@ export function checkCalibrationV3(out: string, checker: string, expectations: s
       "--calibration", calibration, "--batch-id", batchId], "--report", [0, 1]);
     const batch = read(join(out, "batches", batchId + ".json"));
     const errors = report.cohortErrors;
-    if (report.checkerVersion !== 3 || report.batchId !== batchId || batch.batchId !== batchId ||
+    const diagnostic = batch.gate === "diagnostic";
+    if (!v3Revision(report) || (report.diagnostic ?? false) !== diagnostic ||
+        (diagnostic && (batch.kind !== "calibration-probe" || report.checkerRevision !== "3.1.0")) || report.batchId !== batchId || batch.batchId !== batchId ||
         report.batchKind !== batch.kind || (report.gate ?? null) !== (batch.gate ?? null) ||
-        report.machineVerdict !== (status === 0 ? "PASS" : "FAIL") || report.verdict !== (status === 0 ? "PENDING_REVIEW" : "FAIL") ||
+        report.machineVerdict !== (status === 0 ? "PASS" : "FAIL") || report.verdict !== (diagnostic ? "DIAGNOSTIC" : status === 0 ? "PENDING_REVIEW" : "FAIL") ||
         !Array.isArray(errors) || !Array.isArray(report.runs) || !Array.isArray(report.groups) ||
         !isDeepStrictEqual(report.pins, exp.pins)) invalid("checker.v3_report");
     const dir = join(out, "records"), records: RunRecord[] = [];
     const seriesBatches = new Set<string>();
-    if (batch.calibrationSeries) {
+    if (batch.calibrationSeries && !diagnostic) {
       const batches = join(out, "batches");
       for (const f of readdirSync(batches).filter(f => f.endsWith(".json"))) {
         const b = read(join(batches, f));
@@ -178,13 +183,14 @@ export function checkCalibrationV3(out: string, checker: string, expectations: s
     }
     checkRecords(records, errors);
     checkRequests(records, errors);
-    if (errors.length) report.verdict = "FAIL";
+    if (errors.length && !diagnostic) report.verdict = "FAIL";
+    report.checkerExitCode = status;
     report.servingIdentity = batch.servingIdentity ?? "unknown";
     const distribution = fingerprintDistribution(records);
     report.fingerprintDistribution = distribution;
     report.multipleFingerprints = distribution.filter(row => row.system_fingerprint !== null).length > 1;
     publish(destination, safeJson(report) + "\n");
-    return { status: report.verdict === "FAIL" ? 1 : 0, report };
+    return { status: status === 0 && report.machineVerdict === "PASS" && !errors.length ? 0 : 1, report };
   } catch {
     const report = { checkerVersion: 3, batchId, verdict: "CANNOT_CHECK" };
     try { publish(destination, safeJson(report) + "\n"); } catch { /* 路径不可写。 */ }
@@ -193,6 +199,7 @@ export function checkCalibrationV3(out: string, checker: string, expectations: s
 }
 const stages: Phase[] = ["G2", "G3", "G4"];
 function reportPhase(r: Record<string, unknown>): Phase | undefined {
+  if (r.diagnostic === true || r.verdict === "DIAGNOSTIC" || r.gate === "diagnostic") return undefined;
   if (r.batchKind === "calibration-probe") return r.gate === "key" ? "G2" : r.gate === "rest" ? "G3" : undefined;
   if (r.batchKind === "calibration" && r.gate == null) return "G4";
 }
@@ -223,13 +230,15 @@ export function finalCalibration(checker: string, expectations: string, scope: P
   const errors: string[] = [], requested = stages.slice(0, stages.indexOf(scope) + 1), batchIds: string[] = [];
   const inputs = reports.map(path => obj(read(path), "final.input"));
   const uniqueIds = new Set(inputs.map(r => id(r.batchId, "final.batchId")));
+  if (inputs.some(r => r.diagnostic === true || r.verdict === "DIAGNOSTIC" || r.gate === "diagnostic"))
+    errors.push("diagnostic reports are outside formal scope");
   if (inputs.length !== requested.length || uniqueIds.size !== inputs.length) errors.push("wrong report count or duplicate batch ID");
   for (const phase of requested) {
     const reportsForPhase = inputs.filter(r => reportPhase(r) === phase);
     if (reportsForPhase.length !== 1) { errors.push("expected exactly one report for " + phase); continue; }
     const r = reportsForPhase[0]!;
     batchIds.push(String(r.batchId));
-    if (r.checkerVersion !== 3 || r.machineVerdict !== "PASS" || r.verdict !== "PENDING_REVIEW" ||
+    if (!v3Revision(r) || r.machineVerdict !== "PASS" || r.verdict !== "PENDING_REVIEW" ||
         !Array.isArray(r.cohortErrors) || r.cohortErrors.length) errors.push(phase + ": machine or cohort failure");
     if (!isDeepStrictEqual(r.pins, exp.pins)) errors.push(phase + ": report pins differ from expectations");
     if (!coverage(r, exp, phase)) errors.push(phase + ": incomplete or duplicate report coverage");
@@ -246,7 +255,7 @@ export function finalCalibration(checker: string, expectations: string, scope: P
     scope, verdict: "FAIL", errors, groups: [], overrides: [] } };
   const result = pythonReport(checker, ["final", expectations, "--scope", scope, ...reports.flatMap(path => ["--report", path]),
     ...reviews.flatMap(path => ["--review", path])], "--out", [0, 1, 3]);
-  if (result.report.checkerVersion !== 3 || result.report.scope !== scope ||
+  if (!v3Revision(result.report) || result.report.scope !== scope ||
       result.report.verdict !== (result.status === 0 ? "PASS" : result.status === 1 ? "FAIL" : "PENDING_REVIEW"))
     invalid("checker.final_verdict");
   return { ...result, batchIds };

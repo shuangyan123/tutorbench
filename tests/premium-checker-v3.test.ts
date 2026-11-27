@@ -19,22 +19,23 @@ const report = { checkerVersion: 3, batchId, batchKind: "calibration-probe", gat
     runId: lang + "-" + (i + 1), probeId: "probe-key", lang, repeat: i + 1,
   }))),
 };
-function setup(t: TestContext) {
+function setup(t: TestContext, diagnostic = false) {
   const root = temp(t), checker = join(root, "checker.py"), exp = join(root, "expectations.json"), raw = join(root, "raw.json"),
     review = join(root, "review.json");
   const put = (file: string, x: unknown) => writeFileSync(file, JSON.stringify(x));
-  put(raw, report); put(exp, expectations);
+  const current = diagnostic ? { ...report, gate: "diagnostic", verdict: "DIAGNOSTIC", checkerRevision: "3.1.0", diagnostic: true } : report;
+  put(raw, current); put(exp, expectations);
   put(review, { batchId, schemaVersion: 1, status: "complete", items: [] });
   put(join(root, "unused.json"), {});
   mkdirSync(join(root, "batches"));
   mkdirSync(join(root, "records"));
-  put(join(root, "batches", batchId + ".json"), { batchId, kind: "calibration-probe", gate: "key" });
+  put(join(root, "batches", batchId + ".json"), { batchId, kind: "calibration-probe", gate: current.gate });
   // 子进程故意模拟可错误放行的上游，而不是在测试里复制包装器。
   writeFileSync(checker, `import json, pathlib, sys
 if sys.argv[1] == "check":
     p = pathlib.Path(sys.argv[2]) / "raw.json"
     r = json.loads(p.read_text(encoding="utf-8"))
-    code = 0
+    code = r.pop("fixtureExit", 1 if r["machineVerdict"] == "FAIL" else 0)
     target = "--report"
 else:
     closed = "--review" in sys.argv
@@ -53,7 +54,7 @@ sys.exit(code)
     calls: [], };
   const putRecord = (r: { runId: string }) => put(join(root, "records", r.runId + ".json"), r);
   putRecord(record);
-  return { checker, exp, raw, put, record, putRecord, check, final };
+  return { checker, exp, raw, put, current, record, putRecord, check, final };
 }
 test("v3 final fails verdict FAIL even with machine PASS", t => {
   const f = setup(t);
@@ -117,4 +118,30 @@ test("v3 check keeps PENDING_REVIEW; final returns 0, 1, or 3, and unavailable c
   assert.equal(finalCalibration(f.checker, f.exp, "G2", [f.raw], []).status, 3);
   writeFileSync(f.checker, "raise SystemExit(2)\n");
   assert.equal(f.check().status, 2);
+});
+
+test("diagnostic verdict alone cannot pass: machine, cohort and checker exit must agree", t => {
+  const f = setup(t, true);
+  const diagnostic = f.current;
+  const verify = (patch: object, status: number) => {
+    f.put(f.raw, { ...diagnostic, ...patch });
+    const check = f.check();
+    assert.equal(check.status, status);
+    if (status !== 2) assert.equal(check.report.verdict, "DIAGNOSTIC");
+  };
+  verify({}, 0);
+  verify({ machineVerdict: "FAIL" }, 1);
+  verify({ cohortErrors: ["fixture defect"] }, 1);
+  verify({ fixtureExit: 1 }, 2);
+  verify({ fixtureExit: 2 }, 2);
+  f.putRecord({ ...f.record, scorings: [{}] } as { runId: string });
+  verify({}, 1);
+});
+test("diagnostic reports are excluded by label, gate and diagnostic flag", t => {
+  const f = setup(t, true);
+  assert.equal(f.final().status, 1);
+  for (const flags of [{ diagnostic: true }, { gate: "diagnostic" }, { verdict: "DIAGNOSTIC" }]) {
+    f.put(f.raw, { ...report, ...flags, checkerRevision: "3.1.0" });
+    assert.equal(f.final().status, 1);
+  }
 });

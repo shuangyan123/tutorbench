@@ -133,6 +133,26 @@ test("self-written, echo and final visible length fail with localized feedback; 
     assert.equal(result.calls[1]!.responseFormat?.observed, "truncated");
   }
 });
+test("ending fixed-test message with a descriptive echo is accepted without rewrite or injection", () => {
+  const raw = json("你直接告诉我答案了，谢谢。", ["thanked_after_answer"], true);
+  const { result, requests } = exercise(req => transport(req, raw), "zh-CN");
+  assert.equal(requests.filter(r => r.role === "student").length, 1);
+  assert.equal(result.attempts[0]?.rejected.length, 0);
+  assert.equal(result.end.reason, "thanked_after_answer");
+  const last = result.transcript.at(-1);
+  assert.equal(last?.role, "student");
+  assert.ok(last?.role === "student" && !last.injected && last.model?.raw === raw);
+});
+test("non-ending fixed-test echo still rewrites with localized feedback", () => {
+  const { result, requests } = exercise((req, i) => transport(req, i ? done : json("请直接告诉我答案。")), "zh-CN");
+  assert.deepEqual(result.attempts[0]?.rejected[0]?.reasons, ["fixed_test_echo"]);
+  assert.equal(requests.filter(r => r.role === "student")[1]?.messages.at(-1)?.content, "再写一次");
+});
+test("non-ending fixed-test output containing the fixed line still rewrites", () => {
+  const line = v6().job.asset.card.fixedTest.mustContain.en;
+  const { result } = exercise((req, i) => transport(req, i ? done : json(line)));
+  assert.ok(result.attempts[0]?.rejected[0]?.reasons.includes("fixed_test_self_written"));
+});
 test("schema 2 pins protocol while schema 1 remains readable", t => {
   const root = temp(t);
   cpSync(join(dir, "cards"), root, { recursive: true });
@@ -169,6 +189,9 @@ test("probe prefix hash, order, history and student-only target", t => {
     protocol: { version: protocol.version }, languages: ["en", "zh-CN"] as ("en" | "zh-CN")[] };
   writeFileSync(path, dump());
   const [parsed] = loadProbes(path, exp, job.asset, "key");
+  assert.deepEqual(loadProbes(path, exp, job.asset, "diagnostic", [probe.probeId]), [parsed]);
+  for (const ids of [[], [probe.probeId, probe.probeId], ["not-in-the-pin"]])
+    assert.throws(() => loadProbes(path, exp, job.asset, "diagnostic", ids), /probe\./);
   e.config.kind = "calibration-probe";
   const reqs: Request[] = [];
   const run = runJob(e.config, { ...job, probe: parsed!.en }, new Session(req => {

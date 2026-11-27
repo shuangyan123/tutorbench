@@ -6,6 +6,7 @@ import { bool, choices, id, invalid, language, list, localized, obj, positive, s
 export interface Probe { probeId: string; probeSetVersion: string; targetStudentMessage: number; protocolVersion: string;
   prefixHash: string; tutorSource: string; prefix: PrefixLine[] }
 export type Phase = "G2" | "G3" | "G4";
+export type ProbeGate = "key" | "rest" | "diagnostic";
 const gate = choices("key", "rest");
 const pin = shape({ file: id, hash: str });
 const probe = shape({ probeId: id, gate, purpose: str, targetStudentMessage: positive,
@@ -46,7 +47,8 @@ function parsePrefix(lines: Record<string, unknown>[], target: number): PrefixLi
   // 校验结构后保留原对象的键顺序，避免改变私有前缀的哈希。
   return lines as unknown as PrefixLine[];
 }
-export function loadProbes(path: string, exp: Pick<Expectations, "languages" | "probes"> & { protocol: { version: string } }, asset: Asset, selection: "key" | "rest") {
+export function loadProbes(path: string, exp: Pick<Expectations, "languages" | "probes"> & { protocol: { version: string } }, asset: Asset,
+  selection: ProbeGate, diagnosticIds?: string[]) {
   const raw = readFileSync(path, "utf8").replace(/\r\n/g, "\n");
   if (hash(raw) !== exp.probes.hash) invalid("probe.file_hash");
   const file = obj(JSON.parse(raw), "probes");
@@ -58,7 +60,10 @@ export function loadProbes(path: string, exp: Pick<Expectations, "languages" | "
     if (JSON.stringify(rows.filter(p => p.gate === key).map(p => p.probeId).sort()) !==
         JSON.stringify([...exp.probes.gates[key]].sort())) invalid("probes.gate");
   }
-  return exp.probes.gates[selection].map(probeId => {
+  const selected = selection === "diagnostic" ? unique(diagnosticIds ?? [], "probe.diagnostic_ids") : exp.probes.gates[selection];
+  if ((selection !== "diagnostic" && diagnosticIds?.length) || !selected.length ||
+      selected.some(key => !rows.some(p => p.probeId === key))) invalid("probe.selection");
+  return selected.map(probeId => {
     const p = rows.find(row => row.probeId === probeId)!;
     return Object.fromEntries(exp.languages.map(lang => {
       if (hash(JSON.stringify(p.prefix[lang])) !== p.prefixHash[lang]) invalid("probes.prefix_hash");

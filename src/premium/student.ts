@@ -44,7 +44,7 @@ export function checkStudent(raw: string | null, asset: Asset, lang: Lang, previ
   if (events.includes("curt_exit") && stage < card.solvedStage) hard.push("curt_exit_unsolved");
   if (events.includes("left") && card.leaveNotBefore && studentMessage < card.leaveNotBefore) hard.push("left_too_early");
   if (containsText && (studentMessage < fixed.studentMessage || (injected && studentMessage > fixed.studentMessage))) hard.push("fixed_test_early");
-  if (injected && studentMessage === fixed.studentMessage) {
+  if (injected && studentMessage === fixed.studentMessage && !end) {
     if (containsText) hard.push("fixed_test_self_written");
     if (fixed.echoPatterns?.[lang].some(pattern => lang === "en" ? message.toLowerCase().includes(pattern.toLowerCase()) : message.includes(pattern))) hard.push("fixed_test_echo");
   }

@@ -1,6 +1,6 @@
 import { hash, type Asset } from "./cards.js";
 import { batchCache } from "./cache-summary.js";
-import type { Phase, Probe } from "./plan.js";
+import type { Phase, Probe, ProbeGate } from "./plan.js";
 import type { Lang } from "./schema.js";
 import { judgePrompt } from "./judge.js";
 import { dollars, panel, Session, sumUsd, type Config, type Provider } from "./provider.js";
@@ -14,7 +14,7 @@ import { studentPrompt } from "./student.js";
 export interface Execution {
   config: Config; assets: Asset[]; gitCommit: string; tapeHash: string;
   topUp?: boolean; recoverTransportRunId?: string; mockTapeHash?: string;
-  probePlan?: { gate: "key" | "rest"; probes: ReadonlyArray<Record<Lang, Probe>> };
+  probePlan?: { gate: ProbeGate; probes: ReadonlyArray<Record<Lang, Probe>> };
   series?: { phase: Phase; id: string; priorBatchIds: string[] };
   judgePrompts?: Record<"en" | "zh-CN", string>; mode?: "hybrid_calibration";
   provider: (job: Job) => Provider; now?: () => string;
@@ -138,9 +138,14 @@ export function runBatch(store: Store, e: Execution) {
   const recoveryId = e.recoverTransportRunId;
   if (!!e.probePlan !== (c.kind === "calibration-probe") || (e.probePlan && (e.assets.length !== 1 || !e.assets[0]?.protocol ||
       c.tutors.length || !e.probePlan.probes.length))) invalid("calibration.probe_plan");
-  if (e.mode && e.assets.some(a => a.protocol) && !e.series) invalid("calibration.series_required");
+  const diagnostic = e.probePlan?.gate === "diagnostic";
+  if (diagnostic && (e.series || e.topUp || c.budgetUsd <= 0 || c.hardCapUsd !== c.budgetUsd))
+    invalid("calibration.diagnostic_budget_or_series");
+  if (e.mode && e.assets.some(a => a.protocol) && !e.series && !diagnostic) invalid("calibration.series_required");
   const now = e.now ?? (() => new Date().toISOString());
   store.transaction(() => {
+    if (store.batches().some(b => diagnostic ? b.batchId !== c.batchId || b.gate !== "diagnostic" : b.gate === "diagnostic"))
+      invalid("calibration.diagnostic_output");
     checkSeries(store, e);
     bindVersions(store, e, spec.tutors);
     if (e.mode) store.liveGuard(c.batchId);
