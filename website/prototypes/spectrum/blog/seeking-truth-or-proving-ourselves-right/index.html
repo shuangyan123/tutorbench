@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Are We Seeking Truth, or Trying to Prove Ourselves Right? · Teachometry Journal</title>
+<meta name="description" content="Why can an AI breakthrough always be dismissed? The argument over a proof of the Riemann Hypothesis, moving the goalposts, motivated reasoning and the argumentative theory of reasoning, on the difference between rational doubt and refusing evidence, and how AI could be a thinking partner rather than an echo chamber.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="stylesheet" href="../../fonts.css" media="print" data-fonts>
+<noscript><link rel="stylesheet" href="../../fonts.css"></noscript>
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<script>
+  // Web fonts (fonts.css). On a reader's first visit the page paints at once in their own fonts and
+  // the site's fonts are fetched right after that first paint, so a slow connection never waits for
+  // text. Once the fonts are cached the next pages ask for them up front, as an ordinary stylesheet.
+  (function () {
+    var link = document.querySelector("link[data-fonts]");
+    if (!link) return;
+    var KEY = "teachometry-fonts";
+    var done = false;
+    function use() {
+      if (done) return;
+      done = true;
+      link.media = "all";
+      if (!document.fonts || !document.fonts.ready) return;
+      var slow = false;
+      document.fonts.ready.then(function () {
+        if (slow) return;
+        try { window.localStorage.setItem(KEY, "1"); } catch (e) { /* storage is optional */ }
+      });
+      // A font that arrives late would change the text under a reader who is already reading. On a
+      // slow connection (a face still on its way two seconds after it was asked for) the faces that
+      // have not arrived are dropped for this page: the text keeps the reader's own font from
+      // first paint to last, and nothing is swapped late. The next page tries again.
+      var asked = [], since = [];
+      function faces() { var list = []; document.fonts.forEach(function (f) { list.push(f); }); return list; }
+      function plain(name) { return String(name).replace(/["']/g, "").trim(); }
+      // asked for and not here yet: Safari reports such a face as "error" until it arrives
+      function waiting(f) { return f.status === "loading" || f.status === "error"; }
+      var watch = window.setInterval(function () {
+        faces().forEach(function (f) { if (waiting(f) && asked.indexOf(f) < 0) { asked.push(f); since.push(Date.now()); } });
+      }, 250);
+      window.setTimeout(function () {
+        window.clearInterval(watch);
+        var now = Date.now(), sheet = null;
+        try { sheet = link.sheet && link.sheet.cssRules ? link.sheet : null; } catch (e) { /* not readable */ }
+        var late = asked.some(function (f, i) { return waiting(f) && now - since[i] >= 2000; });
+        if (sheet && !late) return;
+        slow = true;
+        try { window.localStorage.removeItem(KEY); } catch (e) { /* storage is optional */ }
+        if (!sheet) { link.media = "print"; return; }   // not even the list of fonts has arrived
+        // the page's faces are listed in the order of the @font-face rules in fonts.css
+        var all = faces(), rules = sheet.cssRules, i;
+        if (all.length !== rules.length) return;
+        for (i = 0; i < rules.length; i++) if (!rules[i].style || plain(rules[i].style.getPropertyValue("font-family")) !== plain(all[i].family)) return;
+        for (i = rules.length - 1; i >= 0; i--) if (all[i].status !== "loaded") sheet.deleteRule(i);
+      }, 3400);
+    }
+    var cached = null;
+    try { cached = window.localStorage.getItem(KEY); } catch (e) { /* storage is optional */ }
+    var paint = window.PerformanceObserver && PerformanceObserver.supportedEntryTypes &&
+      PerformanceObserver.supportedEntryTypes.indexOf("paint") >= 0;
+    if (cached || !paint) { use(); return; }
+    var observer = new PerformanceObserver(function (list) {
+      if (list.getEntriesByName("first-contentful-paint").length) { observer.disconnect(); use(); }
+    });
+    observer.observe({ type: "paint", buffered: true });
+    // a page opened in a background tab does not paint until it is shown
+    window.setTimeout(function () { if (document.visibilityState === "visible") use(); }, 3000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") window.setTimeout(use, 3000); });
+  })();
+</script>
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    // the 404 page answers at any address: under /zh-cn/ it answers in Chinese
+    var lost = !root.getAttribute("data-route-lang") && /\/zh-cn(\/|$)/.test(location.pathname);
+    var wantZh = q ? q.indexOf("zh") === 0 : lost ? true : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    // the reader keeps the place they were sent to: the #anchor and any ?query go across as well
+    if (other) location.replace(location.origin + other + location.search + location.hash);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106" fetchpriority="high"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb" translate="no"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html" aria-current="page"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+    <a href="../../work-with-us/index.html" class="nav-work"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle translate="no" aria-label="中 / EN · Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../work-with-us/index.html"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <header class="essay-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><a class="issue" href="../index.html"><span class="en">Journal · Essay 3 of 10</span><span class="zh" lang="zh-CN">期刊 · 第 3 篇，共 10 篇</span></a><span class="rule" aria-hidden="true"></span><span><span class="en">Perspective</span><span class="zh" lang="zh-CN">观点</span></span><time datetime="2026-11-28"><span class="en">November 28, 2026</span><span class="zh" lang="zh-CN">2026年11月28日</span></time></p>
+        <h1 class="essay-title"><span class="en">Are We Seeking Truth, or Trying to Prove Ourselves Right?</span><span class="zh" lang="zh-CN">我们<wbr>是在<wbr>追求<wbr>真理<wbr>，<wbr>还是<wbr>在<wbr>证明<wbr>自己<wbr>正确<wbr>？</span></h1>
+        <p class="en essay-dek">Is being contradicted a chance to learn something, or a contest we have to win?</p><p class="zh essay-dek" lang="zh-CN">一次反驳，是获取新认识的机会，还是一场必须赢下的竞争？</p>
+        <div class="essay-by">
+          <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">6 sections · about 7 min</span><span class="zh" lang="zh-CN">6 节 · 约 8 分钟</span></span></p>
+          <div class="essay-share" data-share hidden>
+            <button type="button" class="share-btn kicker" data-share-toggle aria-expanded="false" aria-controls="share-list"><svg class="share-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4a2.9 2.9 0 0 0 4.1 0l2.2-2.2a2.9 2.9 0 0 0-4.1-4.1l-.9.9"/><path d="M9.4 6.6a2.9 2.9 0 0 0-4.1 0L3.1 8.8a2.9 2.9 0 0 0 4.1 4.1l.9-.9"/></svg><span class="share-idle"><span class="en">Share</span><span class="zh" lang="zh-CN">分享</span></span><span class="share-done"><span class="en">Link copied</span><span class="zh" lang="zh-CN">链接已复制</span></span></button>
+            <div class="share-list" id="share-list" data-share-list role="group" aria-label="Share this essay" data-aria-label-en="Share this essay" data-aria-label-zh="分享这篇文章" hidden>
+              <button type="button" class="share-item" data-share-copy data-state="idle"><span class="share-idle"><span class="en">Copy link</span><span class="zh" lang="zh-CN">复制链接</span></span><span class="share-fail"><span class="en">Copy it from here</span><span class="zh" lang="zh-CN">请在下面复制</span></span></button>
+              <input class="share-field" data-share-field type="text" readonly hidden aria-label="Link to this essay" data-aria-label-en="Link to this essay" data-aria-label-zh="这篇文章的链接">
+              <a class="share-item" data-share-x href="https://x.com/intent/tweet" target="_blank" rel="noopener noreferrer" aria-label="Post on X (opens in a new tab)" data-aria-label-en="Post on X (opens in a new tab)" data-aria-label-zh="发到 X（在新标签页打开）"><span><span class="en">Post on X</span><span class="zh" lang="zh-CN">发到 X</span></span><svg class="share-out" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a>
+              <button type="button" class="share-item" data-share-native hidden><span><span class="en">More…</span><span class="zh" lang="zh-CN">更多…</span></span></button>
+            </div>
+            <span class="share-said" data-share-said role="status"></span>
+          </div>
+        </div>
+      </div>
+      <figure class="cover-plate">
+        <img src="../../assets/journal/compass.webp" alt="A brass pocket compass on a printed map, set square to the map’s north arrow; beside it lies a red horseshoe magnet, and the needle has swung towards it, in low afternoon sun." width="900" height="1100" data-alt-en="A brass pocket compass on a printed map, set square to the map’s north arrow; beside it lies a red horseshoe magnet, and the needle has swung towards it, in low afternoon sun." data-alt-zh="午后低斜的阳光里，一只黄铜怀表式指南针放在印刷地图上，刻度盘的 N 对准地图的指北箭头；旁边躺着一块红色马蹄形磁铁，指针已经朝它偏了过去。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">North has not moved. The needle has.</span><span class="zh" lang="zh-CN">北没有动，动的是指针。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap essay-body">
+    <nav class="essay-toc" aria-label="On this page">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <ol>
+        <li><a href="#why-can-an-ai-breakthrough-always-be-dismissed"><span class="en">Why can an AI breakthrough always be dismissed?</span><span class="zh" lang="zh-CN">为什么 AI 的突破总是可以被否定？</span></a></li>
+        <li><a href="#must-science-have-direct-practical-value"><span class="en">Must science have direct practical value?</span><span class="zh" lang="zh-CN">科学是否必须具有直接的实用价值？</span></a></li>
+        <li><a href="#what-are-we-really-judging-ai-by"><span class="en">What are we really judging AI by?</span><span class="zh" lang="zh-CN">我们究竟在根据什么评价 AI？</span></a></li>
+        <li><a href="#why-is-it-so-hard-to-change-our-minds"><span class="en">Why is it so hard to change our minds?</span><span class="zh" lang="zh-CN">为什么人们很难改变自己的观点？</span></a></li>
+        <li><a href="#why-do-i-like-discussing-things-with-ai"><span class="en">Why do I like discussing things with AI?</span><span class="zh" lang="zh-CN">我为什么喜欢与 AI 讨论？</span></a></li>
+        <li><a href="#discussion-is-itself-learning"><span class="en">Discussion is itself learning</span><span class="zh" lang="zh-CN">讨论本身就是学习</span></a></li>
+      </ol>
+    </nav>
+    <article class="essay-text">
+      <div class="prose">
+        <p class="en">I used to comment online only rarely.</p><p class="zh" lang="zh-CN">我以前很少在网络上发表评论。</p>
+        <p class="en first">I had noticed that in many discussions, when one person tries to refute another, the other person seldom reconsiders their view. Instead they look for more reasons to refute back.</p><p class="zh first" lang="zh-CN">因为我发现，在很多讨论中，当一个人试图反驳另一个人时，对方往往并不会因此重新审视自己的观点，而是寻找更多理由反驳回来。</p>
+        <p class="en">Both sides put in a great deal of time and the discussion grows ever more heated, yet neither seems to understand the problem any more accurately.</p><p class="zh" lang="zh-CN">双方投入了大量时间，讨论也变得越来越激烈，但他们对问题的认识似乎并没有变得更加准确。</p>
+        <p class="en">The recent arguments about AI have made me feel this more sharply than ever.</p><p class="zh" lang="zh-CN">最近关于 AI 的争论，让我更加明显地感受到了这一点。</p>
+        <h2 id="why-can-an-ai-breakthrough-always-be-dismissed"><span class="no">§1</span><span><span class="en">Why can an AI breakthrough always be dismissed?</span><span class="zh" lang="zh-CN">为什么<wbr> <wbr>AI<wbr> <wbr>的<wbr>突破<wbr>总是<wbr>可以<wbr>被<wbr>否定<wbr>？</span></span></h2>
+        <p class="en">On 20 November 2026, Levent Alpöge, a mathematician at Anthropic, announced a proof of the Riemann Hypothesis that he said he had found working with Claude<a class="fn" href="#source-1" aria-label="Source 1">1</a>. He released it not as a paper but as a formal proof in the Lean proof assistant, a library of about 17 million lines that also covers the Generalized Riemann Hypothesis for Dirichlet L-functions. The next day, the Lean FRO and the Mathlib Initiative issued a joint statement: the library compiles, the theorem it proves is exactly Mathlib’s statement of the Riemann Hypothesis, and the proof has been accepted by several independent checkers<a class="fn" href="#source-2" aria-label="Source 2">2</a>.</p><p class="zh" lang="zh-CN">2026 年 11 月 20 日，Anthropic 的数学家 Levent Alpöge 公布了一个他与 Claude 合作得到的黎曼猜想证明<a class="fn" href="#source-1" aria-label="资料 1">1</a>。这个证明没有以论文的形式发表，而是以 Lean 形式化证明的形式公开：一个约 1700 万行的代码库，其中还包括狄利克雷 L 函数的广义黎曼猜想。第二天，Lean FRO 与 Mathlib Initiative 发表联合声明：这个代码库能够通过编译，它所证明的定理正是 Mathlib 中黎曼猜想的陈述，证明也已经被多个独立的检查器接受<a class="fn" href="#source-2" aria-label="资料 2">2</a>。</p>
+        <p class="en">Formal verification provides important evidence that the result is correct. But what it checks is a proof a machine can check; it does not mean mathematicians have already understood and reviewed the ideas in it. At the time of writing, accounts of the proof for human readers are still being written<a class="fn" href="#source-3" aria-label="Source 3">3</a>, and the work has not yet been through journal peer review or been formally recognised by bodies such as the Clay Mathematics Institute.</p><p class="zh" lang="zh-CN">形式化核验为这项成果提供了重要的正确性证据，但它核验的是机器可以检查的证明，并不等于数学界已经理解和审查了其中的思想。截至本文发布时，面向人类读者的证明解读仍在撰写之中<a class="fn" href="#source-3" aria-label="资料 3">3</a>，这项成果也还没有经过期刊同行评审，或得到克雷数学研究所等机构的正式认定。</p>
+        <figure class="fig" id="fig1">
+          <ol class="checks">
+            <li class="ck-done"><span class="ck-d"><span class="en">20 Nov 2026</span><span class="zh" lang="zh-CN">2026-11-20</span></span><span class="ck-t"><span class="en">Announced: a proof found with Claude, released as a Lean library of about 17 million lines</span><span class="zh" lang="zh-CN">公布：一个与 Claude 合作得到的证明，以约 1700 万行的 Lean 代码库发布</span></span><span class="ck-s"><span class="en">Released</span><span class="zh" lang="zh-CN">已发布</span></span></li><li class="ck-done"><span class="ck-d"><span class="en">21 Nov 2026</span><span class="zh" lang="zh-CN">2026-11-21</span></span><span class="ck-t"><span class="en">Lean FRO and Mathlib Initiative: the library compiles, proves exactly Mathlib’s statement of the Riemann Hypothesis, and is accepted by several independent checkers</span><span class="zh" lang="zh-CN">Lean FRO 与 Mathlib Initiative：代码库能通过编译，证明的正是 Mathlib 中黎曼猜想的陈述，并被多个独立检查器接受</span></span><span class="ck-s"><span class="en">Checked by machine</span><span class="zh" lang="zh-CN">机器已核验</span></span></li><li class="ck-open"><span class="ck-d"><span class="en">In progress</span><span class="zh" lang="zh-CN">进行中</span></span><span class="ck-t"><span class="en">Accounts of the proof written for human readers</span><span class="zh" lang="zh-CN">面向人类读者的证明解读</span></span><span class="ck-s"><span class="en">Being written</span><span class="zh" lang="zh-CN">撰写中</span></span></li><li class="ck-open"><span class="ck-d"><span class="en">Not yet</span><span class="zh" lang="zh-CN">尚未</span></span><span class="ck-t"><span class="en">Journal peer review; formal recognition by bodies such as the Clay Mathematics Institute</span><span class="zh" lang="zh-CN">期刊同行评审；克雷数学研究所等机构的正式认定</span></span><span class="ck-s"><span class="en">Not yet</span><span class="zh" lang="zh-CN">尚未</span></span></li>
+          </ol>
+          <figcaption><b><span class="en">Fig. 1</span><span class="zh" lang="zh-CN">图 1</span></b><span class="en">Where the proof described in this section stood on 28 November 2026, from sources 1–3. Checked by a machine is not yet the same as understood by people.</span><span class="zh" lang="zh-CN">本节所说的证明在 2026 年 11 月 28 日的状态，据资料 1–3。被机器核验，还不等于被人理解。</span></figcaption>
+        </figure>
+        <p class="en">This is, without doubt, a research development worth paying attention to.</p><p class="zh" lang="zh-CN">这无疑是一个值得关注的研究进展。</p>
+        <p class="en">In the comment sections, though, I saw some very different verdicts.</p><p class="zh" lang="zh-CN">然而，我在评论区中看到了一些不同的评价。</p>
+        <p class="en">Some said that even if AI can prove the Riemann Hypothesis, it means nothing, because the Riemann Hypothesis has not directly improved anyone’s life.</p><p class="zh" lang="zh-CN">有人认为，即使 AI 能够证明黎曼猜想，这也没有什么意义，因为黎曼猜想并没有直接改善现实生活。</p>
+        <p class="en">Only when AI solves controlled nuclear fusion, room-temperature superconductivity or the treatment of cancer, they said, will it truly have proved what it can do.</p><p class="zh" lang="zh-CN">他们认为，只有当 AI 解决可控核聚变、常温超导或者癌症治疗等问题时，才能真正证明自己的能力。</p>
+        <p class="en">Of course I hope those problems get solved.</p><p class="zh" lang="zh-CN">我当然希望这些问题得到解决。</p>
+        <p class="en">But judging AI’s intellectual ability and judging its actual contribution to social welfare were always two different questions.</p><p class="zh" lang="zh-CN">但评价 AI 的智力能力，与评价 AI 对社会福利的实际贡献，本来就是两个不同的问题。</p>
+        <p class="en">A mathematical proof depends mainly on logical reasoning and rigorous checking, whereas fusion, superconducting materials and cancer treatment also involve physical experiments, making materials, engineering, clinical trials and deployment in society.</p><p class="zh" lang="zh-CN">数学证明主要依赖逻辑推理与严格核验，而核聚变、超导材料和癌症治疗还涉及物理实验、材料制造、工程建设、临床试验以及社会部署。</p>
+        <p class="en">Even with extraordinarily powerful intelligence, we could not skip those processes.</p><p class="zh" lang="zh-CN">即使我们拥有极其强大的智力，也不意味着可以省略这些过程。</p>
+        <p class="en">So we cannot deny the mathematical reasoning a result shows just because it has not immediately turned into practical benefit.</p><p class="zh" lang="zh-CN">因此，不能仅仅因为一项数学成果没有立即转化为现实利益，就否定它所体现的数学推理能力。</p>
+        <h2 id="must-science-have-direct-practical-value"><span class="no">§2</span><span><span class="en">Must science have direct practical value?</span><span class="zh" lang="zh-CN">科学<wbr>是否<wbr>必须<wbr>具有<wbr>直接<wbr>的<wbr>实用<wbr>价值<wbr>？</span></span></h2>
+        <p class="en">In 1997, in Pasteur’s Quadrant, the political scientist Donald Stokes proposed a framework for classifying research<a class="fn" href="#source-4" aria-label="Source 4">4</a>.</p><p class="zh" lang="zh-CN">1997 年，政治学家 Donald Stokes 在《巴斯德象限》（Pasteur's Quadrant）中提出了一个研究分类框架<a class="fn" href="#source-4" aria-label="资料 4">4</a>。</p>
+        <p class="en">He took two questions as the dimensions of research activity:</p><p class="zh" lang="zh-CN">他将两个问题分别作为研究活动的维度：</p>
+        <p class="en">Does the research seek an understanding of fundamental laws? Is it inspired by considerations of practical use?</p><p class="zh" lang="zh-CN">研究是否追求对基本规律的理解？研究是否受到实际用途的启发？</p>
+        <p class="en">In this framework, basic and applied research are not simple opposites.</p><p class="zh" lang="zh-CN">在这个框架中，基础研究与应用研究并不是简单对立的。</p>
+        <p class="en">Some research mainly seeks to understand the world, some mainly solves practical problems, and some pursues both at once.</p><p class="zh" lang="zh-CN">有些研究主要追求对世界的理解，有些研究主要解决实际问题，还有一些研究同时追求这两个目标。</p>
+        <p class="en">We certainly need research with clear practical value, but that does not mean knowledge without immediate application has no value as research.</p><p class="zh" lang="zh-CN">我们当然需要具有明确现实价值的研究，但这不意味着暂时缺乏直接应用的知识就没有研究价值。</p>
+        <p class="en">Understanding how the prime numbers are distributed, the structure of the universe or the nature of consciousness should not first have to prove it can make money before it deserves human attention.</p><p class="zh" lang="zh-CN">认识素数的分布、理解宇宙的结构、探索意识的本质，都不必首先证明它们能够创造经济收益，才值得人类关注。</p>
+        <p class="en">Nor do I want to defend basic science by claiming that all of it will sooner or later bring huge economic benefits, because that promise itself cannot be guaranteed.</p><p class="zh" lang="zh-CN">我也并不想通过宣称所有基础科学迟早都会产生巨大经济利益来为它们辩护，因为这种承诺本身并不能得到保证。</p>
+        <p class="en">I think understanding the world can itself be something humans pursue as an end.</p><p class="zh" lang="zh-CN">我认为，认识世界本身就可以是人类追求的目的。</p>
+        <h2 id="what-are-we-really-judging-ai-by"><span class="no">§3</span><span><span class="en">What are we really judging AI by?</span><span class="zh" lang="zh-CN">我们<wbr>究竟<wbr>在<wbr>根据<wbr>什么<wbr>评价<wbr> <wbr>AI<wbr>？</span></span></h2>
+        <p class="en">If someone has cared from the start about whether AI can improve ordinary people’s lives, it is entirely reasonable for them to ask to see real results in medicine, energy or social welfare.</p><p class="zh" lang="zh-CN">如果一个人从一开始就关心 AI 能否改善普通人的生活，那么他要求看到医疗、能源或社会福利上的实际成果，是完全合理的。</p>
+        <p class="en">But if someone first denied that AI can reason, and then, once AI made a breakthrough in reasoning, kept denying its ability because the breakthrough has no direct economic value, the standard of judgement has changed.</p><p class="zh" lang="zh-CN">但如果一个人最初否认的是 AI 的推理能力，而当 AI 获得推理突破后，又因为这一突破没有直接经济价值而继续否认其能力，那么评价标准就发生了改变。</p>
+        <p class="en">This way of arguing, which keeps changing the original demand for proof so as to avoid accepting contrary evidence, is called moving the goalposts.</p><p class="zh" lang="zh-CN">这种不断改变原有证明要求、从而避免接受反面证据的论证方式，被称为移动球门（Moving the Goalposts）。</p>
+        <figure class="fig" id="fig2">
+          <div class="posts">
+            <ol class="ps-list">
+              <li class="ps-was"><span class="ps-k"><span class="en">At first</span><span class="zh" lang="zh-CN">起初</span></span><span class="ps-v"><span class="en">“AI cannot really reason.”</span><span class="zh" lang="zh-CN">“AI 并不会真正推理。”</span></span></li>
+              <li class="ps-ev"><span class="ps-k"><span class="en">Then</span><span class="zh" lang="zh-CN">然后</span></span><span class="ps-v"><span class="en">A breakthrough in reasoning</span><span class="zh" lang="zh-CN">推理上取得突破</span></span></li>
+              <li class="ps-now"><span class="ps-k"><span class="en">Now</span><span class="zh" lang="zh-CN">现在</span></span><span class="ps-v"><span class="en">“It has no direct economic value.”</span><span class="zh" lang="zh-CN">“它没有直接的经济价值。”</span></span><span class="ps-tag"><span class="en">The standard has moved</span><span class="zh" lang="zh-CN">标准变了</span></span></li>
+            </ol>
+            <p class="ps-q"><span class="en ps-k">The question to ask first</span><span class="zh ps-k" lang="zh-CN">应该先回答的问题</span><span class="en ps-t">What evidence would make me change my view?</span><span class="zh ps-t" lang="zh-CN">什么样的证据，能让我改变观点？</span></p>
+          </div>
+          <figcaption><b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b><span class="en">The pattern this section calls moving the goalposts. Written from the essay’s description, not quoted from real comments.</span><span class="zh" lang="zh-CN">本节所说的“移动球门”。根据文中的描述写成，不是真实评论的引文。</span></figcaption>
+        </figure>
+        <p class="en">I think any empirical judgement about AI’s abilities should be able to answer one question:</p><p class="zh" lang="zh-CN">我认为，任何对 AI 能力的经验性判断，都应该能够回答一个问题：</p>
+        <p class="en">What evidence, exactly, would make me change my current view?</p><p class="zh" lang="zh-CN">究竟什么样的证据，能够让我改变目前的观点？</p>
+        <p class="en">If AI’s failures can be used to prove it has no ability, while its successes can always be given new reasons for dismissal, the view can hardly ever really be tested.</p><p class="zh" lang="zh-CN">如果 AI 的失败可以被用来证明它没有能力，而 AI 的成功总是能够被赋予新的否定理由，那么这种观点就很难真正接受检验。</p>
+        <p class="en">This is not to say we should believe everything AI companies say about themselves.</p><p class="zh" lang="zh-CN">这并不是说我们应该相信所有 AI 公司的宣传。</p>
+        <p class="en">On the contrary, the bigger the technical achievement, the more it needs rigorous checking, independent reproduction and clearly stated limits to what it can do.</p><p class="zh" lang="zh-CN">相反，越是重大的技术成果，越需要严谨核验、独立复现和明确的能力边界。</p>
+        <p class="en">Rational doubt is not refusing to accept new evidence. It is asking that the evidence be enough to support the conclusion.</p><p class="zh" lang="zh-CN">理性的怀疑并不是拒绝接受新证据，而是要求证据足以支持结论。</p>
+        <h2 id="why-is-it-so-hard-to-change-our-minds"><span class="no">§4</span><span><span class="en">Why is it so hard to change our minds?</span><span class="zh" lang="zh-CN">为什么<wbr>人们<wbr>很<wbr>难<wbr>改变<wbr>自己<wbr>的<wbr>观点<wbr>？</span></span></h2>
+        <p class="en">In “The Case for Motivated Reasoning”, published in 1990, the psychologist Ziva Kunda discussed an important phenomenon: people’s motives can shape how they search for, construct and evaluate information<a class="fn" href="#source-5" aria-label="Source 5">5</a>.</p><p class="zh" lang="zh-CN">心理学家 Ziva Kunda 在 1990 年发表的《动机性推理》（The Case for Motivated Reasoning）中讨论了一个重要现象：人的动机能够影响其寻找、构造和评价信息的方式<a class="fn" href="#source-5" aria-label="资料 5">5</a>。</p>
+        <p class="en">People do not always process evidence neutrally.</p><p class="zh" lang="zh-CN">人并不总是在中立地处理证据。</p>
+        <p class="en">When people want a conclusion to be true, they may find it easier to look for reasons that support it, and hold contrary evidence to a stricter standard.</p><p class="zh" lang="zh-CN">当人们希望某个结论成立时，可能会更容易寻找支持该结论的理由，并对相反证据提出更严格的要求。</p>
+        <p class="en">This offers one possible explanation for some of the arguments about AI.</p><p class="zh" lang="zh-CN">这为理解某些 AI 争论提供了一种可能的解释。</p>
+        <p class="en">If someone’s career prospects are threatened by AI’s progress, accepting that AI has made a major breakthrough may mean not only revising a technical judgement, but facing their own worries about the future again.</p><p class="zh" lang="zh-CN">如果一个人的职业前景受到 AI 发展的威胁，那么接受 AI 取得重大突破，可能不仅意味着修正一个技术判断，也意味着重新面对自己对于未来的担忧。</p>
+        <p class="en"><a class="xref" href="../why-technological-progress-makes-us-fear/index.html#why-do-some-people-start-hoping-ai-wont-be-strong-enough">Hoping AI isn’t strong enough</a> may sometimes be a way of protecting a sense of security.</p><p class="zh" lang="zh-CN"><a class="xref" href="../why-technological-progress-makes-us-fear/index.html#why-do-some-people-start-hoping-ai-wont-be-strong-enough">希望 AI 不够强</a>，有时可能是在维护某种安全感。</p>
+        <p class="en">But we cannot conclude from this that everyone who questions AI does so out of fear. Nor can a single comment tell us reliably what is going on in its author’s mind.</p><p class="zh" lang="zh-CN">但我们不能因此推断所有质疑 AI 的人都出于恐惧。仅凭一个人的评论，也无法准确判断他的心理动机。</p>
+        <p class="en">In addition, in 2011 Hugo Mercier and Dan Sperber put forward the argumentative theory of reasoning<a class="fn" href="#source-6" aria-label="Source 6">6</a>.</p><p class="zh" lang="zh-CN">此外，Hugo Mercier 与 Dan Sperber 在 2011 年提出了推理的论证理论（Argumentative Theory of Reasoning）<a class="fn" href="#source-6" aria-label="资料 6">6</a>。</p>
+        <p class="en">They argue that one of the main functions of human reasoning is to construct arguments and evaluate other people’s arguments in social interaction.</p><p class="zh" lang="zh-CN">他们认为，人类推理的重要功能之一，是在社会互动中构造论据并评价他人的论据。</p>
+        <p class="en">The theory tries to explain why people are sometimes good at finding reasons for views they already hold, yet not necessarily good at finding, on their own, the problems in those views.</p><p class="zh" lang="zh-CN">这一理论试图解释为什么人类有时擅长为自己已经形成的观点寻找理由，却不一定善于独自发现自身观点中的问题。</p>
+        <p class="en">But this does not mean discussion between people is worthless. Quite the opposite: when people with different views carefully test each other’s arguments, group discussion can also improve the quality of reasoning.</p><p class="zh" lang="zh-CN">但这并不意味着人与人的讨论没有价值。恰恰相反，当讨论者具有不同观点，并且能够认真检验彼此的论据时，群体讨论也可能提高推理质量。</p>
+        <p class="en">The question is what we take being contradicted to be.</p><p class="zh" lang="zh-CN">问题在于，我们将反驳视为什么。</p>
+        <p class="en">A chance to understand something new, or a contest we have to win?</p><p class="zh" lang="zh-CN">是一次获取新认识的机会，还是一次必须赢得的竞争？</p>
+        <h2 id="why-do-i-like-discussing-things-with-ai"><span class="no">§5</span><span><span class="en">Why do I like discussing things with AI?</span><span class="zh" lang="zh-CN">我<wbr>为什么<wbr>喜欢<wbr>与<wbr> <wbr>AI<wbr> <wbr>讨论<wbr>？</span></span></h2>
+        <p class="en">Talking with AI, I have found a way of discussing things unlike many discussions online.</p><p class="zh" lang="zh-CN">与 AI 交流时，我体验到了一种与许多网络讨论不同的方式。</p>
+        <p class="en">I can put forward a half-formed idea, work through its contradictions with it, ask it to think from different angles, and change my own view once I find a problem.</p><p class="zh" lang="zh-CN">我可以提出一个不成熟的想法，与它分析其中的矛盾，要求它从不同角度进行思考，也可以在发现问题之后改变自己的观点。</p>
+        <p class="en">AI does not feel humiliated or angry, in the human sense, when I contradict it.</p><p class="zh" lang="zh-CN">AI 不会因为我反驳它而产生人类意义上的羞辱感或愤怒。</p>
+        <p class="en">That lowers the psychological cost of admitting mistakes and changing my mind.</p><p class="zh" lang="zh-CN">这降低了承认错误和修改观点的心理成本。</p>
+        <p class="en">AI is not perfectly objective, but the logical analysis it shows makes it possible for it to be a valuable thinking partner.</p><p class="zh" lang="zh-CN">虽然 AI 并不是完全客观的，但它所展现出的逻辑分析能力，使它有可能成为一个具有价值的思想伙伴。</p>
+        <p class="en">There is, however, a problem here I have to face squarely: AI sycophancy.</p><p class="zh" lang="zh-CN">然而，这里也存在一个必须正视的问题：AI 的迎合性（Sycophancy）。</p>
+        <p class="en">In research released in 2023, Sharma and colleagues found that the AI assistants they tested tended to go along with users’ views. In some cases, optimising for human preferences could lead a model to sacrifice factual accuracy for answers closer to what the user expected<a class="fn" href="#source-7" aria-label="Source 7">7</a>.</p><p class="zh" lang="zh-CN">Sharma 等人在 2023 年公开的研究中发现，受到测试的多种 AI 助手存在迎合用户观点的倾向。在部分情况下，对人类偏好的优化可能使模型牺牲事实准确性，以提供更符合用户期待的回答<a class="fn" href="#source-7" aria-label="资料 7">7</a>。</p>
+        <p class="en">So if AI always agrees with me, the conversation may be pleasant, but it may also become a subtler echo chamber for my thinking.</p><p class="zh" lang="zh-CN">因此，如果 AI 总是赞同我的判断，那么这种交流虽然可能令人愉快，却可能形成一个更加隐蔽的思想回音室。</p>
+        <p class="en">Strong logic cannot guarantee a correct conclusion either.</p><p class="zh" lang="zh-CN">优秀的逻辑能力也不能保证正确的结论。</p>
+        <p class="en">If the premises are wrong, the conclusion can be wrong even when the reasoning is rigorous.</p><p class="zh" lang="zh-CN">只要前提是错误的，即使推理过程十分严密，结论也可能是错误的。</p>
+        <p class="en">I want AI to be a thinking partner, not a defender of my views.</p><p class="zh" lang="zh-CN">我希望 AI 成为思想伙伴，而不是我的观点辩护者。</p>
+        <p class="en">When my argument has a hole, it should point out the hole; when there is a stronger opposing view, it should present it seriously; when the evidence is not enough, it should admit that, for now, we don’t know.</p><p class="zh" lang="zh-CN">当我的论证存在漏洞时，它应该指出漏洞；当存在更有力的反方观点时，它应该认真呈现；当证据不足时，它应该承认我们暂时不知道。</p>
+        <h2 id="discussion-is-itself-learning"><span class="no">§6</span><span><span class="en">Discussion is itself learning</span><span class="zh" lang="zh-CN">讨论<wbr>本身<wbr>就是<wbr>学习</span></span></h2>
+        <p class="en">When I discuss things with AI, there is no set curriculum, no exam, no supervision, and nobody requiring me to keep going.</p><p class="zh" lang="zh-CN">与 AI 讨论时，我们没有预先规定课程，没有考试，没有监督，也没有任何人要求我必须继续。</p>
+        <p class="en">We have gone from <a class="xref" href="../why-learn-when-ai-is-smarter/index.html">what learning is for</a> to AI and jobs, from <a class="xref" href="../why-technological-progress-makes-us-fear/index.html">technological progress to how society’s wealth is shared</a>, and from online arguments to human reason and emotion.</p><p class="zh" lang="zh-CN">我们从<a class="xref" href="../why-learn-when-ai-is-smarter/index.html">学习的意义</a>谈到人工智能与就业，从<a class="xref" href="../why-technological-progress-makes-us-fear/index.html">技术进步谈到社会财富的分配</a>，再从网络争论谈到人类的理性与情感。</p>
+        <p class="en">One question naturally gave rise to another.</p><p class="zh" lang="zh-CN">一个问题自然产生了另一个问题。</p>
+        <p class="en">I keep the discussion going not because it lets me beat the AI, nor because it is sure to bring any real economic return.</p><p class="zh" lang="zh-CN">我愿意继续讨论，并不是因为这场讨论能够让我战胜 AI，也不是因为它一定能够带来现实经济收益。</p>
+        <p class="en">It is because thinking itself brings me joy.</p><p class="zh" lang="zh-CN">而是因为思考本身能够给我带来快乐。</p>
+        <p class="en">This is one of the ways in which I think AI has value.</p><p class="zh" lang="zh-CN">这也是我认为人工智能具有价值的一种方式。</p>
+        <p class="en">It can not only do some intellectual tasks in place of people, but also help a person widen what they understand, meet ideas they did not know before, and test their own judgements.</p><p class="zh" lang="zh-CN">它不仅能够代替人类完成某些智力任务，也能够帮助一个人拓展自己的认识，接触此前不了解的思想，并检验自己的判断。</p>
+        <p class="en">Of course, AI cannot replace all real conversation between people. The emotions, experiences and differing views between people still give discussion important value.</p><p class="zh" lang="zh-CN">当然，AI 不能取代所有真实的人际交流。人与人之间的情感、经验与观点差异，仍然能够为讨论提供重要价值。</p>
+        <p class="en">What I hope for is that AI can give more people the chance to take part in deep exchanges of ideas.</p><p class="zh" lang="zh-CN">我所期待的，是人工智能可以让更多人拥有开展深入思想交流的机会。</p>
+        <p class="en"><strong>The discussions that are truly valuable do not make us ever more sure we are right. They make us ever more able to discover that we might be wrong.</strong></p><p class="zh" lang="zh-CN"><strong>真正有价值的讨论，不是让我们越来越确信自己是正确的，而是让我们越来越有能力发现自己可能是错误的。</strong></p>
+        <aside class="callout boundary">
+          <p class="kicker"><span class="en">Evidence boundary</span><span class="zh" lang="zh-CN">证据边界</span></p>
+          
+          <p class="en">This is an opinion essay, not a TutorBench result. Its account of the Riemann Hypothesis proof is as of 28 November 2026, while mathematical review is still under way. Motivated reasoning and the argumentative theory are offered as possible explanations, not as a judgement of any commenter’s state of mind.</p><p class="zh" lang="zh-CN">本文是观点文章，不是 TutorBench 的评测结果。关于黎曼猜想证明的描述截至 2026 年 11 月 28 日，数学界的审查仍在进行；动机性推理和推理的论证理论只是可能的解释，不构成对任何评论者心理动机的判断。</p>
+        </aside>
+        <section class="sources" aria-labelledby="sources">
+          <h2 id="sources" class="src-h"><span class="en">Sources and further reading</span><span class="zh" lang="zh-CN">资料来源与延伸阅读</span></h2>
+          <ol class="notes-list"><li id="source-1"><span><a href="https://alpo.ge/remark.pdf" rel="noopener"><span class="en">Alpöge (20 November 2026), announcement note on a proof of the Riemann Hypothesis found with Claude, released as Lean code</span><span class="zh" lang="zh-CN">Alpöge（2026-11-20），关于与 Claude 合作得到黎曼猜想证明的公告（证明以 Lean 代码发布）</span></a></span></li><li id="source-2"><span><a href="https://leanprover-community.github.io/blog/posts/riemann-hypothesis/" rel="noopener"><span class="en">Lean FRO and Mathlib Initiative (21 November 2026), joint statement: Lean verification of the Riemann Hypothesis</span><span class="zh" lang="zh-CN">Lean FRO 与 Mathlib Initiative（2026-11-21），联合声明：Lean Verification of the Riemann Hypothesis（黎曼猜想的 Lean 核验）</span></a></span></li><li id="source-3"><span><a href="https://math.uwaterloo.ca/~mrubinst/alpoge_claude_grh/" rel="noopener"><span class="en">Michael Rubinstein (University of Waterloo, updated to 27 November 2026): Alpöge/Claude proof of the Generalized Riemann Hypothesis, expository notes in progress and verification records</span><span class="zh" lang="zh-CN">Michael Rubinstein（滑铁卢大学，更新至 2026-11-27）：Alpöge/Claude proof of the Generalized Riemann Hypothesis，撰写中的证明解读与核验记录</span></a></span></li><li id="source-4"><span><a href="https://www.brookings.edu/books/pasteurs-quadrant/" rel="noopener"><span class="en">Stokes (1997), Pasteur’s Quadrant: Basic Science and Technological Innovation, Brookings Institution Press</span><span class="zh" lang="zh-CN">Stokes（1997），《巴斯德象限：基础科学与技术创新》（Pasteur's Quadrant），布鲁金斯学会出版社</span></a></span></li><li id="source-5"><span><a href="https://doi.org/10.1037/0033-2909.108.3.480" rel="noopener"><span class="en">Kunda (1990), Psychological Bulletin 108(3), 480–498: The case for motivated reasoning</span><span class="zh" lang="zh-CN">Kunda（1990），《心理学公报》108(3)，480–498：The Case for Motivated Reasoning（动机性推理）</span></a></span></li><li id="source-6"><span><a href="https://doi.org/10.1017/S0140525X10000968" rel="noopener"><span class="en">Mercier &amp; Sperber (2011), Behavioral and Brain Sciences 34(2), 57–74: Why do humans reason? Arguments for an argumentative theory</span><span class="zh" lang="zh-CN">Mercier &amp; Sperber（2011），《行为与脑科学》34(2)，57–74：Why Do Humans Reason? Arguments for an Argumentative Theory（人为什么推理？论证理论的依据）</span></a></span></li><li id="source-7"><span><a href="https://www.anthropic.com/research/towards-understanding-sycophancy-in-language-models" rel="noopener"><span class="en">Sharma et al. (2023), Towards Understanding Sycophancy in Language Models</span><span class="zh" lang="zh-CN">Sharma 等（2023），Towards Understanding Sycophancy in Language Models（理解语言模型的迎合性）</span></a></span></li></ol>
+        </section>
+      </div>
+    </article>
+  </div>
+
+  <nav class="wrap essay-nav" aria-label="Article navigation">
+    <a class="prev" href="../why-technological-progress-makes-us-fear/index.html"><span class="kicker"><span class="en">Previous article</span><span class="zh" lang="zh-CN">上一篇文章</span></span><span class="t"><span class="en">Why Does Technological Progress Make Us Fear the Future?</span><span class="zh" lang="zh-CN">为什么技术越进步，人们反而越害怕未来？</span></span></a>
+    <a class="all kicker" href="../index.html"><span class="en">Back to all posts</span><span class="zh" lang="zh-CN">返回全部文章</span></a>
+    <a class="next" href="../after-you-have-beaten-everyone/index.html"><span class="kicker"><span class="en">Next article</span><span class="zh" lang="zh-CN">下一篇文章</span></span><span class="t"><span class="en">After You’ve Beaten Everyone, Then What?</span><span class="zh" lang="zh-CN">当你赢过所有人之后呢？</span></span></a>
+  </nav>
+
+  <section class="wrap issue-row" aria-labelledby="issue-h">
+    <p class="kicker" id="issue-h"><span class="en">The Journal · 10 essays</span><span class="zh" lang="zh-CN">期刊 · 10 篇文章</span></p>
+    <ol class="issue-cards">
+      <li><a href="../why-learn-when-ai-is-smarter/index.html"><img src="../../assets/journal/lens.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 1</span><span class="zh" lang="zh-CN">第 1 篇</span></span><span class="t"><span class="en">Why Learn When AI Is Smarter Than Us?</span><span class="zh" lang="zh-CN">当 AI 比人类更聪明，学习还有什么意义？</span></span></a></li>
+      <li><a href="../why-technological-progress-makes-us-fear/index.html"><img src="../../assets/journal/timeclock.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 2</span><span class="zh" lang="zh-CN">第 2 篇</span></span><span class="t"><span class="en">Why Does Technological Progress Make Us Fear the Future?</span><span class="zh" lang="zh-CN">为什么技术越进步，人们反而越害怕未来？</span></span></a></li>
+      <li aria-current="page"><a href="../seeking-truth-or-proving-ourselves-right/index.html"><img src="../../assets/journal/compass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 3 · reading</span><span class="zh" lang="zh-CN">第 3 篇 · 正在读</span></span><span class="t"><span class="en">Are We Seeking Truth, or Trying to Prove Ourselves Right?</span><span class="zh" lang="zh-CN">我们是在追求真理，还是在证明自己正确？</span></span></a></li>
+      <li><a href="../after-you-have-beaten-everyone/index.html"><img src="../../assets/journal/podium.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 4</span><span class="zh" lang="zh-CN">第 4 篇</span></span><span class="t"><span class="en">After You’ve Beaten Everyone, Then What?</span><span class="zh" lang="zh-CN">当你赢过所有人之后呢？</span></span></a></li>
+      <li><a href="../arrogance-is-not-what-you-need/index.html"><img src="../../assets/journal/piano.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 5</span><span class="zh" lang="zh-CN">第 5 篇</span></span><span class="t"><span class="en">Arrogance Is Not What You Need</span><span class="zh" lang="zh-CN">傲慢是你所不需要的</span></span></a></li>
+      <li><a href="../why-learning-resources-fail-to-reach-learners/index.html"><img src="../../assets/journal/ladder.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 6</span><span class="zh" lang="zh-CN">第 6 篇</span></span><span class="t"><span class="en">Why Good Learning Resources Fail to Reach the People Who Need Them</span><span class="zh" lang="zh-CN">为什么优质教育资源没有抵达需要它的人？</span></span></a></li>
+      <li><a href="../when-learning-starts-to-feel-like-failure/index.html"><img src="../../assets/journal/eraser.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 7</span><span class="zh" lang="zh-CN">第 7 篇</span></span><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a></li>
+      <li><a href="../the-classroom-does-not-need-30-robots/index.html"><img src="../../assets/journal/hooks.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 8</span><span class="zh" lang="zh-CN">第 8 篇</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a></li>
+      <li><a href="../why-teaching-does-not-scale/index.html"><img src="../../assets/journal/hourglass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 9</span><span class="zh" lang="zh-CN">第 9 篇</span></span><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a></li>
+      <li><a href="../teaching-and-supervision-are-different-jobs/index.html"><img src="../../assets/journal/chalk.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 10</span><span class="zh" lang="zh-CN">第 10 篇</span></span><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84" loading="lazy" decoding="async"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16" loading="lazy" decoding="async"><b translate="no">TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../work-with-us/index.html"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="../../contact/index.html#privacy"><span class="en">Privacy</span><span class="zh" lang="zh-CN">隐私</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond and Newsreader; Chinese in Noto Serif SC. Covers rendered in Blender.</span><span class="zh" lang="zh-CN">英文以 Cormorant Garamond 与 Newsreader 排印，中文以思源宋体排印。封面由 Blender 渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204" loading="lazy" decoding="async">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script src="../../share.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Are We Seeking Truth, or Trying to Prove Ourselves Right? · Teachometry Journal", zh: "我们是在追求真理，还是在证明自己正确？ · Teachometry 期刊" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

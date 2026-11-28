@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Why Learn When AI Is Smarter Than Us? · Teachometry Journal</title>
+<meta name="description" content="If AI surpasses humans at every kind of intellectual work, what is learning for? Instrumental and final value, self-determination theory and the four-phase model of interest, on the joy of understanding and how education can help people find it.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="stylesheet" href="../../fonts.css" media="print" data-fonts>
+<noscript><link rel="stylesheet" href="../../fonts.css"></noscript>
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<script>
+  // Web fonts (fonts.css). On a reader's first visit the page paints at once in their own fonts and
+  // the site's fonts are fetched right after that first paint, so a slow connection never waits for
+  // text. Once the fonts are cached the next pages ask for them up front, as an ordinary stylesheet.
+  (function () {
+    var link = document.querySelector("link[data-fonts]");
+    if (!link) return;
+    var KEY = "teachometry-fonts";
+    var done = false;
+    function use() {
+      if (done) return;
+      done = true;
+      link.media = "all";
+      if (!document.fonts || !document.fonts.ready) return;
+      var slow = false;
+      document.fonts.ready.then(function () {
+        if (slow) return;
+        try { window.localStorage.setItem(KEY, "1"); } catch (e) { /* storage is optional */ }
+      });
+      // A font that arrives late would change the text under a reader who is already reading. On a
+      // slow connection (a face still on its way two seconds after it was asked for) the faces that
+      // have not arrived are dropped for this page: the text keeps the reader's own font from
+      // first paint to last, and nothing is swapped late. The next page tries again.
+      var asked = [], since = [];
+      function faces() { var list = []; document.fonts.forEach(function (f) { list.push(f); }); return list; }
+      function plain(name) { return String(name).replace(/["']/g, "").trim(); }
+      // asked for and not here yet: Safari reports such a face as "error" until it arrives
+      function waiting(f) { return f.status === "loading" || f.status === "error"; }
+      var watch = window.setInterval(function () {
+        faces().forEach(function (f) { if (waiting(f) && asked.indexOf(f) < 0) { asked.push(f); since.push(Date.now()); } });
+      }, 250);
+      window.setTimeout(function () {
+        window.clearInterval(watch);
+        var now = Date.now(), sheet = null;
+        try { sheet = link.sheet && link.sheet.cssRules ? link.sheet : null; } catch (e) { /* not readable */ }
+        var late = asked.some(function (f, i) { return waiting(f) && now - since[i] >= 2000; });
+        if (sheet && !late) return;
+        slow = true;
+        try { window.localStorage.removeItem(KEY); } catch (e) { /* storage is optional */ }
+        if (!sheet) { link.media = "print"; return; }   // not even the list of fonts has arrived
+        // the page's faces are listed in the order of the @font-face rules in fonts.css
+        var all = faces(), rules = sheet.cssRules, i;
+        if (all.length !== rules.length) return;
+        for (i = 0; i < rules.length; i++) if (!rules[i].style || plain(rules[i].style.getPropertyValue("font-family")) !== plain(all[i].family)) return;
+        for (i = rules.length - 1; i >= 0; i--) if (all[i].status !== "loaded") sheet.deleteRule(i);
+      }, 3400);
+    }
+    var cached = null;
+    try { cached = window.localStorage.getItem(KEY); } catch (e) { /* storage is optional */ }
+    var paint = window.PerformanceObserver && PerformanceObserver.supportedEntryTypes &&
+      PerformanceObserver.supportedEntryTypes.indexOf("paint") >= 0;
+    if (cached || !paint) { use(); return; }
+    var observer = new PerformanceObserver(function (list) {
+      if (list.getEntriesByName("first-contentful-paint").length) { observer.disconnect(); use(); }
+    });
+    observer.observe({ type: "paint", buffered: true });
+    // a page opened in a background tab does not paint until it is shown
+    window.setTimeout(function () { if (document.visibilityState === "visible") use(); }, 3000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") window.setTimeout(use, 3000); });
+  })();
+</script>
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    // the 404 page answers at any address: under /zh-cn/ it answers in Chinese
+    var lost = !root.getAttribute("data-route-lang") && /\/zh-cn(\/|$)/.test(location.pathname);
+    var wantZh = q ? q.indexOf("zh") === 0 : lost ? true : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    // the reader keeps the place they were sent to: the #anchor and any ?query go across as well
+    if (other) location.replace(location.origin + other + location.search + location.hash);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106" fetchpriority="high"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb" translate="no"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html" aria-current="page"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+    <a href="../../work-with-us/index.html" class="nav-work"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle translate="no" aria-label="中 / EN · Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../work-with-us/index.html"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <header class="essay-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><a class="issue" href="../index.html"><span class="en">Journal · Essay 1 of 10</span><span class="zh" lang="zh-CN">期刊 · 第 1 篇，共 10 篇</span></a><span class="rule" aria-hidden="true"></span><span><span class="en">Perspective</span><span class="zh" lang="zh-CN">观点</span></span><time datetime="2026-11-28"><span class="en">November 28, 2026</span><span class="zh" lang="zh-CN">2026年11月28日</span></time></p>
+        <h1 class="essay-title"><span class="en">Why Learn When AI Is Smarter Than Us?</span><span class="zh" lang="zh-CN">当<wbr> <wbr>AI<wbr> <wbr>比<wbr>人类<wbr>更<wbr>聪明<wbr>，<wbr>学习<wbr>还有<wbr>什么<wbr>意义<wbr>？</span></h1>
+        <p class="en essay-dek">Even if AI one day surpasses us at every kind of intellectual work, is learning still worth anything?</p><p class="zh essay-dek" lang="zh-CN">即使 AI 在所有智力活动中都超过人类，学习是否仍然具有价值？</p>
+        <div class="essay-by">
+          <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">5 sections · about 5 min</span><span class="zh" lang="zh-CN">5 节 · 约 6 分钟</span></span></p>
+          <div class="essay-share" data-share hidden>
+            <button type="button" class="share-btn kicker" data-share-toggle aria-expanded="false" aria-controls="share-list"><svg class="share-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4a2.9 2.9 0 0 0 4.1 0l2.2-2.2a2.9 2.9 0 0 0-4.1-4.1l-.9.9"/><path d="M9.4 6.6a2.9 2.9 0 0 0-4.1 0L3.1 8.8a2.9 2.9 0 0 0 4.1 4.1l.9-.9"/></svg><span class="share-idle"><span class="en">Share</span><span class="zh" lang="zh-CN">分享</span></span><span class="share-done"><span class="en">Link copied</span><span class="zh" lang="zh-CN">链接已复制</span></span></button>
+            <div class="share-list" id="share-list" data-share-list role="group" aria-label="Share this essay" data-aria-label-en="Share this essay" data-aria-label-zh="分享这篇文章" hidden>
+              <button type="button" class="share-item" data-share-copy data-state="idle"><span class="share-idle"><span class="en">Copy link</span><span class="zh" lang="zh-CN">复制链接</span></span><span class="share-fail"><span class="en">Copy it from here</span><span class="zh" lang="zh-CN">请在下面复制</span></span></button>
+              <input class="share-field" data-share-field type="text" readonly hidden aria-label="Link to this essay" data-aria-label-en="Link to this essay" data-aria-label-zh="这篇文章的链接">
+              <a class="share-item" data-share-x href="https://x.com/intent/tweet" target="_blank" rel="noopener noreferrer" aria-label="Post on X (opens in a new tab)" data-aria-label-en="Post on X (opens in a new tab)" data-aria-label-zh="发到 X（在新标签页打开）"><span><span class="en">Post on X</span><span class="zh" lang="zh-CN">发到 X</span></span><svg class="share-out" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a>
+              <button type="button" class="share-item" data-share-native hidden><span><span class="en">More…</span><span class="zh" lang="zh-CN">更多…</span></span></button>
+            </div>
+            <span class="share-said" data-share-said role="status"></span>
+          </div>
+        </div>
+      </div>
+      <figure class="cover-plate">
+        <img src="../../assets/journal/lens.webp" alt="A magnifying glass propped on a pebble over a fallen leaf on a garden stone, in dappled summer sun; through the lens the leaf’s fine network of veins opens up." width="900" height="1100" data-alt-en="A magnifying glass propped on a pebble over a fallen leaf on a garden stone, in dappled summer sun; through the lens the leaf’s fine network of veins opens up." data-alt-zh="夏日树荫下，一把放大镜斜搁在一块卵石上，悬在石板上的一片落叶之上；透过镜片，叶脉细密的网络一下子清楚起来。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">The leaf is the same. What changes is what you can see in it.</span><span class="zh" lang="zh-CN">叶子还是那片叶子，变的是你能从中看到什么。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap essay-body">
+    <nav class="essay-toc" aria-label="On this page">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <ol>
+        <li><a href="#learning-does-not-have-to-be-a-competition"><span class="en">Learning does not have to be a competition</span><span class="zh" lang="zh-CN">学习的价值不必来自竞争</span></a></li>
+        <li><a href="#why-do-we-like-learning"><span class="en">Why do we like learning?</span><span class="zh" lang="zh-CN">我们为什么会喜欢学习？</span></a></li>
+        <li><a href="#education-should-help-people-discover-more-joy"><span class="en">Education should help people discover more joy</span><span class="zh" lang="zh-CN">教育应该帮助人发现更多快乐</span></a></li>
+        <li><a href="#learning-widens-the-world-a-person-can-experience"><span class="en">Learning widens the world a person can experience</span><span class="zh" lang="zh-CN">学习可以扩展一个人所能体验的世界</span></a></li>
+        <li><a href="#learning-need-not-be-a-noble-duty"><span class="en">Learning need not be a noble duty</span><span class="zh" lang="zh-CN">学习不必成为一种高尚的义务</span></a></li>
+      </ol>
+    </nav>
+    <article class="essay-text">
+      <div class="prose">
+        <p class="en">Lately I have been thinking a lot about what learning is for.</p><p class="zh" lang="zh-CN">最近，我一直在思考学习的意义。</p>
+        <p class="en first">As artificial intelligence keeps pushing past the limits of human intellectual work, more and more people have begun to doubt that learning is necessary. If someone spends ten years learning mathematics and still cannot solve the problems an AI can solve, what were those ten years for?</p><p class="zh first" lang="zh-CN">随着人工智能不断突破人类智力活动的边界，越来越多的人开始怀疑学习的必要性。如果一个人投入十年时间学习数学，最终仍然无法解决 AI 能够解决的问题，那么这十年的学习究竟还有什么意义？</p>
+        <p class="en">I don’t want to answer by looking for abilities in which humans are, for now, still ahead of AI. I would rather start from an extreme assumption: even if one day AI surpasses humans at every kind of intellectual work, does learning still have value?</p><p class="zh" lang="zh-CN">我不想通过寻找人类暂时优于 AI 的能力来回答这个问题。我更想提出一个极端的假设：即使未来 AI 在所有智力活动中都超过人类，学习是否仍然具有价值？</p>
+        <p class="en">My answer is actually simple.</p><p class="zh" lang="zh-CN">我的答案其实很简单。</p>
+        <p class="en">If something brings me joy, I am willing to do it.</p><p class="zh" lang="zh-CN">如果一件事情能够给我带来快乐，那么我就愿意去做。</p>
+        <h2 id="learning-does-not-have-to-be-a-competition"><span class="no">§1</span><span><span class="en">Learning does not have to be a competition</span><span class="zh" lang="zh-CN">学习<wbr>的<wbr>价值<wbr>不必<wbr>来自<wbr>竞争</span></span></h2>
+        <p class="en">Humans lost the ability to beat the strongest chess engines on equal terms long ago, yet people still want to learn chess.</p><p class="zh" lang="zh-CN">人类早已无法在公平条件下战胜最强的国际象棋引擎，但仍然有人愿意学习国际象棋。</p>
+        <p class="en">We don’t need to be the world’s best musician to enjoy playing music, or the world’s best painter to find joy in painting.</p><p class="zh" lang="zh-CN">我们不需要成为世界上最优秀的音乐家，才能享受演奏音乐的过程；也不需要成为最优秀的画家，才能从绘画中获得快乐。</p>
+        <p class="en">Why should learning be any different?</p><p class="zh" lang="zh-CN">为什么学习知识不能如此？</p>
+        <p class="en">Value theory in philosophy distinguishes the instrumental value a thing has as a means to other ends from the final value it has as an end in itself<a class="fn" href="#source-1" aria-label="Source 1">1</a>.</p><p class="zh" lang="zh-CN">在哲学的价值理论（Value Theory）中，可以区分事物作为实现其他目标的手段所具有的工具价值（Instrumental Value），以及事物作为目的本身所具有的最终价值（Final Value）<a class="fn" href="#source-1" aria-label="资料 1">1</a>。</p>
+        <p class="en">Learning can help a person get a job, an income and social standing. That is its instrumental value.</p><p class="zh" lang="zh-CN">学习可以帮助一个人获得工作、收入与社会地位。这些是学习的工具价值。</p>
+        <p class="en">But understanding a mathematical theorem, coming to know a living process, or discovering a pattern you never knew before can also be experiences a person seeks for their own sake.</p><p class="zh" lang="zh-CN">但理解一个数学定理、认识一种生命现象、发现一个此前不知道的规律，也可以是人本身所追求的体验。</p>
+        <figure class="fig" id="fig1">
+          <div class="values">
+            <div class="vl-col">
+              <p class="en vl-k">Instrumental value</p><p class="zh vl-k" lang="zh-CN">工具价值</p>
+              <p class="en vl-h">As a means to other ends</p><p class="zh vl-h" lang="zh-CN">作为实现其他目标的手段</p>
+              <ul class="vl-list"><li><span class="en">A job</span><span class="zh" lang="zh-CN">工作</span></li><li><span class="en">An income</span><span class="zh" lang="zh-CN">收入</span></li><li><span class="en">Social standing</span><span class="zh" lang="zh-CN">社会地位</span></li></ul>
+            </div>
+            <div class="vl-col vl-final">
+              <p class="en vl-k">Final value</p><p class="zh vl-k" lang="zh-CN">最终价值</p>
+              <p class="en vl-h">As an end in itself</p><p class="zh vl-h" lang="zh-CN">作为目的本身</p>
+              <ul class="vl-list"><li><span class="en">Understanding a mathematical theorem</span><span class="zh" lang="zh-CN">理解一个数学定理</span></li><li><span class="en">Coming to know a living process</span><span class="zh" lang="zh-CN">认识一种生命现象</span></li><li><span class="en">Discovering a pattern you never knew</span><span class="zh" lang="zh-CN">发现一个此前不知道的规律</span></li></ul>
+            </div>
+          </div>
+          <figcaption><b><span class="en">Fig. 1</span><span class="zh" lang="zh-CN">图 1</span></b><span class="en">The two kinds of value this section separates, filled in with its own examples. Competition with AI bears on the first column; the essay’s argument rests on the second.</span><span class="zh" lang="zh-CN">本节区分的两种价值，填的是文中自己的例子。与 AI 的竞争影响的是第一栏；本文的论证落在第二栏。</span></figcaption>
+        </figure>
+        <p class="en">Even if AI erodes the value of knowledge in the competition for jobs, it does not follow that all the value of learning is disappearing.</p><p class="zh" lang="zh-CN">即使 AI 削弱了知识在职业竞争中的价值，也不能由此推出学习的所有价值都在消失。</p>
+        <p class="en">That AI knows how the universe evolved does not mean I understand the universe. That AI can carry out a mathematical derivation does not mean I have lost the joy I can find in understanding mathematics.</p><p class="zh" lang="zh-CN">AI 知道宇宙如何演化，并不意味着我已经理解了宇宙。AI 能够完成数学推导，也不意味着我失去了理解数学时所能获得的快乐。</p>
+        <p class="en">Knowledge existing in the world and knowledge becoming part of a person’s own understanding are two different states.</p><p class="zh" lang="zh-CN">知识存在于世界上，与知识成为一个人自身认识的一部分，是两种不同的状态。</p>
+        <h2 id="why-do-we-like-learning"><span class="no">§2</span><span><span class="en">Why do we like learning?</span><span class="zh" lang="zh-CN">我们<wbr>为什么<wbr>会<wbr>喜欢<wbr>学习<wbr>？</span></span></h2>
+        <p class="en">Self-determination theory (SDT), developed by the psychologists Edward Deci and Richard Ryan, offers an important framework for understanding what moves people to learn.</p><p class="zh" lang="zh-CN">心理学家 Edward Deci 和 Richard Ryan 提出的自我决定理论（Self-Determination Theory，SDT），为理解人类的学习动力提供了一个重要框架。</p>
+        <p class="en">The theory holds that autonomy, competence and relatedness are three basic psychological needs that support autonomous motivation and healthy development<a class="fn" href="#source-2" aria-label="Source 2">2</a>.</p><p class="zh" lang="zh-CN">该理论认为，自主性（Autonomy）、胜任感（Competence）和联结感（Relatedness）是支持自主性动机与健康发展的三种基本心理需要<a class="fn" href="#source-2" aria-label="资料 2">2</a>。</p>
+        <p class="en">When people can choose for themselves which direction to explore, feel themselves coming to understand what they could not understand before, and share what they find with others, learning may no longer depend on outside rewards and punishments.</p><p class="zh" lang="zh-CN">当一个人能够自主选择探索的方向，感受到自己正在理解原本无法理解的事物，并能够与他人分享发现时，学习就可能不再依赖外部奖惩。</p>
+        <p class="en">This makes me think of games.</p><p class="zh" lang="zh-CN">这让我想到了游戏。</p>
+        <p class="en">Games are not always easy. Players meet complicated rules, fail again and again, and even choose to spend hours studying guides and working out the best strategy.</p><p class="zh" lang="zh-CN">游戏并不总是轻松的。玩家会遇到复杂规则、反复失败，甚至主动花费大量时间研究攻略和计算最优策略。</p>
+        <p class="en">Yet they keep going.</p><p class="zh" lang="zh-CN">但是，他们仍然愿意继续。</p>
+        <p class="en">Difficulty does not necessarily destroy enjoyment. People can also find satisfaction in overcoming difficulty, gaining understanding and discovering new things.</p><p class="zh" lang="zh-CN">困难本身并不必然破坏快乐。人也可以从克服困难、获得理解和发现新事物的过程中获得满足。</p>
+        <p class="en">In many educational settings, however, learning first appears as a demand from outside.</p><p class="zh" lang="zh-CN">然而，在许多教育场景中，学习首先表现为一种外部要求。</p>
+        <p class="en">Students are required to learn set material at set times, pass set exams and so earn the right to move on to the next stage.</p><p class="zh" lang="zh-CN">学生被要求在规定的时间学习规定的知识，通过规定的考试，获得进入下一阶段的资格。</p>
+        <p class="en">I don’t deny that exams and external incentives are needed. But if someone can only ever understand the value of learning through grades and competition, then when an intelligence appears that they can almost never surpass, they may lose their reason to keep learning.</p><p class="zh" lang="zh-CN">我并不否认考试和外部激励的必要性，但如果一个人长期只能通过成绩与竞争理解学习的价值，那么当一个几乎无法超越的智力主体出现时，他就可能失去继续学习的理由。</p>
+        <h2 id="education-should-help-people-discover-more-joy"><span class="no">§3</span><span><span class="en">Education should help people discover more joy</span><span class="zh" lang="zh-CN">教育<wbr>应该<wbr>帮助<wbr>人<wbr>发现<wbr>更多<wbr>快乐</span></span></h2>
+        <p class="en">Someone who has never truly understood mathematics may not even know that understanding mathematics can bring joy.</p><p class="zh" lang="zh-CN">一个从未真正理解过数学的人，可能根本不知道理解数学能够带来快乐。</p>
+        <p class="en">In 2006, Hidi and Renninger proposed the four-phase model of interest development, which describes interest as developing through four states that may follow one another<a class="fn" href="#source-3" aria-label="Source 3">3</a>:</p><p class="zh" lang="zh-CN">Hidi 与 Renninger 在 2006 年提出了兴趣发展的四阶段模型（Four-Phase Model of Interest Development），将兴趣的发展描述为四种可能逐步推进的状态<a class="fn" href="#source-3" aria-label="资料 3">3</a>：</p>
+        <ul class="en prose-list"><li>triggered situational interest;</li><li>maintained situational interest;</li><li>emerging individual interest;</li><li>well-developed individual interest.</li></ul><ul class="zh prose-list" lang="zh-CN"><li>被触发的情境兴趣；</li><li>得到维持的情境兴趣；</li><li>初步形成的个体兴趣；</li><li>充分发展的个体兴趣。</li></ul>
+        <p class="en">The model reminds us that interest is not an entirely fixed personal trait. It can grow gradually through contact, exploration, accumulating knowledge and support from the world around a person.</p><p class="zh" lang="zh-CN">这个模型提醒我们，兴趣并不是一种完全固定的个人属性。它可以通过接触、探索、知识积累与环境支持逐渐发展。</p>
+        <p class="en">Children are forever asking: What is this? Why does it do that? What is it for?</p><p class="zh" lang="zh-CN">儿童原本就会不断地问：这是什么？它为什么会这样？它有什么作用？</p>
+        <p class="en">But some of those questions never get a serious answer, some curiosity is treated as pointless, and some knowledge ends up appearing only as something to memorise and be tested on.</p><p class="zh" lang="zh-CN">但有些问题没有得到认真回答，有些好奇心被认为毫无意义，还有些知识最终只以需要背诵和考试的形式出现。</p>
+        <p class="en">When a student says they don’t like physics, we cannot tell straight away whether they dislike physics, or the physics education they have had.</p><p class="zh" lang="zh-CN">当一个学生说自己不喜欢物理时，我们并不能立即判断，他究竟是不喜欢物理，还是不喜欢自己所经历的物理教育。</p>
+        <p class="en">I particularly believe in teaching that makes things intuitive.</p><p class="zh" lang="zh-CN">我尤其认同直观的教学方式。</p>
+        <p class="en">When a person can directly observe, handle and make sense of the phenomena that knowledge describes, knowledge stops being just symbols to memorise and may become a new tool for understanding the world.</p><p class="zh" lang="zh-CN">当一个人可以直接观察、操作和理解知识所描述的现象时，知识就不再只是需要记忆的符号，而可能成为他认识世界的新工具。</p>
+        <p class="en">This doesn’t mean all knowledge should be taught through games or animations, or that intuitive experience can replace rigorous reasoning. But education can try to lower the threshold for understanding, so that people have a chance to discover how compelling knowledge itself can be.</p><p class="zh" lang="zh-CN">这并不意味着所有知识都应该通过游戏或动画教授，也不意味着直观体验可以替代严格推理。但教育可以尝试降低人们获得理解的门槛，让他们有机会发现知识本身的吸引力。</p>
+        <p class="en">Education shouldn’t force everyone to love the same knowledge. It should give people the chance to discover different interests.</p><p class="zh" lang="zh-CN">教育不应该强迫每个人喜欢相同的知识，而应该让人拥有发现不同兴趣的机会。</p>
+        <h2 id="learning-widens-the-world-a-person-can-experience"><span class="no">§4</span><span><span class="en">Learning widens the world a person can experience</span><span class="zh" lang="zh-CN">学习<wbr>可以<wbr>扩展<wbr>一个<wbr>人<wbr>所能<wbr>体验<wbr>的<wbr>世界</span></span></h2>
+        <p class="en">Someone who knows astronomy and someone who doesn’t may have different experiences looking up at the same night sky.</p><p class="zh" lang="zh-CN">一个了解天文学的人与一个不了解天文学的人，仰望同一片星空时，可能拥有不同的体验。</p>
+        <p class="en">Someone who understands biology may look at a tree and think of cells, photosynthesis, its evolutionary history and its ties to the whole ecosystem.</p><p class="zh" lang="zh-CN">一个理解生物学的人看到一棵树时，可能想到细胞、光合作用、演化历史，以及它与整个生态系统的联系。</p>
+        <p class="en">The world hasn’t changed.</p><p class="zh" lang="zh-CN">世界没有因此改变。</p>
+        <p class="en">What has changed is what a person can recognise in it.</p><p class="zh" lang="zh-CN">改变的是一个人能够从世界中认识到什么。</p>
+        <figure class="fig" id="fig2">
+          <div class="seen">
+            <p class="sn-obj"><span class="en sn-k">In front of everyone</span><span class="zh sn-k" lang="zh-CN">每个人眼前</span><span class="en sn-v">A tree</span><span class="zh sn-v" lang="zh-CN">一棵树</span></p>
+            <div class="sn-more">
+              <p class="en sn-k">What someone who knows biology may also see</p><p class="zh sn-k" lang="zh-CN">懂生物学的人，还可能看到</p>
+              <ol class="sn-list"><li><span class="en">Cells</span><span class="zh" lang="zh-CN">细胞</span></li><li><span class="en">Photosynthesis</span><span class="zh" lang="zh-CN">光合作用</span></li><li><span class="en">Its evolutionary history</span><span class="zh" lang="zh-CN">它的演化历史</span></li><li><span class="en">Its ties to the whole ecosystem</span><span class="zh" lang="zh-CN">它与整个生态系统的联系</span></li></ol>
+            </div>
+          </div>
+          <figcaption><b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b><span class="en">This section’s example. The tree is the same for everyone; the four things listed are what learning lets a person recognise in it.</span><span class="zh" lang="zh-CN">本节的例子。树对谁来说都是同一棵；列出的四样，是学习让人能从中认出的东西。</span></figcaption>
+        </figure>
+        <p class="en">This is why I think learning has value: it widens the range of what a person can understand, and widens the ways they can find joy.</p><p class="zh" lang="zh-CN">这也是我认为学习具有价值的原因：它能够扩展一个人的认识范围，也能够扩展一个人获得快乐的方式。</p>
+        <p class="en">That value does not have to rest on the premise that humans are smarter than AI.</p><p class="zh" lang="zh-CN">这种价值不需要建立在人类比 AI 更聪明的前提之上。</p>
+        <p class="en">On the contrary, if AI can greatly lower the cost of understanding complex knowledge, then understanding once open only to a few professionals may become something many more people can experience.</p><p class="zh" lang="zh-CN">恰恰相反，如果 AI 能够大幅降低理解复杂知识的成本，那么过去只有少数专业人士才能获得的认识，未来或许可以成为更多人的体验。</p>
+        <p class="en">Nor do people need to refuse AI, or personally repeat every piece of intellectual work already done, to defend the meaning of learning.</p><p class="zh" lang="zh-CN">人们也不需要为了维护学习的意义，刻意拒绝使用 AI，或者亲自重复所有已经完成的智力劳动。</p>
+        <p class="en">Using tools to come to know a wider world is itself part of how humans learn.</p><p class="zh" lang="zh-CN">借助工具认识更广阔的世界，本身就是人类学习的一部分。</p>
+        <h2 id="learning-need-not-be-a-noble-duty"><span class="no">§5</span><span><span class="en">Learning need not be a noble duty</span><span class="zh" lang="zh-CN">学习<wbr>不必<wbr>成为<wbr>一种<wbr>高尚<wbr>的<wbr>义务</span></span></h2>
+        <p class="en">I don’t think everyone has to love knowledge.</p><p class="zh" lang="zh-CN">我并不认为所有人都必须热爱知识。</p>
+        <p class="en">If someone, after real contact with mathematics, still prefers music, games or gardening, that is perfectly fine.</p><p class="zh" lang="zh-CN">如果一个人在充分接触数学之后，仍然更喜欢音乐、游戏或者园艺，这也完全可以接受。</p>
+        <p class="en">I don’t want to defend the value of education by building a hierarchy in which intellectual activity ranks above other experiences of life.</p><p class="zh" lang="zh-CN">我不希望为了维护教育的价值，而建立一种知识活动高于其他生活体验的等级。</p>
+        <p class="en">If AI one day takes on most of the intellectual labour that has to be done, education may have a chance to break free of goals that have long centred on productive capacity and competitive advantage.</p><p class="zh" lang="zh-CN">如果未来 AI 能够承担绝大多数必要的智力劳动，那么教育或许有机会摆脱长期以来以生产能力和竞争优势为中心的目标。</p>
+        <p class="en">It could help a person discover what they love, understand the parts of the world that interest them, and live a richer life.</p><p class="zh" lang="zh-CN">它可以帮助一个人发现自己喜欢什么，理解自己感兴趣的世界，并获得更加丰富的生命体验。</p>
+        <p class="en">Of course, that needs <a class="xref" href="../why-technological-progress-makes-us-fear/index.html">the right social conditions</a>. Someone constantly anxious about survival and career prospects does not always have the chance to choose freely what to learn.</p><p class="zh" lang="zh-CN">当然，这需要<a class="xref" href="../why-technological-progress-makes-us-fear/index.html">相应的社会条件</a>。一个为生存和职业前景不断焦虑的人，并不总是拥有自由选择学习内容的机会。</p>
+        <p class="en">But at least as a matter of value, learning need not be about beating other people, or beating AI.</p><p class="zh" lang="zh-CN">但至少从价值上来说，学习不必以战胜其他人或者战胜 AI 为目的。</p>
+        <p class="en"><strong>We don’t need to be smarter than AI to have the right to enjoy understanding the world.</strong></p><p class="zh" lang="zh-CN"><strong>我们不需要比 AI 更聪明，才有资格享受理解世界的快乐。</strong></p>
+        <aside class="callout boundary">
+          <p class="kicker"><span class="en">Evidence boundary</span><span class="zh" lang="zh-CN">证据边界</span></p>
+          
+          <p class="en">This is an opinion essay, not a TutorBench result. The theories it cites explain concepts and possible mechanisms; its views on the value of learning and on intuitive teaching are the author’s judgements, not empirical findings about any teaching method or educational product.</p><p class="zh" lang="zh-CN">本文是观点文章，不是 TutorBench 的评测结果。文中引用的理论用来说明概念和可能的机制；关于学习价值和直观教学的看法是作者的判断，不构成对任何教学方法或教育产品效果的实证结论。</p>
+        </aside>
+        <section class="sources" aria-labelledby="sources">
+          <h2 id="sources" class="src-h"><span class="en">Sources and further reading</span><span class="zh" lang="zh-CN">资料来源与延伸阅读</span></h2>
+          <ol class="notes-list"><li id="source-1"><span><a href="https://plato.stanford.edu/entries/value-intrinsic-extrinsic/" rel="noopener"><span class="en">Stanford Encyclopedia of Philosophy: Intrinsic vs. Extrinsic Value (including the distinction between intrinsic and final value)</span><span class="zh" lang="zh-CN">《斯坦福哲学百科全书》：Intrinsic vs. Extrinsic Value（内在价值与外在价值，也讨论了内在价值与最终价值的区别）</span></a></span></li><li id="source-2"><span><a href="https://doi.org/10.1037/0003-066X.55.1.68" rel="noopener"><span class="en">Ryan &amp; Deci (2000), American Psychologist 55(1), 68–78: Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being</span><span class="zh" lang="zh-CN">Ryan &amp; Deci（2000），《美国心理学家》55(1)，68–78：Self-Determination Theory and the Facilitation of Intrinsic Motivation, Social Development, and Well-Being（自我决定理论与内在动机、社会发展和幸福感的促进）</span></a></span></li><li id="source-3"><span><a href="https://doi.org/10.1207/s15326985ep4102_4" rel="noopener"><span class="en">Hidi &amp; Renninger (2006), Educational Psychologist 41(2), 111–127: The four-phase model of interest development</span><span class="zh" lang="zh-CN">Hidi &amp; Renninger（2006），《教育心理学家》41(2)，111–127：The Four-Phase Model of Interest Development（兴趣发展的四阶段模型）</span></a></span></li></ol>
+        </section>
+      </div>
+    </article>
+  </div>
+
+  <nav class="wrap essay-nav" aria-label="Article navigation">
+    <span></span>
+    <a class="all kicker" href="../index.html"><span class="en">Back to all posts</span><span class="zh" lang="zh-CN">返回全部文章</span></a>
+    <a class="next" href="../why-technological-progress-makes-us-fear/index.html"><span class="kicker"><span class="en">Next article</span><span class="zh" lang="zh-CN">下一篇文章</span></span><span class="t"><span class="en">Why Does Technological Progress Make Us Fear the Future?</span><span class="zh" lang="zh-CN">为什么技术越进步，人们反而越害怕未来？</span></span></a>
+  </nav>
+
+  <section class="wrap issue-row" aria-labelledby="issue-h">
+    <p class="kicker" id="issue-h"><span class="en">The Journal · 10 essays</span><span class="zh" lang="zh-CN">期刊 · 10 篇文章</span></p>
+    <ol class="issue-cards">
+      <li aria-current="page"><a href="../why-learn-when-ai-is-smarter/index.html"><img src="../../assets/journal/lens.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 1 · reading</span><span class="zh" lang="zh-CN">第 1 篇 · 正在读</span></span><span class="t"><span class="en">Why Learn When AI Is Smarter Than Us?</span><span class="zh" lang="zh-CN">当 AI 比人类更聪明，学习还有什么意义？</span></span></a></li>
+      <li><a href="../why-technological-progress-makes-us-fear/index.html"><img src="../../assets/journal/timeclock.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 2</span><span class="zh" lang="zh-CN">第 2 篇</span></span><span class="t"><span class="en">Why Does Technological Progress Make Us Fear the Future?</span><span class="zh" lang="zh-CN">为什么技术越进步，人们反而越害怕未来？</span></span></a></li>
+      <li><a href="../seeking-truth-or-proving-ourselves-right/index.html"><img src="../../assets/journal/compass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 3</span><span class="zh" lang="zh-CN">第 3 篇</span></span><span class="t"><span class="en">Are We Seeking Truth, or Trying to Prove Ourselves Right?</span><span class="zh" lang="zh-CN">我们是在追求真理，还是在证明自己正确？</span></span></a></li>
+      <li><a href="../after-you-have-beaten-everyone/index.html"><img src="../../assets/journal/podium.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 4</span><span class="zh" lang="zh-CN">第 4 篇</span></span><span class="t"><span class="en">After You’ve Beaten Everyone, Then What?</span><span class="zh" lang="zh-CN">当你赢过所有人之后呢？</span></span></a></li>
+      <li><a href="../arrogance-is-not-what-you-need/index.html"><img src="../../assets/journal/piano.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 5</span><span class="zh" lang="zh-CN">第 5 篇</span></span><span class="t"><span class="en">Arrogance Is Not What You Need</span><span class="zh" lang="zh-CN">傲慢是你所不需要的</span></span></a></li>
+      <li><a href="../why-learning-resources-fail-to-reach-learners/index.html"><img src="../../assets/journal/ladder.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 6</span><span class="zh" lang="zh-CN">第 6 篇</span></span><span class="t"><span class="en">Why Good Learning Resources Fail to Reach the People Who Need Them</span><span class="zh" lang="zh-CN">为什么优质教育资源没有抵达需要它的人？</span></span></a></li>
+      <li><a href="../when-learning-starts-to-feel-like-failure/index.html"><img src="../../assets/journal/eraser.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 7</span><span class="zh" lang="zh-CN">第 7 篇</span></span><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a></li>
+      <li><a href="../the-classroom-does-not-need-30-robots/index.html"><img src="../../assets/journal/hooks.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 8</span><span class="zh" lang="zh-CN">第 8 篇</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a></li>
+      <li><a href="../why-teaching-does-not-scale/index.html"><img src="../../assets/journal/hourglass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 9</span><span class="zh" lang="zh-CN">第 9 篇</span></span><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a></li>
+      <li><a href="../teaching-and-supervision-are-different-jobs/index.html"><img src="../../assets/journal/chalk.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 10</span><span class="zh" lang="zh-CN">第 10 篇</span></span><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84" loading="lazy" decoding="async"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16" loading="lazy" decoding="async"><b translate="no">TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../work-with-us/index.html"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="../../contact/index.html#privacy"><span class="en">Privacy</span><span class="zh" lang="zh-CN">隐私</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond and Newsreader; Chinese in Noto Serif SC. Covers rendered in Blender.</span><span class="zh" lang="zh-CN">英文以 Cormorant Garamond 与 Newsreader 排印，中文以思源宋体排印。封面由 Blender 渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204" loading="lazy" decoding="async">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script src="../../share.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Why Learn When AI Is Smarter Than Us? · Teachometry Journal", zh: "当 AI 比人类更聪明，学习还有什么意义？ · Teachometry 期刊" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

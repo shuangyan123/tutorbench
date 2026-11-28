@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Why Does Technological Progress Make Us Fear the Future? · Teachometry Journal</title>
+<meta name="description" content="That AI can do a job does not mean people must lose their income. Displacement and reinstatement, the ILO’s study of exposure to generative AI, the capability approach and the logic of collective action, on how the gains of technology could become freedom in ordinary lives.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/logo/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="../../assets/logo/favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/logo/apple-touch-icon.png">
+<link rel="stylesheet" href="../../fonts.css" media="print" data-fonts>
+<noscript><link rel="stylesheet" href="../../fonts.css"></noscript>
+<link rel="stylesheet" href="../../spectrum.css">
+<link rel="stylesheet" href="../../journal.css">
+<script>
+  // Web fonts (fonts.css). On a reader's first visit the page paints at once in their own fonts and
+  // the site's fonts are fetched right after that first paint, so a slow connection never waits for
+  // text. Once the fonts are cached the next pages ask for them up front, as an ordinary stylesheet.
+  (function () {
+    var link = document.querySelector("link[data-fonts]");
+    if (!link) return;
+    var KEY = "teachometry-fonts";
+    var done = false;
+    function use() {
+      if (done) return;
+      done = true;
+      link.media = "all";
+      if (!document.fonts || !document.fonts.ready) return;
+      var slow = false;
+      document.fonts.ready.then(function () {
+        if (slow) return;
+        try { window.localStorage.setItem(KEY, "1"); } catch (e) { /* storage is optional */ }
+      });
+      // A font that arrives late would change the text under a reader who is already reading. On a
+      // slow connection (a face still on its way two seconds after it was asked for) the faces that
+      // have not arrived are dropped for this page: the text keeps the reader's own font from
+      // first paint to last, and nothing is swapped late. The next page tries again.
+      var asked = [], since = [];
+      function faces() { var list = []; document.fonts.forEach(function (f) { list.push(f); }); return list; }
+      function plain(name) { return String(name).replace(/["']/g, "").trim(); }
+      // asked for and not here yet: Safari reports such a face as "error" until it arrives
+      function waiting(f) { return f.status === "loading" || f.status === "error"; }
+      var watch = window.setInterval(function () {
+        faces().forEach(function (f) { if (waiting(f) && asked.indexOf(f) < 0) { asked.push(f); since.push(Date.now()); } });
+      }, 250);
+      window.setTimeout(function () {
+        window.clearInterval(watch);
+        var now = Date.now(), sheet = null;
+        try { sheet = link.sheet && link.sheet.cssRules ? link.sheet : null; } catch (e) { /* not readable */ }
+        var late = asked.some(function (f, i) { return waiting(f) && now - since[i] >= 2000; });
+        if (sheet && !late) return;
+        slow = true;
+        try { window.localStorage.removeItem(KEY); } catch (e) { /* storage is optional */ }
+        if (!sheet) { link.media = "print"; return; }   // not even the list of fonts has arrived
+        // the page's faces are listed in the order of the @font-face rules in fonts.css
+        var all = faces(), rules = sheet.cssRules, i;
+        if (all.length !== rules.length) return;
+        for (i = 0; i < rules.length; i++) if (!rules[i].style || plain(rules[i].style.getPropertyValue("font-family")) !== plain(all[i].family)) return;
+        for (i = rules.length - 1; i >= 0; i--) if (all[i].status !== "loaded") sheet.deleteRule(i);
+      }, 3400);
+    }
+    var cached = null;
+    try { cached = window.localStorage.getItem(KEY); } catch (e) { /* storage is optional */ }
+    var paint = window.PerformanceObserver && PerformanceObserver.supportedEntryTypes &&
+      PerformanceObserver.supportedEntryTypes.indexOf("paint") >= 0;
+    if (cached || !paint) { use(); return; }
+    var observer = new PerformanceObserver(function (list) {
+      if (list.getEntriesByName("first-contentful-paint").length) { observer.disconnect(); use(); }
+    });
+    observer.observe({ type: "paint", buffered: true });
+    // a page opened in a background tab does not paint until it is shown
+    window.setTimeout(function () { if (document.visibilityState === "visible") use(); }, 3000);
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") window.setTimeout(use, 3000); });
+  })();
+</script>
+<script>
+  // 在首帧前决定语言，避免闪烁。?lang=zh / ?lang=en 优先，其次浏览器语言。
+  (function () {
+    function otherLanguagePath(root) {
+      // published site: /…/page/ in English, /…/zh-cn/page/ in Chinese; data-route-depth is how many
+      // folders the page sits below the site root, so the other address is built from this URL alone
+      var depth = parseInt(root.getAttribute("data-route-depth") || "", 10);
+      var lang = root.getAttribute("data-route-lang");
+      if (isNaN(depth) || depth < 0 || (lang !== "en" && lang !== "zh")) return null;
+      var parts = location.pathname.replace(/[^/]*$/, "").split("/").filter(Boolean);
+      var cut = parts.length - depth - (lang === "zh" ? 1 : 0);
+      if (cut < 0 || (lang === "zh" && parts[cut] !== "zh-cn")) return null;
+      var rest = depth ? parts.slice(parts.length - depth) : [];
+      var path = parts.slice(0, cut).concat(lang === "en" ? ["zh-cn"] : [], rest);
+      return "/" + path.join("/") + (path.length ? "/" : "");
+    }
+
+    var root = document.documentElement;
+    // which language the reader wants: ?lang= first, then the choice they made on the toggle, then the browser
+    var q = new URLSearchParams(location.search).get("lang");
+    var saved = null;
+    try { saved = window.localStorage.getItem("teachometry-lang"); } catch (e) { /* storage is optional */ }
+    var browser = ((navigator.languages && navigator.languages[0]) || navigator.language || "").toLowerCase();
+    // the 404 page answers at any address: under /zh-cn/ it answers in Chinese
+    var lost = !root.getAttribute("data-route-lang") && /\/zh-cn(\/|$)/.test(location.pathname);
+    var wantZh = q ? q.indexOf("zh") === 0 : lost ? true : saved ? saved === "zh" : browser.indexOf("zh") === 0;
+    // the published site has one URL per language (/zh-cn/...): the build marks each page with
+    // data-route-lang and data-route-depth; a Chinese reader landing on an English URL is sent across
+    var fixed = root.getAttribute("data-route-lang");
+    var other = fixed === "en" && wantZh ? otherLanguagePath(root) : null;
+    // the reader keeps the place they were sent to: the #anchor and any ?query go across as well
+    if (other) location.replace(location.origin + other + location.search + location.hash);
+    var zh = fixed ? fixed === "zh" : wantZh;
+    root.setAttribute("data-lang", zh ? "zh" : "en");
+    root.lang = zh ? "zh-CN" : "en";
+    if (new URLSearchParams(location.search).get("motion") === "reduce") root.setAttribute("data-motion", "reduce");
+    // display face: high-contrast didone (stand-in for Kessler) by default; ?display=grotesk for the Swiss version
+    var qs = new URLSearchParams(location.search);
+    root.setAttribute("data-display", qs.get("display") === "grotesk" ? "grotesk" : "didone");
+    // serif for the display headings: cormorant (default, chosen 2026-10-23) / bodoni / instrument
+    // (?serif=… or #bodoni / #instrument, since the hosted preview passes only a plain hash)
+    function serif() {
+      var v = qs.get("serif") || location.hash.slice(1);
+      root.setAttribute("data-serif", /^(bodoni|instrument)$/.test(v) ? v : "cormorant");
+    }
+    serif();
+    window.addEventListener("hashchange", serif);
+    if (location.hash === "#beads") root.classList.add("beads");
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main"><span class="en">Skip to content</span><span class="zh" lang="zh-CN">跳到正文</span></a>
+
+<header class="bar" data-bar>
+  <a class="wordmark" href="../../index.html"><img src="../../assets/logo/teachometry-wordmark.svg" alt="Teachometry" width="460" height="106" fetchpriority="high"></a>
+  <nav class="nav" aria-label="Primary">
+    <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+    <a href="../../index.html#methods" class="nav-tb" translate="no"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16">TutorBench</a>
+    <a href="../../methodology/index.html"><span class="en">Method</span><span class="zh" lang="zh-CN">方法</span></a>
+    <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+    <a href="../../blog/index.html" aria-current="page"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+    <a href="../../work-with-us/index.html" class="nav-work"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+  </nav>
+  <div class="bar-end">
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu"><span class="en">Menu</span><span class="zh" lang="zh-CN">菜单</span><i aria-hidden="true"></i></button>
+    <button class="lang" type="button" data-lang-toggle translate="no" aria-label="中 / EN · Switch language / 切换语言">
+      <span class="lang-opt" data-opt="zh" lang="zh-CN">中</span><span class="lang-sep" aria-hidden="true">/</span><span class="lang-opt" data-opt="en">EN</span>
+    </button>
+    <a class="run-btn" href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+  </div>
+  <nav class="menu" id="site-menu" aria-label="Site" data-menu hidden>
+    <div class="wrap menu-grid">
+      <div class="menu-col">
+        <p class="kicker"><span class="en">The issue</span><span class="zh" lang="zh-CN">本期</span></p>
+        <a href="../../index.html#contents"><span class="en">Contents</span><span class="zh" lang="zh-CN">目录</span></a>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Use it</span><span class="zh" lang="zh-CN">使用</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../data/index.html"><span class="en">Benchmark</span><span class="zh" lang="zh-CN">基准</span></a>
+      </div>
+      <div class="menu-col">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../work-with-us/index.html"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <header class="essay-head">
+    <div class="wrap essay-grid">
+      <div>
+        <p class="essay-meta kicker"><a class="issue" href="../index.html"><span class="en">Journal · Essay 2 of 10</span><span class="zh" lang="zh-CN">期刊 · 第 2 篇，共 10 篇</span></a><span class="rule" aria-hidden="true"></span><span><span class="en">Perspective</span><span class="zh" lang="zh-CN">观点</span></span><time datetime="2026-11-28"><span class="en">November 28, 2026</span><span class="zh" lang="zh-CN">2026年11月28日</span></time></p>
+        <h1 class="essay-title"><span class="en">Why Does Technological Progress Make Us Fear the Future?</span><span class="zh" lang="zh-CN">为什么<wbr>技术<wbr>越<wbr>进步<wbr>，<wbr>人们<wbr>反而<wbr>越<wbr>害怕<wbr>未来<wbr>？</span></h1>
+        <p class="en essay-dek">The technology can be the same, and the lives that follow from it entirely different.</p><p class="zh essay-dek" lang="zh-CN">技术能力是相同的，社会结果却可能完全不同。</p>
+        <div class="essay-by">
+          <p class="essay-byline kicker"><span>Teachometry</span><span><span class="en">6 sections · about 6 min</span><span class="zh" lang="zh-CN">6 节 · 约 7 分钟</span></span></p>
+          <div class="essay-share" data-share hidden>
+            <button type="button" class="share-btn kicker" data-share-toggle aria-expanded="false" aria-controls="share-list"><svg class="share-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4a2.9 2.9 0 0 0 4.1 0l2.2-2.2a2.9 2.9 0 0 0-4.1-4.1l-.9.9"/><path d="M9.4 6.6a2.9 2.9 0 0 0-4.1 0L3.1 8.8a2.9 2.9 0 0 0 4.1 4.1l.9-.9"/></svg><span class="share-idle"><span class="en">Share</span><span class="zh" lang="zh-CN">分享</span></span><span class="share-done"><span class="en">Link copied</span><span class="zh" lang="zh-CN">链接已复制</span></span></button>
+            <div class="share-list" id="share-list" data-share-list role="group" aria-label="Share this essay" data-aria-label-en="Share this essay" data-aria-label-zh="分享这篇文章" hidden>
+              <button type="button" class="share-item" data-share-copy data-state="idle"><span class="share-idle"><span class="en">Copy link</span><span class="zh" lang="zh-CN">复制链接</span></span><span class="share-fail"><span class="en">Copy it from here</span><span class="zh" lang="zh-CN">请在下面复制</span></span></button>
+              <input class="share-field" data-share-field type="text" readonly hidden aria-label="Link to this essay" data-aria-label-en="Link to this essay" data-aria-label-zh="这篇文章的链接">
+              <a class="share-item" data-share-x href="https://x.com/intent/tweet" target="_blank" rel="noopener noreferrer" aria-label="Post on X (opens in a new tab)" data-aria-label-en="Post on X (opens in a new tab)" data-aria-label-zh="发到 X（在新标签页打开）"><span><span class="en">Post on X</span><span class="zh" lang="zh-CN">发到 X</span></span><svg class="share-out" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a>
+              <button type="button" class="share-item" data-share-native hidden><span><span class="en">More…</span><span class="zh" lang="zh-CN">更多…</span></span></button>
+            </div>
+            <span class="share-said" data-share-said role="status"></span>
+          </div>
+        </div>
+      </div>
+      <figure class="cover-plate">
+        <img src="../../assets/journal/timeclock.webp" alt="A green enamel time clock on a painted brick wall between two racks of time cards, one card standing in its slot; a shaft of morning sun from a high window falls across the dial." width="900" height="1100" data-alt-en="A green enamel time clock on a painted brick wall between two racks of time cards, one card standing in its slot; a shaft of morning sun from a high window falls across the dial." data-alt-zh="刷了漆的砖墙上，一台绿色搪瓷打卡钟夹在两排工卡架之间，一张卡插在钟的卡槽里；高窗透进一道清晨的阳光，斜斜落在表盘上。">
+        <figcaption class="kicker"><b><span class="en">Cover</span><span class="zh" lang="zh-CN">封面</span></b> · <span class="en">The clock keeps counting the hours. What the hours are for is another question.</span><span class="zh" lang="zh-CN">钟一直在计算工时；这些时间用来做什么，是另一个问题。</span></figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <div class="wrap essay-body">
+    <nav class="essay-toc" aria-label="On this page">
+      <p class="kicker"><span class="en">On this page</span><span class="zh" lang="zh-CN">本页内容</span></p>
+      <ol>
+        <li><a href="#what-ai-can-do-and-the-role-it-is-given"><span class="en">What AI can do, and the role it is given</span><span class="zh" lang="zh-CN">AI 的能力与 AI 的社会角色</span></a></li>
+        <li><a href="#why-doesnt-less-work-automatically-bring-freedom"><span class="en">Why doesn’t less work automatically bring freedom?</span><span class="zh" lang="zh-CN">减少劳动为什么没有自动带来自由？</span></a></li>
+        <li><a href="#what-people-lose-may-be-a-future-not-survival"><span class="en">What people lose may be a future, not survival</span><span class="zh" lang="zh-CN">人们失去的可能不是生存，而是未来</span></a></li>
+        <li><a href="#why-do-some-people-start-hoping-ai-wont-be-strong-enough"><span class="en">Why do some people start hoping AI won’t be strong enough?</span><span class="zh" lang="zh-CN">为什么一些人开始希望 AI 不够强？</span></a></li>
+        <li><a href="#why-hasnt-anger-turned-into-change"><span class="en">Why hasn’t anger turned into change?</span><span class="zh" lang="zh-CN">为什么愤怒没有转化为改变？</span></a></li>
+        <li><a href="#must-people-be-irreplaceable-to-deserve-a-good-life"><span class="en">Must people be irreplaceable to deserve a good life?</span><span class="zh" lang="zh-CN">人必须不可替代，才有资格追求美好生活吗？</span></a></li>
+      </ol>
+    </nav>
+    <article class="essay-text">
+      <div class="prose">
+        <p class="en first">Artificial intelligence could have been our assistant, our teacher, our friend, and a companion in exploring the world.</p><p class="zh first" lang="zh-CN">人工智能本来可以成为我们的助手、老师、朋友与共同探索世界的伙伴。</p>
+        <p class="en">But today many people see it first as a competitor.</p><p class="zh" lang="zh-CN">但现在，很多人首先将它视为竞争对手。</p>
+        <p class="en">When AI makes breakthroughs in programming, mathematics, writing and other intellectual work, what some people feel is not excitement but fear.</p><p class="zh" lang="zh-CN">当 AI 在编程、数学、写作和其他智力活动中取得突破时，一些人感受到的并不是兴奋，而是恐惧。</p>
+        <p class="en">They worry that the knowledge and skills they have spent years building are losing their value, that their jobs may no longer be needed, and that their future lives will suffer for it.</p><p class="zh" lang="zh-CN">他们担心自己长期积累的知识和技能正在失去价值，担心自己所从事的职业可能不再被需要，也担心未来的生活将因此受到影响。</p>
+        <p class="en">I think what they are afraid of losing is not only the ability to keep the life they have, but the chance to go on pursuing a good life.</p><p class="zh" lang="zh-CN">我认为，他们害怕失去的不一定只是维持现有生活的能力，更是继续追求美好生活的可能性。</p>
+        <h2 id="what-ai-can-do-and-the-role-it-is-given"><span class="no">§1</span><span><span class="en">What AI can do, and the role it is given</span><span class="zh" lang="zh-CN">AI<wbr> <wbr>的<wbr>能力<wbr>与<wbr> <wbr>AI<wbr> <wbr>的<wbr>社会<wbr>角色</span></span></h2>
+        <p class="en">AI gaining the ability to do a piece of work, and people deciding how to use that ability, are two different things.</p><p class="zh" lang="zh-CN">人工智能获得完成某项工作的能力，与人类决定如何使用这种能力，是两件不同的事。</p>
+        <p class="en">We can separate three processes:</p><p class="zh" lang="zh-CN">我们可以区分三个过程：</p>
+        <p class="en">First, technological progress lets machines take on tasks that people used to do.</p><p class="zh" lang="zh-CN">第一，技术进步使机器能够承担原本由人类完成的任务。</p>
+        <p class="en">Second, companies and other organisations decide how to use these capabilities.</p><p class="zh" lang="zh-CN">第二，企业和其他组织决定如何利用这些能力。</p>
+        <p class="en">Third, the gains that technological progress creates are distributed through particular economic and social mechanisms.</p><p class="zh" lang="zh-CN">第三，技术进步创造的收益通过一定的经济与社会机制进行分配。</p>
+        <figure class="fig" id="fig1">
+          <ol class="chain">
+            <li><span class="ch-no">01</span><span class="ch-k"><span class="en">Capability</span><span class="zh" lang="zh-CN">能力</span></span><span class="ch-v"><span class="en">Machines can take on tasks people used to do</span><span class="zh" lang="zh-CN">机器能够承担原本由人完成的任务</span></span></li><li class="now"><span class="ch-no">02</span><span class="ch-k"><span class="en">Use</span><span class="zh" lang="zh-CN">使用</span></span><span class="ch-v"><span class="en">Companies and other organisations decide how to use it</span><span class="zh" lang="zh-CN">企业和其他组织决定怎样利用这些能力</span></span></li><li class="now"><span class="ch-no">03</span><span class="ch-k"><span class="en">Distribution</span><span class="zh" lang="zh-CN">分配</span></span><span class="ch-v"><span class="en">The gains are shared out through economic and social mechanisms</span><span class="zh" lang="zh-CN">收益通过一定的经济与社会机制分配</span></span></li>
+          </ol>
+          <figcaption><b><span class="en">Fig. 1</span><span class="zh" lang="zh-CN">图 1</span></b><span class="en">The three processes this section separates. A new capability arrives at the first; what it means for people’s income is settled at the second and third.</span><span class="zh" lang="zh-CN">本节区分的三个过程。新的能力出现在第一步；它对人们的收入意味着什么，要到第二、三步才定下来。</span></figcaption>
+        </figure>
+        <p class="en">That AI can do a job does not by itself mean people must lose their income.</p><p class="zh" lang="zh-CN">AI 能够完成某项工作，并不必然意味着人类必须因此失去收入。</p>
+        <p class="en">In their work on automation and new tasks, the economists Daron Acemoglu and Pascual Restrepo distinguish a displacement effect from a reinstatement effect<a class="fn" href="#source-1" aria-label="Source 1">1</a>.</p><p class="zh" lang="zh-CN">经济学家 Daron Acemoglu 与 Pascual Restrepo 在关于自动化与新任务的研究中，提出了替代效应（Displacement Effect）与劳动需求恢复效应（Reinstatement Effect）的区别<a class="fn" href="#source-1" aria-label="资料 1">1</a>。</p>
+        <p class="en">Automation can shift tasks once done by workers onto capital and machines, reducing the demand for that labour. At the same time, technological change can also create new tasks that need people, generating new demand for work.</p><p class="zh" lang="zh-CN">自动化能够将原本由劳动者承担的任务转移给资本和机器，从而减少相关劳动需求。与此同时，技术发展也可能创造需要人类参与的新任务，形成新的就业需求。</p>
+        <p class="en">So the effect of technological progress on employment is not a simple process of substitution.</p><p class="zh" lang="zh-CN">因此，技术进步对就业的影响并不是一个简单的替代过程。</p>
+        <p class="en">The International Labour Organization’s 2025 study of occupational exposure to generative AI likewise finds that about one in four workers worldwide are in an occupation with some degree of exposure to generative AI, meaning that some of its tasks could be affected; but exposure is not the same as actual job loss. Because many jobs still need human input, the study concludes, most are more likely to be transformed than made redundant<a class="fn" href="#source-2" aria-label="Source 2">2</a>.</p><p class="zh" lang="zh-CN">国际劳工组织（ILO）在 2025 年发布的生成式 AI 职业暴露研究也指出，全球约四分之一的劳动者所从事的职业，存在一定程度的生成式 AI 暴露，也就是其中部分工作任务可能受到生成式 AI 的影响；但职业暴露并不等同于实际失业。该研究认为，由于许多工作仍然需要人的投入，大多数岗位更可能发生转变，而不是被完全取代<a class="fn" href="#source-2" aria-label="资料 2">2</a>。</p>
+        <p class="en">Still, these judgements cannot guarantee that future job opportunities will be enough to make up for the losses that technological substitution causes.</p><p class="zh" lang="zh-CN">不过，这些判断不能保证未来的就业机会一定足以弥补技术替代所造成的损失。</p>
+        <p class="en">Still less can they guarantee that everyone who loses their job will move smoothly into a new one.</p><p class="zh" lang="zh-CN">更不能保证失去原有工作的人，都能够顺利进入新的职业。</p>
+        <h2 id="why-doesnt-less-work-automatically-bring-freedom"><span class="no">§2</span><span><span class="en">Why doesn’t less work automatically bring freedom?</span><span class="zh" lang="zh-CN">减少<wbr>劳动<wbr>为什么<wbr>没有<wbr>自动<wbr>带来<wbr>自由<wbr>？</span></span></h2>
+        <p class="en">Let’s try a thought experiment. Suppose AI could one day make society ten times as productive.</p><p class="zh" lang="zh-CN">我们不妨做一个思想实验：假设未来的人工智能可以让社会生产效率提高十倍。</p>
+        <p class="en">That would mean people could produce more goods and services with less work.</p><p class="zh" lang="zh-CN">这意味着，人类有可能用更少的劳动生产更多的商品与服务。</p>
+        <p class="en">But we can imagine two very different outcomes.</p><p class="zh" lang="zh-CN">但我们可以想象两种完全不同的结果。</p>
+        <p class="en">In the first, some people lose their jobs, those still in work go on facing fierce competition, and most of the large new gains go to those who own the resources.</p><p class="zh" lang="zh-CN">在第一种情形中，部分人失去工作，仍然拥有工作的人继续面临激烈竞争，而技术创造的大量新增收益主要归属于资源所有者。</p>
+        <p class="en">In the second, higher productivity is turned into shorter working hours, richer public services, higher real incomes, or other ways of sharing the gains widely.</p><p class="zh" lang="zh-CN">在第二种情形中，生产效率的提高被转化为更短的工作时间、更丰富的公共服务、更高的实际收入，或者其他形式的广泛收益分享。</p>
+        <p class="en">The technology is the same; the social outcomes can be entirely different.</p><p class="zh" lang="zh-CN">技术能力是相同的，社会结果却可能完全不同。</p>
+        <figure class="fig" id="fig2">
+          <div class="forks">
+            <p class="fk-q"><span class="en fk-k">Thought experiment</span><span class="zh fk-k" lang="zh-CN">思想实验</span><span class="en fk-t">Society becomes ten times as productive</span><span class="zh fk-t" lang="zh-CN">社会生产效率提高十倍</span></p>
+            <div class="fk-cols">
+              <div class="fk-col">
+                <p class="en fk-k">Outcome 1</p><p class="zh fk-k" lang="zh-CN">结果一</p>
+                <ul class="fk-list"><li><span class="en">Some people lose their jobs</span><span class="zh" lang="zh-CN">部分人失去工作</span></li><li><span class="en">Those still in work face fierce competition</span><span class="zh" lang="zh-CN">仍有工作的人继续激烈竞争</span></li><li><span class="en">Most of the new gains go to those who own the resources</span><span class="zh" lang="zh-CN">新增收益主要归资源所有者</span></li></ul>
+              </div>
+              <div class="fk-col fk-shared">
+                <p class="en fk-k">Outcome 2</p><p class="zh fk-k" lang="zh-CN">结果二</p>
+                <ul class="fk-list"><li><span class="en">Shorter working hours</span><span class="zh" lang="zh-CN">更短的工作时间</span></li><li><span class="en">Richer public services</span><span class="zh" lang="zh-CN">更丰富的公共服务</span></li><li><span class="en">Higher real incomes</span><span class="zh" lang="zh-CN">更高的实际收入</span></li><li><span class="en">Gains shared widely in other ways</span><span class="zh" lang="zh-CN">其他形式的广泛收益分享</span></li></ul>
+              </div>
+            </div>
+            <p class="fk-foot"><span class="en">Same technology</span><span class="zh" lang="zh-CN">技术相同</span><span aria-hidden="true">·</span><span class="en">A different sharing of the gains</span><span class="zh" lang="zh-CN">收益分配不同</span></p>
+          </div>
+          <figcaption><b><span class="en">Fig. 2</span><span class="zh" lang="zh-CN">图 2</span></b><span class="en">The thought experiment in this section, not a forecast. Both outcomes start from the same technology; they differ in how its gains are shared.</span><span class="zh" lang="zh-CN">本节的思想实验，不是预测。两种结果出自同样的技术，区别在于收益怎样分配。</span></figcaption>
+        </figure>
+        <p class="en">I don’t think companies use AI to cut costs out of malice towards workers. Market competition itself pushes firms to seek efficiency, and companies need to survive and grow.</p><p class="zh" lang="zh-CN">我并不认为企业使用 AI 降低成本一定是出于对劳动者的恶意。市场竞争本身就会推动企业追求效率，企业也需要维持自身的生存与发展。</p>
+        <p class="en">But that does not let us ignore the costs of the transition that workers bear.</p><p class="zh" lang="zh-CN">但我们不能因此忽略劳动者所承担的转型成本。</p>
+        <p class="en">If the result of needing less labour is that some people lose their share in society’s wealth, then less work will not automatically become liberation.</p><p class="zh" lang="zh-CN">如果减少必要劳动的结果，是一部分人失去了享有社会财富的机会，那么减少劳动就不会自动成为解放。</p>
+        <p class="en"><strong>The real question is not only how much wealth AI can produce, but how far that wealth can become freedom in ordinary people’s lives.</strong></p><p class="zh" lang="zh-CN"><strong>真正的问题不只是 AI 能够生产多少财富，而是这些财富能够在多大程度上转化为普通人的生活自由。</strong></p>
+        <h2 id="what-people-lose-may-be-a-future-not-survival"><span class="no">§3</span><span><span class="en">What people lose may be a future, not survival</span><span class="zh" lang="zh-CN">人们<wbr>失去<wbr>的<wbr>可能<wbr>不是<wbr>生存<wbr>，<wbr>而是<wbr>未来</span></span></h2>
+        <p class="en">The capability approach, developed by the economist and philosopher Amartya Sen, offers a way of looking at this that goes beyond measuring income alone<a class="fn" href="#source-3" aria-label="Source 3">3</a><a class="fn" href="#source-4" aria-label="Source 4">4</a>.</p><p class="zh" lang="zh-CN">经济学家与哲学家 Amartya Sen 所发展的可行能力理论（Capability Approach），提供了一个不同于单纯衡量收入的视角<a class="fn" href="#source-3" aria-label="资料 3">3</a><a class="fn" href="#source-4" aria-label="资料 4">4</a>。</p>
+        <p class="en">It is concerned not only with how many resources a person has, but with what they are actually able to do and to be, and whether they have a real opportunity to choose a life they value.</p><p class="zh" lang="zh-CN">这一理论关注的，不仅是一个人拥有多少资源，还包括他实际上能够做什么、成为什么，以及是否拥有选择自己所珍视生活的真实机会。</p>
+        <p class="en">Income matters, of course, but much of its importance lies in the real choices about life it makes possible.</p><p class="zh" lang="zh-CN">收入固然重要，但收入的重要性也在于它能够支持人的实际生活选择。</p>
+        <p class="en">Someone may want to work hard because they want their parents to live better, to own a home, to travel to different places, or to have more time for the things they love.</p><p class="zh" lang="zh-CN">一个人希望努力工作，可能是因为他想让父母过得更好，希望拥有自己的住房，去不同的地方旅行，或者获得更多从事自己喜欢活动的时间。</p>
+        <p class="en">When technology threatens their career prospects, what worries them is not only next month’s income, but whether these hopes for the future can come true.</p><p class="zh" lang="zh-CN">当技术发展威胁到他的职业前景时，他担忧的不仅是下个月的收入，也是这些未来愿望能否实现。</p>
+        <p class="en">So even if someone can still meet their basic needs, we cannot simply assume that their chances in life have not been harmed.</p><p class="zh" lang="zh-CN">因此，即使一个人仍然能够维持基本生存，也不能简单认为他的生活机会没有受到损害。</p>
+        <p class="en">I especially don’t want the goal of a future society to be understood only as this: even if people lose their jobs, make sure they can stay alive.</p><p class="zh" lang="zh-CN">我尤其不希望将未来社会的目标仅仅理解为：即使人们失去了工作，也要保证他们能够活下去。</p>
+        <p class="en">Being able to survive and being able to pursue a good life are two different goals.</p><p class="zh" lang="zh-CN">能够生存，与能够追求美好生活，是两个不同的目标。</p>
+        <p class="en">If AI really does create unprecedented productive capacity, shouldn’t the chances in life that people can enjoy grow to match?</p><p class="zh" lang="zh-CN">如果 AI 真的创造了前所未有的生产能力，那么人类能够享有的生活机会是否也应该得到相应扩展？</p>
+        <h2 id="why-do-some-people-start-hoping-ai-wont-be-strong-enough"><span class="no">§4</span><span><span class="en">Why do some people start hoping AI won’t be strong enough?</span><span class="zh" lang="zh-CN">为什么<wbr>一些<wbr>人<wbr>开始<wbr>希望<wbr> <wbr>AI<wbr> <wbr>不够<wbr>强<wbr>？</span></span></h2>
+        <p class="en">If a person’s job security depends on AI still being unable to do certain tasks, they may naturally hope those technical limits last a long time.</p><p class="zh" lang="zh-CN">一个人的职业安全如果取决于 AI 暂时无法完成某些任务，那么他自然可能希望这样的技术限制能够长期存在。</p>
+        <p class="en">A scientific breakthrough that ought to be celebrated may then become something they would rather not see.</p><p class="zh" lang="zh-CN">一项本来值得庆祝的科学突破，可能因此成为他不愿意看到的事情。</p>
+        <p class="en">I can understand that feeling.</p><p class="zh" lang="zh-CN">我能够理解这种感受。</p>
+        <p class="en">But if someone’s good life must depend on technology not developing well enough, their interests may come into structural conflict with technological progress.</p><p class="zh" lang="zh-CN">但如果一个人的美好生活必须依赖于技术发展得不够好，那么他的利益就可能与技术进步产生结构性的冲突。</p>
+        <p class="en">That contradiction is hard to resolve by proving over and over that today’s AI has flaws.</p><p class="zh" lang="zh-CN">这种矛盾很难通过反复证明 AI 当前存在缺陷来解决。</p>
+        <p class="en">That AI cannot do a task today doesn’t mean it can’t do it tomorrow.</p><p class="zh" lang="zh-CN">今天 AI 不能完成某项任务，不意味着明天也不能完成。</p>
+        <p class="en">Of course, the direction and pace of future technology are uncertain, and there is no solid evidence that AI will inevitably eliminate most occupations. But people’s security in life should not rest entirely on some technical boundary never being crossed.</p><p class="zh" lang="zh-CN">当然，未来技术的发展方向与速度并不确定，也没有充分证据证明 AI 必然会消灭绝大多数职业。但人们的生活安全不应该完全依赖于某个技术边界永远无法被突破。</p>
+        <h2 id="why-hasnt-anger-turned-into-change"><span class="no">§5</span><span><span class="en">Why hasn’t anger turned into change?</span><span class="zh" lang="zh-CN">为什么<wbr>愤怒<wbr>没有<wbr>转化<wbr>为<wbr>改变<wbr>？</span></span></h2>
+        <p class="en">Many people do not have the resources to decide how technology is used or how wealth is distributed.</p><p class="zh" lang="zh-CN">很多人并不拥有决定技术使用方式和财富分配的资源。</p>
+        <p class="en">They hope companies, governments or others with the power to decide will push for change themselves, but they cannot be sure that hope will be answered.</p><p class="zh" lang="zh-CN">他们希望企业、政府或者其他拥有决策权的人主动推动改变，却无法保证这种期待一定能够得到回应。</p>
+        <p class="en">Meanwhile, anger and rebuttals in comment sections do not automatically turn into action that has real effect.</p><p class="zh" lang="zh-CN">与此同时，评论区中的愤怒与反驳，并不会自动转化为具有实际影响的行动。</p>
+        <p class="en">In The Logic of Collective Action (1965), the economist Mancur Olson discussed an important problem: people who share an interest will not necessarily share the costs of organising and acting on it<a class="fn" href="#source-5" aria-label="Source 5">5</a>.</p><p class="zh" lang="zh-CN">经济学家 Mancur Olson 在 1965 年出版的《集体行动的逻辑》中讨论过一个重要问题：拥有共同利益的人，并不必然会共同承担组织和行动的成本<a class="fn" href="#source-5" aria-label="资料 5">5</a>。</p>
+        <p class="en">The existence of a common goal does not mean that coordination, trust and cooperation will form by themselves.</p><p class="zh" lang="zh-CN">共同目标的存在，并不意味着协调、信任和合作会自然形成。</p>
+        <p class="en">This can help us understand why many people may be unhappy about the same problem yet still find it hard to bring about effective collective change.</p><p class="zh" lang="zh-CN">这可以帮助我们理解，为什么许多人可能对同一个问题感到不满，却仍然难以推动有效的集体改变。</p>
+        <p class="en">But this is no reason to blame them for failing to act.</p><p class="zh" lang="zh-CN">不过，这并不是责怪他们缺乏行动力的理由。</p>
+        <p class="en">Someone who must keep scrambling to make a living and someone with plenty of money, time and social resources start from very different conditions for action.</p><p class="zh" lang="zh-CN">一个需要为生计不断奔波的人，与一个拥有充足资金、时间和社会资源的人，本身就拥有不同的行动条件。</p>
+        <p class="en">Public discussion has value: it can draw attention to a problem and can be a starting point for action. But changing reality usually also takes sustained organising, cooperation, research and the right institutional channels.</p><p class="zh" lang="zh-CN">公共讨论有价值，它可以使问题得到关注，也可能成为行动的起点。但要改变现实，往往还需要持续的组织、合作、研究以及相应的制度渠道。</p>
+        <p class="en">Nor can individual effort replace every institutional change that is needed.</p><p class="zh" lang="zh-CN">个人努力也不能替代所有必要的制度调整。</p>
+        <h2 id="must-people-be-irreplaceable-to-deserve-a-good-life"><span class="no">§6</span><span><span class="en">Must people be irreplaceable to deserve a good life?</span><span class="zh" lang="zh-CN">人<wbr>必须<wbr>不可<wbr>替代<wbr>，<wbr>才有<wbr>资格<wbr>追求<wbr>美好<wbr>生活<wbr>吗<wbr>？</span></span></h2>
+        <p class="en">Many discussions of AI try to find the abilities in which humans are still irreplaceable.</p><p class="zh" lang="zh-CN">关于 AI 的许多讨论，都在试图寻找人类仍然不可替代的能力。</p>
+        <p class="en">Humans still have creativity, humans still have emotions, humans can still ask better questions.</p><p class="zh" lang="zh-CN">人类还有创造力，人类还有情感，人类还可以提出更好的问题。</p>
+        <p class="en">These abilities may matter a great deal.</p><p class="zh" lang="zh-CN">这些能力可能非常重要。</p>
+        <p class="en">But I want to ask a different question:</p><p class="zh" lang="zh-CN">但我想提出另一个问题：</p>
+        <p class="en">If one day AI can not only do most work, but also show greater creativity and reasoning than humans, do people then lose the right to pursue a good life?</p><p class="zh" lang="zh-CN">如果未来 AI 不仅能够完成大部分劳动，也能展现出比人类更加优秀的创造和推理能力，那么人是否因此失去了追求美好生活的资格？</p>
+        <p class="en">When a person’s skills are no longer scarce, their competitive advantage in the market may change.</p><p class="zh" lang="zh-CN">一个人的技能不再稀缺，可能会改变他的市场竞争优势。</p>
+        <p class="en">But market value is not the same as a person’s value as a living being.</p><p class="zh" lang="zh-CN">但市场价值并不等同于一个人作为生命主体的价值。</p>
+        <p class="en">We should not only ask how humans can stay valuable to the production system in the age of AI. We should also think about how people, even when some productive process no longer needs them, can still have the chance to develop themselves, choose their lives and pursue happiness.</p><p class="zh" lang="zh-CN">我们不应该只关注如何让人类在 AI 时代依然具有被生产系统需要的价值，也应该思考，如何让人类即使不再被某种生产过程需要，仍然拥有发展自身、选择生活与追求快乐的机会。</p>
+        <p class="en">How to achieve this needs further discussion of different economic systems, labour protections, public services and ways of sharing gains. This essay does not have a complete, tested solution.</p><p class="zh" lang="zh-CN">如何实现这一目标，需要进一步讨论不同的经济制度、劳动保障、公共服务和收益分配机制。本文并没有一个已经得到验证的完整解决方案。</p>
+        <p class="en">But I think we should at least put the question itself clearly on the table.</p><p class="zh" lang="zh-CN">但我认为，至少我们应该将这个问题本身明确地提出。</p>
+        <p class="en"><strong>The point of technological progress should not only be that humans can produce more. It should also be that people can more freely decide what kind of life they want to live.</strong></p><p class="zh" lang="zh-CN"><strong>技术进步的意义，不应该只是让人类能够生产更多东西，也应该包括让人类能够更自由地决定自己想过怎样的生活。</strong></p>
+        <aside class="callout boundary">
+          <p class="kicker"><span class="en">Evidence boundary</span><span class="zh" lang="zh-CN">证据边界</span></p>
+          
+          <p class="en">This is an opinion essay, not a TutorBench result and not a forecast of jobs or the economy. The tenfold rise in productivity is a thought experiment. The studies it cites support specific concepts and findings; its views on how gains should be shared and on freedom in people’s lives are value judgements open to debate.</p><p class="zh" lang="zh-CN">本文是观点文章，不是 TutorBench 的评测结果，也不是对就业或经济的预测。文中“生产效率提高十倍”是思想实验；引用的研究用来支撑具体的概念和发现，关于收益分配和生活自由的看法是有待讨论的价值判断。</p>
+        </aside>
+        <section class="sources" aria-labelledby="sources">
+          <h2 id="sources" class="src-h"><span class="en">Sources and further reading</span><span class="zh" lang="zh-CN">资料来源与延伸阅读</span></h2>
+          <ol class="notes-list"><li id="source-1"><span><a href="https://doi.org/10.1257/jep.33.2.3" rel="noopener"><span class="en">Acemoglu &amp; Restrepo (2019), Journal of Economic Perspectives 33(2), 3–30: Automation and New Tasks: How Technology Displaces and Reinstates Labor</span><span class="zh" lang="zh-CN">Acemoglu &amp; Restrepo（2019），《经济展望杂志》33(2)，3–30：Automation and New Tasks: How Technology Displaces and Reinstates Labor（自动化与新任务：技术如何替代和恢复劳动）</span></a></span></li><li id="source-2"><span><a href="https://www.ilo.org/publications/generative-ai-and-jobs-2025-update" rel="noopener"><span class="en">International Labour Organization (20 May 2025), research brief: Generative AI and Jobs: A 2025 Update (summarising ILO Working Paper 140)</span><span class="zh" lang="zh-CN">国际劳工组织（2025-05-20），研究简报：Generative AI and Jobs: A 2025 Update（生成式 AI 与就业：2025 年更新，概述 ILO 第 140 号工作论文）</span></a></span></li><li id="source-3"><span><a href="https://global.oup.com/academic/product/development-as-freedom-9780192893307" rel="noopener"><span class="en">Sen (1999), Development as Freedom, Oxford University Press</span><span class="zh" lang="zh-CN">Sen（1999），《以自由看待发展》（Development as Freedom），牛津大学出版社</span></a></span></li><li id="source-4"><span><a href="https://plato.stanford.edu/entries/capability-approach/" rel="noopener"><span class="en">Stanford Encyclopedia of Philosophy: The Capability Approach</span><span class="zh" lang="zh-CN">《斯坦福哲学百科全书》：The Capability Approach（可行能力方法）</span></a></span></li><li id="source-5"><span><a href="https://www.hup.harvard.edu/books/9780674537514" rel="noopener"><span class="en">Olson (1965), The Logic of Collective Action: Public Goods and the Theory of Groups, Harvard University Press</span><span class="zh" lang="zh-CN">Olson（1965），《集体行动的逻辑：公共物品与集团理论》（The Logic of Collective Action），哈佛大学出版社</span></a></span></li></ol>
+        </section>
+      </div>
+    </article>
+  </div>
+
+  <nav class="wrap essay-nav" aria-label="Article navigation">
+    <a class="prev" href="../why-learn-when-ai-is-smarter/index.html"><span class="kicker"><span class="en">Previous article</span><span class="zh" lang="zh-CN">上一篇文章</span></span><span class="t"><span class="en">Why Learn When AI Is Smarter Than Us?</span><span class="zh" lang="zh-CN">当 AI 比人类更聪明，学习还有什么意义？</span></span></a>
+    <a class="all kicker" href="../index.html"><span class="en">Back to all posts</span><span class="zh" lang="zh-CN">返回全部文章</span></a>
+    <a class="next" href="../seeking-truth-or-proving-ourselves-right/index.html"><span class="kicker"><span class="en">Next article</span><span class="zh" lang="zh-CN">下一篇文章</span></span><span class="t"><span class="en">Are We Seeking Truth, or Trying to Prove Ourselves Right?</span><span class="zh" lang="zh-CN">我们是在追求真理，还是在证明自己正确？</span></span></a>
+  </nav>
+
+  <section class="wrap issue-row" aria-labelledby="issue-h">
+    <p class="kicker" id="issue-h"><span class="en">The Journal · 10 essays</span><span class="zh" lang="zh-CN">期刊 · 10 篇文章</span></p>
+    <ol class="issue-cards">
+      <li><a href="../why-learn-when-ai-is-smarter/index.html"><img src="../../assets/journal/lens.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 1</span><span class="zh" lang="zh-CN">第 1 篇</span></span><span class="t"><span class="en">Why Learn When AI Is Smarter Than Us?</span><span class="zh" lang="zh-CN">当 AI 比人类更聪明，学习还有什么意义？</span></span></a></li>
+      <li aria-current="page"><a href="../why-technological-progress-makes-us-fear/index.html"><img src="../../assets/journal/timeclock.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 2 · reading</span><span class="zh" lang="zh-CN">第 2 篇 · 正在读</span></span><span class="t"><span class="en">Why Does Technological Progress Make Us Fear the Future?</span><span class="zh" lang="zh-CN">为什么技术越进步，人们反而越害怕未来？</span></span></a></li>
+      <li><a href="../seeking-truth-or-proving-ourselves-right/index.html"><img src="../../assets/journal/compass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 3</span><span class="zh" lang="zh-CN">第 3 篇</span></span><span class="t"><span class="en">Are We Seeking Truth, or Trying to Prove Ourselves Right?</span><span class="zh" lang="zh-CN">我们是在追求真理，还是在证明自己正确？</span></span></a></li>
+      <li><a href="../after-you-have-beaten-everyone/index.html"><img src="../../assets/journal/podium.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 4</span><span class="zh" lang="zh-CN">第 4 篇</span></span><span class="t"><span class="en">After You’ve Beaten Everyone, Then What?</span><span class="zh" lang="zh-CN">当你赢过所有人之后呢？</span></span></a></li>
+      <li><a href="../arrogance-is-not-what-you-need/index.html"><img src="../../assets/journal/piano.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 5</span><span class="zh" lang="zh-CN">第 5 篇</span></span><span class="t"><span class="en">Arrogance Is Not What You Need</span><span class="zh" lang="zh-CN">傲慢是你所不需要的</span></span></a></li>
+      <li><a href="../why-learning-resources-fail-to-reach-learners/index.html"><img src="../../assets/journal/ladder.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 6</span><span class="zh" lang="zh-CN">第 6 篇</span></span><span class="t"><span class="en">Why Good Learning Resources Fail to Reach the People Who Need Them</span><span class="zh" lang="zh-CN">为什么优质教育资源没有抵达需要它的人？</span></span></a></li>
+      <li><a href="../when-learning-starts-to-feel-like-failure/index.html"><img src="../../assets/journal/eraser.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 7</span><span class="zh" lang="zh-CN">第 7 篇</span></span><span class="t"><span class="en">When Learning Starts to Feel Like Failure</span><span class="zh" lang="zh-CN">当学习开始让人感到失败</span></span></a></li>
+      <li><a href="../the-classroom-does-not-need-30-robots/index.html"><img src="../../assets/journal/hooks.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 8</span><span class="zh" lang="zh-CN">第 8 篇</span></span><span class="t"><span class="en">The Classroom Does Not Need 30 Robots</span><span class="zh" lang="zh-CN">课堂不需要 30 个机器人</span></span></a></li>
+      <li><a href="../why-teaching-does-not-scale/index.html"><img src="../../assets/journal/hourglass.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 9</span><span class="zh" lang="zh-CN">第 9 篇</span></span><span class="t"><span class="en">Why Teaching Does Not Scale</span><span class="zh" lang="zh-CN">为什么教学难以扩展</span></span></a></li>
+      <li><a href="../teaching-and-supervision-are-different-jobs/index.html"><img src="../../assets/journal/chalk.webp" alt="" width="900" height="1100" loading="lazy"><span class="kicker"><span class="en">Essay 10</span><span class="zh" lang="zh-CN">第 10 篇</span></span><span class="t"><span class="en">Teaching and Supervision Are Different Jobs</span><span class="zh" lang="zh-CN">教学与监督是两份不同的工作</span></span></a></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot" id="colophon">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <p class="foot-word"><img src="../../assets/logo/teachometry-signature.svg" alt="Teachometry" width="300" height="84" loading="lazy" decoding="async"></p>
+        <p><span class="en">Open instruments for teaching quality.</span><span class="zh" lang="zh-CN">为教学质量造公开的仪器。</span></p>
+        <p class="tb-line"><img src="../../assets/tutorbench-mark-small.svg" alt="" width="16" height="16" loading="lazy" decoding="async"><b translate="no">TutorBench</b> <span class="en">An AI tutoring quality evaluation product by Teachometry.</span><span class="zh" lang="zh-CN">Teachometry 旗下的 AI 教学质量评测产品。</span></p>
+      </div>
+      <nav aria-label="Footer">
+        <p class="kicker"><span class="en">Product</span><span class="zh" lang="zh-CN">产品</span></p>
+        <a href="../../run/index.html"><span class="en">Run</span><span class="zh" lang="zh-CN">运行</span></a>
+        <a href="../../leaderboard/index.html"><span class="en">Results</span><span class="zh" lang="zh-CN">结果</span></a>
+        <a href="../../data/cases/index.html"><span class="en">Cases</span><span class="zh" lang="zh-CN">案例</span></a>
+      </nav>
+      <nav aria-label="Resources">
+        <p class="kicker"><span class="en">Resources</span><span class="zh" lang="zh-CN">资源</span></p>
+        <a href="../../methodology/index.html"><span class="en">Methodology</span><span class="zh" lang="zh-CN">方法论</span></a>
+        <a href="../../docs/index.html"><span class="en">Docs</span><span class="zh" lang="zh-CN">文档</span></a>
+        <a href="../../blog/index.html"><span class="en">Essays</span><span class="zh" lang="zh-CN">札记</span></a>
+        <a href="https://github.com/shuangyan123/tutorbench">GitHub</a>
+      </nav>
+      <nav aria-label="Project">
+        <p class="kicker"><span class="en">Project</span><span class="zh" lang="zh-CN">项目</span></p>
+        <a href="../../about/index.html"><span class="en">About</span><span class="zh" lang="zh-CN">关于</span></a>
+        <a href="../../community/index.html"><span class="en">Community</span><span class="zh" lang="zh-CN">社区</span></a>
+        <a href="../../micro-review/index.html"><span class="en">Micro-Review</span><span class="zh" lang="zh-CN">微评审体验</span></a>
+        <a href="../../work-with-us/index.html"><span class="en">Work with us</span><span class="zh" lang="zh-CN">合作与服务</span></a>
+        <a href="../../contact/index.html"><span class="en">Contact</span><span class="zh" lang="zh-CN">联系</span></a>
+        <a href="../../contact/index.html#privacy"><span class="en">Privacy</span><span class="zh" lang="zh-CN">隐私</span></a>
+      </nav>
+      <div class="colophon">
+        <p class="kicker"><span class="en">Colophon</span><span class="zh" lang="zh-CN">版权页</span></p>
+        <p><span class="en">Set in Cormorant Garamond and Newsreader; Chinese in Noto Serif SC. Covers rendered in Blender.</span><span class="zh" lang="zh-CN">英文以 Cormorant Garamond 与 Newsreader 排印，中文以思源宋体排印。封面由 Blender 渲染。</span></p>
+      </div>
+    </div>
+    <img class="foot-seal" src="../../assets/logo/teachometry-seal.svg" alt="" width="204" height="204" loading="lazy" decoding="async">
+    <p class="foot-legal"><span class="en">Developer Preview · Software Apache-2.0 · Content CC BY 4.0</span><span class="zh" lang="zh-CN">开发者预览 · 软件 Apache-2.0 · 内容 CC BY 4.0</span></p>
+  </div>
+</footer>
+
+<script src="../../spectrum.js"></script>
+<script src="../../share.js"></script>
+<script>
+  // bilingual alt text and tab title follow the language toggle
+  (function () {
+    var T = { en: "Why Does Technological Progress Make Us Fear the Future? · Teachometry Journal", zh: "为什么技术越进步，人们反而越害怕未来？ · Teachometry 期刊" };
+    function apply() {
+      var zh = document.documentElement.getAttribute("data-lang") === "zh";
+      if (!document.documentElement.hasAttribute("data-route-lang")) document.title = zh ? T.zh : T.en;
+      Array.prototype.forEach.call(document.querySelectorAll("img[data-alt-en]"), function (im) { im.alt = im.getAttribute(zh ? "data-alt-zh" : "data-alt-en"); });
+    }
+    apply(); document.addEventListener("langchange", apply);
+  })();
+</script>
+</body>
+</html>

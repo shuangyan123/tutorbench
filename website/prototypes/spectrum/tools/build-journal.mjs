@@ -12,6 +12,9 @@ const { BLOG_POSTS: SITE_POSTS, articleHeadingId } = await import(join(REPO, "di
 const { LEARNING_ACCESS_ESSAY: LA } = await import(join(REPO, "dist/src/cli/learning-access-essay.js"));
 const { ARROGANCE_ESSAY: AR } = await import(join(REPO, "dist/src/cli/arrogance-essay.js"));
 const { BEYOND_WINNING_ESSAY: BW } = await import(join(REPO, "dist/src/cli/beyond-winning-essay.js"));
+const { WHY_LEARN_ESSAY: WL } = await import(join(REPO, "dist/src/cli/why-learn-essay.js"));
+const { TECH_FEAR_ESSAY: TF } = await import(join(REPO, "dist/src/cli/tech-fear-essay.js"));
+const { SEEKING_TRUTH_ESSAY: ST } = await import(join(REPO, "dist/src/cli/seeking-truth-essay.js"));
 const { SITE_ZH_CN_COPY } = await import(join(REPO, "dist/src/site/locale-copy.js"));
 
 // "Why Good Learning Resources Fail to Reach the People Who Need Them" (2026-11-03) is written as two
@@ -85,8 +88,35 @@ BW.en.sections.forEach((sec, i) => {
   register(sec.heading, zh.heading);
   sec.paragraphs.forEach((para, k) => register(para, zh.paragraphs[k]));
 });
+// Three essays published together on 2026-11-28, built the same way from parallel Chinese and English
+// (src/cli/why-learn-essay.ts, tech-fear-essay.ts, seeking-truth-essay.ts). They read as a sequence, so they
+// are listed in that order: learning, then work and its gains, then how we argue about it.
+function parallelEssay(E, date, iso, label) {
+  register(E.en.title, E.zh.title); register(E.en.dek, E.zh.dek); register(E.en.description, E.zh.description);
+  register(E.en.boundary, E.zh.boundary); register(date, iso);
+  if (E.zh.intro.length !== E.en.intro.length) throw new Error(`${label}: the opening differs between languages`);
+  E.en.intro.forEach((para, k) => register(para, E.zh.intro[k]));
+  E.en.sections.forEach((sec, i) => {
+    const zh = E.zh.sections[i];
+    if (zh === undefined || zh.paragraphs.length !== sec.paragraphs.length) throw new Error(`${label}: section ${i + 1} differs between languages`);
+    register(sec.heading, zh.heading);
+    sec.paragraphs.forEach((para, k) => register(para, zh.paragraphs[k]));
+  });
+  if (E.en.sections.length !== E.zh.sections.length) throw new Error(`${label}: the sections differ between languages`);
+  return {
+    route: `/blog/${E.slug}/`, category: "Perspective", publishedDate: date,
+    title: E.en.title, excerpt: E.en.dek, description: E.en.description, evidenceBoundary: E.en.boundary,
+    intro: E.en.intro,
+    sections: E.en.sections.map((sec) => ({ heading: sec.heading, paragraphs: sec.paragraphs })),
+    sources: E.sources,
+  };
+}
+const whyLearn = parallelEssay(WL, "November 28, 2026", "2026年11月28日", "why learn");
+const techFear = parallelEssay(TF, "November 28, 2026", "2026年11月28日", "technological progress");
+const seekingTruth = parallelEssay(ST, "November 28, 2026", "2026年11月28日", "seeking truth");
+
 // newest first, as the Journal has always been ordered
-const BLOG_POSTS = [beyondWinning, arrogance, learningAccess, ...SITE_POSTS];
+const BLOG_POSTS = [whyLearn, techFear, seekingTruth, beyondWinning, arrogance, learningAccess, ...SITE_POSTS];
 
 const slug = (p) => p.route.split("/").filter(Boolean).pop();
 const zhWords = (s) => s.replace(/\s/g, "").length;
@@ -96,10 +126,25 @@ function readingTime(p) {
   const zh = all.map((x) => zhWords(Z(x))).reduce((a, b) => a + b, 0);
   return { en: Math.max(1, Math.round(en / 230)), zh: Math.max(1, Math.round(zh / 420)) };
 }
-const DATE_ISO = { "November 11, 2026": "2026-11-11", "November 6, 2026": "2026-11-06", "November 3, 2026": "2026-11-03", "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
+const DATE_ISO = { "November 28, 2026": "2026-11-28", "November 11, 2026": "2026-11-11", "November 6, 2026": "2026-11-06", "November 3, 2026": "2026-11-03", "September 17, 2026": "2026-09-17", "September 28, 2026": "2026-09-28", "September 30, 2026": "2026-09-30" };
 
 // ---------------------------------------------------------------- covers and figures (design content)
 const COVERS = {
+  [WL.slug]: {
+    img: "lens.webp",
+    alt: ["A magnifying glass propped on a pebble over a fallen leaf on a garden stone, in dappled summer sun; through the lens the leaf’s fine network of veins opens up.", "夏日树荫下，一把放大镜斜搁在一块卵石上，悬在石板上的一片落叶之上；透过镜片，叶脉细密的网络一下子清楚起来。"],
+    cap: ["The leaf is the same. What changes is what you can see in it.", "叶子还是那片叶子，变的是你能从中看到什么。"],
+  },
+  [TF.slug]: {
+    img: "timeclock.webp",
+    alt: ["A green enamel time clock on a painted brick wall between two racks of time cards, one card standing in its slot; a shaft of morning sun from a high window falls across the dial.", "刷了漆的砖墙上，一台绿色搪瓷打卡钟夹在两排工卡架之间，一张卡插在钟的卡槽里；高窗透进一道清晨的阳光，斜斜落在表盘上。"],
+    cap: ["The clock keeps counting the hours. What the hours are for is another question.", "钟一直在计算工时；这些时间用来做什么，是另一个问题。"],
+  },
+  [ST.slug]: {
+    img: "compass.webp",
+    alt: ["A brass pocket compass on a printed map, set square to the map’s north arrow; beside it lies a red horseshoe magnet, and the needle has swung towards it, in low afternoon sun.", "午后低斜的阳光里，一只黄铜怀表式指南针放在印刷地图上，刻度盘的 N 对准地图的指北箭头；旁边躺着一块红色马蹄形磁铁，指针已经朝它偏了过去。"],
+    cap: ["North has not moved. The needle has.", "北没有动，动的是指针。"],
+  },
   [BW.slug]: {
     img: "podium.webp",
     alt: ["An empty wooden winners’ podium in a wet meadow at dawn, a medal hanging from the top step, the grass running on into fog.", "黎明时分，湿漉漉的草地上立着一座空的木制领奖台，最高一级挂着一枚奖牌，草地一直延伸进雾里。"],
@@ -304,12 +349,92 @@ FIGS[BW.slug] = [
           </div>`,
     cap: ["The evidence this section asks for, goal by goal. The last row adds to the ones above it rather than replacing them.", "本节按目标列出的证据。最后一行是在前两行之上再加的要求，不是取而代之。"] },
 ];
+// a list of [en, zh] pairs as <li> items
+const liPairs = (pairs) => pairs.map(([en, zh]) => `<li>${bi(esc(en), esc(zh))}</li>`).join("");
+FIGS[WL.slug] = [
+  { at: "after:0.5", body: `<div class="values">
+            <div class="vl-col">
+              ${biP("p", "vl-k", "Instrumental value", "工具价值")}
+              ${biP("p", "vl-h", "As a means to other ends", "作为实现其他目标的手段")}
+              <ul class="vl-list">${liPairs([["A job", "工作"], ["An income", "收入"], ["Social standing", "社会地位"]])}</ul>
+            </div>
+            <div class="vl-col vl-final">
+              ${biP("p", "vl-k", "Final value", "最终价值")}
+              ${biP("p", "vl-h", "As an end in itself", "作为目的本身")}
+              <ul class="vl-list">${liPairs([["Understanding a mathematical theorem", "理解一个数学定理"], ["Coming to know a living process", "认识一种生命现象"], ["Discovering a pattern you never knew", "发现一个此前不知道的规律"]])}</ul>
+            </div>
+          </div>`,
+    cap: ["The two kinds of value this section separates, filled in with its own examples. Competition with AI bears on the first column; the essay’s argument rests on the second.", "本节区分的两种价值，填的是文中自己的例子。与 AI 的竞争影响的是第一栏；本文的论证落在第二栏。"] },
+  { at: "after:3.3", body: `<div class="seen">
+            <p class="sn-obj">${biP("span", "sn-k", "In front of everyone", "每个人眼前")}${biP("span", "sn-v", "A tree", "一棵树")}</p>
+            <div class="sn-more">
+              ${biP("p", "sn-k", "What someone who knows biology may also see", "懂生物学的人，还可能看到")}
+              <ol class="sn-list">${liPairs([["Cells", "细胞"], ["Photosynthesis", "光合作用"], ["Its evolutionary history", "它的演化历史"], ["Its ties to the whole ecosystem", "它与整个生态系统的联系"]])}</ol>
+            </div>
+          </div>`,
+    cap: ["This section’s example. The tree is the same for everyone; the four things listed are what learning lets a person recognise in it.", "本节的例子。树对谁来说都是同一棵；列出的四样，是学习让人能从中认出的东西。"] },
+];
+FIGS[TF.slug] = [
+  { at: "after:0.4", body: `<ol class="chain">
+            ${[["Capability", "能力", "Machines can take on tasks people used to do", "机器能够承担原本由人完成的任务"],
+               ["Use", "使用", "Companies and other organisations decide how to use it", "企业和其他组织决定怎样利用这些能力"],
+               ["Distribution", "分配", "The gains are shared out through economic and social mechanisms", "收益通过一定的经济与社会机制分配"]].map(([ken, kzh, ven, vzh], i) => `<li${i > 0 ? ' class="now"' : ""}><span class="ch-no">${String(i + 1).padStart(2, "0")}</span><span class="ch-k">${bi(esc(ken), esc(kzh))}</span><span class="ch-v">${bi(esc(ven), esc(vzh))}</span></li>`).join("")}
+          </ol>`,
+    cap: ["The three processes this section separates. A new capability arrives at the first; what it means for people’s income is settled at the second and third.", "本节区分的三个过程。新的能力出现在第一步；它对人们的收入意味着什么，要到第二、三步才定下来。"] },
+  { at: "after:1.5", body: `<div class="forks">
+            <p class="fk-q">${biP("span", "fk-k", "Thought experiment", "思想实验")}${biP("span", "fk-t", "Society becomes ten times as productive", "社会生产效率提高十倍")}</p>
+            <div class="fk-cols">
+              <div class="fk-col">
+                ${biP("p", "fk-k", "Outcome 1", "结果一")}
+                <ul class="fk-list">${liPairs([["Some people lose their jobs", "部分人失去工作"], ["Those still in work face fierce competition", "仍有工作的人继续激烈竞争"], ["Most of the new gains go to those who own the resources", "新增收益主要归资源所有者"]])}</ul>
+              </div>
+              <div class="fk-col fk-shared">
+                ${biP("p", "fk-k", "Outcome 2", "结果二")}
+                <ul class="fk-list">${liPairs([["Shorter working hours", "更短的工作时间"], ["Richer public services", "更丰富的公共服务"], ["Higher real incomes", "更高的实际收入"], ["Gains shared widely in other ways", "其他形式的广泛收益分享"]])}</ul>
+              </div>
+            </div>
+            <p class="fk-foot">${bi("Same technology", "技术相同")}<span aria-hidden="true">·</span>${bi("A different sharing of the gains", "收益分配不同")}</p>
+          </div>`,
+    cap: ["The thought experiment in this section, not a forecast. Both outcomes start from the same technology; they differ in how its gains are shared.", "本节的思想实验，不是预测。两种结果出自同样的技术，区别在于收益怎样分配。"] },
+];
+FIGS[ST.slug] = [
+  { at: "after:0.1", body: `<ol class="checks">
+            ${[["20 Nov 2026", "2026-11-20", "Announced: a proof found with Claude, released as a Lean library of about 17 million lines", "公布：一个与 Claude 合作得到的证明，以约 1700 万行的 Lean 代码库发布", "Released", "已发布", "done"],
+               ["21 Nov 2026", "2026-11-21", "Lean FRO and Mathlib Initiative: the library compiles, proves exactly Mathlib’s statement of the Riemann Hypothesis, and is accepted by several independent checkers", "Lean FRO 与 Mathlib Initiative：代码库能通过编译，证明的正是 Mathlib 中黎曼猜想的陈述，并被多个独立检查器接受", "Checked by machine", "机器已核验", "done"],
+               ["In progress", "进行中", "Accounts of the proof written for human readers", "面向人类读者的证明解读", "Being written", "撰写中", "open"],
+               ["Not yet", "尚未", "Journal peer review; formal recognition by bodies such as the Clay Mathematics Institute", "期刊同行评审；克雷数学研究所等机构的正式认定", "Not yet", "尚未", "open"]].map(([den, dzh, ten, tzh, sen, szh, cls]) => `<li class="ck-${cls}"><span class="ck-d">${bi(esc(den), esc(dzh))}</span><span class="ck-t">${bi(esc(ten), esc(tzh))}</span><span class="ck-s">${bi(esc(sen), esc(szh))}</span></li>`).join("")}
+          </ol>`,
+    cap: ["Where the proof described in this section stood on 28 November 2026, from sources 1–3. Checked by a machine is not yet the same as understood by people.", "本节所说的证明在 2026 年 11 月 28 日的状态，据资料 1–3。被机器核验，还不等于被人理解。"] },
+  { at: "after:2.2", body: `<div class="posts">
+            <ol class="ps-list">
+              <li class="ps-was"><span class="ps-k">${bi("At first", "起初")}</span><span class="ps-v">${bi("“AI cannot really reason.”", "“AI 并不会真正推理。”")}</span></li>
+              <li class="ps-ev"><span class="ps-k">${bi("Then", "然后")}</span><span class="ps-v">${bi("A breakthrough in reasoning", "推理上取得突破")}</span></li>
+              <li class="ps-now"><span class="ps-k">${bi("Now", "现在")}</span><span class="ps-v">${bi("“It has no direct economic value.”", "“它没有直接的经济价值。”")}</span><span class="ps-tag">${bi("The standard has moved", "标准变了")}</span></li>
+            </ol>
+            <p class="ps-q">${biP("span", "ps-k", "The question to ask first", "应该先回答的问题")}${biP("span", "ps-t", "What evidence would make me change my view?", "什么样的证据，能让我改变观点？")}</p>
+          </div>`,
+    cap: ["The pattern this section calls moving the goalposts. Written from the essay’s description, not quoted from real comments.", "本节所说的“移动球门”。根据文中的描述写成，不是真实评论的引文。"] },
+];
 // the pull quote goes after this section (skipped when it repeats the dek or a callout)
 const PULL_AFTER = { "when-learning-starts-to-feel-like-failure": "after:5.0", "the-classroom-does-not-need-30-robots": "end:0" };
 
 // ---------------------------------------------------------------- essay page
+// [text](slug) links another Journal essay, [text](slug#n) its section n
+const ESSAY_HEADINGS = {};
+for (const p of BLOG_POSTS) ESSAY_HEADINGS[slug(p)] = p.sections.map((sec) => sec.heading);
+function xref(m, label, target, sec) {
+  if (ESSAY_HEADINGS[target] === undefined) throw new Error(`link to an essay that is not in the Journal: ${target}`);
+  let hash = "";
+  if (sec) {
+    const heading = ESSAY_HEADINGS[target][Number(sec) - 1];
+    if (heading === undefined) throw new Error(`link to a missing section: ${target}#${sec}`);
+    hash = `#${articleHeadingId(heading)}`;
+  }
+  return `<a class="xref" href="../${target}/index.html${hash}">${label}</a>`;
+}
 function prose(text, zh = false) {
   return esc(text)
+    .replace(/\[([^\]]+)\]\(([a-z0-9-]+)(?:#(\d+))?\)/g, xref)
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(zh ? /〔资料 ?(\d+)〕/g : /\s?\[(\d+)\]/g, (m, n) => `<a class="fn" href="#source-${n}" aria-label="${zh ? `资料 ${n}` : `Source ${n}`}">${n}</a>`);
 }
@@ -377,7 +502,10 @@ function essayPage(p, idx) {
   // a paragraph starting with "> " is a spoken line, set apart. The drop cap goes on the essay's first
   // paragraph, or, when it opens with a lead-in and spoken lines, on the first full paragraph after them.
   const dropAt = (p.intro ?? []).findIndex((x) => !x.startsWith("> ") && x.length > 80);
+  // a paragraph made of "- " lines is a list
+  const items = (t, zh) => t.split("\n").map((line) => `<li>${prose(line.replace(/^- /, ""), zh)}</li>`).join("");
   const para = (text, first) => {
+    if (text.startsWith("- ")) return "        " + biP("ul", "prose-list", items(text, false), items(Z(text), true));
     const zh = Z(text), said = text.startsWith("> ");
     const cls = said ? "said" : first ? "first" : "";
     return "        " + biP("p", cls, prose(said ? text.slice(2) : text), prose(said ? zh.slice(2) : zh, true));

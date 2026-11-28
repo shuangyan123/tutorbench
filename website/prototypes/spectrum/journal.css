@@ -462,3 +462,98 @@ a.issue:hover { color: var(--lead-deep); }
   .am-list li { grid-template-columns: 4em minmax(0, 1fr); }
   .am-list li.now { padding-inline: 10px; }
 }
+
+/* ---- essays of 2026-11-28: "Why Learn When AI Is Smarter Than Us?", "Why Does Technological Progress Make
+   Us Fear the Future?", "Are We Seeking Truth, or Trying to Prove Ourselves Right?" */
+/* a list inside the prose, and a link to another essay */
+.essay-text .prose > ul.prose-list { list-style: none; margin: -.2em 0 1.3em; padding: 0 0 0 1.1em; border-left: 1px solid var(--lead-line); text-align: left; }
+.essay-text .prose > ul.prose-list li { padding: .12em 0; }
+.essay-text .prose > ul.prose-list li::before { content: "—"; color: var(--lead); margin-right: .55em; }
+.essay-text .prose a.xref { color: inherit; border-bottom: 1px solid var(--lead-line); transition: color .2s, border-color .2s; }
+.essay-text .prose a.xref:hover { color: var(--lead-deep); border-bottom-color: currentColor; }
+.essay-text .prose a.xref:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* two kinds of value, side by side; the second is the one the essay stands on */
+.values { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--hair-2); }
+.vl-col { padding: 15px 18px 18px 0; }
+.vl-col + .vl-col { padding-left: 18px; border-left: 1px solid var(--hair-2); }
+.vl-k { margin: 0; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.vl-h { margin: 8px 0 12px; font-family: var(--f-display); font-style: italic; font-size: 21px; line-height: 1.2; color: var(--ink-2); }
+.vl-list { list-style: none; margin: 0; padding: 0; }
+.vl-list li { padding: 7px 0; border-top: 1px solid var(--hair); font-family: var(--f-ui); font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
+.vl-final .vl-k, .vl-final .vl-h { color: var(--lead); }
+.vl-final .vl-list li { color: var(--ink); }
+/* one tree, and what learning lets a person recognise in it */
+.seen { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); column-gap: 22px; border-top: 1px solid var(--ink); padding-top: 14px; }
+.sn-obj { margin: 0; display: grid; align-content: start; gap: 10px; }
+.sn-k { margin: 0; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.sn-v { font-family: var(--f-display); font-size: clamp(34px, 3.6vw, 46px); line-height: 1; color: var(--ink); }
+.sn-more { border-left: 1px solid var(--lead-line); padding-left: 18px; }
+.sn-more .sn-k { color: var(--lead); }
+.sn-list { list-style: none; margin: 10px 0 0; padding: 0; counter-reset: sn; }
+.sn-list li { counter-increment: sn; display: grid; grid-template-columns: 2.2em minmax(0, 1fr); padding: 7px 0; border-bottom: 1px solid var(--hair); font-family: var(--f-display); font-size: 20px; line-height: 1.25; color: var(--ink); }
+.sn-list li::before { content: counter(sn, decimal-leading-zero); font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); padding-top: 5px; }
+/* three processes in a row: the capability, then the two steps where its meaning for income is settled */
+.chain { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
+.chain li { display: grid; grid-template-rows: auto auto 1fr; gap: 6px; padding: 13px 16px 16px 0; }
+.chain li + li { padding-left: 16px; border-left: 1px solid var(--hair-2); }
+.ch-no { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
+.ch-k { font-family: var(--f-display); font-size: 23px; line-height: 1.1; color: var(--ink-2); }
+.ch-v { font-family: var(--f-ui); font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.chain li.now { box-shadow: inset 0 2px 0 var(--lead); }
+.chain li.now .ch-k, .chain li.now .ch-no { color: var(--lead); }
+/* the thought experiment: one premise, two outcomes */
+.forks { border-top: 1px solid var(--ink); }
+.fk-q { margin: 0; padding: 13px 0 14px; display: grid; gap: 6px; border-bottom: 1px solid var(--hair-2); }
+.fk-k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.fk-t { font-family: var(--f-display); font-style: italic; font-size: clamp(22px, 2.2vw, 27px); line-height: 1.2; color: var(--ink); }
+.fk-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.fk-col { padding: 14px 18px 16px 0; }
+.fk-col + .fk-col { padding-left: 18px; border-left: 1px solid var(--hair-2); }
+.fk-col .fk-k { margin: 0 0 8px; }
+.fk-shared .fk-k { color: var(--lead); }
+.fk-list { list-style: none; margin: 0; padding: 0; }
+.fk-list li { padding: 6px 0; border-top: 1px dashed rgba(14, 15, 20, .22); font-family: var(--f-ui); font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
+.fk-shared .fk-list li { border-top-style: solid; border-top-color: var(--lead-soft); color: var(--ink); }
+.fk-foot { margin: 0; padding-top: 11px; border-top: 1px solid var(--hair); display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+/* what has been checked, and what has not: solid where it is done, dashed where it is still open */
+.checks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+.checks li { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 9em; column-gap: 16px; align-items: baseline; padding: 12px 0 14px; border-bottom: 1px solid var(--hair-2); }
+.checks li.ck-open { border-bottom-style: dashed; border-bottom-color: rgba(14, 15, 20, .3); }
+.ck-d { font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.ck-t { font-family: var(--f-ui); font-size: 14.5px; line-height: 1.45; color: var(--ink); }
+.ck-s { font-family: var(--f-mono); font-size: 11px; line-height: 1.45; letter-spacing: .08em; text-transform: uppercase; color: var(--lead); text-align: right; }
+.ck-open .ck-t { color: var(--ink-2); }
+.ck-open .ck-s { color: var(--ink-3); }
+/* moving the goalposts: the claim is not where it started */
+.posts { border-top: 1px solid var(--ink); }
+.ps-list { list-style: none; margin: 0; padding: 0; }
+.ps-list li { display: grid; grid-template-columns: 6em minmax(0, 1fr); column-gap: 14px; align-items: baseline; padding: 11px 0 12px; border-bottom: 1px solid var(--hair); }
+.ps-k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.ps-v { font-family: var(--f-display); font-size: 21px; line-height: 1.25; color: var(--ink); }
+.ps-was .ps-v { color: var(--ink-3); text-decoration: line-through; text-decoration-color: rgba(14, 15, 20, .35); text-decoration-thickness: 1px; }
+.ps-ev .ps-v { font-style: italic; color: var(--ink-2); }
+.ps-now .ps-v { padding-left: 14%; }
+.ps-now .ps-v, .ps-now .ps-k { color: var(--lead); }
+.ps-tag { grid-column: 2; padding-left: 14%; font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--lead-deep); }
+.ps-q { margin: 0; padding: 14px 0 0; display: grid; gap: 6px; }
+.ps-q .ps-t { font-family: var(--f-display); font-style: italic; font-size: clamp(22px, 2.2vw, 27px); line-height: 1.2; color: var(--ink); }
+:root[data-lang="zh"] .vl-h, :root[data-lang="zh"] .fk-t, :root[data-lang="zh"] .ps-q .ps-t, :root[data-lang="zh"] .ps-ev .ps-v { font-style: normal; }
+:root[data-lang="zh"] .vl-h, :root[data-lang="zh"] .ch-k, :root[data-lang="zh"] .sn-list li, :root[data-lang="zh"] .ps-v { font-weight: 600; font-size: 18px; line-height: 1.5; }
+:root[data-lang="zh"] .sn-v { font-weight: 600; font-size: clamp(30px, 3vw, 38px); line-height: 1.2; }
+:root[data-lang="zh"] .fk-t, :root[data-lang="zh"] .ps-q .ps-t { font-weight: 600; font-size: 19px; line-height: 1.55; }
+:root[data-lang="zh"] .vl-list li, :root[data-lang="zh"] .ch-v, :root[data-lang="zh"] .fk-list li, :root[data-lang="zh"] .ck-t { line-height: 1.7; }
+:root[data-lang="zh"] .ck-d, :root[data-lang="zh"] .ck-s { letter-spacing: .04em; }
+@media (max-width: 620px) {
+  .values, .seen, .fk-cols { grid-template-columns: 1fr; }
+  .vl-col + .vl-col, .fk-col + .fk-col { padding-left: 0; border-left: 0; border-top: 1px solid var(--hair-2); }
+  .sn-more { border-left: 0; padding-left: 0; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--lead-line); }
+  .chain { grid-template-columns: 1fr; }
+  .chain li { grid-template-columns: 2.4em minmax(0, 1fr); grid-template-rows: auto; column-gap: 10px; row-gap: 3px; padding: 12px 0 13px; }
+  .chain li + li { padding-left: 0; border-left: 0; border-top: 1px solid var(--hair-2); }
+  .chain li.now { padding-inline: 0; }
+  .ch-no { grid-row: span 2; padding-top: 5px; }
+  .checks li { grid-template-columns: minmax(0, 1fr); row-gap: 3px; }
+  .ck-s { text-align: left; }
+  .ps-list li { grid-template-columns: 1fr; row-gap: 3px; }
+  .ps-now .ps-v, .ps-tag { padding-left: 0; grid-column: 1; }
+}

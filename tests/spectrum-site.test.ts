@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join, posix } from "node:path";
 import { buildWebsite } from "../src/cli/website-build.js";
 import { journalFeed, keepLanguage, localizeMarkup, minifyCss, shareCardCover, shareCardFor, withAlternateLocale, withShareImage } from "../src/cli/spectrum-site.js";
-import { arroganceSectionId, beyondWinningSectionId, learningAccessSectionId } from "../src/cli/blog-series.js";
+import { arroganceSectionId, beyondWinningSectionId, journalEssaySectionId, learningAccessSectionId } from "../src/cli/blog-series.js";
 import { INDEXNOW_KEY, INDEXNOW_KEY_FILE } from "../src/cli/indexnow.js";
 import { siteFaq } from "../src/site/faq.js";
 import { escapeHtml } from "../src/site/html.js";
@@ -115,7 +115,7 @@ test("public data and discovery files are unchanged by the redesign", async () =
 
     const index = await page(`${locale}blog/index.html`);
     assert.ok(index.includes(`href="${slug}/"`), "new essay not linked on Journal index");
-    assert.ok(index.includes(locale ? "7 篇文章" : "7 essays"), "index count was not updated");
+    assert.ok(index.includes(locale ? "10 篇文章" : "10 essays"), "index count was not updated");
 
     for (const [oldSlug, section] of old) {
       const oldRoute = `${locale}blog/${oldSlug}/`;
@@ -158,7 +158,7 @@ test("public data and discovery files are unchanged by the redesign", async () =
     assert.ok(home.includes(`blog/${arrogance}/`), "essay not on the home page");
   }
 
-  // the newest essay, "After You’ve Beaten Everyone, Then What?"
+  // "After You’ve Beaten Everyone, Then What?"
   const winning = "after-you-have-beaten-everyone";
   for (const locale of ["", "zh-cn/"]) {
     const route = `${locale}blog/${winning}/`;
@@ -182,13 +182,63 @@ test("public data and discovery files are unchanged by the redesign", async () =
       assert.ok(article.includes(`https://doi.org/${doi}`), `source link ${doi}`);
     }
     assert.ok(article.includes("assets/journal/podium.webp"), "cover plate");
-    assert.ok(article.includes(locale ? "期刊 · 第 1 篇，共 7 篇" : "Journal · Essay 1 of 7"), "essay number");
+    assert.ok(article.includes(locale ? "期刊 · 第 4 篇，共 10 篇" : "Journal · Essay 4 of 10"), "essay number");
     const index = await page(`${locale}blog/index.html`);
-    assert.ok(index.indexOf(`href="${winning}/"`) >= 0 && index.indexOf(`href="${winning}/"`) < index.indexOf(`href="${arrogance}/"`), "newest essay leads the Journal index");
+    assert.ok(index.indexOf(`href="${winning}/"`) >= 0 && index.indexOf(`href="${winning}/"`) < index.indexOf(`href="${arrogance}/"`), "essays are listed newest first");
     const home = await page(`${locale}index.html`);
-    assert.ok(home.includes(`blog/${winning}/`), "newest essay not on the home page");
-    assert.ok(home.indexOf(`blog/${winning}/`) < home.indexOf(`blog/${arrogance}/`), "newest essay leads the home page list");
+    assert.ok(home.includes(`blog/${winning}/`), "essay not on the home page");
+    assert.ok(home.indexOf(`blog/${winning}/`) < home.indexOf(`blog/${arrogance}/`), "the home page lists essays newest first");
   }
+
+  // the three essays of 28 November 2026: routes, metadata, sources, covers, links between them, and their place first
+  const learn = "why-learn-when-ai-is-smarter";
+  const progress = "why-technological-progress-makes-us-fear";
+  const truth = "seeking-truth-or-proving-ourselves-right";
+  const trio = [
+    { slug: learn, card: "essay-learn", cover: "lens", n: 1, sections: 5, sources: 3, title: "Why Learn When AI Is Smarter Than Us?", zh: "当 AI 比人类更聪明，学习还有什么意义？",
+      dois: ["10.1037/0003-066X.55.1.68", "10.1207/s15326985ep4102_4"], links: [`../${progress}/`] },
+    { slug: progress, card: "essay-progress", cover: "timeclock", n: 2, sections: 6, sources: 5, title: "Why Does Technological Progress Make Us Fear the Future?", zh: "为什么技术越进步，人们反而越害怕未来？",
+      dois: ["10.1257/jep.33.2.3"], links: [] },
+    { slug: truth, card: "essay-truth", cover: "compass", n: 3, sections: 6, sources: 7, title: "Are We Seeking Truth, or Trying to Prove Ourselves Right?", zh: "我们是在追求真理，还是在证明自己正确？",
+      dois: ["10.1037/0033-2909.108.3.480", "10.1017/S0140525X10000968"], links: [`../${progress}/#${journalEssaySectionId(progress, 4)}`, `../${learn}/`, `../${progress}/`] },
+  ];
+  for (const locale of ["", "zh-cn/"]) {
+    const index = await page(`${locale}blog/index.html`);
+    const home = await page(`${locale}index.html`);
+    for (const essay of trio) {
+      const route = `${locale}blog/${essay.slug}/`;
+      assert.ok(await isFile(join(spectrum, route, "index.html")), route);
+      assert.ok(spectrumSitemap.includes(`<loc>${SITE_URL}/${route}</loc>`), route);
+      const article = await page(route + "index.html");
+      assert.match(article, /<meta name="robots" content="index,follow(?:,|")/u);
+      assert.match(article, /<meta property="article:published_time" content="2026-11-28">/u);
+      assert.ok(article.includes(locale ? essay.zh : essay.title), `${route}: title`);
+      assert.ok(article.includes(`id="${journalEssaySectionId(essay.slug, essay.sections)}"`), `${route}: all ${essay.sections} sections`);
+      assert.throws(() => journalEssaySectionId(essay.slug, essay.sections + 1));
+      for (const leftover of [/\*\*/u, /〔资料/u, /\]\(/u, /^- /mu]) assert.doesNotMatch(article, leftover, `${route}: markup left in the text`);
+      assert.ok(article.includes(`<link rel="canonical" href="${SITE_URL}/${route}">`), route);
+      assert.ok(article.includes(`<link rel="alternate" hreflang="zh-Hans" href="${SITE_URL}/zh-cn/blog/${essay.slug}/">`), route);
+      const head = article.slice(0, article.indexOf("</head>"));
+      assert.ok(head.includes(`assets/share/${essay.card}-${locale ? "zh" : "en"}.jpg`), `essay share card: ${route}`);
+      assert.ok(!head.includes(winning), `inherited prior essay metadata: ${route}`);
+      assert.ok(article.includes(`<a class="fn" href="#source-${essay.sources}"`), `${route}: every source is cited`);
+      assert.ok(!article.includes(`id="source-${essay.sources + 1}"`), `${route}: no uncited source`);
+      for (const doi of essay.dois) assert.ok(article.includes(`https://doi.org/${doi}`), `${route}: source link ${doi}`);
+      for (const link of essay.links) assert.ok(article.includes(`<a class="xref" href="${link}"`), `${route}: link ${link}`);
+      assert.ok(article.includes(`assets/journal/${essay.cover}.webp`), "cover plate");
+      assert.ok(article.includes(locale ? `期刊 · 第 ${essay.n} 篇，共 10 篇` : `Journal · Essay ${essay.n} of 10`), "essay number");
+      assert.ok(home.includes(`blog/${essay.slug}/`), `${route}: not on the home page`);
+    }
+    const order = [learn, progress, truth, winning];
+    const at = (html: string, needle: (slug: string) => string) => order.map((slug) => html.indexOf(needle(slug)));
+    for (const [where, positions] of [["Journal index", at(index, (slug) => `href="${slug}/"`)], ["home page", at(home, (slug) => `blog/${slug}/`)]] as const) {
+      assert.ok(positions.every((position) => position >= 0), `${where}: an essay is missing`);
+      assert.deepEqual(positions, [...positions].sort((a, b) => a - b), `${where}: the new essays lead, in order`);
+    }
+  }
+  // the Riemann hypothesis passage states what had been verified, and by whom, on the date it was written
+  const truthEn = await page(`blog/${truth}/index.html`);
+  for (const needle of ["https://alpo.ge/remark.pdf", "Lean FRO", "Mathlib", "peer review", "28 November 2026"]) assert.ok(truthEn.includes(needle), `Riemann passage: ${needle}`);
 });
 
 test("each page keeps its route's title, description, robots and canonical metadata", async () => {
