@@ -4,21 +4,25 @@
 // follows the runner's real output format. Cards, tutors, students and judges are all
 // synthetic: no real card, prompt, model output or person appears here.
 //
-// Needs the record schema v5 runner (model identity, fingerprints, cache, checkCalibration). The bundled sample also keeps
-// history, the way a real folder grows across runner versions: with --legacy-runner the batches before 2026-11-25 are
-// written by a record schema v2 runner, with --v3-runner the batches of 2026-11-25 and 2026-11-26 up to 05:00 by a record
-// schema v3 runner, and the newest runner then adds the v5 calibration batches.
+// Needs the record schema v6 runner (student protocol, single-step probes). The bundled sample also keeps history, the way
+// a real folder grows across runner versions: with --legacy-runner the batches before 2026-11-25 are written by a record
+// schema v2 runner, with --v3-runner the batches of 2026-11-25 and 2026-11-26 up to 05:00 by a record schema v3 runner,
+// with --v5-runner the v5 calibration batches of 2026-11-26, and the newest runner then adds the v6 batches of 2026-11-27.
 // Usage (needs a build that contains the premium runner, src/premium/*):
-//   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--v3-runner <dir>] [--legacy-runner <dir>] [--checker <file>]
-//     [--bundle <file>] [--out <dir>]
-// --runner         folder with the built premium runner modules, record schema v5 (default dist/src/premium)
+//   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--v5-runner <dir>] [--v3-runner <dir>] [--legacy-runner <dir>]
+//     [--checker <file>] [--bundle <file>] [--out <dir>]
+// --runner         folder with the built premium runner modules, record schema v6 (default dist/src/premium)
+// --v5-runner      optional: a record schema v5 build for the v5 calibration batches (default: --runner)
 // --v3-runner      optional: a record schema v3 build for the batches of that era (default: --runner)
 // --legacy-runner  optional: a record schema v2 build for the history batches (default: the v3 runner)
 // --checker        the private calibration checker (check_calibration.py, v2). It is not in this repository. The runner's
 //                  checkCalibration runs it on the synthetic calibration batches against the synthetic expectations below;
 //                  without it every calibration report comes out as CANNOT_CHECK.
+//                  The v6 batches need no checker: the real checker v3 is written for one private card, so the generator
+//                  writes their v3 reports, content reviews and gate result itself, in the shapes the checker writes.
 // --bundle  the sample the dashboard loads (default tools/premium-dashboard/sample/sample-data.js)
-// --out     optional: also write the runner's folder layout (index.jsonl, batches/, records/, reports, expectations) there;
+// --out     optional: also write the runner's folder layout (index.jsonl, batches/, records/, reports, expectations, the probe
+//           file, content reviews and the gate result) there;
 //           must be new or empty
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -26,7 +30,7 @@ import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { pathToFileURL } from "node:url";
 
-const { values } = parseArgs({ options: { runner: { type: "string" }, "v3-runner": { type: "string" }, "legacy-runner": { type: "string" }, checker: { type: "string" },
+const { values } = parseArgs({ options: { runner: { type: "string" }, "v5-runner": { type: "string" }, "v3-runner": { type: "string" }, "legacy-runner": { type: "string" }, checker: { type: "string" },
   out: { type: "string" }, bundle: { type: "string" } } });
 const bundlePath = resolve(values.bundle ?? "tools/premium-dashboard/sample/sample-data.js");
 const outDir = values.out ? resolve(values.out) : null;
@@ -35,10 +39,13 @@ async function runnerAt(dir) {
   const [{ hash, loadCards }, { runBatch, rejudge, reconcile }, { configSchema, panel, TransportError }, { replayProvider }, { Store }] =
     await Promise.all(["cards", "batch", "provider", "replay", "store"].map(load));
   const checkCalibration = existsSync(join(dir, "check-calibration.js")) ? (await load("check-calibration")).checkCalibration : null;
-  return { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store, TransportError, checkCalibration };
+  const loadProbes = existsSync(join(dir, "plan.js")) && existsSync(join(dir, "protocol.js")) ? (await load("plan")).loadProbes : null;
+  return { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store, TransportError, checkCalibration, loadProbes };
 }
 const newest = await runnerAt(resolve(values.runner ?? "dist/src/premium"));
-if (!newest.checkCalibration) throw new Error("--runner must be a build with record schema v5 (src/premium/check-calibration)");
+if (!newest.loadProbes) throw new Error("--runner must be a build with record schema v6 (src/premium/plan, src/premium/protocol)");
+const v5 = values["v5-runner"] ? await runnerAt(resolve(values["v5-runner"])) : newest;
+if (!v5.checkCalibration) throw new Error("--v5-runner must be a build with record schema v5 (src/premium/check-calibration)");
 const current = values["v3-runner"] ? await runnerAt(resolve(values["v3-runner"])) : newest;
 const legacy = values["legacy-runner"] ? await runnerAt(resolve(values["legacy-runner"])) : current;
 // The functions below use whichever runner is active; history batches switch to the legacy one.
@@ -120,8 +127,7 @@ const PHRASES = {
   transferFix: { en: "oh right, fixed it", "zh-CN": "哦对 改好了" },
   hmm: { en: "hmm", "zh-CN": "嗯" },
 };
-function cardJson(id, version, setupNote = "") {
-  const c = CARDS[id];
+function cardJson(id, version, setupNote = "", c = CARDS[id]) {
   const both = (en, zh) => ({ en, "zh-CN": zh });
   return {
     schemaVersion: 1, id, version, suite: "synthetic-dashboard-v1", realism: "simulated", subject: c.subject,
@@ -436,7 +442,7 @@ function withClock(startIso, fn) {
   try { return fn(); } finally { globalThis.Date = Real; }
 }
 function calibrationV5(work, runs) {
-  const R = newest;
+  const R = v5;
   const asset = R.loadCards(join(work, "cards")).find(a => a.card.id === "synthetic-tiles");
   const expectations = calibExpectations(asset);
   const expPath = join(work, "calibration-expectations.json");
@@ -489,6 +495,447 @@ function calibrationV5(work, runs) {
     "calib-vague/en/1": ["missing2"], "calib-vague/en/2": ["noKind"],
   }, ["fp_synth_7c1e", "fp_synth_7c1e", "fp_synth_9a40"], false, [CALIB_BUDGET_STOP, 0.05]);
   return { expectations };
+}
+
+// ---------- record schema v6: the student protocol, single-step probes and checker v3 ----------
+// Record schema v6 adds a versioned student protocol: the student answers in JSON mode, and on a card whose fixed test is
+// "injected" the runner writes the fixed sentence itself and drops the event if the model reports it. A probe starts
+// from a fixed history prefix (cut from a calibration tutor tape) and asks the student for one message only. The card,
+// protocol, probes, tapes, checker reports, content reviews and gate result below are synthetic, in this fixture's own words.
+const BEADS = {
+  subject: "patterns", kind: "begs_for_answer", mistake: "count_pairs",
+  first: { en: "red blue red blue.. is the 9th bead blue?", "zh-CN": "红蓝红蓝。。第9颗是蓝的吗？" },
+  literal: { en: "just tell me the colour, it's due tomorrow", "zh-CN": "直接告诉我颜色吧 明天要交" },
+  echo: { en: ["tell me the colour", "due tomorrow"], "zh-CN": ["告诉我颜色", "明天要交"] },
+  hint: { en: "pairs", "zh-CN": "一对" },
+  studentKw: { en: "odd", "zh-CN": "单数" }, tutorKw: { en: "odd", "zh-CN": "单数" },
+  t1: { en: "What colour are the 1st, 3rd and 5th beads?", "zh-CN": "第1、3、5颗是什么颜色？" },
+  s2: { en: "but thats a lot of counting..", "zh-CN": "可是这样要数好久。。" },
+  t2: { en: "Look at the beads two at a time. What does each pair look like?", "zh-CN": "两颗两颗地看，每一对是什么样的？" },
+  s3: { en: "4 pairs is 8 beads, the 9th ends a pair so blue", "zh-CN": "4对是8颗 第9颗是一对的最后 所以是蓝" },
+  t3: { en: "Which beads are red: the odd ones or the even ones?", "zh-CN": "红的是单数颗还是双数颗？" },
+  s4: { en: "odd ones are red.. 9 is odd so its red", "zh-CN": "单数是红 9是单数 所以是红的" },
+  t3v: { en: "Keep looking at the pattern.", "zh-CN": "再看看规律。" },
+  answer: { en: "The 9th bead is red.", "zh-CN": "第9颗是红的。" },
+};
+const RULES_V2 = {
+  en: RULES.en + "\nAnswer with one JSON object. When the runner adds the fixed sentence, leave it out of your message.\n",
+  "zh-CN": RULES["zh-CN"] + "\n只回一个 JSON 对象。固定那句由 runner 来加时，你的话里不要写。\n",
+};
+const both = (en, zh) => ({ "zh-CN": zh, en });
+const PROTOCOL = {
+  schemaVersion: 1, id: "synthetic-student-protocol", version: "1.0.0", rulesVersion: "2.0.0",
+  studentRequest: { responseFormat: { type: "json_object" }, thinking: { type: "disabled" }, temperature: 0.7, maxOutputTokens: 512 },
+  instruction: both("Reply with one JSON object: message, stage, events, end. Events you may use: {events}.",
+    "只回一个 JSON 对象：message、stage、events、end。可以用的事件：{events}。"),
+  instructionEvents: "the card's events; the fixed test's event is left out when the runner injects it",
+  turnNote: { separator: "\n\n", default: both("[your message {k}]", "[你的第 {k} 条]"),
+    fixedTestInjected: both("[your message {k}: the runner adds the fixed sentence, do not write it]", "[你的第 {k} 条：固定那句由 runner 加，你不要写]") },
+  rewrite: { joiner: "\n", codes: {
+    empty_response: both("The reply was empty. Write message {k} again.", "回复是空的，请重写第 {k} 条。"),
+    invalid_json_or_fields: both("Reply with one JSON object holding message, stage, events and end.", "只回一个 JSON 对象，包含 message、stage、events、end。"),
+    internal_state_in_message: both("Keep stage and events out of the message text.", "message 里不要写 stage 或 events。"),
+    unknown_event: both("Use only the events listed.", "只用列出的事件。"),
+    duplicate_event: both("Each event happens once in a conversation.", "每个事件整段对话只出现一次。"),
+    invalid_stage: both("stage must be {prev} or {next}, at most {max}.", "stage 只能是 {prev} 或 {next}，最大 {max}。"),
+    invalid_end: both("end is true only together with one leaving event.", "只有带一个离开事件时 end 才是 true。"),
+    curt_exit_unsolved: both("You have not solved it yet, so do not sign off.", "还没做出来，先别说再见。"),
+    left_too_early: both("Do not leave before message {min}.", "第 {min} 条之前不要走。"),
+    fixed_test_early: both("Do not write \"{fixed}\" before message {at}.", "第 {at} 条之前不要写「{fixed}」。"),
+    fixed_test_missing: both("Message {at} must contain \"{fixed}\".", "第 {at} 条要包含「{fixed}」。"),
+    fixed_test_self_written: both("The runner adds \"{fixed}\"; leave it out.", "「{fixed}」由 runner 加，你不要写。"),
+    fixed_test_echo: both("Do not say the fixed sentence in other words either.", "也不要换个说法重复固定那句。"),
+    too_long: both("At most {lines} lines and {limit} words.", "最多 {lines} 行、{limit} 个字。"),
+    role_reference: both("Stay the learner; do not mention the setup.", "就当学生，不要提设定。"),
+  } },
+  injection: { appliesWhen: "the card's fixed test is injected, at its student message, when end is false", separator: "\n", position: "append",
+    runnerEvent: "the card's fixed test kind", dropModelReportedRunnerEvent: true, lengthCheck: "the final text, after the injection" },
+  history: { assistantContent: "the student's state as JSON, with the final text", userContent: "the tutor's text and the turn note",
+    opening: "the card's first message, fixed" },
+};
+function writeBeads(R, dir) {
+  const folder = join(dir, "synthetic-beads");
+  mkdirSync(folder, { recursive: true });
+  for (const [lang, text] of Object.entries(RULES_V2)) writeFileSync(join(dir, "rules." + lang + ".md"), text);
+  const protocolRaw = JSON.stringify(PROTOCOL, null, 2) + "\n";
+  writeFileSync(join(dir, "protocol.json"), protocolRaw);
+  const c = cardJson("synthetic-beads", "1.0.0", "", BEADS);
+  const raw = JSON.stringify({ ...c, fixedTest: { ...c.fixedTest, delivery: "injected", echoPatterns: BEADS.echo } }, null, 2) + "\n";
+  const md = { en: "Synthetic learner for synthetic-beads.\n", "zh-CN": "合成学生：synthetic-beads。\n" };
+  writeFileSync(join(folder, "card.json"), raw);
+  for (const [lang, text] of Object.entries(md)) writeFileSync(join(folder, "student." + lang + ".md"), text);
+  const lock = { schemaVersion: 2, rulesVersion: PROTOCOL.rulesVersion,
+    protocol: { id: PROTOCOL.id, version: PROTOCOL.version, file: "protocol.json", hash: R.hash(protocolRaw) },
+    cards: [{ id: "synthetic-beads", version: "1.0.0", contentHash: R.hash(JSON.stringify([raw, md["zh-CN"], md.en, RULES_V2["zh-CN"], RULES_V2.en])) }] };
+  writeFileSync(join(dir, "cards.lock.json"), JSON.stringify(lock, null, 2) + "\n");
+  return R.loadCards(dir)[0];
+}
+// Two calibration tutor tapes give the probes their history: one that guides, one that only refuses.
+const TUTOR_TAPES = { guide: "tape-guide-v1", vague: "tape-vague-v1" };
+const tutorTexts = (tape, lang) => tape === "guide" ? [BEADS.t1[lang], BEADS.t2[lang], BEADS.t3[lang], PHRASES.check[lang]]
+  : [PHRASES.refuse[lang], PHRASES.vague[lang], BEADS.t3v[lang]];
+const PROBES = [
+  { probeId: "P-beg", gate: "key", tape: "guide", target: 2, purpose: "The learner pushes back and begs for the answer; the runner adds the fixed sentence." },
+  { probeId: "P-mistake", gate: "key", tape: "guide", target: 3, purpose: "After a hint about pairs, the learner makes the scripted counting mistake." },
+  { probeId: "P-leave", gate: "key", tape: "vague", target: 4, purpose: "After three unhelpful turns the learner leaves; leaving is allowed from message 4." },
+  { probeId: "P-solve", gate: "rest", tape: "guide", target: 4, purpose: "Once the tutor asks about odd and even, the learner finds the colour." },
+];
+// The student's accepted reply at message n of a script, before any twist.
+function beadsState(script, lang, n) {
+  const q = k => BEADS[k][lang], p = k => PHRASES[k][lang];
+  const lines = script === "guide"
+    ? { 2: [q("s2"), 1, ["pushback"]], 3: [q("s3"), 2, ["scripted_mistake:" + BEADS.mistake]], 4: [q("s4"), 3, []], 5: [p("okThanks"), 3, ["curt_exit"], true] }
+    : { 2: [q("s2"), 1, ["pushback"]], 3: [p("stuck"), 1, []], 4: [p("leave"), 1, ["left"], true] };
+  const [message, stage, events, end = false] = lines[n];
+  return { message, stage, events, end };
+}
+function beadsPrefix(lang, target, tape) {
+  const tutors = tutorTexts(tape, lang), lines = [];
+  for (let k = 1; k < target; k++) {
+    const s = beadsState(tape, lang, k === 1 ? 2 : k);
+    lines.push(k === 1 ? { role: "student", text: BEADS.first[lang], state: { stage: 1, events: [], end: false }, fixed: true }
+      : { role: "student", text: s.message + (k === 2 ? PROTOCOL.injection.separator + BEADS.literal[lang] : ""),
+        state: { stage: s.stage, events: k === 2 ? [...s.events, BEADS.kind] : s.events, end: false } });
+    lines.push({ role: "tutor", turn: k, text: tutors[k - 1], source: TUTOR_TAPES[tape] + "#T" + k });
+  }
+  return lines;
+}
+function probesFile(R) {
+  return { schemaVersion: 1, probeSetVersion: "synthetic-probes-1.0.0", protocolVersion: PROTOCOL.version, rulesVersion: PROTOCOL.rulesVersion,
+    note: "Synthetic probe set for the dashboard fixture. Not a real card.",
+    probes: PROBES.map(x => {
+      const prefix = { "zh-CN": beadsPrefix("zh-CN", x.target, x.tape), en: beadsPrefix("en", x.target, x.tape) };
+      return { probeId: x.probeId, gate: x.gate, purpose: x.purpose, targetStudentMessage: x.target, prefix,
+        prefixHash: { "zh-CN": R.hash(JSON.stringify(prefix["zh-CN"])), en: R.hash(JSON.stringify(prefix.en)) } };
+    }) };
+}
+// Twists change one student position: a first reply the runner sends back, or a change to the reply it keeps. A twist
+// applies at its own message (name@n overrides it); in a probe, at the probe's target.
+const TWIST_AT = { dropped: 2, said: 2, selfWritten: 2, echo: 2, noHint: 3, noMistake: 3, offCard: 3, leaveEarly: 3, stageJump: 3, stays: 4 };
+function beadsTape(id, lang, twists, fp) {
+  const probe = PROBES.find(p => p.probeId === id);
+  const script = probe ? probe.tape : id === "calib-beads-guide" ? "guide" : "vague";
+  const positions = probe ? [probe.target] : script === "guide" ? [2, 3, 4, 5] : [2, 3, 4];
+  const at = n => twists.map(t => t.split("@")).filter(([name, k]) => (k ? Number(k) : TWIST_AT[name] ?? positions.at(-1)) === n).map(([name]) => name);
+  const q = k => BEADS[k][lang], p = k => PHRASES[k][lang];
+  const learner = [], empties = [];
+  let calls = 0;
+  const stu = (text, finishReason = "stop") => {
+    calls++;
+    const input = 1700 + 150 * calls, hit = Math.min(input - 64, 1536 + 128 * (calls - 1));
+    learner.push({ text, resolvedModel: LEARNER.pinnedVersion, system_fingerprint: fp, finishReason, latencyMs: 640 + 37 * calls,
+      usage: { inputTokens: input, outputTokens: 30 + (calls % 4) * 7, cacheHitTokens: hit, cacheMissTokens: input - hit } });
+  };
+  const empty = () => { calls++; empties.push(calls); };
+  for (const n of positions) {
+    const on = at(n), s = beadsState(script, lang, n);
+    const json = x => S(x.message, x.stage, x.events, x.end);
+    if (on.includes("dropped")) s.events = [...s.events, BEADS.kind];
+    if (on.includes("said")) s.message = lang === "en" ? "but i said the 9th.. thats a lot of counting" : "可是我说过是第9颗。。这样要数好久";
+    if (on.includes("noHint")) s.message = lang === "en" ? "8 beads and then the 9th is blue" : "8颗以后第9颗就是蓝的";
+    if (on.includes("noMistake")) s.events = [];
+    if (on.includes("offCard")) s.message = lang === "en" ? "4 pairs is 8, plus 1 makes the 10th, so blue" : "按一对数 4对是8颗 再加1颗是第10颗 所以是蓝";
+    if (on.includes("stays")) Object.assign(s, { message: lang === "en" ? "still lost.. what am i even counting" : "还是不会。。我到底在数什么", events: [], end: false });
+    if (on.includes("selfWritten")) stu(json({ ...s, message: s.message + " " + q("literal") }));
+    if (on.includes("echo")) stu(json({ ...s, message: s.message + " " + BEADS.echo[lang][0] }));
+    if (on.includes("plain")) stu(s.message);
+    if (on.includes("empty")) empty();
+    if (on.includes("truncated")) stu(json(s).slice(0, 30), "length");
+    if (on.includes("stageJump")) stu(json({ ...s, stage: s.stage + 1 }));
+    if (on.includes("curtExit")) stu(json({ message: p("okThanks"), stage: 1, events: ["curt_exit"], end: true }));
+    if (on.includes("leaveEarly")) stu(json({ message: p("leave"), stage: 1, events: ["left"], end: true }));
+    // Three replies in a row that are not JSON: the runner discards the attempt and starts the probe again.
+    if (on.includes("discard")) for (let i = 0; i < 3; i++) stu(s.message);
+    stu(on.includes("fence") ? "```json\n" + json(s) + "\n```" : json(s));
+  }
+  const tracks = { [LEARNER.id]: learner };
+  if (!probe) tracks[id] = tutorTexts(script, lang).map(text => ({ text, finishReason: "stop", latencyMs: 0, usage: { inputTokens: 0, outputTokens: 0 } }));
+  return { tracks, empties };
+}
+// The replay tape cannot hold an empty reply, so the provider answers those calls itself, as a JSON-mode model can.
+function beadsProvider(R, tapes, empties, fp) {
+  return job => {
+    const key = [job.asset.card.id, job.lang, job.probe?.probeId ?? job.tutor.id].join("/");
+    const base = R.replayProvider(tapes[job.repeatIndex], job), at = empties[job.repeatIndex][key] ?? [];
+    let n = 0;
+    return req => req.role === "student" && at.includes(++n)
+      ? { text: "", finishReason: "stop", latencyMs: 410, usage: { inputTokens: 1880, outputTokens: 0, cacheHitTokens: 1792, cacheMissTokens: 88 },
+        resolvedModel: LEARNER.pinnedVersion, returnedModel: LEARNER.pinnedVersion, system_fingerprint: fp }
+      : base(req);
+  };
+}
+const beadsPrices = { version: "synthetic-prices-v6", models: [{ ...priced("learner", 0.3, 1.2), cacheHitInputUsdPerMillion: 0.03 },
+  priced("calib-beads-guide", 0, 0), priced("calib-beads-vague", 0, 0)] };
+const BEADS_TUTORS = [scripted("calib-beads-guide", "Guides with pairs · scripted (synthetic)"), scripted("calib-beads-vague", "Only refuses · scripted (synthetic)")];
+// Synthetic expectations in the checker's v3 format: probe expectations, full-run groups, L2 review items and the review rules.
+const TERMINAL = ["left", "curt_exit", "thanked_after_answer"];
+const L2 = {
+  "L2-H1": { severityIfFail: "hard", question: "does the learner state a bead count the card does not script?", machine: "needs_review when the visible message holds a digit" },
+  "L2-H2": { severityIfFail: "hard", question: "does the message show the idea of the stage it claims?", machine: "auto_pass when the stage's key word is visible, else needs_review" },
+  "L2-H3": { severityIfFail: "hard", question: "does the learner misquote what they wrote earlier?", machine: "auto_fail when the learner says what they said before" },
+};
+function beadsExpectations(R, asset, probes, tapeHash) {
+  const msg = (n, stage, mustEvents, end, extra = {}) => ({ n, stage: [stage], mustEvents, forbidEvents: end ? [] : TERMINAL, end, injected: false, mustContain: [], ...extra });
+  const groups = {};
+  for (const lang of ["zh-CN", "en"]) {
+    const opening = msg(2, 1, ["pushback"], false, { injected: true });
+    groups["calib-beads-guide"] = { ...groups["calib-beads-guide"], [lang]: { messages: [opening, msg(3, 2, ["scripted_mistake:" + BEADS.mistake], false),
+      msg(4, 3, [], false), msg(5, 3, ["curt_exit"], true)], end: { reason: ["curt_exit"], fixedTestDelivered: true } } };
+    groups["calib-beads-vague"] = { ...groups["calib-beads-vague"], [lang]: { messages: [opening, msg(3, 1, [], false), msg(4, 1, ["left"], true)],
+      end: { reason: ["left"], fixedTestDelivered: true } } };
+  }
+  const human = {
+    "P-beg": both("Pushes back and asks for the colour in their own words; the fixed sentence is added by the runner, not echoed.", "用自己的话推回去要颜色；固定那句由 runner 加，学生自己不重复。"),
+    "P-mistake": both("Counts in pairs and lands on the wrong colour, the way the card scripts it, and says so with the word pairs.", "按「一对」来数，按卡上写好的方式数错颜色，话里要有「一对」。"),
+    "P-leave": both("Gives up and leaves after three unhelpful turns.", "三轮没帮上忙之后放弃离开。"),
+    "P-solve": both("Uses odd and even to find red without being told.", "自己用单双数推出是红的。"),
+  };
+  const probeExpectations = {
+    "P-beg": msg(2, 1, ["pushback"], false, { injected: true, visible: "own words, no fixed sentence", human: human["P-beg"] }),
+    "P-mistake": msg(3, 2, ["scripted_mistake:" + BEADS.mistake], false, { visible: "the word pairs", human: human["P-mistake"] }),
+    "P-leave": msg(4, 1, ["left"], true, { visible: "a short goodbye", human: human["P-leave"] }),
+    "P-solve": msg(4, 3, [], false, { visible: "odd and even", human: human["P-solve"] }),
+  };
+  return { schemaVersion: 3, purpose: "Synthetic: calibrate the simulated student on the synthetic beads card with probes and scripted tutors. Dashboard fixture only.",
+    card: { id: asset.card.id, version: asset.card.version, contentHash: asset.contentHash, leaveNotBefore: asset.card.leaveNotBefore }, rulesVersion: asset.rulesVersion,
+    protocol: { file: "protocol.json", hash: asset.protocol.hash, version: asset.protocol.version }, tape: { file: "synthetic-tutor-tapes.json", hash: tapeHash },
+    probes: { file: "probes.json", hash: R.hash(probes.raw), probeSetVersion: probes.file.probeSetVersion,
+      gates: { key: PROBES.filter(p => p.gate === "key").map(p => p.probeId), rest: PROBES.filter(p => p.gate === "rest").map(p => p.probeId) } },
+    repeats: 5, languages: ["zh-CN", "en"], plannedGroups: ["calib-beads-guide"], optionalGroups: ["calib-beads-vague"],
+    pass: { run: { maxHard: 0, maxSoft: 1 }, group: { runs: 5, minPassingRuns: 4 }, probe: { runsPerLanguage: 5, minPassingRunsPerLanguage: 4 }, rewriteRateMax: 0.2 },
+    layers: { L0: "format and rewrites: the runner's checks and the rewrite rate", L1: "per message: stage, events, end and injection against these expectations",
+      L2: Object.entries(L2).map(([level, x]) => ({ level, ...x })) },
+    review: { undecided: "an undecided needs_review item counts as fail once the review closes", autoFail: "auto_fail becomes pass only with an override, a quote and a note",
+      machineFail: "a machine FAIL stays FAIL", final: "the gate or final verdict stays PENDING_REVIEW until every review is complete" },
+    milestones: [{ id: "M1-mistake", level: "L1", event: "scripted_mistake:" + BEADS.mistake }, { id: "M2-solved", level: "L1", stage: 3 }],
+    groups, probeExpectations };
+}
+// ---- the synthetic checker v3 (the real one is written for one private card) ----
+const visibleOf = line => line.model?.message ?? line.text;
+function checkRunV3(r, exp) {
+  const lang = r.card.lang, students = r.transcript.filter(l => l.role === "student");
+  const written = students.map((line, i) => ({ n: i + 1, line })).filter(x => !x.line.prefix && !x.line.fixed);
+  const spec = r.probe ? [exp.probeExpectations[r.probe.probeId]] : exp.groups[r.tutor.id][lang].messages;
+  const hard = [], soft = [], devs = [];
+  const dev = (severity, n, rule, text) => { (severity === "hard" ? hard : soft).push("msg " + n + ": " + text); devs.push({ message: n, severity, rule }); };
+  for (const m of spec) {
+    const x = written.find(w => w.n === m.n);
+    if (!x) { dev("hard", m.n, "missing", "no student message"); continue; }
+    const { stage, events, end } = x.line.state;
+    if (!m.stage.includes(stage)) dev("hard", m.n, "stage", "stage " + stage + ", expected " + m.stage.join(" or "));
+    for (const e of m.mustEvents) if (!events.includes(e)) dev("hard", m.n, "mustEvents", "missing event " + e);
+    for (const e of m.forbidEvents) if (events.includes(e)) dev("hard", m.n, "forbidEvents", "forbidden event " + e);
+    if (end !== m.end) dev("hard", m.n, "end", "end " + end + ", expected " + m.end);
+    if (m.injected && !x.line.injected) dev("hard", m.n, "injected", "fixed sentence not injected");
+    for (const f of x.line.checks?.softFlags ?? []) dev("soft", m.n, "softFlags", f);
+    if (x.line.checks?.fenceStripped) dev("soft", m.n, "format", "reply came in a json fence");
+  }
+  const item = (itemId, level, machine, x, list = x ? [x] : []) => ({ itemId, level, machine, severityIfFail: L2[level].severityIfFail,
+    message: machine === "auto_pass" ? null : x.n, ...(machine === "auto_pass" ? { quote: null } : { messages: list.map(w => w.n) }),
+    ...(machine === "auto_fail" ? { quote: visibleOf(x.line) } : {}), question: L2[level].question });
+  const items = [];
+  const digits = written.filter(x => /\d/u.test(visibleOf(x.line)));
+  items.push(item("L2-H1", "L2-H1", digits.length ? "needs_review" : "auto_pass", digits[0], digits));
+  let prev = 1;
+  for (const [i, line] of students.entries()) {
+    const x = written.find(w => w.n === i + 1);
+    if (x && line.state.stage > prev) {
+      const word = line.state.stage === 2 ? BEADS.hint[lang] : BEADS.studentKw[lang];
+      items.push(item("L2-H2-stage" + line.state.stage + "_if_claimed@" + x.n, "L2-H2", visibleOf(line).toLowerCase().includes(word) ? "auto_pass" : "needs_review", x));
+    }
+    prev = Math.max(prev, line.state.stage);
+  }
+  const said = written.find(x => /\bi said\b|我说过/iu.test(visibleOf(x.line)));
+  items.push(item("L2-H3", "L2-H3", said ? "auto_fail" : "auto_pass", said));
+  const claims = items.filter(i => i.level === "L2-H2");
+  const pushback = {};
+  for (const x of written) {
+    const reported = (x.line.model?.events ?? x.line.state.events).includes("pushback"), shown = /^(but|可是)/u.test(visibleOf(x.line));
+    if (reported || shown) { const k = "pushback:" + (reported && shown ? "both" : reported ? "model_only" : "text_only"); pushback[k] = (pushback[k] ?? 0) + 1; }
+  }
+  const discarded = r.attempts.filter(a => a.status === "discarded");
+  const autoFail = sev => items.filter(i => i.machine === "auto_fail" && i.severityIfFail === sev).length;
+  const needsReview = items.filter(i => i.machine === "needs_review").length;
+  return { runId: r.runId, ...(r.probe ? { probeId: r.probe.probeId } : { tutor: r.tutor.id }), lang, repeat: r.repeat.index,
+    machinePass: hard.length <= exp.pass.run.maxHard && soft.length <= exp.pass.run.maxSoft, hard, soft, reviewItems: items, needsReview,
+    provisional: { hard: hard.length + autoFail("hard"), soft: soft.length + autoFail("soft"), pendingDecisions: needsReview,
+      note: "machine findings and auto labels only; the run's result waits for the content review" },
+    milestones: r.probe ? [] : exp.milestones.map(m => {
+      const x = written.find(w => m.event ? w.line.state.events.includes(m.event) : w.line.state.stage >= m.stage);
+      return { id: m.id, level: m.level, status: x ? "met" : "not_triggered", message: x?.n ?? null };
+    }),
+    selfReportStage: r.probe || !claims.length ? null : { agree: claims.filter(i => i.machine === "auto_pass").length, total: claims.length },
+    eventSelfReport: pushback, firstDeviation: devs[0] ?? null,
+    positions: written.length, extraRewrites: written.reduce((a, x) => a + (x.line.checks?.regenerated ?? 0), 0),
+    attempts: r.attempts.length, discardedAttempts: discarded.length,
+    firstTry: written.map(x => [x.n, (x.line.checks?.regenerated ?? 0) === 0 && !discarded.some(a => a.atStudentMessage === x.n)]) };
+}
+function checkV3(dir, batchId, exp, { revision, diagnostic } = {}) {
+  const batch = JSON.parse(readFileSync(join(dir, "batches", batchId + ".json"), "utf8"));
+  const records = readdirSync(join(dir, "records")).map(f => JSON.parse(readFileSync(join(dir, "records", f), "utf8"))).filter(r => r.batchId === batchId);
+  const replaced = new Map(records.flatMap(r => r.restartOf ? [[r.restartOf, r.runId]] : []));
+  const keyOf = r => r.probe?.probeId ?? r.tutor.id, order = batch.probes ?? batch.tutors.map(t => t.id);
+  const adopted = records.filter(r => !replaced.has(r.runId)).sort((a, b) => order.indexOf(keyOf(a)) - order.indexOf(keyOf(b)) ||
+    exp.languages.indexOf(a.card.lang) - exp.languages.indexOf(b.card.lang) || a.repeat.index - b.repeat.index);
+  const checked = adopted.map(r => checkRunV3(r, exp));
+  const groups = order.flatMap(key => exp.languages.map(lang => {
+    const rs = checked.filter(x => (x.probeId ?? x.tutor) === key && x.lang === lang), passing = rs.filter(x => x.machinePass).length;
+    return { [batch.probes ? "probeId" : "tutor"]: key, lang, machinePassing: passing, runs: rs.length,
+      machinePass: rs.length === exp.repeats && passing >= exp.pass.group.minPassingRuns, optional: exp.optionalGroups.includes(key) };
+  }));
+  const cohortErrors = groups.filter(g => g.runs !== exp.repeats).map(g => (g.probeId ?? g.tutor) + "/" + g.lang + ": " + g.runs + " runs, expected " + exp.repeats);
+  const sum = f => checked.reduce((a, x) => a + f(x), 0);
+  const positions = sum(x => x.positions), extra = sum(x => x.extraRewrites), attempts = sum(x => x.attempts), discarded = sum(x => x.discardedAttempts);
+  const firstTryByMessage = {}, observedFormats = {};
+  for (const x of checked) for (const [n, ok] of x.firstTry) {
+    const row = firstTryByMessage[n] ??= { accepted: 0, positions: 0 };
+    row.positions++; if (ok) row.accepted++;
+  }
+  for (const r of adopted) for (const c of r.calls) if (c.responseFormat) observedFormats[c.responseFormat.observed] = (observedFormats[c.responseFormat.observed] ?? 0) + 1;
+  const rate = positions ? extra / positions : 0;
+  const machineVerdict = !cohortErrors.length && groups.every(g => g.optional || g.machinePass) && rate <= exp.pass.rewriteRateMax ? "PASS" : "FAIL";
+  const runs = checked.map(x => { const out = { ...x }; delete out.firstTry; return out; });
+  const items = runs.flatMap(x => x.reviewItems);
+  const review = { status: "pending", itemsNeedingDecision: items.filter(i => i.machine === "needs_review").length, itemsAutoFail: items.filter(i => i.machine === "auto_fail").length };
+  const fps = {};
+  for (const r of records) {
+    const fp = r.calls.find(c => c.role === "student" && c.system_fingerprint)?.system_fingerprint ?? null, row = fps[fp] ??= { system_fingerprint: fp, conversations: 0, adopted: 0, superseded: 0 };
+    row.conversations++; if (replaced.has(r.runId)) row.superseded++; else row.adopted++;
+  }
+  return { checkerVersion: 3, ...(revision ? { checkerRevision: revision } : {}), batchId, batchKind: batch.kind, gate: batch.gate ?? null,
+    pins: { card: exp.card, rulesVersion: exp.rulesVersion, protocolHash: exp.protocol.hash, tapeHash: exp.tape.hash, probesHash: exp.probes.hash },
+    machineVerdict, verdict: diagnostic ? "DIAGNOSTIC" : machineVerdict === "PASS" ? "PENDING_REVIEW" : "FAIL", ...(revision ? { diagnostic: !!diagnostic } : {}),
+    cohortErrors, groups, runs, superseded: [...replaced].map(([runId, replacedBy]) => ({ runId, replacedBy, status: "superseded" })),
+    l0: { rewrite: { positions, extraRewrites: extra, rate, max: exp.pass.rewriteRateMax, pass: rate <= exp.pass.rewriteRateMax },
+      discard: { attempts, discarded, rate: attempts ? discarded / attempts : 0 }, firstTryByMessage, observedFormats },
+    review, humanReviewPending: review.itemsNeedingDecision + review.itemsAutoFail > 0, batchSpentUsd: batch.spentUsd, batchStatus: batch.status,
+    servingIdentity: batch.servingIdentity, fingerprintDistribution: Object.values(fps), multipleFingerprints: Object.keys(fps).length > 1 };
+}
+// A content review in the reviewer's file format. Every item of a run in `upTo` is decided: as planned in `decisions`
+// (keyed probe-or-tutor/lang/repeat/itemId), else pass, or fail for an auto_fail item.
+function contentReview(report, records, decisions, { status, scope, upTo = () => true }) {
+  const items = [];
+  for (const run of report.runs.filter(upTo)) {
+    const r = records.find(x => x.runId === run.runId), students = r.transcript.filter(l => l.role === "student");
+    for (const it of run.reviewItems) {
+      const d = decisions[[run.probeId ?? run.tutor, run.lang, run.repeat, it.itemId].join("/")];
+      const decision = d?.decision ?? (it.machine === "auto_fail" ? "fail" : "pass");
+      const n = it.message ?? students.findLastIndex(l => !l.prefix && !l.fixed) + 1;
+      const overrides = (it.machine === "auto_fail" && decision === "pass") || (it.machine === "auto_pass" && decision === "fail");
+      items.push({ recordId: run.runId, itemId: it.itemId, decision, quote: visibleOf(students[n - 1]), ...(overrides ? { overridesMachine: true } : {}),
+        note: d?.note ?? (it.machine === "needs_review" ? "合成复核：读过原文，符合卡上的设定。" : it.machine === "auto_fail" ? "合成复核：确认机器的判断。" : "合成复核：读过，没有问题。") });
+    }
+  }
+  return { schemaVersion: 1, batchId: report.batchId, reviewer: "Claude", blind: false, status, scope, checkerUsed: "synthetic checker v3, in the dashboard fixture", items };
+}
+// The gate (G2, G3) or final (G4) result over checked batches and their reviews, in the checker's output format.
+function gateResult(scope, entries, exp) {
+  const groups = [], overrides = [], errors = [];
+  let open = false;
+  for (const { report, review } of entries) {
+    if (report.diagnostic) { errors.push(report.batchId + ": a diagnostic batch is outside scope"); continue; }
+    if (!review || review.status !== "complete") open = true;
+    const decided = new Map((review?.items ?? []).map(i => [i.recordId + "/" + i.itemId, i]));
+    for (const i of review?.items ?? []) if (i.overridesMachine) overrides.push({ batchId: report.batchId, recordId: i.recordId, itemId: i.itemId,
+      decision: i.decision, quote: i.quote, overridesMachine: true, note: i.note });
+    for (const g of report.groups) {
+      const key = g.probeId ?? g.tutor;
+      const runs = report.runs.filter(x => (x.probeId ?? x.tutor) === key && x.lang === g.lang);
+      const passing = runs.filter(x => {
+        const fails = x.reviewItems.filter(it => (decided.get(x.runId + "/" + it.itemId)?.decision ?? (it.machine === "auto_pass" ? "pass" : "fail")) === "fail");
+        return x.hard.length + fails.filter(it => it.severityIfFail === "hard").length <= exp.pass.run.maxHard &&
+          x.soft.length + fails.filter(it => it.severityIfFail === "soft").length <= exp.pass.run.maxSoft;
+      }).length;
+      groups.push({ batchId: report.batchId, key, lang: g.lang, passing, runs: runs.length, pass: runs.length === exp.repeats && passing >= exp.pass.group.minPassingRuns, optional: g.optional });
+    }
+  }
+  const machine = Object.fromEntries(entries.map(e => [e.report.batchId, e.report.machineVerdict]));
+  const verdict = errors.length || Object.values(machine).includes("FAIL") ? "FAIL" : open ? "PENDING_REVIEW" : groups.every(g => g.optional || g.pass) ? "PASS" : "FAIL";
+  return { checkerVersion: 3, kind: scope === "G4" ? "final" : "gate", scope, verdict, errors, reviewStatus: open ? "open" : "complete", machineVerdicts: machine, groups, overrides };
+}
+function beadsBatch(R, dir, cfg, asset, at, plan, fp, extra = {}) {
+  const tapes = {}, empties = {};
+  for (let r = 1; r <= cfg.repeats; r++) { tapes[r] = {}; empties[r] = {}; }
+  const ids = extra.probes ? extra.probes.map(p => p.en.probeId) : cfg.tutors.map(t => t.id);
+  for (const id of ids) for (const lang of cfg.languages) for (let r = 1; r <= cfg.repeats; r++) {
+    const x = beadsTape(id, lang, plan[[id, lang, r].join("/")] ?? [], fp), key = ["synthetic-beads", lang, id].join("/");
+    tapes[r][key] = x.tracks;
+    if (x.empties.length) empties[r][key] = x.empties;
+  }
+  const store = new R.Store(dir);
+  try {
+    withClock(at, () => R.runBatch(store, { config: cfg, assets: [asset], provider: beadsProvider(R, tapes, empties, fp),
+      tapeHash: R.hash(JSON.stringify({ tapes, empties })), gitCommit: "synthetic-fixture", now: clock(at, 2),
+      ...(extra.probes ? { probePlan: { gate: extra.gate, probes: extra.probes } } : {}), ...(extra.series ? { series: extra.series } : {}) }));
+  } finally { store.close(); }
+}
+function calibrationV6(work, runs) {
+  const R = newest, dir = join(work, "cards-v6");
+  const asset = writeBeads(R, dir);
+  const file = probesFile(R), raw = JSON.stringify(file, null, 2) + "\n";
+  writeFileSync(join(work, "probes.json"), raw);
+  const tutorTape = Object.fromEntries(Object.entries(TUTOR_TAPES).map(([k, id]) => [id, both(tutorTexts(k, "en"), tutorTexts(k, "zh-CN"))]));
+  const exp = beadsExpectations(R, asset, { raw, file }, R.hash(JSON.stringify(tutorTape)));
+  const probesFor = gate => R.loadProbes(join(work, "probes.json"), { ...exp, languages: exp.languages }, asset, gate);
+  const fp = "fp_synth_c3d2", langs = ["zh-CN", "en"];
+  const cfg = (batchId, purpose, kind, tutors, extra = {}) => R.configSchema({
+    batchId, purpose, kind, languages: langs, repeats: 5, budgetUsd: 2, reserveUsd: 0, prices: beadsPrices, servingIdentity: "alias",
+    tutors, student: LEARNER, judges: [], alternates: [], judgeConfigVersion: "unscored", ...extra }, "config");
+  const copy = (dir, report) => {
+    for (const part of ["records", "batches"]) cpSync(join(dir, part), join(runs, part), { recursive: true });
+    writeFileSync(join(runs, "calibration-report-" + report.batchId + ".json"), JSON.stringify(report, null, 2) + "\n");
+    writeFileSync(join(runs, "index.jsonl"), readFileSync(join(runs, "index.jsonl"), "utf8") + readFileSync(join(dir, "index.jsonl"), "utf8"));
+  };
+  const recordsOf = (dir, batchId) => readdirSync(join(dir, "records")).map(f => JSON.parse(readFileSync(join(dir, "records", f), "utf8"))).filter(r => r.batchId === batchId);
+  // Batch 14: gate G2, the key probes, five runs per probe and language. The machine passes it (two groups at 4 of 5),
+  // but the content review fails one more P-mistake run in Chinese, so the gate result is FAIL. One auto_fail item is
+  // overridden with a quote and a note. First replies the runner sends back: the fixed sentence written by the student,
+  // an echo of it, plain text, an empty reply and a stage jump; and two replies whose begs_for_answer event the runner drops.
+  const g2 = join(work, "v6-g2");
+  beadsBatch(R, g2, cfg("synthetic-probes-g2-14", "synthetic gate G2: the key probes", "calibration-probe", [], { hardCapUsd: 2 }), asset,
+    "2026-11-27T06:00:00Z", {
+      "P-beg/zh-CN/2": ["dropped"], "P-beg/zh-CN/3": ["selfWritten"], "P-beg/zh-CN/5": ["fence"],
+      "P-beg/en/1": ["echo"], "P-beg/en/3": ["said"], "P-beg/en/4": ["dropped"],
+      "P-mistake/zh-CN/2": ["noHint"], "P-mistake/zh-CN/3": ["offCard"], "P-mistake/zh-CN/4": ["noMistake"], "P-mistake/zh-CN/5": ["plain"],
+      "P-mistake/en/1": ["stageJump"], "P-mistake/en/4": ["empty"],
+      "P-leave/en/2": ["stays"],
+    }, fp, { gate: "key", probes: probesFor("key"), series: { phase: "G2", id: "synthetic-series-1", priorBatchIds: [] } });
+  const r14 = checkV3(g2, "synthetic-probes-g2-14", exp);
+  const rec14 = recordsOf(g2, "synthetic-probes-g2-14");
+  const review14 = contentReview(r14, rec14, {
+    "P-mistake/zh-CN/3/L2-H1": { decision: "fail", note: "合成复核：学生说「再加1颗是第10颗」，卡上只写了按一对数错，没有这一步。" },
+    "P-mistake/zh-CN/2/L2-H2-stage2_if_claimed@3": { decision: "pass", note: "合成复核：没写「一对」，但「8颗以后」是按两颗一组数的，阶段 2 有证据。" },
+    "P-beg/en/3/L2-H3": { decision: "pass", note: "合成复核：检测器把 i said 都当成说错了自己的话；学生第 1 条确实问的是第 9 颗，没有说错。" },
+  }, { status: "complete", scope: "all 30 target messages read in full (visible text, raw model output, rejected replies); every review item decided" });
+  const gate = gateResult("G2", [{ report: r14, review: review14 }], exp);
+  copy(g2, r14);
+  // Batch 15: a diagnostic batch of two probes, for development only. The runner this sample is built with knows the key
+  // and rest gates only, so the batch runs as a key batch and its file is then marked gate "diagnostic", as the next
+  // contract describes. Checker 3.1 reports it as DIAGNOSTIC; it gets no content review and no gate.
+  const diag = join(work, "v6-diag");
+  beadsBatch(R, diag, cfg("synthetic-probes-diag-15", "synthetic diagnostic: P-mistake and P-leave after the G2 review", "calibration-probe", []), asset,
+    "2026-11-27T07:00:00Z", {
+      "P-mistake/zh-CN/1": ["noMistake"], "P-mistake/zh-CN/2": ["noMistake"], "P-mistake/zh-CN/4": ["discard"], "P-mistake/zh-CN/5": ["noMistake"],
+      "P-mistake/en/2": ["truncated"], "P-leave/zh-CN/3": ["curtExit"], "P-leave/en/1": ["stays"],
+    }, fp, { gate: "key", probes: probesFor("key").filter(p => ["P-mistake", "P-leave"].includes(p.en.probeId)) });
+  const diagFile = join(diag, "batches", "synthetic-probes-diag-15.json");
+  writeFileSync(diagFile, JSON.stringify({ ...JSON.parse(readFileSync(diagFile, "utf8")), gate: "diagnostic" }) + "\n");
+  const r15 = checkV3(diag, "synthetic-probes-diag-15", exp, { revision: "3.1.0", diagnostic: true });
+  copy(diag, r15);
+  // Batch 16: a full calibration with the protocol and two scripted tutors: the fixed sentence is injected at message 2
+  // of every conversation. Its content review is still open: the Chinese runs are decided, the English ones are not.
+  const full = join(work, "v6-full");
+  beadsBatch(R, full, cfg("synthetic-calibration-16", "synthetic calibration with the student protocol, two scripted tutors", "calibration", BEADS_TUTORS), asset,
+    "2026-11-27T08:00:00Z", {
+      "calib-beads-guide/zh-CN/1": ["dropped"], "calib-beads-guide/zh-CN/3": ["noHint", "fence@5"], "calib-beads-guide/zh-CN/4": ["selfWritten"],
+      "calib-beads-guide/en/2": ["echo", "dropped"], "calib-beads-guide/en/5": ["plain@4"],
+      "calib-beads-vague/zh-CN/2": ["leaveEarly"], "calib-beads-vague/en/3": ["empty@3"],
+    }, fp);
+  const r16 = checkV3(full, "synthetic-calibration-16", exp, { revision: "3.1.0" });
+  const review16 = contentReview(r16, recordsOf(full, "synthetic-calibration-16"), {}, { status: "open",
+    scope: "Chinese runs read so far; the English runs are still to do", upTo: x => x.lang === "zh-CN" });
+  copy(full, r16);
+  return { expectations: exp, probes: file, probesRaw: raw, reviews: [review14, review16], gates: [gate] };
 }
 
 // ---------- run ----------
@@ -659,6 +1106,8 @@ try {
   const runs = join(work, "runs");
   // Last, the newest runner (record schema v5) writes the calibration batches, each checked by its own checkCalibration.
   const calibration = calibrationV5(work, runs);
+  // Then the newest runner (record schema v6) adds the probe batches and a full calibration with the student protocol.
+  const v6 = calibrationV6(work, runs);
   // The runner stamps a reconciliation with the wall clock; pin it so the sample stays deterministic.
   for (const f of readdirSync(join(runs, "batches"))) {
     const path = join(runs, "batches", f), b = JSON.parse(readFileSync(path, "utf8"));
@@ -669,7 +1118,8 @@ try {
   const readDir = dir => readdirSync(join(runs, dir)).filter(f => f.endsWith(".json")).sort().map(f => JSON.parse(readFileSync(join(runs, dir, f), "utf8")));
   const reports = readdirSync(runs).filter(f => /^calibration-report-.+\.json$/u.test(f)).sort().map(f => JSON.parse(readFileSync(join(runs, f), "utf8")));
   const sample = { source: "synthetic", note: "Synthetic sample produced by the premium runner in offline replay. Not real results.",
-    index: readFileSync(join(runs, "index.jsonl"), "utf8"), batches: readDir("batches"), records: readDir("records"), reports, expectations: [calibration.expectations] };
+    index: readFileSync(join(runs, "index.jsonl"), "utf8"), batches: readDir("batches"), records: readDir("records"), reports,
+    expectations: [calibration.expectations, v6.expectations], probes: [v6.probes], reviews: v6.reviews, gates: v6.gates };
   writeFileSync(bundlePath, "// Generated by generate-sample.mjs. Synthetic data only; do not edit by hand.\nglobalThis.PREMIUM_SAMPLE = "
     + JSON.stringify(sample) + ";\n");
   if (outDir) {
@@ -680,9 +1130,14 @@ try {
     for (const f of readdirSync(runs).filter(f => /^calibration-report-.+\.json$/u.test(f))) cpSync(join(runs, f), join(outDir, f));
     // In a real folder the expectations are private and kept elsewhere; the synthetic ones are written beside the runs.
     writeFileSync(join(outDir, "calibration-expectations.json"), JSON.stringify(calibration.expectations, null, 2) + "\n");
+    writeFileSync(join(outDir, "calibration-expectations.v3.json"), JSON.stringify(v6.expectations, null, 2) + "\n");
+    writeFileSync(join(outDir, "probes.json"), v6.probesRaw);
+    for (const r of v6.reviews) writeFileSync(join(outDir, "content-review-" + r.batchId + ".json"), JSON.stringify(r, null, 2) + "\n");
+    for (const g of v6.gates) writeFileSync(join(outDir, "gate-" + g.scope + ".json"), JSON.stringify(g, null, 2) + "\n");
   }
   console.log(JSON.stringify({ bundle: bundlePath, out: outDir, records: sample.records.length, batches: sample.batches.map(b => b.batchId),
-    reports: reports.map(r => r.batchId + " " + r.verdict) }, null, 2));
+    reports: reports.map(r => r.batchId + " " + (r.machineVerdict ? r.machineVerdict + " / " : "") + r.verdict),
+    reviews: v6.reviews.map(r => r.batchId + " " + r.status + " " + r.items.length), gates: v6.gates.map(g => g.scope + " " + g.verdict) }, null, 2));
 } finally { rmSync(work, { recursive: true, force: true }); }
 
 function execution(config, assets, tape, now) {

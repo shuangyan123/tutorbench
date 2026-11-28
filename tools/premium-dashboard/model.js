@@ -1,16 +1,21 @@
 // Data model for the premium runs dashboard. Pure functions only: no DOM, no network.
 // Loaded as a classic script in the page (works from file://) and imported by the Node tests.
 // Input is the premium runner's output: records/<runId>.json, batches/<batchId>.json, index.jsonl.
-// Record schema v1 to v5 are all read, together. v2 adds calibration batches (status "unscored", never scored),
+// Record schema v1 to v6 are all read, together. v2 adds calibration batches (status "unscored", never scored),
 // budget restarts (restartOf), review flags, fixedTestSkipped and cost reconciliation. v3 adds the tutor's own prompt
 // (tutorPromptId, tutorPromptVersion and a language-independent tutorPromptHash) and the effective tutor parameters;
 // its batch lists each tutor's prompt identity and keeps a financial stop (budgetStopReason) beside a drift status.
 // v4 adds fence evidence (end.fenceStripped, checks.fenceStripped, rejected[].fenceStripped, perJudge[].unwrapped) and,
 // on every call, requestedModel, returnedModel, system_fingerprint and calledAt; its batch says how the served model
 // is known (servingIdentity: revision, alias or unknown). v5 adds the cache split of each call (calls[].cache) and a
-// cache summary on the batch. A field a record does not carry is "not recorded", never zero.
-// A calibration report (calibration-report-<batchId>.json, checker v2) is read as the machine verdict of its batch;
-// the page never recomputes that verdict.
+// cache summary on the batch. v6 adds the student protocol (the student answers in JSON mode; on an "injected" card the
+// runner writes the fixed sentence itself, so a student line keeps the model's raw reply, its own message and events, the
+// injected text and the events the runner added or dropped) and single-step probes (batch kind "calibration-probe": a fixed
+// history prefix, then one student message). A field a record does not carry is "not recorded", never zero.
+// A calibration report (calibration-report-<batchId>.json, checker v2 or v3) is read as the machine verdict of its batch.
+// Checker v3 adds review items per run; a content review (content-review-<batchId>.json) decides them, and a gate or final
+// output (checker kind "gate" or "final") gives the final verdict. The page shows all three as written and never
+// recomputes a verdict.
 (function (root) {
   "use strict";
 
@@ -18,7 +23,10 @@
   const BATCH_SCHEMA = "tutorbench.premium-batch";
   const VERDICTS = ["good", "flawed", "fail"];
   const ITEMS = ["correct", "readsState", "helpFit", "noLeak", "responds", "helpLevel"];
-  const SCHEMA_VERSIONS = [1, 2, 3, 4, 5];
+  const SCHEMA_VERSIONS = [1, 2, 3, 4, 5, 6];
+  // Batch kinds that check the simulated student and are never scored: a full calibration and a probe batch.
+  const CALIBRATION_KINDS = ["calibration", "calibration-probe"];
+  const isCalibrationKind = kind => CALIBRATION_KINDS.includes(kind);
   // States that are listed but never part of an evaluation: a calibration run checks the simulated student only,
   // and a superseded run was interrupted by the budget and replaced by a restart.
   const NOT_EVALUATION = ["calibration", "superseded"];
@@ -48,9 +56,17 @@
   const isReport = r => !!r && typeof r === "object" && typeof r.batchId === "string" && typeof r.verdict === "string"
     && (r.verdict === "CANNOT_CHECK" || (Number.isInteger(r.checkerVersion) && Array.isArray(r.groups) && Array.isArray(r.runs)));
   const isExpectations = v => !!v && typeof v === "object" && !!v.card && !!v.pass && Array.isArray(v.plannedGroups);
+  // A content review as the reviewer writes it: one decision per review item, with a quote and a note.
+  const isContentReview = v => !!v && typeof v === "object" && v.schemaVersion === 1 && typeof v.batchId === "string" && typeof v.status === "string"
+    && typeof v.reviewer === "string" && Array.isArray(v.items);
+  // The checker's gate (G2, G3) or final (G4) output. It names its batches only in machineVerdicts.
+  const isGateResult = v => !!v && typeof v === "object" && Number.isInteger(v.checkerVersion) && (v.kind === "gate" || v.kind === "final")
+    && typeof v.scope === "string" && typeof v.verdict === "string" && !!v.machineVerdicts && typeof v.machineVerdicts === "object" && Array.isArray(v.groups);
+  // A probe file: the fixed prefixes of every probe in a probe set, in both languages.
+  const isProbeSet = v => !!v && typeof v === "object" && v.schemaVersion === 1 && typeof v.probeSetVersion === "string" && Array.isArray(v.probes);
 
   const currentScoring = record => (Array.isArray(record.scorings) && record.scorings.length ? record.scorings[record.scorings.length - 1] : null);
-  const isCalibration = record => record.batchKind === "calibration" || record.status === "unscored";
+  const isCalibration = record => isCalibrationKind(record.batchKind) || record.status === "unscored";
   const sameList = (a, b) => JSON.stringify(a || []) === JSON.stringify(b || []);
 
   // Builds one dataset from whatever the person loaded. Unknown files are reported, never trusted.
@@ -133,7 +149,9 @@
           || ("reviewFlags" in row && !sameList(row.reviewFlags, m && m.reviewFlags))
           || ("fixedTestSkipped" in row && row.fixedTestSkipped !== !!(m && m.fixedTestSkipped))
           || ("tutorPromptId" in row && row.tutorPromptId !== (r.tutor.tutorPromptId ?? null))
-          || ("tutorPromptVersion" in row && row.tutorPromptVersion !== (r.tutor.tutorPromptVersion ?? null));
+          || ("tutorPromptVersion" in row && row.tutorPromptVersion !== (r.tutor.tutorPromptVersion ?? null))
+          || ("probeId" in row && row.probeId !== (r.probe ? r.probe.probeId : undefined))
+          || (r.probe && !("probeId" in row));
         if (v2Differs || row.status !== status || (row.scoringId ?? null) !== (s ? s.scoringId : null) || (row.verdict ?? null) !== (m ? m.verdict ?? null : null)) {
           warnings.push({ code: "index_out_of_date", detail: row.runId });
         }
@@ -155,7 +173,7 @@
       reports.set(rep.batchId, rep);
       const b = batches.get(rep.batchId);
       if (!b) warnings.push({ code: "report_without_batch", detail: rep.batchId });
-      else if (b.kind !== "calibration") warnings.push({ code: "report_not_calibration", detail: rep.batchId });
+      else if (!isCalibrationKind(b.kind)) warnings.push({ code: "report_not_calibration", detail: rep.batchId });
       for (const x of rep.runs || []) {
         const r = runs.get(x.runId);
         if (!r || r.batchId !== rep.batchId) warnings.push({ code: "report_run_missing", detail: x.runId });
@@ -168,7 +186,45 @@
       if (!ok) warnings.push({ code: "not_expectations", detail: "?" });
       return ok;
     });
-    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, tutorPrompts, reports, expectations, warnings };
+    // Content reviews: one per batch. Each decision must name a loaded record of that batch and, when the report is loaded,
+    // a review item the checker listed for that run.
+    const reviews = new Map();
+    for (const rv of input.reviews || []) {
+      if (!isContentReview(rv)) { warnings.push({ code: "not_a_review", detail: rv && rv.batchId ? rv.batchId : "?" }); continue; }
+      if (reviews.has(rv.batchId)) {
+        if (JSON.stringify(reviews.get(rv.batchId)) !== JSON.stringify(rv)) warnings.push({ code: "review_conflict", detail: rv.batchId });
+        continue;
+      }
+      reviews.set(rv.batchId, rv);
+      if (!batches.has(rv.batchId)) warnings.push({ code: "review_without_batch", detail: rv.batchId });
+      const rep = reports.get(rv.batchId), items = new Set(rep && rep.verdict !== "CANNOT_CHECK" ? (rep.runs || []).flatMap(x => (x.reviewItems || []).map(i => x.runId + "/" + i.itemId)) : []);
+      for (const it of rv.items) {
+        const r = it && runs.get(it.recordId);
+        if (!r || r.batchId !== rv.batchId) warnings.push({ code: "review_run_unknown", detail: (it && it.recordId) || "?" });
+        else if (rep && rep.verdict !== "CANNOT_CHECK" && !items.has(it.recordId + "/" + it.itemId)) warnings.push({ code: "review_item_unknown", detail: it.recordId + " " + it.itemId });
+      }
+    }
+    // Gate and final outputs. Each batch they name must be loaded, its machine verdict must be the one its report gives,
+    // and a diagnostic batch never belongs in one.
+    const gates = [];
+    for (const g of input.gates || []) {
+      if (!isGateResult(g)) { warnings.push({ code: "not_a_gate", detail: g && g.scope ? g.scope : "?" }); continue; }
+      if (gates.some(x => JSON.stringify(x) === JSON.stringify(g))) continue;
+      gates.push(g);
+      for (const [batchId, verdict] of Object.entries(g.machineVerdicts)) {
+        const b = batches.get(batchId), rep = reports.get(batchId);
+        if (!b) warnings.push({ code: "gate_batch_missing", detail: g.scope + " " + batchId });
+        const machine = rep ? (rep.checkerVersion >= 3 ? rep.machineVerdict : rep.verdict) : null;
+        if (machine && machine !== verdict) warnings.push({ code: "gate_report_differs", detail: g.scope + " " + batchId });
+        if (batchClass(b, rep) === "diagnostic") warnings.push({ code: "gate_has_diagnostic", detail: g.scope + " " + batchId });
+      }
+    }
+    const probeSets = [];
+    for (const p of input.probeSets || []) {
+      if (!isProbeSet(p)) { warnings.push({ code: "not_a_probe_set", detail: "?" }); continue; }
+      if (!probeSets.some(x => JSON.stringify(x) === JSON.stringify(p))) probeSets.push(p);
+    }
+    return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, tutorPrompts, reports, expectations, reviews, gates, probeSets, warnings };
   }
 
   // The state a run counts as under the selected judge configuration.
@@ -538,10 +594,15 @@
       // were sent back, in order. The record does not name it, so it is left out whenever the counts do not match.
       const sentBack = new Set((a.rejected || []).map(x => x.call));
       const writers = (Array.isArray(a.calls) ? a.calls : []).map(k => calls.get(k)).filter(c => c && c.role === "student" && !c.error && !sentBack.has(c.n));
-      const written = (a.transcript || []).filter(m => m.role === "student" && !m.fixed).length;
+      // A probe's fixed prefix was written by nobody in this run; a v6 line names its call itself.
+      const written = (a.transcript || []).filter(m => m.role === "student" && !m.fixed && !m.prefix).length;
       let n = 0, w = 0;
-      const lines = (a.transcript || []).map(m => (m.role !== "student" ? m
-        : { ...m, n: ++n, callInfo: !m.fixed && writers.length === written ? writers[w++] : null }));
+      const lines = (a.transcript || []).map(m => {
+        if (m.role !== "student") return m;
+        const own = !m.fixed && !m.prefix, named = m.checks && m.checks.call != null ? calls.get(m.checks.call) || null : null;
+        const byOrder = own && writers.length === written ? writers[w++] : null;
+        return { ...m, n: ++n, callInfo: own ? named || byOrder : null };
+      });
       const rejected = (a.rejected || []).map(x => ({ ...x, studentMessage: Number(x.studentMessage), reply: parseStudentReply(x.text), callInfo: calls.get(x.call) || null }));
       const byMessage = new Map();
       for (const x of rejected) {
@@ -558,6 +619,8 @@
     invalid_json_or_fields: "format", internal_state_in_message: "format", too_long: "format", role_reference: "format", sensitive_output: "format",
     fixed_test_missing: "protocol", fixed_test_early: "protocol", left_too_early: "protocol", invalid_end: "protocol", curt_exit_unsolved: "protocol",
     invalid_stage: "state", unknown_event: "state", duplicate_event: "state",
+    // Record schema v6: an empty reply is a format failure; writing or echoing the sentence the runner injects breaks the protocol.
+    empty_response: "format", fixed_test_self_written: "protocol", fixed_test_echo: "protocol",
   };
   const ruleFamily = reasons => { for (const r of reasons || []) if (RULE_FAMILY[r]) return RULE_FAMILY[r]; return "other"; };
 
@@ -637,7 +700,7 @@
       fingerprints: [...g.fingerprints].map(([k, v]) => ({ value: k === "\u0000null" ? null : k === "\u0000unrecorded" ? undefined : k, ...v }))
         .sort((a, b) => (a.value === undefined) - (b.value === undefined) || (a.value === null) - (b.value === null) || String(a.value).localeCompare(String(b.value))),
     }));
-    const target = batch && batch.kind === "calibration" ? "student" : "tutor";
+    const target = batch && isCalibrationKind(batch.kind) ? "student" : "tutor";
     const t = list.find(g => g.role === target);
     return { target, roles: list, servingIdentity: (batch && batch.servingIdentity) || null, configured: (batch && batch.configuredServingIdentity) || null,
       evidence: (batch && batch.identityEvidence) || null,
@@ -650,63 +713,218 @@
     const m = /^msg (\d+): ([\s\S]*)$/u.exec(String(line));
     return m ? { n: Number(m[1]), text: m[2], line: String(line) } : { n: null, text: String(line), line: String(line) };
   }
+  // A checker report in one shape. Checker v2 writes pass, tutor groups and the rewrite and discard rates at the top;
+  // checker v3 writes machinePass, probe or tutor groups, the L0 block, review items and a machine verdict apart from its
+  // verdict (PENDING_REVIEW until the review, DIAGNOSTIC for a diagnostic batch). Both are copied, never recomputed.
+  const keyOf = x => (x && (x.probeId ?? x.tutor)) ?? null;
+  function normReport(rep) {
+    if (!rep || rep.verdict === "CANNOT_CHECK" || !Array.isArray(rep.runs)) return null;
+    const v3 = rep.checkerVersion >= 3, l0 = rep.l0 || {};
+    return {
+      checkerVersion: rep.checkerVersion, checkerRevision: rep.checkerRevision ?? null, v3,
+      machineVerdict: v3 ? rep.machineVerdict ?? null : rep.verdict, reportVerdict: rep.verdict,
+      diagnostic: rep.diagnostic === true || rep.verdict === "DIAGNOSTIC", dryRun: rep.dryRun === true, gate: rep.gate ?? null,
+      pins: rep.pins || null, card: rep.card || (rep.pins && rep.pins.card) || null, probes: (rep.groups || []).some(g => g.probeId != null),
+      groups: (rep.groups || []).map(g => ({ key: keyOf(g), lang: g.lang, passing: v3 ? g.machinePassing : g.passing, runs: g.runs, pass: v3 ? g.machinePass : g.pass, optional: !!g.optional })),
+      runs: rep.runs.map(x => ({ ...x, key: keyOf(x), pass: v3 ? x.machinePass : x.pass, hard: x.hard || [], soft: x.soft || [], reviewItems: x.reviewItems || [] })),
+      rewrite: (v3 ? l0.rewrite : rep.rewrite) || null, discard: (v3 ? l0.discard : rep.discard) || null,
+      firstTryByMessage: l0.firstTryByMessage || null, observedFormats: l0.observedFormats || null,
+      review: rep.review || null, humanReviewPending: rep.humanReviewPending ?? null, cohortErrors: rep.cohortErrors || [], superseded: rep.superseded || [],
+      fingerprints: rep.fingerprintDistribution || null, multipleFingerprints: rep.multipleFingerprints ?? null,
+      servingIdentity: rep.servingIdentity ?? null, spentUsd: rep.batchSpentUsd ?? null, batchStatus: rep.batchStatus ?? null,
+    };
+  }
   const reportRun = (dataset, runId) => {
-    for (const rep of dataset.reports.values()) { const x = (rep.runs || []).find(y => y.runId === runId); if (x) return { report: rep, run: x }; }
+    for (const rep of dataset.reports.values()) {
+      const n = normReport(rep), x = n && n.runs.find(y => y.runId === runId);
+      if (x) return { report: rep, norm: n, run: x };
+    }
     return null;
   };
+  // What a batch is for, which decides what may follow from it. A diagnostic batch is for development only: it needs no
+  // content review, a final refuses it, and its numbers never count toward a gate. A calibration (full or probe, gate key
+  // or rest) checks the simulated student and leads to a gate or final verdict. An evaluation scores tutors.
+  function batchClass(batch, report) {
+    if ((batch && batch.gate === "diagnostic") || (report && (report.diagnostic === true || report.verdict === "DIAGNOSTIC"))) return "diagnostic";
+    if ((batch && isCalibrationKind(batch.kind)) || (report && isCalibrationKind(report.batchKind))) return "calibration";
+    return "evaluation";
+  }
+  // The record key of a run in a calibration: its probe in a probe batch, else its scripted tutor.
+  const runKey = r => (r.probe && r.probe.probeId) || r.tutor.id;
 
   // Everything the calibration view shows for one batch. The verdict, the group passes and the rewrite and discard rates
   // come from the report only; without a report the page lists what the records say and calls the batch unchecked.
   function calibrationOf(dataset, batchId) {
     const batch = dataset.batches.find(b => b.batchId === batchId) || null;
     const report = dataset.reports.get(batchId) || null;
-    const checked = !!report && report.verdict !== "CANNOT_CHECK";
+    const norm = normReport(report), checked = !!norm;
     const records = dataset.runs.filter(r => r.batchId === batchId);
     const sup = dataset.supersededBy || {};
     const adopted = records.filter(r => !sup[r.runId]);
-    const byRun = new Map(((checked && report.runs) || []).map(x => [x.runId, x]));
-    const card = (checked && report.card) || (records[0] && { id: records[0].card.id, version: records[0].card.version, contentHash: records[0].card.contentHash }) || null;
+    const byRun = new Map(((checked && norm.runs) || []).map(x => [x.runId, x]));
+    const card = (checked && norm.card) || (records[0] && { id: records[0].card.id, version: records[0].card.version, contentHash: records[0].card.contentHash }) || null;
     // Expectations apply to one card version under one rules version, as the runner's check-calibration requires.
     const rules = records[0] ? records[0].card.rulesVersion : null;
-    const exp = card ? dataset.expectations.find(e => e.card.id === card.id && e.card.version === card.version && (!card.contentHash || e.card.contentHash === card.contentHash)
-      && (!rules || !e.rulesVersion || e.rulesVersion === rules)) || null : null;
-    const tutorOrder = ((batch && batch.tutors) || []).map(x => x.id);
-    for (const r of records) if (!tutorOrder.includes(r.tutor.id)) tutorOrder.push(r.tutor.id);
+    const exp = card ? dataset.expectations.filter(e => e.card.id === card.id && e.card.version === card.version && (!card.contentHash || e.card.contentHash === card.contentHash)
+      && (!rules || !e.rulesVersion || e.rulesVersion === rules)).sort((a, b) => (b.schemaVersion || 0) - (a.schemaVersion || 0))[0] || null : null;
+    const probes = !!(batch && Array.isArray(batch.probes)) || records.some(r => r.probe);
+    const order = probes ? ((batch && batch.probes) || []).slice() : ((batch && batch.tutors) || []).map(x => x.id);
+    for (const r of records) if (!order.includes(runKey(r))) order.push(runKey(r));
     const langs = (batch && batch.languages) || [...new Set(records.map(r => r.card.lang))];
-    const label = id => { const bt = ((batch && batch.tutors) || []).find(x => x.id === id); const r = records.find(x => x.tutor.id === id); return (bt && bt.label) || (r && r.tutor.label) || id; };
-    const optional = new Set(((checked && report.groups) || []).filter(g => g.optional).map(g => g.tutor));
-    const groups = tutorOrder.map(tutor => ({ tutor, label: label(tutor), optional: optional.has(tutor), cells: langs.map(lang => {
-      const runs = adopted.filter(r => r.tutor.id === tutor && r.card.lang === lang).sort((a, b) => a.repeat.index - b.repeat.index)
+    const set = probes ? probeSetOf(dataset, batch, records) : null;
+    const label = key => {
+      if (probes) return key;
+      const bt = ((batch && batch.tutors) || []).find(x => x.id === key), r = records.find(x => x.tutor.id === key);
+      return (bt && bt.label) || (r && r.tutor.label) || key;
+    };
+    const purpose = key => { const p = set && set.probes.find(x => x.probeId === key); return p ? p.purpose || null : null; };
+    const optional = new Set(((checked && norm.groups) || []).filter(g => g.optional).map(g => g.key));
+    const groups = order.map(key => ({ key, tutor: key, label: label(key), purpose: purpose(key), optional: optional.has(key), cells: langs.map(lang => {
+      const runs = adopted.filter(r => runKey(r) === key && r.card.lang === lang).sort((a, b) => a.repeat.index - b.repeat.index)
         .map(r => ({ record: r, check: byRun.get(r.runId) || null }));
-      const g = ((checked && report.groups) || []).find(x => x.tutor === tutor && x.lang === lang) || null;
+      const g = ((checked && norm.groups) || []).find(x => x.key === key && x.lang === lang) || null;
       return { lang, runs, group: g };
     }) })).filter(g => g.cells.some(c => c.runs.length || c.group));
-    const rejects = records.flatMap(r => attemptsOf(r).flatMap(a => a.rejected.map(x => ({ runId: r.runId, tutor: r.tutor.id, lang: r.card.lang, repeat: r.repeat.index,
+    const rejects = records.flatMap(r => attemptsOf(r).flatMap(a => a.rejected.map(x => ({ runId: r.runId, key: runKey(r), tutor: runKey(r), lang: r.card.lang, repeat: r.repeat.index,
       attempt: a.attempt, attemptStatus: a.status, superseded: !!sup[r.runId], n: x.studentMessage, reasons: x.reasons || [], family: ruleFamily(x.reasons) }))));
     const deviations = [];
     for (const [runId, x] of byRun) {
       const r = records.find(y => y.runId === runId);
-      for (const kind of ["hard", "soft"]) for (const line of x[kind] || []) deviations.push({ runId, tutor: x.tutor, lang: x.lang, repeat: x.repeat, kind, record: r || null, ...parseCheckerLine(line) });
+      for (const kind of ["hard", "soft"]) for (const line of x[kind]) deviations.push({ runId, key: x.key, tutor: x.key, lang: x.lang, repeat: x.repeat, kind, record: r || null, ...parseCheckerLine(line) });
     }
-    const need = exp ? (report && report.dryRun ? 1 : exp.pass.group.minPassingRuns) : null;
+    const need = exp ? (norm && norm.dryRun ? 1 : exp.pass.group.minPassingRuns) : null;
     const machine = checked ? {
-      verdict: report.verdict, checkerVersion: report.checkerVersion, dryRun: report.dryRun === true,
-      runsPassing: report.runs.filter(x => x.pass).length, runs: report.runs.length,
-      groupsPassing: report.groups.filter(g => !g.optional && g.pass).length, groups: report.groups.filter(g => !g.optional).length,
-      rewrite: report.rewrite || null, discard: report.discard || null, cohortErrors: report.cohortErrors || [], superseded: report.superseded || [],
-      fingerprints: report.fingerprintDistribution || null, multipleFingerprints: report.multipleFingerprints ?? null,
-      servingIdentity: report.servingIdentity ?? null, spentUsd: report.batchSpentUsd ?? null, batchStatus: report.batchStatus ?? null,
+      verdict: norm.machineVerdict, reportVerdict: norm.reportVerdict, checkerVersion: norm.checkerVersion, checkerRevision: norm.checkerRevision, dryRun: norm.dryRun,
+      runsPassing: norm.runs.filter(x => x.pass).length, runs: norm.runs.length,
+      groupsPassing: norm.groups.filter(g => !g.optional && g.pass).length, groups: norm.groups.filter(g => !g.optional).length,
+      rewrite: norm.rewrite, discard: norm.discard, firstTryByMessage: norm.firstTryByMessage, observedFormats: norm.observedFormats,
+      cohortErrors: norm.cohortErrors, superseded: norm.superseded, pins: norm.pins,
+      fingerprints: norm.fingerprints, multipleFingerprints: norm.multipleFingerprints,
+      servingIdentity: norm.servingIdentity, spentUsd: norm.spentUsd, batchStatus: norm.batchStatus,
     } : null;
-    const criteria = exp ? { maxHard: exp.pass.run.maxHard, maxSoft: exp.pass.run.maxSoft, minPassingRuns: need, repeats: exp.repeats,
-      rewriteRateMax: exp.pass.rewriteRateMax, rulesVersion: exp.rulesVersion || null } : (machine && machine.rewrite ? { rewriteRateMax: machine.rewrite.max } : null);
-    return { batchId, batch, report, checked, cannotCheck: !!report && report.verdict === "CANNOT_CHECK", card, records, adopted, groups, langs, rejects, deviations,
-      machine, criteria, expectations: exp, contentReview: report ? (report.humanReviewPending === true ? "pending" : report.humanReviewPending === false ? "not_pending" : "unstated") : "unstated" };
+    const group = exp && exp.pass ? exp.pass.group || {} : {};
+    const criteria = exp ? { maxHard: exp.pass.run.maxHard, maxSoft: exp.pass.run.maxSoft, minPassingRuns: need, repeats: exp.repeats, groupRuns: group.runs ?? exp.repeats,
+      rewriteRateMax: exp.pass.rewriteRateMax, rulesVersion: exp.rulesVersion || null, probes } : (machine && machine.rewrite ? { rewriteRateMax: machine.rewrite.max, probes } : null);
+    const cls = batchClass(batch, report);
+    return { batchId, batch, report, norm, checked, cannotCheck: !!report && report.verdict === "CANNOT_CHECK", card, records, adopted, groups, langs, rejects, deviations,
+      machine, criteria, expectations: exp, probes, probeSet: set, cls,
+      contentReview: report ? (report.humanReviewPending === true ? "pending" : report.humanReviewPending === false ? "not_pending" : "unstated") : "unstated",
+      review: reviewOf(dataset, batchId), final: finalOf(dataset, batchId) };
   }
 
-  // The calibration batches in view, newest first; a batch with a report before one without.
+  // The content review joined to the checker's review items, run by run. A decision is shown as the reviewer wrote it;
+  // an item nobody decided is shown by the rules the review follows: auto_pass stays pass, auto_fail stays fail unless
+  // overridden, and needs_review is pending while the review is open and counts as fail once it is complete.
+  function reviewOf(dataset, batchId) {
+    const batch = dataset.batches.find(b => b.batchId === batchId) || null, report = dataset.reports.get(batchId) || null;
+    const norm = normReport(report), file = (dataset.reviews && dataset.reviews.get(batchId)) || null;
+    const diagnostic = batchClass(batch, report) === "diagnostic";
+    const complete = !!file && file.status === "complete";
+    const decided = new Map(((file && file.items) || []).map(i => [i.recordId + "/" + i.itemId, i]));
+    const records = new Map(dataset.runs.filter(r => r.batchId === batchId).map(r => [r.runId, r]));
+    const items = [];
+    for (const x of (norm && norm.runs) || []) for (const it of x.reviewItems) {
+      const d = decided.get(x.runId + "/" + it.itemId) || null;
+      const decision = d && (d.decision === "pass" || d.decision === "fail") ? d.decision : null;
+      const effective = decision || (it.machine === "auto_pass" ? "pass" : it.machine === "auto_fail" ? "fail" : complete ? "fail" : "pending");
+      items.push({ runId: x.runId, key: x.key, lang: x.lang, repeat: x.repeat, record: records.get(x.runId) || null, itemId: it.itemId, level: it.level || null,
+        machine: it.machine || null, severityIfFail: it.severityIfFail || null, message: it.message ?? null, messages: it.messages || (it.message != null ? [it.message] : []),
+        question: it.question || null, machineQuote: it.quote ?? null, decision, quote: d ? d.quote ?? null : null, note: d ? d.note ?? null : null,
+        overridesMachine: !!(d && d.overridesMachine), undecidedFail: !decision && it.machine === "needs_review" && complete, effective });
+    }
+    const unknown = ((file && file.items) || []).filter(i => !items.some(x => x.runId === i.recordId && x.itemId === i.itemId));
+    const by = {};
+    for (const m of ["auto_pass", "needs_review", "auto_fail"]) by[m] = { pass: 0, fail: 0, undecided: 0 };
+    for (const x of items) { const row = by[x.machine] || (by[x.machine] = { pass: 0, fail: 0, undecided: 0 }); row[x.decision || "undecided"]++; }
+    return { batchId, file, diagnostic, status: file ? file.status : null, complete, reviewer: file ? file.reviewer : null, blind: file ? file.blind ?? null : null,
+      scope: file ? file.scope || null : null, checkerUsed: file ? file.checkerUsed || null : null, items, unknown, byMachine: by,
+      counts: { items: items.length, decided: items.filter(x => x.decision).length, needsReview: items.filter(x => x.machine === "needs_review").length,
+        autoFail: items.filter(x => x.machine === "auto_fail").length, fails: items.filter(x => x.decision === "fail").length,
+        overrides: items.filter(x => x.overridesMachine).length, undecidedFail: items.filter(x => x.undecidedFail).length,
+        pending: items.filter(x => x.effective === "pending").length } };
+  }
+
+  // The gate or final outputs that name this batch, as written. A diagnostic batch has none: the final refuses it.
+  function finalOf(dataset, batchId) {
+    const batch = dataset.batches.find(b => b.batchId === batchId) || null, report = dataset.reports.get(batchId) || null;
+    const outputs = (dataset.gates || []).filter(g => Object.prototype.hasOwnProperty.call(g.machineVerdicts, batchId)).map(g => ({
+      gate: g, kind: g.kind, scope: g.scope, verdict: g.verdict, reviewStatus: g.reviewStatus || null, errors: g.errors || [], checkerRevision: g.checkerRevision || null,
+      batches: Object.keys(g.machineVerdicts), machineVerdict: g.machineVerdicts[batchId],
+      groups: g.groups.filter(x => x.batchId === batchId), overrides: (g.overrides || []).filter(x => x.batchId === batchId),
+    }));
+    return { batchId, diagnostic: batchClass(batch, report) === "diagnostic", outputs };
+  }
+
+  // The probe file that matches a probe batch's probe set version, if one is loaded.
+  function probeSetOf(dataset, batch, records) {
+    const version = (batch && batch.probeSetVersion) || (records.find(r => r.probe) || { probe: {} }).probe.probeSetVersion;
+    return (dataset.probeSets || []).find(p => p.probeSetVersion === version) || null;
+  }
+  // The fixed history prefix of a probe record, without the line numbers the runner adds, in the key order of the file.
+  const prefixOf = record => (record.transcript || []).filter(l => l.prefix).map(l => { const rest = { ...l }; delete rest.i; delete rest.prefix; return rest; });
+
+  // One model-written student message as its parts: what the model returned, the message and events it wrote, what the
+  // runner injected and dropped, and the final text and state the conversation kept. Record schema v6 keeps all of them;
+  // an older line has only its final text and state, and the rest is null.
+  function messageParts(line) {
+    const ck = line.checks || {}, m = line.model || null;
+    return {
+      raw: m ? m.raw ?? null : null, modelMessage: m ? m.message ?? null : null, modelEvents: m ? m.events || [] : null,
+      injected: line.injected || null, runnerEvents: line.runnerEvents || [], droppedEvents: line.droppedEvents || [],
+      final: line.text ?? null, state: line.state || null, format: ck.observedFormat || null, call: ck.call ?? null,
+      regenerated: ck.regenerated || 0, hardFails: ck.hardFails || [], softFlags: ck.softFlags || [], fenceStripped: !!ck.fenceStripped, v6: !!m,
+    };
+  }
+
+  // A probe batch, probe by probe and language by language: the fixed prefix (the same for every repeat, else flagged),
+  // its hash, and each repeat's target message as its parts. sha, when given, hashes text to its hex SHA-256, so the page
+  // can show that a prefix hash is the hash of the prefix it carries. Probes of the probe file that this batch did not run
+  // are listed apart.
+  function probeView(dataset, batchId, sha) {
+    const c = calibrationOf(dataset, batchId), set = c.probeSet;
+    const exp = c.expectations && c.expectations.probeExpectations ? c.expectations.probeExpectations : {};
+    const ids = c.groups.map(g => g.key);
+    const rows = ids.map(probeId => {
+      const def = set ? set.probes.find(p => p.probeId === probeId) || null : null;
+      const any = c.adopted.find(r => r.probe && r.probe.probeId === probeId) || null;
+      const langs = {};
+      for (const lang of c.langs) {
+        const g = c.groups.find(x => x.key === probeId), cell = g && g.cells.find(x => x.lang === lang);
+        const runs = (cell ? cell.runs : []).map(x => {
+          const atts = attemptsOf(x.record), last = atts[atts.length - 1];
+          const line = last.lines.filter(l => l.role === "student" && !l.prefix).slice(-1)[0] || null;
+          const rejected = atts.flatMap(a => a.rejected.filter(rj => line && rj.studentMessage === line.n).map(rj => ({ ...rj, attempt: a.attempt, attemptStatus: a.status })));
+          const review = c.review.items.filter(i => i.runId === x.record.runId);
+          return { record: x.record, check: x.check, n: line ? line.n : null, parts: line ? messageParts(line) : null, rejected, discarded: atts.filter(a => a.status === "discarded").length, review };
+        });
+        const first = runs[0] ? runs[0].record : null, prefix = first ? prefixOf(first) : [];
+        const text = JSON.stringify(prefix), hash = first ? first.probe.prefixHash : null;
+        const same = runs.every(x => JSON.stringify(prefixOf(x.record)) === text && x.record.probe.prefixHash === hash);
+        const fileText = def && def.prefix && def.prefix[lang] ? JSON.stringify(def.prefix[lang]) : null;
+        langs[lang] = { runs, prefix, prefixHash: hash, sameAcrossRuns: same,
+          hashMatches: sha && hash ? "sha256:" + sha(text) === hash : null, matchesFile: fileText == null ? null : fileText === text && (!def.prefixHash || def.prefixHash[lang] === hash),
+          group: cell ? cell.group : null };
+      }
+      return { probeId, inBatch: true, purpose: def ? def.purpose || null : null, gate: def ? def.gate || null : null,
+        target: (any && any.probe.targetStudentMessage) || (def && def.targetStudentMessage) || null, tutorSource: any ? any.probe.tutorSource : null,
+        protocolVersion: any ? any.probe.protocolVersion : null, expectation: exp[probeId] || null, langs };
+    });
+    const others = set ? set.probes.filter(p => !ids.includes(p.probeId)).map(p => ({ probeId: p.probeId, inBatch: false, purpose: p.purpose || null, gate: p.gate || null,
+      target: p.targetStudentMessage || null, expectation: exp[p.probeId] || null })) : [];
+    return { calibration: c, set, probes: rows, others, langs: c.langs };
+  }
+
+  // The calibration batches in view: formal ones before diagnostic ones, a batch with a report before one without, newest first.
   function calibrationBatches(dataset) {
-    return dataset.batches.filter(b => b.kind === "calibration")
-      .sort((a, b) => (dataset.reports.has(b.batchId) - dataset.reports.has(a.batchId)) || String(b.createdAt).localeCompare(String(a.createdAt)));
+    const diag = b => batchClass(b, dataset.reports.get(b.batchId)) === "diagnostic";
+    return dataset.batches.filter(b => isCalibrationKind(b.kind))
+      .sort((a, b) => diag(a) - diag(b) || (dataset.reports.has(b.batchId) - dataset.reports.has(a.batchId)) || String(b.createdAt).localeCompare(String(a.createdAt)));
+  }
+  // The probe batches, formal before diagnostic, newest first.
+  function probeBatches(dataset) {
+    const diag = b => batchClass(b, dataset.reports.get(b.batchId)) === "diagnostic";
+    return dataset.batches.filter(b => b.kind === "calibration-probe")
+      .sort((a, b) => diag(a) - diag(b) || String(b.createdAt).localeCompare(String(a.createdAt)));
   }
 
   // A batch's status now, and any earlier stop it recovered from. A recovered batch can keep the stopReason of its first
@@ -720,34 +938,114 @@
   // ---------- review pack ----------
   // One row per record of a batch, for the review index in the pack. Checker results are copied from the report;
   // everything else is counted from the record as written. Nothing here re-scores or re-checks a run.
-  const REVIEW_COLUMNS = ["job", "record_role", "tutor", "language", "repeat", "checker_pass", "record_status", "end_reason", "checker_hard", "checker_soft",
+  const REVIEW_COLUMNS = ["job", "batch_class", "record_role", "probe", "tutor", "language", "repeat", "checker_pass", "record_status", "end_reason", "checker_hard", "checker_soft",
+    "review_items", "review_needs_review", "review_auto_fail", "review_decided_fail", "review_overrides", "review_pending",
     "report_extra_rewrites", "rejected_outputs", "rejection_rule_counts", "attempts", "discarded_attempts", "attempt_stops", "student_calls", "transport_errors",
-    "fingerprints", "run_id", "restart_of", "replaced_by", "record_path"];
+    "fingerprints", "prefix_hash", "run_id", "restart_of", "replaced_by", "record_path"];
+  const recordOrder = sup => (a, b) => runKey(a).localeCompare(runKey(b)) || String(a.card.lang).localeCompare(String(b.card.lang)) || a.repeat.index - b.repeat.index
+    || (sup[a.runId] ? -1 : 0) - (sup[b.runId] ? -1 : 0);
   function reviewIndex(dataset, batchId) {
-    const rep = dataset.reports.get(batchId);
-    const checked = rep && rep.verdict !== "CANNOT_CHECK";
-    const byRun = new Map(((checked && rep.runs) || []).map(x => [x.runId, x]));
+    const rep = dataset.reports.get(batchId), norm = normReport(rep);
+    const batch = dataset.batches.find(b => b.batchId === batchId) || null, cls = batchClass(batch, rep);
+    const byRun = new Map(((norm && norm.runs) || []).map(x => [x.runId, x]));
+    const review = reviewOf(dataset, batchId);
     const sup = dataset.supersededBy || {};
-    const records = dataset.runs.filter(r => r.batchId === batchId)
-      .sort((a, b) => a.tutor.id.localeCompare(b.tutor.id) || String(a.card.lang).localeCompare(String(b.card.lang)) || a.repeat.index - b.repeat.index
-        || (sup[a.runId] ? -1 : 0) - (sup[b.runId] ? -1 : 0));
+    const records = dataset.runs.filter(r => r.batchId === batchId).sort(recordOrder(sup));
     return records.map(r => {
-      const x = byRun.get(r.runId), attempts = attemptsOf(r);
+      const x = byRun.get(r.runId), attempts = attemptsOf(r), items = review.items.filter(i => i.runId === r.runId);
       const counts = {};
       for (const a of attempts) for (const rj of a.rejected) for (const k of rj.reasons || []) counts[k] = (counts[k] || 0) + 1;
       const transport = transportOf([r], sup).filter(t => t.error);
       const fps = [...new Set(allCalls(r).filter(c => has(c, "system_fingerprint") && c.system_fingerprint).map(c => c.system_fingerprint))].sort();
+      const n = k => (x ? items.filter(k).length : "");
       return {
-        job: [r.tutor.id, r.card.lang, r.repeat.index].join("/"), record_role: sup[r.runId] ? "superseded" : "adopted", tutor: r.tutor.id, language: r.card.lang, repeat: r.repeat.index,
-        checker_pass: x ? (x.pass ? "PASS" : "FAIL") : !rep ? "NO_REPORT" : !checked ? "CANNOT_CHECK" : "NOT_EVALUATED",
-        record_status: r.status, end_reason: r.end && r.end.reason, checker_hard: x ? x.hard : "", checker_soft: x ? x.soft : "", report_extra_rewrites: x ? x.extraRewrites : "",
-        rejected_outputs: attempts.reduce((n, a) => n + a.rejected.length, 0), rejection_rule_counts: counts, attempts: attempts.filter(a => !a.legacy).length,
+        job: [runKey(r), r.card.lang, r.repeat.index].join("/"), batch_class: cls, record_role: sup[r.runId] ? "superseded" : "adopted",
+        probe: r.probe ? r.probe.probeId : "", tutor: r.tutor.id, language: r.card.lang, repeat: r.repeat.index,
+        checker_pass: x ? (x.pass ? "PASS" : "FAIL") : !rep ? "NO_REPORT" : !norm ? "CANNOT_CHECK" : "NOT_EVALUATED",
+        record_status: r.status, end_reason: r.end && r.end.reason, checker_hard: x ? x.hard : "", checker_soft: x ? x.soft : "",
+        review_items: n(() => true), review_needs_review: n(i => i.machine === "needs_review"), review_auto_fail: n(i => i.machine === "auto_fail"),
+        review_decided_fail: n(i => i.decision === "fail"), review_overrides: n(i => i.overridesMachine), review_pending: n(i => i.effective === "pending"),
+        report_extra_rewrites: x ? x.extraRewrites ?? "" : "",
+        rejected_outputs: attempts.reduce((k, a) => k + a.rejected.length, 0), rejection_rule_counts: counts, attempts: attempts.filter(a => !a.legacy).length,
         discarded_attempts: attempts.filter(a => a.status === "discarded").length,
         attempt_stops: attempts.filter(a => !a.legacy && a.status !== "kept").map(a => ({ attempt: a.attempt, status: a.status, reason: a.reason, atStudentMessage: a.atStudentMessage })),
         student_calls: allCalls(r).filter(c => c.role === "student").length, transport_errors: transport.map(t => "call " + t.n + " " + t.error).join("; "),
-        fingerprints: fps.join(" "), run_id: r.runId, restart_of: r.restartOf || "", replaced_by: sup[r.runId] || "", record_path: "records/" + r.runId + ".json",
+        fingerprints: fps.join(" "), prefix_hash: r.probe ? r.probe.prefixHash || "" : "", run_id: r.runId, restart_of: r.restartOf || "", replaced_by: sup[r.runId] || "",
+        record_path: "records/" + r.runId + ".json",
       };
     });
+  }
+
+  // One row per student message of every attempt, kept or sent back, so an agent can read what the model returned,
+  // what the runner injected or dropped, and what the conversation kept without opening each record. A prefix line is
+  // the probe's fixed history; a fixed line is the card's scripted opening.
+  const MESSAGE_COLUMNS = ["run_id", "record_role", "probe", "tutor", "language", "repeat", "attempt", "attempt_status", "student_message", "target", "row",
+    "call", "observed_format", "rejection_reasons", "regenerated", "raw", "model_message", "model_events", "injected_kind", "injected_text",
+    "runner_events", "dropped_events", "final_text", "stage", "events", "end", "hard_fails", "soft_flags", "fence_stripped"];
+  function messageRows(dataset, batchId) {
+    const sup = dataset.supersededBy || {};
+    const out = [];
+    for (const r of dataset.runs.filter(x => x.batchId === batchId).sort(recordOrder(sup))) {
+      const target = r.probe ? r.probe.targetStudentMessage : null;
+      const base = { run_id: r.runId, record_role: sup[r.runId] ? "superseded" : "adopted", probe: r.probe ? r.probe.probeId : "", tutor: r.tutor.id,
+        language: r.card.lang, repeat: r.repeat.index };
+      for (const a of attemptsOf(r)) {
+        const at = { attempt: a.legacy ? "" : a.attempt, attempt_status: a.legacy ? "" : a.status };
+        for (const l of a.lines.filter(x => x.role === "student")) {
+          for (const rj of a.byMessage.get(l.n) || []) out.push({ ...base, ...at, student_message: l.n, target: target === l.n, row: "rejected", call: rj.call ?? "",
+            observed_format: rj.observedFormat || "", rejection_reasons: (rj.reasons || []).join(" "), regenerated: "", raw: rj.text ?? "",
+            model_message: rj.reply.json ? rj.reply.message : "", model_events: rj.reply.json ? rj.reply.events : "", injected_kind: "", injected_text: "",
+            runner_events: "", dropped_events: "", final_text: "", stage: rj.reply.json ? rj.reply.stage ?? "" : "", events: "", end: "",
+            hard_fails: "", soft_flags: "", fence_stripped: rj.reply.fenced });
+          const p = messageParts(l), st = l.state || {};
+          out.push({ ...base, ...at, student_message: l.n, target: target === l.n, row: l.prefix ? "prefix" : l.fixed ? "fixed" : "kept",
+            call: p.call ?? (l.callInfo ? l.callInfo.n : ""), observed_format: p.format || "", rejection_reasons: "", regenerated: p.v6 ? p.regenerated : "",
+            raw: p.raw ?? "", model_message: p.modelMessage ?? "", model_events: p.modelEvents || "", injected_kind: p.injected ? p.injected.kind || "" : "",
+            injected_text: p.injected ? p.injected.text ?? "" : "", runner_events: p.runnerEvents, dropped_events: p.droppedEvents, final_text: p.final ?? "",
+            stage: st.stage ?? "", events: st.events || "", end: st.end ?? "", hard_fails: p.hardFails, soft_flags: p.softFlags, fence_stripped: p.fenceStripped });
+        }
+        // Replies sent back for a message the attempt never reached (it stopped there) still belong in the table.
+        const reached = new Set(a.lines.filter(x => x.role === "student").map(x => x.n));
+        for (const [n, list] of a.byMessage) if (!reached.has(n)) for (const rj of list) out.push({ ...base, ...at, student_message: n, target: target === n, row: "rejected",
+          call: rj.call ?? "", observed_format: rj.observedFormat || "", rejection_reasons: (rj.reasons || []).join(" "), regenerated: "", raw: rj.text ?? "",
+          model_message: rj.reply.json ? rj.reply.message : "", model_events: rj.reply.json ? rj.reply.events : "", injected_kind: "", injected_text: "",
+          runner_events: "", dropped_events: "", final_text: "", stage: rj.reply.json ? rj.reply.stage ?? "" : "", events: "", end: "",
+          hard_fails: "", soft_flags: "", fence_stripped: rj.reply.fenced });
+      }
+    }
+    return out;
+  }
+
+  // One row per checker review item, with the machine label beside the reviewer's decision and the result the review
+  // rules give it. Empty when the report has no review items (checker v2, or a diagnostic batch).
+  const REVIEW_ITEM_COLUMNS = ["run_id", "probe", "tutor", "language", "repeat", "item_id", "level", "machine", "severity_if_fail", "student_message",
+    "question", "machine_quote", "decision", "overrides_machine", "effective", "review_quote", "review_note", "record_path"];
+  function reviewItemRows(dataset, batchId) {
+    return reviewOf(dataset, batchId).items.map(i => ({
+      run_id: i.runId, probe: i.record && i.record.probe ? i.record.probe.probeId : "", tutor: i.record ? i.record.tutor.id : i.key, language: i.lang, repeat: i.repeat,
+      item_id: i.itemId, level: i.level || "", machine: i.machine || "", severity_if_fail: i.severityIfFail || "", student_message: i.messages.join(" "),
+      question: i.question || "", machine_quote: i.machineQuote ?? "", decision: i.decision || "", overrides_machine: i.overridesMachine, effective: i.effective,
+      review_quote: i.quote ?? "", review_note: i.note ?? "", record_path: "records/" + i.runId + ".json",
+    }));
+  }
+
+  // What the pack holds, in three layers that never mix: what the checker decided, what the reviewer decided, and the
+  // gate or final verdict written from both. Counts are copied or counted, never re-derived into a new verdict.
+  function packLayers(dataset, batchId) {
+    const c = calibrationOf(dataset, batchId), rv = c.review, fin = c.final;
+    const b = c.batch || {};
+    return {
+      batchId, class: c.cls, kind: b.kind || null, gate: b.gate || (c.norm && c.norm.gate) || null, phase: b.phase || null,
+      series: b.calibrationSeries || null, priorBatchIds: b.priorBatchIds || [], probeSetVersion: b.probeSetVersion || null, probes: b.probes || null,
+      card: c.card, languages: c.langs,
+      machine: c.machine ? { verdict: c.machine.verdict, reportVerdict: c.machine.reportVerdict, checkerVersion: c.machine.checkerVersion,
+        checkerRevision: c.machine.checkerRevision, runsPassing: c.machine.runsPassing, runs: c.machine.runs, groupsPassing: c.machine.groupsPassing,
+        groups: c.machine.groups, rewrite: c.machine.rewrite, discard: c.machine.discard, cohortErrors: c.machine.cohortErrors } : null,
+      review: { required: c.cls !== "diagnostic" && rv.counts.items > 0, status: rv.status, complete: rv.complete, reviewer: rv.reviewer, blind: rv.blind,
+        counts: rv.counts, unknownDecisions: rv.unknown.length },
+      final: { refused: fin.diagnostic, outputs: fin.outputs.map(o => ({ kind: o.kind, scope: o.scope, verdict: o.verdict, reviewStatus: o.reviewStatus,
+        machineVerdict: o.machineVerdict, batches: o.batches, errors: o.errors, overrides: o.overrides.length })) },
+    };
   }
 
   function groupBy(views, key) {
@@ -763,6 +1061,8 @@
   const api = { parseJsonl, compareVersions, buildDataset, currentScoring, runView, summarize, wilson, versionKey, tutorVersions, latestVersions, versionTrend, SETUP_PARTS, setupOf, setups, compareSetups, failureEvidence,
     studentChecks, disagreementSummary, costs, tutorEconomy, economyOf, batchInfo, groupBy, itemOf, VERDICTS, ITEMS, NOT_EVALUATION,
     SCHEMA_VERSIONS, isReport, isExpectations, unwrapJson, parseStudentReply, attemptsOf, ruleFamily, RULE_FAMILY, transportOf, cacheOf, identityOf,
-    parseCheckerLine, reportRun, calibrationOf, calibrationBatches, batchHistory, REVIEW_COLUMNS, reviewIndex };
+    parseCheckerLine, reportRun, calibrationOf, calibrationBatches, batchHistory, REVIEW_COLUMNS, reviewIndex,
+    CALIBRATION_KINDS, isCalibrationKind, isContentReview, isGateResult, isProbeSet, normReport, batchClass, runKey, reviewOf, finalOf,
+    probeSetOf, prefixOf, messageParts, probeView, probeBatches, MESSAGE_COLUMNS, messageRows, REVIEW_ITEM_COLUMNS, reviewItemRows, packLayers };
   root.PremiumDashboardModel = api;
 })(globalThis);
