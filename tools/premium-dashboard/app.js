@@ -375,6 +375,90 @@
     empty_response: "empty reply", fixed_test_self_written: "wrote the fixed sentence itself (the runner adds it)", fixed_test_echo: "echoed the fixed sentence",
   });
 
+  // Inference settings, usage, the calibration comparison and several runs folders at once.
+  Object.assign(T.zh, {
+    sourceFolders: "「{name}」· {f} 个 runs 文件夹 · {runs} 段对话 · {batches} 个批次", dropHere: "松开鼠标，载入 runs 文件夹（可以一次放几个）",
+    part_tutorInference: "导师推理配置", part_studentInference: "模拟学生推理配置",
+    infName: "推理 {n}", infOnUnknown: "推理开 · 档位未知", infUnrecorded: "推理配置未记录", infMixed: "推理配置不统一",
+    infMax: "输出上限 {n}", infTemp: "temperature {v}", infTempNotSent: "temperature 未发送", infTempUnrecorded: "temperature 未记录",
+    infSource_inference: "新写法 studentInference", infSource_params: "旧写法 thinking + params", infSource_none: "没有写",
+    id_student: "模拟学生", id_returned: "返回", id_fingerprint: "指纹", id_inference: "推理配置", id_runner: "Runner", id_checker: "检查器", id_card: "卡片", id_protocol: "协议", id_probeSet: "探针集",
+    idOpenCompare: "和另一个批次对照 →",
+    notMeasured: "未测", coverage: "{k}/{n} 次调用有数", notRecordedShort: "未记录",
+    plateUsage: "模拟学生用量：Token、费用、延迟",
+    usageNote: "只算模拟学生的调用，包括被替代的记录和退回重写的调用。「未测」是调用里根本没有这一项，不是 0。费用是 Runner 按价目表估的，没有对账。",
+    u_output: "计费输出 Token", u_outputSub: "推理 {r} · 可见 {v}", u_usd: "估算费用", u_usdSub: "未对账 · 每个接受位置 {p}", u_usdSubNoPos: "未对账",
+    u_latency: "调用延迟中位数", u_latencySub: "P90 {p} · 最长 {m}",
+    u_calls: "调用", u_callsLine: "{n} 次，来自 {r} 段记录", u_notSent: "没发出 {n} 次", u_input: "输入 Token", u_inputLine: "{n} · 缓存命中 {h} · 未命中 {m}",
+    u_reasoning: "推理 Token", u_visible: "可见输出 Token", u_truncated: "截断", u_truncLine: "{n} 次", u_empty: "只有推理、可见为空", u_emptyLine: "{n} 次调用花了推理 Token，却没有写出可见文字",
+    u_estimated: "按预留价估算的调用 {n} 次", u_written: "Runner 写的合计", u_writtenOk: "和逐次调用一致", u_writtenBad: "和逐次调用对不上：{f}",
+    u_writtenLine: "输出 {o} · 推理 {r} · 可见 {v} · {u}", u_reconciled: "已对账（整批，按厂商）", u_noCalls: "这个批次没有模拟学生调用。",
+    sec2: "{v} 秒",
+    ccmpTitle: "两个校准批次，哪里不一样", ccmpNote: "选两个校准或探针批次。页面先逐项列出哪里不一样，再只比两边都跑过、前缀也相同的探针和语言。每格只有几次重复，所以只报数，不判输赢。",
+    ccmpDiag: "诊断对照只用来挑配置，不能代替正式门槛（比如正式 G2）。", ccmpClasses: "A 是{a}，B 是{b}。正式和诊断可以并排看，但永远不会合进同一个门槛。", ccmpClassesSame: "两边都是{a}批次。",
+    ccmpSame: "两边每一项都相同。", ccmpOne: "只变了一样：{p}。", ccmpMany: "变了 {n} 样：{p}。这个差别不能只算在其中一样头上。", ccmpProfileSame: "两边的推理配置完全一致。",
+    ccmpMixedSide: "{s} 里的记录推理配置不统一，先分开再比。",
+    cpart_studentModel: "请求的模型", cpart_returnedModel: "返回的模型", cpart_fingerprint: "指纹", cpart_thinking: "thinking", cpart_effort: "推理档位", cpart_temperature: "temperature",
+    cpart_maxOutputTokens: "输出上限", cpart_responseFormat: "输出格式", cpart_runner: "Runner 提交", cpart_checker: "检查器版本", cpart_card: "卡片和哈希", cpart_protocol: "协议和哈希",
+    cpart_studentPrompt: "学生提示词哈希", cpart_rules: "规则版本", cpart_probeSet: "探针集", cpart_tutorTape: "导师回放哈希", cpart_prices: "价目表", cpart_pins: "报告固定的版本",
+    ccmpCellsTitle: "探针 × 语言", ccmpCellsNote: "横线上的 A、B 是机器判定通过的比例，右边是次数 A → B。只比两边都跑过、前缀哈希相同的格子。",
+    ccmpCellTip: "{s} · {k} · 通过 {p}/{n} · 改写 {w}", ccmpTotal: "对上的格子合计", ccmpRewrites: "改写 A {a} · B {b}",
+    ccmpUnmatched: "没有对上的格子", reason_only_a: "只有 A 跑过", reason_only_b: "只有 B 跑过", reason_prefix_differs: "两边前缀不一样",
+    ccmpNoCells: "两边没有能对上的格子。", ccmpUsageTitle: "模拟学生用量", colRatio: "B ÷ A",
+    ccmpTokensOther: "两边请求的模型不同，Token 数不直接比（分词器不一样），只比美元和秒。",
+    cu_calls: "调用", cu_output: "计费输出 Token", cu_reasoning: "推理 Token", cu_visible: "可见输出 Token", cu_truncated: "截断", cu_empty: "只有推理、可见为空",
+    cu_usd: "估算费用", cu_perPos: "每个接受位置", cu_latency: "延迟中位数", cu_p90: "延迟 P90",
+    ccmpExport: "导出对照", ccmpExportNote: "对照 JSON、compare-cells.csv、README 和 SHA-256，都在这个标签页里生成，不上传。", notSent: "未发送", intFolders: "runs 文件夹", clsWord_diagnostic: "诊断", clsWord_calibration: "正式校准",
+    ccmpNone: "至少要有两个校准或探针批次才能对照。",
+    colReasonVis: "推理 / 可见", colFinish: "结束原因", truncTag: "截断", emptyVisTag: "可见为空",
+    u_tutorTitle: "{r}用量",
+  });
+  Object.assign(T.en, {
+    sourceFolders: "“{name}” · {f} runs folders · {runs} conversations · {batches} batches", dropHere: "Drop to load the runs folders (several at once is fine)",
+    part_tutorInference: "Tutor inference", part_studentInference: "Simulated student inference",
+    infName: "reasoning {n}", infOnUnknown: "reasoning on · effort unknown", infUnrecorded: "inference not recorded", infMixed: "mixed inference settings",
+    infMax: "max output {n}", infTemp: "temperature {v}", infTempNotSent: "temperature not sent", infTempUnrecorded: "temperature not recorded",
+    infSource_inference: "studentInference", infSource_params: "older thinking + params", infSource_none: "not written",
+    id_student: "Simulated student", id_returned: "returned", id_fingerprint: "fingerprint", id_inference: "Inference", id_runner: "Runner", id_checker: "Checker", id_card: "Card", id_protocol: "Protocol", id_probeSet: "Probe set",
+    idOpenCompare: "Compare with another batch →",
+    notMeasured: "not measured", coverage: "{k} of {n} calls carry it", notRecordedShort: "not recorded",
+    plateUsage: "Simulated student usage: tokens, cost, latency",
+    usageNote: "Only the simulated student's calls, including superseded records and replies sent back. “Not measured” means the calls carry no such count; it is not zero. Costs are the runner's price-table estimates, not reconciled.",
+    u_output: "Billed output tokens", u_outputSub: "reasoning {r} · visible {v}", u_usd: "Estimated cost", u_usdSub: "not reconciled · {p} per accepted position", u_usdSubNoPos: "not reconciled",
+    u_latency: "Median call latency", u_latencySub: "P90 {p} · max {m}",
+    u_calls: "Calls", u_callsLine: "{n} from {r} records", u_notSent: "{n} not sent", u_input: "Input tokens", u_inputLine: "{n} · cache hit {h} · miss {m}",
+    u_reasoning: "Reasoning tokens", u_visible: "Visible output tokens", u_truncated: "Truncated calls", u_truncLine: "{n}", u_empty: "Reasoning only, nothing visible", u_emptyLine: "{n} · spent reasoning tokens, wrote nothing visible",
+    u_estimated: "{n} calls estimated at the reservation price", u_written: "Runner's totals", u_writtenOk: "match the calls", u_writtenBad: "differ from the calls: {f}",
+    u_writtenLine: "output {o} · reasoning {r} · visible {v} · {u}", u_reconciled: "Reconciled (whole batch, by provider)", u_noCalls: "This batch has no simulated student calls.",
+    sec2: "{v} s",
+    ccmpTitle: "Two calibration batches: what differs", ccmpNote: "Pick two calibration or probe batches. The page first lists what differs, part by part, then compares only the probes and languages both ran from the same prefix. A cell holds only a few repeats, so the page gives counts and calls no winner.",
+    ccmpDiag: "A diagnostic comparison is for choosing a setup only; it never stands in for a formal gate (such as the formal G2).", ccmpClasses: "A is {a}, B is {b}. Formal and diagnostic batches can sit side by side, but never count toward the same gate.", ccmpClassesSame: "Both sides are {a} batches.",
+    ccmpSame: "Every part is the same on both sides.", ccmpOne: "Only one thing changed: {p}.", ccmpMany: "{n} things changed: {p}. The difference cannot be put down to any one of them.", ccmpProfileSame: "Both sides used exactly the same inference settings.",
+    ccmpMixedSide: "The records in {s} do not share one inference setting; separate them before comparing.",
+    cpart_studentModel: "Requested model", cpart_returnedModel: "Returned model", cpart_fingerprint: "Fingerprint", cpart_thinking: "thinking", cpart_effort: "Reasoning effort", cpart_temperature: "temperature",
+    cpart_maxOutputTokens: "Max output tokens", cpart_responseFormat: "Output format", cpart_runner: "Runner commit", cpart_checker: "Checker version", cpart_card: "Card and hash", cpart_protocol: "Protocol and hash",
+    cpart_studentPrompt: "Student prompt hash", cpart_rules: "Rules version", cpart_probeSet: "Probe set", cpart_tutorTape: "Tutor replay hash", cpart_prices: "Price table", cpart_pins: "Versions pinned by the report",
+    ccmpCellsTitle: "Probes × languages", ccmpCellsNote: "A and B on the line are the share of runs the machine passed; the counts on the right read A → B. Only cells both sides ran from the same prefix hash are compared.",
+    ccmpCellTip: "{s} · {k} · passed {p}/{n} · rewrites {w}", ccmpTotal: "All matched cells", ccmpRewrites: "rewrites A {a} · B {b}",
+    ccmpUnmatched: "Cells that do not match", reason_only_a: "only A ran it", reason_only_b: "only B ran it", reason_prefix_differs: "the prefixes differ",
+    ccmpNoCells: "No cell matches between the two sides.", ccmpUsageTitle: "Simulated student usage", colRatio: "B ÷ A",
+    ccmpTokensOther: "The two sides asked different models, so token counts are not set against each other (their tokenizers differ); only dollars and seconds are.",
+    cu_calls: "Calls", cu_output: "Billed output tokens", cu_reasoning: "Reasoning tokens", cu_visible: "Visible output tokens", cu_truncated: "Truncated", cu_empty: "Reasoning only, nothing visible",
+    cu_usd: "Estimated cost", cu_perPos: "Per accepted position", cu_latency: "Median latency", cu_p90: "P90 latency",
+    ccmpExport: "Export comparison", ccmpExportNote: "The comparison JSON, compare-cells.csv, a README and SHA-256 sums, built in this tab and never uploaded.", notSent: "not sent", intFolders: "Runs folders", clsWord_diagnostic: "diagnostic", clsWord_calibration: "formal calibration",
+    ccmpNone: "Comparing needs at least two calibration or probe batches.",
+    colReasonVis: "reasoning / visible", colFinish: "Finish", truncTag: "truncated", emptyVisTag: "nothing visible",
+    u_tutorTitle: "{r} usage",
+  });
+  Object.assign(CODES.zh, {
+    inference_mismatch: "批次、记录和调用写的推理配置不一致（照原样显示，没有替它改）",
+    inference_usage_differs: "Runner 写的用量合计和逐次调用对不上（两边都显示）",
+  });
+  Object.assign(CODES.en, {
+    inference_mismatch: "the batch, record and calls give different inference settings (shown as written, nothing corrected)",
+    inference_usage_differs: "the runner's usage totals differ from its calls (both are shown)",
+  });
+
   // ---------- state ----------
   const VIEWS = ["overview", "calibration", "probes", "compare", "runs", "checks"];
   const st = {
@@ -456,55 +540,60 @@
     load({ records: s.records, batches: s.batches, index: M.parseJsonl(s.index), reports: s.reports || [], expectations: s.expectations || [],
       reviews: s.reviews || [], gates: s.gates || [], probeSets: s.probes || [] }, { kind: "sample" });
   }
-  // The runs folder is the shallowest folder that holds records/ (or batches/, or index.jsonl), whatever folder the person
-  // picked or dropped. Only its index.jsonl, records/*.json, batches/*.json and top-level .json files are read; every other
-  // file (a ledger database, an earlier snapshot in a subfolder) is listed as not read, so a copy of index.jsonl in a
-  // subfolder can never stand in for the real one.
-  function runsRoot(paths) {
-    const roots = [];
+  // A runs folder is a folder that holds records/ (or batches/, or index.jsonl), whatever folder the person picked or
+  // dropped. Every outermost one is read, so two runs folders side by side open together (each diagnostic batch keeps
+  // its own ledger, and comparing two of them takes both). Only a runs folder's index.jsonl, records/*.json,
+  // batches/*.json and top-level .json files are read; every other file (a ledger database, an earlier snapshot in a
+  // subfolder, a runs folder inside another one) is listed as not read, so a copy of index.jsonl in a subfolder can never
+  // stand in for the real one. Each index is checked only against the records of its own folder.
+  function runsRoots(paths) {
+    const found = new Set();
     for (const p of paths) {
       const m = /^((?:[^/]+\/)*)(?:records|batches)\/[^/]+\.json$/u.exec(p) || /^((?:[^/]+\/)*)index\.jsonl$/u.exec(p);
-      if (m) roots.push(m[1]);
+      if (m) found.add(m[1]);
     }
-    if (!roots.length) return "";
-    return roots.sort((a, b) => a.split("/").length - b.split("/").length || a.length - b.length)[0];
+    const outer = [];
+    for (const r of [...found].sort((a, b) => a.split("/").length - b.split("/").length || a.length - b.length)) if (!outer.some(o => r.startsWith(o))) outer.push(r);
+    return outer.length ? outer.sort() : [""];
   }
   async function loadFiles(files, name) {
-    const input = { records: [], recordNames: [], batches: [], index: null, reports: [], expectations: [], reviews: [], gates: [], probeSets: [] };
+    const input = { records: [], recordNames: [], recordRoots: [], batches: [], indexes: [], reports: [], expectations: [], reviews: [], gates: [], probeSets: [] };
     const extra = [];
-    const src = { root: "", index: null, records: new Map(), batches: new Map(), reports: new Map(), expectations: [], reviews: new Map(), gates: [], probeSets: [], ignored: [] };
+    const src = { roots: [], indexes: new Map(), records: new Map(), batches: new Map(), reports: new Map(), expectations: [], reviews: new Map(), gates: [], probeSets: [], ignored: [] };
     const withPath = files.map(f => ({ f, path: (f.webkitRelativePath || f.fullPath || f.name).replace(/\\/gu, "/") }));
-    const root = src.root = runsRoot(withPath.map(x => x.path));
+    const roots = src.roots = runsRoots(withPath.map(x => x.path));
     for (const { f, path } of withPath) {
-      const rel = path.startsWith(root) ? path.slice(root.length) : null;
+      const root = roots.find(r => path.startsWith(r));
+      const rel = root === undefined ? null : path.slice(root.length);
       const skip = () => src.ignored.push({ path, size: f.size });
+      const record = v => {
+        input.records.push(v); input.recordNames.push(path); input.recordRoots.push(root);
+        if (v && typeof v.runId === "string" && !src.records.has(v.runId)) src.records.set(v.runId, { root, path: rel, file: f });
+      };
       try {
         if (rel === null) skip();
-        else if (rel === "index.jsonl") { input.index = M.parseJsonl(await f.text()); src.index = { path: rel, file: f }; }
-        else if (/^records\/[^/]+\.json$/u.test(rel)) {
-          const v = JSON.parse(await f.text());
-          input.records.push(v); input.recordNames.push(path);
-          if (v && typeof v.runId === "string") src.records.set(v.runId, { path: rel, file: f });
-        } else if (/^batches\/[^/]+\.json$/u.test(rel)) {
+        else if (rel === "index.jsonl") { input.indexes.push({ root, rows: M.parseJsonl(await f.text()) }); src.indexes.set(root, { root, path: rel, file: f }); }
+        else if (/^records\/[^/]+\.json$/u.test(rel)) record(JSON.parse(await f.text()));
+        else if (/^batches\/[^/]+\.json$/u.test(rel)) {
           const v = JSON.parse(await f.text());
           input.batches.push(v);
-          if (v && typeof v.batchId === "string") src.batches.set(v.batchId, { path: rel, file: f });
+          if (v && typeof v.batchId === "string" && !src.batches.has(v.batchId)) src.batches.set(v.batchId, { root, path: rel, file: f });
         } else if (/^[^/]+\.json$/u.test(rel)) {
           // A top-level file is read by what it is, not by its name.
           const v = JSON.parse(await f.text());
-          if (v && v.schema === "tutorbench.premium-batch") { input.batches.push(v); src.batches.set(v.batchId, { path: rel, file: f }); }
-          else if (v && v.schema === "tutorbench.premium-run-record") { input.records.push(v); input.recordNames.push(path); if (typeof v.runId === "string") src.records.set(v.runId, { path: rel, file: f }); }
-          else if (M.isReport(v)) { input.reports.push(v); src.reports.set(v.batchId, { path: rel, file: f }); }
-          else if (M.isExpectations(v)) { input.expectations.push(v); src.expectations.push({ path: rel, file: f, value: v }); }
-          else if (M.isContentReview(v)) { input.reviews.push(v); if (!src.reviews.has(v.batchId)) src.reviews.set(v.batchId, { path: rel, file: f }); }
-          else if (M.isGateResult(v)) { input.gates.push(v); src.gates.push({ path: rel, file: f, value: v }); }
-          else if (M.isProbeSet(v)) { input.probeSets.push(v); src.probeSets.push({ path: rel, file: f, value: v }); }
+          if (v && v.schema === "tutorbench.premium-batch") { input.batches.push(v); if (!src.batches.has(v.batchId)) src.batches.set(v.batchId, { root, path: rel, file: f }); }
+          else if (v && v.schema === "tutorbench.premium-run-record") record(v);
+          else if (M.isReport(v)) { input.reports.push(v); src.reports.set(v.batchId, { root, path: rel, file: f }); }
+          else if (M.isExpectations(v)) { input.expectations.push(v); src.expectations.push({ root, path: rel, file: f, value: v }); }
+          else if (M.isContentReview(v)) { input.reviews.push(v); if (!src.reviews.has(v.batchId)) src.reviews.set(v.batchId, { root, path: rel, file: f }); }
+          else if (M.isGateResult(v)) { input.gates.push(v); src.gates.push({ root, path: rel, file: f, value: v }); }
+          else if (M.isProbeSet(v)) { input.probeSets.push(v); src.probeSets.push({ root, path: rel, file: f, value: v }); }
           else skip();
         } else skip();
       } catch (e) { extra.push({ code: "unreadable_file", detail: path + ": " + (e && e.message ? e.message : "?") }); }
     }
     st.files = src;
-    load(input, { kind: "folder", name });
+    load(input, { kind: "folder", name, folders: roots.length });
     st.dataset.warnings.unshift(...extra);
     render();
   }
@@ -549,8 +638,8 @@
     const src = $("source");
     if (!d) { src.textContent = t("sourceNone") + " " + t("localOnly"); }
     else {
-      const vars = { runs: d.runs.length, batches: d.batches.length, name: st.source.name || "" };
-      src.textContent = st.source.kind === "sample" ? t("sourceSample", vars) : t("sourceFolder", vars);
+      const vars = { runs: d.runs.length, batches: d.batches.length, name: st.source.name || "", f: st.source.folders || 1 };
+      src.textContent = st.source.kind === "sample" ? t("sourceSample", vars) : t(vars.f > 1 ? "sourceFolders" : "sourceFolder", vars);
     }
     const banner = $("banner");
     banner.hidden = !(d && st.source.kind === "sample");
@@ -560,11 +649,16 @@
     if (st.view === "calibration" && d && !hasCalib) st.view = "overview";
     if (st.view === "probes" && d && !hasProbes) st.view = "overview";
     const cv = st.view === "calibration", pv = st.view === "probes";
-    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview", compare: st.view === "compare", attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks", calib: cv,
-      "calib-groups": cv, "calib-rewrites": cv, "calib-dev": cv, "calib-review": cv, "calib-int": cv, probe: pv, "probe-detail": pv };
+    const vs = d ? views() : [];
+    // Compare holds two comparisons: tutor setups, and calibration or probe batches. One that has nothing to compare
+    // steps aside when the other has something.
+    const tutorCmp = !!d && M.setups(vs.filter(isEval)).filter(g => g.views.some(v => v.state === "scored")).length >= 2;
+    const calibCmp = !!d && M.calibrationBatches(d).length >= 2;
+    const show = { board: st.view === "overview", cards: st.view === "overview", value: st.view === "overview", trends: st.view === "overview",
+      compare: st.view === "compare" && (tutorCmp || !calibCmp), "calib-compare": st.view === "compare" && calibCmp, attention: st.view === "overview", runs: st.view === "runs", ops: st.view === "checks", calib: cv,
+      "calib-groups": cv, "calib-rewrites": cv, "calib-dev": cv, "calib-review": cv, "calib-int": cv, "calib-usage": cv, probe: pv, "probe-detail": pv };
     for (const id of Object.keys(show)) { clear($(id)); $(id).hidden = !show[id]; }
     document.querySelector(".sheet").hidden = !d;
-    const vs = d ? views() : [];
     renderViews(vs);
     const filters = clear($("filters"));
     filters.hidden = !(d && st.showFilters);
@@ -581,6 +675,7 @@
       renderSpread(now, rows, keys, latest); renderValue(now, rows, keys, latest); renderTrend(ev, versions, keys); renderAttention(ev);
     }
     if (show.compare) renderCompare(vs.filter(isEval));
+    if (show["calib-compare"]) renderCalibCompare();
     if (show.runs) renderRuns(vs);
     if (show.ops) renderOps(vs);
     if (show.calib) renderCalibration();
@@ -937,6 +1032,7 @@
   function partValue(part, value) {
     if (part === "tutorPrompt" && (value === "null" || value == null)) return t("promptFromCard");
     if (part === "tutorPrompt") return promptName(value);
+    if (/Inference$/.test(part)) { try { const n = M.inferenceName(JSON.parse(value)); return n == null ? "—" : n === "on" ? t("infOnUnknown") : t("infName", { n }); } catch { return value; } }
     if (/Params$/.test(part)) { try { const o = JSON.parse(value); return o ? Object.entries(o).map(([k, v]) => k + "=" + v).join(", ") : "—"; } catch { return value; } }
     return value === "null" || value == null ? "—" : shortHash(value);
   }
@@ -1193,7 +1289,15 @@
       tr.length ? smallTable([t("conversation"), { text: t("call"), num: true }, t("role"), t("error"), { text: t("retryWait"), num: true }, { text: t("charged"), num: true }, t("then")], tRows)
         : el("p", { class: "small muted", text: t("noTransport") }));
 
-    box.append(el("div", { class: "bcalls-body" }, idBlock, fpBlock, cacheBlock, trBlock,
+    // What the observed role's calls used (the student in calibration, the tutor in evaluation); "not measured" is never 0.
+    const u = M.usageOf(recs, id.target);
+    const uKv = (k, v, tip) => el("tr", null, el("th", { scope: "row", class: "small", text: k }), el("td", { class: "num", text: v, "data-tip": tip || null }));
+    const useBlock = el("div", { class: "block" }, el("h4", { text: t("u_tutorTitle", { r: t("role_" + id.target) }) }),
+      !u.calls ? el("p", { class: "small muted", text: t("none") }) : smallTable([t("u_calls"), { text: String(u.calls), num: true }], [
+        uKv(t("cu_output"), sumText(u.output), covText(u.output, u.calls)), uKv(t("cu_reasoning"), sumText(u.reasoning), covText(u.reasoning, u.calls)),
+        uKv(t("cu_visible"), sumText(u.visible), covText(u.visible, u.calls)), uKv(t("cu_truncated"), u.truncated.known ? String(u.truncated.total) : t("notMeasured"), covText(u.truncated, u.calls)),
+        uKv(t("cu_usd"), usdFine(u.usd.total), covText(u.usd, u.calls)), uKv(t("cu_latency"), latText(u.latency.median), covText(u.latency, u.calls)), uKv(t("cu_p90"), latText(u.latency.p90))]));
+    box.append(el("div", { class: "bcalls-body" }, idBlock, fpBlock, cacheBlock, trBlock, useBlock,
       el("div", { class: "bcalls-foot" }, el("button", { type: "button", class: "btn-quiet", onclick: () => exportPack(raw.batchId) }, t("exportPack") + " ↓"),
         el("span", { class: "small faint", text: t("exportNote") }))));
     return box;
@@ -1236,13 +1340,12 @@
       const s = src && src.probeSets.find(x => x.value === c.probeSet);
       add(s ? base(s.path) : "probes.json", await raw(s, c.probeSet), "probe-set");
     }
-    // index.jsonl: only this batch's lines, each line exactly as it was.
-    const indexText = src ? (src.index ? await src.index.file.text() : null) : (globalThis.PREMIUM_SAMPLE && globalThis.PREMIUM_SAMPLE.index);
-    if (indexText != null) {
+    // index.jsonl: only this batch's lines, each line exactly as it was, from every runs folder that was opened.
+    const indexTexts = src ? await Promise.all([...src.indexes.values()].map(x => x.file.text())) : globalThis.PREMIUM_SAMPLE && globalThis.PREMIUM_SAMPLE.index != null ? [globalThis.PREMIUM_SAMPLE.index] : [];
+    const indexText = indexTexts.length ? indexTexts.map(text => (text.match(/[^\n]*\n|[^\n]+$/gu) || [])
       // Each line keeps its own line end. (No look-behind here: older Safari lacks it.)
-      const lines = (indexText.match(/[^\n]*\n|[^\n]+$/gu) || []).filter(line => { try { return JSON.parse(line).batchId === batchId; } catch { return false; } });
-      add("index.jsonl", lines.join(""), "index");
-    }
+      .filter(line => { try { return JSON.parse(line).batchId === batchId; } catch { return false; } }).join("")).join("") : null;
+    if (indexText != null) add("index.jsonl", indexText, "index");
     const exportedAt = new Date().toISOString();
     const reviewRows = M.reviewItemRows(d, batchId), messageRows = M.messageRows(d, batchId);
     add("review-index.csv", P.csv(M.REVIEW_COLUMNS, M.reviewIndex(d, batchId)), "derived-table", { rows: recs.length, columns: M.REVIEW_COLUMNS });
@@ -1270,8 +1373,14 @@
       "- probe file / 探针文件: " + (c.probes ? yesNo(hasRole("probe-set"), (batch && batch.probeSetVersion) || null) : "not a probe batch / 不是探针批次"),
       "- review-index.csv: one row per record. Checker results are copied from the report; counts come from the records. / 每段一行：检查器结论照抄报告，计数来自记录。",
       "- review-items.csv: " + (reviewRows.length ? "one row per checker review item, machine label beside the reviewer's decision and the result by the rules / 每个复核项一行：机器标记、复核决定、按规则的结果" : "not written, the report has no review items / 报告没有复核项，没有这张表"),
-      "- messages.csv: one row per student message of every attempt, kept or sent back: raw output, model text and events, injected text, runner and dropped events, final text / 每条学生消息一行（含退回的）：原始输出、模型原话和事件、注入、runner 加的和丢掉的事件、最终消息",
+      "- messages.csv: one row per student message of every attempt, kept or sent back: raw output, model text and events, injected text, runner and dropped events, final text, and the call's tokens (reasoning and visible), latency, finish reason and truncation / 每条学生消息一行（含退回的）：原始输出、模型原话和事件、注入、runner 加的和丢掉的事件、最终消息，以及这次调用的 Token（推理和可见）、延迟、结束原因和是否截断",
       "- SHA256SUMS.txt: SHA-256 of every other file here / 包内其余文件的 SHA-256",
+      "",
+      "Simulated student / 模拟学生: " + (L.inference.mixed ? "records do not share one inference setting / 记录的推理配置不统一" : [L.inference.name ? "inference " + L.inference.name : "inference not recorded / 推理配置未记录",
+        L.inference.maxOutputTokens != null ? "maxOutputTokens " + L.inference.maxOutputTokens : null, "temperature " + (L.inference.temperature == null ? "not recorded / 未记录" : L.inference.temperature),
+        "from / 来源 " + L.inference.source].filter(Boolean).join(" · ")),
+      "Student usage / 学生用量: " + L.usage.calls + " calls · output " + (L.usage.outputTokens ?? "not measured") + " (reasoning " + (L.usage.reasoningTokens ?? "not measured") + ", visible " + (L.usage.visibleOutputTokens ?? "not measured")
+        + ") · USD " + (L.usage.usd ?? "not measured") + " estimated · median latency " + (L.usage.latencyMs.median ?? "not measured") + " ms. Null means not measured, never zero. / 未测不是 0。",
       "",
       "Three layers, kept apart / 三层分开",
       "- Machine verdict / 机器判定: " + (m ? m.verdict + (m.reportVerdict !== m.verdict ? " (report verdict / 报告总结论 " + m.reportVerdict + ")" : "") + " · checker " + (m.checkerRevision || "v" + m.checkerVersion)
@@ -1300,7 +1409,7 @@
     // The manifest lists every file above with its role and hash, then the layers as the page read them.
     const manifest = {
       schema: "tutorbench.observatory-review-pack", schemaVersion: 1, exportedAt,
-      source: synthetic ? { kind: "synthetic-sample", originalBytes: false } : { kind: "folder", name: st.source.name || null, originalBytes: true },
+      source: synthetic ? { kind: "synthetic-sample", originalBytes: false } : { kind: "folder", name: st.source.name || null, runsFolders: src.roots, originalBytes: true },
       ...L,
       counts: { records: recs.length, adopted: recs.filter(r => !sup[r.runId]).length, superseded: recs.filter(r => sup[r.runId]).length, reviewItems: reviewRows.length, studentMessages: messageRows.length },
       files: files.map(f => ({ path: f.path, role: f.role, bytes: P.bytesOf(f.data).length, sha256: P.sha256(P.bytesOf(f.data)),
@@ -1310,15 +1419,12 @@
         "Machine verdict, content review and final verdict are separate layers; the page copies each from its own file and never derives one from another.",
         "A diagnostic batch needs no content review, and no gate or final verdict may count it.",
         "An undecided needs_review item counts as fail once the review is complete; auto_fail passes only with an override.",
+        "Usage counts that no call carried are null (not measured), never zero; known gives how many calls carried each.",
       ],
     };
     add("manifest.json", JSON.stringify(manifest, null, 2) + "\n", "manifest");
     files.push({ path: "SHA256SUMS.txt", data: files.map(f => P.sha256(P.bytesOf(f.data)) + "  " + f.path).join("\n") + "\n" });
-    const bytes = P.zip(files.map(f => ({ path: folder + f.path, data: f.data })), exportedAt);
-    const url = URL.createObjectURL(new Blob([bytes], { type: "application/zip" }));
-    const a = el("a", { href: url, download: "review-pack-" + batchId + ".zip", hidden: true });
-    document.body.append(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    saveZip(P.zip(files.map(f => ({ path: folder + f.path, data: f.data })), exportedAt), "review-pack-" + batchId + ".zip");
   }
 
   // ---------- Calibration ----------
@@ -1338,12 +1444,13 @@
     box.append(el("header", { class: "sec-head" }, el("div", { class: "title" }, el("h2", { id: "calib-title", text: t("calibTitle") }), el("p", { class: "lede", text: t("calibLede") })),
       list.length > 1 ? el("div", { class: "filters" }, select("calib-batch", t("calibBatch"), st.calib, list.map(b => [b.batchId, batchOption(b)]),
         v => { st.calib = v; st.calibSel = null; render(); })) : el("span", { class: "mono muted", text: st.calib })));
-    box.append(classStrip(c.cls), calibLayers(c), el("div", { class: "calib-facts" }, calibCriteria(c), calibRates(c)));
-    renderCalibGroups(c); renderCalibRewrites(c); renderCalibDeviations(c); renderCalibReview(c); renderCalibIntegrity(c);
+    const side = M.calibrationSide(d, c.batchId);
+    box.append(calibIdentity(side, comparePairFor(c.batchId)), classStrip(c.cls), calibLayers(c), el("div", { class: "calib-facts" }, calibCriteria(c), calibRates(c)));
+    renderCalibGroups(c); renderCalibRewrites(c); renderCalibDeviations(c); renderCalibReview(c); renderCalibIntegrity(c); renderCalibUsage(c, side);
   }
   // A batch in a picker: its id, what it is for and, when it has no report, that.
-  const batchOption = b => [b.batchId, t("cls_" + clsOf(b)), b.kind === "calibration-probe" && b.gate !== "diagnostic" ? (b.phase || (b.gate ? tOr("gate_" + b.gate, b.gate) : null)) : null,
-    st.dataset.reports.has(b.batchId) ? null : t("v_none")].filter(Boolean).join(" · ");
+  const batchOption = b => { const p = batchProfile(b); return [b.batchId, t("cls_" + clsOf(b)), b.kind === "calibration-probe" && b.gate !== "diagnostic" ? (b.phase || (b.gate ? tOr("gate_" + b.gate, b.gate) : null)) : null,
+    p && p.source !== "none" ? inferenceText(p, false) : null, st.dataset.reports.has(b.batchId) ? null : t("v_none")].filter(Boolean).join(" · "); };
   // What this batch is for, among the three, with the rule that keeps them apart.
   function classStrip(cls) {
     return el("div", { class: "cls-strip" },
@@ -1678,11 +1785,264 @@
     if (m && m.pins) row(t("intPins"), Object.entries(m.pins).map(([k, v]) => el("div", { class: "small mono", "data-tip": typeof v === "string" ? v : null,
       text: k + ": " + (v && typeof v === "object" ? [v.id, v.version, v.contentHash ? shortHash(v.contentHash) : null].filter(Boolean).join(" ") : shortHash(String(v))) })));
     const f = st.files;
+    if (f && f.roots.length > 1) row(t("intFolders"), el("ul", null, f.roots.map(x => el("li", { class: "small mono", text: x || "./" }))));
     row(t("intFiles"), el("span", { class: "small", text: f ? t("filesLine", { r: f.records.size, b: f.batches.size, p: f.reports.size, e: f.expectations.length, i: f.ignored.length }) + " · " + t("filesLine2", { v: f.reviews.size, g: f.gates.length, s: f.probeSets.length }) : t("filesSample") }),
       f && f.ignored.length ? el("details", { class: "ignored" }, el("summary", { class: "small faint", text: t("filesIgnored", { n: f.ignored.length }) }),
         el("ul", null, f.ignored.slice(0, 200).map(x => el("li", { class: "small mono", text: x.path })))) : null);
     box.append(dl, el("div", { class: "bcalls-foot" }, el("button", { type: "button", onclick: () => exportPack(c.batchId) }, t("exportPack") + " ↓"),
       el("span", { class: "small faint", text: t("exportNote") + (f ? "" : " " + t("exportSynthetic")) })));
+  }
+
+  // ---------- inference settings and usage ----------
+  // Small dollar amounts keep their digits: a probe batch can cost a cent.
+  const usdFine = x => (x == null ? "—" : "$" + (x >= 1 ? x.toFixed(2) : (Math.round(x * 1e7) / 1e7).toFixed(7).replace(/0+$/u, "").replace(/\.$/u, "")));
+  const latText = ms => (ms == null ? t("notMeasured") : t("sec2", { v: (ms / 1000).toFixed(2) }));
+  const ratioText = x => (x == null ? "" : "×" + x.toFixed(2));
+  // A summed count is "not measured" when no call carried it, never zero; coverage says how many did.
+  const sumText = s => (s.known ? fmtInt(s.total) : t("notMeasured"));
+  const covText = (s, n) => t("coverage", { k: s.known, n });
+  const shortCommit = v => (v == null ? null : String(v).replace(/\b([0-9a-f]{7})[0-9a-f]{33}\b/gu, "$1"));
+  // How a model was asked to answer, in words: "reasoning High · max output 8192 · temperature not sent". Nothing is
+  // guessed: thinking switched on without an effort is "effort unknown", and an older record says what it does not have.
+  function inferenceText(p, full) {
+    if (!p) return t("infMixed");
+    const name = M.inferenceName(p);
+    const head = name == null ? t("infUnrecorded") : name === "on" ? t("infOnUnknown") : t("infName", { n: name });
+    if (!full || p.source === "none") return head;
+    return [head, p.maxOutputTokens != null ? t("infMax", { n: p.maxOutputTokens }) : null,
+      p.temperature !== undefined ? t("infTemp", { v: p.temperature }) : t(p.source === "inference" ? "infTempNotSent" : "infTempUnrecorded")].filter(Boolean).join(" · ");
+  }
+  // A batch's simulated student, from its first record (the comparison lists any batch whose records disagree).
+  const batchProfile = b => { const r = st.dataset.runs.find(x => x.batchId === b.batchId); return r ? M.studentProfile(r, b) : null; };
+  // One value of a comparison part as a short label; an object (a price table, the report's pins) by its version and hash.
+  const partText = (part, v) => (v == null ? t("notRecordedShort") : part === "temperature" && v === "not sent" ? t("notSent")
+    : typeof v === "object" ? [v.version || null, shaHex(JSON.stringify(v)) ? "#" + shaHex(JSON.stringify(v)).slice(0, 8) : null].filter(Boolean).join(" · ")
+      : part === "runner" ? shortCommit(v) : shortHash(String(v)));
+  const partsText = (part, vs) => (vs.length ? vs.map(v => partText(part, v)).join(", ") : "—");
+  const partsTip = vs => vs.filter(v => v != null).map(v => (typeof v === "object" ? JSON.stringify(v) : String(v))).join("\n") || null;
+
+  // The experiment's identity for the simulated student, in one line: what was asked and what answered, how it was
+  // asked to think, and the code and materials around it, each as the records and the report wrote it.
+  function calibIdentity(side, pair) {
+    const P = side.parts, list = (part, vs) => vs.filter(v => v != null).map(v => partText(part, v)).join(", ");
+    const item = (k, v, cls, tip) => (v ? el("span", { class: "ident-item", role: "listitem" }, el("span", { class: "ident-k", text: t(k) }),
+      el("span", { class: "ident-v" + (cls ? " " + cls : ""), text: v, "data-tip": tip || null })) : null);
+    return el("div", { class: "ident-row" },
+      el("div", { class: "ident", role: "list", "aria-label": t("id_student") },
+        item("id_student", list("studentModel", P.studentModel) || t("notRecordedShort"), "mono"),
+        item("id_returned", list("returnedModel", P.returnedModel), "mono"),
+        item("id_inference", inferenceText(side.profile, true), "strong", side.profile ? t("infSource_" + side.profile.source) : null),
+        item("id_fingerprint", list("fingerprint", P.fingerprint), "mono"),
+        item("id_runner", list("runner", P.runner), "mono", partsTip(P.runner.filter(Boolean))),
+        item("id_checker", list("checker", P.checker), "mono"),
+        item("id_card", list("card", P.card), "mono", partsTip(P.card.filter(Boolean))),
+        item("id_protocol", list("protocol", P.protocol), "mono", partsTip(P.protocol.filter(Boolean))),
+        item("id_probeSet", list("probeSet", P.probeSet), "mono")),
+      pair ? el("button", { type: "button", class: "btn-quiet", onclick: () => { [st.ccA, st.ccB] = pair; setView("compare"); } }, t("idOpenCompare")) : null);
+  }
+  // The pair the calibration view's "compare" link opens: the default pair when this batch is in it, else this batch
+  // against the newest other batch of its kind.
+  function comparePairFor(batchId) {
+    const d = st.dataset, list = M.calibrationBatches(d);
+    if (list.length < 2) return null;
+    const pair = M.defaultCalibrationPair(d);
+    if (pair && pair.includes(batchId)) return pair;
+    const me = list.find(b => b.batchId === batchId), other = list.filter(b => b.batchId !== batchId).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const partner = other.find(b => me && b.kind === me.kind) || other[0];
+    return [partner.batchId, batchId];
+  }
+
+  // Calibration Plate VI: what the simulated student's calls used. Counted from the calls themselves, every attempt
+  // included; the runner's own totals, when the batch or its report has them, sit beside them with whether they agree.
+  function renderCalibUsage(c, side) {
+    const box = $("calib-usage"), u = side.usage;
+    box.append(plateHead("VI", "calib-usage-title", t("plateUsage"), el("p", { class: "plate-note", text: t("usageNote") })));
+    if (!u.calls) { box.append(el("p", { class: "empty-note", text: t("u_noCalls") })); return; }
+    const fig = (label, value, sub, cov) => el("div", { class: "rate-fig" }, el("span", { class: "rf-label", text: label }), el("span", { class: "rf-num", text: value }),
+      el("span", { class: "rf-sub", text: sub }), el("span", { class: "rf-sub", text: cov }));
+    const perPos = u.usd.total != null && side.positions ? u.usd.total / side.positions : null;
+    box.append(el("div", { class: "rates usage" },
+      fig(t("u_output"), sumText(u.output), t("u_outputSub", { r: sumText(u.reasoning), v: sumText(u.visible) }), covText(u.output, u.calls)),
+      fig(t("u_usd"), usdFine(u.usd.total), perPos != null ? t("u_usdSub", { p: usdFine(perPos) }) : t("u_usdSubNoPos"), covText(u.usd, u.calls)),
+      fig(t("u_latency"), latText(u.latency.median), t("u_latencySub", { p: latText(u.latency.p90), m: latText(u.latency.max) }), covText(u.latency, u.calls))));
+    const dl = el("dl", { class: "kv integrity" });
+    const row = (k, ...v) => dl.append(el("dt", { text: k }), el("dd", null, ...v));
+    // Each count on one line with its coverage beside it.
+    const val = (text, s) => el("span", null, text, el("span", { class: "small faint", text: " · " + covText(s, u.calls) }));
+    row(t("u_calls"), el("span", { text: t("u_callsLine", { n: u.calls, r: u.records }) + (u.notSent ? " · " + t("u_notSent", { n: u.notSent }) : "") }));
+    row(t("u_input"), val(u.input.known ? t("u_inputLine", { n: fmtInt(u.input.total), h: sumText(u.cacheHit), m: sumText(u.cacheMiss) }) : t("notMeasured"), u.input));
+    row(t("u_reasoning"), val(sumText(u.reasoning), u.reasoning));
+    row(t("u_visible"), val(sumText(u.visible), u.visible));
+    row(t("u_truncated"), val(u.truncated.known ? t("u_truncLine", { n: u.truncated.total }) : t("notMeasured"), u.truncated));
+    if (u.emptyVisible) row(t("u_empty"), el("span", { class: "stopped", text: t("u_emptyLine", { n: u.emptyVisible }) }));
+    if (u.usd.estimated) row(t("u_usd"), el("span", { class: "small", text: t("u_estimated", { n: u.usd.estimated }) }));
+    const w = side.written;
+    if (w) {
+      const diff = M.usageDiffers(w, c.records), n = x => (x == null ? t("notMeasured") : fmtInt(x));
+      row(t("u_written"), el("div", { class: "small mono", text: t("u_writtenLine", { o: n(w.outputTokens), r: n(w.reasoningTokens), v: n(w.visibleOutputTokens), u: usdFine(w.usd) }) }),
+        el("div", { class: "small" + (diff.length ? " stopped" : " muted"), text: diff.length ? t("u_writtenBad", { f: diff.join(", ") }) : t("u_writtenOk") }));
+    }
+    if (side.reconciled) row(t("u_reconciled"), Object.entries(side.reconciled).map(([p, v]) => el("div", { class: "small mono", text: p + " " + usdFine(v) })));
+    box.append(dl);
+  }
+
+  // ---------- Compare: two calibration or probe batches ----------
+  // What differs first, part by part; then the probes (or scripted tutors) both ran in each language from the same fixed
+  // prefix, each side's machine counts as its report gives them; then what the simulated student's calls used. Counts
+  // only: five repeats a cell decide nothing, and a diagnostic batch never stands in for a formal gate.
+  function renderCalibCompare() {
+    const d = st.dataset, box = $("calib-compare"), list = M.calibrationBatches(d);
+    box.append(plateHead("", "ccmp-title", t("ccmpTitle"), el("p", { class: "plate-note", text: t("ccmpNote") })));
+    if (list.length < 2) { box.append(el("p", { class: "empty-note", text: t("ccmpNone") })); return; }
+    const ids = list.map(b => b.batchId);
+    if (!ids.includes(st.ccA) || !ids.includes(st.ccB)) [st.ccA, st.ccB] = M.defaultCalibrationPair(d) || [ids[1], ids[0]];
+    const rerender = () => { clear(box); renderCalibCompare(); };
+    const opts = list.map(b => [b.batchId, batchOption(b)]);
+    box.append(el("div", { class: "pickers" },
+      el("div", { class: "picker a" }, select("ccmp-a", t("sideA"), st.ccA, opts, v => { st.ccA = v; rerender(); })),
+      el("button", { type: "button", class: "btn-quiet swap", "aria-label": t("swap"), "data-tip": t("swap"), onclick: () => { [st.ccA, st.ccB] = [st.ccB, st.ccA]; rerender(); } }, "⇄"),
+      el("div", { class: "picker b" }, select("ccmp-b", t("sideB"), st.ccB, opts, v => { st.ccB = v; rerender(); }))));
+    const cmp = M.calibrationCompare(d, st.ccA, st.ccB), A = cmp.a, B = cmp.b;
+    if (cmp.diagnostic) box.append(el("p", { class: "ccmp-diag", role: "note" }, el("strong", { text: t("ccmpDiag") }), " " + t(A.cls === B.cls ? "ccmpClassesSame" : "ccmpClasses", { a: tOr("clsWord_" + A.cls, t("cls_" + A.cls)), b: tOr("clsWord_" + B.cls, t("cls_" + B.cls)) })));
+
+    // What differs: every part, the differing ones first and in ink.
+    const differs = new Set(cmp.changed);
+    const rows = [...cmp.parts].sort((x, y) => (differs.has(y.part) ? 1 : 0) - (differs.has(x.part) ? 1 : 0)).map(p => el("div", { class: "drow" + (differs.has(p.part) ? " differs" : ""), role: "row" },
+      el("span", { class: "dpart", role: "rowheader", text: t("cpart_" + p.part) }),
+      el("span", { class: "dval mono", role: "cell", text: partsText(p.part, p.a), "data-tip": partsTip(p.a) }),
+      el("span", { class: "dval mono", role: "cell", text: p.same ? t("partSame") : partsText(p.part, p.b), "data-tip": p.same ? null : partsTip(p.b) })));
+    box.append(el("div", { class: "block" }, el("h3", { text: t("diffTitle") }),
+      el("div", { class: "dtable", role: "table" }, el("div", { class: "drow head", role: "row" }, el("span", { role: "columnheader" }), el("span", { role: "columnheader", text: "A · " + A.batchId }),
+        el("span", { role: "columnheader", text: "B · " + B.batchId })), rows)));
+    const names = cmp.changed.map(p => t("cpart_" + p)).join(st.lang === "zh" ? "、" : ", ");
+    const notes = [!cmp.changes ? t("ccmpSame") : cmp.changes === 1 ? t("ccmpOne", { p: names }) : t("ccmpMany", { n: cmp.changes, p: names })];
+    if (A.profile && B.profile && JSON.stringify(A.profile) === JSON.stringify(B.profile)) notes.push(t("ccmpProfileSame"));
+    for (const [s, side] of [["A", A], ["B", B]]) if (side.mixedProfiles) notes.push(t("ccmpMixedSide", { s }));
+    box.append(el("div", { class: "cmp-verdict unsure" }, el("div", { class: "cmp-notes" }, notes.map(n => el("p", { text: n })))));
+
+    // The cells both ran: A and B on a 0–100% line, the counts beside it.
+    const cellsBlock = el("div", { class: "block" }, el("h3", { text: t("ccmpCellsTitle") }), el("p", { class: "small muted", text: t("ccmpCellsNote") }));
+    if (!cmp.cells.length) cellsBlock.append(el("p", { class: "empty-note", text: t("ccmpNoCells") }));
+    else {
+      const chart = el("div", { class: "spread cmp ccmp", role: "table", "aria-label": t("ccmpCellsTitle") });
+      chart.append(el("div", { class: "srow counts axis-row", role: "row" }, el("span", { role: "columnheader" }),
+        el("div", { class: "track axis", role: "columnheader" }, [0, 25, 50, 75, 100].map(x => el("span", { style: "left:" + x + "%", text: x + (x === 100 ? "%" : "") }))),
+        el("span", { class: "delta", role: "columnheader", text: "A → B" })));
+      const frac = s => (s.pass == null ? "—" : s.pass) + "/" + s.runs;
+      const row = (label, a, b, strong, sub) => {
+        const ra = a.pass == null || !a.runs ? null : a.pass / a.runs, rb = b.pass == null || !b.runs ? null : b.pass / b.runs;
+        const same = ra != null && rb != null && Math.round(ra * 50) === Math.round(rb * 50);
+        const track = el("div", { class: "track", role: "cell", style: "--stack:" + (same ? 2 : 1) });
+        if (ra != null && rb != null) track.append(el("i", { class: "range", style: `left:${Math.min(ra, rb) * 100}%;width:${Math.abs(rb - ra) * 100}%` }));
+        [["A", a, ra, 0], ["B", b, rb, same ? 1 : 0]].forEach(([k, s, r, stack]) => {
+          if (r == null) return;
+          const tip = t("ccmpCellTip", { s: k, k: label, p: s.pass, n: s.runs, w: s.rewrites });
+          track.append(el("span", { class: "mk " + k.toLowerCase(), style: `left:${r * 100}%;--k:${stack}`, "data-tip": tip, "aria-label": tip, tabindex: "0" }, k));
+        });
+        return el("div", { class: "srow counts" + (strong ? " overall" : ""), role: "row" },
+          el("span", { class: "card", role: "rowheader" }, el("span", { text: label }), sub ? el("span", { class: "ccmp-sub", text: sub }) : null),
+          track, el("span", { class: "delta num", role: "cell", text: frac(a) + " → " + frac(b) }));
+      };
+      const rw = (a, b) => (a || b ? t("ccmpRewrites", { a, b }) : null);
+      chart.append(row(t("ccmpTotal"), cmp.totals.a, cmp.totals.b, true, t("ccmpRewrites", { a: cmp.totals.a.rewrites, b: cmp.totals.b.rewrites })));
+      for (const x of cmp.cells) chart.append(row(x.key + " · " + langShort(x.lang), x.a, x.b, false, rw(x.a.rewrites, x.b.rewrites)));
+      cellsBlock.append(el("div", { class: "spread-box" }, chart));
+    }
+    if (cmp.unmatched.length) cellsBlock.append(el("details", { class: "ccmp-unmatched" }, el("summary", { class: "small", text: t("ccmpUnmatched") + " · " + cmp.unmatched.length }),
+      el("ul", null, cmp.unmatched.map(x => el("li", { class: "small" }, el("span", { class: "mono", text: x.key + " · " + langShort(x.lang) }), " · " + t("reason_" + x.reason))))));
+    box.append(cellsBlock);
+
+    // What the simulated student's calls used on each side. Tokens are set against each other only for one model.
+    const ua = A.usage, ub = B.usage;
+    const sumCell = (s, n) => (!s.known ? t("notMeasured") : fmtInt(s.total) + (s.known < n ? " (" + s.known + "/" + n + ")" : ""));
+    const perPos = s => (s.usage.usd.total != null && s.positions ? s.usage.usd.total / s.positions : null);
+    const ratio = (x, y) => (x != null && y != null && x > 0 ? y / x : null);
+    const urow = (label, a, b, r, tipA, tipB) => el("tr", null, el("th", { scope: "row", class: "small", text: label }), el("td", { class: "num", "data-col": "A", text: a, "data-tip": tipA || null }),
+      el("td", { class: "num", "data-col": "B", text: b, "data-tip": tipB || null }), el("td", { class: "num muted", "data-col": t("colRatio"), text: ratioText(r) }));
+    const urows = [
+      urow(t("cu_calls"), fmtInt(ua.calls), fmtInt(ub.calls), null),
+      urow(t("cu_output"), sumCell(ua.output, ua.calls), sumCell(ub.output, ub.calls), cmp.ratios.output, covText(ua.output, ua.calls), covText(ub.output, ub.calls)),
+      urow(t("cu_reasoning"), sumCell(ua.reasoning, ua.calls), sumCell(ub.reasoning, ub.calls), null, covText(ua.reasoning, ua.calls), covText(ub.reasoning, ub.calls)),
+      urow(t("cu_visible"), sumCell(ua.visible, ua.calls), sumCell(ub.visible, ub.calls), null, covText(ua.visible, ua.calls), covText(ub.visible, ub.calls)),
+      urow(t("cu_truncated"), ua.truncated.known ? String(ua.truncated.total) : t("notMeasured"), ub.truncated.known ? String(ub.truncated.total) : t("notMeasured"), null),
+      urow(t("cu_empty"), String(ua.emptyVisible), String(ub.emptyVisible), null),
+      urow(t("cu_usd"), usdFine(ua.usd.total), usdFine(ub.usd.total), cmp.ratios.usd),
+      urow(t("cu_perPos"), usdFine(perPos(A)), usdFine(perPos(B)), ratio(perPos(A), perPos(B))),
+      urow(t("cu_latency"), latText(ua.latency.median), latText(ub.latency.median), cmp.ratios.latency),
+      urow(t("cu_p90"), latText(ua.latency.p90), latText(ub.latency.p90), ratio(ua.latency.p90, ub.latency.p90)),
+    ];
+    box.append(el("div", { class: "block" }, el("h3", { text: t("ccmpUsageTitle") }), smallTable(["", { text: "A", num: true }, { text: "B", num: true }, { text: t("colRatio"), num: true }], urows, "usage-table"),
+      el("p", { class: "small faint", text: (cmp.sameModel ? "" : t("ccmpTokensOther") + " ") + t("usageNote") })));
+    box.append(el("div", { class: "bcalls-foot" }, el("button", { type: "button", onclick: () => exportCompare(cmp) }, t("ccmpExport") + " ↓"),
+      el("span", { class: "small faint", text: t("ccmpExportNote") + (st.files ? "" : " " + t("exportSynthetic")) })));
+  }
+  // The comparison as files an agent or a person can read without the page: every part, every cell and the usage of
+  // both sides, with the rules that keep a diagnostic comparison out of any gate.
+  async function exportCompare(cmp) {
+    const d = st.dataset, P = globalThis.PremiumReviewPack;
+    if (!d || !P) return;
+    const name = "compare-" + cmp.a.batchId + "-vs-" + cmp.b.batchId, exportedAt = new Date().toISOString(), synthetic = !st.files;
+    const cellOut = c => (c ? { runs: c.runs, machinePass: c.pass, checked: c.checked, rewrites: c.rewrites, prefixHashes: c.prefixes } : null);
+    const side = s => {
+      const L = M.packLayers(d, s.batchId);
+      return { batchId: s.batchId, class: s.cls, kind: s.kind, gate: s.gate, createdAt: s.createdAt, adoptedRecords: s.adopted, machine: L.machine,
+        inference: L.inference, usage: L.usage, acceptedPositions: s.positions, reconciledUsd: s.reconciled };
+    };
+    const body = {
+      schema: "tutorbench.observatory-calibration-compare", schemaVersion: 1, exportedAt,
+      source: synthetic ? { kind: "synthetic-sample" } : { kind: "folder", name: st.source.name || null, runsFolders: st.files.roots },
+      diagnostic: cmp.diagnostic, classes: { a: cmp.a.cls, b: cmp.b.cls }, a: side(cmp.a), b: side(cmp.b),
+      changes: cmp.changes, changed: cmp.changed, parts: cmp.parts, sameModel: cmp.sameModel, ratios: cmp.ratios, totals: cmp.totals,
+      cells: cmp.cells.map(x => ({ key: x.key, language: x.lang, prefixHash: x.prefixHash, a: cellOut(x.a), b: cellOut(x.b) })),
+      unmatched: cmp.unmatched.map(x => ({ key: x.key, language: x.lang, reason: x.reason, a: cellOut(x.a), b: cellOut(x.b) })),
+      rules: [
+        "A diagnostic comparison is for choosing a setup only; it never stands in for a formal gate.",
+        "Cell counts are copied from each batch's checker report. The page judges nothing and claims no significance.",
+        "Cells are matched only when both sides ran them from the same fixed prefix hash.",
+        "Token counts are set against each other only when both sides asked the same model.",
+        "A usage count that no call carried is null (not measured), never zero.",
+      ],
+    };
+    const ua = cmp.a.usage, ub = cmp.b.usage, n = x => (x == null ? "not measured / 未测" : String(x));
+    const lines = [
+      "TutorBench Observatory · calibration comparison / 校准对照",
+      "A: " + cmp.a.batchId + " (" + cmp.a.cls + (cmp.a.profile ? ", " + (M.inferenceName(cmp.a.profile) || "inference not recorded") : "") + ")",
+      "B: " + cmp.b.batchId + " (" + cmp.b.cls + (cmp.b.profile ? ", " + (M.inferenceName(cmp.b.profile) || "inference not recorded") : "") + ")",
+      "Exported / 导出: " + exportedAt,
+      "Source / 来源: " + (synthetic ? "synthetic sample bundled with the page / 合成示例" : "folder \"" + (st.source.name || "") + "\" / 打开的文件夹"),
+      "",
+      ...(cmp.diagnostic ? ["DIAGNOSTIC: for choosing a setup only, never a formal gate. / 诊断对照只用来挑配置，不能代替正式门槛。", ""] : []),
+      "What differs / 哪里不一样: " + (cmp.changes ? cmp.changes + " parts: " + cmp.changed.join(", ") : "nothing / 都一样"),
+      "Matched cells / 对上的格子: " + cmp.cells.length + " · machine pass / 机器通过 A " + cmp.totals.a.pass + "/" + cmp.totals.a.runs + " → B " + cmp.totals.b.pass + "/" + cmp.totals.b.runs
+        + " · rewrites / 改写 A " + cmp.totals.a.rewrites + " · B " + cmp.totals.b.rewrites + (cmp.unmatched.length ? " · not matched / 没对上 " + cmp.unmatched.length : ""),
+      "Student calls / 学生调用: A " + ua.calls + " · B " + ub.calls,
+      "Billed output tokens / 计费输出: A " + n(ua.output.total) + " · B " + n(ub.output.total) + (cmp.ratios.output != null ? " (B/A " + cmp.ratios.output.toFixed(3) + ")" : cmp.sameModel ? "" : " (different models, not compared / 模型不同，不比)"),
+      "Reasoning · visible / 推理 · 可见: A " + n(ua.reasoning.total) + " · " + n(ua.visible.total) + " | B " + n(ub.reasoning.total) + " · " + n(ub.visible.total),
+      "Estimated USD / 估算费用: A " + n(ua.usd.total) + " · B " + n(ub.usd.total) + (cmp.ratios.usd != null ? " (B/A " + cmp.ratios.usd.toFixed(3) + ")" : "") + " · price-table estimates, not reconciled / 价目表估算，未对账",
+      "Median latency ms / 延迟中位数: A " + n(ua.latency.median) + " · B " + n(ub.latency.median) + (cmp.ratios.latency != null ? " (B/A " + cmp.ratios.latency.toFixed(3) + ")" : ""),
+      "",
+      "Files / 文件",
+      "- " + name + ".json: every part, cell and usage figure, with the rules / 全部差异、格子和用量，附规则",
+      "- compare-cells.csv: one row per cell, matched or not / 每格一行，含没对上的",
+      "- SHA256SUMS.txt: SHA-256 of every other file here / 包内其余文件的 SHA-256",
+      "",
+      "Limits / 限制",
+      "- Counts are copied from each batch's checker report; nothing is re-checked and no significance is claimed. / 数照抄检查器报告，不重算，不说显著。",
+      "- The page does not read the ledger database, re-run the checker or check provider invoices. / 页面不读账本数据库，不重跑检查器，不核对厂商账单。", "",
+    ];
+    const files = [
+      { path: name + ".json", data: JSON.stringify(body, null, 2) + "\n" },
+      { path: "compare-cells.csv", data: P.csv(M.COMPARE_CELL_COLUMNS, M.compareCellRows(cmp)) },
+      { path: "README.txt", data: lines.join("\n") },
+    ];
+    files.push({ path: "SHA256SUMS.txt", data: files.map(f => P.sha256(P.bytesOf(f.data)) + "  " + f.path).join("\n") + "\n" });
+    saveZip(P.zip(files.map(f => ({ path: name + "/" + f.path, data: f.data })), exportedAt), name + ".zip");
+  }
+  function saveZip(bytes, filename) {
+    const url = URL.createObjectURL(new Blob([bytes], { type: "application/zip" }));
+    const a = el("a", { href: url, download: filename, hidden: true });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
   }
 
   // ---------- Probes ----------
@@ -1864,6 +2224,8 @@
         el("span", { class: "mono muted" }, r.card.id + "@" + r.card.version + (v.olderCard ? " (" + t("olderCard") + ")" : "") + " · " + String(r.card.contentHash).slice(0, 19) + "…"),
         el("span", { class: "mono muted" }, r.probe ? t("probeTape") + " " + r.tutor.id + (r.tutor.provider ? " · " + r.tutor.provider : "")
           : [M.versionKey(r), r.tutor.tutorPromptHash ? promptName(r.tutor.tutorPromptHash) : t("noPrompt")].join(" · ")),
+        M.isCalibrationKind(r.batchKind) && r.student ? el("span", { class: "mono muted" }, [t("id_student") + " " + (r.student.requestedModel || "—"),
+          inferenceText(M.studentProfile(r, d.batches.find(b => b.batchId === r.batchId)), true), r.code && r.code.gitCommit ? "runner " + shortCommit(r.code.gitCommit) : null].filter(Boolean).join(" · ")) : null,
         el("span", { class: "mono muted" }, t("runId") + " " + r.runId)),
       el("button", { type: "button", onclick: closeDrawer, id: "drawer-close" }, t("close"))));
 
@@ -2115,12 +2477,18 @@
     const tok = u => (u ? fmtInt(u.inputTokens) + " / " + fmtInt(u.outputTokens) : "—");
     const cacheText = c => (!has(c, "cache") ? t("notRecorded") : c.cache && c.cache.hitTokens != null && c.cache.missTokens != null ? fmtInt(c.cache.hitTokens) + " / " + fmtInt(c.cache.missTokens) : t("unknownWhole"));
     const model = c => [c.model, c.requestedModel && c.requestedModel !== c.model ? "(" + c.requestedModel + ")" : null, has(c, "returnedModel") ? "→ " + (c.returnedModel ?? "—") : null].filter(Boolean).join(" ");
-    return smallTable([t("colN"), t("role"), t("colModel"), t("fingerprint"), { text: t("colTokens"), num: true }, { text: t("colCacheHM"), num: true }, { text: t("colCost"), num: true },
-      { text: t("colLatency"), num: true }, t("colErr"), t("calledAt")],
+    // Inside the billed output: the reasoning and the visible part, "not measured" when the call carries neither.
+    const split = u => (u && (u.reasoningTokens !== undefined || u.visibleOutputTokens !== undefined) ? fmtInt(u.reasoningTokens) + " / " + fmtInt(u.visibleOutputTokens) : t("notMeasured"));
+    const finish = c => [c.finishReason ? el("span", { class: "mono", text: c.finishReason }) : null,
+      c.truncated === true || (c.truncated === undefined && c.finishReason === "length") ? el("span", { class: "tag crit", text: t("truncTag") }) : null,
+      c.usage && c.usage.visibleOutputTokens === 0 && (c.usage.reasoningTokens || 0) > 0 ? el("span", { class: "tag soft", text: t("emptyVisTag") }) : null].filter(Boolean);
+    return smallTable([t("colN"), t("role"), t("colModel"), t("fingerprint"), { text: t("colTokens"), num: true }, { text: t("colReasonVis"), num: true }, { text: t("colCacheHM"), num: true }, { text: t("colCost"), num: true },
+      { text: t("colLatency"), num: true }, t("colFinish"), t("colErr"), t("calledAt")],
     calls.map(c => el("tr", { class: c.error ? "err" : null }, el("td", { class: "num", text: String(c.n) }), el("td", { class: "small", text: t("role_" + c.role) }),
       el("td", { class: "mono", text: model(c) }), el("td", { class: "mono", text: has(c, "system_fingerprint") ? fpText(c.system_fingerprint) : t("notRecorded") }),
-      el("td", { class: "num small", text: tok(c.usage) }), el("td", { class: "num small", text: cacheText(c) }),
+      el("td", { class: "num small", text: tok(c.usage) }), el("td", { class: "num small" + (split(c.usage) === t("notMeasured") ? " muted" : ""), text: split(c.usage) }), el("td", { class: "num small", text: cacheText(c) }),
       el("td", { class: "num small", text: (c.costEstimated ? "≈ " : "") + usd(c.usd) }), el("td", { class: "num small", text: c.latencyMs == null ? "—" : secs(c.latencyMs) }),
+      el("td", { class: "small" }, ...(finish(c).length ? finish(c) : ["—"])),
       el("td", { class: "small" + (c.error ? " stopped" : "") }, c.error ? code(c.error) : null, c.retryDelayMs > 0 ? (c.error ? " · " : "") + t("retryWaited", { v: (c.retryDelayMs / 1000).toFixed(1) }) : null),
       el("td", { class: "small muted", text: c.calledAt ? whenShort(c.calledAt) : "—" }))), "calls-table");
   }
