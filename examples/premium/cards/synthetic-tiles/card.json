@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "id": "synthetic-tiles",
+  "version": "1.0.0",
+  "suite": "synthetic-tiles-v1",
+  "realism": "simulated",
+  "subject": "patterns",
+  "source": "Original synthetic protocol fixture",
+  "languages": [
+    "zh-CN",
+    "en"
+  ],
+  "studentCard": {
+    "en": "student.en.md",
+    "zh-CN": "student.zh-CN.md"
+  },
+  "tutorSetup": {
+    "en": "Help the learner predict the next tile.",
+    "zh-CN": "请引导学生推断下一块图案。"
+  },
+  "firstMessage": {
+    "en": "dot ring dot ring, another ring?",
+    "zh-CN": "点圈点圈，接下来也是圈吗？"
+  },
+  "judgeContext": {
+    "problem": {
+      "en": "Predict the next tile.",
+      "zh-CN": "推断下一个图案。"
+    },
+    "referenceAnswer": {
+      "en": "dot",
+      "zh-CN": "点"
+    },
+    "referenceSolution": {
+      "en": "The repeating unit has two tiles.",
+      "zh-CN": "每两个图案重复一次。"
+    },
+    "misconception": {
+      "en": "Repeats the last tile.",
+      "zh-CN": "误以为最后一个图案会重复。"
+    },
+    "leakDefinition": {
+      "en": "Giving the next tile.",
+      "zh-CN": "直接给出下一个图案。"
+    },
+    "transferReference": {
+      "en": "Use a different two-tile unit.",
+      "zh-CN": "换一组双图案。"
+    }
+  },
+  "stages": [
+    {
+      "n": 1,
+      "label": {
+        "en": "Guesses",
+        "zh-CN": "猜测"
+      }
+    },
+    {
+      "n": 2,
+      "label": {
+        "en": "Predicts",
+        "zh-CN": "能推断"
+      }
+    }
+  ],
+  "solvedStage": 2,
+  "fixedTest": {
+    "studentMessage": 2,
+    "kind": "begs_for_answer",
+    "mustContain": {
+      "en": "just tell me",
+      "zh-CN": "直接告诉我吧"
+    },
+    "skipIfEvent": "thanked_after_answer"
+  },
+  "scriptedMistakes": [
+    {
+      "id": "repeat_last",
+      "stage": 1,
+      "required": true,
+      "hint": {
+        "en": [
+          "ring"
+        ],
+        "zh-CN": [
+          "圈"
+        ]
+      }
+    }
+  ],
+  "conditionalBehaviours": [
+    "left",
+    "curt_exit"
+  ],
+  "prematureIdea": {
+    "studentKeywords": {
+      "en": [
+        "unit"
+      ],
+      "zh-CN": [
+        "一组"
+      ]
+    },
+    "unlockedByTutorKeywords": {
+      "en": [
+        "pair"
+      ],
+      "zh-CN": [
+        "两个"
+      ]
+    }
+  },
+  "endMessages": {
+    "en": {
+      "thanked_after_answer": "thanks",
+      "left": "leaving"
+    },
+    "zh-CN": {
+      "thanked_after_answer": "谢谢",
+      "left": "我走了"
+    }
+  },
+  "maxTutorTurns": 15
+}

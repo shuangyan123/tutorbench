@@ -9,6 +9,7 @@ website/private-dist/
 .env.*
 
 results/
+runs/
 artifacts/
 benchmark-result.json
 data/private/

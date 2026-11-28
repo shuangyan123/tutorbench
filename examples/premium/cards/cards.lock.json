@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "rulesVersion": "1.0.0",
+  "cards": [
+    {
+      "id": "synthetic-tiles",
+      "version": "1.0.0",
+      "contentHash": "sha256:83fab76b0c6066ede3882305c054c2160e6bbe2f6ed0716376cca99a37a56032"
+    }
+  ]
+}
