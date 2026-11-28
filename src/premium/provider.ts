@@ -1,5 +1,6 @@
 import { observedFormat, type ObservedFormat } from "./student.js";
 import { hash } from "./cards.js";
+import { studentRequestParametersHash } from "./student-http.js";
 import { amount, choices, id, invalid, list, localized, nullable, optional, positive, shape, str, type Reader } from "./schema.js";
 
 const modelFields = { id, label: optional(str), developer: id, provider: id, requestedModel: id, pinnedVersion: id };
@@ -49,7 +50,7 @@ export type Role = Request["role"];
 export type Failure = `http_${number}` | "timeout" | "overloaded" | "not_dispatched" | "content_filter" | "provider_error" | "mock_not_dispatched" | "sensitive_output" | "invalid_response" | "model_version_drift" | "budget_stop" | "unknown_cost";
 export interface Call {
   historyHash?: string; responseFormat?: { requested: "json_object"; observed: ObservedFormat | null };
-  studentInference?: StudentInference; truncated?: boolean | null;
+  studentInference?: StudentInference; requestParametersHash?: string; truncated?: boolean | null;
   transportDiagnostic?: TransportDiagnostic;
   cache?: ReturnType<typeof cacheReceipt>;
   requestedModel: string; returnedModel: string | null; system_fingerprint: string | null; calledAt: string;
@@ -177,7 +178,8 @@ export class Session {
       call.responseFormat = { requested: req.responseFormat.type, observed: null };
       if (req.historyHash) call.historyHash = req.historyHash;
     }
-    if (req.studentInference) Object.assign(call, { studentInference: req.studentInference, truncated: null });
+    if (req.studentInference) Object.assign(call, { studentInference: req.studentInference,
+      requestParametersHash: studentRequestParametersHash(req), truncated: null });
     this.calls.push(call);
     call.usd = reserve;
     this.remaining = dollars(this.remaining - reserve)!;

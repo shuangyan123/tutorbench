@@ -25,13 +25,15 @@ function main() {
     cards: { type: "string" }, card: { type: "string" }, config: { type: "string" }, tape: { type: "string" },
     out: { type: "string", default: "runs/premium" }, "run-id": { type: "string" },
   } });
+  const loadConfig = (file: string) => configSchema(JSON.parse(readFileSync(file, "utf8")), "config");
   if (command === "validate-calibration" || command === "final-calibration") {
     if (!values.checker || !values.expectations) invalid("checker.arguments");
     const result = command === "validate-calibration" ? (() => {
       if (!values.cards || !values.calibration) invalid("checker.validate_arguments");
       return validateCalibration(resolve(values.checker), resolve(values.expectations), resolve(values.cards), resolve(values.calibration));
     })() : finalCalibration(resolve(values.checker), resolve(values.expectations),
-      choices("G2", "G3", "G4")(values.phase, "checker.phase"), (values.report ?? []).map(p => resolve(p)), (values.review ?? []).map(p => resolve(p)));
+      choices("G2", "G3", "G4")(values.phase, "checker.phase"), (values.report ?? []).map(p => resolve(p)), (values.review ?? []).map(p => resolve(p)),
+      values.config ? loadConfig(values.config) : undefined);
     if (values.output) publish(resolve(values.output), safeJson(result.report) + "\n");
     process.exitCode = result.status;
     return result.report;
@@ -40,10 +42,10 @@ function main() {
     if (!values.checker || !values.expectations || !values["batch-id"]) invalid("checker.arguments");
     if (JSON.parse(readFileSync(values.expectations, "utf8")).schemaVersion === 3) {
       if (!values.cards || !values.calibration || values["dry-run"]) invalid("checker.v3_arguments");
-      const audit = values.config ? configSchema(JSON.parse(readFileSync(values.config, "utf8")), "config") : undefined;
+      const audit = values.config ? loadConfig(values.config) : undefined;
       if (audit && (audit.batchId !== values["batch-id"] || !audit.studentInference)) invalid("checker.studentInference_config");
       const result = checkCalibrationV3(resolve(values.out!), resolve(values.checker), resolve(values.expectations),
-        values["batch-id"], resolve(values.cards), resolve(values.calibration), audit?.studentInference);
+        values["batch-id"], resolve(values.cards), resolve(values.calibration), audit);
       process.exitCode = result.status;
       return result.report;
     }
@@ -72,7 +74,7 @@ function main() {
   if (!assets.length) invalid("card-id");
   if (command === "check-cards") return assets.map(a => ({ id: a.card.id, version: a.card.version, contentHash: a.contentHash }));
   if (!values.config || !values.tape || !["run", "calibrate", "rejudge"].includes(command ?? "")) throw new Error("Expected run/rejudge with --config and --tape");
-  const config = configSchema(JSON.parse(readFileSync(values.config, "utf8")), "config");
+  const config = loadConfig(values.config);
   if (command === "calibrate") {
     if (config.kind === "evaluation") invalid("calibration.kind");
     const probe = values.phase === "G2" || values.phase === "G3" || values.phase === "DIAGNOSTIC";
@@ -111,13 +113,13 @@ function main() {
       config.tutors.some(m => ![...exp.required, ...exp.optional].includes(m.id)))) invalid("calibration.tape_or_tutors");
   if (exp && (config.judges.length || config.alternates.length)) invalid("calibration.no_judges");
   let series: Execution["series"];
-  if (live && exp && phase) {
+  if (exp && phase && (live || (config.studentInference && phase !== "DIAGNOSTIC"))) {
     if (!values.checker) invalid("calibration.checker_required");
     const validated = validateCalibration(resolve(values.checker), resolve(values.expectations!), resolve(values.cards),
       resolve(values.calibration ?? dirname(values.expectations!)));
     if (validated.status !== 0) invalid("calibration.validate_assets");
     const prior = phase === "G2" || phase === "DIAGNOSTIC" ? undefined : finalCalibration(resolve(values.checker), resolve(values.expectations!),
-      phase === "G3" ? "G2" : "G3", (values.report ?? []).map(p => resolve(p)), (values.review ?? []).map(p => resolve(p)));
+      phase === "G3" ? "G2" : "G3", (values.report ?? []).map(p => resolve(p)), (values.review ?? []).map(p => resolve(p)), config);
     if (prior && prior.status !== 0) invalid("calibration.prior_gate_not_passed");
     if (phase !== "DIAGNOSTIC") series = { phase, id: hash(JSON.stringify(exp.pins)), priorBatchIds: prior?.batchIds ?? [] };
   }

@@ -3,6 +3,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { test, type TestContext } from "node:test";
 import { checkCalibrationV3, finalCalibration } from "../src/premium/check-calibration.js";
+import { hash } from "../src/premium/cards.js";
+import { studentRequestParametersHash } from "../src/premium/student-http.js";
 import { inferenceUsage, readStudentInference, type Call, type StudentInference } from "../src/premium/provider.js";
 import { temp } from "./premium-fixture.js";
 
@@ -13,6 +15,7 @@ const expectations = { schemaVersion: 3, card, rulesVersion: pins.rulesVersion, 
   protocol: { file: "protocol.json", hash: pins.protocolHash, version: "2" }, tape: { file: "tape.json", hash: pins.tapeHash },
   probes: { file: "probes.json", probeSetVersion: "2", hash: pins.probesHash, gates: { key: ["probe-key"], rest: ["probe-rest"] } } };
 const batchId = "synthetic-checker-batch";
+const student = { id: "learner", label: undefined, developer: "deepseek", provider: "deepseek", requestedModel: "deepseek-flash", pinnedVersion: "fixture-pin" };
 const report = { checkerVersion: 3, batchId, batchKind: "calibration-probe", gate: "key", pins,
   machineVerdict: "PASS", verdict: "PENDING_REVIEW", cohortErrors: [], humanReviewPending: true,
   groups: languages.map(lang => ({ probeId: "probe-key", lang, runs: repeats, optional: false })),
@@ -47,8 +50,8 @@ else:
 pathlib.Path(sys.argv[sys.argv.index(target)+1]).write_text(json.dumps(r), encoding="utf-8")
 sys.exit(code)
 `);
-  const final = () => finalCalibration(checker, exp, "G2", [raw], [review]);
-  const check = (inference?: StudentInference) => checkCalibrationV3(root, checker, exp, batchId, root, root, inference);
+  const final = (inference?: StudentInference) => finalCalibration(checker, exp, "G2", [raw], [review], inference ? { student, studentInference: inference } : undefined);
+  const check = (inference?: StudentInference) => checkCalibrationV3(root, checker, exp, batchId, root, root, inference ? { student, studentInference: inference } : undefined);
   const record = { schemaVersion: 6, batchId, batchKind: report.batchKind, runId: "r1", status: "unscored", scorings: [],
     card: { ...card, lang: "en", rulesVersion: pins.rulesVersion, protocolVersion: "2", protocolHash: pins.protocolHash },
     probe: { probeId: "probe-key", prefixHash: "fixture" }, tutor: { id: "replay" }, repeat: { index: 1 },
@@ -157,6 +160,34 @@ test("diagnostic checker binds the authorized inference profile to the batch, re
     f.putRecord({ ...record, calls: [{ ...call, ...replacement }] } as { runId: string });
     assert.equal(f.check(profile).status, 1);
   }
+});
+test("formal High checker verifies actual wire receipts and propagates the authorized identity into final reports", t => {
+  const f = setup(t);
+  const profile = readStudentInference({ thinking: "enabled", reasoningEffort: "high", maxOutputTokens: 8192 }, "test");
+  const responseFormat = { type: "json_object" } as const;
+  const params = { maxOutputTokens: 8192 };
+  const requestParametersHash = studentRequestParametersHash({ model: student, studentInference: profile, params, responseFormat });
+  const call = { studentInference: profile, role: "student", model: student.id, requestedModel: student.requestedModel,
+    requestHash: "sha256:" + "a".repeat(64), historyHash: "sha256:" + "b".repeat(64),
+    requestParametersHash, truncated: false, finishReason: "stop", responseFormat: { requested: "json_object", observed: "json" },
+    usd: 0.001, usage: { inputTokens: 3000, outputTokens: 100, reasoningTokens: 90, visibleOutputTokens: 10 } } as Call;
+  const record = { ...f.record, student: { ...student, thinking: "enabled", studentInference: profile, params, responseFormat }, calls: [call] };
+  f.putRecord(record);
+  const calibrationSeries = hash(JSON.stringify(pins));
+  f.putBatch({ phase: "G2", calibrationSeries, student, studentInference: profile, inferenceUsage: inferenceUsage([call]) });
+  const checked = f.check(profile);
+  assert.equal(checked.status, 0);
+  f.put(f.raw, checked.report);
+  assert.equal(f.final().status, 1);
+  assert.equal(f.final({ ...profile, reasoningEffort: "low" }).status, 1);
+  assert.equal(f.final(profile).status, 0);
+  assert.equal(f.final(profile).report.requestParametersHash, requestParametersHash);
+  for (const drift of [{ requestParametersHash: "sha256:" + "f".repeat(64) }, { requestedModel: "different" }]) {
+    f.putRecord({ ...record, calls: [{ ...call, ...drift }] } as { runId: string });
+    assert.equal(f.check(profile).status, 1);
+  }
+  f.put(f.raw, { ...checked.report, diagnostic: true });
+  assert.equal(f.final(profile).status, 1);
 });
 test("diagnostic reports are excluded by label, gate and diagnostic flag", t => {
   const f = setup(t, true);

@@ -8,8 +8,10 @@ import { childEnvironment } from "./child-environment.js";
 import { obj, id, invalid } from "./schema.js";
 import { publish, safeJson } from "./store.js";
 import type { RunRecord } from "./runner.js";
-import { inferenceUsage, type StudentInference } from "./provider.js";
+import { hash } from "./cards.js";
+import { inferenceUsage, type Config, type StudentInference } from "./provider.js";
 import { studentRequestOptions } from "./student.js";
+import { studentRequestParametersHash } from "./student-http.js";
 
 const read = (path: string) => JSON.parse(readFileSync(path, "utf8"));
 
@@ -114,14 +116,26 @@ export function checkCalibration(out: string, checker: string, expectations: str
 
 // v3 的机器报告必须保留待复核状态。最终关卡还要独立核验报告身份及计划覆盖。
 const formats = ["json", "fenced_json", "text", "empty", "truncated"];
-function checkRequests(records: RunRecord[], errors: string[], inference?: StudentInference) {
+type StudentAudit = Pick<Config, "student" | "studentInference">;
+const jsonFormat = { type: "json_object" } as const;
+function formalInferenceFields(exp: Expectations, audit: StudentAudit) {
+  const { id, developer, provider, requestedModel, pinnedVersion } = audit.student;
+  return { calibrationSeries: hash(JSON.stringify(exp.pins)), studentInference: audit.studentInference,
+    studentModel: { id, developer, provider, requestedModel, pinnedVersion },
+    requestParametersHash: studentRequestParametersHash({ model: audit.student,
+      ...studentRequestOptions(audit.studentInference, undefined), responseFormat: jsonFormat }) };
+}
+function checkRequests(records: RunRecord[], errors: string[], inference?: StudentInference, formal?: ReturnType<typeof formalInferenceFields>) {
   const { params } = studentRequestOptions(inference, undefined);
   for (const r of records) {
     if (r.schemaVersion !== 6 || r.student.thinking !== (inference?.thinking ?? "disabled") || (r.batchKind === "calibration-probe") !== !!r.probe ||
-        !isDeepStrictEqual(r.student.responseFormat, { type: "json_object" }) ||
+        !isDeepStrictEqual(r.student.responseFormat, jsonFormat) ||
+        (formal && Object.entries(formal.studentModel).some(([key, value]) => r.student[key as keyof Config["student"]] !== value)) ||
         !isDeepStrictEqual(r.student.params, params) || !isDeepStrictEqual(r.student.studentInference, inference) ||
         !Array.isArray(r.calls) || r.calls.some(c => c.role === "judge" ||
           (c.role === "student" && (!isDeepStrictEqual(c.studentInference, inference) ||
+            (formal && (c.requestParametersHash !== formal.requestParametersHash || c.model !== formal.studentModel.id ||
+              c.requestedModel !== formal.studentModel.requestedModel)) ||
             (inference && (!/^sha256:[a-f0-9]{64}$/u.test(c.requestHash) ||
               c.truncated !== (c.finishReason === null ? null : c.finishReason === "length") || !validOutputBreakdown(c.usage))) ||
             c.responseFormat?.requested !== "json_object" ||
@@ -156,7 +170,7 @@ export function validateCalibration(checker: string, expectations: string, cards
   if (!v3Revision(report) || report.ok !== (status === 0) || !Array.isArray(report.errors) || (status === 0 && report.errors.length)) invalid("checker.validate");
   return { status, report };
 }
-export function checkCalibrationV3(out: string, checker: string, expectations: string, batchId: string, cards: string, calibration: string, expectedInference?: StudentInference) {
+export function checkCalibrationV3(out: string, checker: string, expectations: string, batchId: string, cards: string, calibration: string, audit?: StudentAudit) {
   id(batchId, "batch");
   const destination = join(out, "calibration-report-" + batchId + ".json");
   try {
@@ -166,6 +180,8 @@ export function checkCalibrationV3(out: string, checker: string, expectations: s
     const batch = read(join(out, "batches", batchId + ".json"));
     const errors = report.cohortErrors;
     const diagnostic = batch.gate === "diagnostic";
+    const expectedInference = audit?.studentInference;
+    const formal = !diagnostic && audit?.studentInference ? formalInferenceFields(exp, audit) : undefined;
     if (!v3Revision(report) || (report.diagnostic ?? false) !== diagnostic ||
         (diagnostic && (batch.kind !== "calibration-probe" || report.checkerRevision !== "3.1.0")) || report.batchId !== batchId || batch.batchId !== batchId ||
         report.batchKind !== batch.kind || (report.gate ?? null) !== (batch.gate ?? null) ||
@@ -179,7 +195,10 @@ export function checkCalibrationV3(out: string, checker: string, expectations: s
       for (const f of readdirSync(batches).filter(f => f.endsWith(".json"))) {
         const b = read(join(batches, f));
         if (b.calibrationSeries === batch.calibrationSeries && b.batchId + ".json" === f &&
-            ["G2", "G3", "G4"].includes(b.phase)) seriesBatches.add(b.batchId);
+            ["G2", "G3", "G4"].includes(b.phase)) {
+          if (!isDeepStrictEqual(b.studentInference, expectedInference)) errors.push("student inference drift within the shared ledger");
+          seriesBatches.add(b.batchId);
+        }
       }
     }
     for (const f of readdirSync(dir).filter(f => f.endsWith(".json")).sort()) {
@@ -195,9 +214,15 @@ export function checkCalibrationV3(out: string, checker: string, expectations: s
       records.push(r);
     }
     checkRecords(records, errors);
-    if (!isDeepStrictEqual(batch.studentInference, expectedInference) || (expectedInference && !diagnostic))
-      errors.push("student inference settings differ from the authorized diagnostic configuration");
-    checkRequests(records, errors, expectedInference);
+    if (!isDeepStrictEqual(batch.studentInference, expectedInference))
+      errors.push("student inference settings differ from the authorized configuration");
+    if (formal) {
+      if (batch.calibrationSeries !== formal.calibrationSeries || batch.phase !== reportPhase(report) ||
+          !Object.entries(formal.studentModel).every(([key, value]) => batch.student?.[key] === value))
+        errors.push("formal experiment identity differs from the authorized series or student");
+      Object.assign(report, formal);
+    }
+    checkRequests(records, errors, expectedInference, formal);
     if (expectedInference) {
       report.studentInference = expectedInference;
       report.inferenceUsage = inferenceUsage(records.flatMap(r => r.calls.filter(c => c.role === "student")));
@@ -245,9 +270,10 @@ function coverage(r: Record<string, unknown>, exp: Expectations, phase: Phase) {
   }
   return !expectedGroups.size && !expectedRuns.size;
 }
-export function finalCalibration(checker: string, expectations: string, scope: Phase, reports: string[], reviews: string[]) {
+export function finalCalibration(checker: string, expectations: string, scope: Phase, reports: string[], reviews: string[], audit?: StudentAudit) {
   const exp = readExpectations(expectations);
   const errors: string[] = [], requested = stages.slice(0, stages.indexOf(scope) + 1), batchIds: string[] = [];
+  const formal = audit?.studentInference ? formalInferenceFields(exp, audit) : undefined;
   const inputs = reports.map(path => obj(read(path), "final.input"));
   const uniqueIds = new Set(inputs.map(r => id(r.batchId, "final.batchId")));
   if (inputs.some(r => r.diagnostic === true || r.verdict === "DIAGNOSTIC" || r.gate === "diagnostic"))
@@ -261,22 +287,25 @@ export function finalCalibration(checker: string, expectations: string, scope: P
     if (!v3Revision(r) || r.machineVerdict !== "PASS" || r.verdict !== "PENDING_REVIEW" ||
         !Array.isArray(r.cohortErrors) || r.cohortErrors.length) errors.push(phase + ": machine or cohort failure");
     if (!isDeepStrictEqual(r.pins, exp.pins)) errors.push(phase + ": report pins differ from expectations");
+    if (formal ? Object.entries(formal).some(([key, value]) => !isDeepStrictEqual(r[key], value)) :
+        [r.studentInference, r.studentModel, r.requestParametersHash].some(value => value !== undefined))
+      errors.push(phase + ": report inference identity differs from the authorized series configuration");
     if (!coverage(r, exp, phase)) errors.push(phase + ": incomplete or duplicate report coverage");
   }
   const reviewed = new Set<string>();
   for (const path of reviews) {
     const review = obj(read(path), "final.review");
     const idValue = id(review.batchId, "final.review.batchId");
-    if (!uniqueIds.has(idValue) || reviewed.has(idValue) || review.schemaVersion !== 1 ||
+    if (!uniqueIds.has(idValue) || reviewed.has(idValue) || review.schemaVersion !== 1 || review.diagnostic === true ||
         !["open", "complete"].includes(String(review.status)) || !Array.isArray(review.items)) errors.push("invalid or duplicate review");
     reviewed.add(idValue);
   }
   if (errors.length) return { status: 1, batchIds, report: { checkerVersion: 3, kind: scope === "G4" ? "final" : "gate",
-    scope, verdict: "FAIL", errors, groups: [], overrides: [] } };
+    scope, verdict: "FAIL", errors, groups: [], overrides: [], ...formal } };
   const result = pythonReport(checker, ["final", expectations, "--scope", scope, ...reports.flatMap(path => ["--report", path]),
     ...reviews.flatMap(path => ["--review", path])], "--out", [0, 1, 3]);
   if (!v3Revision(result.report) || result.report.scope !== scope ||
       result.report.verdict !== (result.status === 0 ? "PASS" : result.status === 1 ? "FAIL" : "PENDING_REVIEW"))
     invalid("checker.final_verdict");
-  return { ...result, batchIds };
+  return { ...result, report: { ...result.report, ...formal }, batchIds };
 }

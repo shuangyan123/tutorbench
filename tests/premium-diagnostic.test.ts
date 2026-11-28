@@ -50,6 +50,24 @@ test("diagnostic output is isolated in both directions; its budget cannot be top
   assert.deepEqual(record?.student.studentInference, studentInference);
   assert.deepEqual(record?.calls[0]?.studentInference, studentInference);
   assert.throws(() => runBatch(scratch, { ...experiment, probePlan: { ...d.probePlan, gate: "key" } }), /studentInference_scope/);
+  const ledger = storage(t).store;
+  const g2 = { ...experiment, config: { ...experiment.config, batchId: "formal-g2", budgetUsd: 2, hardCapUsd: 2 },
+    probePlan: { ...d.probePlan, gate: "key" as const },
+    series: { phase: "G2" as const, id: "synthetic-formal", priorBatchIds: [] } };
+  assert.equal(runBatch(ledger, g2).status, "complete");
+  assert.ok(ledger.records(g2.config.batchId)[0]?.calls[0]?.requestParametersHash);
+  const g3 = { ...g2, config: { ...g2.config, batchId: "formal-g3" },
+    probePlan: { ...d.probePlan, gate: "rest" as const },
+    series: { ...g2.series, phase: "G3" as const, priorBatchIds: [g2.config.batchId] } };
+  for (const drift of [undefined, { ...studentInference, reasoningEffort: "low" as const }]) {
+    assert.throws(() => runBatch(ledger, { ...g3, config: { ...g3.config, studentInference: drift } }), /calibration-series/);
+  }
+  const { series: _series, ...standalone } = g3;
+  assert.throws(() => runBatch(ledger, { ...standalone, config: { ...g3.config, studentInference: undefined } }), /series_output/);
+  assert.equal(ledger.getBatch("formal-g3"), null);
+  const next = runBatch(ledger, g3);
+  assert.equal(next.status, "complete");
+  assert.ok(Number(next.seriesSpentUsd) > Number(next.spentUsd));
 });
 
 test("four DeepSeek inference profiles send only supported settings and retain the historical default", () => {

@@ -1,15 +1,22 @@
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { cancelResponseBody, readBoundedJson } from "../transport/response-body.js";
+import { hash } from "./cards.js";
 import type { Request, TransportDiagnostic } from "./provider.js";
 import { obj } from "./schema.js";
 
-export function studentPayload(req: Request) {
+function studentParameters(req: Pick<Request, "model" | "params" | "studentInference" | "responseFormat">) {
   const inference = req.studentInference;
-  return JSON.stringify({ model: req.model.requestedModel, messages: [{ role: "system", content: req.system }, ...req.messages],
+  return {
     temperature: inference ? inference.temperature : req.params.temperature,
     max_tokens: inference?.maxOutputTokens ?? req.params.maxOutputTokens, thinking: { type: inference?.thinking ?? "disabled" },
-    ...(inference ? { reasoning_effort: inference.reasoningEffort } : {}), ...(req.responseFormat ? { response_format: req.responseFormat } : {}) });
+    ...(inference ? { reasoning_effort: inference.reasoningEffort } : {}), ...(req.responseFormat ? { response_format: req.responseFormat } : {}) };
+}
+export function studentRequestParametersHash(req: Parameters<typeof studentParameters>[0]) {
+  return hash(JSON.stringify({ model: req.model.requestedModel, ...studentParameters(req) }));
+}
+export function studentPayload(req: Request) {
+  return JSON.stringify({ model: req.model.requestedModel, messages: [{ role: "system", content: req.system }, ...req.messages], ...studentParameters(req) });
 }
 function outputBreakdown(bill: Record<string, unknown>, req: Request) {
   const details = bill.completion_tokens_details;

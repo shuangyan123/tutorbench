@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from "node:util";
 import { hash, type Asset } from "./cards.js";
 import { batchCache } from "./cache-summary.js";
 import type { Phase, Probe, ProbeGate } from "./plan.js";
@@ -122,11 +123,16 @@ function checkSeries(store: Store, e: Execution) {
   if (!e.series) return;
   const { id, phase, priorBatchIds } = e.series, c = e.config;
   if (c.budgetUsd !== 2 || c.hardCapUsd !== 2 || e.topUp) invalid("calibration.series_budget");
-  store.bind("calibration-series/" + id, hash(safeJson([c.student, c.prices, e.gitCommit, e.mode])));
+  if ((phase === "G4" ? e.probePlan !== undefined || c.kind !== "calibration" :
+      e.probePlan?.gate !== (phase === "G2" ? "key" : "rest"))) invalid("calibration.series_phase");
+  // 保留旧账本绑定；新系列将推理配置写入同一共享预算的身份。
+  store.bind("calibration-series/" + id, hash(safeJson([c.student, c.prices, e.gitCommit, e.mode,
+    ...(c.studentInference ? [c.studentInference] : [])])));
   const others = store.batches().filter(b => b.batchId !== c.batchId);
   const priorPhases = phase === "G4" ? ["G2", "G3"] : phase === "G3" ? ["G2"] : [];
   if (others.length !== priorPhases.length || priorBatchIds.length !== priorPhases.length || priorPhases.some((p, i) =>
-    !others.some(b => b.phase === p && b.batchId === priorBatchIds[i] && b.status === "complete" && b.calibrationSeries === id)))
+    !others.some(b => b.phase === p && b.batchId === priorBatchIds[i] && b.status === "complete" && b.calibrationSeries === id &&
+      isDeepStrictEqual(b.studentInference, c.studentInference))))
     invalid("calibration.series_order");
 }
 function recoverable(store: Store, batchId: string, r: RunRecord | null) {
@@ -141,7 +147,7 @@ export function runBatch(store: Store, e: Execution) {
       c.tutors.length || !e.probePlan.probes.length))) invalid("calibration.probe_plan");
   const diagnostic = e.probePlan?.gate === "diagnostic";
   if (c.studentInference) {
-    if (!diagnostic) invalid("calibration.studentInference_scope");
+    if (!diagnostic && (!e.series || e.assets.some(a => !a.protocol))) invalid("calibration.studentInference_scope");
     readStudentInference(c.studentInference, "calibration.studentInference");
   }
   if (diagnostic && (e.series || e.topUp || c.budgetUsd <= 0 || c.hardCapUsd !== c.budgetUsd))
@@ -149,8 +155,10 @@ export function runBatch(store: Store, e: Execution) {
   if (e.mode && e.assets.some(a => a.protocol) && !e.series && !diagnostic) invalid("calibration.series_required");
   const now = e.now ?? (() => new Date().toISOString());
   store.transaction(() => {
-    if (store.batches().some(b => diagnostic ? b.batchId !== c.batchId || b.gate !== "diagnostic" : b.gate === "diagnostic"))
+    const batches = store.batches();
+    if (batches.some(b => diagnostic ? b.batchId !== c.batchId || b.gate !== "diagnostic" : b.gate === "diagnostic"))
       invalid("calibration.diagnostic_output");
+    if (batches.some(b => !!b.calibrationSeries !== !!e.series)) invalid("calibration.series_output");
     checkSeries(store, e);
     bindVersions(store, e, spec.tutors);
     if (e.mode) store.liveGuard(c.batchId);
