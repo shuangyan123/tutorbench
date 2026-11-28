@@ -1,0 +1,550 @@
+{
+  "schemaVersion": 1,
+  "id": "exam-science-source-reconciliation-2022-2026-v0.1",
+  "status": "provenance_crosswalk_only_not_content_verified",
+  "source": {
+    "repository": "qingshuo/China-Gaokao-Papers-Collection",
+    "revision": "b33ea3dd5427afa963a944808d3a6c0183fc454e",
+    "path": "data/exams.csv",
+    "gitBlobSha": "38d188f067065c597ad1e3903dd4130b10d653e2"
+  },
+  "existingTutorBench": {
+    "catalog": "fixtures/research/exam-source-expansion-2022-2026-v0.1.json",
+    "catalogGitBlobSha": "5b1b4661a18cb8595845e33434c9ea7e8fbd6be2",
+    "mathGaokaoEditions": 36
+  },
+  "sample": {
+    "candidateRows": 217,
+    "rowsWithSha256": 216,
+    "identicalSha256AcrossCandidateRecords": 0,
+    "coarseIdentityCollisionGroups": 18,
+    "mathCandidateRows": 51,
+    "mathExactSourcePathMatches": 25,
+    "mathUnresolvedRows": 26
+  },
+  "boundaries": [
+    "Source-path matches establish a relationship between metadata, not identical file bytes: upstream uses mutable /main/ while TutorBench catalog is Git-commit pinned.",
+    "A coarse identity collision is not evidence of duplicate or identical exam editions.",
+    "Different sha256 values do not prove different examination questions or papers (recompression, page annotations or version changes).",
+    "No paper statement, figure, answer key or legal redistributability is certified by this reconciliation."
+  ],
+  "mathExactSourcePathMatches": [
+    {
+      "upstreamRecordId": "deekur-2022-24-math",
+      "tutorBenchPaperId": "gaokao-2022-shanghai",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022上海.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2022-25-math",
+      "tutorBenchPaperId": "gaokao-2022-national-b-humanities",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022全国乙文(河南,山西,江西,安徽,陕西,甘肃,青海,内蒙古,黑龙江,吉林,.宁夏,新疆).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2022-26-math",
+      "tutorBenchPaperId": "gaokao-2022-national-b-science",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022全国乙理(河南,山西,江西,安徽,陕西,甘肃,青海,内蒙古,黑龙江,吉林,.宁夏,新疆).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2022-27-math",
+      "tutorBenchPaperId": "gaokao-2022-national-a-humanities",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022全国甲文(云南,广西,贵州,西藏,四川).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2022-28-math",
+      "tutorBenchPaperId": "gaokao-2022-national-a-science",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022全国甲理(云南,广西,贵州,西藏,四川).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2022-30-math",
+      "tutorBenchPaperId": "gaokao-2022-tianjin",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022天津.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2022-31-math",
+      "tutorBenchPaperId": "gaokao-2022-new-gaokao-1",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022新高考1(山东,广东,湖南,湖北,河北,江苏,福建).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2022-32-math",
+      "tutorBenchPaperId": "gaokao-2022-new-gaokao-2",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022新高考2(海南,辽宁,重庆).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2022-33-math",
+      "tutorBenchPaperId": "gaokao-2022-zhejiang",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2022/2022浙江.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2024-43-math",
+      "tutorBenchPaperId": "gaokao-2024-shanghai",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2024/2024上海.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2024-44-math",
+      "tutorBenchPaperId": "gaokao-2024-national-humanities",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2024/2024全国文(西藏,四川,内蒙古,陕西,青海,宁夏).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2024-45-math",
+      "tutorBenchPaperId": "gaokao-2024-national-science",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2024/2024全国理(西藏,四川,内蒙古,陕西,青海,宁夏).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2024-46-math",
+      "tutorBenchPaperId": "gaokao-2024-beijing",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2024/2024北京.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2024-47-math",
+      "tutorBenchPaperId": "gaokao-2024-tianjin",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2024/2024天津.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2024-48-math",
+      "tutorBenchPaperId": "gaokao-2024-new-gaokao-1",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2024/2024新高考1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2024-49-math",
+      "tutorBenchPaperId": "gaokao-2024-new-gaokao-2",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2024/2024新高考2(辽宁,重庆,海南,吉林,黑龙江,山西,云南,广西,甘肃,贵州,新疆).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2025-50-math",
+      "tutorBenchPaperId": "gaokao-2025-shanghai",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2025/2025上海.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2025-51-math",
+      "tutorBenchPaperId": "gaokao-2025-national-1",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2025/2025全国1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2025-52-math",
+      "tutorBenchPaperId": "gaokao-2025-national-2",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2025/2025全国2(辽宁,重庆,海南,吉林,黑龙江,山西,云南,广西,甘肃,贵州,新疆,四川,内蒙古,陕西,青海,宁夏,西藏).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2025-54-math",
+      "tutorBenchPaperId": "gaokao-2025-tianjin",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2025/2025天津.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2026-55-math",
+      "tutorBenchPaperId": "gaokao-2026-shanghai",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2026/2026上海.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2026-56-math",
+      "tutorBenchPaperId": "gaokao-2026-national-1",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2026/2026全国1(山东,广东,湖南,湖北,河北,江苏,福建,浙江,河南,江西,安徽).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2026-57-math",
+      "tutorBenchPaperId": "gaokao-2026-national-2",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2026/2026全国2(辽宁,重庆,海南,吉林,黑龙江,山西,云南,广西,甘肃,贵州,新疆,四川,内蒙古,陕西,青海,宁夏,西藏).pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2026-58-math",
+      "tutorBenchPaperId": "gaokao-2026-beijing",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2026/2026北京.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    },
+    {
+      "upstreamRecordId": "deekur-2026-59-math",
+      "tutorBenchPaperId": "gaokao-2026-tianjin",
+      "sourceRepository": "deekur/gaokaomath",
+      "upstreamSourcePath": "普通高考/2026/2026天津.pdf",
+      "relation": "exact_source_path_match_only",
+      "artifactHashCompared": false
+    }
+  ],
+  "mathUnresolved": [
+    {
+      "upstreamRecordId": "2024-sh-spring-math-51jiaoxi",
+      "year": 2024,
+      "title": "2024年上海市普通高校春季招生统一文化考试数学（候选外部原卷）",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "2024-全国-数学-新高考I卷",
+      "year": 2024,
+      "title": "2024年普通高等学校招生全国统一考试数学（新高考I卷）",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "2025-全国-数学-全国一卷",
+      "year": 2025,
+      "title": "2025年高考数学全国一卷",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "2025-全国-数学-全国二卷",
+      "year": 2025,
+      "title": "2025年高考数学全国二卷",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "2025-BJ-数学-地方卷",
+      "year": 2025,
+      "title": "2025年北京高考数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "2026-全国-数学-全国一卷",
+      "year": 2026,
+      "title": "2026年高考数学全国一卷",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2022-29-math",
+      "year": 2022,
+      "title": "2022年普通高等学校招生全国统一考试（北京卷）数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-34-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生考试（上海卷）数学（秋考）",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-35-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生全国统一考试（全国乙卷）文科数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-36-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生全国统一考试（全国乙卷）理科数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-37-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生全国统一考试（全国甲卷）文科数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-38-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生全国统一考试（全国甲卷）理科数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-39-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生全国统一考试（北京卷）数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-40-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生全国统一考试（天津卷）数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-41-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生全国统一考试（新课标Ⅰ卷）数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "deekur-2023-42-math",
+      "year": 2023,
+      "title": "2023年普通高等学校招生全国统一考试（新课标Ⅱ卷）数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2022-数学-a016ca0bddd7",
+      "year": 2022,
+      "title": "2022年新高考全国II卷数学试题",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2022-数学-d00e85ebf75c",
+      "year": 2022,
+      "title": "2022年全国高考乙卷数学（理）试题（原卷版）",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2022-数学-193147c003da",
+      "year": 2022,
+      "title": "（网络收集版）2022年全国乙卷数学（文科）高考真题文档版（原卷）",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2022-数学-09dfad0d449a",
+      "year": 2022,
+      "title": "（网络收集版）2022年新高考浙江数学高考真题文档版（原卷）",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2024-数学-d7ffc6dab1af",
+      "year": 2024,
+      "title": "天津数学-试题-p",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2024-数学-3056423645c4",
+      "year": 2024,
+      "title": "2024年普通高等学校招生全国统一考试数学（新课标Ⅰ卷）",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2026-数学-ef8099d5f60a",
+      "year": 2026,
+      "title": "数学一卷",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2026-数学-b4cda6722b5f",
+      "year": 2026,
+      "title": "数学（北京卷）",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2026-数学-66df94475d50",
+      "year": 2026,
+      "title": "上海数学",
+      "reason": "not_a_deekur_main_source_path"
+    },
+    {
+      "upstreamRecordId": "temp-2026-数学-9c9cb50bcd0c",
+      "year": 2026,
+      "title": "数学天津卷",
+      "reason": "not_a_deekur_main_source_path"
+    }
+  ],
+  "coarseIdentityCollisions": [
+    {
+      "coarseIdentity": "2022|数学|普通高考|全国",
+      "recordIds": [
+        "deekur-2022-25-math",
+        "deekur-2022-26-math",
+        "deekur-2022-27-math",
+        "deekur-2022-28-math",
+        "deekur-2022-31-math",
+        "deekur-2022-32-math",
+        "deekur-2022-33-math"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2024|数学|普通高考|全国",
+      "recordIds": [
+        "deekur-2024-44-math",
+        "deekur-2024-45-math",
+        "deekur-2024-48-math",
+        "deekur-2024-49-math"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2025|数学|普通高考|全国",
+      "recordIds": [
+        "deekur-2025-51-math",
+        "deekur-2025-52-math"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2026|数学|普通高考|全国",
+      "recordIds": [
+        "deekur-2026-56-math",
+        "deekur-2026-57-math"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2024|物理|普通高考|全国",
+      "recordIds": [
+        "deekur-2024-physics-002",
+        "deekur-2024-physics-009",
+        "deekur-2024-physics-015",
+        "deekur-2024-physics-022"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2024|物理|普通高考|ZJ",
+      "recordIds": [
+        "deekur-2024-physics-013",
+        "deekur-2024-physics-014"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2025|物理|普通高考|全国",
+      "recordIds": [
+        "deekur-2025-physics-025",
+        "deekur-2025-physics-039",
+        "deekur-2025-physics-046",
+        "deekur-2025-physics-047"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2025|物理|普通高考|ZJ",
+      "recordIds": [
+        "deekur-2025-physics-037",
+        "deekur-2025-physics-038"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2026|物理|普通高考|ZJ",
+      "recordIds": [
+        "deekur-2026-physics-056",
+        "deekur-2026-physics-057"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2026|物理|普通高考|全国",
+      "recordIds": [
+        "deekur-2026-physics-061",
+        "deekur-2026-physics-062"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2022|物理|普通高考|全国",
+      "recordIds": [
+        "deekur-物理-2022-071",
+        "deekur-物理-2022-072"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2022|物理|普通高考|ZJ",
+      "recordIds": [
+        "deekur-物理-2022-079",
+        "deekur-物理-2022-080"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2023|物理|普通高考|全国",
+      "recordIds": [
+        "deekur-物理-2023-088",
+        "deekur-物理-2023-089",
+        "deekur-物理-2023-094"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2023|物理|普通高考|ZJ",
+      "recordIds": [
+        "deekur-物理-2023-097",
+        "deekur-物理-2023-098"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2022|数学|原卷|全国",
+      "recordIds": [
+        "temp-2022-数学-a016ca0bddd7",
+        "temp-2022-数学-d00e85ebf75c",
+        "temp-2022-数学-193147c003da"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2024|化学|原卷|ZJ",
+      "recordIds": [
+        "temp-2024-化学-69be3d0549c1",
+        "temp-2024-化学-1e0f3d143092"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2024|物理|原卷|全国",
+      "recordIds": [
+        "temp-2024-物理-8e8411cb9231",
+        "temp-2024-物理-85388ff8cf28"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    },
+    {
+      "coarseIdentity": "2025|物理|原卷|FJ",
+      "recordIds": [
+        "temp-2025-物理-52459f22cce5",
+        "temp-2025-物理-2485405e092c"
+      ],
+      "disposition": "ambiguous_coarse_key_do_not_deduplicate"
+    }
+  ]
+}
