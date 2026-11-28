@@ -4,15 +4,20 @@ import { articleHeadingId } from "../site/pages/blog.js";
 import { ARROGANCE_ESSAY } from "./arrogance-essay.js";
 import { BEYOND_WINNING_ESSAY } from "./beyond-winning-essay.js";
 import { LEARNING_ACCESS_ESSAY } from "./learning-access-essay.js";
+import { SEEKING_TRUTH_ESSAY } from "./seeking-truth-essay.js";
+import { TECH_FEAR_ESSAY } from "./tech-fear-essay.js";
+import { WHY_LEARN_ESSAY } from "./why-learn-essay.js";
 import { withSecurityPolicy } from "./security-policy.js";
 
 /**
- * The Journal essays written after the generated site's four: "After You’ve Beaten Everyone, Then What?",
- * "Arrogance Is Not What You Need" and "Why Good Learning Resources Fail to Reach the People Who Need Them".
+ * The Journal essays written after the generated site's four: the three of 2026-11-28 ("Why Learn When AI Is
+ * Smarter Than Us?", "Why Does Technological Progress Make Us Fear the Future?", "Are We Seeking Truth, or
+ * Trying to Prove Ourselves Right?"), "After You’ve Beaten Everyone, Then What?", "Arrogance Is Not What You
+ * Need" and "Why Good Learning Resources Fail to Reach the People Who Need Them".
  *
  * Their pages are built like every other essay, by the Spectrum Journal generator
- * (website/prototypes/spectrum/tools/build-journal.mjs, from BEYOND_WINNING_ESSAY, ARROGANCE_ESSAY and
- * LEARNING_ACCESS_ESSAY).
+ * (website/prototypes/spectrum/tools/build-journal.mjs, from WHY_LEARN_ESSAY, TECH_FEAR_ESSAY,
+ * SEEKING_TRUTH_ESSAY, BEYOND_WINNING_ESSAY, ARROGANCE_ESSAY and LEARNING_ACCESS_ESSAY).
  * The generated site has no page for them, so this module supplies the search and sharing metadata the
  * Spectrum install takes from that site for each route, and after the install writes their sitemap
  * entries and the redirects from the five short essays the learning-access essay replaced.
@@ -25,6 +30,9 @@ export interface LearningAccessOptions {
 export const LEARNING_ACCESS_SLUG = LEARNING_ACCESS_ESSAY.slug;
 export const ARROGANCE_SLUG = ARROGANCE_ESSAY.slug;
 export const BEYOND_WINNING_SLUG = BEYOND_WINNING_ESSAY.slug;
+export const WHY_LEARN_SLUG = WHY_LEARN_ESSAY.slug;
+export const TECH_FEAR_SLUG = TECH_FEAR_ESSAY.slug;
+export const SEEKING_TRUTH_SLUG = SEEKING_TRUTH_ESSAY.slug;
 
 interface JournalEssay {
   slug: string;
@@ -37,6 +45,9 @@ interface JournalEssay {
 
 /** Newest first. */
 const ESSAYS: readonly JournalEssay[] = [
+  { slug: WHY_LEARN_SLUG, published: WHY_LEARN_ESSAY.published, image: "assets/journal/lens.webp", en: WHY_LEARN_ESSAY.en, zh: WHY_LEARN_ESSAY.zh },
+  { slug: TECH_FEAR_SLUG, published: TECH_FEAR_ESSAY.published, image: "assets/journal/timeclock.webp", en: TECH_FEAR_ESSAY.en, zh: TECH_FEAR_ESSAY.zh },
+  { slug: SEEKING_TRUTH_SLUG, published: SEEKING_TRUTH_ESSAY.published, image: "assets/journal/compass.webp", en: SEEKING_TRUTH_ESSAY.en, zh: SEEKING_TRUTH_ESSAY.zh },
   { slug: BEYOND_WINNING_SLUG, published: BEYOND_WINNING_ESSAY.published, image: "assets/journal/podium.webp", en: BEYOND_WINNING_ESSAY.en, zh: BEYOND_WINNING_ESSAY.zh },
   { slug: ARROGANCE_SLUG, published: ARROGANCE_ESSAY.published, image: "assets/journal/piano.webp", en: ARROGANCE_ESSAY.en, zh: ARROGANCE_ESSAY.zh },
   { slug: LEARNING_ACCESS_SLUG, published: "2026-11-03", image: "assets/journal/ladder.webp", en: LEARNING_ACCESS_ESSAY.en, zh: LEARNING_ACCESS_ESSAY.zh },
@@ -69,6 +80,17 @@ export function arroganceSectionId(n: number): string {
 export function beyondWinningSectionId(n: number): string {
   const heading = BEYOND_WINNING_ESSAY.en.sections[n - 1]?.heading;
   if (heading === undefined) throw new Error(`The essay has no section ${n}`);
+  return articleHeadingId(heading);
+}
+
+const SECTIONED: ReadonlyMap<string, { en: { sections: readonly { heading: string }[] } }> = new Map([
+  [WHY_LEARN_SLUG, WHY_LEARN_ESSAY], [TECH_FEAR_SLUG, TECH_FEAR_ESSAY], [SEEKING_TRUTH_SLUG, SEEKING_TRUTH_ESSAY],
+]);
+
+/** The anchor of section `n` (1-based) of one of the essays of 2026-11-28, by its slug. */
+export function journalEssaySectionId(slug: string, n: number): string {
+  const heading = SECTIONED.get(slug)?.en.sections[n - 1]?.heading;
+  if (heading === undefined) throw new Error(`The essay ${slug} has no section ${n}`);
   return articleHeadingId(heading);
 }
 
