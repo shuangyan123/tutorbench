@@ -8,10 +8,15 @@
 // a real folder grows across runner versions: with --legacy-runner the batches before 2026-11-25 are written by a record
 // schema v2 runner, with --v3-runner the batches of 2026-11-25 and 2026-11-26 up to 05:00 by a record schema v3 runner,
 // with --v5-runner the v5 calibration batches of 2026-11-26, and the newest runner then adds the v6 batches of 2026-11-27.
+// Last, a runner with the student inference settings (--inference-runner) writes two diagnostic probe batches of
+// 2026-11-28 that differ only in how the simulated student is asked to answer: thinking off (no settings, the historical
+// request) and thinking on at effort high. Each keeps a ledger of its own, as the runner requires of a diagnostic batch.
 // Usage (needs a build that contains the premium runner, src/premium/*):
-//   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--v5-runner <dir>] [--v3-runner <dir>] [--legacy-runner <dir>]
-//     [--checker <file>] [--bundle <file>] [--out <dir>]
+//   node tools/premium-dashboard/sample/generate-sample.mjs [--runner <dir>] [--inference-runner <dir>] [--v5-runner <dir>] [--v3-runner <dir>]
+//     [--legacy-runner <dir>] [--checker <file>] [--bundle <file>] [--out <dir>]
 // --runner         folder with the built premium runner modules, record schema v6 (default dist/src/premium)
+// --inference-runner  a record schema v6 build with the student inference settings (studentInference, reasoning and
+//                  visible output tokens per call) for the two inference batches (default: --runner)
 // --v5-runner      optional: a record schema v5 build for the v5 calibration batches (default: --runner)
 // --v3-runner      optional: a record schema v3 build for the batches of that era (default: --runner)
 // --legacy-runner  optional: a record schema v2 build for the history batches (default: the v3 runner)
@@ -21,16 +26,16 @@
 //                  The v6 batches need no checker: the real checker v3 is written for one private card, so the generator
 //                  writes their v3 reports, content reviews and gate result itself, in the shapes the checker writes.
 // --bundle  the sample the dashboard loads (default tools/premium-dashboard/sample/sample-data.js)
-// --out     optional: also write the runner's folder layout (index.jsonl, batches/, records/, reports, expectations, the probe
-//           file, content reviews and the gate result) there;
-//           must be new or empty
+// --out     optional: also write the runner's folder layout there: runs/ (index.jsonl, batches/, records/, reports,
+//           expectations, the probe file, content reviews and the gate result) and one runs folder per inference batch
+//           (inference-none/, inference-high/), side by side, the way two diagnostic ledgers sit; must be new or empty
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { pathToFileURL } from "node:url";
 
-const { values } = parseArgs({ options: { runner: { type: "string" }, "v5-runner": { type: "string" }, "v3-runner": { type: "string" }, "legacy-runner": { type: "string" }, checker: { type: "string" },
+const { values } = parseArgs({ options: { runner: { type: "string" }, "inference-runner": { type: "string" }, "v5-runner": { type: "string" }, "v3-runner": { type: "string" }, "legacy-runner": { type: "string" }, checker: { type: "string" },
   out: { type: "string" }, bundle: { type: "string" } } });
 const bundlePath = resolve(values.bundle ?? "tools/premium-dashboard/sample/sample-data.js");
 const outDir = values.out ? resolve(values.out) : null;
@@ -40,10 +45,13 @@ async function runnerAt(dir) {
     await Promise.all(["cards", "batch", "provider", "replay", "store"].map(load));
   const checkCalibration = existsSync(join(dir, "check-calibration.js")) ? (await load("check-calibration")).checkCalibration : null;
   const loadProbes = existsSync(join(dir, "plan.js")) && existsSync(join(dir, "protocol.js")) ? (await load("plan")).loadProbes : null;
-  return { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store, TransportError, checkCalibration, loadProbes };
+  const { inferenceUsage = null } = await load("provider");
+  return { hash, loadCards, runBatch, rejudge, reconcile, configSchema, panel, replayProvider, Store, TransportError, checkCalibration, loadProbes, inferenceUsage };
 }
 const newest = await runnerAt(resolve(values.runner ?? "dist/src/premium"));
 if (!newest.loadProbes) throw new Error("--runner must be a build with record schema v6 (src/premium/plan, src/premium/protocol)");
+const inference = values["inference-runner"] ? await runnerAt(resolve(values["inference-runner"])) : newest;
+if (!inference.inferenceUsage) throw new Error("--inference-runner must be a build with the student inference settings (studentInference in src/premium/provider)");
 const v5 = values["v5-runner"] ? await runnerAt(resolve(values["v5-runner"])) : newest;
 if (!v5.checkCalibration) throw new Error("--v5-runner must be a build with record schema v5 (src/premium/check-calibration)");
 const current = values["v3-runner"] ? await runnerAt(resolve(values["v3-runner"])) : newest;
@@ -612,7 +620,9 @@ function probesFile(R) {
 // Twists change one student position: a first reply the runner sends back, or a change to the reply it keeps. A twist
 // applies at its own message (name@n overrides it); in a probe, at the probe's target.
 const TWIST_AT = { dropped: 2, said: 2, selfWritten: 2, echo: 2, noHint: 3, noMistake: 3, offCard: 3, leaveEarly: 3, stageJump: 3, stays: 4 };
-function beadsTape(id, lang, twists, fp) {
+// With thinking on, every student frame also carries the reasoning tokens inside its billed output and the visible rest,
+// and takes longer; with thinking off the frame has neither count, as the historical request records none.
+function beadsTape(id, lang, twists, fp, thinking = false) {
   const probe = PROBES.find(p => p.probeId === id);
   const script = probe ? probe.tape : id === "calib-beads-guide" ? "guide" : "vague";
   const positions = probe ? [probe.target] : script === "guide" ? [2, 3, 4, 5] : [2, 3, 4];
@@ -623,8 +633,10 @@ function beadsTape(id, lang, twists, fp) {
   const stu = (text, finishReason = "stop") => {
     calls++;
     const input = 1700 + 150 * calls, hit = Math.min(input - 64, 1536 + 128 * (calls - 1));
-    learner.push({ text, resolvedModel: LEARNER.pinnedVersion, system_fingerprint: fp, finishReason, latencyMs: 640 + 37 * calls,
-      usage: { inputTokens: input, outputTokens: 30 + (calls % 4) * 7, cacheHitTokens: hit, cacheMissTokens: input - hit } });
+    const visible = 30 + (calls % 4) * 7, reasoning = thinking ? 140 + ((calls * 53 + text.length) % 9) * 31 : 0;
+    learner.push({ text, resolvedModel: LEARNER.pinnedVersion, system_fingerprint: fp, finishReason, latencyMs: thinking ? 1450 + 7 * reasoning + 41 * calls : 640 + 37 * calls,
+      usage: { inputTokens: input, outputTokens: visible + reasoning, cacheHitTokens: hit, cacheMissTokens: input - hit,
+        ...(thinking ? { reasoningTokens: reasoning, visibleOutputTokens: visible } : {}) } });
   };
   const empty = () => { calls++; empties.push(calls); };
   for (const n of positions) {
@@ -653,13 +665,15 @@ function beadsTape(id, lang, twists, fp) {
   return { tracks, empties };
 }
 // The replay tape cannot hold an empty reply, so the provider answers those calls itself, as a JSON-mode model can.
-function beadsProvider(R, tapes, empties, fp) {
+// With thinking on, an empty reply is one whose whole output went to reasoning.
+function beadsProvider(R, tapes, empties, fp, thinking = false) {
   return job => {
     const key = [job.asset.card.id, job.lang, job.probe?.probeId ?? job.tutor.id].join("/");
     const base = R.replayProvider(tapes[job.repeatIndex], job), at = empties[job.repeatIndex][key] ?? [];
     let n = 0;
     return req => req.role === "student" && at.includes(++n)
-      ? { text: "", finishReason: "stop", latencyMs: 410, usage: { inputTokens: 1880, outputTokens: 0, cacheHitTokens: 1792, cacheMissTokens: 88 },
+      ? { text: "", finishReason: "stop", latencyMs: thinking ? 5230 : 410,
+        usage: { inputTokens: 1880, outputTokens: thinking ? 612 : 0, cacheHitTokens: 1792, cacheMissTokens: 88, ...(thinking ? { reasoningTokens: 612, visibleOutputTokens: 0 } : {}) },
         resolvedModel: LEARNER.pinnedVersion, returnedModel: LEARNER.pinnedVersion, system_fingerprint: fp }
       : base(req);
   };
@@ -858,14 +872,14 @@ function beadsBatch(R, dir, cfg, asset, at, plan, fp, extra = {}) {
   for (let r = 1; r <= cfg.repeats; r++) { tapes[r] = {}; empties[r] = {}; }
   const ids = extra.probes ? extra.probes.map(p => p.en.probeId) : cfg.tutors.map(t => t.id);
   for (const id of ids) for (const lang of cfg.languages) for (let r = 1; r <= cfg.repeats; r++) {
-    const x = beadsTape(id, lang, plan[[id, lang, r].join("/")] ?? [], fp), key = ["synthetic-beads", lang, id].join("/");
+    const x = beadsTape(id, lang, plan[[id, lang, r].join("/")] ?? [], fp, !!extra.thinking), key = ["synthetic-beads", lang, id].join("/");
     tapes[r][key] = x.tracks;
     if (x.empties.length) empties[r][key] = x.empties;
   }
   const store = new R.Store(dir);
   try {
-    withClock(at, () => R.runBatch(store, { config: cfg, assets: [asset], provider: beadsProvider(R, tapes, empties, fp),
-      tapeHash: R.hash(JSON.stringify({ tapes, empties })), gitCommit: "synthetic-fixture", now: clock(at, 2),
+    withClock(at, () => R.runBatch(store, { config: cfg, assets: [asset], provider: beadsProvider(R, tapes, empties, fp, !!extra.thinking),
+      tapeHash: extra.tapeHash ?? R.hash(JSON.stringify({ tapes, empties })), gitCommit: "synthetic-fixture", now: clock(at, 2),
       ...(extra.probes ? { probePlan: { gate: extra.gate, probes: extra.probes } } : {}), ...(extra.series ? { series: extra.series } : {}) }));
   } finally { store.close(); }
 }
@@ -936,6 +950,45 @@ function calibrationV6(work, runs) {
     scope: "Chinese runs read so far; the English runs are still to do", upTo: x => x.lang === "zh-CN" });
   copy(full, r16);
   return { expectations: exp, probes: file, probesRaw: raw, reviews: [review14, review16], gates: [gate] };
+}
+
+// ---------- student inference settings: two diagnostic arms ----------
+// The same three probes, prefixes, scripted history, card and price table, run twice by the inference runner: once with no
+// inference settings (the historical request: thinking off, temperature 0.7, 512 output tokens; the provider reports no
+// reasoning tokens) and once with thinking on at effort high and an 8192-token output cap (no temperature is sent). Each
+// is a diagnostic batch with a ledger of its own, checked as DIAGNOSTIC, with no content review and no gate.
+const ARM_PROBES = ["P-beg", "P-mistake", "P-leave"];
+function inferenceArms(work, v6) {
+  const R = inference, asset = writeBeads(R, join(work, "cards-inference"));
+  const exp = v6.expectations, probes = R.loadProbes(join(work, "probes.json"), exp, asset, "diagnostic", ARM_PROBES);
+  const noMistake = ["zh-CN/1", "zh-CN/2", "zh-CN/4", "zh-CN/5", "en/1", "en/2", "en/3", "en/4", "en/5"].map(k => ["P-mistake/" + k, ["noMistake"]]);
+  const arms = [
+    { name: "inference-none", batchId: "synthetic-probes-diag-none-17", at: "2026-11-28T02:00:00Z", inference: null,
+      purpose: "synthetic diagnostic: three probes with the historical student request (thinking off)",
+      // Without reasoning the learner mostly skips the scripted mistake, and three first replies are sent back.
+      plan: { ...Object.fromEntries(noMistake), "P-beg/zh-CN/2": ["plain"], "P-beg/en/4": ["selfWritten"], "P-leave/zh-CN/3": ["fence"] } },
+    { name: "inference-high", batchId: "synthetic-probes-diag-high-18", at: "2026-11-28T03:00:00Z",
+      inference: { thinking: "enabled", reasoningEffort: "high", maxOutputTokens: 8192 },
+      purpose: "synthetic diagnostic: the same three probes with thinking on at effort high",
+      // One reply spends its whole output on reasoning and shows nothing; one is cut at the length limit. Both are sent back.
+      plan: { "P-leave/zh-CN/2": ["empty"], "P-mistake/en/3": ["truncated"] } },
+  ];
+  return arms.map(arm => {
+    const dir = join(work, arm.name);
+    const cfg = R.configSchema({ batchId: arm.batchId, purpose: arm.purpose, kind: "calibration-probe", languages: ["zh-CN", "en"], repeats: 5,
+      budgetUsd: 1, hardCapUsd: 1, reserveUsd: 0, prices: beadsPrices, servingIdentity: "alias", tutors: [], student: LEARNER, judges: [], alternates: [],
+      judgeConfigVersion: "unscored", ...(arm.inference ? { studentInference: arm.inference } : {}) }, "config");
+    // As on the command line, the batch pins the tutor tape the probes were cut from, the same for both.
+    beadsBatch(R, dir, cfg, asset, arm.at, arm.plan, "fp_synth_c3d2", { gate: "diagnostic", probes, thinking: !!arm.inference, tapeHash: exp.tape.hash });
+    const report = checkV3(dir, arm.batchId, exp, { revision: "3.1.0", diagnostic: true });
+    if (arm.inference) {
+      // As the runner's check does when it is given the settings: it names them and totals the student calls of the records.
+      const records = readdirSync(join(dir, "records")).sort().map(f => JSON.parse(readFileSync(join(dir, "records", f), "utf8")));
+      Object.assign(report, { studentInference: arm.inference, inferenceUsage: R.inferenceUsage(records.flatMap(r => r.calls.filter(c => c.role === "student"))) });
+    }
+    writeFileSync(join(dir, "calibration-report-" + arm.batchId + ".json"), JSON.stringify(report, null, 2) + "\n");
+    return { ...arm, dir, report };
+  });
 }
 
 // ---------- run ----------
@@ -1108,6 +1161,8 @@ try {
   const calibration = calibrationV5(work, runs);
   // Then the newest runner (record schema v6) adds the probe batches and a full calibration with the student protocol.
   const v6 = calibrationV6(work, runs);
+  // Last, the inference runner writes the two inference batches, each into a runs folder of its own.
+  const arms = inferenceArms(work, v6);
   // The runner stamps a reconciliation with the wall clock; pin it so the sample stays deterministic.
   for (const f of readdirSync(join(runs, "batches"))) {
     const path = join(runs, "batches", f), b = JSON.parse(readFileSync(path, "utf8"));
@@ -1115,10 +1170,11 @@ try {
     b.reconciliationHistory = b.reconciliationHistory.map(h => ({ ...h, at: "2026-11-25T11:00:00.000Z" }));
     writeFileSync(path, JSON.stringify(b) + "\n");
   }
-  const readDir = dir => readdirSync(join(runs, dir)).filter(f => f.endsWith(".json")).sort().map(f => JSON.parse(readFileSync(join(runs, dir, f), "utf8")));
-  const reports = readdirSync(runs).filter(f => /^calibration-report-.+\.json$/u.test(f)).sort().map(f => JSON.parse(readFileSync(join(runs, f), "utf8")));
+  const folders = [runs, ...arms.map(a => a.dir)];
+  const readDir = part => folders.flatMap(root => readdirSync(join(root, part)).filter(f => f.endsWith(".json")).sort().map(f => JSON.parse(readFileSync(join(root, part, f), "utf8"))));
+  const reports = folders.flatMap(root => readdirSync(root).filter(f => /^calibration-report-.+\.json$/u.test(f)).sort().map(f => JSON.parse(readFileSync(join(root, f), "utf8"))));
   const sample = { source: "synthetic", note: "Synthetic sample produced by the premium runner in offline replay. Not real results.",
-    index: readFileSync(join(runs, "index.jsonl"), "utf8"), batches: readDir("batches"), records: readDir("records"), reports,
+    index: folders.map(root => readFileSync(join(root, "index.jsonl"), "utf8")).join(""), batches: readDir("batches"), records: readDir("records"), reports,
     expectations: [calibration.expectations, v6.expectations], probes: [v6.probes], reviews: v6.reviews, gates: v6.gates };
   writeFileSync(bundlePath, "// Generated by generate-sample.mjs. Synthetic data only; do not edit by hand.\nglobalThis.PREMIUM_SAMPLE = "
     + JSON.stringify(sample) + ";\n");
@@ -1126,14 +1182,20 @@ try {
     // Never overwrite a folder that already holds something, such as a real runs folder.
     if (existsSync(outDir) && readdirSync(outDir).length) throw new Error("--out must be a new or empty folder: " + outDir);
     mkdirSync(outDir, { recursive: true });
-    for (const part of ["index.jsonl", "batches", "records"]) cpSync(join(runs, part), join(outDir, part), { recursive: true });
-    for (const f of readdirSync(runs).filter(f => /^calibration-report-.+\.json$/u.test(f))) cpSync(join(runs, f), join(outDir, f));
-    // In a real folder the expectations are private and kept elsewhere; the synthetic ones are written beside the runs.
-    writeFileSync(join(outDir, "calibration-expectations.json"), JSON.stringify(calibration.expectations, null, 2) + "\n");
-    writeFileSync(join(outDir, "calibration-expectations.v3.json"), JSON.stringify(v6.expectations, null, 2) + "\n");
-    writeFileSync(join(outDir, "probes.json"), v6.probesRaw);
-    for (const r of v6.reviews) writeFileSync(join(outDir, "content-review-" + r.batchId + ".json"), JSON.stringify(r, null, 2) + "\n");
-    for (const g of v6.gates) writeFileSync(join(outDir, "gate-" + g.scope + ".json"), JSON.stringify(g, null, 2) + "\n");
+    const copyRuns = (from, to) => {
+      mkdirSync(to, { recursive: true });
+      for (const part of ["index.jsonl", "batches", "records"]) cpSync(join(from, part), join(to, part), { recursive: true });
+      for (const f of readdirSync(from).filter(f => /^calibration-report-.+\.json$/u.test(f))) cpSync(join(from, f), join(to, f));
+      // In a real folder the expectations are private and kept elsewhere; the synthetic ones are written beside the runs.
+      writeFileSync(join(to, "calibration-expectations.v3.json"), JSON.stringify(v6.expectations, null, 2) + "\n");
+      writeFileSync(join(to, "probes.json"), v6.probesRaw);
+    };
+    const main = join(outDir, "runs");
+    copyRuns(runs, main);
+    writeFileSync(join(main, "calibration-expectations.json"), JSON.stringify(calibration.expectations, null, 2) + "\n");
+    for (const r of v6.reviews) writeFileSync(join(main, "content-review-" + r.batchId + ".json"), JSON.stringify(r, null, 2) + "\n");
+    for (const g of v6.gates) writeFileSync(join(main, "gate-" + g.scope + ".json"), JSON.stringify(g, null, 2) + "\n");
+    for (const a of arms) copyRuns(a.dir, join(outDir, a.name));
   }
   console.log(JSON.stringify({ bundle: bundlePath, out: outDir, records: sample.records.length, batches: sample.batches.map(b => b.batchId),
     reports: reports.map(r => r.batchId + " " + (r.machineVerdict ? r.machineVerdict + " / " : "") + r.verdict),

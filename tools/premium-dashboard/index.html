@@ -593,6 +593,25 @@ details.prefix-lines .msgs { border-top: 0; }
 .msg.prefix { opacity: .82; }
 .msg.target { box-shadow: inset 2px 0 0 var(--accent); }
 
+/* The simulated student's identity: model, inference settings, code and materials, in one line */
+.ident-row { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.ident { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 0; min-width: 0; }
+.ident-item { display: inline-flex; flex-wrap: wrap; gap: 0 7px; align-items: baseline; min-width: 0; font-size: 13px; color: var(--ink-2); }
+.ident-k { font-size: 11.5px; color: var(--ink-3); }
+.ident-v { overflow-wrap: anywhere; }
+.ident-v.strong { color: var(--ink); font-weight: 600; }
+.rates.usage .rf-num { font-size: 36px; }
+table.usage-table th[scope="row"] { font-weight: 400; color: var(--ink-2); white-space: nowrap; }
+
+/* Compare: two calibration or probe batches */
+.ccmp-diag { margin: 0; padding: 10px 0 10px 14px; border-left: 2px dashed var(--ink-2); font-size: 13.5px; color: var(--ink-2); text-wrap: pretty; }
+.ccmp-diag strong { color: var(--ink); font-weight: 600; }
+.srow.counts { grid-template-columns: minmax(8em, 13em) minmax(0, 1fr) minmax(6em, max-content); }
+.srow.counts:not(.axis-row) .delta { white-space: nowrap; font-size: 15px; }
+.ccmp-sub { display: block; font-size: 11.5px; color: var(--ink-3); }
+.ccmp-unmatched > summary { cursor: pointer; padding: 8px 0; color: var(--ink-2); }
+.ccmp-unmatched ul { margin: 0; padding-left: 18px; }
+
 @media (max-width: 860px) {
   .calib-facts { grid-template-columns: minmax(0, 1fr); }
 }
@@ -665,6 +684,18 @@ details.prefix-lines .msgs { border-top: 0; }
   .pl-lang { display: inline; }
   .kv.integrity dd { margin-bottom: 14px; }
   .bcalls-body { padding-left: 0; }
+  .srow.counts { grid-template-columns: minmax(0, 1fr) max-content; }
+  .srow.counts:not(.axis-row) .delta { font-size: 13.5px; }
+  table.usage-table, table.usage-table tbody { display: block; }
+  table.usage-table thead { display: none; }
+  table.usage-table tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(3.2em, auto); gap: 0 10px; border-bottom: 1px solid var(--rule); padding: 8px 0; }
+  table.usage-table th[scope="row"] { grid-column: 1 / -1; padding: 0 0 2px; border: 0; white-space: normal; }
+  table.usage-table td { border: 0; padding: 0; text-align: left; white-space: nowrap; }
+  table.usage-table td::before { content: attr(data-col); display: block; font-size: 11px; color: var(--ink-3); }
+  .ident-row { display: grid; gap: 10px; }
+  .ident { display: grid; gap: 4px; }
+  .ident-item { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 0 10px; }
+  .rates.usage { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: no-preference) {
   .drawer { animation: slide .18s ease-out; }
@@ -698,6 +729,7 @@ details.prefix-lines .msgs { border-top: 0; }
     <section class="sec" id="attention" aria-labelledby="attention-title"></section>
     <section class="sec" id="runs" aria-labelledby="runs-title"></section>
     <section class="sec" id="compare" aria-labelledby="compare-title"></section>
+    <section class="sec" id="calib-compare" aria-labelledby="ccmp-title"></section>
     <section class="sec" id="ops" aria-labelledby="ops-title"></section>
     <section class="sec" id="calib" aria-labelledby="calib-title"></section>
     <section class="sec" id="calib-groups" aria-labelledby="calib-groups-title"></section>
@@ -705,6 +737,7 @@ details.prefix-lines .msgs { border-top: 0; }
     <section class="sec" id="calib-dev" aria-labelledby="calib-dev-title"></section>
     <section class="sec" id="calib-review" aria-labelledby="calib-review-title"></section>
     <section class="sec" id="calib-int" aria-labelledby="calib-int-title"></section>
+    <section class="sec" id="calib-usage" aria-labelledby="calib-usage-title"></section>
     <section class="sec" id="probe" aria-labelledby="probe-title"></section>
     <section class="sec" id="probe-detail" aria-labelledby="probe-detail-title"></section>
   </main>
@@ -712,7 +745,7 @@ details.prefix-lines .msgs { border-top: 0; }
 <div id="scrim" class="scrim" hidden></div>
 <aside id="drawer" class="drawer" hidden aria-modal="true" role="dialog" aria-labelledby="drawer-title"></aside>
 <div id="tip" class="tip" hidden role="status"></div>
-<div id="drop" class="drop" hidden data-i18n="dropHere">松开鼠标，载入这个 runs 文件夹</div>
+<div id="drop" class="drop" hidden data-i18n="dropHere">松开鼠标，载入 runs 文件夹（可以一次放几个）</div>
 <script src="model.js"></script>
 <script src="pack.js"></script>
 <script src="sample/sample-data.js"></script>
