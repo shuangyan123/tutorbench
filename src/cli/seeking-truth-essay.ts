@@ -16,8 +16,8 @@ export const SEEKING_TRUTH_ESSAY = {
     "description": "Why can an AI breakthrough always be dismissed? The argument over a proof of the Riemann Hypothesis, moving the goalposts, motivated reasoning and the argumentative theory of reasoning, on the difference between rational doubt and refusing evidence, and how AI could be a thinking partner rather than an echo chamber.",
     "boundary": "This is an opinion essay, not a TutorBench result. Its account of the Riemann Hypothesis proof is as of 28 November 2026, while mathematical review is still under way. Motivated reasoning and the argumentative theory are offered as possible explanations, not as a judgement of any commenter’s state of mind.",
     "intro": [
-      "I used to comment online only rarely.",
-      "I had noticed that in many discussions, when one person tries to refute another, the other person seldom reconsiders their view. Instead they look for more reasons to refute back.",
+      "I have never been one to argue in comment sections, and I still rarely do.",
+      "I have noticed that in many discussions, when one person tries to refute another, the other person seldom reconsiders their view. Instead they look for more reasons to refute back.",
       "Both sides put in a great deal of time and the discussion grows ever more heated, yet neither seems to understand the problem any more accurately.",
       "The recent arguments about AI have made me feel this more sharply than ever."
     ],
@@ -124,7 +124,7 @@ export const SEEKING_TRUTH_ESSAY = {
     "description": "AI 的突破为什么总能被否定？从黎曼猜想证明引发的争论、移动球门、动机性推理和推理的论证理论，谈理性的怀疑与拒绝证据的区别，以及 AI 怎样才能成为思想伙伴，而不是回音室。",
     "boundary": "本文是观点文章，不是 TutorBench 的评测结果。关于黎曼猜想证明的描述截至 2026 年 11 月 28 日，数学界的审查仍在进行；动机性推理和推理的论证理论只是可能的解释，不构成对任何评论者心理动机的判断。",
     "intro": [
-      "我以前很少在网络上发表评论。",
+      "我一直很少在评论区与人争论。",
       "因为我发现，在很多讨论中，当一个人试图反驳另一个人时，对方往往并不会因此重新审视自己的观点，而是寻找更多理由反驳回来。",
       "双方投入了大量时间，讨论也变得越来越激烈，但他们对问题的认识似乎并没有变得更加准确。",
       "最近关于 AI 的争论，让我更加明显地感受到了这一点。"
