@@ -636,10 +636,11 @@ const CAL = "synthetic-calibration-13";
 test("v5: the sample's calibration reports load, and the page shows them as written", () => {
   const d = full();
   assert.deepEqual(d.warnings, []);
-  assert.equal(d.reports.size, 6);
-  // Formal batches with a report first, newest first; the diagnostic batch last.
+  assert.equal(d.reports.size, 8);
+  // Formal batches with a report first, newest first; the diagnostic batches last.
   assert.deepEqual(M.calibrationBatches(d).map(b => b.batchId),
-    ["synthetic-calibration-16", "synthetic-probes-g2-14", CAL, "synthetic-dryrun-12", "synthetic-cannot-check-11", "synthetic-drift-10", "synthetic-calibration-05", "synthetic-probes-diag-15"]);
+    ["synthetic-calibration-16", "synthetic-probes-g2-14", CAL, "synthetic-dryrun-12", "synthetic-cannot-check-11", "synthetic-drift-10", "synthetic-calibration-05",
+      "synthetic-probes-diag-high-18", "synthetic-probes-diag-none-17", "synthetic-probes-diag-15"]);
   const rep = d.reports.get(CAL), c = M.calibrationOf(d, CAL);
   assert.equal(c.machine.verdict, rep.verdict);
   assert.equal(c.machine.runsPassing, rep.runs.filter(x => x.pass).length);
@@ -889,7 +890,7 @@ test("v6: reviews, gate outputs and probe files are told apart from reports and 
   // A probe run is a calibration run: never scored, never in a tutor's pass rate.
   const probe = d.runs.find(r => r.batchId === G2);
   assert.equal(M.runView(probe, d.judgeVersions[0], d.latestCard, d.supersededBy).state, "calibration");
-  assert.deepEqual(M.probeBatches(d).map(b => b.batchId), [G2, DIAG], "formal probe batches before diagnostic ones");
+  assert.deepEqual(M.probeBatches(d).map(b => b.batchId), [G2, "synthetic-probes-diag-high-18", "synthetic-probes-diag-none-17", DIAG], "formal probe batches before diagnostic ones");
 });
 
 test("v6: checker v2 and v3 reports read in one shape, and nothing is recomputed", () => {
@@ -1065,4 +1066,152 @@ test("v6: the pack tables: one row per record, per review item and per student m
   assert.ok(msgs.some(r => r.injected_kind === "fixed_test" && r.injected_text));
   // Older batches still export: a v2 report and v5 records.
   assert.ok(M.messageRows(d, CAL).length > 0);
+});
+
+// ---------- inference settings, usage, the calibration comparison and several runs folders ----------
+const HIGH = "synthetic-probes-diag-high-18", NONE = "synthetic-probes-diag-none-17";
+const recsOf = (d, id) => d.runs.filter(r => r.batchId === id);
+
+test("v7: inference settings: studentInference, the older thinking + params, the batch's, and nothing guessed", () => {
+  const fresh = M.inferenceOf({ studentInference: { thinking: "enabled", reasoningEffort: "high", maxOutputTokens: 8192 } });
+  assert.deepEqual({ ...fresh }, { source: "inference", thinking: "enabled", effort: "high", temperature: undefined, maxOutputTokens: 8192 });
+  assert.equal(M.inferenceName(fresh), "High");
+  const older = M.inferenceOf({ thinking: "disabled", params: { temperature: 0.7, maxOutputTokens: 512 } });
+  assert.deepEqual(older, { source: "params", thinking: "disabled", effort: null, temperature: 0.7, maxOutputTokens: 512 });
+  assert.equal(M.inferenceName(older), "None");
+  // Thinking on without an effort is not given one; params alone name no mode; nothing written stays nothing.
+  assert.equal(M.inferenceName(M.inferenceOf({ thinking: "enabled" })), "on");
+  const paramsOnly = M.inferenceOf({ params: { temperature: 0.3 } });
+  assert.equal(paramsOnly.source, "params");
+  assert.equal(M.inferenceName(paramsOnly), null);
+  assert.equal(M.inferenceOf({}).source, "none");
+  assert.equal(M.inferenceOf(undefined).source, "none");
+  // A record that writes nothing takes its batch's studentInference.
+  const fromBatch = M.studentProfile({ student: { requestedModel: "m" } }, { studentInference: { thinking: "enabled", reasoningEffort: "max", maxOutputTokens: 4096, temperature: 0.2 } });
+  assert.equal(fromBatch.source, "inference");
+  assert.equal(fromBatch.effort, "max");
+  assert.equal(fromBatch.temperature, 0.2);
+  // The sample's two arms read as written.
+  const d = all();
+  assert.ok(recsOf(d, HIGH).every(r => M.inferenceName(M.studentProfile(r)) === "High"));
+  assert.ok(recsOf(d, NONE).every(r => { const p = M.studentProfile(r); return p.source === "params" && M.inferenceName(p) === "None" && p.temperature === 0.7; }));
+});
+
+test("v7: the batch, the record and each call agree on inference settings, and the runner's usage totals match the calls", () => {
+  assert.deepEqual(all().warnings, []);
+  const records = clone(SAMPLE.records), batches = clone(SAMPLE.batches), reports = clone(SAMPLE.reports);
+  const r = records.find(x => x.batchId === HIGH);
+  r.calls.find(c => c.role === "student").studentInference.reasoningEffort = "low";
+  batches.find(b => b.batchId === HIGH).inferenceUsage.outputTokens += 1;
+  reports.find(x => x.batchId === HIGH).inferenceUsage.reasoningTokens = null;
+  const w = all({ records, batches, reports }).warnings;
+  assert.deepEqual(w.filter(x => x.code === "inference_mismatch").map(x => x.detail), [r.runId]);
+  assert.deepEqual(w.filter(x => x.code === "inference_usage_differs").map(x => x.detail), [HIGH + " outputTokens", "report " + HIGH + " reasoningTokens"]);
+});
+
+test("v7: usage: not measured is never zero, coverage is counted, and latency is median and P90", () => {
+  const d = all();
+  const none = M.usageOf(recsOf(d, NONE), "student"), high = M.usageOf(recsOf(d, HIGH), "student");
+  assert.equal(none.reasoning.total, null);
+  assert.equal(none.reasoning.known, 0);
+  assert.equal(none.visible.total, null);
+  assert.equal(none.output.known, none.calls);
+  assert.ok(none.output.total > 0);
+  assert.equal(high.reasoning.known, high.calls);
+  assert.equal(high.output.total, high.reasoning.total + high.visible.total, "billed output is reasoning plus visible");
+  assert.equal(high.emptyVisible, 1);
+  assert.equal(high.truncated.total, 1);
+  assert.deepEqual(M.usageDiffers(d.batches.find(b => b.batchId === HIGH).inferenceUsage, recsOf(d, HIGH)), []);
+  // Only some calls carry a count: the total covers those, and the runner's all-or-nothing total is null.
+  const call = (n, usage, latencyMs) => ({ n, role: "student", usage, usd: 0.001, latencyMs });
+  const part = [{ calls: [call(1, { outputTokens: 10, reasoningTokens: 6, visibleOutputTokens: 4 }, 100), call(2, { outputTokens: 5 }, 200)] }];
+  const u = M.usageOf(part, "student");
+  assert.deepEqual(u.reasoning, { total: 6, known: 1 });
+  assert.deepEqual(M.usageDiffers({ reasoningTokens: null, outputTokens: 15, knownReasoningCalls: 1 }, part), []);
+  assert.deepEqual(M.usageDiffers({ reasoningTokens: 6 }, part), ["reasoningTokens"]);
+  const waits = M.usageOf([{ calls: [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000].map((ms, i) => call(i + 1, null, ms)) }], "student").latency;
+  assert.deepEqual(waits, { median: 550, p90: 900, max: 1000, known: 10 });
+  assert.deepEqual(M.usageOf([], "student").latency, { median: null, p90: null, max: null, known: 0 });
+});
+
+test("v7: the calibration comparison lists what differs and matches cells only on one prefix", () => {
+  const d = all();
+  assert.deepEqual(M.defaultCalibrationPair(d), [NONE, HIGH], "same card and probe set, different inference, older as A");
+  const cmp = M.calibrationCompare(d, NONE, HIGH);
+  assert.deepEqual(cmp.changed, ["thinking", "effort", "temperature", "maxOutputTokens"]);
+  assert.equal(cmp.diagnostic, true);
+  assert.equal(cmp.sameModel, true);
+  assert.equal(cmp.unmatched.length, 0);
+  assert.equal(cmp.cells.length, 6);
+  // Counts are the reports', cell by cell.
+  for (const [id, side] of [[NONE, "a"], [HIGH, "b"]]) {
+    const m = M.calibrationOf(d, id).machine;
+    assert.equal(cmp.totals[side].pass, m.runsPassing);
+    assert.equal(cmp.totals[side].runs, m.runs);
+  }
+  assert.deepEqual([cmp.totals.a.pass, cmp.totals.b.pass], [21, 30]);
+  assert.equal(cmp.ratios.usd, cmp.b.usage.usd.total / cmp.a.usage.usd.total);
+  assert.equal(cmp.ratios.output, cmp.b.usage.output.total / cmp.a.usage.output.total);
+  // One run of a cell from another prefix takes the cell out; a cell one side never ran is named.
+  const records = clone(SAMPLE.records);
+  const moved = records.find(r => r.batchId === HIGH && r.probe.probeId === "P-beg" && r.card.lang === "en");
+  moved.probe.prefixHash = "sha256:" + "0".repeat(64);
+  const left = records.filter(r => !(r.batchId === HIGH && r.probe.probeId === "P-leave" && r.card.lang === "zh-CN"));
+  const d2 = M.buildDataset({ records: left, batches: SAMPLE.batches, reports: SAMPLE.reports, expectations: SAMPLE.expectations, probeSets: SAMPLE.probes });
+  const c2 = M.calibrationCompare(d2, NONE, HIGH);
+  assert.deepEqual(c2.unmatched.map(x => [x.key, x.lang, x.reason]), [["P-beg", "en", "prefix_differs"], ["P-leave", "zh-CN", "only_a"]]);
+  assert.equal(c2.cells.length, 4);
+  const rows = M.compareCellRows(c2);
+  for (const row of rows) assert.deepEqual(Object.keys(row), M.COMPARE_CELL_COLUMNS);
+  assert.deepEqual(rows.map(r => r.status), ["matched", "matched", "matched", "matched", "prefix_differs", "only_a"]);
+  assert.equal(rows.find(r => r.status === "only_a").b_runs, "");
+  // Two different models: tokens are not set against each other.
+  const other = clone(SAMPLE.records).map(r => (r.batchId === HIGH ? { ...r, student: { ...r.student, requestedModel: "Other" } } : r));
+  const c3 = M.calibrationCompare(M.buildDataset({ records: other, batches: SAMPLE.batches, reports: SAMPLE.reports }), NONE, HIGH);
+  assert.equal(c3.sameModel, false);
+  assert.equal(c3.ratios.output, null);
+  assert.ok(c3.ratios.usd > 0);
+  assert.ok(c3.changed.includes("studentModel"));
+});
+
+test("v7: several runs folders open together, and each index is checked against its own folder only", () => {
+  const rows = M.parseJsonl(SAMPLE.index), roots = ["none/", "high/"], ids = [NONE, HIGH];
+  const records = SAMPLE.records.filter(r => ids.includes(r.batchId)), recordRoots = records.map(r => roots[ids.indexOf(r.batchId)]);
+  const indexes = roots.map((root, i) => ({ root, rows: rows.filter(x => x.batchId === ids[i]) }));
+  const base = { records, recordRoots, batches: SAMPLE.batches.filter(b => ids.includes(b.batchId)), reports: SAMPLE.reports.filter(r => ids.includes(r.batchId)) };
+  assert.deepEqual(M.buildDataset({ ...base, indexes }).warnings, []);
+  // A record missing from its own folder's index is named, once, even though the other folder's index is complete.
+  const gone = records.find(r => r.batchId === HIGH).runId;
+  const short = [indexes[0], { root: "high/", rows: indexes[1].rows.filter(x => x.runId !== gone) }];
+  assert.deepEqual(M.buildDataset({ ...base, indexes: short }).warnings.map(w => w.code + " " + w.detail), ["record_not_in_index " + gone]);
+});
+
+test("v7: the review pack carries the inference settings and usage, and messages.csv each call's tokens", () => {
+  const d = all();
+  const L = M.packLayers(d, HIGH), u = M.usageOf(recsOf(d, HIGH), "student");
+  assert.equal(L.inference.name, "High");
+  assert.equal(L.inference.temperature, "not sent");
+  assert.equal(L.inference.source, "inference");
+  assert.equal(L.usage.reasoningTokens, u.reasoning.total);
+  assert.equal(L.usage.visibleOutputTokens, u.visible.total);
+  assert.equal(L.usage.emptyVisibleCalls, 1);
+  assert.deepEqual(L.usage.writtenByRunner, d.batches.find(b => b.batchId === HIGH).inferenceUsage);
+  const N = M.packLayers(d, NONE);
+  assert.deepEqual([N.inference.name, N.inference.temperature, N.inference.source], ["None", 0.7, "params"]);
+  assert.equal(N.usage.reasoningTokens, null, "not measured, never 0");
+  assert.equal(N.usage.known.reasoning, 0);
+  const msgs = M.messageRows(d, HIGH);
+  for (const row of msgs) assert.deepEqual(Object.keys(row), M.MESSAGE_COLUMNS);
+  assert.ok(msgs.filter(r => r.row === "prefix").every(r => r.reasoning_tokens === "" && r.latency_ms === ""));
+  assert.ok(msgs.filter(r => r.row === "kept" && r.target).every(r => typeof r.reasoning_tokens === "number" && typeof r.latency_ms === "number"));
+  assert.ok(msgs.some(r => r.visible_output_tokens === 0 && r.reasoning_tokens > 0), "the call that wrote nothing visible is there");
+  assert.ok(M.messageRows(d, NONE).every(r => r.reasoning_tokens === "" && r.visible_output_tokens === ""), "an older record leaves the cells empty, not 0");
+});
+
+test("v7: a tutor setup names its inference mode apart from its parameters", () => {
+  const run = (id, thinking) => record({ runId: id, tutor: { resolvedModel: "m-1" }, student: { resolvedModel: "s-1", thinking, params: { temperature: 0.7 } } });
+  const d = M.buildDataset({ records: [run("a1", "disabled"), run("b1", "enabled")], batches: [batch] });
+  const vs = d.runs.map(r => M.runView(r, V1, d.latestCard));
+  assert.deepEqual(M.compareSetups([vs[0]], [vs[1]]).diff.map(x => x.part), ["studentInference"]);
+  assert.equal(M.setupOf(vs[0]).tutorInference, JSON.stringify({ thinking: null, effort: null }));
 });

@@ -11,7 +11,7 @@ The folder keeps its old name, `tools/premium-dashboard/`, so links and scripts 
 
 Open `index.html` in a browser. No server and no build step are needed; it also works from `file://`.
 
-- **Open runs folder** picks a runs folder (for example `runs/premium/`). You can also drag the folder onto the page.
+- **Open runs folder** picks a runs folder (for example `runs/premium/`). You can also drag the folder onto the page. A folder that holds several runs folders side by side opens them all: each diagnostic batch keeps a ledger of its own, so comparing two of them takes two runs folders. A runs folder is any folder with `records/`, `batches/` or `index.jsonl`; one inside another (an earlier snapshot) is not read, and each `index.jsonl` is checked only against the records of its own folder.
 - **Load synthetic sample** shows the bundled sample in `sample/sample-data.js`.
 
 The files are read inside the browser tab. Nothing is uploaded, and the page makes no network requests (its Content-Security-Policy allows none).
@@ -27,8 +27,8 @@ The page has up to six views. The filters (judge configuration, batch, language,
   - *Plate IV, Did the new version get better*, has one small panel for each tutor with more than one version in view. Each version is a dot at its pass rate with its 95% range as a vertical line. The big number is the newest version against the one before, in percentage points. It is called outside the error range only when the two ranges do not overlap. Versions are compared only on the card versions and languages that every one of them has scored runs on, so no version is judged on easier cards.
   - *Plate V, Needs you*, shows the number of conversations that need review and the number worth a spot check (soft student flags, rewrites, review flags or tied judges).
   - Hovering a specimen, a letter or a version dot gives the detail. Clicking a specimen opens that conversation. Clicking a letter, a tutor name, a version dot or a number opens the matching list.
-- **Compare** puts two setups side by side. Pick A and B; the page first lists what differs (tutor, tutor model, tutor prompt, tutor parameters, simulated student model and parameters, judge configuration, rules version), then compares the pass rates overall and per card and language, only on the card versions and languages both sides scored. A result is read as the effect of a change only when exactly one thing differs (another tutor counts as one change, its model included). When more than one thing differs, the page says the difference cannot be put down to any one of them.
-- **Calibration** appears when a calibration batch (full or probe) is loaded. It is described below.
+- **Compare** puts two setups side by side. Pick A and B; the page first lists what differs (tutor, tutor model, tutor prompt, tutor parameters, tutor inference, simulated student model, parameters and inference, judge configuration, rules version; inference is the thinking mode and effort, apart from the parameters), then compares the pass rates overall and per card and language, only on the card versions and languages both sides scored. A result is read as the effect of a change only when exactly one thing differs (another tutor counts as one change, its model included). When more than one thing differs, the page says the difference cannot be put down to any one of them.
+- **Calibration** appears when a calibration batch (full or probe) is loaded. It is described below. With two or more calibration or probe batches loaded, Compare also holds the **calibration comparison**, described below.
 - **Probes** appears when a single-step probe batch (`kind: "calibration-probe"`) is loaded. It is described below.
 - **All conversations** is the full list, with state tabs and the run drawer. The drawer shows the conversation's own specimen, large; clicking a leaf scrolls to that tutor turn. Tabs for superseded and calibration runs appear when such runs are loaded. A toggle keeps only the runs with a transport error.
 - **Run checks** shows judge disagreement and the batches. A batch's spend is the runner's price-table estimate. The row also shows the hard cap, any budget top-up, and each reconciled provider invoice with its difference from the estimate. It lists each tutor's own prompt (name, version, start of its hash) and any parameters other than the defaults. When a model-version drift stops a batch and the same call also used up the budget, the drift is the status and the financial stop (`budgetStopReason`) is shown under it. Each batch also has a **calls** block (record schema v4 and later), described below.
@@ -94,7 +94,9 @@ Beside the layers are the pass criteria and the rates:
 - **Spend** is the batch's estimated spend and status as the report states them.
 - With checker v3: **accepted at first try**, per target message, and the **observed output formats** (`json`, `fenced_json`, `text`, `empty`, `truncated`).
 
-Five plates follow:
+Above the class strip, one line gives the experiment's identity for the simulated student: the model asked for and returned, the **inference settings** (for example *reasoning High · max output 8192 · temperature not sent*), the fingerprints, the runner commit, the checker version, the card and protocol with their hashes, and the probe set. With another calibration batch loaded, a link opens the calibration comparison on this batch.
+
+Six plates follow:
 
 - *Plate I, Groups* has one row per scripted tutor, or per probe with its purpose, and one column per language. Each cell holds the report's passing runs out of the group's runs, its pass mark, the count after review when a gate file gives one, and one student specimen per adopted run (see below). Optional groups are labelled and never fail the batch. Superseded runs are counted under the cell, not drawn.
 - *Plate II, Sent back* is a heatmap of the student replies the runner sent back: one row per rule, grouped by family (format, protocol, state), one column per student message. A darker cell means more. Clicking a cell lists the runs and attempts behind it, and each one opens the drawer at that message. Replies from superseded runs are left out and counted under the plate.
@@ -102,7 +104,23 @@ Five plates follow:
 - *Plate IV, Content review* crosses the checker's label (auto pass, needs review, auto fail) with the reviewer's decision (pass, fail, undecided). Clicking a cell lists its items with the run, the message, the question, the checker's and the reviewer's quotes, the note, and the result by the rules; overrides and undecided fails are marked. Decisions in the review file that match no item in the report are listed under the plate.
 - *Plate V, Integrity* lists the report's cohort errors, adopted runs the report does not mention, superseded runs and what replaced them, transport errors (with a link to the calls block under Run checks), the serving identity and fingerprints, how much of the learner's cache split is known, the batch's status history, the gate and phase, the calibration series and earlier batches, the requested output format, the versions the report pins, and the files the page read and did not read. The review-pack export is here too.
 
-With more than one calibration batch loaded, a select picks the batch. Formal batches come first, diagnostic ones last.
+- *Plate VI, Simulated student usage* gives the billed output tokens with the reasoning and visible part inside them, the estimated cost (with the cost per accepted position, from the report's position count), the median, P90 and longest call latency, then the calls, input tokens with the cache split, truncated calls and calls that spent reasoning tokens and wrote nothing visible. Every count says how many calls carry it. A count no call carries is *not measured*, never 0. When the batch or its report has the runner's own totals (`inferenceUsage`), they sit beside the page's with whether they agree; a reconciled invoice is listed too.
+
+With more than one calibration batch loaded, a select picks the batch. It names each batch's inference setting. Formal batches come first, diagnostic ones last.
+
+### Inference settings
+
+How the simulated student was asked to answer is read from the record's `student.studentInference` (`thinking`, `reasoningEffort`, `maxOutputTokens`, `temperature` when it was sent), else the batch's `studentInference`, else, for older records, `student.thinking` with `student.params` (temperature and output cap). Thinking off is *None*; thinking on is its effort, and *effort unknown* when none was written. Nothing is filled in: a temperature that was not sent says so, and an older record says what it does not have. The batch, the record and each student call must give the same settings; when they do not, the page warns and shows them as written.
+
+## Calibration comparison
+
+Under Compare, pick two calibration or probe batches as A and B (by default the newest two of one card and probe set whose inference settings differ, older as A).
+
+- A note at the top names each side's class. When either side is diagnostic it says that a diagnostic comparison is for choosing a setup and never stands in for a formal gate. Formal and diagnostic batches can sit side by side, but never count toward one gate.
+- **What differs**, part by part, the differing ones first: thinking, effort, temperature and output cap apart, then the model asked for and returned, the fingerprint, output format, runner commit, checker version, card, protocol, student prompt hashes, rules version, probe set, tutor replay hash, price table and the versions the report pins. The page counts the changes and says when the difference cannot be put down to any one of them, and says so when both sides used exactly the same inference settings.
+- **Probes × languages**: only the cells (a probe, or a scripted tutor, in one language) both sides ran from the same fixed prefix hash. Each shows A and B on a 0–100% line and the machine passes as counts, A → B, with any rewrites. The counts come from each batch's checker report. A cell holds a few repeats, so the page gives counts and calls no winner. Cells that do not match are listed with the reason: only one side ran it, or the prefixes differ.
+- **Simulated student usage**: calls, billed output, reasoning and visible tokens, truncations, calls with nothing visible, estimated cost, cost per accepted position, median and P90 latency, with B ÷ A for cost, latency and billed output. Token counts are set against each other only when both sides asked the same model.
+- **Export comparison** builds `compare-<A>-vs-<B>.zip` in the tab: `compare-<A>-vs-<B>.json` (schema `tutorbench.observatory-calibration-compare` v1: both sides' class, machine verdict, inference settings and usage, every part, cell and ratio, and the rules), `compare-cells.csv` (one row per cell, matched or not), a README and SHA-256 sums.
 
 ### How to read a student specimen
 
@@ -133,9 +151,9 @@ For record schema v4 and later the drawer also shows:
 - under a line that was sent back, **each rejected draft** with its call, the rules that rejected it and its text (parsed when it is JSON, raw when it is not), then the accepted reply marked with its call. In a discarded attempt the last draft is marked as never accepted.
 - the checker's lines for that message, copied from the report, and the checker's whole-run lines above the transcript
 - the rejected replies counted by rule in the student checks
-- a **calls** table with each call's role, model asked for and returned, fingerprint, tokens, cache split, cost (estimated or charged at its reservation), retry wait and error
+- a **calls** table with each call's role, model asked for and returned, fingerprint, tokens, the reasoning and visible part of the output (*not measured* when the call has neither), cache split, cost (estimated or charged at its reservation), latency, finish reason with *truncated* and *nothing visible* marks, retry wait and error
 
-For a calibration run the drawer opens with the checker's result for that run and a large student specimen; clicking a leaf scrolls to that message.
+For a calibration run the drawer opens with the checker's result for that run and a large student specimen; clicking a leaf scrolls to that message. Its header names the simulated student's model, inference settings and runner commit.
 
 For record schema v6 and checker v3 it also shows:
 
@@ -145,11 +163,12 @@ For record schema v6 and checker v3 it also shows:
 
 ## The calls block under Run checks
 
-Each batch has a folded block (it says so when its records are older than v4) with four small tables:
+Each batch has a folded block (it says so when its records are older than v4) with five small tables:
 
 - **Model identity**: per role, the model asked for, the model returned and when the calls were made, then the batch's serving identity (`pinned`, `alias` or not recorded) and its evidence when the batch has some.
 - **Fingerprints** of the role under test (the student in a calibration batch, the tutor otherwise), each with how many conversations it was in, adopted and superseded. A second fingerprint is flagged. A missing fingerprint is shown as *none returned*, not hidden.
 - **Cache**: per model, how many calls have a known hit and miss split out of all its calls, the hit and miss tokens and the hit rate over those calls only, and the batch's own summary as written. A partial split is never read as the whole. Scripted models with no input are named under the table instead of shown as zero.
+- **Usage** of the role under test: billed output, reasoning and visible tokens, truncations, estimated cost, median and P90 latency, each with how many calls carry it.
 - **Transport**: each call that ended in a transport error and each retry that then succeeded: its run and call number, role, error, the wait before the retry, what it was charged (at its reservation when the call failed), and what became of the run. A run that was restarted links to the run that replaced it.
 
 ## Review pack
@@ -168,8 +187,8 @@ Each batch has a folded block (it says so when its records are older than v4) wi
 | `index.jsonl` | Only this batch's lines, each exactly as it was |
 | `review-index.csv` | One row per record, made by the page: the batch's class, whether the record is adopted or superseded, probe, tutor, language, repeat, the checker's result, findings and extra rewrites copied from the report, its review items (how many need review, auto fail, were decided fail, override the machine, are pending), status, end, rejected replies by rule, attempts and how they stopped, student calls, transport errors, fingerprints, the prefix hash, the restart links and the record's path |
 | `review-items.csv` | One row per checker review item: run, probe or tutor, language, repeat, item, level, the checker's label and quote, the question, the reviewer's decision, quote and note, whether it overrides the machine, and the result by the rules. Not written when the report has no review items. |
-| `messages.csv` | One row per student message of every attempt, kept or sent back, prefix lines and fixed openings included: whether it is the probe's target, the call, the observed format, the rules that sent it back, the raw output, the model's words and events, the injected text, the events the runner added and dropped, the final text, stage, events and end, and the hard and soft flags |
-| `manifest.json` | `tutorbench.observatory-review-pack` v1: the batch, its class, kind, gate, phase, series and probes; the three layers as the page read them (machine, review, final, with their counts); every file with its role, size and SHA-256, the derived tables with their rows and columns; the files the page did not read; and the rules that keep the layers apart |
+| `messages.csv` | One row per student message of every attempt, kept or sent back, prefix lines and fixed openings included: whether it is the probe's target, the call, the observed format, the rules that sent it back, the raw output, the model's words and events, the injected text, the events the runner added and dropped, the final text, stage, events and end, the hard and soft flags, and the call's output, reasoning and visible tokens, latency, finish reason and truncation (empty when the call does not carry them, never 0) |
+| `manifest.json` | `tutorbench.observatory-review-pack` v1: the batch, its class, kind, gate, phase, series and probes; the three layers as the page read them (machine, review, final, with their counts); the simulated student's `inference` settings and `usage` (tokens with how many calls carry each, truncations, cost, latency, and the runner's own totals when written); every file with its role, size and SHA-256, the derived tables with their rows and columns; the files the page did not read; and the rules that keep the layers apart |
 | `README.txt` | What is inside, the class, the three layers, what is not included and the limits, in English and Chinese. A diagnostic batch is marked as not counting toward any gate. |
 | `SHA256SUMS.txt` | SHA-256 of every other file in the pack |
 
@@ -222,6 +241,7 @@ The page reports instead of trusting:
 - a file that looks like a calibration report or expectations file but is not one, two different reports for one batch, a report whose batch is missing or is not a calibration batch, and a run named in a report that is not in `records/`
 - a file that looks like a content review, gate output or probe file but is not one; two different reviews for one batch; a review whose batch is missing; a decision for a run outside the batch or for an item the report does not list
 - a gate or final output that names a batch that is not loaded, gives a machine verdict other than the report's, or includes a diagnostic batch
+- inference settings that differ between a batch, its records and their student calls (`inference_mismatch`), and runner usage totals (`inferenceUsage` on a record, batch or report) that do not match the calls, summed all-or-nothing as the runner does (`inference_usage_differs`)
 - for a probe record, the page also shows (it does not warn) whether its prefix is the same in every run, matches its hash and matches the probe file
 
 ## Files
@@ -267,10 +287,15 @@ The sample is produced by the premium runner itself, so it follows the runner's 
   - `synthetic-probes-diag-15`: a diagnostic probe batch (`gate: "diagnostic"`, checker 3.1 `DIAGNOSTIC`), with a discarded attempt. It has no review and no final verdict.
   - `synthetic-calibration-16`: a full calibration with the protocol and two scripted tutors, checker 3.1, and a content review still open (Chinese runs read, English runs not yet).
   - Their target messages cover an injected fixed sentence, a student who wrote it or echoed it, an empty reply, a truncated reply, a fenced reply, a dropped event and a skipped stage.
+- two diagnostic probe batches of 2026-11-28, written by a runner with the student inference settings, that differ only in how the simulated student is asked to answer, so the calibration comparison shows four changes:
+  - `synthetic-probes-diag-none-17`: thinking off, the older request (`student.thinking` and `params`), no reasoning counts, so its reasoning and visible tokens are *not measured*
+  - `synthetic-probes-diag-high-18`: `studentInference` with thinking on at effort high, an output cap of 8192 and no temperature; per-call reasoning and visible tokens and the runner's `inferenceUsage`, one truncated call and one call that spent reasoning tokens and wrote nothing visible
+  - each keeps its own ledger and, with `--out`, its own runs folder. Offline replay returns no token counts, so the generator writes them into the replay tape in the runner's format; the runner then totals them.
 
-Regenerating it needs four builds of the premium runner (`src/premium/` from PR #431) and the private calibration checker (v2), which is not in this repository:
+Regenerating it needs five builds of the premium runner (`src/premium/` from PR #431) and the private calibration checker (v2), which is not in this repository:
 
 - `--runner`: record schema v6 with probes (PR #431 at 1969737). It writes the v6 batches.
+- `--inference-runner`: record schema v6 with the student inference settings (PR #431 at 955c99a). It writes the two inference batches.
 - `--v5-runner`: record schema v5 with `check-calibration` (PR #431 at db9ba4b). It writes the v5 calibration batches.
 - `--v3-runner`: record schema v3 (PR #431 at 0f6dfb1). It writes the later evaluation batches.
 - `--legacy-runner`: record schema v2 (PR #431 at 23cb0a5). It writes the history batches.
@@ -279,11 +304,12 @@ Regenerating it needs four builds of the premium runner (`src/premium/` from PR 
 Without `--v5-runner`, `--v3-runner` or `--legacy-runner`, the next newer runner writes those batches, so the file changes.
 
 ```sh
-node tools/premium-dashboard/sample/generate-sample.mjs --runner <v6 build>/dist/src/premium --v5-runner <v5 build>/dist/src/premium \
-  --v3-runner <v3 build>/dist/src/premium --legacy-runner <v2 build>/dist/src/premium --checker <path to check_calibration.py>
-# optional: also write a runs folder to try "Open runs folder" (must be a new or empty folder).
-# It holds the reports, the synthetic expectations (v2 and v3), the probe file, the content reviews and the gate output,
-# so every view and every part of the review pack can be tried.
+node tools/premium-dashboard/sample/generate-sample.mjs --runner <v6 build>/dist/src/premium --inference-runner <inference build>/dist/src/premium \
+  --v5-runner <v5 build>/dist/src/premium --v3-runner <v3 build>/dist/src/premium --legacy-runner <v2 build>/dist/src/premium --checker <path to check_calibration.py>
+# optional: also write the runs folders to try "Open runs folder" (must be a new or empty folder): runs/ holds the reports,
+# the synthetic expectations (v2 and v3), the probe file, the content reviews and the gate output; inference-none/ and
+# inference-high/ hold one diagnostic batch each. Open the folder that holds all three to try every view, the review pack
+# and the calibration comparison.
 node tools/premium-dashboard/sample/generate-sample.mjs <same flags> --out /tmp/premium-sample-runs
 ```
 

@@ -15,7 +15,10 @@
 // A calibration report (calibration-report-<batchId>.json, checker v2 or v3) is read as the machine verdict of its batch.
 // Checker v3 adds review items per run; a content review (content-review-<batchId>.json) decides them, and a gate or final
 // output (checker kind "gate" or "final") gives the final verdict. The page shows all three as written and never
-// recomputes a verdict.
+// recomputes a verdict. The runner's inference experiments add how the simulated student was asked to answer
+// (studentInference: thinking, reasoning effort, output cap, temperature) to the record, its batch and every student call,
+// and split each call's billed output into reasoning and visible tokens (inferenceUsage totals them). Several runs
+// folders can be loaded at once, since each diagnostic batch keeps a ledger of its own.
 (function (root) {
   "use strict";
 
@@ -135,9 +138,13 @@
     }
     const judgeVersions = [...seen.entries()].sort((a, b) => a[1].localeCompare(b[1])).map(([v]) => v);
 
-    // index.jsonl must agree with the records it was built from.
-    if (input.index) {
-      for (const row of input.index) {
+    // index.jsonl must agree with the records it was built from. With several runs folders, each folder's index is checked
+    // against the records of that folder (input.indexes and input.recordRoots); one index alone covers every record.
+    const recordRoot = new Map();
+    (input.records || []).forEach((r, i) => { if (r && typeof r.runId === "string" && !recordRoot.has(r.runId)) recordRoot.set(r.runId, (input.recordRoots || [])[i] ?? null); });
+    const indexes = Array.isArray(input.indexes) ? input.indexes : input.index ? [{ root: null, rows: input.index }] : [];
+    for (const ix of indexes) {
+      for (const row of ix.rows) {
         const r = runs.get(row.runId);
         if (!r) { warnings.push({ code: "index_row_without_record", detail: row.runId }); continue; }
         const s = currentScoring(r);
@@ -156,8 +163,8 @@
           warnings.push({ code: "index_out_of_date", detail: row.runId });
         }
       }
-      const indexed = new Set(input.index.map(row => row.runId));
-      for (const id of runs.keys()) if (!indexed.has(id)) warnings.push({ code: "record_not_in_index", detail: id });
+      const indexed = new Set(ix.rows.map(row => row.runId));
+      for (const id of runs.keys()) if ((ix.root == null || recordRoot.get(id) === ix.root) && !indexed.has(id)) warnings.push({ code: "record_not_in_index", detail: id });
     }
     const tutorPrompts = [...prompts.values()].sort((a, b) => a.firstAt.localeCompare(b.firstAt) || a.hash.localeCompare(b.hash));
 
@@ -223,6 +230,25 @@
     for (const p of input.probeSets || []) {
       if (!isProbeSet(p)) { warnings.push({ code: "not_a_probe_set", detail: "?" }); continue; }
       if (!probeSets.some(x => JSON.stringify(x) === JSON.stringify(p))) probeSets.push(p);
+    }
+    // Inference settings: the batch, the record and each of its student calls must name the same ones, as the runner's
+    // check requires. Totals the runner wrote (inferenceUsage on a record, a batch or a report) must equal the calls they
+    // total. A difference is reported and the runner's own figures are still the ones shown.
+    for (const r of list) {
+      const b = batches.get(r.batchId), own = (r.student && r.student.studentInference) || null;
+      const calls = (r.calls || []).filter(c => c && c.role === "student");
+      if ((b && has(b, "studentInference") && JSON.stringify(b.studentInference) !== JSON.stringify(own)) || (own && b && !has(b, "studentInference"))
+        || calls.some(c => JSON.stringify(c.studentInference || null) !== JSON.stringify(own))) warnings.push({ code: "inference_mismatch", detail: r.runId });
+      const diff = r.inferenceUsage ? usageDiffers(r.inferenceUsage, [r]) : [];
+      if (diff.length) warnings.push({ code: "inference_usage_differs", detail: r.runId + " " + diff.join(",") });
+    }
+    for (const b of batches.values()) {
+      const diff = b.inferenceUsage ? usageDiffers(b.inferenceUsage, list.filter(r => r.batchId === b.batchId)) : [];
+      if (diff.length) warnings.push({ code: "inference_usage_differs", detail: b.batchId + " " + diff.join(",") });
+    }
+    for (const rep of reports.values()) {
+      const diff = rep.inferenceUsage ? usageDiffers(rep.inferenceUsage, list.filter(r => r.batchId === rep.batchId)) : [];
+      if (diff.length) warnings.push({ code: "inference_usage_differs", detail: "report " + rep.batchId + " " + diff.join(",") });
     }
     return { runs: list, batches: [...batches.values()], latestCard, judgeVersions, supersededBy, tutorPrompts, reports, expectations, reviews, gates, probeSets, warnings };
   }
@@ -365,7 +391,9 @@
   // (card version and language). A prompt of the tutor's own (v3) is read from tutor.tutorPromptHash, which is the same
   // for its Chinese and English text; without one, the tutor's system prompt is the card's setup alone. Per-language or
   // per-card prompt hashes (tutor.promptHash, the judge prompt) are never parts: they would split one setup by language.
-  const SETUP_PARTS = ["tutor", "tutorModel", "tutorPrompt", "tutorParams", "studentModel", "studentParams", "judgeConfig", "rules"];
+  // How each model was asked to think (thinking and reasoning effort) is a part of its own beside its parameters
+  // (temperature and output cap): a run that never recorded it reads as not recorded on both sides, never as a change.
+  const SETUP_PARTS = ["tutor", "tutorModel", "tutorPrompt", "tutorParams", "tutorInference", "studentModel", "studentParams", "studentInference", "judgeConfig", "rules"];
   function setupOf(v) {
     const r = v.record, t = r.tutor || {}, s = r.student || {}, jc = v.scoring && v.scoring.judgeConfig;
     return {
@@ -373,8 +401,10 @@
       tutorModel: versionKey(r),
       tutorPrompt: t.tutorPromptHash || null,
       tutorParams: canonical(t.params),
+      tutorInference: modeKey(inferenceOf(t)),
       studentModel: s.resolvedModel || s.pinnedVersion || s.requestedModel || null,
       studentParams: canonical(s.params),
+      studentInference: modeKey(inferenceOf(s)),
       // The judge prompt differs by language, so the configuration's version names it, not the prompt hash.
       judgeConfig: jc ? jc.version || null : null,
       rules: (r.card && r.card.rulesVersion) || null,
@@ -935,6 +965,166 @@
     return { status: (b && b.status) || null, earlierStop: stop && stop !== b.status ? stop : null, topUps };
   }
 
+  // ---------- inference settings, usage and the calibration comparison ----------
+  // How a model was asked to answer. The runner's inference experiments write it as studentInference ({thinking,
+  // reasoningEffort, maxOutputTokens, temperature when sent}). Before that, a v6 record has only student.thinking beside
+  // student.params (temperature and output cap), an older record only the params, and a tutor only tutor.params. What
+  // was never written stays null: an effort is not inferred from thinking, and no field is filled with a default.
+  function inferenceOf(side) {
+    const x = side || {}, p = x.params || {}, inf = x.studentInference && typeof x.studentInference === "object" ? x.studentInference : null;
+    if (inf) return { source: "inference", thinking: inf.thinking ?? null, effort: inf.reasoningEffort ?? null,
+      temperature: has(inf, "temperature") ? inf.temperature : undefined, maxOutputTokens: inf.maxOutputTokens ?? null };
+    const thinking = typeof x.thinking === "string" ? x.thinking : null, effort = x.reasoningEffort ?? p.reasoningEffort ?? null;
+    return { source: thinking || effort || has(p, "temperature") || has(p, "maxOutputTokens") ? "params" : "none", thinking, effort,
+      temperature: has(p, "temperature") ? p.temperature : undefined, maxOutputTokens: p.maxOutputTokens ?? null };
+  }
+  // A record's simulated student: the record's own settings, else its batch's studentInference.
+  function studentProfile(record, batch) {
+    const p = inferenceOf(record && record.student);
+    return p.source === "none" && batch && batch.studentInference && typeof batch.studentInference === "object" ? inferenceOf({ studentInference: batch.studentInference }) : p;
+  }
+  // The thinking mode alone, as a setup part: temperature and the output cap are already the parameters part.
+  const modeKey = p => JSON.stringify({ thinking: p.thinking, effort: p.effort });
+  // A short name for a profile: None when thinking is off, the effort when it is on, null when nothing was recorded.
+  const inferenceName = p => (p.thinking === "disabled" ? "None" : p.thinking === "enabled" ? (p.effort ? p.effort.charAt(0).toUpperCase() + p.effort.slice(1) : "on")
+    : p.effort ? p.effort.charAt(0).toUpperCase() + p.effort.slice(1) : null);
+
+  // What one role's calls used across some records: input tokens with the cache split, billed output and, inside it, the
+  // reasoning and the visible part; truncations; dollars; seconds. A count no call carried is null, "not measured",
+  // never zero, and known says how many calls carried it: when only some did, total is the sum over those (a floor, which
+  // the page labels with its coverage). The calls are the records' own (calls[]), as the runner totals them, whatever
+  // their outcome; notSent counts the ones that never left.
+  function usageOf(records, role) {
+    const calls = records.flatMap(r => (r.calls || []).filter(c => c && c.role === role));
+    const sumOf = key => {
+      const known = calls.filter(c => c.usage && typeof c.usage[key] === "number");
+      return { total: known.length ? known.reduce((a, c) => a + c.usage[key], 0) : null, known: known.length };
+    };
+    const trunc = calls.filter(c => typeof c.truncated === "boolean" || typeof c.finishReason === "string");
+    const priced = calls.filter(c => typeof c.usd === "number");
+    const waits = calls.map(c => c.latencyMs).filter(x => typeof x === "number" && x >= 0).sort((a, b) => a - b);
+    const empty = calls.filter(c => c.usage && c.usage.visibleOutputTokens === 0 && (c.usage.reasoningTokens || 0) > 0);
+    return {
+      role, records: records.length, calls: calls.length, notSent: calls.filter(c => c.error === "not_dispatched" || c.error === "mock_not_dispatched").length, input: sumOf("inputTokens"), cacheHit: sumOf("cacheHitTokens"), cacheMiss: sumOf("cacheMissTokens"),
+      output: sumOf("outputTokens"), reasoning: sumOf("reasoningTokens"), visible: sumOf("visibleOutputTokens"),
+      truncated: { total: trunc.filter(c => c.truncated === true || (c.truncated === undefined && c.finishReason === "length")).length, known: trunc.length },
+      usd: { total: priced.length ? Math.round(priced.reduce((a, c) => a + c.usd, 0) * 1e9) / 1e9 : null, known: priced.length, estimated: calls.filter(c => c.costEstimated === true).length },
+      latency: { median: median(waits), p90: waits.length ? waits[Math.ceil(0.9 * waits.length) - 1] : null, max: waits.length ? waits[waits.length - 1] : null, known: waits.length },
+      emptyVisible: empty.length,
+    };
+  }
+  // The fields of a written inferenceUsage that do not equal the student calls of the given records. The runner's totals
+  // are all-or-nothing: one call without the count makes the total null, so they are recounted the same way here.
+  function usageDiffers(written, records) {
+    const calls = records.flatMap(r => (r.calls || []).filter(c => c && c.role === "student")), out = [];
+    const strict = f => { let t = 0; for (const c of calls) { const v = f(c); if (typeof v !== "number" || !Number.isFinite(v)) return null; t += v; } return calls.length ? t : null; };
+    const usd = strict(c => (typeof c.usd === "number" ? Math.round(c.usd * 1e9) : null));
+    const expect = { calls: calls.length, outputTokens: strict(c => c.usage && c.usage.outputTokens), reasoningTokens: strict(c => c.usage && c.usage.reasoningTokens),
+      visibleOutputTokens: strict(c => c.usage && c.usage.visibleOutputTokens), knownReasoningCalls: calls.filter(c => c.usage && c.usage.reasoningTokens !== undefined).length,
+      knownVisibleOutputCalls: calls.filter(c => c.usage && c.usage.visibleOutputTokens !== undefined).length, truncatedCalls: calls.filter(c => c.truncated === true).length,
+      knownTruncationCalls: calls.filter(c => typeof c.truncated === "boolean").length, usd: usd == null ? null : usd / 1e9 };
+    for (const [name, value] of Object.entries(expect)) {
+      if (!has(written, name)) continue;
+      const w = written[name];
+      if (w !== value && !(typeof w === "number" && typeof value === "number" && Math.abs(w - value) < 1e-9)) out.push(name);
+    }
+    return out;
+  }
+
+  // Two calibration or probe batches side by side. First what differs, part by part, then the cells both ran: a probe
+  // (or a scripted tutor) in one language, matched only when both sides started it from the same fixed prefix. Each
+  // cell shows each side's machine counts as its report gives them, and nothing is judged from them: five repeats a cell
+  // decide nothing. Usage is the simulated student's, so the two sides' dollars and seconds sit side by side; tokens are
+  // set against each other only when both asked the same model. A diagnostic side is named, and nothing here is a gate.
+  const CALIBRATION_PARTS = ["studentModel", "returnedModel", "fingerprint", "thinking", "effort", "temperature", "maxOutputTokens", "responseFormat",
+    "runner", "checker", "card", "protocol", "studentPrompt", "rules", "probeSet", "tutorTape", "prices", "pins"];
+  const distinct = values => { const m = new Map(); for (const v of values) if (v !== undefined) m.set(JSON.stringify(v), v); return [...m.keys()].sort().map(k => m.get(k)); };
+  function calibrationSide(dataset, batchId) {
+    const c = calibrationOf(dataset, batchId), b = c.batch || {}, recs = c.adopted, all = c.records;
+    const calls = recs.flatMap(r => (r.calls || []).filter(x => x && x.role === "student"));
+    const prof = recs.map(r => studentProfile(r, b));
+    const parts = {
+      studentModel: distinct(recs.map(r => r.student ? r.student.requestedModel ?? null : null)),
+      returnedModel: distinct(calls.map(x => (has(x, "returnedModel") ? x.returnedModel : undefined)).filter(v => v != null)),
+      fingerprint: distinct(calls.map(x => (has(x, "system_fingerprint") ? x.system_fingerprint : undefined)).filter(v => v != null)),
+      thinking: distinct(prof.map(p => p.thinking)), effort: distinct(prof.map(p => p.effort)),
+      temperature: distinct(prof.map(p => (p.temperature !== undefined ? p.temperature : p.source === "inference" ? "not sent" : null))), maxOutputTokens: distinct(prof.map(p => p.maxOutputTokens)),
+      responseFormat: distinct(recs.map(r => (r.student && r.student.responseFormat ? r.student.responseFormat.type || null : null))),
+      runner: distinct(recs.map(r => (r.code ? [r.code.gitCommit || null, r.code.runnerVersion || null].filter(Boolean).join(" ") || null : null))),
+      checker: c.norm ? [c.norm.checkerRevision || "v" + c.norm.checkerVersion] : [null],
+      card: distinct(recs.map(r => r.card.id + "@" + r.card.version + " " + (r.card.contentHash || ""))),
+      protocol: distinct(recs.map(r => (r.card.protocolVersion ? r.card.protocolVersion + " " + (r.card.protocolHash || "") : null))),
+      studentPrompt: distinct(recs.map(r => r.card.lang + " " + ((r.student && r.student.promptHash) || ""))),
+      rules: distinct(recs.map(r => r.card.rulesVersion || null)),
+      probeSet: distinct(recs.map(r => (r.probe ? r.probe.probeSetVersion || null : null))),
+      tutorTape: [b.tapeHash || null],
+      prices: distinct(recs.map(r => (r.usage && r.usage.rates ? r.usage.rates : r.usage ? r.usage.priceTable || null : null))),
+      pins: [c.norm && c.norm.pins ? c.norm.pins : null],
+    };
+    const cells = new Map();
+    for (const g of c.groups) for (const cell of g.cells) {
+      if (!cell.runs.length) continue;
+      const rejects = c.rejects.filter(x => !x.superseded && x.key === g.key && x.lang === cell.lang).length;
+      const prefixes = distinct(cell.runs.map(x => (x.record.probe ? x.record.probe.prefixHash || null : null)));
+      const checked = cell.runs.filter(x => x.check);
+      cells.set(g.key + "\u0001" + cell.lang, { key: g.key, lang: cell.lang, runs: cell.runs.length, pass: c.checked ? checked.filter(x => x.check.pass).length : null,
+        checked: checked.length, rewrites: rejects, prefixes, group: cell.group });
+    }
+    return { batchId, calibration: c, cls: c.cls, kind: b.kind || null, gate: b.gate || null, createdAt: b.createdAt || null, parts,
+      profile: prof.length && distinct(prof.map(p => JSON.stringify(p))).length === 1 ? prof[0] : null, mixedProfiles: distinct(prof.map(p => JSON.stringify(p))).length > 1,
+      cells, usage: usageOf(all, "student"), written: b.inferenceUsage || (c.report && c.report.inferenceUsage) || null, adopted: recs.length,
+      // Accepted student messages, as the checker counts them (one per position), and any invoice the batch was reconciled to.
+      positions: c.machine && c.machine.rewrite && typeof c.machine.rewrite.positions === "number" ? c.machine.rewrite.positions : null,
+      reconciled: b.reconciledUsd && typeof b.reconciledUsd === "object" && Object.keys(b.reconciledUsd).length ? b.reconciledUsd : null };
+  }
+  function calibrationCompare(dataset, idA, idB) {
+    const A = calibrationSide(dataset, idA), B = calibrationSide(dataset, idB);
+    const parts = CALIBRATION_PARTS.map(part => {
+      const a = A.parts[part], b = B.parts[part], same = JSON.stringify(a) === JSON.stringify(b);
+      const unknown = a.every(v => v == null) && b.every(v => v == null);
+      return { part, a, b, same, unknown };
+    });
+    const changes = parts.filter(p => !p.same && !p.unknown);
+    const cells = [], unmatched = [];
+    // In the batches' own order: A's probes (or tutors) and languages, then any only B has.
+    const keys = [...new Set([...A.cells.keys(), ...B.cells.keys()])];
+    for (const k of keys) {
+      const a = A.cells.get(k) || null, b = B.cells.get(k) || null, any = a || b;
+      const row = { key: any.key, lang: any.lang, a, b };
+      if (!a || !b) unmatched.push({ ...row, reason: a ? "only_a" : "only_b" });
+      else if (a.prefixes.length !== 1 || b.prefixes.length !== 1 || JSON.stringify(a.prefixes) !== JSON.stringify(b.prefixes)) unmatched.push({ ...row, reason: "prefix_differs" });
+      else cells.push({ ...row, prefixHash: a.prefixes[0] });
+    }
+    const total = side => cells.reduce((t, x) => ({ runs: t.runs + x[side].runs, pass: t.pass == null || x[side].pass == null ? null : t.pass + x[side].pass, rewrites: t.rewrites + x[side].rewrites }),
+      { runs: 0, pass: 0, rewrites: 0 });
+    const ratio = (x, y) => (x != null && y != null && x > 0 ? y / x : null);
+    const sameModel = A.parts.studentModel.length === 1 && JSON.stringify(A.parts.studentModel) === JSON.stringify(B.parts.studentModel);
+    return { a: A, b: B, parts, changes: changes.length, changed: changes.map(p => p.part), cells, unmatched, totals: { a: total("a"), b: total("b") },
+      diagnostic: A.cls === "diagnostic" || B.cls === "diagnostic", classes: [A.cls, B.cls], sameModel,
+      ratios: { usd: ratio(A.usage.usd.total, B.usage.usd.total), latency: ratio(A.usage.latency.median, B.usage.latency.median),
+        output: sameModel ? ratio(A.usage.output.total, B.usage.output.total) : null } };
+  }
+  // The pair the comparison opens on: the newest two calibration batches of one kind, card and probe set whose inference
+  // settings differ, older as A; else the newest two of one kind; else none.
+  function defaultCalibrationPair(dataset) {
+    const list = dataset.batches.filter(b => isCalibrationKind(b.kind)).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const sig = b => { const r = dataset.runs.find(x => x.batchId === b.batchId); return r ? [b.kind, r.card.id, r.card.version, r.probe ? r.probe.probeSetVersion : ""].join("/") : null; };
+    const prof = b => { const r = dataset.runs.find(x => x.batchId === b.batchId); return r ? JSON.stringify(studentProfile(r, b)) : null; };
+    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
+      if (sig(list[i]) && sig(list[i]) === sig(list[j]) && prof(list[i]) !== prof(list[j])) return [list[j].batchId, list[i].batchId];
+    }
+    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) if (list[i].kind === list[j].kind) return [list[j].batchId, list[i].batchId];
+    return null;
+  }
+  // The cells of a comparison as table rows, for the comparison export.
+  const COMPARE_CELL_COLUMNS = ["probe_or_tutor", "language", "status", "a_runs", "a_machine_pass", "a_rewrites", "b_runs", "b_machine_pass", "b_rewrites", "prefix_hash"];
+  function compareCellRows(cmp) {
+    const row = (x, status) => ({ probe_or_tutor: x.key, language: x.lang, status, a_runs: x.a ? x.a.runs : "", a_machine_pass: x.a && x.a.pass != null ? x.a.pass : "",
+      a_rewrites: x.a ? x.a.rewrites : "", b_runs: x.b ? x.b.runs : "", b_machine_pass: x.b && x.b.pass != null ? x.b.pass : "", b_rewrites: x.b ? x.b.rewrites : "",
+      prefix_hash: x.prefixHash || "" });
+    return [...cmp.cells.map(x => row(x, "matched")), ...cmp.unmatched.map(x => row(x, x.reason))];
+  }
+
   // ---------- review pack ----------
   // One row per record of a batch, for the review index in the pack. Checker results are copied from the report;
   // everything else is counted from the record as written. Nothing here re-scores or re-checks a run.
@@ -981,11 +1171,17 @@
   // the probe's fixed history; a fixed line is the card's scripted opening.
   const MESSAGE_COLUMNS = ["run_id", "record_role", "probe", "tutor", "language", "repeat", "attempt", "attempt_status", "student_message", "target", "row",
     "call", "observed_format", "rejection_reasons", "regenerated", "raw", "model_message", "model_events", "injected_kind", "injected_text",
-    "runner_events", "dropped_events", "final_text", "stage", "events", "end", "hard_fails", "soft_flags", "fence_stripped"];
+    "runner_events", "dropped_events", "final_text", "stage", "events", "end", "hard_fails", "soft_flags", "fence_stripped",
+    "output_tokens", "reasoning_tokens", "visible_output_tokens", "latency_ms", "finish_reason", "truncated"];
+  // The call columns of a message row: what that call used and how it ended, blank where the call did not record it.
+  const callCols = c => (c ? { output_tokens: c.usage && c.usage.outputTokens != null ? c.usage.outputTokens : "", reasoning_tokens: c.usage && c.usage.reasoningTokens != null ? c.usage.reasoningTokens : "",
+    visible_output_tokens: c.usage && c.usage.visibleOutputTokens != null ? c.usage.visibleOutputTokens : "", latency_ms: c.latencyMs ?? "", finish_reason: c.finishReason || "",
+    truncated: typeof c.truncated === "boolean" ? c.truncated : "" } : { output_tokens: "", reasoning_tokens: "", visible_output_tokens: "", latency_ms: "", finish_reason: "", truncated: "" });
   function messageRows(dataset, batchId) {
     const sup = dataset.supersededBy || {};
     const out = [];
     for (const r of dataset.runs.filter(x => x.batchId === batchId).sort(recordOrder(sup))) {
+      const byN = new Map((r.calls || []).map(c => [c.n, c]));
       const target = r.probe ? r.probe.targetStudentMessage : null;
       const base = { run_id: r.runId, record_role: sup[r.runId] ? "superseded" : "adopted", probe: r.probe ? r.probe.probeId : "", tutor: r.tutor.id,
         language: r.card.lang, repeat: r.repeat.index };
@@ -996,13 +1192,14 @@
             observed_format: rj.observedFormat || "", rejection_reasons: (rj.reasons || []).join(" "), regenerated: "", raw: rj.text ?? "",
             model_message: rj.reply.json ? rj.reply.message : "", model_events: rj.reply.json ? rj.reply.events : "", injected_kind: "", injected_text: "",
             runner_events: "", dropped_events: "", final_text: "", stage: rj.reply.json ? rj.reply.stage ?? "" : "", events: "", end: "",
-            hard_fails: "", soft_flags: "", fence_stripped: rj.reply.fenced });
+            hard_fails: "", soft_flags: "", fence_stripped: rj.reply.fenced, ...callCols(rj.callInfo) });
           const p = messageParts(l), st = l.state || {};
           out.push({ ...base, ...at, student_message: l.n, target: target === l.n, row: l.prefix ? "prefix" : l.fixed ? "fixed" : "kept",
             call: p.call ?? (l.callInfo ? l.callInfo.n : ""), observed_format: p.format || "", rejection_reasons: "", regenerated: p.v6 ? p.regenerated : "",
             raw: p.raw ?? "", model_message: p.modelMessage ?? "", model_events: p.modelEvents || "", injected_kind: p.injected ? p.injected.kind || "" : "",
             injected_text: p.injected ? p.injected.text ?? "" : "", runner_events: p.runnerEvents, dropped_events: p.droppedEvents, final_text: p.final ?? "",
-            stage: st.stage ?? "", events: st.events || "", end: st.end ?? "", hard_fails: p.hardFails, soft_flags: p.softFlags, fence_stripped: p.fenceStripped });
+            stage: st.stage ?? "", events: st.events || "", end: st.end ?? "", hard_fails: p.hardFails, soft_flags: p.softFlags, fence_stripped: p.fenceStripped,
+            ...callCols(l.prefix || l.fixed ? null : p.call != null ? byN.get(p.call) : l.callInfo) });
         }
         // Replies sent back for a message the attempt never reached (it stopped there) still belong in the table.
         const reached = new Set(a.lines.filter(x => x.role === "student").map(x => x.n));
@@ -1010,7 +1207,7 @@
           call: rj.call ?? "", observed_format: rj.observedFormat || "", rejection_reasons: (rj.reasons || []).join(" "), regenerated: "", raw: rj.text ?? "",
           model_message: rj.reply.json ? rj.reply.message : "", model_events: rj.reply.json ? rj.reply.events : "", injected_kind: "", injected_text: "",
           runner_events: "", dropped_events: "", final_text: "", stage: rj.reply.json ? rj.reply.stage ?? "" : "", events: "", end: "",
-          hard_fails: "", soft_flags: "", fence_stripped: rj.reply.fenced });
+          hard_fails: "", soft_flags: "", fence_stripped: rj.reply.fenced, ...callCols(rj.callInfo) });
       }
     }
     return out;
@@ -1033,6 +1230,7 @@
   // gate or final verdict written from both. Counts are copied or counted, never re-derived into a new verdict.
   function packLayers(dataset, batchId) {
     const c = calibrationOf(dataset, batchId), rv = c.review, fin = c.final;
+    const side = calibrationSide(dataset, batchId), u = side.usage;
     const b = c.batch || {};
     return {
       batchId, class: c.cls, kind: b.kind || null, gate: b.gate || (c.norm && c.norm.gate) || null, phase: b.phase || null,
@@ -1045,6 +1243,15 @@
         counts: rv.counts, unknownDecisions: rv.unknown.length },
       final: { refused: fin.diagnostic, outputs: fin.outputs.map(o => ({ kind: o.kind, scope: o.scope, verdict: o.verdict, reviewStatus: o.reviewStatus,
         machineVerdict: o.machineVerdict, batches: o.batches, errors: o.errors, overrides: o.overrides.length })) },
+      // How the simulated student was asked to answer, and what its calls used. null counts were not measured.
+      inference: side.profile ? { ...side.profile, name: inferenceName(side.profile),
+        temperature: side.profile.temperature !== undefined ? side.profile.temperature : side.profile.source === "inference" ? "not sent" : null }
+        : { mixed: side.mixedProfiles },
+      usage: { role: "student", calls: u.calls, inputTokens: u.input.total, cacheHitTokens: u.cacheHit.total, cacheMissTokens: u.cacheMiss.total,
+        outputTokens: u.output.total, reasoningTokens: u.reasoning.total, visibleOutputTokens: u.visible.total,
+        known: { usage: u.output.known, reasoning: u.reasoning.known, visible: u.visible.known, truncation: u.truncated.known, latency: u.latency.known },
+        truncatedCalls: u.truncated.total, emptyVisibleCalls: u.emptyVisible, usd: u.usd.total, usdEstimatedCalls: u.usd.estimated,
+        latencyMs: { median: u.latency.median, p90: u.latency.p90, max: u.latency.max }, writtenByRunner: side.written },
     };
   }
 
@@ -1063,6 +1270,7 @@
     SCHEMA_VERSIONS, isReport, isExpectations, unwrapJson, parseStudentReply, attemptsOf, ruleFamily, RULE_FAMILY, transportOf, cacheOf, identityOf,
     parseCheckerLine, reportRun, calibrationOf, calibrationBatches, batchHistory, REVIEW_COLUMNS, reviewIndex,
     CALIBRATION_KINDS, isCalibrationKind, isContentReview, isGateResult, isProbeSet, normReport, batchClass, runKey, reviewOf, finalOf,
-    probeSetOf, prefixOf, messageParts, probeView, probeBatches, MESSAGE_COLUMNS, messageRows, REVIEW_ITEM_COLUMNS, reviewItemRows, packLayers };
+    probeSetOf, prefixOf, messageParts, probeView, probeBatches, MESSAGE_COLUMNS, messageRows, REVIEW_ITEM_COLUMNS, reviewItemRows, packLayers,
+    inferenceOf, studentProfile, inferenceName, usageOf, usageDiffers, CALIBRATION_PARTS, calibrationSide, calibrationCompare, defaultCalibrationPair, COMPARE_CELL_COLUMNS, compareCellRows };
   root.PremiumDashboardModel = api;
 })(globalThis);
